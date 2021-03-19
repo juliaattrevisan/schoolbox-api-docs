@@ -1,9 +1,17 @@
 <?php
 
+/**
+ *
+ * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Schoolbox\Calendar\Event as EventModel;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\User;
 
 class Calendar extends DeprecatedModel
 {
@@ -15,9 +23,11 @@ class Calendar extends DeprecatedModel
     /** @var string[] */
     private $colourSet;
 
-    function __construct()
+    /**
+     * @inheritDoc
+     */
+    public function __construct()
     {
-
         $this->_table = "event";
         $this->_index = "id";
 
@@ -176,7 +186,7 @@ class Calendar extends DeprecatedModel
         return $this->db->delete('event_attendance', 'id', $attendanceId);
     }
 
-    function displayColour($id)
+    public function displayColour($id)
     {
         if (!is_array($this->colourSet)) {
             //build cache of colours on first call
@@ -189,9 +199,8 @@ class Calendar extends DeprecatedModel
         return $this->colourSet[$id] ?? '';
     }
 
-    function getPerm($eventID)
+    private function getPerm($eventID)
     {
-
         if (is_array($eventID)) {
             $event =& $eventID;
         } else {
@@ -203,7 +212,6 @@ class Calendar extends DeprecatedModel
         }
 
         switch ($event['access']) {
-
             /* Allow people to post events on your behalf, such as parents, staff, superuser
              * However, this depends on the author of the event?
              * If I'm a student or parent, I only have read access to events I
@@ -227,7 +235,7 @@ class Calendar extends DeprecatedModel
                 }
 
                 $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
-                $permissions = array();
+                $permissions = [];
                 foreach ($categoryList as $category) {
                     $permissions[] = $this->groupHandler->getPermission($category);
                 }
@@ -239,7 +247,7 @@ class Calendar extends DeprecatedModel
                 return min($permissions);
 
             case EventModel::ACCESS_CAMPUS:
-
+                $campusList = null;
                 if (is_array($event['campusList'])) {
                     $campusList = $event['campusList'];
                 } elseif ($event['id']) {
@@ -266,7 +274,7 @@ class Calendar extends DeprecatedModel
         }
     }
 
-    function getTypeList()
+    public function getTypeList()
     {
         $query = "SELECT eventTypeID, eventType, eventColour FROM luEventType WHERE deleted_at IS NULL ORDER BY sequence ASC";
         return $this->db->getAll($query);
@@ -296,21 +304,19 @@ class Calendar extends DeprecatedModel
 
 
         $allCampuses = $this->db->getAll($query);
+        $output = [];
 
         if (is_array($allCampuses) && count($allCampuses)) {
             foreach ($allCampuses as $currentCampus) {
-                $output[] = array(
+                $output[] = [
                     'CAMPUS_ID'   => $currentCampus['id'],
                     'CAMPUS_NAME' => $currentCampus['name'],
-                );
+                ];
             }
-        } else {
-            $output = array();
         }
 
         return $output;
     }
-
 
 
     /**
@@ -337,7 +343,7 @@ class Calendar extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
-    function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'diff', $sort_dir = 'desc')
     {
         $keyword = $this->db->quote($keyword);
 
@@ -346,13 +352,11 @@ class Calendar extends DeprecatedModel
 
             $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
         } else {
-            $campusList = array(1);
-
             $campusQuery = '1 = 1';
         }
 
         // get accessible groups
-        $groupList  = array();
+        $groupList  = [];
         $groupQuery = '';
 
         $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
@@ -442,50 +446,45 @@ class Calendar extends DeprecatedModel
     /**
      * Get all events occurring across the specified date span.
      *
-     * @param \Schoolbox\User $user
-     * @param \Schoolbox\User $viewer
-     * @param int             $startTimestamp If not null, filter out events that end on
+     * @param User  $user
+     * @param User  $viewer
+     * @param int   $startTimestamp           If not null, filter out events that end on
      *                                        or before this time
      *                                        (end times are exclusive in calendars)
-     * @param int             $endTimestamp   If not null, filter out events that start
+     * @param int   $endTimestamp             If not null, filter out events that start
      *                                        after this time
-     * @param array           $filter A filter to put on the list of results.
-     *                                * campus: if set, event set is restricted to
-     *                                events in this campus.
-     *                                * group: if set, event set is restricted to
-     *                                events for this group.
-     *                                * personal: if set, only personal events for
-     *                                current user are set.
-     *                                * id: if set, only this event ID will be retrieved.
-     *                                If empty, all events for user are retrieved.
-     *                                * type: if set, only events of this type will be retrieved.
+     * @param array $filter                   A filter to put on the list of results.
+     *                                        * campus: if set, event set is restricted to
+     *                                        events in this campus.
+     *                                        * group: if set, event set is restricted to
+     *                                        events for this group.
+     *                                        * personal: if set, only personal events for
+     *                                        current user are set.
+     *                                        * id: if set, only this event ID will be retrieved.
+     *                                        If empty, all events for user are retrieved.
+     *                                        * type: if set, only events of this type will be retrieved.
      * @return Collection
      */
-    public function getDayEvents(\Schoolbox\User $user, \Schoolbox\User $viewer, $startTimestamp, $endTimestamp, $filter = array())
+    public function getDayEvents(User $user, User $viewer, $startTimestamp, $endTimestamp, $filter = [])
     {
-        $firstCampus = false;
+        // If campus is NOT provided in $filter or the viewer is not staff, we limit events by campuses which the user has access
+        $campusList = [];
+        if (!isset($filter['campus']) || !$viewer->getRole()->isStaff()) {
+            $campusList = $user->getCampusCollection()->getPropertyValues('id');
 
-        $campusList = array();
+            //Fake in some campusii here from calendar permissions, so user can see events relevant
+            $accessMapper = UserAccessMapper::getInstance();
 
-        if ($user->getCampusCollection()->count()) {
-            foreach ($user->getCampusCollection() as $currentCampus) {
-                if (!$firstCampus) {
-                    $firstCampus = $currentCampus;
-                }
-
-                $campusList[] = $currentCampus->getId();
-            }
-
-
+            $calendarPerms = $accessMapper->findByColumnList(
+                [
+                    'uid'     => $user->getId(),
+                    'service' => UserAccess::SERVICE_CALENDAR,
+                ]
+            )->getPropertyValues('ServiceIdentifier');
+            $campusList    = array_merge($campusList, $calendarPerms);
         }
 
-        //Fake in some campusii here from calendar permissions, so user can see events relevant
-        $accessMapper = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
-
-        $calendarPerms = $accessMapper->findByColumnList(['uid' => $user->getId(), 'service' => \Schoolbox\Permission\Access\UserAccess::SERVICE_CALENDAR])->getPropertyValues('ServiceIdentifier');
-        $campusList = array_merge($campusList, $calendarPerms);
-
-        if(count($campusList) > 0){
+        if (count($campusList) > 0) {
             $campusQuery = "event_campus.campus_id IN(" . implode(',', $campusList) . ")";
         } else {
             $campusQuery = '1 = 1';
@@ -493,7 +492,7 @@ class Calendar extends DeprecatedModel
 
         /* get accessible groups
          */
-        $groupList = array();
+        $groupList  = [];
         $groupQuery = '';
 
         $this->groupHandler->setService(UserAccess::SERVICE_HOMEPAGE);
@@ -530,7 +529,7 @@ class Calendar extends DeprecatedModel
          * an admin.
          */
         if ($user->getCampusCollection()->count()) {
-            if ($this->groupHandler->getPermission($firstCampus->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
+            if ($this->groupHandler->getPermission($user->getCampusCollection()->first()->getId(), $user->getId()) > UserAccess::ACCESS_WRITE) {
                 $groupChunk = "";
             } else {
                 $groupChunk = "AND event_role.role_id = {$user->getRole()->getId()}";
@@ -540,7 +539,7 @@ class Calendar extends DeprecatedModel
         //
         // Filters - some of these are covered by main query anyway, so no need
         // for extra filters.
-        $filter_query = array();
+        $filter_query = [];
 
         if ($filter['campus']) {
             $filter_query[] = 'access = ' . EventModel::ACCESS_CAMPUS;
@@ -587,8 +586,8 @@ class Calendar extends DeprecatedModel
 
 
         // Build the date query
-        $dateQuery = '';
-        $dateQueryParts = array();
+        $dateQuery      = '';
+        $dateQueryParts = [];
         if (isset($startTimestamp)) {
             // Start timestamp: don't get events which end before or on that time
             $adf              = Alaress_Date_Format::newFromTimestamp($startTimestamp);
@@ -606,12 +605,13 @@ class Calendar extends DeprecatedModel
             );
         }
         if (!empty($dateQueryParts)) {
-            $dateQuery = "AND (NOT (".implode(' OR ', $dateQueryParts).'))';
+            $dateQuery = "AND (NOT (" . implode(' OR ', $dateQueryParts) . '))';
         }
 
         // get single events for the day
         // Don't get events for resources, get them separately.
-        $query = sprintf("
+        $query = sprintf(
+            "
             SELECT DISTINCT
                 event.id,
                 event.series_id,
@@ -660,7 +660,8 @@ class Calendar extends DeprecatedModel
             GROUP BY id
             ORDER BY
                 event.start_datetime, event.end_datetime
-        ", EventModel::ACCESS_PERSONAL, EventModel::ACCESS_GROUP, EventModel::ACCESS_CAMPUS, EventModel::ACCESS_CAMPUS);
+        ", EventModel::ACCESS_PERSONAL, EventModel::ACCESS_GROUP, EventModel::ACCESS_CAMPUS, EventModel::ACCESS_CAMPUS
+        );
 
         $allEvents = $this->db->getAll($query);
 
@@ -676,10 +677,10 @@ class Calendar extends DeprecatedModel
                 $event->setAuthorId($currentEvent['uid']);
                 $event->setEventId($currentEvent['id']);
                 $event->setStartTime(
-                    new Alaress_Date_Format($currentEvent['start_datetime'],'Y-m-d H:i:s')
+                    new Alaress_Date_Format($currentEvent['start_datetime'], 'Y-m-d H:i:s')
                 );
                 $event->setEndTime(
-                    new Alaress_Date_Format($currentEvent['end_datetime'],'Y-m-d H:i:s' )
+                    new Alaress_Date_Format($currentEvent['end_datetime'], 'Y-m-d H:i:s')
                 );
                 $event->setType($currentEvent['type']);
                 $event->setTitle($currentEvent['title']);
@@ -720,35 +721,13 @@ class Calendar extends DeprecatedModel
                 $isFutureEvent   = $event->getPublishDate()->getUnixTimeStamp() >= time();
                 $isAlwaysVisible = $viewer->isSuperuser() || $event->isOwner() || $event->isEditable();
 
-                if($isAlwaysVisible || !$isFutureEvent) {
+                if ($isAlwaysVisible || !$isFutureEvent) {
                     $stack->add($event);
                 }
             }
         }
 
         return $stack;
-    }
-
-    function getDayByGroup($currentDay, $groupList, $campusList)
-    {
-
-        $query = "SELECT DISTINCT id, owner,
-							TIME_FORMAT(start_datetime, '" . Config::get('calendar_time_format') . "') as startTime,
-							TIME_FORMAT(end_datetime, '" . Config::get('calendar_time_format') . "') as endTime,
-							type, title, location, detail, access, event_campus.campus_id as sid
-						FROM event
-						LEFT JOIN event_campus ON event.id = event_campus.event_id
-						LEFT JOIN event_role ON event.id = event_role.event_id
-						WHERE start_datetime = '" . date("Y-m-d", $currentDay) . "'
-						AND event.deleted_at IS NULL
-							AND (
-								  (access = '3' AND event_campus.campus_id IN(" . implode(',', $campusList)
-            . ") AND event_role.role_id IN(" . implode(',', $groupList) . ") )
-								)
-						GROUP BY id
-						ORDER BY event.start_datetime, event.end_datetime";
-
-        return $this->db->getAll($query);
     }
 
 
@@ -761,8 +740,8 @@ class Calendar extends DeprecatedModel
      */
     public function getEventGroup($eventID)
     {
-        $output = array();
-        $query  = "SELECT role_id FROM event_role WHERE event_id = ".intval($eventID);
+        $output = [];
+        $query  = "SELECT role_id FROM event_role WHERE event_id = " . intval($eventID);
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
             $output[] = $event['group_id'];
@@ -779,8 +758,8 @@ class Calendar extends DeprecatedModel
      */
     public function getEventCampus($eventID)
     {
-        $output = array();
-        $query  = "SELECT campus_id FROM event_campus WHERE event_id = ".intval($eventID);
+        $output = [];
+        $query  = "SELECT campus_id FROM event_campus WHERE event_id = " . intval($eventID);
         $result = $this->db->query($query);
         while ($event = $this->db->getNextArray($result)) {
             $output[] = $event['campus_id'];
@@ -809,76 +788,40 @@ class Calendar extends DeprecatedModel
         return $output;
     }
 
-    function getMonthList()
-    {
-        for ($i = 1; $i <= 12; $i++) {
-            $output['DROP_MONTH_NUMBER'] = $i;
-            $output['DROP_MONTH_NAME']   = date('F', mktime(0, 0, 0, $i, 1));
-            $monthList[]                 = $output;
-        }
-        return $monthList;
-    }
-
-    function getYearList()
-    {
-        for ($i = date('Y') - 2; $i <= date('Y') + 1; $i++) {
-            $output['DROP_YEAR_NUMBER'] = $i;
-            $yearList[]                 = $output;
-        }
-        return $yearList;
-    }
-
-    function createGroups($groupList, $eventID)
+    private function createGroups($groupList, $eventID)
     {
         if (is_array($groupList)) {
             foreach ($groupList as $groupID) {
-                $eventGroup = array(
+                $eventGroup = [
                     'event_id' => $eventID,
-                    'role_id' => $groupID,
-                );
+                    'role_id'  => $groupID,
+                ];
                 $this->db->insert('event_role', $eventGroup);
             }
         }
     }
 
-    function createCampus($campusList, $eventID)
+    private function createCampus($campusList, $eventID)
     {
         if (is_array($campusList)) {
             foreach ($campusList as $campusID) {
-                $eventCampus = array(
+                $eventCampus = [
                     'event_id'  => $eventID,
                     'campus_id' => $campusID,
-                );
+                ];
                 $this->db->insert('event_campus', $eventCampus);
             }
         }
     }
 
-    function delPerms($eventID)
+    private function delPerms($eventID)
     {
-
         $this->db->delete('event_role', 'event_id', $eventID);
         $this->db->delete('event_campus', 'event_id', $eventID);
     }
 
-    function updateFilters($filters, $view)
+    public function create($event)
     {
-        // set the filters into the session
-        foreach ($filters as $filter) {
-            $_SESSION['calendarFilter'][$filter[0]] = preg_replace('/^[^0-9]+/', '', $filter[1]);
-        }
-
-        // Update database record only if there are changes
-        if ($this->db->update('user', 'id', array('id' => $_SESSION['id'], 'calendar_view' => $view))) {
-            return true;
-        }
-
-        return false;
-    }
-
-    function create($event)
-    {
-
         if ($this->getPerm($event) < UserAccess::ACCESS_WRITE) {
             error(35);
         }
@@ -897,9 +840,8 @@ class Calendar extends DeprecatedModel
         return $eventID;
     }
 
-    function update($event)
+    public function update($event)
     {
-
         $cleanEvent = $this->getByID($event['id']);
 
         /* Check perms on existing event */
@@ -933,7 +875,7 @@ class Calendar extends DeprecatedModel
         return $event['id'];
     }
 
-    function delete($eventID)
+    public function delete($eventID)
     {
         $event = $this->getByID($eventID);
 
