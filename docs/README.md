@@ -1,81 +1,26 @@
-# Schoolbox Developer Documentation
+# Vue in Schoolbox
 
-This folder and its subfolders contain various documents that are pertinent to
-the Schoolbox product team.
+Vue is now being used increasingly more throughout Schoolbox. It's gradually replacing older code that relied more on jQuery and in particular Foundation. It's shown it does a pretty good job of parachuting in where ever you like and landing as soft or as heavy as needed.
+As the number of Vue files really starts to grow it's a good time to expand further on recommended best practices.
 
+## Essential Vue Rules
 
-## Where should documentation exist?
+The below is a list of rules considered essential by Vue, scroll through them all or select an individual link:
 
-As a team member writing documentation, or looking for it, you should consider
-where that documentation ought to exist.
+-   Multi-word component names (https://vuejs.org/v2/style-guide/#Multi-word-component-names-essential)
+-   Component data must be a function. (https://vuejs.org/v2/style-guide/#Component-data-essential)
+-   Prop definitions should be as detailed as possible. (https://vuejs.org/v2/style-guide/#Prop-definitions-essential)
+-   Always use key with v-for. (https://vuejs.org/v2/style-guide/#Keyed-v-for-essential)
+-   Component style scoping (https://vuejs.org/v2/style-guide/#Component-style-scoping-essential)
+-   Use module scoping to keep private functions inaccessible from the outside. (https://vuejs.org/v2/style-guide #Private-property-names-essential)
+-
 
-As a general principle:
+## Essential Schoolbox Rules
 
-> Documentation should live as close to the problem space as it is possible to
-> put it.
+Have a look through all the other rules, with the below proposed when adding to Schoolbox Vue:
 
-
-### Documentation for a class
-
-Class documentation should exist in the docblock for that class.
-
-The docblock should describe:
-* the purpose of the class
-* the concept that it represents
-
-
-### Documentation for a class method
-
-Method documentation should exist in the docblock for that method.
-
-In addition to the standard `@param` and `@return` annotations, the docblock
-should:
-* summarise what the method does
-* summarise the purpose of the method
-* detail any assumptions or gotchas within the method
-
-
-### Documentation for a CLI tool
-
-CLI tool documentation should exist in the CLI tool's docblock.
-
-The CLI tool's class' `help()` method should also provide end-user help,
-audienced to those who will be running the tool (usually, Schoolbox support).
-
-See [./tools/example.php](./tools/example.php) for an example.
-
-
-### Documentation for a module
-
-Module documentation should be provided in a `README.md` file in the module's
-root folder.
-
-This documentation should:
-* describe the module's purpose
-* give a brief overview of the entities that the module encapsulates
-
-
-### Documentation for a process
-
-Documentation about a process for building Schoolbox belongs in this folder or
-in one of its sub-folders.
-
-Examples of process documentation include:
-* Help for [getting started with Schoolbox development](./mvc/readme.md)
-* The Schoolbox product team's [charter](./charter)
-
-
-### Documentation for outside of product
-
-At this stage, there is little need for documentation outside of Schoolbox to be
-considered by the Schoolbox product team.
-
-Other teams may have their own documentation on the Schoolbox product, possibly
-written in conjunction with the product team: that documentation is the
-responsibility of the other team, though product team members may and should
-feel encouraged to contribute to this external documentation.
-
-External documentation on Schoolbox exists in the following places:
-* [Schoolbox Help end-user documentation](https://help.schoolbox.com.au/homepage/2896)
-* [Support Wiki](https://schoolbox.atlassian.net/wiki/spaces/SUP/overview)
-* [Infrastructure Services Wiki](https://schoolbox.atlassian.net/wiki/spaces/IST/overview)
+-   Each component should be in its own file. (https://vuejs.org/v2/style-guide/#Component-files-strongly-recommended)
+-   Filenames of single-file components should always be kebab-case. (https://vuejs.org/v2/style-guide/#Single-file-component-filename-casing-strongly-recommended)
+-   Prop names should always use camelCase during declaration, but kebab-case in templates and JSX. (https://vuejs.org/v2/style-guide/#Prop-name-casing-strongly-recommended)
+-   Directive shorthands should be used always. (https://vuejs.org/v2/style-guide/#Directive-shorthands-strongly-recommended)
+-   Single-file components should always order <script> <template> <style> (https://vuejs.org/v2/style-guide/#Single-file-component-top-level-element-order-recommended)
