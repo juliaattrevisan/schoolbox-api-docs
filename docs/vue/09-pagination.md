@@ -16,8 +16,8 @@ Add a `Paginate` component to the corresponding node in `user-list.vue`.
 
 ```js
 components: {
-    'user': User,
-    'Paginate': VuejsPaginate
+    'single-user': SingleUser,
+    'v-paginate': VuejsPaginate
 },
 ```
 
@@ -115,7 +115,7 @@ The `users` method is a computed property that takes a _subset_ of `this.allUser
 In `user-list.vue`,
 
 ```html
-<li v-for="user in this.users">
+<li v-for="(user, index) in this.users" :key="index">
     ...
 </li>
 ```
@@ -132,8 +132,8 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
 </template>
 <template v-else>
     <ul class="information-list">
-        <li v-for="user in this.users">
-            <user
+        <li v-for="(user, index) in this.users" :key="index">
+            <single-user
                 :fullname="user.fullname"
                 :firstname="user.firstname"
                 :lastname="user.lastname"
@@ -141,10 +141,10 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
                 :route="user.route"
                 :nameLength="nameLength(user.fullname)"
             >
-            </user>
+            </single-user>
         </li>
     </ul>
-    <Paginate
+    <v-paginate
         v-model="page"
         :page-count="pageCount"
         :container-class="'pagination'"
@@ -154,7 +154,7 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
         :next-link-class="'arrow'"
         :disabled-class="'unavailable'"
         :click-handler="onPaginate"
-    ></Paginate>
+    ></v-paginate>
 </template>
 ```
 
