@@ -64,4 +64,24 @@ class PrefixGenerator
             $this->config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_PREFIX),
         );
     }
+
+    /**
+     * Generate a temporary redirect header for this URL.
+     *
+     * @param string $url
+     */
+    public function redirectTemporary(string $url): void
+    {
+        header('Location: ' . $this->generate() . $url, null, 307);
+    }
+
+    /**
+     * Generate a permanent redirect header for this URL.
+     *
+     * @param string $url
+     */
+    public function redirectPermanent(string $url): void
+    {
+        header('Location: ' . $this->generate() . $url, null, 301);
+    }
 }
