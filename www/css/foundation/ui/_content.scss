@@ -739,6 +739,8 @@ $rotate-span-width: 11rem;
 
 // Labels
 .label {
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
   text-transform: uppercase;
   margin: 0 rem-calc(($base-font-size - 8)) rem-calc(($base-font-size - 8)) 0;
 
@@ -1255,11 +1257,14 @@ $selector-width: 2.25rem;
 }
 
 .grade {
+  font-size: rem-calc(($base-font-size - 4));
+  padding: 0.285rem 1rem;
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+
   &.gradient-none-bg {
     background-color: $aluminum;
   }
-  font-size: rem-calc(($base-font-size - 4));
-  padding: 0.285rem 1rem;
   span {
     display: block;
     white-space: nowrap;
@@ -1283,6 +1288,8 @@ $selector-width: 2.25rem;
 // Grades that sit along side of other elements
 .flex-grade {
   display: flex;
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 
   .sibling {
     flex: 1;
@@ -1322,31 +1329,28 @@ $selector-width: 2.25rem;
       background-color: $base;
     }
   }
-  @media #{$medium-down} {
-    flex-wrap: wrap;
-    justify-content: center;
+  @media not print {
+    @media #{$medium-down} {
+      flex-wrap: wrap;
+      justify-content: center;
 
-    .txt p {
-      margin-bottom: 0.5rem;
+      .txt p {
+        margin-bottom: 0.5rem;
+      }
+      .grade {
+        flex: 1 100%;
+        margin-left: 0;
+      }
     }
+    ~ blockquote {
+      margin-bottom: 0;
+    }
+  }
+  @media print {
     .grade {
-      flex: 1 100%;
-      margin-left: 0;
+      flex: 0 0 auto;
+      flex-wrap: nowrap;
     }
-  }
-  ~ blockquote {
-    margin-bottom: 0;
-  }
-}
-
-.grade-small {
-  display: none;
-
-  @media #{$mediumwide-down} {
-    display: flex;
-    flex: 1 100%;
-    padding: 0 1rem;
-    justify-content: center;
   }
 }
 

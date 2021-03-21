@@ -39,6 +39,8 @@ $timetable-cell-border: $body-bg;
         /* For coloured blocks
          */
         .timetable-subject {
+            color-adjust: exact;
+            -webkit-print-color-adjust: exact;
             padding: 1rem;
 
             /* override global icon colour.

@@ -58,6 +58,8 @@ $alert-default-background: css-darken($body-bg, 10%);
   background-color: $alert-default-background;
   // DONE use contrast color
   color: $body-bg-contrast;
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 
   .close {
     &:hover {

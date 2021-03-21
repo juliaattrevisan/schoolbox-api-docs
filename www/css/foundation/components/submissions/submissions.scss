@@ -50,6 +50,8 @@ table.rubric {
 
         input:checked + label {
             background-color: $table-cell-highlight-background;
+            color-adjust: exact;
+            -webkit-print-color-adjust: exact;
         }
 
         input[type=radio]:not(.plain):disabled + label{

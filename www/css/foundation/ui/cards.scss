@@ -416,6 +416,8 @@
   .card-class-image {
     position: relative;
     padding-top: 50%;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
 
     .related {
       position: absolute;
