@@ -209,6 +209,7 @@ class Freedom implements IQueryHelper
                 ''                              AS CourtOrderType,
                 S.MOBILEPHONE                   AS StudentMobilePhone,
                 ''                              AS StudentSpecialNeedsFlag,
+                ''                              AS ParentsSeparatedFlag,
                 CASE
                     WHEN S.NON_ENG_SPEAK = 'Y' THEN 1
                     ELSE ''

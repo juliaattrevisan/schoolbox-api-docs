@@ -191,6 +191,7 @@ class External_Schooledge_User implements External_UserInterface
                 '' AS StudentStudiesCode,
                 '' AS AlertMessage,
                 '' AS CourtOrderType,
+                '' AS ParentsSeparatedFlag,
                 0 AS countIndividualEducationPlans
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID AND sc.EmergencyContact = 'Y'

@@ -109,6 +109,7 @@ class External_Schoolbox_User implements External_UserInterface
                           alert_comment AS Comment,
                           '' AS StudentEnrolmentDate,
                           '' AS StudentLeavingDate,
+                          '' AS ParentsSeparatedFlag,
                           ib AS StudentIBFlag,
                           individual_learning_plans AS countIndividualEducationPlans
                 FROM      `sis_user_profile` sup
