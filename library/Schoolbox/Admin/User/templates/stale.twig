@@ -4,11 +4,7 @@
 <div class="admin-container row">
 {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
-
-
-
-    <h1>Stale Users Report</h1>
-    <h3>Deleting users will prevent them from logging into the system and from accessing resources that belong to them.  Attached resources that will be removed include; ePortfolio, My Files, Pastoral Records and My Links.  Resources shared with or by the user like Files, Grades, News, Forum Posts and other collaborative activities will remain available.</h3>
+    <h2 class="subheader">Stale Users Report</h2>
     <div id='stale-users-report'>
         <stale-users-report
                 date-format="{{ config.date_local | momentJsFormat }}"
