@@ -100,10 +100,6 @@ try {
     /** @var PrefixGenerator $cdnPrefixGenerator */
     $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
 
-    // 307 Temporary Redirect: eventually someone will upload a logo
-    header(
-        'Location: ' . $cdnPrefixGenerator->generate() . '/images' . $logoSizes[$logo][$size][2],
-        null,
-        307,
-    );
+    // Temporary Redirect: eventually someone will upload a logo
+    $cdnPrefixGenerator->redirectTemporary('/images' . $logoSizes[$logo][$size][2]);
 }

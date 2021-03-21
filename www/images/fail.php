@@ -100,11 +100,6 @@ try {
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
     /** @var PrefixGenerator $prefixGenerator */
-    // Assume this is a permanent redirect?
     $prefixGenerator = $kernel->get('cdnPrefixGenerator');
-    header(
-        'Location: ' . $prefixGenerator->generate() . $path,
-        null,
-        307,
-    );
+    $prefixGenerator->redirectTemporary($path);
 }

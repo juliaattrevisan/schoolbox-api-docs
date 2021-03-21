@@ -72,7 +72,7 @@ class PrefixGenerator
      */
     public function redirectTemporary(string $url): void
     {
-        header('Location: ' . $this->generate() . $url, null, 307);
+        header('Location: ' . $this->generate() . $url, true, 307);
     }
 
     /**
@@ -82,6 +82,6 @@ class PrefixGenerator
      */
     public function redirectPermanent(string $url): void
     {
-        header('Location: ' . $this->generate() . $url, null, 301);
+        header('Location: ' . $this->generate() . $url, true, 301);
     }
 }

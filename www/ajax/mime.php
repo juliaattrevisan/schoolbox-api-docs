@@ -76,11 +76,7 @@ foreach ($filenames as $filename) {
     // Permanent redirect instead of dumping
     /** @var PrefixGenerator $prefixGenerator */
     $prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
-    header(
-        'Location: ' . $prefixGenerator->generate() . $filename,
-        null,
-        301
-    );
+    $prefixGenerator->redirectPermanent($filename);
     exit;
 }
 
