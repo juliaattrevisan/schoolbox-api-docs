@@ -18,10 +18,13 @@ use Schoolbox\IConfigLoader;
 class PrefixGenerator
 {
     /**
-     * The default prefix: not a CDN at all, it references the same host as all
+     * The local prefix: not a CDN at all, it references the same host as all
      * other Schoolbox requests.
+     *
+     * Made public because some scripts need to know where locally served files
+     * actually exist.
      */
-    private const DEFAULT_PREFIX = '/static';
+    public const LOCAL_PREFIX = '/static';
 
     /**
      * Config is required for determining:
@@ -53,7 +56,7 @@ class PrefixGenerator
     public function generate(): string
     {
         if (!$this->config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN)) {
-            return self::DEFAULT_PREFIX;
+            return self::LOCAL_PREFIX;
         }
         return str_replace(
             '{site_version}',
