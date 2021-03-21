@@ -1288,6 +1288,8 @@ $selector-width: 2.25rem;
 // Grades that sit along side of other elements
 .flex-grade {
   display: flex;
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 
   .sibling {
     flex: 1;
@@ -1327,20 +1329,22 @@ $selector-width: 2.25rem;
       background-color: $base;
     }
   }
-  @media #{$medium-down} {
-    flex-wrap: wrap;
-    justify-content: center;
+  @media not print {
+    @media #{$medium-down} {
+      flex-wrap: wrap;
+      justify-content: center;
 
-    .txt p {
-      margin-bottom: 0.5rem;
+      .txt p {
+        margin-bottom: 0.5rem;
+      }
+      .grade {
+        flex: 1 100%;
+        margin-left: 0;
+      }
     }
-    .grade {
-      flex: 1 100%;
-      margin-left: 0;
+    ~ blockquote {
+      margin-bottom: 0;
     }
-  }
-  ~ blockquote {
-    margin-bottom: 0;
   }
   @media print {
     .grade {

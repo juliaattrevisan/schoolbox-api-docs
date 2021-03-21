@@ -7,7 +7,7 @@
 table.rb {
     color-adjust: exact;
     -webkit-print-color-adjust: exact;
-  
+
     [colspan] {
         border-right-width: 0 !important;
     }
@@ -360,104 +360,123 @@ select.letter-grade-select {
     margin-bottom: 0;
 }
 
-@media #{$medium-down} {
+@media not print {
+  @media #{$medium-down} {
     table.rb.markable {
-        thead {
-            position: absolute;
-            clip: rect(1px, 1px, 1px, 1px);
-            padding: 0;
-            border: 0;
-            height: 1px;
-            width: 1px;
-            overflow: hidden;
-        }
-        tbody,
-        tr,
-        th,
-        td {
-            display: block;
-            white-space: normal;
-        }
-        tr td,
-        tr th {
-            overflow: hidden;
-            position: relative;
-            width: 100%;
-            white-space: normal;
-        }
-        .capability {
-            background-color: $snow;
-        }
-        th[scope="row"] {
-            display: block;
-            font-size: rem-calc(($base-font-size - 2));
-            text-align: center;
-            width: 100%;
-        }
+      thead {
+        position: absolute;
+        clip: rect(1px, 1px, 1px, 1px);
+        padding: 0;
+        border: 0;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+      }
+
+      tbody,
+      tr,
+      th,
+      td {
+        display: block;
+        white-space: normal;
+      }
+
+      tr td,
+      tr th {
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+        white-space: normal;
+      }
+
+      .capability {
+        background-color: $snow;
+      }
+
+      th[scope="row"] {
+        display: block;
+        font-size: rem-calc(($base-font-size - 2));
+        text-align: center;
+        width: 100%;
+      }
     }
     table.rb {
-        tbody th {
-            &:last-of-type {
-                border-right-width: 0;
-            }
-            &:first-of-type {
-                border-right-width: 0;
-                border-bottom-width: 1px;
-            }
+      tbody th {
+        &:last-of-type {
+          border-right-width: 0;
         }
-        .rb-group-name,
-        .rb-group-header label {
-            font-size: $base-font-size;
-        }
-        .hide-v,
-        .rb-blank,
-        th:empty{
-            display: none;
-        }
-        thead {
-            display: block;
-        }
-        tr {
-            .rb-group-header {
-                label {
-                    font-weight: bold;
-                }
-            }
-        }
-        .rb-criterion-name {
-            padding-left: 1.25rem;
-        }
-        .rb-group-summary {
-            padding-left: 1.5rem;
-        }
-        label span {
-            margin-left: 1.25rem;
-        }
-        .rb-description,
-        .rb-value {
-            margin-left: 1.5rem;
-        }
-        select {
-            padding: 0 1.5rem;
-        }
-        textarea {
-            min-height: 1rem;
-        }
-        .rb-no-cell {
-            display: none;
-        }
-        .sequencer {
-            margin-bottom: 0.5rem;
-        }
-    }
-}
 
-// Rubric progression graph
-th.rubric-progression-capability, th.rubric-progression-indicator {
-  width: 15%;
-}
-td.rubric-progression-graph {
-  padding: 0;
+        &:first-of-type {
+          border-right-width: 0;
+          border-bottom-width: 1px;
+        }
+      }
+
+      .rb-group-name,
+      .rb-group-header label {
+        font-size: $base-font-size;
+      }
+
+      .hide-v,
+      .rb-blank,
+      th:empty {
+        display: none;
+      }
+
+      thead {
+        display: block;
+      }
+
+      tr {
+        .rb-group-header {
+          label {
+            font-weight: bold;
+          }
+        }
+      }
+
+      .rb-criterion-name {
+        padding-left: 1.25rem;
+      }
+
+      .rb-group-summary {
+        padding-left: 1.5rem;
+      }
+
+      label span {
+        margin-left: 1.25rem;
+      }
+
+      .rb-description,
+      .rb-value {
+        margin-left: 1.5rem;
+      }
+
+      select {
+        padding: 0 1.5rem;
+      }
+
+      textarea {
+        min-height: 1rem;
+      }
+
+      .rb-no-cell {
+        display: none;
+      }
+
+      .sequencer {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  // Rubric progression graph
+  th.rubric-progression-capability, th.rubric-progression-indicator {
+    width: 15%;
+  }
+  td.rubric-progression-graph {
+    padding: 0;
+  }
 }
 
 @media print {
