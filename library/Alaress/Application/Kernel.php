@@ -454,6 +454,7 @@ abstract class Kernel
             )
         );
 
+        // Localisation
         $di->set(
             'l10n',
             $di->lazy(
@@ -462,6 +463,12 @@ abstract class Kernel
                     return $stoneFactory->build($di->get('mapperFactory')->get(L10nMapper::class));
                 }
             )
+        );
+
+        // CDN prefix generator
+        $di->set(
+            'cdnPrefixGenerator',
+            $di->lazyNew(PrefixGenerator::class, ['config' => $di->lazyGet('config')])
         );
 
         // Enable mappers to be injectable, but instantiated only when required
@@ -927,7 +934,10 @@ abstract class Kernel
                     $twig->addGlobal('dateFormats', $dateFormats);
                     $twig->addGlobal('NOW', Alaress_Date_Format::now());
                     $twig->addGlobal('USER', $_SESSION['user']);
-                    $twig->addGlobal('CDN_PREFIX', PrefixGenerator::generate($config));
+
+                    /** @var PrefixGenerator $cdnPrefixGenerator */
+                    $cdnPrefixGenerator = $di->get('cdnPrefixGenerator');
+                    $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
 
                     // Global access to returnUrl vars
                     $encodedUrl = Redirect::encode($_GET["page"]);

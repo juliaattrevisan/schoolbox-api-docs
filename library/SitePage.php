@@ -845,7 +845,9 @@ class SitePage extends Page
      */
     public function injectGlobalVars(): void
     {
-        $this->setVar('CDN_PREFIX', PrefixGenerator::generate($this->config));
+        /** @var PrefixGenerator $cdnPrefixGenerator */
+        $cdnPrefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
+        $this->setVar('CDN_PREFIX', $cdnPrefixGenerator->generate());
         $this->localise();
     }
 
