@@ -384,8 +384,7 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => $this->router->generate('adminUser.getStaleReport'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUser.getStaleReport')),
-            ]]
-        );
+            ]]);
     }
 
 
@@ -777,6 +776,25 @@ class Controller extends Base
             'format' => 'json',
             'data'   => true
         ]);
+    }
+
+    /**
+     * Delete a list of users
+     * @api /adminv2/list/delete
+     */
+    public function postDeleteList(): void
+    {
+        $userList = $this->request->post('users');
+        if ($this->userMapper->deleteByColumn('id', $userList)) {
+            $this->getResponse()->content->set(
+                [
+                    'format' => 'json',
+                    'data'   => true
+                ]
+            );
+        } else {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
     }
 
     /**
