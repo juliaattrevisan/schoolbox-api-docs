@@ -99,5 +99,11 @@ try {
     // redirect to the placeholder
     /** @var PrefixGenerator $cdnPrefixGenerator */
     $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
-    SitePage::localRedir($cdnPrefixGenerator->generate() . '/images' . $logoSizes[$logo][$size][2]);
+
+    // 307 Temporary Redirect: eventually someone will upload a logo
+    header(
+        'Location: ' . $cdnPrefixGenerator->generate() . '/images' . $logoSizes[$logo][$size][2],
+        null,
+        307,
+    );
 }
