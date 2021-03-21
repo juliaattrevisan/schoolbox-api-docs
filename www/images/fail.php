@@ -10,6 +10,7 @@
 
 use Alaress\Image\Cache;
 use Alaress\Image;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -88,13 +89,22 @@ switch ($_GET['transform_type']) {
 
 // Try to transform the fail image in /resources
 // If even THAT fails, just redirect to the static version.
+// (The redirect should never happen anymore, as an invalid transform falls back
+//  to a valid one now.)
 try {
     $imageProcessor = new Image\Processor(
-        Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
+        Cache\LocalFS::getStorageModel(WEB_root, PrefixGenerator::LOCAL_PREFIX . $path),
         $cache_key,
         $transform
     );
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
-    SitePage::localRedir($path);
+    /** @var PrefixGenerator $prefixGenerator */
+    // Assume this is a permanent redirect?
+    $prefixGenerator = $kernel->get('cdnPrefixGenerator');
+    header(
+        'Location: ' . $prefixGenerator->generate() . $path,
+        null,
+        307,
+    );
 }
