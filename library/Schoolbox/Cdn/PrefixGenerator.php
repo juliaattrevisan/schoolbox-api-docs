@@ -20,11 +20,8 @@ class PrefixGenerator
     /**
      * The local prefix: not a CDN at all, it references the same host as all
      * other Schoolbox requests.
-     *
-     * Made public because some scripts need to know where locally served files
-     * actually exist.
      */
-    public const LOCAL_PREFIX = '/static';
+    private const LOCAL_PREFIX = '/static';
 
     /**
      * Config is required for determining:

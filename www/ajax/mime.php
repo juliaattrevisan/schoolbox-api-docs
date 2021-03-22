@@ -69,7 +69,7 @@ $filenames[] = DEFAULT_NONE_ICON;
 foreach ($filenames as $filename) {
     /* Progressively degrade icon choice until we find the first available
      */
-    if (!file_exists(WEB_root . PrefixGenerator::LOCAL_PREFIX . $filename)) {
+    if (!file_exists(WEB_root . '/static' . $filename)) {
         continue;
     }
 

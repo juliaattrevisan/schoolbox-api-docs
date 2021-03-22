@@ -93,7 +93,7 @@ switch ($_GET['transform_type']) {
 //  to a valid one now.)
 try {
     $imageProcessor = new Image\Processor(
-        Cache\LocalFS::getStorageModel(WEB_root, PrefixGenerator::LOCAL_PREFIX . $path),
+        Cache\LocalFS::getStorageModel(WEB_root, '/static' . $path),
         $cache_key,
         $transform
     );
