@@ -51,9 +51,8 @@ then
     exit 0;
 fi
 
-options=$(getopt -o hiuv --long help,initial,upload,verbose -- "$@")
-if [ $? -ne 0 ];
-then
+
+if ! options=$(getopt -o hiuv --long help,initial,upload,verbose -- "$@"); then
     helpmsg;
     echo "";
     echo "Error: Incorrect options provided";
