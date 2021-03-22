@@ -10,7 +10,7 @@ import {VueGoodTable} from 'vue-good-table';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 import {mixinVgtSelectRows} from '@schoolbox/vueGoodTable/mixinVgtSelectRows';
-import {fetchAsJson} from '@shared/fetch/fetch';
+import axios from 'axios';
 import dayjs from 'dayjs';
 import {ResizeObserver} from 'vue-resize';
 import 'vue-resize/dist/vue-resize.css';
@@ -43,6 +43,11 @@ export default {
       hasRowsLoaded: false,
       hasLoadError: false,
       columns: [
+        {
+          id: 'id',
+          field: 'id',
+          hidden: true
+        },
         {
           label: 'Username',
           field: 'username',
@@ -110,14 +115,14 @@ export default {
      *
      */
     loadRows() {
-      fetchAsJson('/adminv2/user/stale/list')
-          .then((response) => {
-            this.rows = response;
-            this.hasRowsLoaded = true;
-            this.customVueGoodTableSetup();
-          }).catch((error) => {
-        this.hasLoadError = true; //display error note in the DOM
-      });
+      axios.get('/adminv2/user/stale/list')
+        .then((response) => {
+          this.rows = response.data;
+          this.hasRowsLoaded = true;
+          this.customVueGoodTableSetup();
+        }).catch((error) => {
+          this.hasLoadError = true; //display error note in the DOM
+       });
     },
 
     /**
@@ -155,12 +160,22 @@ export default {
 
       this.$refs.toast.activate('Deleting...');
 
+      const usersToDeleteIDList = this.$_vgtSelectRows_getSelectedRows().map(row => row.id);
+      
+      axios.post('/adminv2/user/list/delete', {
+          users: usersToDeleteIDList
+        })
 
-      this.$refs.toast.timeout('Deleted', true, 2000);
-      this.$refs.deleteModal.close();
+        .then((response) => {
+          this.$refs.toast.timeout('Deleted', true, 2000);
+          this.$refs.deleteModal.close();
+          this.rows = this.getUpdatedRowsAfterUserDeletion();
+          this.$_vgtSelectRows_clearRows();  
+        
+        }).catch((error) => {
+          this.$refs.toast.timeout('Unable to delete', false, 2000);
 
-      this.rows = this.getUpdatedRowsAfterUserDeletion();
-      this.$_vgtSelectRows_clearRows();
+        });
 
     },
 
