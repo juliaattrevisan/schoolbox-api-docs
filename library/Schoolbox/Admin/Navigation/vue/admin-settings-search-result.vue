@@ -191,13 +191,4 @@ export default {
 	background: $content-ui-hover;
 }
 
-//::v-deep to target the deep nest
-//https://vue-loader.vuejs.org/guide/scoped-css.html#deep-selectors
-.result-title ::v-deep .highlight-text {
-	background: #ff0;
-}
-.result-description ::v-deep .highlight-text {
-	background: #ff0;
-}
-
 </style>
