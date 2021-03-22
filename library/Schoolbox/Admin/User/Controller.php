@@ -780,11 +780,11 @@ class Controller extends Base
 
     /**
      * Delete a list of users
-     * @api /adminv2/list/delete
+     * @api /adminv2/user/list/delete
      */
     public function postDeleteList(): void
     {
-        $userList = $this->request->post('users');
+        $userList = $this->getRequest()->post['users'];
         if ($this->userMapper->deleteByColumn('id', $userList)) {
             $this->getResponse()->content->set(
                 [

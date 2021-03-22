@@ -161,17 +161,19 @@ export default {
       this.$refs.toast.activate('Deleting...');
 
       const usersToDeleteIDList = this.$_vgtSelectRows_getSelectedRows().map(row => row.id);
-      
-      axios.post('/adminv2/user/list/delete', {
-          users: usersToDeleteIDList
-        })
 
+      let formdata = new FormData();
+      usersToDeleteIDList.forEach((item) => {
+        formdata.append('users[]',item);
+      })
+
+      axios.post('/adminv2/user/list/delete', formdata)
         .then((response) => {
           this.$refs.toast.timeout('Deleted', true, 2000);
           this.$refs.deleteModal.close();
           this.rows = this.getUpdatedRowsAfterUserDeletion();
-          this.$_vgtSelectRows_clearRows();  
-        
+          this.$_vgtSelectRows_clearRows();
+
         }).catch((error) => {
           this.$refs.toast.timeout('Unable to delete', false, 2000);
 
