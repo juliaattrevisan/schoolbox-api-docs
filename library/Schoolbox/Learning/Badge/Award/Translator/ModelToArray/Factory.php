@@ -58,15 +58,17 @@ class Factory
     /**
      * Constructor
      *
-     * @param Router     $router
-     * @param Authorizer $authorizer
-     * @param User       $user
+     * @param Router          $router
+     * @param Authorizer      $authorizer
+     * @param User            $user
+     * @param PrefixGenerator $prefixGenerator
      */
-    public function __construct(Router $router, Authorizer $authorizer, User $user)
+    public function __construct(Router $router, Authorizer $authorizer, User $user, PrefixGenerator $prefixGenerator)
     {
-        $this->router     = $router;
-        $this->authorizer = $authorizer;
-        $this->user       = $user;
+        $this->router          = $router;
+        $this->authorizer      = $authorizer;
+        $this->user            = $user;
+        $this->prefixGenerator = $prefixGenerator;
     }
 
 
@@ -81,7 +83,7 @@ class Factory
             new User\Translator\ModelToArray(),
             new \Schoolbox\Learning\Badge\Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
-                new \Schoolbox\Resource\Storage\Translator\ModelToArray(),
+                new \Schoolbox\Resource\Storage\Translator\ModelToArray($this->prefixGenerator),
                 new ScrubAdapter(),
                 new BadgeLinksTranslator($this->router, $this->authorizer, $this->user)
             ),

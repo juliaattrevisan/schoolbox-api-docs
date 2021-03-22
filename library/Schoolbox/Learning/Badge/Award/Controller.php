@@ -13,6 +13,7 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Base;
 use Exception;
 use PDOException;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
@@ -541,7 +542,12 @@ class Controller extends Base
      */
     private function buildBadgeAwardModelToArrayTranslator(): Translator\ModelToArray
     {
-        $factory = new Translator\ModelToArray\Factory($this->router, $this->authorizer, $this->getUser());
+        $factory = new Translator\ModelToArray\Factory(
+            $this->router,
+            $this->authorizer,
+            $this->getUser(),
+            new PrefixGenerator($this->getConfigLoader()),
+        );
         return $factory->build();
     }
 }

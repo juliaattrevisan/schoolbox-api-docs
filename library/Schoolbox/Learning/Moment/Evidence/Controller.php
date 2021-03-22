@@ -451,7 +451,8 @@ class Controller extends Base
             $this->router,
             $this->authorizer,
             $this->getUser(),
-            $this->commentMapper
+            $this->commentMapper,
+            new PrefixGenerator($this->getConfigLoader()),
         ))->buildWithComments($commentLimit);
     }
 
