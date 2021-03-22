@@ -106,6 +106,18 @@ class SystemPayload
             INNER JOIN storage ON f.hash = storage.hash
             
             UNION
+    
+            SELECT
+                'Due Work' AS label,
+                COALESCE(SUM(storage.filesize), 0) AS size
+            FROM (SELECT DISTINCT storage_id AS hash 
+                FROM submission_box_file sbf
+                INNER JOIN submission_box sb ON sbf.box_id = sb.id
+                WHERE sb.owner = :userId
+            ) f
+            INNER JOIN storage ON f.hash = storage.hash
+            
+            UNION
             
             SELECT
                 'News' AS label,

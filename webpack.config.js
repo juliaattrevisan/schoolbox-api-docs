@@ -37,6 +37,7 @@ module.exports = {
         usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/user.main.js',
 
         usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/total.main.js',
+        usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/system.main.js',
 
         //Sass
         chromeFoundation: './www/css/foundation/chrome-foundation.scss',

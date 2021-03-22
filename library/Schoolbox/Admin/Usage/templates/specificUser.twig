@@ -33,6 +33,14 @@
                 </div>
             </section>
         </div>
+
+        <div class="small-12 island">
+            <section class="content">
+                <div id="usage-specific-system-container">
+                    <usage-specific-system :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserSystemPayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-system>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
 
@@ -61,3 +69,4 @@
 {#</div>#}
 
 <script src="/javascript/components/usageSpecificTotal.bundle.js"></script>
+<script src="/javascript/components/usageSpecificSystem.bundle.js"></script>
