@@ -158,9 +158,21 @@ export default {
 <template>
     <div>
         <template v-if="this.loading">
-            <div>
-                <h2>Loading data, wait</h2>
-            </div>
+            <table class="skeleton">
+                <thead>
+                <tr>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
         </template>
         <template v-else>
             <vue-good-table
