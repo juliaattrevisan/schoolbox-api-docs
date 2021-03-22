@@ -559,7 +559,7 @@
             $createForm.draft({
                 inputs: ['#news-title', '#audience-search', '#news-topics', '#news-sticky'],
                 textareas: ['body', 'blurb'],
-                attachzones: ['#{{ featureImageZone.id }}-zone'],
+                attachzones: ['#{{ featureImageZone.id }}-zone', '#{{ fileZone.id }}-zone'],
                 datepickers: ['#publishAt', '#expiresAt'],
                 staller: $submitButton,
                 onSaveSuccess: function (response) {
