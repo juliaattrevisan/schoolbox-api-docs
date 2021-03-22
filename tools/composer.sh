@@ -7,6 +7,7 @@
 
 # Go to parent directory of this file, and run Composer from there.
 cd $(dirname $(dirname $(readlink -f $0)))
+export XDEBUG_MODE=off
 composer install --no-progress -o $*
 checkexit=`echo $?`;
 if [ $checkexit -eq 0 ];
