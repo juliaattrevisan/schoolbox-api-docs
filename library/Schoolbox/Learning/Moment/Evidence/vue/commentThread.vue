@@ -31,7 +31,15 @@ export default {
         },
         createThreadEndpoint: {
             type: String,
-        }
+        },
+        /**
+         * The CDN prefix for this instance: used as the source from which
+         * scripts are loaded.
+         */
+        cdnPrefix: {
+            type: String,
+            default: '',
+        },
     },
     data() {
         return {
@@ -39,7 +47,7 @@ export default {
             pendingComment: '',
             saveInProgress: false,
             commentIndexToDelete: null,
-            editorUrl: "/javascript/ckeditor/ckeditor.js",
+            editorUrl: this.cdnPrefix + "/javascript/ckeditor/ckeditor.js",
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
             isCKEditorReady: false,

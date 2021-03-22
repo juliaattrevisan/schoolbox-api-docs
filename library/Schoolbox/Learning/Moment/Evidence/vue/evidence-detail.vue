@@ -1,8 +1,9 @@
 <script>
-import MediaArticle  from '@schoolbox/media-article';
-import Storage       from '@schoolbox/storage';
-import RelativeTime  from '@schoolboxLearningMomentEvidence/relative-time';
-import CommentThread from './commentThread';
+import MediaArticle   from '@schoolbox/media-article';
+import Storage        from '@schoolbox/storage';
+import RelativeTime   from '@schoolboxLearningMomentEvidence/relative-time';
+import CommentThread  from './commentThread';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 
 export default {
     /**
@@ -18,7 +19,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [cdnPrefixMixin],
 
     /**
      * Props.
@@ -171,7 +172,9 @@ export default {
 
                         <!-- Discussion thread -->
                         <comment-thread :thread="evidence.discussionThread"
-                                        :create-thread-endpoint="evidence._links.createThread" />
+                                        :create-thread-endpoint="evidence._links.createThread"
+                                        :cdn-prefix="cdnPrefix"
+                        />
                     </div>
                 </section>
             </div>

@@ -1,11 +1,11 @@
 <script>
 
-import Vue from 'vue';
 import moment from 'moment';
 import axios from 'axios';
 import MediaArticle from '@schoolbox/media-article';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 
 export default {
 
@@ -17,6 +17,8 @@ export default {
         RevealModal
     },
 
+    mixins: [cdnPrefixMixin],
+
     props: {
         articleId: Number,
         threadIdOnLoad: Number,
@@ -26,15 +28,6 @@ export default {
         isPublished: Boolean,
         createThreadEndpoint: String,
         siteVersion: String, //for cache busting
-
-        /**
-         * The CDN prefix for this instance: used as the source from which
-         * scripts are loaded.
-         */
-        cdnPrefix: {
-            type: String,
-            default: '',
-        }
     },
 
     data () {
