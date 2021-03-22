@@ -1,25 +1,42 @@
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<div class="row">
-    <div class="small-12 island">
-        {% include ('@adminUsage/total.twig') %}
-    </div>
+<div class="admin-container row">
 
-    <div class="small-12 medium-6 island">
-        {% include ('@adminUsage/system.twig') %}
-    </div>
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
 
-    <div class="small-12 medium-6 island">
-        {% include ('@adminUsage/filetype.twig') %}
-    </div>
-
-    <div class="small-12 island">
-        {% include ('@adminUsage/role.twig') %}
-    </div>
-
-    <div class="small-12 island">
-        <h2 class="subheader">CMS Usage by User</h2>
-        {% include ('@adminUsage/user.twig') %}
+    <div class="admin-content">
+        <div class="small-12 island">
+            <div id="usage-global-total-container">
+                <usage-global-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'"></usage-global-total>
+            </div>
+        </div>
     </div>
 </div>
 
+<div class="row">
+
+{#    <div class="small-12 island">#}
+{#        {% include ('@adminUsage/total.twig') %}#}
+{#    </div>#}
+
+{#    <div class="small-12 medium-6 island">#}
+{#        {% include ('@adminUsage/system.twig') %}#}
+{#    </div>#}
+
+{#    <div class="small-12 medium-6 island">#}
+{#        {% include ('@adminUsage/filetype.twig') %}#}
+{#    </div>#}
+
+{#    <div class="small-12 island">#}
+{#        {% include ('@adminUsage/role.twig') %}#}
+{#    </div>#}
+
+{#    <div class="small-12 island">#}
+{#        <h2 class="subheader">CMS Usage by User</h2>#}
+{#        {% include ('@adminUsage/user.twig') %}#}
+{#    </div>#}
+</div>
+
+<script src="/javascript/components/usageGlobalTotal.bundle.js"></script>

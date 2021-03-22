@@ -10,6 +10,7 @@ namespace Schoolbox\Admin\Usage;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\FilesystemFactory;
@@ -48,7 +49,9 @@ class Controller extends Base
     public function getIndex(): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/global.twig', [
-            'isS3Adapter' => $this->isS3Adapter()
+            'pageCurrent' => $this->router->generate('adminUsage.getIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUsage.getIndex')),
+            'isS3Adapter' => $this->isS3Adapter(),
         ]));
     }
 
