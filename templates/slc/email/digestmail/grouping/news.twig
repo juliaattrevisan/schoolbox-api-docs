@@ -3,7 +3,7 @@
 {% block image %}
     {% set msg = row.messages | first %}
     {% if 'icon=news' in msg.icon %}
-        <img src="https://{{ config.fqdn }}/images/logo.php?logo=skin_logo_square&size=normal" width="56" height="56" />
+        <img src="{{ config.fqdn_cdn_prefix }}/images/logo.php?logo=skin_logo_square&size=normal" width="56" height="56" />
     {% else %}
         <img src="{{ msg.icon }}" width="64" height="64" />
     {% endif %}

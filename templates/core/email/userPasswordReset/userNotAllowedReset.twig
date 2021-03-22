@@ -3,13 +3,13 @@
 {% extends 'schoolmail.twig' %}
 {% block content %}
     <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
-        <tr>{{ fn.spacer(config.fqdn, 16, 0) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 16, 0) }}</tr>
         <tr>
             <td width="640">
                 <p>Hi,</p>
             </td>
         </tr>
-        <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 0) }}</tr>
         <tr>
             <td width="640">
                 <p>
@@ -21,7 +21,7 @@
                 </p>
             </td>
         </tr>
-        <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 0) }}</tr>
         <tr>
             <td width="640">
                 <p>
@@ -29,6 +29,6 @@
                 </p>
             </td>
         </tr>
-        <tr>{{ fn.spacer(config.fqdn, 16, 0, 2) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 16, 0, 2) }}</tr>
     </table>
 {% endblock %}

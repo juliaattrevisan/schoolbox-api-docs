@@ -3,22 +3,22 @@
 {% extends 'schoolmail.twig' %}
 {% block content %}
     <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
-        <tr>{{ fn.spacer(config.fqdn, 16, 0) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 16, 0) }}</tr>
         <tr>
             <td width="640">
                 <p>Dear {{ user.firstName }},</p>
                 <p>Your school has added you to <a href="https://help.schoolbox.com.au/login/" title="Schoolbox Help">Schoolbox Help</a></p>
             </td>
         </tr>
-        <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 0) }}</tr>
         <tr>
             <td width="640">
-                <p>Schoolbox Help is designed to support your learning journey in Schoolbox. There are step-by-step guides and information about the latest features. 
+                <p>Schoolbox Help is designed to support your learning journey in Schoolbox. There are step-by-step guides and information about the latest features.
                 On Schoolbox Help, you also have the ability to engage in the community. You can post feature suggestions, ask or answer questions and collaborate with other staff.</p>
                 <p>And if your school has subscribed to the Teacher Course, you will be able to develop your skills and receive targeted feedback from the Schoolbox Team.</p>
             </td>
         </tr>
-        <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 0) }}</tr>
         <tr>
             <td width="640">
                 <p>Your username is <strong>{{ user.username }}</strong> and you can <a href="http://{{ config.fqdn }}/passwordReset/{{ reset.token }}" title="Create Password">
@@ -27,13 +27,13 @@
                 </p>
             </td>
         </tr>
-        <tr>{{ fn.spacer(config.fqdn, 8, 0) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 0) }}</tr>
         <tr>
             <td width="640">
                 <p>We look forward to you engaging with Schoolbox Help and our fabulous Schoolbox community!</p>
                 <p>The Schoolbox Team</p>
             </td>
         </tr>
-        <tr>{{ fn.spacer(config.fqdn, 16, 0, 2) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 16, 0, 2) }}</tr>
     </table>
 {% endblock %}
