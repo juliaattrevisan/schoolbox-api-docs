@@ -55,11 +55,14 @@ export default {
              */
             allData: [],
 
+            /* Table columns. You can define sorting and formatting functions
+             * here, but I found the custom slots to work best for sorting on
+             * html representations e.g. linked firstname, linked lastname
+             */
             columns: [
                 {
                     label: 'Filename',
-                    html: true,
-                    field: this.linkFilename,
+                    field: 'name'
                 },
                 {
                     label: 'Filesize',
@@ -69,8 +72,7 @@ export default {
                 },
                 {
                     label: 'Folder',
-                    html: true,
-                    field: this.linkFolder,
+                    field: 'folder'
                 },
                 {
                     label: 'Type',
@@ -78,8 +80,9 @@ export default {
                 },
                 {
                     label: 'Delete',
-                    html: true,
                     field: this.linkDelete,
+                    html: true,
+                    sortable: false
                 },
             ],
         }
@@ -140,28 +143,6 @@ export default {
     methods: {
 
         /**
-         * Render filenames with html links
-         *
-         * @param rowObj
-         * @returns {string}
-         */
-        linkFilename(rowObj) {
-            return '<a href="'+rowObj._links.send+'">'+rowObj.name+'</a>';
-        },
-
-
-        /**
-         * Render folder names with html links
-         *
-         * @param rowObj
-         * @returns {string}
-         */
-        linkFolder(rowObj) {
-            return '<a href="/homepage/'+rowObj.folderId+'">'+rowObj.folder+'</a>';
-        },
-
-
-        /**
          * Render a delete link
          * (This needs a confirmDialog equivalent in vue)
          *
@@ -191,8 +172,8 @@ export default {
                 }"
                 :sort-options="{
                     initialSortBy: {
-                        field: 'size',
-                        type: 'desc'
+                        field: 'name',
+                        type: 'asc'
                     }
                 }"
                 :pagination-options="{
@@ -202,7 +183,22 @@ export default {
                     rowsPerPageLabel: 'Files per page',
                     infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Files`,
                 }"
-            />
+            >
+                <template slot="table-row" slot-scope="props">
+                    <template v-if="props.column.field == 'name'">
+                        <a :href="props.row._links.send">{{ props.row.name }}</a>
+                    </template>
+                    <template v-else-if="props.column.field == 'folder'">
+                        <a :href="'/homepage/' + props.row.folderId">{{ props.row.folder }}</a>
+                    </template>
+                    <template v-else-if="props.column.label == 'Delete'">
+                        <a :href="props.row._links.delete">Delete</a>
+                    </template>
+                    <template v-else>
+                        {{props.formattedRow[props.column.field]}}
+                    </template>
+                </template>
+            </vue-good-table>
         </template>
     </div>
 </template>
