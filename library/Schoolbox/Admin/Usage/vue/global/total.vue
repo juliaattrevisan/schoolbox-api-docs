@@ -117,10 +117,12 @@ export default {
 
                     plotOptions: {
                         bar: {
+                            /* https://stackoverflow.com/questions/25721067/highchart-data-label-issue-in-bar-chart
+                             */
                             dataLabels: {
                                 enabled: true,
                                 formatter: function() {
-                                    return '<span style="color: #aaaaaa">' + this.y + '%</span>'
+                                    return '<span style="color: #777777">' + this.y + '%</span>'
                                 }
                             }
                         }
