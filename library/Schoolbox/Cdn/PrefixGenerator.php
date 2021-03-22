@@ -52,8 +52,33 @@ class PrefixGenerator
      */
     public function generate(): string
     {
+        return $this->generateInternal();
+    }
+
+    /**
+     * Generates a fully-qualified CDN prefix, given a base URL.
+     *
+     * Intended for use in emails, and other content which will be viewed
+     * from a relative URL that is different to the Schoolbox instance.
+     *
+     * @param string $baseUrl The base URL of the instance (scheme and host)
+     * @return string
+     */
+    public function generateWithBaseUrl(string $baseUrl): string
+    {
+        return $this->generateInternal($baseUrl);
+    }
+
+    /**
+     * Internal method for generating a prefix, with or without a base URL.
+     *
+     * @param string|null $baseUrl
+     * @return string
+     */
+    private function generateInternal(string $baseUrl = null): string
+    {
         if (!$this->config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN)) {
-            return self::LOCAL_PREFIX;
+            return ($baseUrl ?? '') . self::LOCAL_PREFIX;
         }
         return str_replace(
             '{site_version}',

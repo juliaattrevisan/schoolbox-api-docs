@@ -1,11 +1,18 @@
-{# Spacer for email templates #}
-{% macro spacer(fqdn, height, width, colspan) %}
+{##
+ # Spacer for email templates
+ #
+ # cdnPrefix: the instance's CDN prefix: must be an absolute URL with scheme
+ # height:    the spacer's height
+ # width:     the spacer's width
+ # colspan:   the spacer spans this many table columns
+ #}
+{% macro spacer(cdnPrefix, height, width, colspan) %}
     <td colspan="{{ colspan|default('1') }}"
         valign="top"
         height="{{ height|default('1') }}"
         width="{{ width|default('1') }}"
         style="line-height:{{ height|default('1') }}px;">
-        <img src="{{ fqdn }}/images/emails/spacer.gif"
+        <img src="{{ cdnPrefix }}/images/emails/spacer.gif"
              height="{{ height|default('1') }}"
              width="0"
              border="0" />

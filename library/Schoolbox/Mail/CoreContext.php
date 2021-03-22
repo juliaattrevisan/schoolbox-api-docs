@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,12 +9,11 @@
 
 namespace Schoolbox\Mail;
 
-
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;
-use Zend\Uri\Uri;
 
-class CoreContext {
+class CoreContext
+{
 
     /** @var array */
     protected $context;
@@ -42,19 +42,17 @@ class CoreContext {
             $this->context['config'][$key] = $conf->get($key);
         }
 
-        $this->context['config']['fqdn'] = trim(
+        $fqdn = trim(
             $this->context['config']['site_hostname'] . "." . $this->context['config']['site_domain'],
             '.'
         );
+        $this->context['config']['fqdn'] = $fqdn;
 
         // Create a fully-qualified CDN prefix
         $prefixGenerator = new PrefixGenerator($conf);
-        $cdnPrefix       = $prefixGenerator->generate();
-        $cdnPrefixUrl    = (new Uri($cdnPrefix))->makeRelative($this->context['config']['fqdn']);
-        $this->context['config']['fqdn_cdn_prefix'] = $cdnPrefixUrl->toString();
-
-        $this->context['config']['year'] = date('Y');
-        $this->context['config']['padding'] = 4;
+        $this->context['config']['fqdn_cdn_prefix'] = 'https://' . $prefixGenerator->generateWithBaseUrl($fqdn);
+        $this->context['config']['year']            = date('Y');
+        $this->context['config']['padding']         = 4;
 
         // I'm reasonably sure that these logos are not used anymore.
         // I can find no reference to `config.logo` in twig templates.
