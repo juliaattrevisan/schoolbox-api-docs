@@ -258,15 +258,15 @@ export default {
             </template>
         </v-select>
         <ul class="flex-list buttons">
-            <li><button @click.prevent="onCancel">Cancel</button></li>
             <li>
                 <button @click.prevent="onSubmit" class="submit" :disabled="isSubmitButtonDisabled">
                     <!-- @slot The text for this badge award form's confirm button -->
                     <slot name="confirmButton">
-                        Award Achievement
+                      Award Achievement
                     </slot>
                 </button>
             </li>
+            <li><button @click.prevent="onCancel">Cancel</button></li>
         </ul>
 
         <toast ref="toast"></toast>
