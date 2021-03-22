@@ -4,6 +4,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Video\ResourceVideo;
@@ -69,6 +71,8 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
         );
 
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
+        $prefixGenerator     = new PrefixGenerator($this->getConfigLoader());
+        $cdnPrefix           = $prefixGenerator->generate();
 
         if ($this->getConfig('size') > 1) {
             $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig, $this->getConfig('size') - 1);
@@ -174,7 +178,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                         $this->setVar(
                             array(
                                 'VIDEO_LIST_STATUS'    => $video->getStatus(),
-                                'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
+                                'VIDEO_LIST_STATUSIMG' => $cdnPrefix . $video->getStatusImage(),
                             )
                         );
 

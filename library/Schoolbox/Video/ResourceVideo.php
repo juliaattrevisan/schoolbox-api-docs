@@ -53,7 +53,10 @@ class ResourceVideo
     }
 
     /**
-     * Get the full path to the image used in statuses
+     * Get the full path (minus CDN prefix) to the image used in statuses.
+     *
+     * (The status image ought not be a responsibility of this class anyway:
+     *  that should be something that a renderer class or template should know.)
      *
      * @param string $type Defaults to "video", but you could pass "audio" for an audio thumbnail.
      * @return string

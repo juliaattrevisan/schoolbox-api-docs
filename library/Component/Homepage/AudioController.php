@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Resource\File\Model;
 use \Schoolbox\Permission\Access\UserAccess;
@@ -97,6 +98,9 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         } else {
             $this->outputList = new \Schoolbox\Collection(array());
         }
+
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
+        $cdnPrefix       = $prefixGenerator->generate();
 
         if (!count($this->outputList)) {
 
@@ -199,8 +203,8 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                     } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
 
                         $this->setVar([
-                            'AUDIO_LIST_STATUS' => $audio->getStatus(),
-                            'AUDIO_LIST_STATUSIMG' => $audio->getStatusImage('audio'),
+                            'AUDIO_LIST_STATUS'    => $audio->getStatus(),
+                            'AUDIO_LIST_STATUSIMG' => $cdnPrefix . $audio->getStatusImage('audio'),
                         ]);
                         $this->parse('audio_pending_list_block', 'audio_pending_list', true);
                     }
