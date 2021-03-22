@@ -4,4 +4,11 @@
         width: 100% !important;
         height: 100% !important;
     }
+
+    /* The actual chart itself at /adminv2/usage
+     * These crush up against each other too closely
+     */
+    .usage-chart {
+        padding-bottom: 1rem;
+    }
 }
