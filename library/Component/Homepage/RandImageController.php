@@ -59,6 +59,10 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         );
 
         if (!count($fileList)) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
+
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 

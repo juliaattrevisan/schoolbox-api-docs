@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_EtherpadController extends Component_Homepage_ControllerAbstract
 {
@@ -53,7 +53,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'etherpad')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -75,6 +75,9 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if (count($allPads) == 0) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');

@@ -4,8 +4,9 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Resource\File\Model;
+
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\File\Model;
 
 class Component_Homepage_ImageGalleryController extends Component_Homepage_ControllerAbstract
 {
@@ -25,7 +26,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
         return true;
@@ -46,7 +47,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         if (!parent::loadTemplate($templateHandle, 'imageGallery')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -73,6 +74,9 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         ]);
 
         if ($allImages->count() == 0) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');

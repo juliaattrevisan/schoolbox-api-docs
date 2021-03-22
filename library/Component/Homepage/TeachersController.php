@@ -6,7 +6,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
 use Schoolbox\Role;
 
@@ -39,6 +38,9 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
         }
 
         if (empty($listSyns)) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
@@ -57,20 +59,15 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                 'empty_students_admin_block' => '',
             ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-            } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 and !$this->getSource()->getFolder()->isGroup()) {
-
+            if ($this->getSource()->getFolder()->getCodes()->count() == 0 and !$this->getSource()->getFolder()->isGroup()) {
                 if ($this->getUser()->isSuperuser()) {
                     $this->parse('empty_code_admin_block', 'empty_code_admin');
                 } else {
                     $this->parse('empty_code_block', 'empty_code');
                 }
-
             } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 and $this->getSource()->getFolder()->isGroup()) {
                 $this->parse('empty_is_group_block', 'empty_is_group');
             } else {
-
                 if ($this->getUser()->isSuperuser()) {
                     $this->parse('empty_students_admin_block', 'empty_students_admin');
                 } else {
@@ -184,8 +181,7 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             } else {
                                 $this->parse('photo_block', 'photo');
                             }
-                        }
-                        else {
+                        } else {
                             $this->parse('photo_block', 'photo');
                         }
 

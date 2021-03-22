@@ -6,7 +6,7 @@
  */
 
 use Schoolbox\Resource\Folder;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_FolderListController extends Component_Homepage_ControllerAbstract
 {
@@ -20,7 +20,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
 
@@ -38,7 +38,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         if (!parent::loadTemplate($templateHandle, 'folderList')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -61,7 +61,10 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         //setup block for submission button
         $this->setVar('FOLDER_CAT_ID', $this->getSource()->getId());
 
-        if (count($allFolders) == 0 || $this->getContentPermission() == UserAccess::ACCESS_DENY) {
+        if (count($allFolders) === 0) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');

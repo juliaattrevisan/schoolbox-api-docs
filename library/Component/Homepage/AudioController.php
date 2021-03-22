@@ -65,7 +65,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         if (!parent::loadTemplate($templateHandle, 'audio')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -99,6 +99,9 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         }
 
         if (!count($this->outputList)) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');

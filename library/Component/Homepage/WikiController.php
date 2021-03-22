@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_WikiController extends Component_Homepage_ControllerAbstract
 {
@@ -42,7 +42,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         if (!parent::loadTemplate($templateHandle, 'wiki')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -64,6 +64,9 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         ]);
 
         if (!is_array($wikiList)) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');

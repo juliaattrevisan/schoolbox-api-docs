@@ -57,6 +57,10 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
         $allStudents          = $externalClassHandler->getStudents($this->getContext()->getCodeString());
 
         if (!count($allStudents)) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
+
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
             $this->setBlock('empty_state', 'empty_code', 'empty_code_block');

@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LinkMapper;
 
 /**
@@ -40,7 +40,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
 
@@ -63,7 +63,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'linkList')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
            return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -103,6 +103,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         $linkCount = $this->linkMapper->countByColumnList($countParams);
 
+        if ($linkCount === 0 && !$this->hasContextWriteAccess()) {
+            return false;
+        }
+
         /* Need title injected here
          */
         $this->parseConfig();
@@ -113,7 +117,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         //setup block for submission button
         $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
 
-        if (\count($allLinks) === 0) {
+        if (count($allLinks) === 0) {
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');

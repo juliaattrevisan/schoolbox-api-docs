@@ -7,7 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_PinterestController extends Component_Homepage_ControllerAbstract
 {
@@ -70,6 +70,9 @@ class Component_Homepage_PinterestController extends Component_Homepage_Controll
         }
 
         if ($emptyState) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');

@@ -55,7 +55,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
 
@@ -74,7 +74,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'fileList')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -111,7 +111,10 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         //setup block for submission button
         $this->setVar('FILE_CAT_ID', $this->getSource()->getId());
 
-        if (count($fileList) == 0) {
+        if (count($fileList) === 0) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
@@ -170,7 +173,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                 /** @var Schoolbox\Resource\File\Model[] $fileList */
                 if (count($fileList)) {
-                    $folderId =$this->getContext()->getId();
+                    $folderId = $this->getContext()->getId();
                     foreach ($fileList as $file) {
                         if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                             continue;

@@ -54,7 +54,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         // Get collection of members
         $userMapper = UserMapper::getInstance();
-        if($this->getContext()->getInherit()) {
+        if ($this->getContext()->getInherit()) {
             // Find nearest nian folder
             $folderMapper = FolderMapper::getInstance();
             $nianFolder = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
@@ -63,8 +63,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 UserAccess::ACCESS_READ,
                 $nianFolder->getId(),
                 ['lastname' => 'asc']);
-        }
-        else {
+        } else {
             $userList   = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_READ,
@@ -72,7 +71,10 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 ['lastname' => 'asc']);
         }
 
-        if (count($userList) == 0) {
+        if (count($userList) === 0) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read_members', 'empty_read_members_block');
             $this->setBlock('empty_state', 'empty_read_managers', 'empty_read_managers_block');

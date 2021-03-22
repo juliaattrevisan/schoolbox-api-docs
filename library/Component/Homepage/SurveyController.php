@@ -4,7 +4,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
 
 
@@ -20,7 +20,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
 
@@ -47,6 +47,9 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if (!is_array($allSurveys)) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
