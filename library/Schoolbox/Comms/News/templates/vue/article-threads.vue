@@ -25,7 +25,16 @@ export default {
         isThreadEnabledOnLoad: Boolean,
         isPublished: Boolean,
         createThreadEndpoint: String,
-        siteVersion: String //for cache busting
+        siteVersion: String, //for cache busting
+
+        /**
+         * The CDN prefix for this instance: used as the source from which
+         * scripts are loaded.
+         */
+        cdnPrefix: {
+            type: String,
+            default: '',
+        }
     },
 
     data () {
@@ -229,8 +238,8 @@ export default {
 
                 try {
 
-                    await this.injectScript('/javascript/ckeditor/ckeditor.js?v=' + this.siteVersion);
-                    await this.injectScript('/javascript/shared/editor/jquery.editor.js?v=' + this.siteVersion);
+                    await this.injectScript(this.cdnPrefix + '/javascript/ckeditor/ckeditor.js?v=' + this.siteVersion);
+                    await this.injectScript(this.cdnPrefix + '/javascript/shared/editor/jquery.editor.js?v=' + this.siteVersion);
 
                     $.fn.alaressEditor({
                         targetElements: $('#comment'),
