@@ -1,4 +1,3 @@
-<script type="text/javascript" src="/javascript/components/highcharts-release/highcharts.js"></script>
 <script>
     $(function() {
         $('[data-file-usage]').on('click', '[data-action=delete]', function(event) {
@@ -17,26 +16,48 @@
         });
     });
 </script>
-<div class="row">
-    <div class="small-12 columns">
-        <h2 class="subheader">Usage for <a href="/search/user{{ user.id }}">{{ user.fullname }}</a></h2>
-    </div>
 
-    <div class="small-12 island">
-        {% include '@adminUsage/specificUser/total.twig' with {user: user} %}
-    </div>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-    <div class="small-12 medium-6 island">
-        {% include '@adminUsage/specificUser/system.twig' with {user: user} %}
-    </div>
+<div class="admin-container row">
 
-    <div class="small-12 medium-6 island">
-        {% include '@adminUsage/specificUser/filetype.twig' with {user: user} %}
-    </div>
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
 
-    <div class="small-12 island">
-        <h2 class="subheader">Files</h2>
-        {% include '@adminUsage/specificUser/file.twig' with {user: user} %}
+    <div class="admin-content">
+        <div class="small-12 island">
+            <section class="content">
+                <div id="usage-specific-total-container">
+                    <usage-specific-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserTotalPayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-total>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
 
+
+{#<div class="row">#}
+{#    <div class="small-12 columns">#}
+{#        <h2 class="subheader">Usage for <a href="/search/user{{ user.id }}">{{ user.fullname }}</a></h2>#}
+{#    </div>#}
+
+{#    <div class="small-12 island">#}
+{#        {% include '@adminUsage/specificUser/total.twig' with {user: user} %}#}
+{#    </div>#}
+
+{#    <div class="small-12 medium-6 island">#}
+{#        {% include '@adminUsage/specificUser/system.twig' with {user: user} %}#}
+{#    </div>#}
+
+{#    <div class="small-12 medium-6 island">#}
+{#        {% include '@adminUsage/specificUser/filetype.twig' with {user: user} %}#}
+{#    </div>#}
+
+{#    <div class="small-12 island">#}
+{#        <h2 class="subheader">Files</h2>#}
+{#        {% include '@adminUsage/specificUser/file.twig' with {user: user} %}#}
+{#    </div>#}
+{#</div>#}
+
+<script src="/javascript/components/usageSpecificTotal.bundle.js"></script>

@@ -36,6 +36,8 @@ module.exports = {
         usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/filetype.main.js',
         usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/user.main.js',
 
+        usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/total.main.js',
+
         //Sass
         chromeFoundation: './www/css/foundation/chrome-foundation.scss',
         editor: './www/css/foundation/editor.scss'

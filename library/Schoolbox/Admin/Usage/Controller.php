@@ -77,6 +77,8 @@ class Controller extends Base
     public function getSpecificUser(User $user): void
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@adminUsage/specificUser.twig', [
+            'pageCurrent' => $this->router->generate('adminUsage.getIndex'),
+            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUsage.getIndex')),
             'isS3Adapter' => $this->isS3Adapter(),
             'user' => $user
         ]));
