@@ -72,13 +72,13 @@ class Controller extends Base
             $data['page'] = '';
         }
 
-        // Determine the login background image to use
+        // Build a set of login backgrounds: choose a random one in Twig
+        $data['login_backgrounds'] = [];
         $backgrounds = explode(',', $this->getConfigLoader()->get('skin_login_bg'));
-
-        if (count($backgrounds) && $backgrounds[0]) {
-            $data['login_bg'] = '/storage/image.php?hash=' . $backgrounds[array_rand($backgrounds)] . '&size=maxsize';
-        } else {
-            $data['login_bg'] = '/images/core/login-bg.jpg';
+        foreach ($backgrounds as $background) {
+            if (!empty($background)) {
+                $data['login_backgrounds'][] = '/storage/image.php?' . http_build_query(['hash' => $background, 'size' => 'maxsize']);
+            }
         }
 
         // Display an error if appropriate to the user

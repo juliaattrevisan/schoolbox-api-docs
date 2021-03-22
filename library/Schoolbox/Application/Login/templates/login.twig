@@ -25,11 +25,19 @@
 <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.php?logo=skin_logo_square&size=apple180">
 <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
 {% include 'include/skin.twig' with { config: config } only %}
-<style type="text/css">
-    body.login {
-        background-image: url({{ login_bg }});
-    }
-</style>
+
+{% autoescape 'css' %}
+    <style type="text/css">
+        body.login {
+            background-image: url("{{
+                login_backgrounds is not empty
+                    ? random(login_backgrounds)
+                    : (CDN_PREFIX ~ '/images/core/login-bg.jpg')
+             }}");
+        }
+    </style>
+{% endautoescape %}
+
 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/javascript/shared/browser-redirect.js"></script>
 {% if config.site_usage_tracking %}
