@@ -44,6 +44,8 @@ export default {
      * the meaning of "this" in a way you don't expect.
      */
     data() {
+        return {
+        }
     },
 
     /**
@@ -51,7 +53,7 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: {
+    mounted: function () {
     },
 
     /**
