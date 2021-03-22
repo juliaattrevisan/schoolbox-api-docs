@@ -33,11 +33,11 @@ export default {
         return {
 
             /* True, when data is currently isLoading; used to show skeleton
-                */
+             */
             isLoading: true,
                
-            /* The table headings to dsiplay and thus row data to show
-                */
+            /* The table headings to display and thus row data to show
+             */
             columns: [
                 {
                     label: 'Name',
@@ -50,7 +50,7 @@ export default {
                 {
                     label: 'Last Visited',
                     field: 'occursAt.absolute',
-					formatFn: this.formatLastVisited
+                    formatFn: this.formatLastVisited
                 },
             ],
 

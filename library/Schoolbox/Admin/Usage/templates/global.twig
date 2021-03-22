@@ -30,17 +30,18 @@
                 <usage-global-filetype :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getFileTypePayload') }}'"></usage-global-filetype>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="row">
-{#    <div class="small-12 island">#}
-{#        <h2 class="subheader">CMS Usage by User</h2>#}
-{#        {% include ('@adminUsage/user.twig') %}#}
-{#    </div>#}
+        <div class="small-12 island">
+            <div id="usage-global-user-container">
+                <h2 class="subheader">CMS Usage by User</h2>
+                <usage-global-user :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getUserPayload') }}'"></usage-global-user>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="/javascript/components/usageGlobalTotal.bundle.js"></script>
 <script src="/javascript/components/usageGlobalRole.bundle.js"></script>
 <script src="/javascript/components/usageGlobalSystem.bundle.js"></script>
 <script src="/javascript/components/usageGlobalFiletype.bundle.js"></script>
+<script src="/javascript/components/usageGlobalUser.bundle.js"></script>

@@ -34,6 +34,7 @@ module.exports = {
         usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/role.main.js',
         usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/system.main.js',
         usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/filetype.main.js',
+        usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/user.main.js',
 
         //Sass
         chromeFoundation: './www/css/foundation/chrome-foundation.scss',
