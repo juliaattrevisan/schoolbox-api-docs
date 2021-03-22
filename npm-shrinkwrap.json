@@ -15594,8 +15594,7 @@
     "regenerator-runtime": {
       "version": "0.13.7",
       "resolved": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.13.7.tgz",
-      "integrity": "sha1-ysLazIoepnX+qrrriugziYrkb1U=",
-      "dev": true
+      "integrity": "sha1-ysLazIoepnX+qrrriugziYrkb1U="
     },
     "regenerator-transform": {
       "version": "0.14.5",
@@ -16794,6 +16793,24 @@
         "loader-utils": "^1.1.0",
         "vue-hot-reload-api": "^2.3.0",
         "vue-style-loader": "^4.1.0"
+      }
+    },
+    "vue-resize": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/vue-resize/-/vue-resize-1.0.1.tgz",
+      "integrity": "sha512-z5M7lJs0QluJnaoMFTIeGx6dIkYxOwHThlZDeQnWZBizKblb99GSejPnK37ZbNE/rVwDcYcHY+Io+AxdpY952w==",
+      "requires": {
+        "@babel/runtime": "^7.13.10"
+      },
+      "dependencies": {
+        "@babel/runtime": {
+          "version": "7.13.10",
+          "resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.13.10.tgz",
+          "integrity": "sha512-4QPkjJq6Ns3V/RgpEahRk+AGfL0eO6RHHtTWoNNr5mO49G6B5+X6d6THgWEAvTrznU5xYpbAlVKRYcsCgh/Akw==",
+          "requires": {
+            "regenerator-runtime": "^0.13.4"
+          }
+        }
       }
     },
     "vue-select": {
