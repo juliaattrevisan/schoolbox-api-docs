@@ -38,7 +38,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      */
     public function determineIcon($iconSize = 'square64'): string
     {
-        $iconDirectory = '/images/mime/';
+        $iconDirectory = '/ajax/mime/';
 
         /* Default icon as a fallback */
         $icon = $iconDirectory . 'application-document.svg';
@@ -47,7 +47,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
          * (sysadmins can choose their own icons)
          */
         try {
-            $iconFile = MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getIconFile();
+            $iconFile = MimetypeMapper::getInstance()->getByFilename($this->getExternalTitle())->getMime();
             $icon = $iconDirectory . $iconFile;
         } catch (FileException $e) {
             /* Mimetype unknown? Try to load either an icon or a thumbnail image
