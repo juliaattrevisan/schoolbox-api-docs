@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Usage\Graph;
+namespace Schoolbox\Admin\Usage\Graph\GlobalUsers;
 
 use Alaress\Database\Connector\IConnector;
 
@@ -13,7 +13,7 @@ use Alaress\Database\Connector\IConnector;
 /**
  * Class TotalPayload
  *
- * @package Schoolbox\Admin\Usage\Graph
+ * @package Schoolbox\Admin\Usage\Graph\GlobalUsers
  */
 class TotalPayload
 {

@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Usage\Graph;
+namespace Schoolbox\Admin\Usage\Graph\GlobalUsers;
 
 use Alaress\Database\Connector\IConnector;
 
@@ -24,6 +24,8 @@ use Alaress\Database\Connector\IConnector;
  * Pastoral
  * My Files
  * Tiles
+ *
+ * @package Schoolbox\Admin\Usage\Graph\GlobalUsers
  */
 class SystemPayload
 {

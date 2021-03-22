@@ -93,7 +93,7 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\SystemPayload($database))->generate();
+        $payload = (new Graph\GlobalUsers\SystemPayload($database))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -107,7 +107,7 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\RolePayload($database))->generate();
+        $payload = (new Graph\GlobalUsers\RolePayload($database))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -121,7 +121,7 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\TotalPayload($database, $this->getConfigLoader()->get('storage_dir')))->generate();
+        $payload = (new Graph\GlobalUsers\TotalPayload($database, $this->getConfigLoader()->get('storage_dir')))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -135,7 +135,7 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\UserPayload($database))->generate();
+        $payload = (new Graph\GlobalUsers\UserPayload($database))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }
@@ -149,7 +149,7 @@ class Controller extends Base
         /** @var IConnector $database */
         $database = $this->getDi()->get('databaseInternal');
 
-        $payload = (new Graph\FileTypePayload($database))->generate();
+        $payload = (new Graph\GlobalUsers\FileTypePayload($database))->generate();
 
         $this->getResponse()->content->set($this->buildJsonOutput($payload));
     }

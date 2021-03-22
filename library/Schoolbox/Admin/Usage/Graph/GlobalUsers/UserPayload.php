@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Admin\Usage\Graph;
+namespace Schoolbox\Admin\Usage\Graph\GlobalUsers;
 
 use Alaress\Database\Connector\IConnector;
 
@@ -14,7 +14,7 @@ use Alaress\Database\Connector\IConnector;
  *
  * Calculate each user's storage usage
  *
- * @package Schoolbox\Admin\Usage\Graph
+ * @package Schoolbox\Admin\Usage\Graph\GlobalUsers
  */
 class UserPayload
 {
