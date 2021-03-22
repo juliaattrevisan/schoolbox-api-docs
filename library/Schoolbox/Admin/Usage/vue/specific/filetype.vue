@@ -1,8 +1,5 @@
 <script>
-import axios from 'axios';
-import {Chart} from 'highcharts-vue';
-import filesize from 'filesize';
-import { VueGoodTable } from 'vue-good-table';
+import UsageBarchart from "../barchart";
 
 export default {
 
@@ -28,7 +25,7 @@ export default {
      */
     props: [
        'endpoint',
-        'isS3Adapter'
+       'isS3Adapter'
     ],
 
     /**
@@ -37,8 +34,7 @@ export default {
      * at the top of the file.
      */
     components: {
-        highcharts: Chart,
-        VueGoodTable
+        UsageBarchart
     },
 
     /**
@@ -48,20 +44,6 @@ export default {
      * the meaning of "this" in a way you don't expect.
      */
     data() {
-        return {
-
-            /* True, when data is currently loading; used to show skeleton
-             */
-            loading: true,
-
-            /* All the data for this visualisation
-             */
-            allData: [],
-
-            /* Chart options
-             */
-            chartOptions: {}
-        }
     },
 
     /**
@@ -69,108 +51,7 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-        let self = this;
-
-        /* Show skeleton
-         */
-        this.loading = true;
-
-        /* Fetch payload asynchronously
-         */
-        let request = {
-            url: self.endpoint,
-            method: 'get',
-            responseType: 'json'
-        }
-
-        axios.request(request)
-            .then(function (response) {
-
-                /* Load into vue component
-                 */
-                self.allData = response.data;
-
-                let categories = Array();
-                let values = Array();
-
-                self.allData.forEach(function(element, index)
-                {
-                    categories.push(element.label);
-                    values.push(parseInt(element.size));
-                });
-
-                self.chartOptions = {
-                    chart: {
-                        reflow: true,
-                        spacingRight: 48,
-                        type: 'bar',
-                        zoomType: 'xy'
-                    },
-
-                    credits: {
-                        enabled: false
-                    },
-
-                    legend: {
-                        enabled: false
-                    },
-
-                    plotOptions: {
-                        bar: {
-                            dataLabels: {
-                                enabled: true,
-                                formatter: function() {
-                                    return '<span style="color: #aaaaaa">' + filesize(this.y) + '</span>'
-                                }
-                            }
-                        }
-                    },
-
-                    series: [
-                        {
-                            color: '#82b5d8',
-                            name: '',
-                            data: values
-                        }
-                    ],
-
-                    time: {
-                        useUTC: false
-                    },
-
-                    title: {
-                        text: 'Type Usage'
-                    },
-
-                    tooltip: {
-                        enabled: false
-                    },
-
-                    xAxis: {
-                        categories: categories
-                    },
-
-                    yAxis: {
-                        allowDecimals: false,
-                        min: 0,
-                        title: {
-                            text: 'Bytes'
-                        }
-                    }
-                }
-            })
-            .catch(error => {
-                if (error.response) {
-                    self.loading = false;
-                }
-            })
-            .then(function () {
-
-                /* Hide skeleton
-                 */
-                self.loading = false;
-            });
+    mounted: {
     },
 
     /**
@@ -191,13 +72,6 @@ export default {
 </script>
 <template>
     <div>
-        <template v-if="this.loading">
-            <div>
-                <h2>Loading data, wait</h2>
-            </div>
-        </template>
-        <template v-else>
-            <highcharts ref="filetypeGraph" :options="chartOptions"></highcharts>
-        </template>
+        <usage-barchart :endpoint="endpoint" :is-s3-adapter="isS3Adapter" :title="'Type Usage'" :y-axis-title="'Bytes'"/>
     </div>
 </template>
