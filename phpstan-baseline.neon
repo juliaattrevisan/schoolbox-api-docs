@@ -8268,16 +8268,6 @@ parameters:
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 1
-			path: library/Schoolbox/Admin/Usage/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Admin/Usage/Model.php
-
-		-
-			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
 			path: library/Schoolbox/Fixtures/Coach/Model.php
 
 		-
