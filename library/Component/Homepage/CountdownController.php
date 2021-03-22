@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_CountdownController extends Component_Homepage_ControllerAbstract
 {
@@ -50,6 +50,9 @@ class Component_Homepage_CountdownController extends Component_Homepage_Controll
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if ($showEmpty) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock('empty_state', 'empty_read_only', 'empty_read_only_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');

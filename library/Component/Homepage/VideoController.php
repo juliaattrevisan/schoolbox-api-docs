@@ -6,9 +6,9 @@
  */
 
 use Schoolbox\Collection;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Video\ResourceVideo;
-use \Schoolbox\Video\ResourceVideoMapper;
+use Schoolbox\Video\ResourceVideoMapper;
 
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract
 {
@@ -126,6 +126,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         /* No videos found
          */
         if (!$this->outputList->count()) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
             $this->buildEmptyState();
 
             return true;
@@ -245,7 +248,9 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 $numVideosListed++;
             }
         }
-
+        if ($numVideosListed === 0 && !$this->hasContextWriteAccess()) {
+            return false;
+        }
         if (is_object($this->defaultVideo) && $this->defaultVideo->isComplete()) {
             $this->setVar('DEFAULT_VIDEO_ID', $this->defaultVideo->getFile()->getId());
             $this->parse('default_video_block', 'default_video');

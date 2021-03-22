@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 use Schoolbox\Mapper\Exception\Deleted;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_PollController extends Component_Homepage_ControllerAbstract
 {
@@ -79,7 +79,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 ]);
 
                 // Owner name and optional link
-                if($author->isDeleted()){
+                if ($author->isDeleted()) {
                     $this->setVar('owner_exists_block', '');
                     $this->parse('owner_deleted_block', 'owner_deleted');
                 } else {
@@ -166,10 +166,9 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             $this->parse('has_poll_block', 'has_poll');
 
             $current = $poll;
-
-        }
-        else
-        {
+        } elseif (!$this->hasContextWriteAccess()) {
+            return false;
+        } else {
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 

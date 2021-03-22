@@ -7,7 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\File\Model as File;
 
 class Component_Homepage_ImageController extends Component_Homepage_ControllerAbstract
@@ -21,7 +21,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
         return true;
@@ -40,7 +40,7 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
 
         // Is an selected image configured to be displayed ?
         $image = null;
-        if($this->getConfig('image')){
+        if ($this->getConfig('image')) {
             /** @var File $image */
             $image = $this->getFileMapper()->findForFolders(
                 [$this->getContext()->getId()],
@@ -100,9 +100,11 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                 $this->setVar('submit_image_block', '');
             }
             $this->parse('has_image_block', 'has_image');
-        }
-        // No Image - render the empty state
-        else {
+        } elseif (!$this->hasContextWriteAccess()) {
+            return false;
+        } else {
+            // No Image - render the empty state
+
             $this->setVar('has_image_block', '');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');

@@ -31,7 +31,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 
         // get rubric details
         $this->criteria = Mapper::getInstance()->findForFolder($this->getContext()->getId());
-        return true;
+        return !(count($this->criteria) === 0 && !$this->hasContextWriteAccess());
     }
 
     /**

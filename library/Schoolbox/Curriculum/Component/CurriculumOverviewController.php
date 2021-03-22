@@ -64,7 +64,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                     break;
                 }
             }
-        } elseif (!$this->hasReadAccess()) {
+        } elseif (!$this->hasContextWriteAccess()) {
             return false;
         }
 

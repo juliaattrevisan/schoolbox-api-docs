@@ -128,7 +128,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             (int)$this->getConfig('days')
         );
 
-        return true;
+        // Do not show this component, if there's no match for readonly user
+        return !($this->readOnly && $this->matches->count() === 0);
     }
 
 

@@ -6,7 +6,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ClickviewController extends Component_Homepage_ControllerAbstract
 {
@@ -128,6 +128,9 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
         }
 
         if ($showEmpty) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
 
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');

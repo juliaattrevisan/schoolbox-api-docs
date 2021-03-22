@@ -5,7 +5,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 
 class Component_Homepage_PodcastController extends Component_Homepage_ControllerAbstract
@@ -54,6 +54,10 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
         $this->parseConfig();
 
         if ($emptyState) {
+            if (!$this->hasContextWriteAccess()) {
+                return false;
+            }
+
             $this->setVar([
                 'podcast_block' => '',
                 'empty_read_block' => '',

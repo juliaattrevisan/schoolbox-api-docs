@@ -50,10 +50,9 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
-
             // Limit to the number specified in blog component config (0 == 'ALL')
             $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
 
@@ -62,6 +61,10 @@ class Controller extends Component_Homepage_ControllerAbstract
                 ->findByColumn("folder_id", $this->getSource()->getId())
                 ->sortBy('createdAt', 'desc')
                 ->limit($limit);
+
+            if (!$this->hasContextWriteAccess() && !count($blogs)) {
+                return false;
+            }
 
             // Grab comments and image gallery items for each blog post
 
