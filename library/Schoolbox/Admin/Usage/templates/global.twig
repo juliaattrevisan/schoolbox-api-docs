@@ -12,14 +12,17 @@
                 <usage-global-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'"></usage-global-total>
             </div>
         </div>
+
+        <div class="small-12 island">
+            <div id="usage-global-role-container">
+                <usage-global-role :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'"></usage-global-role>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="row">
 
-{#    <div class="small-12 island">#}
-{#        {% include ('@adminUsage/total.twig') %}#}
-{#    </div>#}
 
 {#    <div class="small-12 medium-6 island">#}
 {#        {% include ('@adminUsage/system.twig') %}#}
@@ -30,13 +33,10 @@
 {#    </div>#}
 
 {#    <div class="small-12 island">#}
-{#        {% include ('@adminUsage/role.twig') %}#}
-{#    </div>#}
-
-{#    <div class="small-12 island">#}
 {#        <h2 class="subheader">CMS Usage by User</h2>#}
 {#        {% include ('@adminUsage/user.twig') %}#}
 {#    </div>#}
 </div>
 
 <script src="/javascript/components/usageGlobalTotal.bundle.js"></script>
+<script src="/javascript/components/usageGlobalRole.bundle.js"></script>

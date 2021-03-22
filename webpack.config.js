@@ -31,6 +31,7 @@ module.exports = {
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
 
         usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/total.main.js',
+        usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/role.main.js',
 
         //Sass
         chromeFoundation: './www/css/foundation/chrome-foundation.scss',
