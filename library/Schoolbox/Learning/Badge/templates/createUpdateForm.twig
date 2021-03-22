@@ -75,16 +75,23 @@
                                         /* Shank twig data into js; I could probably skip this
                                          * by providing the registry from backend instead
                                          */
+                                        let cdnPrefix = "{{ CDN_PREFIX }}";
                                         $('#icon-modal').iconModal({
                                             registry: $.parseJSON('{{ iconRegistry.registry|json_encode|escape('js') }}'),
                                             pageLength: {{ iconRegistry.pageLength }},
 
+                                            root: cdnPrefix + "/images/badges",
+
                                             /* Inflict it upon the form
                                              */
                                             onSelect: function(element) {
-                                                $('[data-icon-selection] img').attr('src', $(element).attr('src')).show();
+                                                let badgeImageSource = $(element).attr('src');
+                                                $('[data-icon-selection] img').attr('src', badgeImageSource).show();
                                                 $('#badge-icon-file-error').remove();
-                                                $('input[name=icon]').val($(element).attr('src'));
+
+                                                // Strip away the CDN prefix from the input value:
+                                                // this is so that the badge is portable between the CDN and static
+                                                $('input[name=icon]').val(badgeImageSource.replace(cdnPrefix, ''));
 
                                                 $('#icon-modal').foundation('reveal', 'close');
                                             }
@@ -118,7 +125,7 @@
                             </div>
                             <div class="small-12 medium-6 columns" data-icon-container>
                                 <div data-icon-selection>
-                                    <img src="{{ badge and badge.icon ? badge.icon : '' }}" width="128" height="128" />
+                                    <img src="{{ badge and badge.icon ? (CDN_PREFIX ~ badge.icon) : '' }}" width="128" height="128" />
                                     <input id="badge-icon-file" name="icon" type="hidden" value="{{ badge and badge.icon ? badge.icon : '' }}" />
                                 </div>
                                 <div>
