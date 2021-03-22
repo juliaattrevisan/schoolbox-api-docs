@@ -155,8 +155,8 @@ export default {
                 }"
                 :sort-options="{
                     initialSortBy: {
-                        field: 'size',
-                        type: 'desc'
+                        field: 'lastname',
+                        type: 'asc'
                     }
                 }"
                 :pagination-options="{
