@@ -1,5 +1,6 @@
 <?php
 use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Message\NSMapper;
 
@@ -141,8 +142,11 @@ switch ($this->arg[0]) {
                 $image = "/storage/image.php?size=square64&hash=$hash";
                 $thumb = "/storage/image.php?size=square200&hash=$hash";
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $image = '/images/icon.php?size=64&icon='.NSMapper::NS_NEWS;
-                $thumb = '/images/emails/spacer.gif';
+                $image = '/images/icon.php?size=64&icon=' . NSMapper::NS_NEWS;
+
+                /** @var PrefixGenerator $prefixGenerator */
+                $prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
+                $thumb           = $prefixGenerator->generate() . '/images/emails/spacer.gif';
             }
 
             $decorator->appendInstance($bob

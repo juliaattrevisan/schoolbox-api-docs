@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Parameter\Param;
 use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Model as Article;
 use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
@@ -60,6 +61,11 @@ class Notifier extends AbstractModuleNotifier
     private $userMapper;
 
     /**
+     * Prefix generator, for creating a fallback thumbnail
+     */
+    private PrefixGenerator $prefixGenerator;
+
+    /**
      * @inheritdoc
      *
      * @throws ServiceNotFound
@@ -82,6 +88,7 @@ class Notifier extends AbstractModuleNotifier
             'setUserMapper'        => $mf->getLazy(UserMapper::class),
             'setAudienceResolver'  => $userResolver,
             'setModeratorResolver' => $moderatorResolver,
+            'setPrefixGenerator'   => $di->lazyGet('cdnPrefixGenerator'),
         ];
     }
 
@@ -129,6 +136,14 @@ class Notifier extends AbstractModuleNotifier
     public function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
+    }
+
+    /**
+     * @param PrefixGenerator $prefixGenerator
+     */
+    public function setPrefixGenerator(PrefixGenerator $prefixGenerator)
+    {
+        $this->prefixGenerator = $prefixGenerator;
     }
 
     /**
@@ -545,7 +560,7 @@ class Notifier extends AbstractModuleNotifier
 
         } else {
             $icon  = $this->getUserIcon($author);
-            $thumb = '/images/emails/spacer.gif';
+            $thumb = $this->prefixGenerator->generate() . '/images/emails/spacer.gif';
         }
 
         $href = sprintf(self::PATTERN_POSTED_HREF, $articleId);
