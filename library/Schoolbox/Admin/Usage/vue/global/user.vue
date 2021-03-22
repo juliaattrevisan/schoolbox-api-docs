@@ -55,16 +55,18 @@ export default {
              */
             allData: [],
 
+            /* Table columns. You can define sorting and formatting functions
+             * here, but I found the custom slots to work best for sorting on
+             * html representations e.g. linked firstname, linked lastname
+             */
             columns: [
                 {
                     label: 'Firstname',
-                    html: true,
-                    field: this.linkFirstname,
+                    field: 'firstname'
                 },
                 {
                     label: 'Lastname',
-                    html: true,
-                    field: this.linkLastname,
+                    field: 'lastname'
                 },
                 {
                     label: 'Role',
@@ -133,27 +135,6 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
-
-        /**
-         * Render firstnames with html links
-         *
-         * @param rowObj
-         * @returns {string}
-         */
-        linkFirstname(rowObj) {
-            return '<a href="/adminv2/usage/specific/'+rowObj.userId+'">'+rowObj.firstname+'</a>';
-        },
-
-
-        /**
-         * Render lastnames with html links
-         *
-         * @param rowObj
-         * @returns {string}
-         */
-        linkLastname(rowObj) {
-            return '<a href="/adminv2/usage/specific/'+rowObj.userId+'">'+rowObj.lastname+'</a>';
-        },
     }
 }
 </script>
@@ -185,7 +166,19 @@ export default {
                     rowsPerPageLabel: 'Users per page',
                     infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
                 }"
-            />
+            >
+                <template slot="table-row" slot-scope="props">
+                    <template v-if="props.column.field == 'firstname'">
+                        <a :href="'/adminv2/usage/specific/' + props.row.userId">{{ props.row.firstname }}</a>
+                    </template>
+                    <template v-else-if="props.column.field == 'lastname'">
+                        <a :href="'/adminv2/usage/specific/' + props.row.userId">{{ props.row.lastname }}</a>
+                    </template>
+                    <template v-else>
+                        {{props.formattedRow[props.column.field]}}
+                    </template>
+                </template>
+            </vue-good-table>
         </template>
     </div>
 </template>
