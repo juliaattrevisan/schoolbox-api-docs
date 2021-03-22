@@ -85,7 +85,7 @@ class Factory
                 new User\Translator\ModelToArray(),
                 new \Schoolbox\Resource\Storage\Translator\ModelToArray($this->prefixGenerator),
                 new ScrubAdapter(),
-                new BadgeLinksTranslator($this->router, $this->authorizer, $this->user)
+                new BadgeLinksTranslator($this->router, $this->authorizer, $this->user, $this->prefixGenerator)
             ),
             new BadgeAwardLinksTranslator($this->router, $this->authorizer, $this->user)
         );

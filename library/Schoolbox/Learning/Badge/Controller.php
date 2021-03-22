@@ -375,12 +375,13 @@ class Controller extends Base
      */
     private function buildModelToArrayTranslator(): Composite
     {
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
         return new Composite(
             new Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
-                new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+                new Storage\Translator\ModelToArray($prefixGenerator),
                 new ScrubAdapter(),
-                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
             ),
             new Translator\ModelToArray\Links(
                 $this->router,

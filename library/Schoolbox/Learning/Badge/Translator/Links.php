@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Badge\Translator;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge;
 use Schoolbox\User;
 
@@ -45,17 +46,29 @@ class Links
 
 
     /**
+     * Prefix generator: for attaching a prefix to the badge image link.
+     */
+    private PrefixGenerator $prefixGenerator;
+
+
+    /**
      * Constructor
      *
-     * @param Router     $router
-     * @param Authorizer $authorizer
-     * @param User       $currentUser
+     * @param Router          $router
+     * @param Authorizer      $authorizer
+     * @param User            $currentUser
+     * @param PrefixGenerator $prefixGenerator
      */
-    public function __construct(Router $router, Authorizer $authorizer, User $currentUser)
-    {
-        $this->router      = $router;
-        $this->authorizer  = $authorizer;
-        $this->currentUser = $currentUser;
+    public function __construct(
+        Router $router,
+        Authorizer $authorizer,
+        User $currentUser,
+        PrefixGenerator $prefixGenerator
+    ) {
+        $this->router          = $router;
+        $this->authorizer      = $authorizer;
+        $this->currentUser     = $currentUser;
+        $this->prefixGenerator = $prefixGenerator;
     }
 
 
@@ -79,9 +92,11 @@ class Links
         /* Endpoint for deleting the badge
         */
         $translation['delete'] = $this->getRouteIfAuthorized(
-            'learningBadge.deleteBadge', [
-            'badgeId' => $badge->getId()
-        ]);
+            'learningBadge.deleteBadge',
+            [
+                'badgeId' => $badge->getId()
+            ]
+        );
 
         /* All the people who have received this badge as an achievement
          */
@@ -118,6 +133,13 @@ class Links
                 'badgeId' => $badge->getId(),
             ]
         );
+
+        // Icon: only if the badge has an icon
+        $translation['icon'] = $badge->getIcon()
+            ? ($this->prefixGenerator->generate() . $badge->getIcon())
+            : null
+        ;
+
 
         return $translation;
     }
