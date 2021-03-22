@@ -18,15 +18,17 @@
                 <usage-global-role :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getRolePayload') }}'"></usage-global-role>
             </div>
         </div>
+
+        <div class="small-12 medium-6 island">
+            <div id="usage-global-system-container">
+                <usage-global-system :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSystemPayload') }}'"></usage-global-system>
+            </div>
+        </div>
     </div>
 </div>
 
 <div class="row">
 
-
-{#    <div class="small-12 medium-6 island">#}
-{#        {% include ('@adminUsage/system.twig') %}#}
-{#    </div>#}
 
 {#    <div class="small-12 medium-6 island">#}
 {#        {% include ('@adminUsage/filetype.twig') %}#}
@@ -40,3 +42,4 @@
 
 <script src="/javascript/components/usageGlobalTotal.bundle.js"></script>
 <script src="/javascript/components/usageGlobalRole.bundle.js"></script>
+<script src="/javascript/components/usageGlobalSystem.bundle.js"></script>
