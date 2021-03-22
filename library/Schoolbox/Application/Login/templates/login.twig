@@ -29,11 +29,7 @@
 {% autoescape 'css' %}
     <style type="text/css">
         body.login {
-            background-image: url("{{
-                login_backgrounds is not empty
-                    ? random(login_backgrounds)
-                    : (CDN_PREFIX ~ '/images/core/login-bg.jpg')
-             }}");
+            background-image: url("{{ random(login_backgrounds) }}");
         }
     </style>
 {% endautoescape %}

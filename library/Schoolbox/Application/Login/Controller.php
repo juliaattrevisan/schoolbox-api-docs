@@ -9,6 +9,7 @@ namespace Schoolbox\Application\Login;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
@@ -17,6 +18,21 @@ use Zend\Uri\Uri;
 class Controller extends Base
 {
     public const LOGIN_ERROR_FLASH = 'login';
+
+    /**
+     * Prefix generator, used for generating a link to the fallback background.
+     */
+    private PrefixGenerator $prefixGenerator;
+
+    /**
+     * Constructor
+     *
+     * @param PrefixGenerator $prefixGenerator
+     */
+    public function __construct(PrefixGenerator $prefixGenerator)
+    {
+        $this->prefixGenerator = $prefixGenerator;
+    }
 
     /**
      * Displays login page, will show error if XHR, will redirect to SAML if enabled
@@ -79,6 +95,9 @@ class Controller extends Base
             if (!empty($background)) {
                 $data['login_backgrounds'][] = '/storage/image.php?' . http_build_query(['hash' => $background, 'size' => 'maxsize']);
             }
+        }
+        if (empty($data['login_backgrounds'])) {
+            $data['login_backgrounds'][] = $this->prefixGenerator->generate() . '/images/core/login-bg.jpg';
         }
 
         // Display an error if appropriate to the user
