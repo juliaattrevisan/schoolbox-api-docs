@@ -29,6 +29,7 @@ restartservices() {
     mv /tmp/sbc_vagrantx /etc/cron.d/sbc_vagrantx;
 }
 
+# Update instance to act like a vagrant development environment
 localiseVagrant() {
     echo "Re-localising vagrant"
     mysql schoolbox < /vagrant/sql/vagrant.sql;
@@ -36,6 +37,7 @@ localiseVagrant() {
     /vagrant/tools/generate-dir-sql.sh /vagrant/data | mysql --defaults-extra-file=/root/.my.cnf schoolbox
 }
 
+# Prepare instance to be archived so it can be deployed to new SB environments
 cleanupVagrant() {
     echo "Reverting vagrant-specific changes";
     mysql --defaults-extra-file=~/.my.cnf schoolbox < /vagrant/sql/vagrant-cleanup.sql;
