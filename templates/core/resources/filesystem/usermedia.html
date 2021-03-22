@@ -62,12 +62,9 @@
             upload: {
                 url: '/storage/asyncUpload'
             },
-            flash: {
-                session: {
-                    name: '{SESSION_NAME}',
-                    id:   '{SESSION_ID}'
-                }
-            }
+            webrtc: {
+                workerPath: '{CDN_PREFIX}/javascript/recorder/webrtc/recorderWorker.js',
+            },
         });
         recorderInterface = recorderContainer.data('recorder');
 
