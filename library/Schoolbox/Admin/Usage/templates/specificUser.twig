@@ -41,9 +41,16 @@
                 </div>
             </section>
         </div>
+
+        <div class="small-12 island">
+            <section class="content">
+                <div id="usage-specific-filetype-container">
+                    <usage-specific-filetype :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFileTypePayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-filetype>
+                </div>
+            </section>
+        </div>
     </div>
 </div>
-
 
 {#<div class="row">#}
 {#    <div class="small-12 columns">#}
@@ -70,3 +77,4 @@
 
 <script src="/javascript/components/usageSpecificTotal.bundle.js"></script>
 <script src="/javascript/components/usageSpecificSystem.bundle.js"></script>
+<script src="/javascript/components/usageSpecificFiletype.bundle.js"></script>
