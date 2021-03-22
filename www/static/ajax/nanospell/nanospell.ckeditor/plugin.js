@@ -43,9 +43,9 @@
 
 			/* #1 menu layer */
 
-		//== 
+		//==
 			var afterInit= function(editor) {
-		
+
 
 
 
@@ -71,8 +71,8 @@
 
 			editor.wiggles_filter_handle =  setInterval(function(){if(editor.instanceReady){afterInit(editor)}},33);
 
-		  
-		  
+
+
 //function(){this.instanceReadyHelper(editor, this);
 
 			settings_path = this.path;
@@ -159,14 +159,14 @@
 						if (suggestion.indexOf(String.fromCharCode(160)) > -1) {
 							return window.open('http://ckeditor-spellcheck.nanospell.com/license?discount=developer_max');
 						}
- 
+
 						    var txt = document.createElement("textarea");
 						    txt.innerHTML = suggestion;
-						    
-						 
+
+
 
 						editor.insertText(txt.value);
-				
+
 
 						element.$.className = "nanospell-typo-disabled"
 					}
@@ -341,7 +341,7 @@
 		xhr.open('POST', url, true);
 		xhr.onreadystatechange = function() {
 			if ((xhr.readyState == 4 && ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 || xhr.status === 0 || xhr.status == 1223))) {
-				
+
 				callback(xhr.responseText);
 				xhr = null;
 			}
@@ -354,9 +354,9 @@
 		try{
 		var json = JSON.parse(data);
 	 }catch(e){
-	
+
 			var msg = ("Nanospell need to be installed correctly before use (server:"+settings.server+").\n\nPlease run nanospell/getstarted.html. ");
-		 
+
 			if(window.location.href.indexOf('nanospell/')<0){
 				console.log(msg)
 			}else{
@@ -365,7 +365,7 @@
 				}
 			}
 	 }
- 
+
 		var result = json.result
 		for (var i in words) {
 			var word = words[i];
@@ -382,7 +382,7 @@
 	function resolveAjaxHandler() {
 		var svr = settings.server;
 		var url = settings_path;
-		
+
 		url +="../";
 
 		if (typeof(svr) == "undefined") {
@@ -403,8 +403,8 @@
 				return url + "server/ajax/asp/tinyspell.asp"
 				break;
 			default:
-				/*php*/
-				return url + "server/ajax/php/tinyspell.php"
+				// Use the server's value directly
+				return svr;
 				break
 		}
 	}
@@ -507,7 +507,7 @@
 		var invalidchar = "\\s!\"#$%&()*+,-.â€¦/:;<=>?@[\\]^_{|}`\u200b\u00a7\u00a9\u00ab\u00ae\u00b1\u00b6\u00b7\u00b8\u00bb\u00bc\u00bd\u00be\u00bf\u00d7\u00f7\u00a4\u201d\u201c\u201e\u201f" + String.fromCharCode(160)
 		var validword = "[^" + invalidchar + "'\u2018\u2019][^" + invalidchar + "]+[^" + invalidchar + "'\u2018\u2019]";
 		var result = new RegExp("(" + email + ")|(" + protocol + ")|(" + domain + ")|(&#\d+;)|(" + validword + ")", singleton ? "" : "g");
-		
+
 
 
 		if (singleton) {
@@ -874,8 +874,8 @@
 
 
 		}
-		
-		
+
+
 	});
-	
+
 })();

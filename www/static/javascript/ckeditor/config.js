@@ -42,7 +42,7 @@ CKEDITOR.editorConfig = function( config ) {
 
 // Inject nanospell
 
-var nanospell = {
+let nanospell = {
 	ckeditor: function (selector, settings) {
 		if (typeof(window.CKEDITOR) == "undefined") {
 			setTimeout(function () {
@@ -56,21 +56,22 @@ var nanospell = {
 			settings = {}
 		}
 
-		var plugin_name = 'nanospell';
-		var plugin_url = '/ajax/nanospell/nanospell.ckeditor/plugin.js';
+		// Plugin URL: relative to the page's location, not the script's?
+		let plugin_name = 'nanospell',
+		    plugin_url = '../../ajax/nanospell/nanospell.ckeditor/plugin.js';
 
 		if (typeof(CKEDITOR) != 'undefined') {
 			ckInstances = {};
 
-			for (var i in CKEDITOR.instances) {
+			for (let i in CKEDITOR.instances) {
 				if (selector.toLowerCase() === 'all' || CKEDITOR.instances[i].element.$.id === selector) {
 					ckInstances[i] = true;
 				}
 			}
 			CKEDITOR.plugins.addExternal(plugin_name, plugin_url, '');
 			CKEDITOR.plugins.load(plugin_name, function (plugins) {
-				for (var i in ckInstances) {
-					var editor = CKEDITOR.instances[i];
+				for (let i in ckInstances) {
+					let editor = CKEDITOR.instances[i];
 					editor.config.nanospell = settings;
 					editor.config.removePlugins += ',wsc,scayt';
 					plugins[plugin_name].init(editor)
@@ -84,5 +85,5 @@ nanospell.ckeditor('all', {
 	dictionary: "en_au,en",
 	ignore_block_caps: true,
 	ignore_non_alpha: true,
-	server: "php"
+	server: "/ajax/nanospell/server/ajax/php/tinyspell.php",
 });
