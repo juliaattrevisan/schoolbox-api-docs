@@ -203,7 +203,7 @@ export default {
                 }
             },
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            eventDidMount: this.$_fullCalendarHelper_eventRender,
+            eventDidMount: this.eventRender,
             resources: this.resources,
             // schedulerLicenseKey: this.config.schedulerLicenseKey,
             schedulerLicenseKey: '0819459365-fcs-1616456951',
@@ -657,9 +657,10 @@ export default {
         },
 
         redrawWeekNumbers() {
-            document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach((element, index) => {
-                element.innerHTML = index + 1;
-            });
+            //@TODO - is this still needed? 
+            // document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach((element, index) => {
+            //     element.innerHTML = index + 1;
+            // });
         },
 
         /**

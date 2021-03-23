@@ -206,14 +206,14 @@ export default {
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
-            debugger
+            
             if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
                 eventRenderInfo.event.setProp('display', 'none');
                 return false;
             }
 
-            let bookingStatus = eventRenderInfo.event.extendedProps.data.booking?.status,
-                isEventRendered = true;
+            let bookingStatus = eventRenderInfo.event.extendedProps.data.booking?.status;
+            let isEventRendered = true;
 
             if (bookingStatus?.isRejected) {
                 eventRenderInfo.el.classList.add('rejected');
