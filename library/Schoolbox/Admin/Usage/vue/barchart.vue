@@ -106,8 +106,7 @@ export default {
                     chart: {
                         reflow: true,
                         spacingRight: 48,
-                        type: 'bar',
-                        zoomType: 'xy'
+                        type: 'bar'
                     },
 
                     credits: {

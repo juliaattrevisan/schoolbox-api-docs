@@ -103,8 +103,7 @@ export default {
                     chart: {
                         height: 150,
                         spacingRight: 48,
-                        type: 'bar',
-                        zoomType: 'xy'
+                        type: 'bar'
                     },
 
                     credits: {
