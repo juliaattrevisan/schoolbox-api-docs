@@ -2,6 +2,8 @@
 import axios from 'axios';
 import { VueGoodTable } from 'vue-good-table';
 import filesize from 'filesize';
+import RevealModal from '@schoolbox/reveal-modal';
+import Toast from '@schoolbox/toast';
 
 export default {
 
@@ -35,6 +37,8 @@ export default {
      * at the top of the file.
      */
     components: {
+        RevealModal,
+        Toast,
         VueGoodTable
     },
 
@@ -85,6 +89,12 @@ export default {
                     sortable: false
                 },
             ],
+
+            /* When you click the Delete link, remember its url
+             * A singleton modal spawns and uses this as its confirmation button destination
+             * Because of the way the reveal-modal works, you don't pass it an arg
+             */
+            fileUrlToDelete: undefined,
         }
     },
 
@@ -151,6 +161,68 @@ export default {
          */
         linkDelete(rowObj) {
             return '<a href="'+rowObj._links.delete+'">Delete</a>';
+        },
+
+
+        /**
+         * Open the Delete File confirmDialog equivalent
+         *
+         * @param url
+         */
+        showDeleteModal(url) {
+            this.fileUrlToDelete = url;
+            this.$refs.deleteModal.open();
+        },
+
+
+        /**
+         * Asynchronously access an endpoint to delete a file from the appropriate place
+         */
+        deleteFile() {
+
+            /* Set the loading flag to prevent people spamming the button
+             */
+            this.isProcessActive = true;
+
+            /* Asynchronously access the endpoint to delete the thing
+             */
+            axios.get(this.fileUrlToDelete).then(() => {
+
+                /* Remove the element from the allData stack
+                 * Since we only have the url, I guess we search the stack until we find it
+                 * then splice it away (not sure if vue-good-table gives me an actual index)
+                 */
+                let deletionIndex = -1;
+
+                for (let i = 0; i < this.allData.length; i++) {
+                    if (this.allData[i]._links.delete === this.fileUrlToDelete) {
+                        let deletionIndex = i;
+                        break;
+                    }
+                }
+
+                /* This should always happen, but anyway
+                 * Splice away the deleted thing
+                 */
+                if (deletionIndex > -1) {
+                    this.allData.splice(deletionIndex, 1);
+                }
+
+                /* Shut the modal
+                 */
+                this.$refs.deleteModal.close();
+
+                /* Toast (though I prefer our twig toast until a better replacement comes along)
+                 */
+                this.$refs.toast.timeout('File deleted', true);
+                this.isProcessActive = false;
+            }).catch((error) => {
+
+                /* Deal with error case
+                 */
+                this.$refs.toast.timeout('Unable to delete file', false);
+                this.isProcessActive = false;
+            });
         }
     }
 }
@@ -204,14 +276,23 @@ export default {
                         <a :href="'/homepage/' + props.row.folderId">{{ props.row.folder }}</a>
                     </template>
                     <template v-else-if="props.column.label == 'Delete'">
-                        <a :href="props.row._links.delete">Delete</a>
+                        <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
                     </template>
                     <template v-else>
-                        {{props.formattedRow[props.column.field]}}
+                        {{ props.formattedRow[props.column.field] }}
                     </template>
                 </template>
             </vue-good-table>
         </template>
+        <toast ref="toast"></toast>
+        <reveal-modal ref="deleteModal">
+            <h2>Please confirm</h2>
+            <p>Are you sure you want to delete this file?</p>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="deleteFile" class="button submit" id="usage-file-delete-button" :disabled="isProcessActive">Delete</a></li>
+                <li><a @click.prevent="$refs.deleteModal.close" class="button" id="usage-file-cancel-button" :disabled="isProcessActive">Cancel</a></li>
+            </ul>
+        </reveal-modal>
     </div>
 </template>
 
