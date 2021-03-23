@@ -97,7 +97,7 @@ if (is_array($sectionValues) && count($sectionValues)) {
 
         /* A list of attempts
            */
-        if (count($currentQuestion['attempts'])) {
+        if (is_array($currentQuestion['attempts'])) {
             foreach ($currentQuestion['attempts'] as $currentAttempt) {
                 $start  = new Alaress_Date_Format($currentAttempt['start'], 'Y-m-d H:i:s');
                 $finish = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d H:i:s');

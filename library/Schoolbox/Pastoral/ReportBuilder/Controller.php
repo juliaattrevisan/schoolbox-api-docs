@@ -509,10 +509,12 @@ class Controller extends Base
          */
         $includeStudentsWithoutYear  = $post->getBool('includeStudentsWithoutYear', false);
         $includeStudentsWithoutHouse = $post->getBool('includeStudentsWithoutHouse', false);
-        if (!strlen(trim($post['name']))
+        // For years and houses, either no-house/year or years/houses need to be selected
+        if (
+            !strlen(trim($post['name']))
             || !count($post['types'])
-            || (!count($post['years']) && !$includeStudentsWithoutYear)
-            || (!count($post['houses']) && !$includeStudentsWithoutHouse)
+            || !($includeStudentsWithoutYear || count($post['years']))
+            || !($includeStudentsWithoutHouse || count($post['houses']))
         ) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }

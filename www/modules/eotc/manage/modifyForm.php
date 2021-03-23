@@ -185,7 +185,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
      */
     $metadata->setRamsFiles(new Collection());
 
-    if (\count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
+    if (is_array($_POST['attachment']) && count($_POST['attachment']) && $event->getMetadata()->getRamsRequired()) {
         try {
             $factory = new CollectorFactory();
             $files   = $factory->build($_POST['attachment'])->getAll();
