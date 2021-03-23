@@ -775,5 +775,5 @@ export default {
 </template>
 
 <style lang="scss">
-  @import "../styles/calendar";
+@import "@schoolbox/fullcalendar/styles/calendar";
 </style>

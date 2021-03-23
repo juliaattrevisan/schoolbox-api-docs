@@ -956,12 +956,7 @@ export default {
 
 <style lang="scss">
 
-// @import '~@fullcalendar/core/main.css';
-// @import '~@fullcalendar/daygrid/main.css';
-// @import '~@fullcalendar/timegrid/main.css';
-// @import '~@fullcalendar/list/main.css';
-// @import '~@fullcalendar/timeline/main.css';
-// @import '~@fullcalendar/resource-timeline/main.css';
+@import "@schoolbox/fullcalendar/styles/calendar";
 
 // Please forgive me...
 

@@ -369,10 +369,5 @@ export default {
 </template>
 
 <style lang="scss">
-  @import "../../../Calendar/styles/calendar";
-
-  // @import '~@fullcalendar/core/main.css';
-  // @import '~@fullcalendar/daygrid/main.css';
-  // @import '~@fullcalendar/timegrid/main.css';
-  // @import '~@fullcalendar/list/main.css';
+@import "@schoolbox/fullcalendar/styles/calendar";
 </style>
