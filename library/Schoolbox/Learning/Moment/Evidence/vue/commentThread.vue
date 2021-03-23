@@ -8,6 +8,7 @@ import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 
 export default {
     components: {
@@ -16,6 +17,7 @@ export default {
         Toast,
         RevealModal
     },
+    mixins: [cdnPrefixMixin],
     props: {
         thread: {
             type: Object,
@@ -31,14 +33,6 @@ export default {
         },
         createThreadEndpoint: {
             type: String,
-        },
-        /**
-         * The CDN prefix for this instance: used as the source from which
-         * scripts are loaded.
-         */
-        cdnPrefix: {
-            type: String,
-            default: '',
         },
     },
     data() {
@@ -63,7 +57,7 @@ export default {
                 ],
                 contentsCss: [
                     '/css/core/skin.css.php',
-                    '/css/core/editor.css',
+                    this.cdnPrefix + '/css/core/editor.css',
                 ],
                 height: '4rem',
                 resize_enabled: false,
