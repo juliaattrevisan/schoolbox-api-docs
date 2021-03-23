@@ -92,7 +92,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     /**
      * Loads the grid component into its set configuration.
      *
-     * @return true
+     * @return bool
      * @throws ServiceNotFound
      * @throws RuntimeException
      */
