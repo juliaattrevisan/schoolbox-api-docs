@@ -55,7 +55,7 @@ class FilePayload
                 (SELECT
                     `f`.`id`,
                     COALESCE(`f`.`realname`, `s`.`filename`) AS `name`,
-                    'File' AS location,
+                    'CMS' AS location,
                     `s`.`filesize` AS size,
                     `t`.`mime` AS mimeType,
                     `s`.`hash`,

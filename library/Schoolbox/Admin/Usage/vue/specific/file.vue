@@ -75,8 +75,8 @@ export default {
                     field: 'folder'
                 },
                 {
-                    label: 'Type',
-                    field: 'mimeType'
+                    label: 'Location',
+                    field: 'location'
                 },
                 {
                     label: 'Delete',
