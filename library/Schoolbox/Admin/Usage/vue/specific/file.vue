@@ -196,7 +196,7 @@ export default {
 
                 for (let i = 0; i < this.allData.length; i++) {
                     if (this.allData[i]._links.delete === this.fileUrlToDelete) {
-                        let deletionIndex = i;
+                        deletionIndex = i;
                         break;
                     }
                 }
