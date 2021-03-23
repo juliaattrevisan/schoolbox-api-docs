@@ -13,7 +13,7 @@
     $(function() {
         const mq = window.matchMedia( "(max-width: 950px)" );
         if (mq.matches) {
-            $("[data-parent-item] a").on('click', function(event) {
+            $("[data-parent-item] > a").on('click', function(event) {
                 event.preventDefault();
 
                 let $target = $(this).closest('[data-parent-item]').find("[data-admin-subnav-flyout]").slideToggle();
