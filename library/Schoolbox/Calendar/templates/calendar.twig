@@ -61,7 +61,7 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 
 <div class="row actions-small-1">
-    <div class="small-12 columns">{{ RETURN_URL.name }}{{ RETURN_URL.current }}
+    <div class="small-12 columns">
         <h1>{{ locale.calendar.proper ~ " for " ~ user.fullName}}</h1>
     </div>
     {% set assessmentCalendar = routeLookupIfAuthorized('learningAssessmentCalendar.getReport')  %}
