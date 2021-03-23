@@ -74,10 +74,10 @@ export default {
                 },
                 resourceTimelineWeek: {
                     slotLabelFormat: ['ddd D/M', 'h'],
-                    slotWidth: '50'
+                    slotMinWidth: '50'
                 },
                 resourceTimelineDay: {
-                    slotWidth: '50'
+                    slotMinWidth: '50'
                 }
             },
             eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
@@ -120,7 +120,8 @@ export default {
             resources: this.config.resources,
             resourceOrder: this.resourceOrder,
             resourceColumns: this.config.resourceColumns,
-            schedulerLicenseKey: this.config.schedulerLicenseKey,
+            // schedulerLicenseKey: this.config.schedulerLicenseKey,
+            schedulerLicenseKey: '0819459365-fcs-1616456951',
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView,
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,

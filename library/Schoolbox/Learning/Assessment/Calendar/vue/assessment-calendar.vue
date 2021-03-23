@@ -144,8 +144,8 @@ export default {
                 start: this.minDate,
                 end: this.maxDate,
             },
-            resourceLabelText: 'Week',
-            slotWidth: '50'
+            resourceAreaHeaderContent: 'Week',
+            slotMinWidth: '50'
         },
         this.resourceTimelineWeek = {
             dayHeaderFormat: this.formats.displayWeekDay,
@@ -163,7 +163,7 @@ export default {
                 resourceTimelineSemester: this.resourceTimelineSemester, 
                 resourceTimelineWeek: this.resourceTimelineWeek
             },
-            initialView: this.resourceTimelineSemester,
+            initialView: 'resourceTimelineSemester',
             weekText: "''",
             eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
             headerToolbar: {
@@ -205,7 +205,8 @@ export default {
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             eventDidMount: this.$_fullCalendarHelper_eventRender,
             resources: this.resources,
-            schedulerLicenseKey: this.config.schedulerLicenseKey,
+            // schedulerLicenseKey: this.config.schedulerLicenseKey,
+            schedulerLicenseKey: '0819459365-fcs-1616456951',
             firstDay: '1',
             initialDate: this.termStartDate,
             viewDidMount: this.viewDidMount,
@@ -449,8 +450,9 @@ export default {
          */
         viewDidMount(info) {
 
-            const eventSource = this.calendarApi.getEventSourceById('events');
-            const groupedEventSource = this.calendarApi.getEventSourceById('groupedEvents');
+            const calendarApi = this.$refs.fullCalendar.getApi(); //runs before the nextTick, so need api here
+            const eventSource = calendarApi.getEventSourceById('events');
+            const groupedEventSource = calendarApi.getEventSourceById('groupedEvents');
 
             this.currentView = info.view.type;
 
@@ -465,7 +467,7 @@ export default {
                     eventSource.remove();
                 }
                 if (!groupedEventSource) {
-                    this.calendarApi.addEventSource(this.eventSources.groupedEvents);
+                    calendarApi.addEventSource(this.eventSources.groupedEvents);
                 }
             } else {
                 // Add standard events source if it's not there:
@@ -474,7 +476,7 @@ export default {
                     groupedEventSource.remove();
                 }
                 if (!eventSource) {
-                    this.calendarApi.addEventSource(this.eventSources.events);
+                    calendarApi.addEventSource(this.eventSources.events);
                 }
             }
 
