@@ -42,7 +42,7 @@ class Connector implements IConnector
     public const PATH_DELETE_DOCUMENT = 'embed/documents/';
 
     // How long should view sessions last for by default?
-    public const DEFAULT_SESSION_EXPIRY_HOURS = 1;
+    public const DEFAULT_SESSION_EXPIRY_SECONDS = 3600;
 
     // Export types
     public const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
@@ -131,6 +131,7 @@ class Connector implements IConnector
      * @throws Exception\ApiException if response doesn't contain required fields
      * @throws Exception\InvalidStatusException if response status is invalid
      * @throws Exception\NotFound If document somehow does not exist in Kami after being uploaded
+     * @throws GuzzleException
      */
     public function uploadDocument(IStorage $storage): Document
     {
@@ -180,6 +181,7 @@ class Connector implements IConnector
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws ClientException If cannot fetch documents for reasons other than simply not existing.
+     * @throws GuzzleException
      */
     public function listDocuments(): GenericCollection
     {
@@ -216,6 +218,7 @@ class Connector implements IConnector
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\NotFound If document does not exist in Kami
      * @throws Exception\InvalidStatusException if document's status is invalid
+     * @throws GuzzleException
      */
     public function getDocument(string $documentId): Document
     {
@@ -246,6 +249,7 @@ class Connector implements IConnector
      * @throws Exception\ApiException If cannot fetch a document for reasons other than simply not existing.
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws GuzzleException
      */
     public function deleteDocument(string $documentId): bool
     {
@@ -270,15 +274,14 @@ class Connector implements IConnector
      *
      * Note that this implementation does not permit creation of a session that does not expire.
      *
-     * @param string                   $documentId
-     * @param User                     $user
-     * @param bool                     $editable
-     * @param null|Alaress_Date_Format $expires
-     * @param string                   $theme     Sets the theme to use when viewing the document
-     * @param bool                     $showSave  Hides the save (download) button
-     * @param bool                     $showPrint Hides the print button
-     * @param bool                     $showHelp  Hides the help button
-     * @param bool                     $showMenu  Hides the menu button
+     * @param string $documentId
+     * @param User   $user
+     * @param bool   $editable
+     * @param string $theme     Sets the theme to use when viewing the document
+     * @param bool   $showSave  Hides the save (download) button
+     * @param bool   $showPrint Hides the print button
+     * @param bool   $showHelp  Hides the help button
+     * @param bool   $showMenu  Hides the menu button
      * @return Session
      * @throws Exception\ResponseDecodeException If unable to decode a server response
      * @throws Exception\EmptySiteSchoolCode If 'site_school_code' is empty
@@ -286,12 +289,12 @@ class Connector implements IConnector
      * @throws Exception\EmptyApiKeyException If API key not configured
      * @throws \InvalidArgumentException If cannot convert the request or response to a string
      * @throws Exception\NotFound If document does not exist in Kami
+     * @throws GuzzleException
      */
     public function viewSession(
         string $documentId,
         User $user,
         bool $editable = true,
-        Alaress_Date_Format $expires = null,
         string $theme = IConnector::SESSION_THEME_LIGHT,
         bool $showSave = true,
         bool $showPrint = true,
@@ -301,19 +304,15 @@ class Connector implements IConnector
         $this->assertEnabled();
         $this->assertValidSiteSchoolCode();
 
-        // When should the view session expire?
-        if (!$expires) {
-            $expires = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
-        }
-        $options  = [
+        $options = [
             RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
-            RequestOptions::BODY    => \GuzzleHttp\json_encode([
+            RequestOptions::BODY    =>  \GuzzleHttp\Utils::jsonEncode([
                 'document_identifier' => $documentId,
                 'user'                => [
                     'name'    => "{$user->getFirstname()} {$user->getLastname()}",
                     'user_id' => "{$this->siteSchoolCode}-{$user->getId()}",
                 ],
-                'expires_at'          => $expires->getUsingFormat(Alaress_Date_Format::FORMAT_DATETIME_UTC),
+                'expires_at'          => gmdate(Alaress_Date_Format::FORMAT_DATETIME_UTC, time() + self::DEFAULT_SESSION_EXPIRY_SECONDS),
                 'viewer_options'      => [
                     'theme'      => $theme,
                     'show_save'  => $showSave,
