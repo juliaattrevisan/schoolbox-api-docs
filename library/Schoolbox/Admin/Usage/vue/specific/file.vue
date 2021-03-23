@@ -95,6 +95,7 @@ export default {
              * Because of the way the reveal-modal works, you don't pass it an arg
              */
             fileUrlToDelete: undefined,
+            isProcessActive: false,
         }
     },
 

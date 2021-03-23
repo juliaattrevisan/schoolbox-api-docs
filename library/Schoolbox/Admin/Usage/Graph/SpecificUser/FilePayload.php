@@ -139,7 +139,7 @@ class FilePayload
              * Each place has its own send and deletion endpoints
              */
             switch ($row['location']) {
-                case 'File':
+                case 'CMS':
                     $sendUrl = "/send.php?id={$row['id']}";
                     $deleteUrl = "/cms/fileForm.php?delete={$row['id']}";
                     break;
