@@ -37,7 +37,7 @@ export default {
     mixins: [
         mixinFullCalendarHelper
     ],
-    
+
     data () {
         return {
             calendarApi: null, //to access the underlying calendar object
@@ -137,7 +137,7 @@ export default {
     },
 
     mounted() {
-        
+
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
@@ -324,14 +324,14 @@ export default {
             return 0;
         },
     }
-    
+
 }
 
 </script>
 
 <template>
     <div>
-        <export-modal 
+        <export-modal
             ref="export"
             :token="config.token"
             :booking-export-url="urls.export"
@@ -339,13 +339,13 @@ export default {
             :booking-type="'category'"
         />
 
-        <filter-modal 
+        <filter-modal
             ref="filter"
             :selected-filters="config.selectedFilters"
-            @filterChanged="reloadEvents" 
+            @filterChanged="reloadEvents"
         />
 
-        <create-booking-modal 
+        <create-booking-modal
             ref="createBooking"
             :to-moment="$_fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
@@ -353,7 +353,7 @@ export default {
             :booking-type="'category'"
         />
 
-        <view-event-modal 
+        <view-event-modal
             ref="event"
             :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
@@ -363,7 +363,7 @@ export default {
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
             @eventModified="reloadEvents"
-            @eventDeleted="reloadEvents" 
+            @eventDeleted="reloadEvents"
         />
 
         <full-calendar
@@ -384,5 +384,5 @@ export default {
 </template>
 
 <style lang="scss">
-    
+  @import "../../../Calendar/styles/calendar";
 </style>

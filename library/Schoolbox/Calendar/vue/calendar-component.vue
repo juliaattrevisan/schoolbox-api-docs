@@ -236,6 +236,6 @@ export default {
     </div>
 </template>
 
-<style scoped>
-
+<style lang="scss">
+  @import "../styles/calendar";
 </style>

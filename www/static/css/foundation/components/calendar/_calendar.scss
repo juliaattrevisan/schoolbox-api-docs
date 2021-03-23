@@ -64,29 +64,6 @@
   }
 }
 
-.fc-theme-standard th,
-.fc-theme-standard td,
-.fc-theme-standard thead,
-.fc-theme-standard tbody,
-.fc-theme-standard .fc-divider,
-.fc-theme-standard .fc-row,
-.fc-theme-standard .fc-content,
-.fc-theme-standard .fc-popover,
-.fc-theme-standard .fc-list-view,
-.fc-theme-standard .fc-list-heading td,
-.fc .fc-row .fc-content-skeleton td {
-  border: 1px solid #ededed;
-}
-
-.fc-day-header {
-  font-weight: 400 !important;
-  text-transform: uppercase !important;
-}
-
-.fc-day-grid-event {
-  padding: 3px 2px !important;
-}
-
 @media #{$medium-down} {
   .fc-toolbar {
     flex-direction: column;

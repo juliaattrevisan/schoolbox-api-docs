@@ -114,7 +114,7 @@ export default {
     },
 
     mounted () {
-        
+
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
@@ -227,7 +227,7 @@ export default {
 
 <template>
     <div>
-        <view-event-modal 
+        <view-event-modal
             ref="event"
             :to-moment="$_fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
@@ -251,5 +251,5 @@ export default {
 </template>
 
 <style lang="scss">
-    
+  @import "../../../Calendar/styles/calendar";
 </style>

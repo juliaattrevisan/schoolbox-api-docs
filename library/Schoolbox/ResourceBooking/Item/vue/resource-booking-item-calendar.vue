@@ -205,7 +205,7 @@ export default {
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
-            
+
             if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
                 eventRenderInfo.event.setProp('display', 'none');
                 return false;
@@ -308,14 +308,14 @@ export default {
             this.calendarApi.gotoDate(value.selectedDate);
         },
     }
-    
+
 }
 
 </script>
 
 <template>
     <div>
-        <export-modal 
+        <export-modal
             ref="export"
             :token="config.token"
             :booking-export-url="urls.export"
@@ -323,13 +323,13 @@ export default {
             :booking-type="'item'"
         />
 
-        <filter-modal 
+        <filter-modal
             ref="filter"
             :selected-filters="config.selectedFilters"
-            @filterChanged="reloadEvents" 
+            @filterChanged="reloadEvents"
         />
 
-        <create-booking-modal 
+        <create-booking-modal
             ref="createBooking"
             :to-moment="$_fullCalendarHelper_toMoment"
             :booking-path="config.createBookingPath"
@@ -337,7 +337,7 @@ export default {
             :booking-type="'item'"
         />
 
-        <view-event-modal 
+        <view-event-modal
             ref="event"
             :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
@@ -347,7 +347,7 @@ export default {
             :format-display-time="formats.displayTime"
             :format-display-datetime="formats.displayDatetime"
             @eventModified="reloadEvents"
-            @eventDeleted="reloadEvents" 
+            @eventDeleted="reloadEvents"
         />
 
         <full-calendar
@@ -369,8 +369,10 @@ export default {
 </template>
 
 <style lang="scss">
-    // @import '~@fullcalendar/core/main.css';
-    // @import '~@fullcalendar/daygrid/main.css';
-    // @import '~@fullcalendar/timegrid/main.css';
-    // @import '~@fullcalendar/list/main.css';
+  @import "../../../Calendar/styles/calendar";
+
+  // @import '~@fullcalendar/core/main.css';
+  // @import '~@fullcalendar/daygrid/main.css';
+  // @import '~@fullcalendar/timegrid/main.css';
+  // @import '~@fullcalendar/list/main.css';
 </style>
