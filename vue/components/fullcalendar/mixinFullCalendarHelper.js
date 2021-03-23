@@ -121,7 +121,7 @@ export const mixinFullCalendarHelper = {
                 element.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
             
-            calEvent.setProp('display', 'none');
+            calEvent.setProp('display', 'block');
             return true;
         },
 
