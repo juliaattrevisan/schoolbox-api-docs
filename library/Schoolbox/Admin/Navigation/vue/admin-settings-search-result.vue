@@ -6,6 +6,8 @@
  *
  */
 
+import { getIndex } from '@shared/util/domTools';
+
 export default {
 	
 	props: {
@@ -80,32 +82,12 @@ export default {
 		 *
 		 */
 		checkIndex() {
-			this.itemIndex = this.getIndex(this.$el.parentElement);
+			this.itemIndex = getIndex(this.$el.parentElement);
 			if (this.itemIndex === this.activeIndex) {
 				this.isActive = true;
 			} else {
 				this.isActive = false;
 			}
-		},
-
-		/**
-		 * returns an integer indicating the position of the 
-		 * passed element relative to the original collection
-		 * replacement for $(el).index
-		 *
-		 * @param el the DOM element to find the index of
-		 * 
-		 * @return index of the DOM element
-		 */
-		getIndex(el) {
-			if (!el) {
-				return -1;
-			}
-			let i = 0;
-			while (el = el.previousElementSibling) {
-				i++;
-			}
-			return i;
 		},
 
 		/**

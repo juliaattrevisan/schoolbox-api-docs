@@ -24,8 +24,8 @@ export default {
 			settingsList: [],
             isLoaded: false,
 			hasLoadError: false,
-			currentSearchString: '',
-			minSearchStringLength: 3,
+			searchQuery: '',
+			minSearchQueryLength: 3,
             searchResultsShownLimit: 6,
             activeIndex: 0 //to track which index is selected
     	}
@@ -37,18 +37,18 @@ export default {
          * to notify whether still loading the results or not
          */
         searchInputPlaceholder () {
-			if (!this.isLoaded) {
-                return 'Loading settings, please wait...'
-            } else {
+			if (this.isLoaded) {
                 return 'Search administration settings...';
+            } else {
+                return 'Loading settings, please wait...'
             }
 		},
 
         /**
-         * only when started typing beyond minSearchStringLength count and there's actual results
+         * only when started typing beyond minSearchQueryLength count and there's actual results
          */
         isSearchActive () {
-			if ((this.currentSearchString.length >= this.minSearchStringLength) && (this.filteredSearchList.length > 0)) {
+			if ((this.searchQuery.length >= this.minSearchQueryLength) && (this.filteredSearchList.length > 0)) {
                 return true
             } else {
                 return false;
@@ -61,7 +61,7 @@ export default {
          * @returns {Array} the search string broken into single words
          */
         searchStringWordList () {
-			const allWords = this.currentSearchString.match(/\b(\w+)\b/g);
+			const allWords = this.searchQuery.match(/\b(\w+)\b/g);
             const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
             return onlyWordsAboveTwoLetters;
 		},
@@ -70,13 +70,12 @@ export default {
          * the settings relevant to the search input
          */
 		filteredSearchList () {
-			if (this.currentSearchString.length < this.minSearchStringLength) {
+			if (this.searchQuery.length < this.minSearchQueryLength) {
 				return [];
 			}
             const matchedTitleList = this.settingsList.filter(this.searchForTitle);
             const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
-            const combinedList = matchedTitleList.concat(matchedNameAndDescriptionList); //so those that have title matches take precedence
-            return combinedList; 
+            return matchedTitleList.concat(matchedNameAndDescriptionList); //so those that have title matches take precedence
 		},
 
         /**
@@ -125,6 +124,7 @@ export default {
 
     mounted () {
         this.initKeyboardEvents();
+        this.initMouseEvents();
         this.loadSettings();
     },
 
@@ -134,6 +134,9 @@ export default {
          * find all those results that match EACH search word
          * within the the title field
          *
+         * @params {Object} 
+         * 
+         * @return {Boolean} true if found 
          */
         searchForTitle (setting) {
             let wordMatchCount = 0;
@@ -152,7 +155,10 @@ export default {
         /**
          * find all those results that match EACH search word
          * within the name and description fields
+         * 
+         * @params {Object} 
          *
+         * @return {Boolean} true if found 
          */
         searchForNameAndDescription (setting) {
             let wordMatchCount = 0;
@@ -188,7 +194,7 @@ export default {
                     this.incrementActiveIndex();
 
                 }
-            }, false);
+            });
 		},
 
         /**
@@ -214,6 +220,19 @@ export default {
 		},
 
         /**
+         * to be able to close the menu when something else 
+         * is selected outside the menu
+         *
+         */
+		initMouseEvents () {
+			document.addEventListener('click', (event) => {
+                if (!this.$el.contains(event.target)) {
+                    this.clearInput();
+                } 
+            });
+		},
+
+        /**
          * load the settings for possible retrieval
          *
          */
@@ -223,7 +242,7 @@ export default {
 				this.settingsList = response;
 				this.isLoaded = true;
 			}).catch((error) => {
-				this.hasLoadError = true; //display error note in the DOM
+				this.hasLoadError = true; //hide search bar in the dom
 			});
 		},
 
@@ -240,7 +259,7 @@ export default {
          *
          */
 		clearInput () {
-			this.currentSearchString = '';
+			this.searchQuery = '';
             this.activeIndex = -1;
 		},
 
@@ -345,7 +364,8 @@ export default {
 <template>
     <div class="admin-search-container">
         <input
-            v-model="currentSearchString"
+            v-if="!hasLoadError"
+            v-model="searchQuery"
             :readonly="!isLoaded"
             :placeholder="searchInputPlaceholder"
             type="text"
