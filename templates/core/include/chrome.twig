@@ -72,6 +72,9 @@
             schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
             schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
             schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
+
+            // Reluctantly add the CDN prefix as a global JS variable
+            window.cdnPrefix = "{{ CDN_PREFIX }}";
         </script>
         {% endautoescape %}
 

@@ -74,9 +74,13 @@
             removeButtons: 'CodeSnippet,HorizontalRule,Sourcedialog,About,Indent,Outdent,Embed',
             magicline_color: '#0066b0',
             format_tags: 'p;h2;h3;h4;pre',
+
+            // Reluctantly use the CDN prefix installed in the window object.
+            // The alternative is to inject the CDN prefix into every place
+            // which instantiates an editor.
             contentsCss: [
                 '/css/core/skin.css.php',
-                '/css/core/editor.css',
+                window.cdnPrefix + '/css/core/editor.css',
             ],
 
             /* set to use our iframely API key for oEmbed calls
