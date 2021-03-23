@@ -120,8 +120,8 @@ export default {
             resources: this.config.resources,
             resourceOrder: this.resourceOrder,
             resourceAreaColumns: this.config.resourceColumns,
-            // schedulerLicenseKey: this.config.schedulerLicenseKey,
-            schedulerLicenseKey: '0819459365-fcs-1616456951',
+            schedulerLicenseKey: this.config.schedulerLicenseKey,
+            // schedulerLicenseKey: '0819459365-fcs-1616456951',
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView,
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
@@ -148,7 +148,6 @@ export default {
         let quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
         quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
-
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
 
     },

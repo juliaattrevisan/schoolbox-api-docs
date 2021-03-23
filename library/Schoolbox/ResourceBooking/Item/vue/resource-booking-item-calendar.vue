@@ -148,7 +148,6 @@ export default {
         let quickSwitchIcon = document.createElement('a');
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
         quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
-
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
 
     },
