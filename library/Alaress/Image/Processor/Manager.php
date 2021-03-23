@@ -128,12 +128,18 @@ class Manager
      */
     private int $attemptsPerTransform;
 
-    /**
-     * @var int
-     */
-    private int $managerPid;
-
     private LockInterface $lock;
+
+    private int $logLevel;
+
+    /**
+     * Did processing stop early due to receiving some signal, eg a Ctrl+C or `kill PID`
+     *
+     * @var bool
+     */
+    private bool $isInterrupted = false;
+
+    private int $managerPid;
 
     /**
      * @param int             $timeInterval    Time period in minutes to look up images for processing
@@ -142,6 +148,7 @@ class Manager
      * @param LoggerInterface $logger
      * @param bool            $retryFailed
      * @param int             $attemptsPerTransform
+     * @param int             $logLevel
      */
     public function __construct(
         int $timeInterval,
@@ -149,15 +156,17 @@ class Manager
         int $workerCount,
         LoggerInterface $logger,
         bool $retryFailed,
-        int $attemptsPerTransform
+        int $attemptsPerTransform,
+        int $logLevel
     ) {
-        $this->managerPid           = posix_getpid();
         $this->timeInterval         = $timeInterval;
         $this->imageCountLimit      = $imageCountLimit;
         $this->workerCountLimit     = min($workerCount, $imageCountLimit);
         $this->logger               = $logger;
         $this->retryFailed          = $retryFailed;
         $this->attemptsPerTransform = $attemptsPerTransform;
+        $this->logLevel             = $logLevel;
+        $this->managerPid           = posix_getpid();
     }
 
     /**
@@ -172,10 +181,11 @@ class Manager
      * @throws UnexpectedValueException
      * @throws InvalidColumnException
      */
-    public function run(): void
+    public function run(): bool
     {
         pcntl_async_signals(true);
-        pcntl_signal(SIGTERM, [$this, 'signalHandler']);
+        pcntl_signal(SIGINT, [$this, 'signalHandler']);  // eg Ctrl+C
+        pcntl_signal(SIGTERM, [$this, 'signalHandler']); // eg `kill PID`
         $this->startTime = time();
         $pdo             = $this->buildPdo();
         $this->lock = $this->checkOverlappingExecution($pdo);
@@ -183,27 +193,41 @@ class Manager
         unset($pdo);
         $this->processTransformations($transformations);
         $this->lock->release();
+        return $this->isInterrupted;
     }
 
 
     /**
-     * signal handler function
+     * Signal handler
+     *
+     *  SIGINT  - delete temp files and exit
+     *  SIGKILL - die immediately, don't clean up temp files
      *
      * @param int $signal
-     * @throws LockException\LockReleasingException
      */
     public function signalHandler(int $signal): void
     {
-        if ($signal === SIGTERM) {
-            if ($this->managerPid === posix_getpid()) {
-                $this->lock->release();
-                $this->logger->warning($this->prefixLog("Caught SIGTERM signal, killing workers"));
-                foreach ($this->workerPids as $workerPid) {
-                    $this->logger->warning($this->prefixLog("Killing worker: $workerPid"));
-                    posix_kill($workerPid, SIGTERM);
-                }
-            }
+        if (posix_getpid() !== $this->managerPid) {
+            // This occurs when child has forked, but not yet replaced the signal handler
+            $this->logger->warning(sprintf("[%s] Caught signal $signal, exiting", posix_getpid()));
             exit(1);
+        }
+        if ($signal === SIGINT) {
+            echo "\n";
+        }
+        $this->isInterrupted = true;
+        switch ($signal) {
+            case SIGINT:
+            case SIGTERM:
+                $signalName = $signal === SIGINT ? 'SIGINT' : 'SIGTERM';
+                $this->logger->warning($this->prefixLog("Caught $signalName ($signal) signal, sending $signalName to workers"));
+                foreach ($this->workerPids as $workerPid) {
+                    $this->logger->warning($this->prefixLog("Sending $signalName to worker: $workerPid"));
+                    posix_kill($workerPid, $signal);
+                }
+                break;
+            default:
+                $this->logger->error($this->prefixLog("Caught unknown signal '$signal'"));
         }
     }
 
@@ -531,7 +555,7 @@ class Manager
         $this->logger->debug($this->prefixLog("Manager PID: $pid"));
 
         // While still have work to do
-        while (count($transformations)) {
+        while (count($transformations) && !$this->isInterrupted) {
             $this->workerCleanup();
             // Are we less than concurrent worker limit?
             if (count($this->workerPids) < $this->workerCountLimit) {
@@ -549,16 +573,20 @@ class Manager
                     $this->workerPids[] = $pid;
                 } else {
                     // Worker Process
+                    $worker = new Worker(
+                        $t->getHash(),
+                        $t->getCacheKey(),
+                        $t->getTransform(),
+                        self::TIMED_OUT_THRESHOLD,
+                        self::IMAGICK_TIME_LIMIT,
+                        $this->retryFailed,
+                        $this->attemptsPerTransform
+                    );
+                    pcntl_signal(SIGINT, [$worker, 'signalHandler']);  // eg Ctrl+C
+                    pcntl_signal(SIGTERM, SIG_DFL);                    // eg `kill PID`
                     (new CliTool\Kernel(
-                        new Worker(
-                            $t->getHash(),
-                            $t->getCacheKey(),
-                            $t->getTransform(),
-                            self::TIMED_OUT_THRESHOLD,
-                            self::IMAGICK_TIME_LIMIT,
-                            $this->retryFailed,
-                            $this->attemptsPerTransform
-                        )
+                        $worker,
+                        [CliTool\Kernel::OPTION_LEVEL => $this->logLevel]
                     ))->runApp();
                     exit;
                 }

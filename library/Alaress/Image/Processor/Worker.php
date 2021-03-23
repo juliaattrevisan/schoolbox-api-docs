@@ -12,6 +12,7 @@ namespace Alaress\Image\Processor;
 use Alaress\Image;
 use Alaress\Image\Cache\LocalFS;
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Alaress\Image\ImagickConfigParser;
 use Alaress\Image\ITransform;
 use LogicException;
 use RecursiveDirectoryIterator;
@@ -109,6 +110,35 @@ class Worker extends CliTool\App
         $this->suppressSentryReporting = $suppressSentryReporting;
         $this->attemptsPerTransform    = $attemptsPerTransform;
     }
+
+
+    /**
+     * Signal handling
+     *
+     * @param int $signal
+     */
+    public function signalHandler(int $signal): void
+    {
+        $this->getLogger()->warning($this->prefixLog("Caught signal '$signal'"));
+        if ($signal === SIGINT) {
+            $resourceLimitMap = (new ImagickConfigParser())->parseImageMagickResourceLimits();
+            $tempPath         = rtrim($resourceLimitMap['temporary-path'], DIRECTORY_SEPARATOR);
+            $this->getLogger()->warning($this->prefixLog("Deleting temp files then exiting"));
+            $match = "$tempPath/magick-";
+            $this->getLogger()->debug($this->prefixLog("Deleting open files that match: '$match'"));
+            $pid = posix_getpid();
+            exec("lsof -Fn -p $pid 2>/dev/null | grep '$match' | grep -E '^n/' | sed s/^n//g", $output);
+            foreach ($output as $line) {
+                $this->getLogger()->debug($this->prefixLog("Deleting temp file: '$line'"));
+                unlink($line);
+            }
+        } else {
+            $this->getLogger()->error($this->prefixLog("Unrecognised signal '$signal'"));
+        }
+
+        exit(1);
+    }
+
 
     /**
      * @throws LogicException

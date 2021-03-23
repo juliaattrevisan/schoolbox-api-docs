@@ -64,6 +64,8 @@ $parent = new Image\Processor\Manager(
     $workerCount,
     new Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$verboseFlagCount]),
     $retryFailed,
-    $attemptsPerTransform
+    $attemptsPerTransform,
+    $limits[$verboseFlagCount]
 );
-$parent->run();
+$isInterrupted = $parent->run();
+exit($isInterrupted ? 1 : 0);
