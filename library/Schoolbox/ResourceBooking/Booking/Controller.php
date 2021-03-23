@@ -22,6 +22,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -254,8 +255,8 @@ class Controller extends Base
          */
         $returnUrl = null;
 
-        if (strlen($this->getRequest()->post['returnUrl'])) {
-            $returnUrl = \Schoolbox\Learning\Assessment\Redirect::decode($this->getRequest()->post['returnUrl']);
+        if ('' !== ($this->getRequest()->post['returnUrl'] ?? '')) {
+            $returnUrl = Redirect::decode($this->getRequest()->post['returnUrl']);
         }
 
         if ($this->getRequest()->isXhr()) {
@@ -369,7 +370,7 @@ class Controller extends Base
         $returnUrl = null;
 
         if (strlen($this->getRequest()->post['returnUrl'])) {
-            $returnUrl = \Schoolbox\Learning\Assessment\Redirect::decode($this->getRequest()->post['returnUrl']);
+            $returnUrl = Redirect::decode($this->getRequest()->post['returnUrl']);
         }
 
         if ($this->getRequest()->isXhr()) {
