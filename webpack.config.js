@@ -28,7 +28,18 @@ module.exports = {
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
-        adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js', 
+        adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
+
+        usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/total.main.js',
+        usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/role.main.js',
+        usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/system.main.js',
+        usageGlobalFiletype: './library/Schoolbox/Admin/Usage/vue/global/filetype.main.js',
+        usageGlobalUser: './library/Schoolbox/Admin/Usage/vue/global/user.main.js',
+
+        usageSpecificTotal: './library/Schoolbox/Admin/Usage/vue/specific/total.main.js',
+        usageSpecificSystem: './library/Schoolbox/Admin/Usage/vue/specific/system.main.js',
+        usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/filetype.main.js',
+        usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/file.main.js',
 
         //Sass
         chromeFoundation: './www/css/foundation/chrome-foundation.scss',

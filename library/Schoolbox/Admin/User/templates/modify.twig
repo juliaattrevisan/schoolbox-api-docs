@@ -1,10 +1,11 @@
-{# Shared navigation menu #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-
-{# Display header #}
 <div class="admin-container row">
 
+    {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
+
     <div class="admin-content">
 {% if method=='Update' %}
 
