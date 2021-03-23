@@ -46,30 +46,13 @@
         createBookingPath:      {{ routeLookup('resourceBooking.book', {id: ''})|json_encode|raw }},
         resourceId:             Number('{{ category.id }}'),
         resourceColumns: [{
-            labelText: 'Resource',
-
-            text: function(resource) {
-                var extendedProps = resource.extendedProps;
-                var name = extendedProps.name;
-                var roomCode = extendedProps.room_code;
-
-                if (roomCode) {
-                    name = name + ' [' + roomCode + ']';
-                }
-
-                return name;
-            },
-            render: function(resource, el) {
-                var name = el.getElementsByClassName('fc-cell-text')[0].innerText;
-
-                var link = document.createElement("a");
-                    link.setAttribute('href', '/resource-booking/item/' + resource.id);
-                    link.innerHTML = name;
-
-                el.getElementsByClassName('fc-cell-text')[0].innerHTML = '';
-                el.getElementsByClassName('fc-cell-text')[0].appendChild(link);
-                el.getElementsByClassName('fc-cell-text')[0].setAttribute('class', 'resource-link');
-
+            headerContent: 'Resource',
+            cellContent: function(args) {
+                let link = document.createElement('a');
+                link.setAttribute('href', '/resource-booking/item/' + args.fieldValue);
+                link.setAttribute('class', 'resource-link');
+                link.innerText = args.resource.extendedProps.name;
+                return { domNodes: [ link ] }
             }
         }],
         resources: {{ resources|json_encode|raw }},
