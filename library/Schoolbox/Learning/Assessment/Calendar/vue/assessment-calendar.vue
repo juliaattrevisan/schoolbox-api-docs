@@ -565,7 +565,7 @@ export default {
              * You'll be able to replicate it by just removing all the lines below except for line 519 and 522.
              */
             new Promise((resolve) => {
-                this.onLoading(true);
+                this.$_fullCalendarHelper_onLoading(true);
                 setTimeout(() => resolve(1), 1000);
             }).then((result) => {
                 // Semester view, will just use the term start date that's set on page load
@@ -577,7 +577,7 @@ export default {
 
                 return result;
             }).then((result) => {
-                this.onLoading(false);
+                this.$_fullCalendarHelper_onLoading(false);
 
                 return result;
             });
