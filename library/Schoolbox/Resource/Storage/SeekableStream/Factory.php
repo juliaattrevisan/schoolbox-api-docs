@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\SeekableStream;
 
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\IStorage;
@@ -67,7 +68,10 @@ class Factory
      */
     public function buildSeekableStream(FilesystemInterface $filesystem, string $path)
     {
-        if ($filesystem->getAdapter() instanceof AwsS3Adapter) {
+        // getAdapter() isn't on FilesystemInterface, it only happens to exist
+        // on all of its implementations.
+        // Therefore check it's an actual filesystem and not a mount manager.
+        if ($filesystem instanceof Filesystem && $filesystem->getAdapter() instanceof AwsS3Adapter) {
             return S3Stream::open($path, $this->config);
         }
         return $filesystem->readStream($path);
