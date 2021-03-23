@@ -50,24 +50,6 @@
   margin: 0 !important;
   padding: 1rem;
 
-  .fc-left .fc-button-group {
-    margin: 0 !important;
-  }
-
-  .fc-center {
-    flex-basis: 80%;
-    margin: 0 1rem;
-    padding: 0 !important;
-
-    h2 {
-      font-size: 1.125rem;
-    }
-  }
-
-  .fc-right .fc-button-group {
-    margin: 0;
-  }
-
   button {
     @include button-dimensions();
     color: $content-ui-foreground;
@@ -124,8 +106,6 @@
 }
 
 .fc-event {
-  border-radius: 0 !important;
-  color: $black !important;
   color-adjust: exact;
   -webkit-print-color-adjust: exact;
 }

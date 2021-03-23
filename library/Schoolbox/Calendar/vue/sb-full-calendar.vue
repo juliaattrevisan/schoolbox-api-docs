@@ -202,7 +202,7 @@ export default {
         quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
 
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
-        
+
     },
 
     methods: {
@@ -309,7 +309,7 @@ export default {
          * @return {boolean}
          */
         eventRender (eventRenderInfo) {
-            
+
             const calEvent = eventRenderInfo.event;
 
             if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
@@ -335,7 +335,7 @@ export default {
                     eventAttributes[attributeGroup].push(id);
                 }
             });
-            
+
             // All of the event's attributes must match at least one
             // selected filter.
             // If it doesn't, don't render it.
@@ -352,7 +352,7 @@ export default {
                     eventMatchesFilter = true;
                     return;
                 }
-                
+
                 // Otherwise: check id against the list of selected filters.
                 ids.forEach((id) => {
                     let keyspace = [];
@@ -697,34 +697,34 @@ export default {
         },
 
     }
-    
+
 }
 
 </script>
 
 <template>
     <div>
-        <export-modal 
+        <export-modal
             ref="export"
             :event-types="config.eventTypes"
             :groups="config.groups"
             :campuses="config.campuses"
             :translations="config.translations"
             :token="config.token"
-            :event-export-url="urls.export" 
+            :event-export-url="urls.export"
         />
 
-        <filter-modal 
+        <filter-modal
             ref="filter"
             :selected-filters="config.selectedFilters"
             :sources="config.sources"
             :event-types="config.eventTypes"
             :groups="config.groups"
             :campuses="config.campuses"
-            @filterChanged="updateSelectedFilters" 
+            @filterChanged="updateSelectedFilters"
         />
 
-        <create-event-modal 
+        <create-event-modal
             ref="createEvent"
             :user-id="config.userId"
             :can-invite="config.canInvite"
@@ -737,10 +737,10 @@ export default {
             :format-form-datetime="formats.formDatetime"
             :format-display-date="formats.displayDate"
             :format-display-datetime="formats.displayDatetime"
-            @eventCreated="addEvent" 
+            @eventCreated="addEvent"
         />
 
-        <view-event-modal 
+        <view-event-modal
             ref="event"
             :to-moment="$_fullCalendarHelper_toMoment"
             :event-modify-form-url="urls.modifyForm"
@@ -754,7 +754,7 @@ export default {
             :format-display-datetime="formats.displayDatetime"
             :return-url="returnUrl()"
             @eventModified="reloadEvents"
-            @eventDeleted="reloadEvents" 
+            @eventDeleted="reloadEvents"
         />
 
         <full-calendar
@@ -775,15 +775,6 @@ export default {
     </div>
 </template>
 
-<style>
-    .fc-button-group > .fc-button {
-        padding: 0 0.6rem !important;
-    }
-    .strike {
-        text-decoration: line-through !important;
-    }
-</style>
-
 <style lang="scss">
-    
+  @import "../styles/calendar";
 </style>

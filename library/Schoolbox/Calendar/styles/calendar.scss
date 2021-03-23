@@ -1,0 +1,57 @@
+@import "www/css/foundation/utils/colors";
+@import "www/css/foundation/utils/variables";
+
+.fc {
+  .fc-button-primary {
+    background-color: $content-ui-background;
+    border: 0;
+    border-radius: 0;
+    color: $content-ui-foreground;
+  }
+  .flatpickr-input {
+    padding: 0 !important;
+    a {
+      margin: 0;
+      padding: 0.5rem 0.875rem !important;
+    }
+  }
+  .fc-customPrev-button,
+  .fc-customNext-button {
+    line-height: 1;
+  }
+  .fc-toolbar-title {
+    font-size: 1.125rem;
+  }
+  .fc-cell-shaded {
+    background-color: $white-smoke;
+  }
+  .fc-list-event-title {
+    width: 100%;
+    a {
+      display: block;
+      width: 100%;
+    }
+  }
+  .fc-list-event:hover td {
+    background-color: $content-ui-hover;
+  }
+  //.fc-daygrid-event:hover {
+  //  margin-top: 1px;
+  //}
+}
+
+.fc-theme-standard .fc-list,
+.fc-theme-standard th,
+.fc-theme-standard td,
+.fc-event {
+  border: 0;
+}
+
+.fc-event,
+.fc-event:hover {
+  margin: 0;
+}
+
+.strike {
+  text-decoration: line-through !important;
+}
