@@ -72,4 +72,4 @@ preserving their folder structure), because:
   be disabled by simply setting the CDN URL to a relative URL stub
 
 The subfolder `/www/static/` was chosen as the destination folder for all static
-assets.
+assets: these assets will now be accessible via `$schoolboxHost/static/`.
