@@ -174,13 +174,13 @@ class Subnav
                 'name' => 'ePortfolio',
                 'visible' =>  true,
                 'children' => [
-                    '/adminv2/eportfolio' => [
-                        'name' => 'Templates',
+                    '/adminv2/eportfolio/deploy' => [
+                        'name' => 'Deployment',
                         'visible' =>  true,
                         'children' => []
                     ],
-                    '/adminv2/eportfolio/deploy' => [
-                        'name' => 'Deployment',
+                    '/adminv2/eportfolio' => [
+                        'name' => 'Templates',
                         'visible' =>  true,
                         'children' => []
                     ],
@@ -195,6 +195,11 @@ class Subnav
                 'name' => 'Import',
                 'visible' =>  true,
                 'children' => [
+                    '/adminv2/import/directImport' => [
+                        'name' => 'Home',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/import/folder' => [
                         'name' => 'Pages',
                         'visible' =>  true,
@@ -373,6 +378,11 @@ class Subnav
                 'name' => 'Modules',
                 'visible' =>  true,
                 'children' => [
+                    '/adminv2/setting/Modules' => [
+                        'name' => 'Home',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/setting/Board%20Leave' => [
                         'name' => 'Board Leave',
                         'visible' =>  true,
@@ -404,6 +414,11 @@ class Subnav
                 'name' => 'Notifications',
                 'visible' =>  true,
                 'children' => [
+                    '/adminv2/messages' => [
+                        'name' => 'Home',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/messages/apps' => [
                         'name' => 'Delivery Providers',
                         'visible' =>  true,
@@ -466,6 +481,11 @@ class Subnav
                 'name' => 'Resources',
                 'visible' =>  true,
                 'children' => [
+                    '/adminv2/setting/Resources' => [
+                        'name' => 'Home',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/allowed-file' => [
                         'name' => 'Allowed Files',
                         'visible' =>  true,
@@ -495,8 +515,13 @@ class Subnav
             ],
             '/adminv2/import/schoolDataImport' => [
                 'name' => 'School Data Import',
-                'visible' =>  $this->configLoader->get('external_type') === 'schoolbox',
+                'visible' => $this->configLoader->get('external_type') === 'schoolbox',
                 'children' => [
+                    '/adminv2/import/schoolDataImport' => [
+                        'name' => 'Home',
+                        'visible' => $this->configLoader->get('external_type') === 'schoolbox',
+                        'children' => []
+                    ],
                     '/adminv2/import/profile' => [
                         'name' => 'User Profiles',
                         'visible' =>  true,
@@ -523,6 +548,11 @@ class Subnav
                 'name' => 'System Settings',
                 'visible' =>  true,
                 'children' => [
+                    '/adminv2/setting' => [
+                        'name' => 'Home',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/setting/3rd%20Party%20Services' => [
                         'name' => '3rd Party Services',
                         'visible' =>  true,
@@ -594,6 +624,11 @@ class Subnav
                 'name' => 'User Management',
                 'visible' =>  true,
                 'children' => [
+                    '/adminv2/user' => [
+                        'name' => 'Home',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
                     '/adminv2/reports/activity/all' => [
                         'name' => 'Activity Report',
                         'visible' =>  true,
