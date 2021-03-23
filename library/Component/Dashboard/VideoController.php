@@ -175,6 +175,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                             ));
                         }
 
+                        // TODO remove CDN prefix from here, use {CDN_PREFIX} in template instead
                         $this->setVar(
                             array(
                                 'VIDEO_LIST_STATUS'    => $video->getStatus(),

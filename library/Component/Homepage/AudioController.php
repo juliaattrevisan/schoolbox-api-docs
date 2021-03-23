@@ -201,7 +201,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         $this->parse('audio_list_block', 'audio_list', true);
 
                     } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-
+                        // TODO remove CDN prefix from here, use {CDN_PREFIX} in template instead
                         $this->setVar([
                             'AUDIO_LIST_STATUS'    => $audio->getStatus(),
                             'AUDIO_LIST_STATUSIMG' => $cdnPrefix . $audio->getStatusImage('audio'),

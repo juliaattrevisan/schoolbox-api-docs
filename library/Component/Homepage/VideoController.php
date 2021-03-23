@@ -237,6 +237,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                     $this->parse('video_list_block', 'video_list', true);
                 } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     // Only users with higher permissions can see pending videos
+                    // TODO remove CDN prefix from here, use {CDN_PREFIX} in template instead
                     $this->setVar([
                         'VIDEO_LIST_STATUS'    => $video->getStatus(),
                         'VIDEO_LIST_STATUSIMG' => $cdnPrefix . $video->getStatusImage(),
