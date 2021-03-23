@@ -121,7 +121,6 @@ export default {
             resourceOrder: this.resourceOrder,
             resourceAreaColumns: this.config.resourceColumns,
             schedulerLicenseKey: this.config.schedulerLicenseKey,
-            // schedulerLicenseKey: '0819459365-fcs-1616456951',
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView,
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
