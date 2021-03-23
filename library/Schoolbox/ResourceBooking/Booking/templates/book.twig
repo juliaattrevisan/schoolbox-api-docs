@@ -136,8 +136,8 @@ $(function() {
             /* Use a calling module's callback url, pass it booking ids
              * that were just created for it
              */
-            if (data.returnUrl?.length) {
-                if (data.item?.length) {
+            if (data.returnUrl && data.returnUrl.length) {
+                if (data.item && data.item.length) {
                     var ids = data.item.map(function (v) {
                         return v.id;
                     }).join();
