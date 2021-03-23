@@ -8,6 +8,7 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress_Date_Format;
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\File\Mimetype;
 
 /**
@@ -126,4 +127,19 @@ interface IStorage
      */
     public function readStream();
 
+    /**
+     * Get this file's filesystem.
+     *
+     * @inherited from Flysystem\File
+     * @return FilesystemInterface
+     */
+    public function getFilesystem();
+
+    /**
+     * Get the path to the file on its filesystem.
+     *
+     * @inherited from Flysystem\File
+     * @return string
+     */
+    public function getPath();
 }

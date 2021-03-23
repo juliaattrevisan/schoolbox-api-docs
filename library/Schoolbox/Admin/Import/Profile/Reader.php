@@ -131,8 +131,12 @@ class Reader implements \Iterator
     /**
      * Reader constructor.
      *
-     * Check that the filename/resource is valid
-     * Die loudly if it's not
+     * Check that the filename/resource is valid, and that the resource is
+     * seekable: die loudly if it's not.
+     *
+     * @see \Schoolbox\Resource\Storage\SeekableStream\Factory::buildSeekableStream
+     *      for building a resource stream that is guaranteed to be seekable
+     *      (a stream from AWS might not be)
      *
      * @param resource|string $filename a path to file or a fopen'd file resource
      * @param bool            $hasHeaderRow
@@ -154,11 +158,17 @@ class Reader implements \Iterator
              */
             $this->filename = $filename;
             $this->fp = fopen($this->filename, 'r');
-        } else {
+        }
 
-            /* Everything else is unknown; exit loudly
-             */
+        // Verify the file pointer is a seekable resource
+        if (!is_resource($this->fp)) {
             throw new \RuntimeException(sprintf('File "%s" not found, or is not readable!', $filename));
+        }
+
+        $metadata = stream_get_meta_data($this->fp);
+        $seekable = $metadata['seekable'] ?? false;
+        if (!$seekable) {
+            throw new \RuntimeException('File stream does not support seeking');
         }
 
         /* Remember whether the csv file had a header row or not

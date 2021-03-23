@@ -340,4 +340,14 @@ class Submission implements IStorage, ISoftDeletable
     {
         throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
     }
+
+    public function getFilesystem()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
+
+    public function getPath()
+    {
+        throw new \BadMethodCallException(sprintf('%s needs to be rewritten to use multiple storage', __FUNCTION__));
+    }
 }
