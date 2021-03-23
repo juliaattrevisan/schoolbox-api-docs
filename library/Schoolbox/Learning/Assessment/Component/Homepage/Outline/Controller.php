@@ -114,8 +114,8 @@ class Controller extends Component_Homepage_ControllerAbstract
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
 
-        if (!$courseImplId = $this->getConfig('importedCourse')) {
-            return !$this->readOnly;
+        if(!$courseImplId = $this->getConfig('importedCourse')) {
+            return true;
         }
 
         $this->courseImplementation = null;
@@ -165,9 +165,6 @@ class Controller extends Component_Homepage_ControllerAbstract
                     $unitImpl->setAssessables($assessments[$unitImpl->getId()]);
                 }
             }
-        } elseif ($this->readOnly) {
-            // hide component from read only user, if there's no course implementation
-            return false;
         }
 
         return true;

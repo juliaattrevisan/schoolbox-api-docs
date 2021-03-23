@@ -14,6 +14,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
+
 class Component_Homepage_ManagersController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -47,7 +48,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
         // Get collection of members
         $userMapper = UserMapper::getInstance();
 
-        if ($this->getContext()->getInherit()) {
+        if($this->getContext()->getInherit()) {
             // Find nearest nian folder
             $folderMapper = FolderMapper::getInstance();
             $nianFolder = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
@@ -56,7 +57,8 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 UserAccess::ACCESS_WRITE,
                 $nianFolder->getId(),
                 ['lastname' => 'asc']);
-        } else {
+        }
+        else {
             $managerList   = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_WRITE,
@@ -64,10 +66,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 ['lastname' => 'asc']);
         }
 
-        if (count($managerList) === 0) {
-            if (!$this->hasContextWriteAccess()) {
-                return false;
-            }
+        if (count($managerList) == 0) {
 
             $this->setBlock('empty_state', 'empty_read_members', 'empty_read_members_block');
             $this->setBlock('empty_state', 'empty_read_managers', 'empty_read_managers_block');
@@ -92,7 +91,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 'FOLDER_ID' => $this->getSource()->getFolder()->getId(),
             ]);
 
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getInherit()) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getInherit() ) {
                 $block = 'empty_read_managers';
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';

@@ -1,4 +1,7 @@
 <?php
+use Schoolbox\Feed\Feed;
+use Schoolbox\Feed\StandardFeed;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  *
@@ -6,10 +9,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
-use Schoolbox\Feed\Feed;
-use Schoolbox\Feed\StandardFeed;
-
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract
 {
 
@@ -56,9 +55,6 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if (!$this->feed->count()) {
-            if (!$this->hasContextWriteAccess()) {
-                return false;
-            }
 
             $this->setVar('has_activity_block', '');
             $this->parse('empty_state_block', 'empty_state');

@@ -46,7 +46,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
     /**
      * Loads the grid component into its set configuration.
      *
-     * @return bool
+     * @return true
      */
     public function execute()
     {
@@ -57,9 +57,6 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
         }
 
         $this->layout = $this->delegate->fetchLayout($this);
-        if ((!$this->layout || $this->layout->getTileList()->count() === 0) && !$this->hasContextWriteAccess()) {
-            return false;
-        }
         return true;
     }
 
