@@ -46,19 +46,14 @@
  * Skin Builder choices
  */
 .fc-toolbar {
-  border: 1px solid #ededed;
+  border-bottom: 1px solid #ededed;
   margin: 0 !important;
   padding: 1rem;
 
-  button {
+  .fc-button {
     @include button-dimensions();
-    color: $content-ui-foreground;
-    background-color: $content-ui-background;
-    border-radius: 0;
-    padding: 0 0.875rem !important;
-    margin: 0 1px 0 0 !important;
 
-    &.fc-button-primary:disabled {
+    &:disabled {
       @extend .disabled;
     }
     &:hover,
@@ -69,24 +64,18 @@
   }
 }
 
-.fc-unthemed th,
-.fc-unthemed td,
-.fc-unthemed thead,
-.fc-unthemed tbody,
-.fc-unthemed .fc-divider,
-.fc-unthemed .fc-row,
-.fc-unthemed .fc-content,
-.fc-unthemed .fc-popover,
-.fc-unthemed .fc-list-view,
-.fc-unthemed .fc-list-heading td,
+.fc-theme-standard th,
+.fc-theme-standard td,
+.fc-theme-standard thead,
+.fc-theme-standard tbody,
+.fc-theme-standard .fc-divider,
+.fc-theme-standard .fc-row,
+.fc-theme-standard .fc-content,
+.fc-theme-standard .fc-popover,
+.fc-theme-standard .fc-list-view,
+.fc-theme-standard .fc-list-heading td,
 .fc .fc-row .fc-content-skeleton td {
-  border-color: #ededed !important;
-}
-
-.fc-widget-header span {
-  display: block;
-  font-size: 0.875rem;
-  margin: 0.25rem;
+  border: 1px solid #ededed;
 }
 
 .fc-day-header {
@@ -94,20 +83,8 @@
   text-transform: uppercase !important;
 }
 
-.fc-day-top {
-  text-align: center;
-  span {
-    float: none !important;
-  }
-}
-
 .fc-day-grid-event {
   padding: 3px 2px !important;
-}
-
-.fc-event {
-  color-adjust: exact;
-  -webkit-print-color-adjust: exact;
 }
 
 @media #{$medium-down} {

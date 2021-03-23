@@ -2,11 +2,12 @@
 @import "www/css/foundation/utils/variables";
 
 .fc {
-  .fc-button-primary {
+  .fc-button {
     background-color: $content-ui-background;
     border: 0;
     border-radius: 0;
     color: $content-ui-foreground;
+    margin: 0 1px 0 0 !important;
   }
   .flatpickr-input {
     padding: 0 !important;
@@ -27,29 +28,53 @@
   }
   .fc-list-event-title {
     width: 100%;
+
     a {
       display: block;
       width: 100%;
     }
   }
+  .fc-col-header-cell-cushion {
+    font-size: .875rem;
+    font-weight: normal;
+    text-transform: uppercase;
+  }
+  .fc-daygrid-day-number {
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
+  }
   .fc-list-event:hover td {
     background-color: $content-ui-hover;
   }
-  //.fc-daygrid-event:hover {
-  //  margin-top: 1px;
-  //}
+  .fc-daygrid-event:hover {
+    margin-top: 1px;
+  }
+  .fc-daygrid-day.fc-day-today {
+    background-color: $content-ui-selected;
+  }
 }
 
+.fc-list-table {
+  td, th, tr {
+    border: 0;
+  }
+}
+
+.fc-theme-standard .fc-scrollgrid,
 .fc-theme-standard .fc-list,
-.fc-theme-standard th,
-.fc-theme-standard td,
 .fc-event {
   border: 0;
 }
 
-.fc-event,
-.fc-event:hover {
+.fc-event {
   margin: 0;
+  color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+
+  &:hover {
+    margin: 0;
+  }
 }
 
 .strike {
