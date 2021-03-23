@@ -177,7 +177,7 @@ export default {
                 }
             ],
             eventDidMount: this.eventRender,
-            viewDidMount: this.viewSkeletonRender,
+            viewDidMount: this.viewDidMount,
             loading: this.$_fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
             eventClick: this.onEventClick,
@@ -250,19 +250,22 @@ export default {
         /**
          * Callback for when the calendar view changes: preserve the
          * newly selected view for this user.
-         * @see https://fullcalendar.io/docs/viewSkeletonRender
+         * @see https://fullcalendar.io/docs/viewDidMount
          *
          * @param info
          */
-        viewSkeletonRender(info) {
-
+        viewDidMount(info) {
+            
             const customGroup = document.querySelector('.fc-custom-group');
 
             this.currentDisplay = info.view.type;
 
-            document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach((element) => {
+            // document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach((element) => {
+            document.querySelectorAll('.fc-button-group').forEach((element) => {
                 if (this.currentViewIsList()) {
-                    element.classList.add('hide');
+                    if (!element.firstChild.classList.contains('fc-customFilters-button')) { //never hide the right side buttons
+                        element.classList.add('hide');
+                    }
                     if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
                         customGroup.classList.remove('hide')
                     }
@@ -275,12 +278,13 @@ export default {
             });
 
             if (this.currentViewIsList()) {
+                
                 this.registerListCustomInputFields();
 
                 /**
                  * Re-initialise datepicker upon date update on list view.
                  * Without this, date picker fields just turns into a normal text field.
-                     */
+                */
                 let attachAlaressDatePicker = function () {
                     var $dateinput = $(this);
                     if ($dateinput.attr('data-datepicker-id') === undefined) {
@@ -547,9 +551,10 @@ export default {
          * Register customised input fields for list view
          */
         registerListCustomInputFields() {
-
+            
             // Make sure that there's only one of the custom input field
-            if (!document.querySelector('.fc-custom-group')) {
+            if (!document.querySelector('.fc-custom-group')) 
+            {
                 // Prepare input fields
                 const container = document.createElement('div');
                 const startDate = document.createElement('input');
@@ -619,10 +624,12 @@ export default {
 
                             this.duration = this.$_fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                             this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
+                            // this.updateListViewDateRangeField(document.querySelector('#start_date').value, document.querySelector('#end_date').value);
                         }
                     }
                 });
             }
+
         },
 
         /**
