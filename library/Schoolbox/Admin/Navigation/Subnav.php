@@ -548,11 +548,6 @@ class Subnav
                 'name' => 'System Settings',
                 'visible' =>  true,
                 'children' => [
-                    '/adminv2/setting' => [
-                        'name' => 'Home',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
                     '/adminv2/setting/3rd%20Party%20Services' => [
                         'name' => '3rd Party Services',
                         'visible' =>  true,

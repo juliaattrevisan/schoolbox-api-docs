@@ -94,7 +94,7 @@
                  # Otherwise rely entirely on the children
                  #}
                 {% if parentData.children|length %}
-                    <a href="#">{{ parentData.name }}</a>
+                    <a>{{ parentData.name }}</a>
                 {% else %}
                     <a href="{{ parentUrl }}">{{ parentData.name }}</a>
                 {% endif %}
