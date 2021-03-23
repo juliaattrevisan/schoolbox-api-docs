@@ -128,7 +128,7 @@ export default {
             dayMaxEventRows: this.config.eventLimit,
             firstDay: this.config.firstDay,
             events: this.events,
-            eventDidMount: this.$_fullCalendarHelper_eventRender,
+            eventDidMount: this.eventRender,
             defaultTimedEventDuration: '00:05:00',
             loading: this.$_fullCalendarHelper_onLoading,
             dateClick: this.onDateClick,
@@ -206,6 +206,7 @@ export default {
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
+            debugger
             if (!this.$_fullCalendarHelper_eventRender(eventRenderInfo)) {
                 eventRenderInfo.event.setProp('display', 'none');
                 return false;
@@ -227,7 +228,7 @@ export default {
             } else {
                 eventRenderInfo.event.setProp('display', 'none');
             }
-
+            
             return isEventRendered;
         },
 
