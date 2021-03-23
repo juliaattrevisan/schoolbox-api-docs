@@ -40,7 +40,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setUrl($url->getUrl());
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
-        $link->setHidden($_POST['visible'] ? false : true);
+        $link->setHidden($_POST['visible'] ? 0 : 1);
         $link->setTarget($_POST['target']);
         $link->setModified(Alaress_Date_Format::now());
 
@@ -52,13 +52,13 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
 
     } else {
         /** @var Link $link */
-        $link = LinkMapper::getInstance()->createModel();
+        $link = LinkMapper::getInstance()->createModel(0);
         $link->setOwner($sessionUser->getId());
 
         $link->setUrl($url->getUrl());
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
-        $link->setHidden($_POST['visible'] ? false : true);
+        $link->setHidden($_POST['visible'] ? 0 : 1);
         $link->setTarget($_POST['target']);
 
         // Add to multiple locations
