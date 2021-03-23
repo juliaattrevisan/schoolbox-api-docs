@@ -3301,11 +3301,6 @@ parameters:
 			path: library/Schoolbox/Application/CliTool/PdfGenerator/App.php
 
 		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/Login/Controller.php
-
-		-
 			message: "#^Variable \\$authenticated might not be defined\\.$#"
 			count: 1
 			path: library/Schoolbox/Application/Login/Controller.php
