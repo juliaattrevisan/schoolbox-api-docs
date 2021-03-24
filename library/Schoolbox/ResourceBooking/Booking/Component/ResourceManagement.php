@@ -101,6 +101,11 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
 
+        /* This is a Dashboard component
+         * redirect back here after potentially modifying a resource booking
+         */
+        $returnUrl = \Schoolbox\Learning\Assessment\Redirect::encode('/');
+
         // Don't mess about with blocks, shove this into Twig
         if (!$this->loadTemplate($templateHandle, 'resourceManagement')) {
             return false;
@@ -112,6 +117,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             [
                 'bookingsByResource' => $this->bookings,
                 'component'          => $this,
+                'returnUrl'          => $returnUrl
             ],
             true,
             false

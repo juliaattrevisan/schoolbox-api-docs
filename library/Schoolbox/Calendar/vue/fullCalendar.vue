@@ -154,8 +154,9 @@
              */
             events(fetchInfo, callback) {
                 var self = this;
+
                 axios.get(
-                    URL_EVENT_SOURCE,
+                    URL_EVENT_SOURCE + '?returnUrl=' + self.returnUrl(),
                     {
                         headers: {
                             'X-Requested-With' : 'XMLHttpRequest'

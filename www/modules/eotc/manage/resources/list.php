@@ -7,6 +7,9 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Learning\Assessment\Redirect;
+
+
 $authenticator = new \EOTC\Authenticator($this);
 
 $event = false;
@@ -34,6 +37,15 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 		'EVENT_START_TIME' => $event->getStartDateTime()->getUsingFormat('H:i'),
 		'EVENT_END_DATE' => $event->getEndDateTime()->getDatabaseDate(),
 		'EVENT_END_TIME' => $event->getEndDateTime()->getUsingFormat('H:i'),
+
+        /* This is a postprocessing redirect that creates relations between resource booking
+         * and an eotc event, decoupling them from each other in a specific way
+         */
+        'RETURN_URL_CALLBACK' => Redirect::encode("/modules/eotc/manage/resources/bookingForm/{$event->getId()}"),
+
+        /* This is a redirect to return to the list screen
+         */
+        'RETURN_URL' => Redirect::encode("/modules/eotc/manage/resources/list/{$event->getId()}"),
 	));
 
 	/* Render a list of existing bookings for this EOTC Event
@@ -55,7 +67,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				'RESOURCEBOOKING_START' => $resourceBooking->getEvent()->getStartDateTime()->getShort(),
 				'RESOURCEBOOKING_END' => $resourceBooking->getEvent()->getEndDateTime()->getShort(),
 				'RESOURCE_ID' => $resource->getId(),
-				'RESOURCE_NAME' => $resource->getName()
+				'RESOURCE_NAME' => $resource->getName(),
 			));
 
 			$this->parse('resourcebooking_block', 'resourcebooking', true);

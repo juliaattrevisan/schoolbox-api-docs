@@ -794,7 +794,7 @@ class Controller extends Base
          */
         if ($this->request->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput([
-                'callbackUrl' => $redirect
+                'returnUrl' => $redirect
             ]));
         } else {
             $this->response->redirect->to($redirect);
