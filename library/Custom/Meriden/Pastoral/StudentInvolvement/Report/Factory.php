@@ -173,6 +173,11 @@ class Factory
         if ($tutorGroup instanceof TutorGroup\SeniorSchool) {
             $allFolders = [];
             $allGrades  = [];
+
+            // If the student was in the TASS class, but not in any assessment,
+            // `getFolderWithGrades` won't find them.
+            // In this case, add a fake folder to the list so it still shows.
+            $fakeFolderId = -1;
             foreach ($subjectList as $subject) {
                 $folderWithGrades = $this->getFolderWithGrades(
                     $subject->getSubjectCode(),
@@ -189,6 +194,11 @@ class Factory
                     // (Clone so this doesn't inadvertently affect any caches)
                     $allFolders[] = (clone $folder)->setName($subject->getName());
                     $allGrades[]  = $folderWithGrades['grades'];
+                } else {
+                    $allFolders[] = (new Folder())
+                        ->setId($fakeFolderId--)
+                        ->setName($subject->getName());
+                    $allGrades[]  = [];
                 }
             }
 
