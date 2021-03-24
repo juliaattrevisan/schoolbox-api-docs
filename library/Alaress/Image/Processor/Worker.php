@@ -14,7 +14,9 @@ use Alaress\Image\Cache\LocalFS;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ImagickConfigParser;
 use Alaress\Image\ITransform;
+use Aura\Di;
 use LogicException;
+use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Schoolbox\File as SchoolboxFile;
@@ -109,6 +111,16 @@ class Worker extends CliTool\App
         $this->imageMagickTimeout      = $imageMagickTimeout;
         $this->suppressSentryReporting = $suppressSentryReporting;
         $this->attemptsPerTransform    = $attemptsPerTransform;
+    }
+
+
+    /** @inheritDoc */
+    public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
+    {
+        parent::setup($appOptions, $di, $outStream, $logger, $perform);
+        pcntl_signal(SIGINT, [$this, 'signalHandler']);   // eg Ctrl+C
+        pcntl_signal(SIGTERM, SIG_DFL);                   // eg `kill PID`
+        return $this;
     }
 
 

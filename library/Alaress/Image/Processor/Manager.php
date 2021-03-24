@@ -582,8 +582,6 @@ class Manager
                         $this->retryFailed,
                         $this->attemptsPerTransform
                     );
-                    pcntl_signal(SIGINT, [$worker, 'signalHandler']);  // eg Ctrl+C
-                    pcntl_signal(SIGTERM, SIG_DFL);                    // eg `kill PID`
                     (new CliTool\Kernel(
                         $worker,
                         [CliTool\Kernel::OPTION_LEVEL => $this->logLevel]
