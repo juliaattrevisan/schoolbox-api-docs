@@ -95,13 +95,6 @@ try {
     $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
-    $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
-
-    if (is_readable($placeHolderFile)) {
-        header('Content-type: image/png');
-        readfile($placeHolderFile);
-        exit;
-    } else {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
-    }
+    // just redirect to the placeholder
+    SitePage::localRedir('/images' . $logoSizes[$logo][$size][2]);
 }

@@ -75,7 +75,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import 'www/css/foundation/utils/_variables.scss';
+@import 'www/static/css/foundation/utils/_variables.scss';
 
 .search-result {
   display: block;

@@ -361,9 +361,9 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Building Javascript";
 cd $cachedir;
 bowerfile='';
 bowerlocksha=`sha1sum /vagrant/bower.json 2>/dev/null | awk '{print $1}'`;
-if [ -f /vagrant/www/javascript/components/bower.checksum ];
+if [ -f /vagrant/www/static/javascript/components/bower.checksum ];
 then
-    currentbowersha=`awk '{print $1}' /vagrant/www/javascript/components/bower.checksum`;
+    currentbowersha=`awk '{print $1}' /vagrant/www/static/javascript/components/bower.checksum`;
     if [ "$currentbowersha" == "$bowerlocksha" ];
     then
         echo "[SB][`date +%Y-%m-%d\ %X`] Javascript build up to date, nothing to change ($bowerlocksha)";
@@ -403,11 +403,11 @@ then
                             # Add new file to etag cache
                             echo "$etag $branch-bower.tar.gz" >> bower.etag.cache;
                             # Cleanup for purity
-                            rm -fR /vagrant/vagrantcache/www/javascript/components 2>/dev/null;
+                            rm -fR /vagrant/vagrantcache/www/static/javascript/components 2>/dev/null;
                             # Extract checksum
-                            tar xzf $branch-bower.tar.gz www/javascript/components/bower.checksum;
-                            bowerchecksum=`awk '{print $1}' www/javascript/components/bower.checksum`;
-                            rm -fR /vagrant/vagrantcache/www/javascript/components 2>/dev/null;
+                            tar xzf $branch-bower.tar.gz www/static/javascript/components/bower.checksum;
+                            bowerchecksum=`awk '{print $1}' www/static/javascript/components/bower.checksum`;
+                            rm -fR /vagrant/vagrantcache/www/static/javascript/components 2>/dev/null;
                             # Add new file to Javascript cache
                             echo "$bowerchecksum $branch-bower.tar.gz" >> bower.cache;
                             # Check if this is file we need
@@ -428,7 +428,7 @@ then
         then
             # Extract content
             echo "[SB][`date +%Y-%m-%d\ %X`] Found matching Javascript cache file ($bowerlocksha) '$bowerfile', now extracting";
-            rm -fR /vagrant/www/javascript/components/ 2>/dev/null;
+            rm -fR /vagrant/www/static/javascript/components/ 2>/dev/null;
             tar xzf /vagrant/vagrantcache/$bowerfile;
         else
             # Still no luck, build from scratch with bower

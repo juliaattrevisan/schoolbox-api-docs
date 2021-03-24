@@ -40,7 +40,7 @@ $('#image-slider').alaressSlider({
 ````
 
 ## Styles
-Styles can be found in `www/css/foundation/ui/_slider.scss`.
+Styles can be found in `www/static/css/foundation/ui/_slider.scss`.
 
 ## Parameters
 You can send any of the options Swiper takes, see the [Swiper docs](http://idangero.us/swiper/api/#parameters) for the list of Swiper parameters.
@@ -178,7 +178,7 @@ This wrapper has been created to do lazy loading by default. It will preload 3 i
 
 
 ## Pagination tweaks
-By default, this slider plugin places the pagination dots as an overlay on the bottom of the image (just like the next/prev arrows are also overlays). 
+By default, this slider plugin places the pagination dots as an overlay on the bottom of the image (just like the next/prev arrows are also overlays).
 However, this is not the schoolbox way of doing things: we prefer to have the pagination UNDERNEATH the entire slider, not overlaying the image.
 
 In order to achieve this while maintaining the correct positioning of the next/prev arrows, the pagination has been moved to just below and outside of the `swiper-container` div.
