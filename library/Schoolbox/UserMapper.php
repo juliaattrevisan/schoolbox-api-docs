@@ -8,6 +8,7 @@
 
 namespace Schoolbox;
 
+use Alaress\Database\Predicate\Builder;
 use Aura\Di\Exception\ServiceNotFound;
 use DomainException;
 use House;
@@ -36,6 +37,7 @@ use UnexpectedValueException;
  * @method User createModel($idValue = null)
  * @method GenericCollection|User[] createCollection($contents = [])
  * @method GenericCollection|User[] findByColumn($columnName, $columnValue, $options = [])
+ * @method GenericCollection|User[] findByPredicates(Builder $pb, array $options = [])
  */
 class UserMapper extends Mapper
 {
