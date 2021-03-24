@@ -61,7 +61,7 @@ export default {
           field: 'firstname',
         },
         {
-          label: 'Second Name',
+          label: 'Surname',
           field: 'lastname',
         },
         {
