@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Navigation;
 
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -63,6 +64,9 @@ class Subnav
         }
 
         $this->twig = new Environment(new FilesystemLoader($paths), $options);
+
+        // The CDN_PREFIX needs to be made available in this Twig instance
+        $this->twig->addGlobal('CDN_PREFIX', (new PrefixGenerator($this->configLoader))->generate());
     }
 
 
