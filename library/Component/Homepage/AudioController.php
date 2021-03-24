@@ -5,10 +5,9 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Resource\File\Model;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Video\ResourceVideo;
 use Schoolbox\Video\ResourceVideoMapper;
 
@@ -98,9 +97,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         } else {
             $this->outputList = new \Schoolbox\Collection(array());
         }
-
-        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
-        $cdnPrefix       = $prefixGenerator->generate();
 
         if (!count($this->outputList)) {
 
@@ -201,11 +197,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
                         $this->parse('audio_list_block', 'audio_list', true);
 
                     } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                        // TODO remove CDN prefix from here, use {CDN_PREFIX} in template instead
-                        $this->setVar([
-                            'AUDIO_LIST_STATUS'    => $audio->getStatus(),
-                            'AUDIO_LIST_STATUSIMG' => $cdnPrefix . $audio->getStatusImage('audio'),
-                        ]);
+                        $this->setVar('AUDIO_LIST_STATUS', strtolower($audio->getStatus()));
                         $this->parse('audio_pending_list_block', 'audio_pending_list', true);
                     }
                 }

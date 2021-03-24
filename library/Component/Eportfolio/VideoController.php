@@ -6,8 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Cdn\PrefixGenerator;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * @method \Schoolbox\Video\ResourceVideoMapper getMapper()
@@ -103,9 +102,6 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         $this->setVar('video_pending_list_block', '');
         $this->setVar('default_video_block', '');
 
-        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
-        $cdnPrefix       = $prefixGenerator->generate();
-
         if (count($this->outputList)) {
             $j = 0;
 
@@ -122,12 +118,8 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 
                 if ($video->getStatus() == "completed") {
                     $this->parse('video_list_block', 'video_list', true);
-                }                 elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                    $this->setVar(array(
-                        'VIDEO_LIST_STATUS'    => $video->getStatus(),
-                        'VIDEO_LIST_STATUSIMG' => $cdnPrefix . $video->getStatusImage(),
-                    ));
-
+                } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                    $this->setVar('VIDEO_LIST_STATUS', strtolower($video->getStatus()));
                     $this->parse('video_pending_list_block', 'video_pending_list', true);
                 }
             }

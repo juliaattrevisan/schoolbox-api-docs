@@ -5,9 +5,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Video\ResourceVideo;
 
 class Component_Dashboard_VideoController extends Component_Dashboard_ControllerAbstract
@@ -71,8 +70,6 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
         );
 
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
-        $prefixGenerator     = new PrefixGenerator($this->getConfigLoader());
-        $cdnPrefix           = $prefixGenerator->generate();
 
         if ($this->getConfig('size') > 1) {
             $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig, $this->getConfig('size') - 1);
@@ -175,13 +172,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                             ));
                         }
 
-                        // TODO remove CDN prefix from here, use {CDN_PREFIX} in template instead
-                        $this->setVar(
-                            array(
-                                'VIDEO_LIST_STATUS'    => $video->getStatus(),
-                                'VIDEO_LIST_STATUSIMG' => $cdnPrefix . $video->getStatusImage(),
-                            )
-                        );
+                        $this->setVar('VIDEO_LIST_STATUS', strtolower($video->getStatus()));
 
                         $this->parse('video_pending_list_block', 'video_pending_list', true);
                     }
