@@ -106,14 +106,19 @@
 
                     /* Show all the dates and stuff too
                      */
-                    $(element).parent().find('[data-assessment-dates]').prop('disabled', false).show();
+                    $(element).parent()
+                        .find('[data-assessment-dates]').show()
+                        .find('input').prop('disabled', false);
                 },
                 onAfterSelectAllUntick: function(allCheckboxes) {
                     $(element).parent().find('[data-show-count]').attr('data-show-count', 0);
 
                     /* Hide all the dates and stuff too
                      */
-                    $(element).parent().find('[data-assessment-dates]').prop('disabled', true).hide();
+                    $(element).parent()
+                        .find('[data-assessment-dates]').hide()
+                        .find('input').prop('disabled', true);
+
                 }
             })
         });
