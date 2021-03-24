@@ -481,11 +481,6 @@ class Subnav
                 'name' => 'Resources',
                 'visible' =>  true,
                 'children' => [
-                    '/adminv2/setting/Resources' => [
-                        'name' => 'Home',
-                        'visible' =>  true,
-                        'children' => []
-                    ],
                     '/adminv2/allowed-file' => [
                         'name' => 'Allowed Files',
                         'visible' =>  true,
