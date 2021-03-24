@@ -65,10 +65,6 @@ export default {
           field: 'lastname',
         },
         {
-          label: 'Second Name',
-          field: 'lastname',
-        },
-        {
           label: 'Role',
           field: 'role',
         },
@@ -164,7 +160,7 @@ export default {
 
       let formdata = new FormData();
       usersToDeleteIDList.forEach((item) => {
-        formdata.append('users[]',item);
+        formdata.append('users[]', item);
       })
 
       axios.post('/adminv2/user/list/delete', formdata)
