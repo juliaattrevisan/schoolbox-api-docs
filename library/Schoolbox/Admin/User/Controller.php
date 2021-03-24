@@ -409,7 +409,6 @@ class Controller extends Base
         $userList = $this->userMapper->findByPredicates($pb, ['order' => ['updated_at' => 'ASC']]);
 
         foreach ($userList as $user) {
-            /** @var User $user */
             $jsonPayload[] = [
                 'id'            => $user->getId(),
                 'username'      => $user->getUsername(),
