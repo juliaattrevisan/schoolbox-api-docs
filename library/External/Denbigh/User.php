@@ -180,7 +180,8 @@ class External_Denbigh_User implements External_UserInterface
                             '' AS CourtOrderType,
                             '' AS StudentEnrolmentDate,
                             '' AS StudentLeavingDate,
-                            '' AS StudentIBFlag
+                            '' AS StudentIBFlag,
+                            '' AS ParentsSeparatedFlag
                 FROM        People pe
                 LEFT JOIN   Students stu ON stu.peopleDenbighID = pe.denbighID
                 LEFT JOIN   Staff sta ON sta.tutorGroup = stu.tutorGroup

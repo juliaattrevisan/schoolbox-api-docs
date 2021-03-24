@@ -353,6 +353,7 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                                                  AS StudentEnrolmentDate,
                 ''                                                  AS StudentLeavingDate,
                 ''                                                  AS StudentIBFlag,
+                ''                                                  AS ParentsSeparatedFlag,
                 pca.CustodyAlert                                    AS CustodyAlert,
                 pca.CustodyNotes                                    AS CustodyNotes,
                 pcad.Description                                    AS CustodyResponsiblePerson,

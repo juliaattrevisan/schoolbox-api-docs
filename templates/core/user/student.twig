@@ -146,7 +146,7 @@
 
                         {% block synergeticComments %}
                             {% if externalUser.Comment ?? false and showComments %}
-                                <div class="alert-box highlight icon-info no-margin">
+                                <div class="alert-box highlight icon-info">
                                     {{ externalUser.Comment | nl2br }}
                                 </div>
                             {% endif %}
@@ -889,17 +889,19 @@
                     {% block contacts_island %}
                         {% block contacts %}
                             <h2 class="subheader">Contact Information</h2>
-
-                            {% for message in externalUser.AlertMessages ?? [] %}
-                                {% block contacts_alert %}
-                                    {# Only staff may view contact alerts #}
-                                    {% if showContactsAlert %}
-                                        <div class="alert-box alert icon-alert">
-                                            {{ message | nl2br }}
-                                        </div>
-                                    {% endif %}
-                                {% endblock contacts_alert %}
-                            {% endfor %}
+                            {% if showContactsAlert %}
+                                {% for message in externalUser.AlertMessages ?? [] %}
+                                    {% block contacts_alert %}
+                                        {# Only staff may view contact alerts #}
+                                            <div class="alert-box alert icon-alert">
+                                                {{ message | nl2br }}
+                                            </div>
+                                    {% endblock contacts_alert %}
+                                {% endfor %}
+                                {% if externalUser.ParentsSeparatedFlag == 1 %}
+                                <div class="alert-box highlight icon-info">Parents Separated</div>
+                                {% endif %}
+                            {% endif %}
 
                             <section>
                                 <ul class="information-list expandable-card">

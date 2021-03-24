@@ -346,6 +346,7 @@ class NonFreedom implements IQueryHelper
                 ''                                                            AS EnglishSecondFlag,
                 ''                                                            AS StudentStudiesCode,
                 S.ALERT                                                       AS AlertMessage,
+                ''                                                            AS ParentsSeparatedFlag,
                 0                                                             AS countIndividualEducationPlans
             FROM STUDENT S
             LEFT JOIN CODEMAST AS S_HOUSE ON S.HOUSE = S_HOUSE.CODE AND S_HOUSE.TYPE = 'HOUSE'
