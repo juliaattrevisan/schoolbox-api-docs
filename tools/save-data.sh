@@ -1,206 +1,246 @@
 #!/bin/bash
 
-cachedir='/vagrant/vagrantcache';
+# Global const
+readonly CACHE_DIR='/vagrant/vagrantcache';
+readonly BUCKET='schoolbox-data';
+readonly INSTANCE_DATA_DIR='/vagrant/data/vagrantx';  # Location of 'vagrantx' instance data files
+readonly LOG=/usr/bin/alaress-logger
+readonly L_INFO=200;
+readonly L_ERROR=400
 
-helpmsg() {
-    echo "save-data.sh OPTIONS save-name";
-    echo "Options:";
-    echo "  -h | --help      display this help message";
-    echo "  -i | --initial   prepare data for using as an initial dataset (more cleaning)";
-    echo "  -u | --upload    upload the data for other to use on completion";
-    echo "  -v | --verbose   verbose mode for easier debugging";
+# Global vars used across multiple functions
+verbose='';        # [''|'v']
+long_verbose='';   # [''|'-v']
+initial='';        # [''|'1']
+upload='';         # [''|'1']
+filename='';       # eg 'initial.tar.gz', 'sales.tar.gz', 'custom-dataset-xyz.tar.gz'
+
+function log(){
+  $LOG $L_INFO "$1"
+}
+function error(){
+  $LOG $L_ERROR "$1"
 }
 
-logMessage() {
-    echo "[SB][`date +%Y-%m-%d\ %X`] $1";
-}
-
-stopservices() {
-    echo "Stopping Services";
-    service nginx stop >/dev/null 2>&1;
-    /vagrant/tools/notif/allstop >/dev/null 2>&1;
-    mv /etc/cron.d/sbc_vagrantx /tmp/sbc_vagrantx;
-}
-
-restartservices() {
-    echo "Restarting Services";
-    service nginx restart >/dev/null 2>&1;
-    /vagrant/tools/notif/allrestart >/dev/null 2>&1;
-    mv /tmp/sbc_vagrantx /etc/cron.d/sbc_vagrantx;
-}
-
-localiseVagrant() {
-    echo "Re-localising vagrant"
-    mysql schoolbox < /vagrant/sql/vagrant.sql;
-    mysql schoolbox < "${cachedir}"/vagrant-secrets.sql;
-    /vagrant/tools/generate-dir-sql.sh /vagrant/data | mysql --defaults-extra-file=/root/.my.cnf schoolbox
-}
-
-cleanupVagrant() {
-    echo "Reverting vagrant-specific changes";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox < /vagrant/sql/vagrant-cleanup.sql;
-    mysql --defaults-extra-file=~/.my.cnf schoolbox < $cachedir/vagrant-cleanup-secrets.sql;
-
-    logMessage "Applying data dir sql fixes";
-    /vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
-}
-
-if [ -z $1 ];
-then
-    helpmsg;
-    exit 0;
-fi
-
-options=$(getopt -o hiuv --long help,initial,upload,verbose -- "$@")
-if [ $? -ne 0 ];
-then
-    helpmsg;
-    echo "";
-    echo "Error: Incorrect options provided";
+# Checks script is being run as root or sudo
+check_run_as_root(){
+  if [[ $EUID != "0" ]]; then
+    echo "Please execute script as sudo or root user" >&2;
     exit 1;
-fi
+  fi
+}
 
-eval set -- "$options";
-verbose='';
-longverbose='';
-while true;
-do
-    case "$1" in
-    -h)
-        help='1';
-        ;;
-    --help)
-        help='1';
-        ;;
-    -i)
-        initial='1'
-        ;;
-    --initial)
-        initial='1'
-        ;;
-    -u)
-        upload='1'
-        ;;
-    --upload)
-        upload='1'
-        ;;
-    -v)
-        verbose='v'
-        longverbose=' -v'
-        ;;
-    --verbose)
-        verbose='v'
-        longverbose=' -v'
-        ;;
-    --)
-        shift
-        break
-        ;;
-    esac
-    shift
-done
-filename="$1.tar.gz";
+# Print a help message to STDOUT
+help_msg() {
+  echo "save-data.sh OPTIONS";
+  echo "Options:";
+  echo "       --name [X]  Required. Name of the dataset to persist, eg 'sales', 'initial', 'custom-dataset-x'"
+  echo "  -h | --help      Optional. Display this help message";
+  echo "  -i | --initial   Optional. Prepare data for using as an initial dataset (more cleaning)";
+  echo "  -u | --upload    Optional. Upload the data for others to use on completion";
+  echo "  -v | --verbose   Optional. Verbose mode for easier debugging";
+}
 
-if [ ! -z $help ];
-then
-    helpmsg;
-    exit 0;
-fi
+# Stop nginx, daemons, cron
+stop_services() {
+  log "Stopping Services";
+  service nginx stop
+  /vagrant/tools/notif/allstop
+  find /etc/cron.d -maxdepth 1 -iname 'sbc_*' -type f -delete
+}
 
+# Restart nginx, daemons, cron
+restart_services() {
+  log "Restarting Services";
+  service nginx restart
+  /vagrant/tools/notif/allrestart
+  /usr/local/bin/schoolboxcloud-rebuild-cronjobs --site-root /vagrant --is-primary-host 1
+}
 
-echo "Saving data as: $filename";
-mkdir -p $cachedir;
+# Prepare instance to be archived so it can be deployed to new SB environments
+cleanup_vagrant() {
+  log "Reverting vagrant-specific changes";
+  mysql --defaults-extra-file=~/.my.cnf schoolbox < /vagrant/sql/vagrant-cleanup.sql;
+  mysql --defaults-extra-file=~/.my.cnf schoolbox < $CACHE_DIR/vagrant-cleanup-secrets.sql;
+  log "Applying data dir sql changes";
+  /vagrant/tools/generate-dir-sql.sh /var/lib/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+}
 
-stopservices;
+# Update instance to act like a vagrant development environment
+localise_vagrant() {
+  log "Re-localising vagrant"
+  mysql schoolbox < /vagrant/sql/vagrant.sql;
+  mysql schoolbox < "${CACHE_DIR}"/vagrant-secrets.sql;
+  log "Applying data dir sql changes";
+  /vagrant/tools/generate-dir-sql.sh "$INSTANCE_DATA_DIR" | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+}
 
-if [ ! -z $initial ];
-then
-    echo "Cleaning data for Initial dataset";
-    echo "Cleaning: log tables";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE cmsLog";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE user_activity_log";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE login_log";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE msg_reroute_override";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE user_assume_log";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE user_password_reset_request";
-    mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE ups_log";
-fi
+# Parse CLI args
+parse_args(){
+ local errors='0'
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+    -h|--help)
+      help_msg
+      exit;
+      ;;
+    -i|--initial)
+      initial='1';
+      shift
+      ;;
+    -u|--upload)
+      upload='1';
+      shift
+      ;;
+    -v|--verbose)
+      verbose='v'
+      long_verbose='-v';
+      shift
+      ;;
+    --name)
+      dataset="$2";
+      shift; shift;
+      ;;
+    *)
+      error "Unrecognised option: '$1'"
+      errors='1'
+      shift # past argument
+      ;;
+  esac
+  done
 
-echo "Cleaning data";
-echo "Cleaning: deleted files";
-/vagrant/tools/gc-storage.php$longverbose -n 10000000 -p;
-echo "Cleaning: log and cache files";
-rm -f$longverbose /vagrant/data/*.log{,.gz};
-rm -f$longverbose -R /vagrant/data/cache/logs;
-rm -f$longverbose -R /vagrant/data/storage/css;
-/vagrant/tools/clean-cache-dir.sh >/dev/null 2>&1;
-/vagrant/tools/create-data-dirs.sh /vagrant/data >/dev/null;
-echo "Cleaning: old sql backups";
-rm -f$longverbose /vagrant/data/*.sql{,.gz};
-cleanupVagrant;
+  # Check dataset name is sane
+  if [[ -z $dataset ]]; then
+    error "Error: You must indicate a dataset name using the --name option";
+    errors='1'
+  elif [[ ! $dataset =~ ^[a-zA-Z0-9]+[a-zA-Z0-9_-]*$ ]]; then
+    error "Error: Dataset name must start with alphanumeric and only contain [a-zA-Z0-9_-]";
+    errors='1'
+  fi
+  filename="$dataset.tar.gz";
 
-echo "Exporting database";
-mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c schoolbox > /vagrant/data/schoolbox.sql;
-if [ $? -ne 0 ];
-then
-    echo "Error: exporting database failed";
-    localiseVagrant;
-    restartservices;
+  if [[ $errors == 1 ]]; then
+    error "Error: Incorrect options provided";
+    help_msg
+    exit 1
+  fi
+}
+
+# Additional cleaning for initial datasets
+cleanup_initial_dataset(){
+  if [ -n "$initial" ]; then
+    log "Cleaning data for Initial dataset";
+    log "Cleaning: log tables";
+    for table_name in cmsLog user_activity_log login_log msg_reroute_override user_assume_log user_password_reset_request ups_log; do
+      mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE $table_name";
+    done
+  fi
+}
+
+# Cleanup deleted + log files
+cleanup_deleted_and_log_files(){
+  log "Cleaning data";
+  log "Cleaning: deleted files";
+  /vagrant/tools/gc-storage.php $long_verbose -n 10000000 -p;
+  log "Cleaning: log and cache files";
+  rm -f "$long_verbose" "$INSTANCE_DATA_DIR"/*.log{,.gz};
+  rm -f "$long_verbose" -R "$INSTANCE_DATA_DIR"/cache/logs;
+  rm -f "$long_verbose" -R "$INSTANCE_DATA_DIR"/storage/css;
+  /vagrant/tools/clean-cache-dir.sh
+  /vagrant/tools/create-data-dirs.sh "$INSTANCE_DATA_DIR"
+  log "Cleaning: old sql backups";
+  rm -f "$long_verbose" "$INSTANCE_DATA_DIR"/*.sql{,.gz};
+}
+
+# Dump database to file
+dump_db_and_restore_vagrant(){
+  log "Exporting database";
+  if ! mysqldump --defaults-extra-file=~/.my.cnf -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c schoolbox > "$INSTANCE_DATA_DIR"/schoolbox.sql; then
+    error "Error: exporting database failed";
+    localise_vagrant;
+    restart_services;
     exit 1;
-fi
+  fi
 
-localiseVagrant;
+  localise_vagrant;
+}
 
-echo "Creating tarball package";
-cd $cachedir/../;
-tar czf$verbose $cachedir/$filename data;
-if [ $? -ne 0 ];
-then
-    echo "Error: tarball creation failed";
-    restartservices;
+# Create the tarball archive
+create_tarball(){
+  log "Creating tarball package";
+  # To avoid needing to change the tarball deployment code, we will use a temporary symlink to insert the
+  # instance's data into the tarball without an instance_id dir prefix.
+  rm -rf /tmp/data
+  ln -s "$INSTANCE_DATA_DIR" /tmp/data
+  local archive=$CACHE_DIR/"$filename"
+  if ! tar -C /tmp -f "$archive" -czh$verbose data; then
+    error "Error: tarball creation failed";
+    restart_services;
+    rm -rf /tmp/data
     exit 1;
-fi
-du -sh $cachedir/$filename;
+  fi
+  rm -rf /tmp/data
+  du -sh $CACHE_DIR/"$filename";
+}
 
-if [ ! -z $upload ];
-then
-    echo -e "AWS S3 Key: \c" && read S3KEY;
-    if [ -z $S3KEY ];
-    then
-        echo "Error: an AWS S3 Key must be supplied";
-        restartservices;
-        exit 1;
-    fi
-    echo -e "AWS S3 Secret: \c" && read S3SECRET;
-    if [ -z $S3SECRET ];
-    then
-        echo "Error: an AWS S3 Secret must be supplied";
-        restartservices;
-        exit 1;
-    fi
-    # below is based on: https://gist.github.com/chrismdp/6c6b6c825b07f680e710
-    path=$cachedir;
-    file=$filename;
-    aws_path='/';
-    bucket='schoolbox-data';
-    date=$(date +"%a, %d %b %Y %T %z");
-    acl="x-amz-acl:public-read";
-    content_type='application/x-compressed-tar';
-    string="PUT\n\n$content_type\n$date\n$acl\n/$bucket$aws_path$file";
-    signature=$(echo -en "${string}" | openssl sha1 -hmac "${S3SECRET}" -binary | base64)
-    curl $longverbose -X PUT -T "$path/$file" \
-      -H "Host: $bucket.s3-ap-southeast-2.amazonaws.com" \
+# Upload tarball archive to AWS S3
+upload_tarball(){
+  if [ -z "$upload" ]; then
+    return;
+  fi
+  echo -e "AWS S3 Key: \c" && read -r S3KEY;
+  if [ -z "$S3KEY" ]; then
+    error "Error: an AWS S3 Key must be supplied";
+    restart_services;
+    exit 1;
+  fi
+  echo -e "AWS S3 Secret: \c" && read -r S3SECRET;
+  if [ -z "$S3SECRET" ]; then
+    error "Error: an AWS S3 Secret must be supplied";
+    restart_services;
+  exit 1;
+  fi
+  # below is based on: https://gist.github.com/chrismdp/6c6b6c825b07f680e710
+  path=$CACHE_DIR;
+  date=$(date +"%a, %d %b %Y %T %z");
+  acl="x-amz-acl:public-read";
+  content_type='application/x-compressed-tar';
+  string="PUT\n\n$content_type\n$date\n$acl\n/${BUCKET}/${filename}";
+  signature=$(echo -en "${string}" | openssl sha1 -hmac "${S3SECRET}" -binary | base64)
+
+  if response=$(curl $long_verbose -X PUT -T "$path/$filename" \
+      -H "Host: $BUCKET.s3-ap-southeast-2.amazonaws.com" \
       -H "Date: $date" \
       -H "Content-Type: $content_type" \
       -H "$acl" \
       -H "Authorization: AWS ${S3KEY}:$signature" \
-      "https://$bucket.s3-ap-southeast-2.amazonaws.com$aws_path$file";
-    if [ $? -eq 0 ];
-    then
-        echo "Upload of $filename to S3 completed";
+      -H "Accept: application/json" \
+      "https://$BUCKET.s3-ap-southeast-2.amazonaws.com/${filename}"); then
+    if [[ -z $response ]]; then
+      log "Upload of $filename to S3 completed";
     else
-        echo "Error: an error occurred uploading to S3";
+      error "Error: an error occurred uploading to S3";
+      echo -e "$response" >&2;
     fi
-fi
-restartservices;
-echo "Save complete";
+  else
+    error "Error: an error occurred uploading to S3";
+  fi
+}
+
+main(){
+  check_run_as_root
+  parse_args "$@"
+  log "Saving data as: '$dataset.tar.gz'";
+  mkdir -p $CACHE_DIR;
+  cleanup_initial_dataset
+  cleanup_deleted_and_log_files
+  cleanup_vagrant
+  stop_services;
+  dump_db_and_restore_vagrant
+  create_tarball
+  upload_tarball
+  restart_services;
+  log "Save complete";
+}
+
+main "$@"
