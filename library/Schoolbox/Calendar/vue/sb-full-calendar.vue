@@ -201,7 +201,7 @@ export default {
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
         quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
-
+        
     },
 
     methods: {
@@ -609,7 +609,7 @@ export default {
                 container.appendChild(endDateFieldWrapper);
                 container.appendChild(buttonWrapper);
 
-                // document.querySelector('.fc-toolbar > .fc-left').appendChild(container);
+                //add to the first tooblbar chunk, so it'll appear on the left hand side
                 document.querySelector('.fc-toolbar').getElementsByClassName('fc-toolbar-chunk')[0].appendChild(container);
 
                 // Register an event listener when update button is clicked.
@@ -624,7 +624,7 @@ export default {
 
                             this.duration = this.$_fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                             this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
-                            // this.updateListViewDateRangeField(document.querySelector('#start_date').value, document.querySelector('#end_date').value);
+                            debugger
                         }
                     }
                 });
