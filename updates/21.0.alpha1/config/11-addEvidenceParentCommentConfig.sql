@@ -2,7 +2,7 @@ INSERT INTO config(name, value, title, description, field_id, options, type_id, 
 VALUES (
            'evidence_parent_comment',
            1,
-           'Allow Parents to Comment on Learning Moments',
+           'Allow Parents to comment on Learning Moments',
            'If set to ON, parents will be able to comment on learning moments of their own children',
            (SELECT id FROM lu_config_field WHERE field = 'boolean'),
            '',
