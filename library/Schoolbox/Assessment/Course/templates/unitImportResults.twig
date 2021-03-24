@@ -80,7 +80,11 @@
 
             // Update display of how many assessments are currently selected in this unit
             // Includes sub-assessments inside projects if project is selected
-            $countSelectedElem.attr('data-show-count', $unit.find(':checked:not(:disabled)').length);
+
+            /* $unit.find() also includes the select-all checkbox, so you have to be particular about
+             * what checkboxes you're selecting to find the count
+             */
+            $countSelectedElem.attr('data-show-count', $unit.find('[data-checkbox-group]:checked:not(:disabled)').length);
         });
     });
 </script>

@@ -86,24 +86,27 @@
     </div>
 </div>
 
+<script src="/static/javascript/shared/select-all/jquery.select-all.basic.js"></script>
 <script>
-    // Select all checkbox for unit assessments
-    $(function() {
-        $('[data-select-all-unit-assessments]').click(function(e) {
-            // Find all the checkboxes associated with this unit
-            const checkboxGroupSelector = '[data-checkbox-group="' + $(e.target).data('select-all-unit-assessments') + '"]';
 
-            if ($(e.target).prop('checked')) {
-                $(checkboxGroupSelector).each(function(index,checkbox) {
-                    // Select all the assessments in this unit
-                    $(checkbox).prop("checked", true);
-                });
-            } else {
-                $(checkboxGroupSelector).each(function(index,checkbox) {
-                    // Deselect all the assessments in this unit
-                    $(checkbox).prop("checked", false);
-                });
-            }
+    $(function() {
+
+        /* Select all checkbox for unit assessments
+         * Note that there's a select-all checkbox which shouldn't contribute to the count
+         * (it's set specially in unitImportResults)
+         */
+        $('[data-select-all-unit-assessments]').each(function(index, element) {
+            const assessmentSelector ='[data-checkbox-group="' + $(element).attr('data-select-all-unit-assessments') + '"]'
+
+            $(element).selectAllBasic({
+                'selector': assessmentSelector,
+                onAfterSelectAllTick: function(allCheckboxes) {
+                    $(element).parent().find('[data-show-count]').attr('data-show-count', allCheckboxes.length);
+                },
+                onAfterSelectAllUntick: function(allCheckboxes) {
+                    $(element).parent().find('[data-show-count]').attr('data-show-count', 0);
+                }
+            })
         });
     });
 </script>
