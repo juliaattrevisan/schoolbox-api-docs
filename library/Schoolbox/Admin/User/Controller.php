@@ -399,10 +399,10 @@ class Controller extends Base
         $rolepb = $this->roleMapper->getPredicateBuilder()->notEquals('group_type', Role::GUEST);
         $roles = $this->roleMapper->findIdsByPredicates($rolepb);
 
-        $lastWeek = new \Alaress_Date_Format(strtotime('-1 week'), \Alaress_Date_Format::TIMESTAMP);
+        $lastWeek =  \Alaress_Date_Format::now()->addWeeks(-1);
 
         $pb = $this->userMapper->getPredicateBuilder()
-                               ->notEquals('username', 'alaress')
+                               ->notEquals('username', UserMapper::USERNAME_ALARESS_ADMIN)
                                 ->lessThan('updated_at', $lastWeek)
                                ->in('group_id', $roles);
 
