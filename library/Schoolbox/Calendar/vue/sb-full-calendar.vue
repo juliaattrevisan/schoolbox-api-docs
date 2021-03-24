@@ -73,7 +73,9 @@ export default {
         return {
             calendarApi: null, //to access the underlying calendar object
             currentDisplay: null,
-            duration: 31,
+            duration: {
+                days: 31
+            },
             listViewDateRange: {
                 start: null,
                 end: null,
@@ -123,7 +125,7 @@ export default {
                 },
                 list: {
                     buttonText: 'List',
-                    duration: { days: this.duration },
+                    duration: this.duration,
                     listDayFormat: this.config.momentJsDateShort
                 }
             },
@@ -584,7 +586,7 @@ export default {
                 endDate.setAttribute('data-datepicker', '');
                 endDate.setAttribute('data-datepicker-buttontext', '');
                 endDate.setAttribute('value',
-                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.$_fullCalendarHelper_toMoment(new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE)
+                    (this.listViewDateRange.end) ? this.listViewDateRange.end : this.$_fullCalendarHelper_toMoment(new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE)
                 );
 
 
@@ -622,9 +624,9 @@ export default {
                             this.listViewDateRange.start = document.querySelector('#start_date').value;
                             this.listViewDateRange.end = document.querySelector('#end_date').value;
 
-                            this.duration = this.$_fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
+                            this.duration.days = this.$_fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                             this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
-                            debugger
+                            
                         }
                     }
                 });
@@ -640,7 +642,7 @@ export default {
         updateListViewDateRangeField(start, end = null) {
             window.history.pushState('', '', '/calendar/' + this.$_fullCalendarHelper_toMoment(start).format(FORMAT_FORM_DATE) + '/' + this.config.userId);
             this.listViewDateRange.start = this.$_fullCalendarHelper_toMoment(start).format(FORMAT_FLATPICKR_DATE);
-            this.listViewDateRange.end = this.$_fullCalendarHelper_toMoment(end || new Date()).add(this.duration, 'days').format(FORMAT_FLATPICKR_DATE);
+            this.listViewDateRange.end = this.$_fullCalendarHelper_toMoment(end || new Date()).add(this.duration.days, 'days').format(FORMAT_FLATPICKR_DATE);
 
             let startDate = this.jQuery('#start_date'),
                 endDate   = this.jQuery('#end_date');
