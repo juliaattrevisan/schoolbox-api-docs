@@ -23,6 +23,15 @@
             <ul class="action-list">
                 <li>
                     <div class="list-item">
+                        {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
+
+                        {##
+                         # No read perm on unit spec? don't show the full assessment count, just what was selected.
+                         # This is so that users don't see a count that's greater than what they can actually affect.
+                        #}
+                        {% if not canReadUnitSpec %}
+                            {% set unitAssessmentCount = countSelected %}
+                        {% endif %}
 
                         {# Unit title and select-all checkbox for unit asesssments #}
                         {# Don't show the select-all checkbox if we are modifying a unit implementation #}
@@ -30,6 +39,7 @@
                             <div class="card small-12">
                                 <h3>
                                     <span class="icon-unit"></span>{{ unitSpec.folder.name }}
+                                    <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
                                 </h3>
                             </div>
                         {% else %}
@@ -40,18 +50,9 @@
                             >
                             <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
                                 <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
+                                <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
                             </label>
                         {% endif %}
-                        {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
-
-                        {##
-                         # No read perm on unit spec? don't show the full assessment count, just what was selected.
-                         # This is so that users don't see a count that's greater than what they can actually affect.
-                         #}
-                        {% if not canReadUnitSpec %}
-                            {% set unitAssessmentCount = countSelected %}
-                        {% endif %}
-                        <p class="meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</p>
 
                         {# Unit assessments #}
                         <div class="row">
