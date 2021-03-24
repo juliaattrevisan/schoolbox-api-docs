@@ -11,29 +11,26 @@ namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 use Schoolbox\Video\QueueMapper;
 
-
-class Media extends Base {
-
+class Media extends Base
+{
     /**
      * Audio/visual files
      *
      * @return mixed
      */
-    public function test() {
-
-        if($this->getItem() instanceof \Schoolbox\Resource\File\Model) {
+    public function test()
+    {
+        if ($this->item instanceof \Schoolbox\Resource\File\Model) {
             $type = 'sbfs';
-            $id = $this->getItem()->getId();
-        }
-        else if($this->getItem() instanceof \Schoolbox\Resource\Storage\IStorage) {
+            $id = $this->item->getId();
+        } elseif ($this->item instanceof \Schoolbox\Resource\Storage\IStorage) {
             $type = 'storage';
-            $id = $this->getItem()->getHash();
-        }
-        else {
+            $id = $this->item->getHash();
+        } else {
             return $this->testNext();
         }
 
-        if ($this->getItem()->getMimetype()->isVideo()) {
+        if ($this->item->getMimetype()->isVideo()) {
             $error = true;
 
             /* Check its status. If it's processing we can send that flag out to
@@ -44,7 +41,7 @@ class Media extends Base {
              */
             try {
                 $videoQueueItem = (QueueMapper::getInstance())
-                    ->findOneByColumn('hash', $this->getItem()->getStorage()->getHash());
+                    ->findOneByColumn('hash', $this->item->getHash());
 
                 /* If it was in the queue, check its processing status
                  * If it's complete, we can show it normally
@@ -54,7 +51,6 @@ class Media extends Base {
                     $error = false;
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 // noop: hash not found
                 // This file was never in the queue, so I guess we don't load it
             }
@@ -70,7 +66,7 @@ class Media extends Base {
                     ]
                 ]
             ];
-        } elseif ($this->getItem()->getMimetype()->isAudio()) {
+        } elseif ($this->item->getMimetype()->isAudio()) {
             return [
                 'type' => 'inline',
                 'twig' => [
