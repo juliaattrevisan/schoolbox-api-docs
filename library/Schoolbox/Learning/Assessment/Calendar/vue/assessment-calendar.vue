@@ -448,7 +448,7 @@ export default {
          * @param info
          */
         viewDidMount(info) {
-
+            
             const calendarApi = this.$refs.fullCalendar.getApi(); //runs before the nextTick, so need api here
             const eventSource = calendarApi.getEventSourceById('events');
             const groupedEventSource = calendarApi.getEventSourceById('groupedEvents');
@@ -568,7 +568,9 @@ export default {
                 setTimeout(() => resolve(1), 1000);
             }).then((result) => {
                 // Semester view, will just use the term start date that's set on page load
-                if (viewType !== VIEW_RESOURCE_TIMELINE_SEMESTER) {
+                if (viewType === VIEW_RESOURCE_TIMELINE_SEMESTER) {
+                    this.calendarApi.gotoDate(this.termStartDate);
+                } else { //otherwise use current date
                     this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
                 }
 
