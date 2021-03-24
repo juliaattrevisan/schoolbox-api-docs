@@ -17,7 +17,7 @@ $sessionUser = $_SESSION['user'];
 if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
 
     $url = new Url($_POST['url']);
-    try{
+    try {
         $url->normalise();
     } catch (InvalidArgumentException $e) {
         error(\Schoolbox\Error\Mapper::ERROR_LINK_FORMAT);
@@ -40,7 +40,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setUrl($url->getUrl());
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
-        $link->setHidden($_POST['visible'] ? false : true);
+        $link->setHidden($_POST['visible'] ? 0 : 1);
         $link->setTarget($_POST['target']);
         $link->setModified(Alaress_Date_Format::now());
 
@@ -58,7 +58,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setUrl($url->getUrl());
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
-        $link->setHidden($_POST['visible'] ? false : true);
+        $link->setHidden($_POST['visible'] ? 0 : 1);
         $link->setTarget($_POST['target']);
 
         // Add to multiple locations
