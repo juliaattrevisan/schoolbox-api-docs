@@ -40,6 +40,7 @@ config:
 
   #Learning Moments
   evidence_parent_create: {hide: false}
+  evidence_parent_comment: {hide: false}
 
   #LMS
   grade_comments_enable: {value: false, hide: true}
