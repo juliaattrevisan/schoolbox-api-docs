@@ -384,6 +384,8 @@ class Controller extends Base
             'data' => [
                 'pageCurrent' => $this->router->generate('adminUser.getStaleReport'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUser.getStaleReport')),
+                'listEndpoint' => $this->router->generate('adminUser.getStaleUsers'),
+                'deleteEndpoint' => $this->router->generate('adminUser.postDeleteList'),
             ]]);
     }
 

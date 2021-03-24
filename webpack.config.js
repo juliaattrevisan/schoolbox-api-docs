@@ -29,7 +29,7 @@ module.exports = {
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
-        staleUsersReport: './library/Schoolbox/Admin/Lists/vue/staleUsersReports/initStaleUsersReport.js',
+        staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/initStaleUsersReport.js',
 
         usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/total.main.js',
         usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/role.main.js',

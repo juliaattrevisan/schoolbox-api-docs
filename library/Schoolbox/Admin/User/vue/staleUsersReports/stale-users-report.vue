@@ -35,6 +35,14 @@ export default {
       type: String,
       required: true,
       default: 'DD/MM/YYYY'
+    },
+    src: {
+      type: String,
+      required: true
+    },
+    action: {
+      type: String,
+      required: true
     }
   },
 
@@ -111,7 +119,7 @@ export default {
      *
      */
     loadRows() {
-      axios.get('/adminv2/user/stale/list')
+      axios.get(this.src)
         .then((response) => {
           this.rows = response.data;
           this.hasRowsLoaded = true;
@@ -163,7 +171,7 @@ export default {
         formdata.append('users[]', item);
       })
 
-      axios.post('/adminv2/user/list/delete', formdata)
+      axios.post(this.action, formdata)
         .then((response) => {
           this.$refs.toast.timeout('Deleted', true, 2000);
           this.$refs.deleteModal.close();
@@ -296,6 +304,6 @@ export default {
 <style lang="scss">
 
 @import '@schoolbox/vueGoodTable/vueGoodTable';
-@import './staleUsersReport';
+@import 'staleUsersReport';
 
 </style>
