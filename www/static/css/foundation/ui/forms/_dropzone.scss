@@ -168,7 +168,7 @@ section > .dropzone-wrap {
 #attachment-browser {
   .content {
     &.preload {
-      background: transparent url("/images/loading-bar.gif") no-repeat 50%;
+      background: transparent url("#{$cdn-prefix}/images/loading-bar.gif") no-repeat 50%;
       height: 30rem;
     }
     iframe {
@@ -382,7 +382,7 @@ ul.az-error-list {
     }
   }
   img[data-dz-thumbnail] {
-    background-image: url("/images/foundation/preloader.gif");
+    background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
     background-position: center center;
     background-repeat: no-repeat;
     background-size: 1rem 1rem;

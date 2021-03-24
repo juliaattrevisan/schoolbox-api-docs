@@ -1,5 +1,5 @@
 {% for file in files %}
-<li style="background-image: url(/images/mime/{{ file.mimetype.iconFile }})">
+<li style="background-image: url({{ CDN_PREFIX | escape('css') }}/images/mime/{{ file.mimetype.iconFile }})">
     <a data-id="{{ file.id }}" href="/send.php?id={{ file.id }}" title="{{ file.filename }}">
         {{ file.title }}
     </a>

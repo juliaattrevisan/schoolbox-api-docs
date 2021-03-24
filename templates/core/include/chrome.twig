@@ -10,10 +10,10 @@
     <meta name="author" content="Schoolbox Pty Ltd"/>
     <meta name="application-name" content="{{ config.school_name }}" />
     <meta name="msapplication-TileColor" content="#0066b0" />
-    <meta name="msapplication-square70x70logo" content="/images/logo.php?logo=skin_logo_square&size=tile70" />
-    <meta name="msapplication-square150x150logo" content="/images/logo.php?logo=skin_logo_square&size=tile150" />
-    <meta name="msapplication-wide310x150logo" content="/images/logo.php?logo=skin_logo_login&size=tile310" />
-    <meta name="msapplication-square310x310logo" content="/images/logo.php?logo=skin_logo_large&size=tile310" />
+    <meta name="msapplication-square70x70logo" content="{{ CDN_PREFIX }}/images/logo.php?logo=skin_logo_square&size=tile70" />
+    <meta name="msapplication-square150x150logo" content="{{ CDN_PREFIX }}/images/logo.php?logo=skin_logo_square&size=tile150" />
+    <meta name="msapplication-wide310x150logo" content="{{ CDN_PREFIX }}/images/logo.php?logo=skin_logo_login&size=tile310" />
+    <meta name="msapplication-square310x310logo" content="{{ CDN_PREFIX }}/images/logo.php?logo=skin_logo_large&size=tile310" />
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <link rel="apple-touch-icon" sizes="57x57" href="/images/logo.php?logo=skin_logo_square&size=apple57">
     <link rel="apple-touch-icon" sizes="60x60" href="/images/logo.php?logo=skin_logo_square&size=apple60">
@@ -27,8 +27,8 @@
 
     {% block mainHeader %}
         {% include 'include/skin.twig' with { config: config } only %}
-        <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/datepicker.css?v={{ config.site_version }}" />
-        <link rel="stylesheet" type="text/css" href="/css/core/fullcalendar/fullcalendar.overrides.css?v={{ config.site_version }}" />
+        <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/fullcalendar/datepicker.css?v={{ config.site_version }}" />
+        <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/fullcalendar/fullcalendar.overrides.css?v={{ config.site_version }}" />
         <link rel="Shortcut Icon" href="/images/logo.php?logo=skin_logo_square&size=favicon" type="image/x-icon" />
         {% if tour.data is defined and not user.impersonated %}
         {% autoescape 'js' %}
@@ -37,12 +37,12 @@
         </script>
         {% endautoescape %}
         {% endif %}
-        <script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/schoolbox.min.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
 
-        <script src="/javascript/shared/browser-redirect.js"></script>
-        <script type="text/javascript" src="/javascript/math/jscurry-0.3.0.js"></script>
-        <script type="text/javascript" src="/javascript/math/jqmath-0.4.0.js"></script>
+        <script src="{{ CDN_PREFIX }}/javascript/shared/browser-redirect.js"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/math/jscurry-0.3.0.js"></script>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/math/jqmath-0.4.0.js"></script>
         <script async charset="utf-8" src="//cdn.iframe.ly/embed.js?api_key=94aa8fc28ac1089a2dfb28"></script>
 
         {% autoescape 'js' %}
@@ -72,6 +72,9 @@
             schoolboxUser.role           = {{ user.current.role | json_encode | raw }};
             schoolboxUser.impersonated   = Boolean('{{ user.impersonated }}');
             schoolboxUser.communityLogin = Boolean('{{ user.communityLogin }}');
+
+            // Reluctantly add the CDN prefix as a global JS variable
+            window.cdnPrefix = "{{ CDN_PREFIX }}";
         </script>
         {% endautoescape %}
 
@@ -361,6 +364,6 @@
     </div>
 </div>
 
-<script src="/javascript/components/hybridbar.bundle.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/hybridbar.bundle.js"></script>
 </body>
 </html>

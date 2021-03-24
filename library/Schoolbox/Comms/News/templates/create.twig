@@ -434,15 +434,15 @@
 {% endif %}
 
 {# le scripts #}
-<script src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 {% if isAutoSavable %}
-    <script src="/javascript/shared/comms/draft.js"></script>
+    <script src="{{ CDN_PREFIX }}/javascript/shared/comms/draft.js"></script>
 {% endif %}
-<script src="/javascript/shared/comms/audience-bricks.js"></script>
-<script src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script src="/javascript/components/schoolbox-vue.min.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/shared/comms/audience-bricks.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/schoolbox-vue.min.js"></script>
 {% autoescape 'js' %}
 <script>
     'use strict';

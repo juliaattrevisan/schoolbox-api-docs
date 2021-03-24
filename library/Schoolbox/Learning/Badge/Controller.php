@@ -13,6 +13,7 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Cursor\MapperCursor;
 use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
@@ -374,12 +375,13 @@ class Controller extends Base
      */
     private function buildModelToArrayTranslator(): Composite
     {
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
         return new Composite(
             new Translator\ModelToArray(
                 new User\Translator\ModelToArray(),
-                new Storage\Translator\ModelToArray(),
+                new Storage\Translator\ModelToArray($prefixGenerator),
                 new ScrubAdapter(),
-                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser())
+                new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
             ),
             new Translator\ModelToArray\Links(
                 $this->router,

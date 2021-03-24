@@ -11,7 +11,7 @@ tour:
     - step:
         title: What's New
         type: modal
-        content: " <img src='/images/tour/20_2_release.png' style='width:100%;margin-bottom:16px;'>
+        content: " <img src='/static/images/tour/20_2_release.png' style='width:100%;margin-bottom:16px;'>
                    <h6>Goals and Achievements</h6>
                    <p>Create engaging visual badges, and align them with your curriculum, to represent the rich individualised student journeys on offer at your school.  Engage each student’s growth mindset by encouraging them to set goals, and then celebrate their success and share with parents as they demonstrate mastery.</p>
                    <h6>Learning Moments</h6>

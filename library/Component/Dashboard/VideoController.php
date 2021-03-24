@@ -4,8 +4,9 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Collection;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Video\ResourceVideo;
 
 class Component_Dashboard_VideoController extends Component_Dashboard_ControllerAbstract
@@ -171,12 +172,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                             ));
                         }
 
-                        $this->setVar(
-                            array(
-                                'VIDEO_LIST_STATUS'    => $video->getStatus(),
-                                'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
-                            )
-                        );
+                        $this->setVar('VIDEO_LIST_STATUS', strtolower($video->getStatus()));
 
                         $this->parse('video_pending_list_block', 'video_pending_list', true);
                     }

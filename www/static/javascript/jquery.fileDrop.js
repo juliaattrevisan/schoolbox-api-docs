@@ -162,7 +162,7 @@
                 self.checkState();
 
                 //fileDrop instances should not be clickable, as they weren't before
-                //it appears an update to DropZone has added in a <button class='dz-button> 
+                //it appears an update to DropZone has added in a <button class='dz-button>
                 //and the options.clickable property is not being considered, so the
                 //button still appears despite it being set to false on all fileDrop instances
                 if (!this.options.clickable) {
@@ -304,10 +304,13 @@
 
         e = isself ? t : t.find('.dz-preview');
 
+        // Hardcoding the static URL will be good enough.
+        // I can see no place which actually creates a template instead of
+        // having it be passed in.
         e.addClass('dz-file-preview')
             .append($('<div class="dz-details" />')
                 .append($('<div class="dz-filename" />').html('<span data-dz-name></span>'))
-                .append('<img class="dz-pending" width="16" height="16" src="/images/foundation/preloader.gif" />'))
+                .append('<img class="dz-pending" width="16" height="16" src="/static/images/foundation/preloader.gif" />'))
             .append($('<div class="dz-progress" />').html('<span class="dz-upload"></span>'));
 
         if(isself) {

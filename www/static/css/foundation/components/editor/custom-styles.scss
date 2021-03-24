@@ -14,7 +14,7 @@
     a[id] {
         padding-left: 16px;
         margin-left: 4px;
-        background-image: url('/javascript/ckeditor/plugins/schoolboxanchor/anchor.png');
+        background-image: url("#{$cdn-prefix}/javascript/ckeditor/plugins/schoolboxanchor/anchor.png");
         background-repeat: no-repeat;
         background-position: 0 0;
     }

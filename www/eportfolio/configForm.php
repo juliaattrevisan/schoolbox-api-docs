@@ -80,7 +80,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
                 /** @var Component_Eportfolio_ControllerAbstract $component */
                 $component = $componentFactory->buildComponent($instance);
-                $renderer->renderEportfolioComponent($eportfolioPage, $component);
+                $renderer->renderEportfolioComponent($page, $eportfolioPage, $component);
             }
         } elseif (is_numeric($_POST['delete'])) {
             // Delete the instance and its configuration
@@ -116,10 +116,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             $componentInstanceMapper->cascadeSequence($eportfolioHandler->getSettingsPageOwner());
 
             // Retrieve the instance definition controller
-
-            $componentSitepage = new SitePage(false);
-            $componentSitepage->setDi($kernel->getDependencyInjector());
-            $factory = new Component_Eportfolio_Factory(new User(), $componentSitepage);
+            $factory = new Component_Eportfolio_Factory(new User(), $page);
 
             $instance = $componentInstanceMapper->findByInstanceId($instanceID);
 
@@ -201,7 +198,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             );
 
             $renderer = new Component_Renderer();
-            $renderer->renderEportfolioComponent($eportfolioPage, $component);
+            $renderer->renderEportfolioComponent($page, $eportfolioPage, $component);
         } elseif (is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
             // Update column widths
 
@@ -284,11 +281,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
             if (SitePage::detectAjax()) {
                 // Just rebuild and refetch the component
-
-                $sitepage = new SitePage(false);
-                $sitepage->setDi($kernel->getDependencyInjector());
-
-                $factory = new Component_Eportfolio_Factory(new User(), $sitepage);
+                $factory = new Component_Eportfolio_Factory(new User(), $page);
 
                 $componentInstance = $componentInstanceMapper->findByInstanceId($instance->getId());
 
@@ -303,7 +296,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                     UserAccess::ACCESS_FULL
                 );
 
-                $renderer->renderEportfolioComponent($eportfolioPage, $component);
+                $renderer->renderEportfolioComponent($page, $eportfolioPage, $component);
             } else {
                 SitePage::localRedir("/eportfolio/{$eportfolioHandler->getPageInstance()->getOwner()->getId()}/{$eportfolioHandler->getPageId()}");
             }

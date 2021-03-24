@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,10 +9,11 @@
 
 namespace Schoolbox\Mail;
 
-
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;
 
-class CoreContext {
+class CoreContext
+{
 
     /** @var array */
     protected $context;
@@ -36,37 +38,44 @@ class CoreContext {
             'digest_email_intro'
         );
 
-        foreach($required as $key) {
+        foreach ($required as $key) {
             $this->context['config'][$key] = $conf->get($key);
         }
 
-        $this->context['config']['fqdn'] = trim(
-            $this->context['config']['site_hostname'].".".$this->context['config']['site_domain'],
+        $fqdn = trim(
+            $this->context['config']['site_hostname'] . "." . $this->context['config']['site_domain'],
             '.'
         );
+        $this->context['config']['fqdn'] = $fqdn;
 
-        $this->context['config']['year'] = date('Y');
-        $this->context['config']['padding'] = 4;
+        // Create a fully-qualified CDN prefix
+        $prefixGenerator = new PrefixGenerator($conf);
+        $this->context['config']['fqdn_cdn_prefix'] = 'https://' . $prefixGenerator->generateWithBaseUrl($fqdn);
+        $this->context['config']['year']            = date('Y');
+        $this->context['config']['padding']         = 4;
 
-        $site = $this->context['config']['site_location'];
-
-        $possibleLogos = array(
-            'email-logo',
-            "$site-logo",
-            'logo',
-            'hercules',
-        );
-
-        foreach($possibleLogos as $filename) {
-            if(file_exists(SITE_root . "/www/images/$site/$filename.png")) {
-                $this->context['config']['logo'] = $filename;
-                break;
-            }
-        }
-
-        if(!isset($this->context['config']['logo'])) {
-            $this->context['config']['logo'] = 'logo';
-        }
+        // I'm reasonably sure that these logos are not used anymore.
+        // I can find no reference to `config.logo` in twig templates.
+        // TODO remove the old logo images completely
+//        $site = $this->context['config']['site_location'];
+//
+//        $possibleLogos = array(
+//            'email-logo',
+//            "$site-logo",
+//            'logo',
+//            'hercules',
+//        );
+//
+//        foreach ($possibleLogos as $filename) {
+//            if (file_exists(SITE_root . "/www/images/$site/$filename.png")) {
+//                $this->context['config']['logo'] = $filename;
+//                break;
+//            }
+//        }
+//
+//        if (!isset($this->context['config']['logo'])) {
+//            $this->context['config']['logo'] = 'logo';
+//        }
 
         // feedback url
         $this->context['config']['feedback_url_object'] = new \Url($conf->get('feedback_url'));

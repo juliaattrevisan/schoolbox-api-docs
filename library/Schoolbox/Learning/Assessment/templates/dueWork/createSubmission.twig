@@ -11,8 +11,8 @@ Data:
     errorMessage:   null|string                  If re-loading this page because user attempted to upload bad MIME types
 #}
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 
 <script type="text/javascript">
     $(function () {

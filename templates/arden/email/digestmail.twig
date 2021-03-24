@@ -5,16 +5,16 @@
 {% block content %}
     <table>
     {% for ns, group in groups %}
-        <tr>{{ fn.spacer(config.fqdn, 16, 0, 3) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 16, 0, 3) }}</tr>
         <tr class="heading">
-            {{ fn.spacer(config.fqdn, 0, 8) }}
+            {{ fn.spacer(config.fqdn_cdn_prefix, 0, 8) }}
             <td class="heading" valign="middle" height="32">{{ group.heading }}</td>
         </tr>
         {% if ns == 'news' %}
         <tr class="admin-nav">
             <td colspan="2">
                 <table width="624">
-                    <tr>      
+                    <tr>
                         <td valign="middle" height="32">
                             <a class="all" href="http://{{ config.fqdn }}/news/" title="News All">News All</a>
                         </td>
@@ -53,12 +53,12 @@
                             </table>
                         </td>
                     </tr>
-                    <tr>{{ fn.spacer(config.fqdn, 4, 0) }}</tr>
+                    <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 4, 0) }}</tr>
                 </table>
             </td>
         </tr>
     {% endfor %}
-        <tr>{{ fn.spacer(config.fqdn, 8, 0, 2) }}</tr>
+        <tr>{{ fn.spacer(config.fqdn_cdn_prefix, 8, 0, 2) }}</tr>
     </table>
 {% endblock %}
 

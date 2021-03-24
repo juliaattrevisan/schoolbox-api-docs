@@ -85,7 +85,7 @@ export default {
             <img :src="badge.image._links.image" :alt="badge.name" :class="'badge-image ' + css" />
         </template>
         <template v-else>
-            <img :src="badge.icon" :alt="badge.name" :class="'badge-icon ' + css" />
+            <img :src="badge._links.icon" :alt="badge.name" :class="'badge-icon ' + css" />
         </template>
     </div>
 </template>

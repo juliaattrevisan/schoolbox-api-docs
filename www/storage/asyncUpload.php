@@ -1,4 +1,6 @@
 <?php
+
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Translator\ModelToArray;
@@ -13,6 +15,9 @@ use Schoolbox\Resource\Storage\Translator\ModelToArray;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+
+/** @var PrefixGenerator $prefixGenerator */
+$prefixGenerator = $kernel->get('cdnPrefixGenerator');
 
 // Force session usage due to flash audio recorder.
 // (Uploadify will die, but this is still needed for flash audio upload.)
@@ -42,7 +47,7 @@ if (!$_SESSION['id']) {
         $metas = array();
         for ($i = 0; $i < count($meta['name']); ++$i) {
             try {
-                $result = attemptStorage(getFileAtIndex($meta, $i));
+                $result = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator);
                 $hashes[] = $result['hash'];
                 $metas[]  = $result['meta'];
 
@@ -56,7 +61,7 @@ if (!$_SESSION['id']) {
 
     } else {
         try {
-            $result = attemptStorage($meta);
+            $result = attemptStorage($meta, $prefixGenerator);
         } catch (Exception $e) {
             $result['hash'] = 'exception:'.$e->getMessage();
             $result['meta'] = array();
@@ -86,11 +91,14 @@ function getFileAtIndex($meta, $i)
 
 
 /**
- * @param array $fileData
- * @throws Schoolbox\File\Exception
+ * @param array           $fileData
+ * @param PrefixGenerator $prefixGenerator
  * @return array
+ * @throws \League\Flysystem\FileNotFoundException
+ * @throws \Schoolbox\File\Exception
+ * @throws \Schoolbox\Mapper\Exception
  */
-function attemptStorage($fileData)
+function attemptStorage($fileData, PrefixGenerator $prefixGenerator)
 {
     if ($fileData['size'] == 0) {
         throw new Schoolbox\File\Exception("File has no content");
@@ -101,8 +109,8 @@ function attemptStorage($fileData)
 
     $storage = StorageMapper::getInstance()->accept($fileData['name'], $fileData['tmp_name']);
 
-    //to also return the stored file location for possible reference / display
-    $modelToArray = new ModelToArray();
+    // to also return the stored file location for possible reference / display
+    $modelToArray = new ModelToArray($prefixGenerator);
 
     return [
         'success' => true,

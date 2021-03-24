@@ -8,6 +8,7 @@ import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 
 export default {
     components: {
@@ -16,6 +17,7 @@ export default {
         Toast,
         RevealModal
     },
+    mixins: [cdnPrefixMixin],
     props: {
         thread: {
             type: Object,
@@ -31,7 +33,7 @@ export default {
         },
         createThreadEndpoint: {
             type: String,
-        }
+        },
     },
     data() {
         return {
@@ -39,7 +41,7 @@ export default {
             pendingComment: '',
             saveInProgress: false,
             commentIndexToDelete: null,
-            editorUrl: "/javascript/ckeditor/ckeditor.js",
+            editorUrl: this.cdnPrefix + "/javascript/ckeditor/ckeditor.js",
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
             isCKEditorReady: false,
@@ -55,7 +57,7 @@ export default {
                 ],
                 contentsCss: [
                     '/css/core/skin.css.php',
-                    '/css/core/editor.css',
+                    this.cdnPrefix + '/css/core/editor.css',
                 ],
                 height: '4rem',
                 resize_enabled: false,

@@ -1,11 +1,11 @@
 <script>
 
-import Vue from 'vue';
 import moment from 'moment';
 import axios from 'axios';
 import MediaArticle from '@schoolbox/media-article';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 
 export default {
 
@@ -17,6 +17,8 @@ export default {
         RevealModal
     },
 
+    mixins: [cdnPrefixMixin],
+
     props: {
         articleId: Number,
         threadIdOnLoad: Number,
@@ -25,7 +27,7 @@ export default {
         isThreadEnabledOnLoad: Boolean,
         isPublished: Boolean,
         createThreadEndpoint: String,
-        siteVersion: String //for cache busting
+        siteVersion: String, //for cache busting
     },
 
     data () {
@@ -229,8 +231,8 @@ export default {
 
                 try {
 
-                    await this.injectScript('/javascript/ckeditor/ckeditor.js?v=' + this.siteVersion);
-                    await this.injectScript('/javascript/shared/editor/jquery.editor.js?v=' + this.siteVersion);
+                    await this.injectScript(this.cdnPrefix + '/javascript/ckeditor/ckeditor.js?v=' + this.siteVersion);
+                    await this.injectScript(this.cdnPrefix + '/javascript/shared/editor/jquery.editor.js?v=' + this.siteVersion);
 
                     $.fn.alaressEditor({
                         targetElements: $('#comment'),

@@ -1,10 +1,10 @@
 {% import 'macro/spacer.twig' as fn %}
 
-<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
+<tr>{{ fn.spacer(config.fqdn_cdn_prefix, 16, 4, 3) }}</tr>
 <tr>
-  {{ fn.spacer(config.fqdn, 64, 4) }}
+  {{ fn.spacer(config.fqdn_cdn_prefix, 64, 4) }}
     <td valign="middle">
-        <img src="https://{{ config.fqdn }}/images/{{ config.site_location }}/moriah-logo.png"
+        <img src="{{ config.fqdn_cdn_prefix }}/images/{{ config.site_location }}/moriah-logo.png"
              alt="{{ config.title }}" border="0" height="72" />
     </td>
     <td valign="middle">
@@ -12,4 +12,4 @@
              alt="{{ config.title }}" border="0" height="72" />
     </td>
 </tr>
-<tr>{{ fn.spacer(config.fqdn, 16, 4, 3) }}</tr>
+<tr>{{ fn.spacer(config.fqdn_cdn_prefix, 16, 4, 3) }}</tr>

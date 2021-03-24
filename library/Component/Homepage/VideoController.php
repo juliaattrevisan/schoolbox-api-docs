@@ -6,9 +6,9 @@
  */
 
 use Schoolbox\Collection;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Video\ResourceVideo;
-use \Schoolbox\Video\ResourceVideoMapper;
+use Schoolbox\Video\ResourceVideoMapper;
 
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract
 {
@@ -234,10 +234,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                     $this->parse('video_list_block', 'video_list', true);
                 } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     // Only users with higher permissions can see pending videos
-                    $this->setVar([
-                        'VIDEO_LIST_STATUS' => $video->getStatus(),
-                        'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
-                    ]);
+                    $this->setVar('VIDEO_LIST_STATUS', strtolower($video->getStatus()));
 
                     $this->parse('video_pending_list_block', 'video_pending_list', true);
                 }

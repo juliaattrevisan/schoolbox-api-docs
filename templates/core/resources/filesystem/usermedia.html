@@ -1,6 +1,6 @@
-<script type="text/javascript" src="/javascript/recorder/getusermedia-shim/getUserMedia.js"></script>
-<script type="text/javascript" src="/javascript/recorder/webrtc/recorder.js"></script>
-<script type="text/javascript" src="/javascript/recorder/jquery.recorder.js"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/recorder/getusermedia-shim/getUserMedia.js"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/recorder/webrtc/recorder.js"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/recorder/jquery.recorder.js"></script>
 <script type="text/javascript">
     $(function() {
         var recorderContainer      = $('#ab-usermedia'),
@@ -62,12 +62,9 @@
             upload: {
                 url: '/storage/asyncUpload'
             },
-            flash: {
-                session: {
-                    name: '{SESSION_NAME}',
-                    id:   '{SESSION_ID}'
-                }
-            }
+            webrtc: {
+                workerPath: '{CDN_PREFIX}/javascript/recorder/webrtc/recorderWorker.js',
+            },
         });
         recorderInterface = recorderContainer.data('recorder');
 

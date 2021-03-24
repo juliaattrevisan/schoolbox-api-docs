@@ -154,7 +154,7 @@ button {
             $submit-button-bg-color,
             $alpha: $button-disabled-opacity
         );
-		background-image: url('/images/foundation/preloader.gif');
+		background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
 		background-repeat: no-repeat;
 		background-size: 1rem;
 		background-position: 0.75rem 50%;

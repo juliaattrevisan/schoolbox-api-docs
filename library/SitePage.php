@@ -5,6 +5,7 @@ use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
@@ -300,7 +301,7 @@ class SitePage extends Page
             'SITE_VERSION' => $this->config->get('site_version'),
         ];
         $this->setVar($templateVar);
-        $this->localise();
+        $this->injectGlobalVars();
 
 
         // Output the PHPLib using the renderer
@@ -832,6 +833,24 @@ class SitePage extends Page
             set_time_limit($currentLimit + $seconds);
         }
     }
+
+
+    /**
+     * Inject global vars required for Sitepage to do its thing.
+     *
+     * That currently includes:
+     * * the CDN prefix (so that stylesheets and images can be referenced)
+     *   into `CDN_PREFIX`
+     * * localisations
+     */
+    public function injectGlobalVars(): void
+    {
+        /** @var PrefixGenerator $cdnPrefixGenerator */
+        $cdnPrefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
+        $this->setVar('CDN_PREFIX', $cdnPrefixGenerator->generate());
+        $this->localise();
+    }
+
 
     /**
      * Jam localisation vars into the template. Uncomment / modify the list as required

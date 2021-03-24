@@ -138,9 +138,9 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract
             if (isset($prefix)) {
                 $page->setVar(
                     array(
-                        $prefix.'_POSTER'     => Scrub::text($result['poster']),
-                        $prefix.'_SRC'        => Scrub::text($result['src']),
-                        $prefix.'_STATUS_IMG' => Scrub::text("/images/core/component/video-thumbnail-".strtolower($result['status']).".gif"),
+                        $prefix.'_POSTER' => Scrub::text($result['poster']),
+                        $prefix.'_SRC'    => Scrub::text($result['src']),
+                        $prefix.'_STATUS' => Scrub::text(strtolower($result['status'])),
                     )
                 );
                 if ($result['status'] === 'completed') {

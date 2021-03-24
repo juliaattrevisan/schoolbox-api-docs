@@ -12,6 +12,7 @@ import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
 import BadgeImage from "../../../Badge/vue/badge-image";
 import foundationMixin from "@schoolbox/foundation-mixin";
 import userProfileConstants from '../../../vue/user-profile/constants';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 
 export default {
     components: {
@@ -25,6 +26,7 @@ export default {
     },
     mixins: [
         foundationMixin,
+        cdnPrefixMixin,
     ],
     data() {
         return {
@@ -315,6 +317,7 @@ export default {
                             <div class="feed-comments small-12 columns">
                                 <comment-thread :thread="evidence.object.discussionThread"
                                                 :create-thread-endpoint="evidence.object._links.createThread"
+                                                :cdn-prefix="cdnPrefix"
                                 />
                             </div>
                         </template>

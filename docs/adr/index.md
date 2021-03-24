@@ -6,6 +6,7 @@ This log lists the architectural decisions for Schoolbox, as of 2021-03-18.
 
 - [ADR-0000](0000-use-markdown-architectural-decision-records.md) - Use Markdown Architectural Decision Records
 - [ADR-0001](0001-separateStaticAssetsAndExecutableScriptsWithinWebRoot.md) - Separate static assets and executable scripts within web root
+- [ADR-0002](0002-makingCdnPrefixGloballyAvailable.md) - Making CDN Prefix globally available
 
 <!-- adrlogstop -->
 

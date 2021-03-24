@@ -13,6 +13,7 @@ namespace Schoolbox\Learning\Moment\Feed;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Badge\Award\Translator\ModelToArray\Factory as BadgeAwardTranslatorFactory;
@@ -100,17 +101,24 @@ class Controller extends Base
      */
     public function getFeedForUser(User $user): void
     {
-        $encodedCursor = $this->request->query->get('cursor');
-        $cursor        = new Cursor($this->database, $user, self::FEED_ITEMS_PER_PAGE, $this->getConfigLoader());
-        $hydrator      = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
-        $translator    = new ModelToArray(
+        $encodedCursor   = $this->request->query->get('cursor');
+        $cursor          = new Cursor($this->database, $user, self::FEED_ITEMS_PER_PAGE, $this->getConfigLoader());
+        $hydrator        = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
+        $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
+        $translator      = new ModelToArray(
             (new EvidenceTranslatorFactory(
                 $this->router,
                 $this->authorizer,
                 $this->getUser(),
-                $this->commentMapper
+                $this->commentMapper,
+                $prefixGenerator
             ))->buildWithComments(self::FEED_COMMENTS_PER_ITEM),
-            (new BadgeAwardTranslatorFactory($this->router, $this->authorizer, $this->getUser()))->build()
+            (new BadgeAwardTranslatorFactory(
+                $this->router,
+                $this->authorizer,
+                $this->getUser(),
+                $prefixGenerator,
+            ))->build()
         );
 
         $data       = $cursor->retrieveResults($encodedCursor);

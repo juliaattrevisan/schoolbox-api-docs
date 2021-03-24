@@ -121,7 +121,7 @@
                             <!-- BEGIN submission_file_list -->
                             <div class="card small-12 compact">
                                 <a href="/storage/fetch.php?hash={SHOWCASED_WORK_FILE_HASH}" title="{SHOWCASED_WORK_FILE_NAME}" rel="external" data-plugin="preview">
-                                    <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="Preview" class="mime">
+                                    <img src="{CDN_PREFIX}/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="Preview" class="mime">
                                     <p>{SHOWCASED_WORK_FILE_NAME}</p>
                                     <p class="pipe meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
                                 </a>
@@ -174,8 +174,8 @@
         <!-- END no_recent_blog -->
 
         <!-- BEGIN has_recent_photo -->
-        <script src="/javascript/components/swiper/dist/js/swiper.min.js"></script>
-        <script src="/javascript/jquery.alaressSlider.js"></script>
+        <script src="{CDN_PREFIX}/javascript/components/swiper/dist/js/swiper.min.js"></script>
+        <script src="{CDN_PREFIX}/javascript/jquery.alaressSlider.js"></script>
         <script>
             $(function() {
                 $('#profile-imageslider').alaressSlider({

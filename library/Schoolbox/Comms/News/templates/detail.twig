@@ -90,7 +90,7 @@ Data:
 
     <nav>
         {# Save For Later #}
-        <script src="/javascript/shared/comms/saveforlater.js"></script>
+        <script src="{{ CDN_PREFIX }}/javascript/shared/comms/saveforlater.js"></script>
         <script>
             $(function() {
                 $('#saveforlater-container').saveForLater();
@@ -256,8 +256,8 @@ Data:
     <a class="close-reveal-modal">&#215;</a>
 </div>
 
-<script src="/javascript/shared/comms/audience-bricks.js"></script>
-<script src="/javascript/components/schoolbox-vue.min.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/shared/comms/audience-bricks.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/schoolbox-vue.min.js"></script>
 {% autoescape 'js' %}
 <script>
     /**

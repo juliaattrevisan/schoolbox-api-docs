@@ -5,21 +5,21 @@ import AchievementFeed from "../../Badge/Award/vue/achievement-feed.vue";
 
 window.activityFeed = new Vue({
     el: '#activity-feed',
-    render: function (createElement) {
-        return createElement(ActivityFeed)
+    components: {
+        'activity-feed': ActivityFeed
     }
 });
 
 window.goalFeed = new Vue({
     el: '#goal-feed',
-    render: function (createElement) {
-        return createElement(GoalFeed)
+    components: {
+        'goal-feed': GoalFeed
     }
 });
 
 window.achievementFeed = new Vue({
     el: '#achievement-feed',
-    render: function (createElement) {
-        return createElement(AchievementFeed)
+    components: {
+        'achievement-feed': AchievementFeed
     }
 });

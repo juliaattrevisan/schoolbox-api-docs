@@ -67,7 +67,7 @@
                     <!-- BEGIN submission_file_list -->
                     <div class="card small-12 compact">
                         <a href="/storage/fetch.php?hash={SHOWCASED_WORK_FILE_HASH}" title="{SHOWCASED_WORK_FILE_NAME}" rel="external" data-plugin="preview">
-                            <img src="/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="Preview" class="mime">
+                            <img src="{CDN_PREFIX}/images/mime/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="Preview" class="mime">
                             <p>
                                 {SHOWCASED_WORK_FILE_NAME}
                                 <span class="pipe meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</span>
@@ -88,7 +88,7 @@
         <!-- END has_showcased_work -->
     </div>
 </div>
-<script src="/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
+<script src="{CDN_PREFIX}/javascript/shared/eportfolio/jquery.eportfolio.js"></script>
 <script type="text/javascript">
     $(function () {
         $('[data-publish-to-eportfolio]').eportfolioPublish({
