@@ -609,7 +609,7 @@
                         'learningMomentFeed.getFeedForUser',
                         {user: user, userId: user.id}
                     ) }}';
-                    window.learningEvidenceFeedConfig.canComment = {{ (USER.role.staff or USER.role.student or (USER.role.parent and config.evidence_parent_comment)) ? 'true' : 'false' }};
+                    window.learningEvidenceFeedConfig.canComment = Boolean('{{ learningMomentCanComment }}');
 
                     window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
                     window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(
