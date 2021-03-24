@@ -263,9 +263,9 @@ export default {
             this.currentDisplay = info.view.type;
 
             // document.querySelectorAll('.fc-toolbar .fc-left .fc-button-group, .fc-toolbar .fc-center').forEach((element) => {
-            document.querySelectorAll('.fc-button-group').forEach((element) => {
+            document.querySelectorAll('.fc-button-group, .fc-toolbar-title').forEach((element) => {
                 if (this.currentViewIsList()) {
-                    if (!element.firstChild.classList.contains('fc-customFilters-button')) { //never hide the right side buttons
+                    if (!element.firstChild?.classList?.contains('fc-customFilters-button')) { //never hide the right side buttons
                         element.classList.add('hide');
                     }
                     if (customGroup?.classList && customGroup?.classList.contains('hide') !== null) {
