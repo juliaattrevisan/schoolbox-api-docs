@@ -102,9 +102,17 @@
                 'selector': assessmentSelector,
                 onAfterSelectAllTick: function(allCheckboxes) {
                     $(element).parent().find('[data-show-count]').attr('data-show-count', allCheckboxes.length);
+
+                    /* Show all the dates and stuff too
+                     */
+                    $(element).parent().find('[data-assessment-dates]').prop('disabled', false).show();
                 },
                 onAfterSelectAllUntick: function(allCheckboxes) {
                     $(element).parent().find('[data-show-count]').attr('data-show-count', 0);
+
+                    /* Hide all the dates and stuff too
+                     */
+                    $(element).parent().find('[data-assessment-dates]').prop('disabled', true).hide();
                 }
             })
         });
