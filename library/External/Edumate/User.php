@@ -111,7 +111,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         $caseSensitiveFields = array(
             'StudentID', 'StudentGiven1', 'StudentSurname', 'StudentBirthDate',
             'StudentHouseDescription', 'StudentYearLevel', 'StudentTutor', 'StudentHeadOfHouse', 'StudentForm',
-            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone', 'StudentMobilePhone', 'EnglishSecondFlag', 'ParentsSeperatedFlag'
+            'StudentFormStaffName', 'StudentEmergencyName', 'StudentEmergencyPhone', 'StudentMobilePhone', 'EnglishSecondFlag', 'ParentsSeparatedFlag'
         );
 
         $stmt = $this->getConnection()->prepareQuery("
@@ -128,7 +128,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
               '' AS STUDENTIBFLAG,
               '' AS STUDENTSTUDIESCODE,
               '' AS ENGLISHSECONDFLAG,
-              '' AS PARENTSSEPERATEDFLAG,
+              '' AS PARENTSSEPARATEDFLAG,
               0 AS COUNTINDIVIDUALEDUCATIONPLANS
             FROM SCHOOLBOX_STUDENTS S
             LEFT JOIN SCHOOLBOX_PARENT_STUDENT PS ON S.STUDENT_NUMBER = PS.STUDENT_NUMBER
