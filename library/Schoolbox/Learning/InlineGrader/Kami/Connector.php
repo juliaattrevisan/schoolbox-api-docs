@@ -42,7 +42,7 @@ class Connector implements IConnector
     public const PATH_DELETE_DOCUMENT = 'embed/documents/';
 
     // How long should view sessions last for by default?
-    public const DEFAULT_SESSION_EXPIRY_SECONDS = 3600;
+    public const DEFAULT_SESSION_EXPIRY_HOURS = 1;
 
     // Export types
     public const EXPORT_TYPE_ANNOTATION = 'annotation'; // Annotations embedded into the document as PDF Annotations.
@@ -304,7 +304,9 @@ class Connector implements IConnector
         $this->assertEnabled();
         $this->assertValidSiteSchoolCode();
 
-        $options = [
+        // When should the view session expire?
+        $expires = Alaress_Date_Format::now()->addHours(self::DEFAULT_SESSION_EXPIRY_HOURS);
+        $options  = [
             RequestOptions::HEADERS => ['Content-Type' => 'application/json'],
             RequestOptions::BODY    =>  \GuzzleHttp\Utils::jsonEncode([
                 'document_identifier' => $documentId,
@@ -312,7 +314,7 @@ class Connector implements IConnector
                     'name'    => "{$user->getFirstname()} {$user->getLastname()}",
                     'user_id' => "{$this->siteSchoolCode}-{$user->getId()}",
                 ],
-                'expires_at'          => gmdate(Alaress_Date_Format::FORMAT_DATETIME_UTC, time() + self::DEFAULT_SESSION_EXPIRY_SECONDS),
+                'expires_at'          => $expires->getDateTimeObject()->utc()->format(Alaress_Date_Format::FORMAT_DATETIME_UTC),
                 'viewer_options'      => [
                     'theme'      => $theme,
                     'show_save'  => $showSave,
