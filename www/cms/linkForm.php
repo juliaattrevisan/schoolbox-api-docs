@@ -17,7 +17,7 @@ $sessionUser = $_SESSION['user'];
 if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
 
     $url = new Url($_POST['url']);
-    try{
+    try {
         $url->normalise();
     } catch (InvalidArgumentException $e) {
         error(\Schoolbox\Error\Mapper::ERROR_LINK_FORMAT);
@@ -52,7 +52,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
 
     } else {
         /** @var Link $link */
-        $link = LinkMapper::getInstance()->createModel(0);
+        $link = LinkMapper::getInstance()->createModel();
         $link->setOwner($sessionUser->getId());
 
         $link->setUrl($url->getUrl());
