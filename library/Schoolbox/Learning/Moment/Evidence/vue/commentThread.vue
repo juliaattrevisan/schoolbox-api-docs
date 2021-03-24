@@ -130,6 +130,15 @@ export default {
         },
 
         /**
+         * Whether the current user is allowed to comment
+         *
+         * @returns {Boolean}
+         */
+        canComment() {
+            return window.learningEvidenceFeedConfig.canComment;
+        },
+
+        /**
          * Retrieve a list of comments, even if no thread exists yet.
          *
          * @returns {Array}
@@ -288,14 +297,16 @@ export default {
         <section id="threads-section" class="discussion">
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
-                <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
-                <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                    <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
-                    <a class="button submit"
-                    @click="postComment"
-                    :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
-                </div>
+                <template v-if="canComment">
+                    <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
+                    <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
+                    <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
+                        <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                        <a class="button submit"
+                        @click="postComment"
+                        :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
+                    </div>
+                </template>
                 <template v-if="hasComments">
                     <ul class="information-list">
                         <li class="actions-small-1" v-for="(comment, index) in comments" :key="index">
