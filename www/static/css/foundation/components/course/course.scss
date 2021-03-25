@@ -26,14 +26,22 @@ ul.unit-list {
       padding: .75rem;
     }
 
-    label {
+    h3, label {
       margin: 0;
+    }
+    .checkbox-label {
+      padding: 0 0 0 2.65rem;
     }
   }
   span[class^='icon-']:before,
   span[class*=' icon-']:before {
-    padding-left: 10px;
     padding-right: 5px;
+  }
+  [data-assessment] {
+    span[class^='icon-']:before,
+    span[class*=' icon-']:before {
+      padding-left: 10px;
+    }
   }
   [data-assessment-dates] {
     padding-left: 2.65rem;

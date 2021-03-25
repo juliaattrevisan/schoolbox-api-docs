@@ -31,12 +31,10 @@
         {# Unit title and select-all checkbox for unit asesssments #}
         {# Don't show the select-all checkbox if we are modifying a unit implementation #}
         {% if unitAction == 'modify' %}
-        <div class="card small-12">
-            <h3>
-                <span class="icon-unit"></span>{{ unitSpec.folder.name }}
-                <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
-            </h3>
-        </div>
+        <h3>
+            <span class="icon-unit"></span>{{ unitSpec.folder.name }}
+            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+        </h3>
         {% else %}
         <input id="select-all-unit-assessments-{{ unitSpec.id }}"
                type="checkbox"
