@@ -1,5 +1,5 @@
-@import "www/css/foundation/utils/colors";
-@import "www/css/foundation/utils/variables";
+@import "www/static/css/foundation/utils/colors";
+@import "www/static/css/foundation/utils/variables";
 
 .fc {
   .fc-button {
@@ -35,7 +35,7 @@
     }
   }
   .fc-col-header-cell-cushion {
-    font-size: .875rem;
+    font-size: 0.875rem;
     font-weight: normal;
     text-transform: uppercase;
   }
@@ -70,7 +70,9 @@
 }
 
 .fc-list-table {
-  td, th, tr {
+  td,
+  th,
+  tr {
     border: 0;
   }
 }
