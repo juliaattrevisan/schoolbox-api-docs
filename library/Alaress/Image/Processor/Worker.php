@@ -15,6 +15,7 @@ use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\ImagickConfigParser;
 use Alaress\Image\ITransform;
 use Aura\Di;
+use League\Flysystem\FileNotFoundException;
 use LogicException;
 use Psr\Log\LoggerInterface;
 use RecursiveDirectoryIterator;
@@ -279,9 +280,10 @@ class Worker extends CliTool\App
             $this->getLogger()->warning($e->getMessage());
         } catch (Throwable $e) {
             // Need to handle here rather than bubbling to kernel because we want to render the process id in the log.
-            // Don't send exception to Sentry if we are retrying failed transforms, as it's quite normal for these to
-            // continue to fail
-            if (!$this->suppressSentryReporting) {
+            // Don't send exception to Sentry if:
+            // * we are retrying failed transforms, as it's quite normal for these to continue to fail.
+            // * this is a staging instance and file not found on disk. This is normal after a prd-to-stg sync
+            if (!$this->suppressSentryReporting && !($this->getConfig()->get('site_type') === 'dev' && $e instanceof FileNotFoundException)) {
                 $this->captureException($e);
             }
             // Print all exceptions in chain
