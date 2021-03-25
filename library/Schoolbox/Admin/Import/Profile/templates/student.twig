@@ -23,7 +23,7 @@
                                 {% if numProfiles %}
                                     <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-export button">Export Student Data</a>
                                 {% else %}
-                                    <a href="/adminv2/import/profile/student.csv" class="icon-download button">Download Student Template</a>
+                                    <a href="{{ CDN_PREFIX }}/adminv2/import/profile/student.csv" class="icon-download button">Download Student Template</a>
                                 {% endif %}
                             </li>
                             <li>

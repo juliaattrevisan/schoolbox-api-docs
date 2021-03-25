@@ -1,25 +1,32 @@
-{{ renderAdminNavigation(pageCurrent, subpageCurrent) }}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
-<sec class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">{{ output['externalType'] ?? '' }} Database Health Check</h2>
+<div class="admin-container row">
 
-        {% if (output['errors'] ?? []) | length %}
-            {% for error in output['errors'] %}
-                <div data-alert class="alert-box alert">
-                    {{ error }}
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">{{ output['externalType'] ?? '' }} Database Health Check</h2>
+
+            {% if (output['errors'] ?? []) | length %}
+                {% for error in output['errors'] %}
+                    <div data-alert class="alert-box alert">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div data-alert class="alert-box success">
+                    No Errors Detected
                 </div>
-            {% endfor %}
-        {% else %}
-            <div data-alert class="alert-box success">
-                No Errors Detected
-            </div>
-        {% endif %}
+            {% endif %}
 
-        {% if (output['log'] ?? null) is not empty %}
-            <section class="content">
-                <pre>{{ output['log'] }}</pre>
-            </section>
-        {% endif %}
+            {% if (output['log'] ?? null) is not empty %}
+                <section class="content">
+                    <pre>{{ output['log'] }}</pre>
+                </section>
+            {% endif %}
+        </div>
     </div>
-</sec>
+</div>

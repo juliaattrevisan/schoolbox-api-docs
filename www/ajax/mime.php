@@ -5,10 +5,11 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-define('MIME_URL_PREFIX', __DIR__ . '/../images/mime');
+define('MIME_URL_PREFIX', '/images/mime');
 define('DEFAULT_FOLDER_ICON', MIME_URL_PREFIX . '/application-document.svg');
 define('DEFAULT_NONE_ICON', MIME_URL_PREFIX . '/none.svg');
 define('MAX_AGE', 2419200); // 28 days
@@ -21,6 +22,7 @@ if (empty($this)) {
     SitePage::localRedir('/mime');
 }
 
+/** @var SitePage $this */
 $this->setAjax();
 
 $filenames = [];
@@ -32,7 +34,6 @@ try {
     if ($this->arg === ['folder']) {
         $filenames[] = DEFAULT_FOLDER_ICON;
     } else {
-
         /* Always need two args for the mime
          */
         if (\count($this->arg) !== 2) {
@@ -50,7 +51,6 @@ try {
         $filenames[] = MIME_URL_PREFIX . '/' . $mime->getIconFile();
     }
 } catch (Schoolbox\Mapper\Exception $e) {
-
     /* Something died in MimetypeMapper, probably
      * noop
      */
@@ -67,25 +67,16 @@ $filenames[] = DEFAULT_NONE_ICON;
  * then gradually fall back to other files
  */
 foreach ($filenames as $filename) {
-
     /* Progressively degrade icon choice until we find the first available
      */
-    if (!file_exists($filename)) {
+    if (!file_exists(WEB_root . '/static' . $filename)) {
         continue;
     }
 
-    $fp = fopen($filename, 'rb');
-
-    // send the right headers
-    header('Content-Type: image/svg+xml');
-    header('Content-Length: ' . filesize($filename));
-    header('Pragma: public');
-    header('Cache-Control: public, max-age=' . MAX_AGE);
-    header('Expires: ' . date('r', $_SERVER['REQUEST_TIME'] + MAX_AGE));
-
-    // dump the picture and stop the script
-    fpassthru($fp);
-
+    // Permanent redirect instead of dumping
+    /** @var PrefixGenerator $prefixGenerator */
+    $prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
+    $prefixGenerator->redirectPermanent($filename);
     exit;
 }
 

@@ -12,8 +12,8 @@ use Schoolbox\User;
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
-class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default {
+class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventType_Event_Schoolbox_Default
+{
 
     /**
      * The campus to get events for. If null, returns events for all campuses.
@@ -37,20 +37,21 @@ class Calendar_Api_EventType_Event_Schoolbox_Campus extends Calendar_Api_EventTy
 
 
     /**
-	 * Overridden to get events only for this campus.
-	 *
-	 * @param int $startTimestamp
-	 * @param int $endTimestamp
-	 *
-	 * @return \Calendar\Event\Collection
-	 */
-	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
-		return $this->getCalendarHandler()->getDayEvents(
-			$this->getUser(),
+     * Overridden to get events only for this campus.
+     *
+     * @param int $startTimestamp
+     * @param int $endTimestamp
+     *
+     * @return \Calendar\Event\Collection
+     */
+    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp)
+    {
+        return $this->getCalendarHandler()->getDayEvents(
+            $this->getUser(),
             $this->getViewer(),
-			$startTimestamp,
-			$endTimestamp,
+            $startTimestamp,
+            $endTimestamp,
             ['campus' => $this->campus_id]
         );
-	}
+    }
 }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\Translator;
 
 use League\Flysystem\FileNotFoundException;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Resource\Storage\Model;
 
 /**
@@ -18,6 +19,21 @@ use Schoolbox\Resource\Storage\Model;
  */
 class ModelToArray
 {
+    /**
+     * Prefix generator: for attaching a prefix to the mime icon
+     */
+    private PrefixGenerator $prefixGenerator;
+
+    /**
+     * Constructor
+     *
+     * @param PrefixGenerator $prefixGenerator
+     */
+    public function __construct(PrefixGenerator $prefixGenerator)
+    {
+        $this->prefixGenerator = $prefixGenerator;
+    }
+
     /**
      * @param Model $storage
      * @return array
@@ -34,7 +50,11 @@ class ModelToArray
 
         if ($storage->getMimetype()) {
             $type = $storage->getMimetype()->getType();
-            $links['icon'] = '/images/mime/' . $storage->getMimetype()->getIconFile();
+            $links['icon'] = sprintf(
+                '%s/images/mime/%s',
+                $this->prefixGenerator->generate(),
+                $storage->getMimetype()->getIconFile()
+            );
             if ($storage->getMimetype()->isImage()) {
                 $links['image'] = "/storage/image.php?hash={$storage->getHash()}";
             }

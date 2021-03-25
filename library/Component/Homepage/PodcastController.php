@@ -31,9 +31,12 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             $emptyState = true;
             $noConfig = true;
         } else {
-            $xml = new Xml($this->getConfig('url'));
-
-            if (!count($xml->channel->item)) {
+            try {
+                $xml = new Xml($this->getConfig('url'));
+                if (!$xml->channel || !count($xml->channel->item)) {
+                    $emptyState = true;
+                }
+            } catch (\Exception $e) {
                 $emptyState = true;
             }
         }

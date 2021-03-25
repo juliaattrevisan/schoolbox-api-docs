@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Cdn;
+
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
+
+/**
+ * CDN prefix generator.
+ */
+class PrefixGenerator
+{
+    /**
+     * The local prefix: not a CDN at all, it references the same host as all
+     * other Schoolbox requests.
+     */
+    private const LOCAL_PREFIX = '/static';
+
+    /**
+     * Config is required for determining:
+     * * whether assets are served from CDN
+     * * if so, the CDN URL
+     */
+    private IConfigLoader $config;
+
+    /**
+     * Constructor
+     *
+     * @param IConfigLoader $config
+     */
+    public function __construct(IConfigLoader $config)
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * Generates a CDN prefix based on Schoolbox's current configuration.
+     *
+     * This value must be prefixed to all requests for static assets, so that
+     * static assets are served from either:
+     * * a configured CDN (with or without a replacement for the site version)
+     * * the `/static` folder on the same host that serves Schoolbox itself
+     *
+     * @return string
+     */
+    public function generate(): string
+    {
+        return $this->generateInternal();
+    }
+
+    /**
+     * Generates a fully-qualified CDN prefix, given a base URL.
+     *
+     * Intended for use in emails, and other content which will be viewed
+     * from a relative URL that is different to the Schoolbox instance.
+     *
+     * @param string $baseUrl The base URL of the instance (scheme and host)
+     * @return string
+     */
+    public function generateWithBaseUrl(string $baseUrl): string
+    {
+        return $this->generateInternal($baseUrl);
+    }
+
+    /**
+     * Internal method for generating a prefix, with or without a base URL.
+     *
+     * @param string|null $baseUrl
+     * @return string
+     */
+    private function generateInternal(string $baseUrl = null): string
+    {
+        if (!$this->config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN)) {
+            return ($baseUrl ?? '') . self::LOCAL_PREFIX;
+        }
+        return str_replace(
+            '{site_version}',
+            $this->config->get(ConfigMapper::NAME_SITE_VERSION),
+            $this->config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_PREFIX),
+        );
+    }
+
+    /**
+     * Generate a temporary redirect header for this URL.
+     *
+     * @param string $url
+     */
+    public function redirectTemporary(string $url): void
+    {
+        header('Location: ' . $this->generate() . $url, true, 307);
+    }
+
+    /**
+     * Generate a permanent redirect header for this URL.
+     *
+     * @param string $url
+     */
+    public function redirectPermanent(string $url): void
+    {
+        header('Location: ' . $this->generate() . $url, true, 301);
+    }
+}

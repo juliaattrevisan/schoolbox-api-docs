@@ -86,7 +86,7 @@
                     </nav>
                     <ul id="resourceManagement-status-{{ event.booking.id }}" class="f-dropdown" aria-hidden="true" data-dropdown-content>
                         <li>
-                            <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}"
+                            <a href="{{ routeLookup('resourceBooking.edit', {id: event.booking.id}) }}?returnUrl={{ returnUrl }}"
                                class="icon-modify">Modify Booking</a>
                         </li>
                         <li class="separator">Set Status</li>

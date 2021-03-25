@@ -73,6 +73,7 @@ class NodeRenderer
 
         /* Send it out
          */
+        $this->page->injectGlobalVars();
         $this->getPage()->setAjax();
         $this->getPage()->template->pparse('finaloutput', $this->getHandle());
     }

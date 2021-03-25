@@ -106,7 +106,7 @@
             events(fetchInfo, callback) {
                 var self = this;
                 axios.get(
-                    self.config.resourceBookingEndpoint,
+                    self.config.resourceBookingEndpoint + '?returnUrl=' + self.returnUrl() ,
                     {
                         headers: {
                             'X-Requested-With' : 'XMLHttpRequest'
@@ -152,6 +152,17 @@
                 }
 
                 return isEventRendered;
+            },
+
+            /**
+             * Get the current url; these redirects are used after backend processing
+             * so you can return to your current location afterwards
+             *
+             * Use the base64encoded version of the url's pathname, so it can work in
+             * conjunection with Class Redirect in the back end
+             */
+            returnUrl() {
+                return btoa(window.location.pathname);
             },
 
             /**

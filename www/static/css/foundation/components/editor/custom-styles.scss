@@ -1,0 +1,21 @@
+/* Yellow box
+ */
+.highlighted-note {
+    background-color: #ffffb5;
+    padding: 0.75rem;
+    display: block;
+}
+
+.cke_editable {
+    margin: 0;
+
+    /* Anchor elements display a little flag
+     */
+    a[id] {
+        padding-left: 16px;
+        margin-left: 4px;
+        background-image: url("#{$cdn-prefix}/javascript/ckeditor/plugins/schoolboxanchor/anchor.png");
+        background-repeat: no-repeat;
+        background-position: 0 0;
+    }
+}

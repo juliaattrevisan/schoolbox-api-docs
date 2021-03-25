@@ -619,7 +619,8 @@ class Controller extends Base\Base
         $post = $this->getRequest()->post;
         $courseSpec->getFolder()->setName(trim($post['name']));
         $parentFolderId = (int)trim($post['parent']);
-        $curriculumCodes = $post['curriculumCodes'];
+        // curriculumCodes is not set when curriculum is disabled
+        $curriculumCodes = $post['curriculumCodes'] ?: [];
 
         try {
             $this->validateCourseData($courseSpec->getFolder()->getName(), $parentFolderId, $courseSpec->getFolder()->getId());
@@ -673,7 +674,7 @@ class Controller extends Base\Base
         // Save the folder
         $folder = $courseSpec->getFolder();
 
-        if (\count($curriculumCodes)) {
+        if (count($curriculumCodes)) {
             $folder->setCurriculumNodes($this->curriculumNodeMapper->findByColumn('id', $curriculumCodes));
         }
 

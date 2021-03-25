@@ -61,7 +61,7 @@
                     <td>{RESOURCEBOOKING_END}</td>
                     <td class="actions-small-2">
                         <nav>
-                            <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit" class="icon-modify" alt="Remove Booking" title="Update Booking"></a>
+                            <a aria-haspopup="true" href="/resource-booking/booking/{RESOURCEBOOKING_ID}/edit?returnUrl={RETURN_URL}" class="icon-modify" alt="Remove Booking" title="Update Booking"></a>
                             <a aria-haspopup="true" href="/modules/eotc/manage/resources/bookingForm/delete/{RESOURCEBOOKING_ID}" class="icon-delete" alt="Remove Booking" title="Remove Booking" data-action="delete"></a>
                         </nav>
                     </td>
@@ -73,8 +73,8 @@
     </div>
 </div>
 
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
         $('[data-resourcebookingsuggest]').selectizeSelector({
@@ -90,7 +90,7 @@
             event.preventDefault();
 
             var id = $('[data-resourcebookingsuggest]').val().pop();
-            var url = $('[data-bookitemform]').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&callbackUrl=/modules/eotc/manage/resources/bookingForm/{EVENT_ID}';
+            var url = $('[data-bookitemform]').attr('action') + id + '?startDate={EVENT_START_DATE}&startTime={EVENT_START_TIME}&endDate={EVENT_END_DATE}&endTime={EVENT_END_TIME}&name={EVENT_NAME_ENCODED}&returnUrl={RETURN_URL_CALLBACK}';
 
             window.location.href = url;
 

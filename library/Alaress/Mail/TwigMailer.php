@@ -106,6 +106,8 @@ class TwigMailer extends AbstractMailer
                 [TextFormatter::class, 'cutSentence']
             )
         );
+
+        // TODO figure out what to do about CDN_PREFIX
     }
 
     /**

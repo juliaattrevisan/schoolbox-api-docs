@@ -43,6 +43,9 @@ class Config
     /** @var null|int */
     private $typeId;
 
+    /** @var Type\Model */
+    private $type;
+
     /** @var bool */
     private $editable;
 
@@ -183,6 +186,24 @@ class Config
     {
         return $this->typeId;
     }
+
+    /**
+     * @return Type\Model
+     */
+    public function getType(): ?Type\Model
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param Type\Model $type
+     */
+    public function setType(Type\Model $type): self
+    {
+        $this->type = $type;
+        return $this;
+    }
+
 
 
     /**

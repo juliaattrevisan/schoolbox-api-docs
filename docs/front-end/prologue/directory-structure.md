@@ -43,12 +43,12 @@ Examples:
 
 - created-by-me.twig - holds a container div for the above React code to attach to, as well as including the bundled JS file for the module, and sending through any data needed by React that's available on page load.
 
-### www/javascript (legacy)
+### www/static/javascript (legacy)
 
 Contains all our legacy JS/jQuery code.
 
-#### www/javascript/components (legacy)
+#### www/static/javascript/components (legacy)
 
 This is the destination of packages installed via Bower package manager.
 
-One common beginner mistake is making code changes here. These packages are kept separate from the Schoolbox repo, any changes made here will not be comitted or deployed.
+One common beginner mistake is making code changes here. These packages are kept separate from the Schoolbox repo, any changes made here will not be committed or deployed.

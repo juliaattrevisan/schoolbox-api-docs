@@ -1,9 +1,19 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
     $(function () {
-        $('[data-delete]').click(function (event) {
+        $('[data-delete-section]').click(function (event) {
             event.preventDefault();
-            $(this).confirmDialog();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this section?',
+                confirmLabel: 'Delete',
+            });
+        });
+        $('[data-delete-question]').click(function (event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this question?',
+                confirmLabel: 'Delete',
+            });
         });
 
         /* Make questions sortable
@@ -50,7 +60,7 @@
     <ul class="f-dropdown" data-dropdown-content id="section{SECTION_SECTION_ID}-options">
         <li class="separator">Section</li>
         <li><a class="icon-modify" href="/{ASSESS_KIND_LC}/section/modify/{SECTION_SECTION_ID}{RETURN_URL}">Modify</a></li>
-        <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}{RETURN_URL}" data-delete>Delete</a></li>
+        <li><a class="icon-delete" href="/{ASSESS_KIND_LC}/section/delete/{SECTION_SECTION_ID}{RETURN_URL}" data-delete-section>Delete</a></li>
         <li class="separator">Question</li>
         <li><a class="icon-add" href="/{ASSESS_KIND_LC}/question/create/{SECTION_SECTION_ID}{RETURN_URL}">New Question</a></li>
         <li><a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/contents/0/{ASSESS_ASSESS_ID}/{SECTION_SECTION_ID}{RETURN_URL}">Add from Question Bank</a></li>
@@ -90,7 +100,7 @@
                 </div>
             </div>
             <nav>
-                <a class="icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}{RETURN_URL}" title="Delete" data-delete></a>
+                <a class="icon-delete" href="/{ASSESS_KIND_LC}/question/delete/{QUESTION_QUESTION_ID}{RETURN_URL}" title="Delete" data-delete-question></a>
                 <a class="icon-modify" href="/{ASSESS_KIND_LC}/question/modify/{QUESTION_QUESTION_ID}{RETURN_URL}" title="Modify"></a>
                 <a class="icon-download" href="/{ASSESS_KIND_LC}/questionbank/addQuestion/{QUESTION_QUESTION_ID}{RETURN_URL}" data-reveal-id="question-bank" data-reveal-ajax="true" title="Import into Question Bank"></a>
             </nav>

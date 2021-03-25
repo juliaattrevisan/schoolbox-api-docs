@@ -124,5 +124,5 @@ parent's permanent record; for this reason, Meriden are notoriously
 perfectionist regarding the visual layout and branding of the eReport.
 
 The eReport's custom CSS is committed to our code repository
-(www/css/meriden/pastoral.scss), but is _not_ automatically compiled as part of
-their skin; it must be copy-pasted into their custom CSS.
+(www/static/css/meriden/pastoral.scss), but is _not_ automatically compiled as
+part of their skin; it must be copy-pasted into their custom CSS.

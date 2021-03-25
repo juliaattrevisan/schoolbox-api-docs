@@ -512,7 +512,7 @@ class ArticleResolver implements IArticleResolver
 
         if (count($orderBy)) {
             $sql .= "
-                {$this->folderMapper::buildOrderByClause(Simple\Mapper::TABLE_NAME, $orderBy, $this->db)}";
+                {$this->folderMapper::buildOrderByClause(Simple\Mapper::TABLE_NAME, $orderBy, $this->db->getQuoter())}";
         }
 
         if (null !== $limit) {
@@ -564,7 +564,7 @@ class ArticleResolver implements IArticleResolver
         ";
 
         if (count($orderBy)) {
-            $sql .= "\n" . Complex\Mapper::buildOrderByClause(Complex\Mapper::TABLE_NAME, $orderBy, $this->db);
+            $sql .= "\n" . Complex\Mapper::buildOrderByClause(Complex\Mapper::TABLE_NAME, $orderBy, $this->db->getQuoter());
         }
 
         if (null !== $limit) {

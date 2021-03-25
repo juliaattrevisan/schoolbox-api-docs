@@ -796,11 +796,6 @@ parameters:
 			path: library/Assess/Main.php
 
 		-
-			message: "#^Variable \\$campusList might not be defined\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
 			message: "#^Variable \\$groupChunk might not be defined\\.$#"
 			count: 3
 			path: library/Calendar.php
@@ -812,16 +807,6 @@ parameters:
 
 		-
 			message: "#^Variable \\$endTimestamp in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^Variable \\$monthList might not be defined\\.$#"
-			count: 1
-			path: library/Calendar.php
-
-		-
-			message: "#^Variable \\$yearList might not be defined\\.$#"
 			count: 1
 			path: library/Calendar.php
 
@@ -3314,11 +3299,6 @@ parameters:
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/Application/CliTool/PdfGenerator/App.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Application/Login/Controller.php
 
 		-
 			message: "#^Variable \\$authenticated might not be defined\\.$#"

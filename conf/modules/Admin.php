@@ -99,5 +99,8 @@ class Admin implements ModuleConfigInterface
 
         // Grades page
         (new \Schoolbox\Admin\Grades\Module($di))->init('/adminv2/grades');
+
+        // Usage Graphs
+        (new \Schoolbox\Admin\Usage\Module($di))->init('/adminv2/usage');
     }
 }

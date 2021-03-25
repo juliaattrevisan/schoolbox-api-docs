@@ -5,7 +5,7 @@ _Note: this plugin should be used for all future select-all needs. However, some
 
 Include the plugin with the following:
 ```
-<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/select-all/jquery.select-all.js"></script>
 ```
 ## Basic usage
 
@@ -17,12 +17,12 @@ Include the plugin with the following:
 <div class="checklist">
     <input id="selectAll" type="checkbox">
     <label for="selectAll">Select All</label>
-    
+
     <input id="checkbox1" type="checkbox" data-checkbox>
     <label for="checkbox1">
         A Checkbox
     </label>
-    
+
     <input id="checkbox2" type="checkbox" data-checkbox>
     <label for="checkbox2">
         Another Checkbox
@@ -34,7 +34,7 @@ Include the plugin with the following:
 The plugin is initialised on a container element of your choice. Only checkboxes inside this container will be affected by the select-all functionality.
 
 ```
-$("#container").selectAll({    
+$("#container").selectAll({
     selector: "#selectAll",
     checkboxes: "[data-checkbox]"
 });
@@ -51,17 +51,17 @@ Parent checkboxes get an icon indicating that they have children. This is a usef
 <div class="checklist">
     <input id="selectAll" type="checkbox">
     <label for="selectAll">Select All</label>
-    
+
     <input id="parentCheckbox1" type="checkbox" data-checkbox>
     <label for="parentCheckbox1" title="Select to reveal children">
         Parent Checkbox
         <i class="icon-click-view size-8"></i>
     </label>
-    
+
     <div class="checklist" data-child-group>
         <input id="childCheckbox1" type="checkbox" data-child-checkbox>
         <label for="childCheckbox1">A Child Checkbox</label>
-        
+
         <input id="childCheckbox2" type="checkbox" data-child-checkbox>
         <label for="childCheckbox2">Another Child Checkbox</label>
     </div>
@@ -71,7 +71,7 @@ Parent checkboxes get an icon indicating that they have children. This is a usef
 #### jQuery
 
 ```
-$("#container").selectAll({    
+$("#container").selectAll({
     selector: "#selectAll",
     checkboxes: "[data-checkbox]",
     childCheckboxes: "[data-child-checkbox]",
@@ -163,9 +163,9 @@ For example, if you are adding or removing a `<div class='checkbox-container'>`,
 Providing this selector allows the plugin to listen for changes to direct children of the `observerParent`, and update its copy of the DOM accordingly.
 
 ### Custom onChange function
-You can supply your own function which is run when the checkbox specified by `selector` is checked or unchecked. 
+You can supply your own function which is run when the checkbox specified by `selector` is checked or unchecked.
 ```
-$("#form").selectAll({    
+$("#form").selectAll({
     selector: "#selectAll",
     checkboxes: "[data-checkbox]",
     change: function() {

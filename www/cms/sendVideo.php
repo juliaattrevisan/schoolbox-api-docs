@@ -9,6 +9,7 @@
  */
 
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
 use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
@@ -96,18 +97,7 @@ if (isset($type) && isset($id)) {
     }
 
 
-    // ----------------------------------------------------------------------------------------------------------------
-    // Retrieve stream
-    // ----------------------------------------------------------------------------------------------------------------
-
-    // Open a video stream using the appropriate method based on the underlying storage
-
-    // Flysystem does not allow chunking of data (given that it has to support a multitude of different underlying
-    // storage structures, some of which may not support chunking). We need to work around this for S3 (and other
-    // future adapters we use) and open our own stream which we can stream back to the user.
-
-    $videoStream = null;
-
+    // Redir to the presigned URL if it is enabled
     if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
         // AWS S3
         if ($config->get('otfs_s3_presigned_urls_enabled')) {
@@ -124,14 +114,26 @@ if (isset($type) && isset($id)) {
             );
 
             $preSignedUrlService->download($preSignedUrlDataObject);
-        } else {
-            $videoStream = S3Stream::open($video->getTranscodePath(), $config);
+            exit;
         }
-    } elseif (($localFilename = getLocalFilesystemPath($video, $config)) !== false) {
-        // Local Disk
-        $videoStream = fopen($localFilename, "rb");
     }
 
+    // ----------------------------------------------------------------------------------------------------------------
+    // Retrieve stream
+    // ----------------------------------------------------------------------------------------------------------------
+
+    // Open a video stream using the appropriate method based on the underlying storage
+
+    // Flysystem does not allow chunking of data (given that it has to support a multitude of different underlying
+    // storage structures, some of which may not support chunking). We need to work around this for S3 (and other
+    // future adapters we use) and open our own stream which we can stream back to the user.
+    $videoStream   = null;
+    $streamFactory = new Schoolbox\Resource\Storage\SeekableStream\Factory($config);
+    try {
+        $videoStream = $streamFactory->buildSeekableStream($fileSystem, $video->getTranscodePath());
+    } catch (FileNotFoundException $e) {
+        fail();
+    }
     if (!is_resource($videoStream)) {
         fail();
     }

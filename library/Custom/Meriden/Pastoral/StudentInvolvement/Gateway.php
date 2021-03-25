@@ -282,11 +282,53 @@ class Gateway
      */
     public function getCocurricular($year, User $student)
     {
-        $activities = [];
-        foreach (self::ACTIVITY_TYPES_COCURRICULAR as $activityType) {
-            $activities[] = $this->queryActivities($year, $student, $activityType);
+        $externalId = $student->getExternalId();
+        if (!$externalId) {
+            return [];
         }
-        return array_merge(...$activities);
+
+        // Differences to the standard query:
+        // * `act_code` is gone: it isn't needed, and causes duplicate results
+        // * there's some coalescence magic happening with the `act_type` field:
+        //   I think the main difference is the `ecaud21_desc` lookup.
+        //   Could it be rewritten as `COALESCE(ea.act_desc, ea.ecaud21_desc)`?
+        $query = "
+            SELECT DISTINCT
+                se.stud_code,
+                CONCAT(
+                    CASE
+                        WHEN ea.ecaud21_desc IS NULL THEN RTRIM(ea.act_desc)
+                        ELSE RTRIM(ea.ecaud21_desc)
+                    END,
+                    CASE
+                        WHEN el.lev_desc IS NULL THEN ''
+                        ELSE CONCAT (' - ', el.lev_desc)
+                    END) AS act_desc,
+                ea.act_type,
+                el.lev_desc,
+                eu.ud_desc
+            FROM ecactivity ea
+            INNER JOIN studecact se
+                ON se.act_code = ea.act_code
+                AND se.cmpy_code = ea.cmpy_code
+            LEFT JOIN ecalevel el
+                ON el.cmpy_code = se.cmpy_code
+                AND el.lev_code = se.act_level
+            LEFT JOIN ecudtable eu
+                ON eu.ud_code = se.ecud2_code
+                AND eu.cmpy_code = se.cmpy_code
+                AND eu.ref_code = '2'
+        ";
+
+        $pb = new PredicateBuilder($this->database, 'ecactivity');
+        $pb = $pb->equals('se.stud_code', $externalId)
+                 ->equals('se.act_year', $year)
+                 ->in('ea.act_type', self::ACTIVITY_TYPES_COCURRICULAR)
+                 ->equals('ea.cmpy_code', self::COMPANY_CODE);
+
+        $query .= " WHERE " . implode(' AND ', $pb->getWhere());
+
+        return $this->database->executeQuery($query, $pb->getParams())->fetchAll();
     }
 
     /**

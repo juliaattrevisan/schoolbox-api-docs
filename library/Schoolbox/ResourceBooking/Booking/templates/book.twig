@@ -1,7 +1,7 @@
 <!-- BEGIN custom_header -->
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="/javascript/components/jquery-validation/dist/additional-methods.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/jquery-validation/dist/additional-methods.js"></script>
 <script type="text/javascript">
 
 $(function() {
@@ -136,12 +136,15 @@ $(function() {
             /* Use a calling module's callback url, pass it booking ids
              * that were just created for it
              */
-            if (data.callbackUrl.length) {
-                if (!data.callbackUrl.includes('#resourceBookingByCategory')) {
-                    var ids = data.item.map(function(v) { return v.id; }).join();
-                    window.location.href = data.callbackUrl + '?ids=' + ids;
+            if (data.returnUrl && data.returnUrl.length) {
+                if (data.item && data.item.length) {
+                    var ids = data.item.map(function (v) {
+                        return v.id;
+                    }).join();
+
+                    window.location.href = data.returnUrl + '?ids=' + ids;
                 } else {
-                    window.location.href = data.callbackUrl;
+                    window.location.href = data.returnUrl;
                 }
             } else {
                 // Get the time of the first booking, direct to that date
@@ -356,7 +359,7 @@ $(function() {
         </div>
         <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
             <input type="hidden" name="id" value="{{ item.id }}"/>
-            <input type="hidden" name="callbackUrl" value="{{ callbackUrl }}" />
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
             {# Inputs for editing bookings in a series #}
             <input type="hidden" name="efficacy" value="{{ efficacySelf }}" />
@@ -550,7 +553,7 @@ $(function() {
  # This should redirect to the last page I was on.
  #}
 <form id="resource-booking-cancel-form" action="{{ routeLookup('resourceBooking.cancel', {id: item.id}) }}">
-    <input type="hidden" name="callbackUrl" value="{{ cancelCallbackUrl }}" />
+    <input type="hidden" name="returnUrl" value="{{ cancelReturnUrl }}" />
 </form>
 
 {# Booking for bulk events #}

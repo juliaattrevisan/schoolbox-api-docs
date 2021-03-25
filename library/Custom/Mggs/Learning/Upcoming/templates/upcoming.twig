@@ -3,8 +3,8 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 
 <!-- BEGIN custom_head -->
-<link rel="stylesheet" type="text/css" href="/css/mggs/personalised.css" />
-<script type="text/javascript" src="/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/mggs/personalised.css" />
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/fullcalendar-scheduler/dist/scheduler.min.js"></script>
 <script type="text/javascript">
 
     var realEventList = {};
@@ -613,7 +613,7 @@
             ;
 
             // indicate new date is saving
-            dateField.html('<img class="saving-spinner" src="/images/foundation/preloader.gif" /> Saving new date&hellip;');
+            dateField.html('<img class="saving-spinner" src="{{ CDN_PREFIX }}/images/foundation/preloader.gif" /> Saving new date&hellip;');
 
             // attempt to persist this data
             updateAssessment(eventData, null, onFail, onDone);

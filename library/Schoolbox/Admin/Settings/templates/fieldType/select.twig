@@ -8,7 +8,7 @@
     renderEmptyOption: bool            Should we insert an empty option in the dropdown select?
 #}
 
-<select name="{{ name }}" id="{{ name }}" {{ required ? 'required ' }} {% if not editable %}disabled="disabled"{% endif %}>
+<select name="{{ name }}" id="{{ name }}-field" {{ required ? 'required ' }} {% if not editable %}disabled="disabled"{% endif %}>
     {% if renderEmptyOption %}
         <option value="" {% if required %} style="display: none;"{% endif %}{% if value is null %} selected="selected"{% endif %}>-- select an option --</option>
     {% endif %}

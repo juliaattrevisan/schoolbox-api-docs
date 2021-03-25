@@ -13,7 +13,7 @@
     $(function() {
         const mq = window.matchMedia( "(max-width: 950px)" );
         if (mq.matches) {
-            $("[data-parent-item] a").on('click', function(event) {
+            $("[data-parent-item] > a").on('click', function(event) {
                 event.preventDefault();
 
                 let $target = $(this).closest('[data-parent-item]').find("[data-admin-subnav-flyout]").slideToggle();
@@ -68,6 +68,10 @@
 
 <nav id="admin-nav">
     <h2 class="subheader">Menu</h2>
+    <div id='admin-settings-search'>
+        <admin-settings-search />
+    </div>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/adminSettingsSearch.bundle.js"></script>
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
     <ul class="admin side-nav" role="navigation" data-admin>
 
@@ -85,7 +89,15 @@
             {% endif %}
 
             <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
-                <a href="{{ parentUrl }}">{{ parentData.name }}</a>
+
+                {# Only link parent nodes if they have no children
+                 # Otherwise rely entirely on the children
+                 #}
+                {% if parentData.children|length %}
+                    <a>{{ parentData.name }}</a>
+                {% else %}
+                    <a href="{{ parentUrl }}">{{ parentData.name }}</a>
+                {% endif %}
 
                 {% if parentData.children|length %}
                     <ul class="flyout" role="navigation" data-admin-subnav-flyout>

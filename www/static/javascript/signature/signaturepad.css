@@ -1,0 +1,32 @@
+.sigPad .pad {
+    position: relative;
+    /* Heights still sadly necessary for consistent sigpad */
+    height: 142px;
+}
+.sigPad:not(.readonly) .pad {
+    /**
+     * Should no longer need to define this twice (as IE no longer supported)
+     */
+    cursor: url("./assets/pen.cur") 16 16, crosshair;
+
+    -ms-touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+.sigPad .sigPadWrapper {
+    border: 1px solid #dedede;
+    /* Heights still sadly necessary for consistent sigpad */
+    height: 142px;
+}
+
+.sigPad .signaturePadAnswer {
+    border:0;
+    opacity:0;
+    height:0px;
+    padding:0px;
+    margin:0px;
+}

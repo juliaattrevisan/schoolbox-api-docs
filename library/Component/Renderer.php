@@ -133,7 +133,7 @@ class Component_Renderer
 
         /* Localise terminologies
          */
-        $page->localise();
+        $page->injectGlobalVars();
 
         $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
@@ -141,10 +141,12 @@ class Component_Renderer
     /**
      * Renders an ePortfolio template into the Sitepage within $component.
      *
+     * @param SitePage                                $page
      * @param Eportfolio_Page_Instance                $eportfolioPage
      * @param Component_Eportfolio_ControllerAbstract $component
      */
     public function renderEportfolioComponent(
+        SitePage $page,
         Eportfolio_Page_Instance $eportfolioPage,
         Component_Eportfolio_ControllerAbstract $component
     ) {
@@ -165,6 +167,9 @@ class Component_Renderer
                     'EPORTFOLIO_PAGE_USER_ID' => $eportfolioPage->getUserId(),
                 ]);
 
+                /* Localise terminologies
+                 */
+                $page->injectGlobalVars();
                 $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
             }
         }

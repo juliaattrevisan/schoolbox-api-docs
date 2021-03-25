@@ -51,13 +51,14 @@
             dueWork: {
                 proper: '{{ locale.dueWork.proper }}'
             }
-        }
+        },
+        returnUrl: '{{ RETURN_URL.name }}={{ RETURN_URL.current }}'
     };
 </script>
 {% endautoescape %}
 
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 
 <div class="row actions-small-1">
     <div class="small-12 columns">
@@ -78,7 +79,7 @@
     <div class="small-12 island">
         <section>
             <div id="calendar"></div>
-            <script type="text/javascript" src="/javascript/components/fullCalendar.bundle.js?v={{ config.site_version }}"></script>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/fullCalendar.bundle.js?v={{ config.site_version }}"></script>
         </section>
     </div>
 </div>

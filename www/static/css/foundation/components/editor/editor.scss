@@ -1,0 +1,132 @@
+.cke {
+    border: $input-border-width solid $form-border-color !important;
+    margin-bottom: 1rem !important;
+}
+
+.cke_dialog_body {
+    .schoolboxresource-preview {
+        border: 1px solid #ccc;
+        width: 100%;
+        height: 200px;
+    }
+
+    .schoolboxresource-separator {
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 0.25rem;
+        display: block;
+    }
+
+    .schoolboxlink-anchor-preamble {
+        color: #808080;
+    }
+
+    .schoolboxlink-anchor-example {
+        font-weight: bold;
+    }
+
+    .cke_dialog_ui_input_select {
+        width: 100%;
+    }
+
+    .cke_dialog_ui_hbox_last {
+        vertical-align: bottom;
+    }
+
+    /**
+     * Overwrite our global input styles for ckeditor dialogs
+     */
+    input,
+    select {
+        height: auto;
+        min-height: 28px;
+    }
+
+    select {
+        line-height: normal !important;
+    }
+
+    input[type="checkbox"]+label,
+    input[type="radio"]+label {
+        margin: 0;
+    }
+
+    input[type=checkbox],
+    input[type=radio] {
+        position: static;
+        opacity: 1;
+        width: auto;
+        height: auto;
+    }
+}
+
+/* Icons for our custom plugins
+ */
+a.cke_button {
+
+    /* Add a generic link to a generic place
+     */
+    .cke_button__schoolboxlink_icon {
+        background: url("#{$cdn-prefix}/editor/plugins.png") 0px 0px no-repeat;
+    }
+
+    /* Remove a generic link
+     */
+    .cke_button__unlink_icon {
+        background: url("#{$cdn-prefix}/editor/plugins.png") 0px -16px no-repeat;
+    }
+
+    /* Add anchor elements
+     */
+    .cke_button__schoolboxanchor_icon {
+        background: url("#{$cdn-prefix}/editor/plugins.png") 0px -32px no-repeat;
+    }
+
+    /* Duped up media icon
+     */
+    .cke_button__schoolboxresourcemedia_icon {
+        background: url("#{$cdn-prefix}/editor/plugins.png") 0px -48px no-repeat;
+    }
+
+    /* Dupe up media icon
+     */
+    .cke_button__schoolboxresourceimage_icon {
+        background: url("#{$cdn-prefix}/editor/plugins.png") 0px -64px no-repeat;
+    }
+
+    /* Add an iframe
+     */
+    .cke_button__schoolboxiframe_icon {
+        background: url("#{$cdn-prefix}/editor/plugins.png") 0px -80px no-repeat;
+    }
+
+    /* "Make Blank" for Fillgap (Cloze Exercise) question type in Quiz
+     * Special green background
+     */
+    .cke_button__schoolboxmakeblank_icon {
+        background: url("#{$cdn-prefix}/editor/plugins.png") 0px -96px no-repeat;
+    }
+
+    &.cke_button__schoolboxmakeblank {
+        background-color: #cae9b9;
+    }
+}
+
+/* For putting dragresize handles in the right place
+ * It's getting reset by cke_reset, so bring firepower
+ */
+.cke_contents {
+    padding: 1rem !important;
+}
+
+article,
+.cke_editable {
+    h1, h2, h3, h4, h5, h6 {
+        margin-bottom: 0.75rem;
+        margin-top: 1.25rem;
+    }
+
+    >:first-child {
+        margin-top: 0;
+    }
+}

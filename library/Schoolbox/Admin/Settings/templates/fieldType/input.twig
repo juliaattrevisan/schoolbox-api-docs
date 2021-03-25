@@ -3,4 +3,4 @@
     value:         string
     required:      bool
 #}
-<input id="{{ name }}" {{ required ? 'required ' }}type="{% block inputType %}text{% endblock %}" name="{{ name }}" value="{{ value }}" {% if not editable %}disabled="disabled"{% endif %} />
+<input id="{{ name }}-field" {{ required ? 'required ' }}type="{% block inputType %}text{% endblock %}" name="{{ name }}" value="{{ value }}" {% if not editable %}disabled="disabled"{% endif %} />

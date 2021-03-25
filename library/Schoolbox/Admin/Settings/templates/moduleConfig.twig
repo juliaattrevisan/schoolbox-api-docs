@@ -7,15 +7,18 @@
     isEditable                bool        - Is the form editable?
     postRoute:                string      - Where to post form to
 #}
-<link rel="stylesheet" type="text/css" href="/javascript/components/spectrum/spectrum.css" />
-<script type="text/javascript" src="/javascript/components/schoolbox-masonry.min.js?v={{ siteVersion }}"></script>
-<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js?v={{ siteVersion }}"></script>
-<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js?v={{ siteVersion }}"></script>
+<link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/javascript/components/spectrum/spectrum.css" />
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/schoolbox-masonry.min.js?v={{ siteVersion }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ siteVersion }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ siteVersion }}"></script>
 
 <script type="text/javascript">
     $(function() {
 
         var settingsForm = $('#settings');
+
+        var hash = window.location.hash.substr(1);
+        document.getElementById(hash).parentElement.style.backgroundColor="#ffa";
 
         {% if hasColourPicker %}
         $("[data-colour-picker]").spectrum({
@@ -73,7 +76,7 @@
                         {% set data = setting.data %}
                         {% if not data.hidden %}
                             <div class="small-12 columns">
-                            <label for="{{ data.name }}" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
+                            <label id="{{ data.name }}" for="{{ data.name }}-field" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
                             <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
                                 {% include '@settings/fieldType/' ~ setting.template with data only %}
                             </div>

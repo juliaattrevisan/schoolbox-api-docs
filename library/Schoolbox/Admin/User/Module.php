@@ -44,6 +44,9 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'getInsert', $basePath, "/create");
         $this->addGetRoute($router, 'getModify', $basePath, "/{userId}/modify")->setTokens(['userId' => '\d+']);
+        $this->addGetRoute($router, 'getStaleReport', $basePath, "/stale");
+        $this->addGetRoute($router, 'getStaleUsers', $basePath, "/stale/list");
+
 
         // CRUD Actions
 
@@ -55,6 +58,7 @@ class Module extends BaseModule
         $this->addPostRoute($router, 'postUpdateGroup', $basePath, "/{userId}/group/{folderId}");
         $this->addPostRoute($router, 'postUpdateService', $basePath, "/{userId}/permission/{service}/{sid}");
 
+        $this->addPostRoute($router, 'postDeleteList', $basePath, "/list/delete");
         $this->addPostRoute($router, 'postDeleteUser', $basePath, "/{userId}/delete");
         $this->addPostRoute($router, 'postDeletePermission', $basePath, "/{userId}/permission/{service}/{sid}/delete");
         $this->addPostRoute($router, 'postDeleteGroup', $basePath, "/{userId}/group/{folderId}/delete");

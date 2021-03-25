@@ -20,7 +20,7 @@
                                 <div class="list-item">
                                     <div class="compact card small-12">
                                         <a href="{{ routeLookup('customStkOleReport.sendReport', {studentId: student.id, reportId: reportId}) }}">
-                                            <img src="/images/mime/application-pdf.svg" class="mime">
+                                            <img src="{{ CDN_PREFIX }}/images/mime/application-pdf.svg" class="mime">
                                             <h3>{{ report.description }}</h3>
                                         </a>
                                     </div>

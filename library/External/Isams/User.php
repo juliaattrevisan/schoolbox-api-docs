@@ -138,6 +138,7 @@ class External_Isams_User implements External_UserInterface
                         ''                      AS StudentStudiesCode,
                         ''                      AS StudentBoarder,
                         ''                      AS StudentIBFlag,
+                        ''                      AS ParentsSeparatedFlag,
                         EnrolmentDate           AS StudentEnrolmentDate,
                         LeavingDate             AS StudentLeavingDate,
                         0 AS countIndividualEducationPlans

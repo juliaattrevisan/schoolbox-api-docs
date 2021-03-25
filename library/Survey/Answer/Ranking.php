@@ -274,9 +274,12 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 
         /* Collate each response into $allValues
          */
-        if(is_array($allResults)) {
+        if (is_array($allResults)) {
             foreach ($allResults as $currentResult) {
                 $response = unserialize($currentResult['response']);
+                if (!is_array($response)) {
+                    continue;
+                }
 
                 for ($i = 0; $i < count($response); $i++) {
                     $scoreboard[$i][$response[$i]]++;
@@ -333,7 +336,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
             for ($i = 0; $i < count($allAnswers); $i++) {
                 $page->setVar(
                     array(
-                        'ANSWER_LEFT_VALUE'  => ($i+1).')',
+                        'ANSWER_LEFT_VALUE' => ($i + 1) . ')',
                         'ANSWER_RIGHT_VALUE' => $right[$i],
                     )
                 );

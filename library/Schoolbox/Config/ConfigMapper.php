@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Config;
 
+use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 
@@ -101,13 +102,15 @@ class ConfigMapper extends Mapper
     public const NAME_ALLOW_STUDENT_CLASS_ACCESS = 'allow_student_class_access';
     public const NAME_LMS_RESUBMIT_WINDOW        = 'lms_resubmit_window';
 
-    public const PREFIX_CLOUDWORK_OAUTH             = 'cloudwork_oauth_';
-    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
-    public const _CLOUDWORK_OAUTH_CLIENT_ID         = self::PREFIX_CLOUDWORK_OAUTH . 'client_id';
-    public const _CLOUDWORK_OAUTH_CLIENT_SECRET     = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
-    public const _CANVAS_DATA_API_KEY               = 'canvas_data_api_key';
-    public const _CANVAS_DATA_API_SECRET            = 'canvas_data_api_secret';
-    public const _CANVAS_URL                        = 'canvas_url';
+    public const PREFIX_CLOUDWORK_OAUTH              = 'cloudwork_oauth_';
+    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER  = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
+    public const _CLOUDWORK_OAUTH_CLIENT_ID          = self::PREFIX_CLOUDWORK_OAUTH . 'client_id';
+    public const _CLOUDWORK_OAUTH_CLIENT_SECRET      = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
+    public const _CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS = self::PREFIX_CLOUDWORK_OAUTH . 'identifying_claims';
+
+    public const _CANVAS_DATA_API_KEY    = 'canvas_data_api_key';
+    public const _CANVAS_DATA_API_SECRET = 'canvas_data_api_secret';
+    public const _CANVAS_URL             = 'canvas_url';
 
     public const NAME_OTFS_ADAPTER                   = 'otfs_adapter';
     public const NAME_OTFS_S3_BUCKET                 = 'otfs_s3_bucket';
@@ -128,6 +131,10 @@ class ConfigMapper extends Mapper
     public const NAME_JWT_PRIVATE_KEY = 'jwt_private_key';
     public const NAME_ETHERPAD_HOST   = 'etherpad_host';
 
+    public const NAME_SITE_VERSION = 'site_version';
+    public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
+    public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
+
     /**
      * @throws \InvalidArgumentException
      */
@@ -143,7 +150,7 @@ class ConfigMapper extends Mapper
         $this->uses(self::COL_DESCRIPTION, self::TYPE_STRING);
         $this->uses(self::COL_FIELD, self::TYPE_INTEGER);
         $this->uses(self::COL_OPTIONS, self::TYPE_STRING);
-        $this->uses(self::COL_TYPE, self::TYPE_INTEGER);
+        //$this->uses(self::COL_TYPE, self::TYPE_INTEGER);
         $this->uses(self::COL_EDITABLE, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_HIDDEN, self::TYPE_BOOL_ENUM);
         $this->uses(self::COL_REQUIRED, self::TYPE_BOOL_ENUM);
@@ -154,6 +161,7 @@ class ConfigMapper extends Mapper
             null,
             [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH, self::MODULE_SCHOOLDATA]
         );
+        $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);
     }
 
@@ -182,7 +190,6 @@ class ConfigMapper extends Mapper
      */
     public function findTypeList(): array
     {
-        // Don't include boarder leave configs if boarder leave is off
         $query = "
             SELECT DISTINCT lu_config_type.type
             FROM {$this->getTable()}
@@ -215,13 +222,27 @@ class ConfigMapper extends Mapper
     protected function getSelectString(): string
     {
         return "
-          SELECT  {$this->getColumnString()}
+          SELECT  {$this->getColumnString()}, {$this->getJoinColumnString('type', 'lct')}
           FROM {$this->getTable()}
           INNER JOIN lu_config_field lcf on config.field_id = lcf.id
           LEFT  JOIN lu_config_type  lct on config.type_id  = lct.id
         ";
     }
 
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $configs = $this->createCollection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $config = $this->hydrate($row);
+            $type = $this->hydrateJoin($row, 'type', 'lct');
+            if($type instanceof Type\Model) {
+                $config->setType($type);
+            }
+            $configs->add($config);
+        }
+        return $configs;
+    }
 
     /**
      * Light-weight hydration to respect boolean fields

@@ -3304,7 +3304,7 @@
     "date-fns": {
       "version": "2.19.0",
       "resolved": "https://registry.npmjs.org/date-fns/-/date-fns-2.19.0.tgz",
-      "integrity": "sha512-X3bf2iTPgCAQp9wvjOQytnf5vO5rESYRXlPIVcgSbtT5OTScPcsf9eZU+B/YIkKAtYr5WeCii58BgATrNitlWg=="
+      "integrity": "sha1-ZRkzSGNaKNXZFsQ+x85vvRRQWeE="
     },
     "dateformat": {
       "version": "3.0.3",
@@ -3315,7 +3315,7 @@
     "dayjs": {
       "version": "1.10.4",
       "resolved": "https://registry.npmjs.org/dayjs/-/dayjs-1.10.4.tgz",
-      "integrity": "sha512-RI/Hh4kqRc1UKLOAf/T5zdMMX5DQIlDxwUe3wSyMMnEbGunnpENCdbUgM+dW7kXidZqCttBrmw7BhN4TMddkCw=="
+      "integrity": "sha1-jlRKm4aD9heD9XCYCoqA6vVKseI="
     },
     "de-indent": {
       "version": "1.0.2",
@@ -3487,7 +3487,7 @@
     "elliptic": {
       "version": "6.5.4",
       "resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.5.4.tgz",
-      "integrity": "sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==",
+      "integrity": "sha1-2jfOvTHnmhNn6UG1ku0fvr1Yq7s=",
       "dev": true,
       "requires": {
         "bn.js": "^4.11.9",
@@ -3502,13 +3502,13 @@
         "bn.js": {
           "version": "4.12.0",
           "resolved": "https://registry.npmjs.org/bn.js/-/bn.js-4.12.0.tgz",
-          "integrity": "sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==",
+          "integrity": "sha1-d1s/J477uXGO7HNh9IP7Nvu/6og=",
           "dev": true
         },
         "inherits": {
           "version": "2.0.4",
           "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.4.tgz",
-          "integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
+          "integrity": "sha1-D6LGT5MpF8NDOg3tVTY6rjdBa3w=",
           "dev": true
         }
       }
@@ -4583,6 +4583,11 @@
         }
       }
     },
+    "gsap": {
+      "version": "3.6.0",
+      "resolved": "https://registry.npmjs.org/gsap/-/gsap-3.6.0.tgz",
+      "integrity": "sha1-kl8lNwxpjOD26lY1ItqPa17SGwo="
+    },
     "gzip-size": {
       "version": "3.0.0",
       "resolved": "https://registry.npmjs.org/gzip-size/-/gzip-size-3.0.0.tgz",
@@ -4710,6 +4715,16 @@
       "resolved": "https://registry.npmjs.org/he/-/he-1.2.0.tgz",
       "integrity": "sha1-hK5l+n6vsWX922FWauFLrwVmTw8=",
       "dev": true
+    },
+    "highcharts": {
+      "version": "9.0.1",
+      "resolved": "https://registry.npmjs.org/highcharts/-/highcharts-9.0.1.tgz",
+      "integrity": "sha1-SeyZSniXqW/D4IgPSaDso0rf9qI="
+    },
+    "highcharts-vue": {
+      "version": "1.3.5",
+      "resolved": "https://registry.npmjs.org/highcharts-vue/-/highcharts-vue-1.3.5.tgz",
+      "integrity": "sha1-mj5fYFC/AifBkjhDOr+xercmLbM="
     },
     "hmac-drbg": {
       "version": "1.0.1",
@@ -6312,8 +6327,7 @@
     "regenerator-runtime": {
       "version": "0.13.7",
       "resolved": "https://registry.npmjs.org/regenerator-runtime/-/regenerator-runtime-0.13.7.tgz",
-      "integrity": "sha1-ysLazIoepnX+qrrriugziYrkb1U=",
-      "dev": true
+      "integrity": "sha1-ysLazIoepnX+qrrriugziYrkb1U="
     },
     "regenerator-transform": {
       "version": "0.14.5",
@@ -7486,9 +7500,9 @@
       "integrity": "sha1-9evU+mvShpQD4pqJau1JBEVskSM="
     },
     "vue-good-table": {
-      "version": "2.21.7",
-      "resolved": "https://registry.npmjs.org/vue-good-table/-/vue-good-table-2.21.7.tgz",
-      "integrity": "sha512-1xjMANW/0lHkrCU6nD2/mVs+RebNIyZemguMoY69TqI6xnrA2ZtZ86/Xt1f/EIC1jDw68y7JFINRut3KlAK3EQ==",
+      "version": "2.21.8",
+      "resolved": "https://registry.npmjs.org/vue-good-table/-/vue-good-table-2.21.8.tgz",
+      "integrity": "sha1-b1mRGW8KxHN9IVbUg/GmOpirtI8=",
       "requires": {
         "date-fns": "^2.17.0",
         "diacriticless": "1.0.1",
@@ -7512,6 +7526,24 @@
         "loader-utils": "^1.1.0",
         "vue-hot-reload-api": "^2.3.0",
         "vue-style-loader": "^4.1.0"
+      }
+    },
+    "vue-resize": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/vue-resize/-/vue-resize-1.0.1.tgz",
+      "integrity": "sha512-z5M7lJs0QluJnaoMFTIeGx6dIkYxOwHThlZDeQnWZBizKblb99GSejPnK37ZbNE/rVwDcYcHY+Io+AxdpY952w==",
+      "requires": {
+        "@babel/runtime": "^7.13.10"
+      },
+      "dependencies": {
+        "@babel/runtime": {
+          "version": "7.13.10",
+          "resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.13.10.tgz",
+          "integrity": "sha512-4QPkjJq6Ns3V/RgpEahRk+AGfL0eO6RHHtTWoNNr5mO49G6B5+X6d6THgWEAvTrznU5xYpbAlVKRYcsCgh/Akw==",
+          "requires": {
+            "regenerator-runtime": "^0.13.4"
+          }
+        }
       }
     },
     "vue-select": {

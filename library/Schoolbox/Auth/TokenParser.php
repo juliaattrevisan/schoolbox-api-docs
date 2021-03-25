@@ -35,15 +35,28 @@ class TokenParser
 
 
     /**
+     * A set of candidate claims in the JWT.
+     *
+     * Each will be checked in order for whether it contains a value, and if
+     * that user exists within Schoolbox.
+     *
+     * @var string[]|array
+     */
+    private array $candidateClaims;
+
+
+    /**
      * Constructor
      *
      * @param UserMapper  $userMapper
      * @param JwtVerifier $jwtVerifier
+     * @param array       $candidateClaims
      */
-    public function __construct(UserMapper $userMapper, JwtVerifier $jwtVerifier)
+    public function __construct(UserMapper $userMapper, JwtVerifier $jwtVerifier, array $candidateClaims)
     {
-        $this->userMapper  = $userMapper;
-        $this->jwtVerifier = $jwtVerifier;
+        $this->userMapper      = $userMapper;
+        $this->jwtVerifier     = $jwtVerifier;
+        $this->candidateClaims = $candidateClaims;
     }
 
 
@@ -66,18 +79,32 @@ class TokenParser
         // * "preferred_username" matches a Schoolbox username
         // * "https://cloudwork.id/claims/sis_id" matches an external ID
         // We'll just use the preferred username until I hear otherwise.
-        if (isset($claims['preferred_username'])) {
-            $user = $this->userMapper->findByUsername($claims['preferred_username']);
-            if (!$user) {
-                throw new SchoolboxException\NotFound(
-                    'The token\'s "preferred_username" claim must match a user\'s username'
+
+        $messages = [];
+        foreach ($this->candidateClaims as $candidateClaim) {
+            $candidateClaim = trim($candidateClaim);
+            if (isset($claims[$candidateClaim])) {
+                $user = $this->userMapper->findByUsername($claims[$candidateClaim]);
+                if ($user) {
+                    return $user;
+                }
+                $failureMessage = sprintf(
+                    'The token contained a "%s" claim, but its value did not match a Schoolbox user',
+                    $candidateClaim
+                );
+            } else {
+                $failureMessage = sprintf(
+                    'The token did not contain a "%s" claim',
+                    $candidateClaim
                 );
             }
-            return $user;
+            $messages[] = $failureMessage;
         }
 
-        // No username found in token: can't use it
-        throw new SchoolboxException\NotFound('The token must contain a "preferred_username" claim');
+        // Candidate claims found no user: can't use it
+        throw new SchoolboxException\NotFound(
+            sprintf('No claim in the candidates matched a user (%s)', implode('; ', $messages))
+        );
     }
 
 

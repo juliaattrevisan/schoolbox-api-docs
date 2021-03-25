@@ -318,7 +318,8 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/healthcheck.twig',
                 'data' => array(
-                    'pageCurrent' => 'healthcheck',
+                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
                     'output' => $output
                 )
             )
@@ -349,7 +350,8 @@ class Controller extends Base
                 'template' => '@adminHome/disaster-recovery.twig',
                 'data'     => array_merge(
                     [
-                        'pageCurrent' => 'home',
+                        'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
                         'enabled'     => $isEnabled,
                     ],
                     $enabledData

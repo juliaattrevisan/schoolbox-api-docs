@@ -1,0 +1,49 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container usage-charts row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader">Usage for {{ user.fullname }}</h2>
+        </div>
+
+        <div class="small-12 island">
+            <section class="content">
+                <div id="usage-specific-total-container">
+                    <usage-specific-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserTotalPayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-total>
+                </div>
+            </section>
+        </div>
+
+        <div class="small-12 medium-6 island">
+            <section class="content">
+                <div id="usage-specific-system-container">
+                    <usage-specific-system :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserSystemPayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-system>
+                </div>
+            </section>
+        </div>
+
+        <div class="small-12 medium-6 island">
+            <section class="content">
+                <div id="usage-specific-filetype-container">
+                    <usage-specific-filetype :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFileTypePayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-filetype>
+                </div>
+            </section>
+        </div>
+
+        <div class="small-12 columns">
+            <div id="usage-specific-file-container">
+                <usage-specific-file :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getSpecificUserFilePayload', {userId: user.id}) }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-specific-file>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ CDN_PREFIX }}/javascript/components/usageSpecificTotal.bundle.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/usageSpecificSystem.bundle.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/usageSpecificFiletype.bundle.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/usageSpecificFile.bundle.js?v={{ config.site_version }}"></script>

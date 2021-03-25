@@ -38,4 +38,4 @@ then
 	exit $check;
 fi
 
-sha1sum bower.json > www/javascript/components/bower.checksum;
+sha1sum bower.json > www/static/javascript/components/bower.checksum;

@@ -2,123 +2,123 @@ const jsSrc = {
     main: [
 
         // jQuery
-        'www/javascript/components/jquery/dist/jquery.js',
+        'www/static/javascript/components/jquery/dist/jquery.js',
 
         // jQuery Validation
-        'www/javascript/components/jquery-validation/dist/jquery.validate.js',
-        'www/javascript/jquery.alaressValidate.js',
+        'www/static/javascript/components/jquery-validation/dist/jquery.validate.js',
+        'www/static/javascript/jquery.alaressValidate.js',
 
         // jQuery UI
         // dependencies
-        'www/javascript/components/jquery-ui/ui/version.js',
-        'www/javascript/components/jquery-ui/ui/plugin.js',
-        'www/javascript/components/jquery-ui/ui/widget.js',
-        'www/javascript/components/jquery-ui/ui/data.js',
-        'www/javascript/components/jquery-ui/ui/disable-selection.js',
-        'www/javascript/components/jquery-ui/ui/ie.js',
-        'www/javascript/components/jquery-ui/ui/keycode.js',
-        'www/javascript/components/jquery-ui/ui/safe-active-element.js',
-        'www/javascript/components/jquery-ui/ui/safe-blur.js',
-        'www/javascript/components/jquery-ui/ui/scroll-parent.js',
-        'www/javascript/components/jquery-ui/ui/widgets/mouse.js',
+        'www/static/javascript/components/jquery-ui/ui/version.js',
+        'www/static/javascript/components/jquery-ui/ui/plugin.js',
+        'www/static/javascript/components/jquery-ui/ui/widget.js',
+        'www/static/javascript/components/jquery-ui/ui/data.js',
+        'www/static/javascript/components/jquery-ui/ui/disable-selection.js',
+        'www/static/javascript/components/jquery-ui/ui/ie.js',
+        'www/static/javascript/components/jquery-ui/ui/keycode.js',
+        'www/static/javascript/components/jquery-ui/ui/safe-active-element.js',
+        'www/static/javascript/components/jquery-ui/ui/safe-blur.js',
+        'www/static/javascript/components/jquery-ui/ui/scroll-parent.js',
+        'www/static/javascript/components/jquery-ui/ui/widgets/mouse.js',
         // interactions
-        'www/javascript/components/jquery-ui/ui/widgets/draggable.js',
-        'www/javascript/components/jquery-ui/ui/widgets/resizable.js',
-        'www/javascript/components/jquery-ui/ui/widgets/sortable.js',
+        'www/static/javascript/components/jquery-ui/ui/widgets/draggable.js',
+        'www/static/javascript/components/jquery-ui/ui/widgets/resizable.js',
+        'www/static/javascript/components/jquery-ui/ui/widgets/sortable.js',
 
         // jQueryUI Touch Punch
-        'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
+        'www/static/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
 
         // Reforge The Shards of Foundation
         // Choose the specific things we are utilising, rather
         // than just including everything
         // Note all of foundations has been placed in javascript/shared to remove references to Modernizr
-        'www/javascript/shared/foundation/foundation.js',
-        'www/javascript/shared/foundation/foundation.accordion.js',
-        'www/javascript/shared/foundation/foundation.alert.js',
-        'www/javascript/shared/foundation/foundation.equalizer.js',
-        'www/javascript/shared/foundation/foundation.offcanvas.js',
-        'www/javascript/shared/foundation/foundation.reveal.js',
-        'www/javascript/shared/foundation/foundation.slider.js',
-        'www/javascript/shared/foundation/foundation.tab.js',
-        'www/javascript/shared/foundation/foundation.tooltip.js',
-        'www/javascript/shared/foundation/foundation.dropdown.js',
-        'www/javascript/shared/jquery.tab-activator.js',
-        'www/javascript/shared/jquery.collapsable.js',
+        'www/static/javascript/shared/foundation/foundation.js',
+        'www/static/javascript/shared/foundation/foundation.accordion.js',
+        'www/static/javascript/shared/foundation/foundation.alert.js',
+        'www/static/javascript/shared/foundation/foundation.equalizer.js',
+        'www/static/javascript/shared/foundation/foundation.offcanvas.js',
+        'www/static/javascript/shared/foundation/foundation.reveal.js',
+        'www/static/javascript/shared/foundation/foundation.slider.js',
+        'www/static/javascript/shared/foundation/foundation.tab.js',
+        'www/static/javascript/shared/foundation/foundation.tooltip.js',
+        'www/static/javascript/shared/foundation/foundation.dropdown.js',
+        'www/static/javascript/shared/jquery.tab-activator.js',
+        'www/static/javascript/shared/jquery.collapsable.js',
 
         // Side Navigation
         // This includes the Flyout menu, on user profile drop down
         // Also fixes touch on side navigation and adds scroll to top
-        'www/javascript/shared/sidemenu/jquery.flyout.js',
-        'www/javascript/shared/sidemenu/jquery.touch-menu.js',
-        'www/javascript/shared/sidemenu/jquery.scroll-to.js',
+        'www/static/javascript/shared/sidemenu/jquery.flyout.js',
+        'www/static/javascript/shared/sidemenu/jquery.touch-menu.js',
+        'www/static/javascript/shared/sidemenu/jquery.scroll-to.js',
 
         // CKEditor
-        'www/javascript/shared/editor/jquery.modal.js',
-        'www/javascript/shared/editor/jquery.proxy-replacement.js',
-        'www/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
+        'www/static/javascript/shared/editor/jquery.modal.js',
+        'www/static/javascript/shared/editor/jquery.proxy-replacement.js',
+        'www/static/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
 
         // DateTime
         'node_modules/moment/moment.js',
 
         // Files And Resource Browser
-        'www/socialstream/browser/browser.js',
-        'www/javascript/components/dropzone/dist/dropzone.js',
+        'www/static/socialstream/browser/browser.js',
+        'www/static/javascript/components/dropzone/dist/dropzone.js',
 
         // Magnific Popup Lightbox
-        'www/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
+        'www/static/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
 
         // Notifier
-        'www/javascript/shared/notifications/jquery.notifier.js',
+        'www/static/javascript/shared/notifications/jquery.notifier.js',
 
         // Confirm Dialog
-        'www/javascript/shared/jquery.confirm-dialog.js',
+        'www/static/javascript/shared/jquery.confirm-dialog.js',
 
         // Data tables
-        'www/javascript/components/datatables/media/js/jquery.dataTables.min.js',
-        'www/javascript/components/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
+        'www/static/javascript/components/datatables/media/js/jquery.dataTables.min.js',
+        'www/static/javascript/components/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
 
         // Toasts, popups to notify something has happened
-        'www/javascript/shared/jquery.toast-timeout.js',
+        'www/static/javascript/shared/jquery.toast-timeout.js',
 
         // File uploading
-        'www/javascript/resource/jquery.resourceAttach.js',
+        'www/static/javascript/resource/jquery.resourceAttach.js',
 
         // Image/File previewing
-        'www/javascript/preview/preview.js',
+        'www/static/javascript/preview/preview.js',
 
         // Course selector
-        'www/javascript/shared/course/jquery.course-selector.js',
+        'www/static/javascript/shared/course/jquery.course-selector.js',
 
         // Date syncing
-        'www/javascript/shared/alaress-datetime-picker/jquery.sync-dates.js',
+        'www/static/javascript/shared/alaress-datetime-picker/jquery.sync-dates.js',
 
         // Flatpickr date selector
         'node_modules/flatpickr/dist/flatpickr.js',
 
         // Loads Flatpickr into a modal
-        'www/javascript/shared/alaress-datetime-picker/attacher.datepicker.js',
-        'www/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
-        'www/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
+        'www/static/javascript/shared/alaress-datetime-picker/attacher.datepicker.js',
+        'www/static/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
+        'www/static/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
 
         // This is a Webpack-built module for strtotime
-        'www/javascript/components/strtotime.bundle.js',
+        'www/static/javascript/components/strtotime.bundle.js',
 
         // Allow deference of form submit actions
-        'www/javascript/shared/jquery.stallSubmit.js',
+        'www/static/javascript/shared/jquery.stallSubmit.js',
 
         // Random Scripts
         // Various javascripts that are so tiny they didn't get
         // their own files/plugins
-        'www/javascript/shared/miscellaneous.js',
+        'www/static/javascript/shared/miscellaneous.js',
 
         //Maths formulas
-        //'www/javascript/math/jscurry-0.3.0.js',
-        //'www/javascript/math/jqmath-0.4.0.js'
+        //'www/static/javascript/math/jscurry-0.3.0.js',
+        //'www/static/javascript/math/jqmath-0.4.0.js'
 
         // Feature tours
-        'www/javascript/components/intro.js/intro.js',
-        'www/javascript/shared/tour/tour.js',
+        'www/static/javascript/components/intro.js/intro.js',
+        'www/static/javascript/shared/tour/tour.js',
 
         // Lodash
         'node_modules/lodash/lodash.js',
@@ -126,15 +126,15 @@ const jsSrc = {
         // MS Immersive Reader
         'node_modules/@microsoft/immersive-reader-sdk/lib/immersive-reader-sdk.js',
 
-        'www/javascript/shared/calendar/jquery.getExportCalendarLink.js'
+        'www/static/javascript/shared/calendar/jquery.getExportCalendarLink.js'
     ],
     masonry: [
         // Colour handling
-        'www/javascript/components/spectrum/spectrum.js',
+        'www/static/javascript/components/spectrum/spectrum.js',
 
         // homepage editing
-        'www/javascript/shared/masonry/jquery.masonry.js',
-        'www/javascript/shared/masonry/jquery.masonry.spectrum.js'
+        'www/static/javascript/shared/masonry/jquery.masonry.js',
+        'www/static/javascript/shared/masonry/jquery.masonry.spectrum.js'
     ],
     fullcalendar: [
         // Required for the datepicker calendar for now
@@ -148,10 +148,10 @@ const jsSrc = {
     ]
 };
 const jsDest = {
-    main: 'www/javascript/components/<%= pkg.name %>.min.js',
-    masonry: 'www/javascript/components/<%= pkg.name %>-masonry.min.js',
-    fullcalendar: 'www/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
-    vue: 'www/javascript/components/<%= pkg.name %>-vue.min.js'
+    main: 'www/static/javascript/components/<%= pkg.name %>.min.js',
+    masonry: 'www/static/javascript/components/<%= pkg.name %>-masonry.min.js',
+    fullcalendar: 'www/static/javascript/components/<%= pkg.name %>-fullcalendar.min.js',
+    vue: 'www/static/javascript/components/<%= pkg.name %>-vue.min.js'
 };
 
 module.exports = function (grunt) {
@@ -210,11 +210,11 @@ module.exports = function (grunt) {
             }
         },
         clean: {
-            js: ['www/javascript/components/schoolbox*.min.js*']
+            js: ['www/static/javascript/components/schoolbox*.min.js*']
         },
         watch: {
             scripts: {
-                files: ['www/javascript/**/*.js', '!www/javascript/components/*'],
+                files: ['www/static/javascript/**/*.js', '!www/static/javascript/components/*'],
                 tasks: 'concat',
                 options: {
                     interrupt: true

@@ -12,6 +12,7 @@ use Alaress\Image;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
@@ -95,13 +96,10 @@ try {
     $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
 } catch (Exception $e) {
-    $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
+    // redirect to the placeholder
+    /** @var PrefixGenerator $cdnPrefixGenerator */
+    $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
 
-    if (is_readable($placeHolderFile)) {
-        header('Content-type: image/png');
-        readfile($placeHolderFile);
-        exit;
-    } else {
-        SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
-    }
+    // Temporary Redirect: eventually someone will upload a logo
+    $cdnPrefixGenerator->redirectTemporary('/images' . $logoSizes[$logo][$size][2]);
 }

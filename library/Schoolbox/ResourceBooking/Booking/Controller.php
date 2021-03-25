@@ -22,6 +22,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\Collection;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -142,8 +143,8 @@ class Controller extends Base
                     'item'              => $booking,
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
-                    'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
-                    'cancelCallbackUrl' => $this->session->getHistory(),
+                    'returnUrl'         => $this->getRequest()->query['returnUrl'],
+                    'cancelReturnUrl'   => $this->session->getHistory(),
                     'allowOverride'     => $booking->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
                     'validationData'    => [
@@ -245,36 +246,36 @@ class Controller extends Base
             $code = 400;
         }
 
+        /* Append the booking's id to the url, for the calling module to
+         * process in whatever way it needs. This allows a decoupling between
+         * Resource Booking any any modules that use it.
+         *
+         * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
+         * (name/startdate/enddate/details)
+         */
+        $returnUrl = null;
+
+        if ('' !== ($this->getRequest()->post['returnUrl'] ?? '')) {
+            $returnUrl = Redirect::decode($this->getRequest()->post['returnUrl']);
+        }
+
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->status->setCode($code);
-
-            /* Append the booking's id to the url, for the calling module to
-             * process in whatever way it needs. This allows a decoupling between
-             * Resource Booking any any modules that use it.
-             *
-             * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
-             * (name/startdate/enddate/details)
-             */
-            $callbackUrl = '';
-
-            if (strlen($this->getRequest()->post['callbackUrl'])) {
-                $callbackUrl = $this->getRequest()->post['callbackUrl'];
-            }
 
             $this->getResponse()->content->set(
                 [
                     'format' => 'json',
                     'data'   => [
-                        'item'        => $bookingList,
-                        'errors'      => $errors,
-                        'callbackUrl' => $callbackUrl,
+                        'item'      => $bookingList,
+                        'errors'    => $errors,
+                        'returnUrl' => (string)$returnUrl,
                     ],
                 ]
             );
         } else {
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
-            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory());
+            $this->getResponse()->redirect->afterPost($returnUrl ?? $this->getSession()->getHistory());
         }
     }
 
@@ -366,10 +367,10 @@ class Controller extends Base
          * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
          * (name/startdate/enddate/details)
          */
-        $callbackUrl = '';
+        $returnUrl = null;
 
-        if (strlen($this->getRequest()->post['callbackUrl'])) {
-            $callbackUrl = $this->getRequest()->post['callbackUrl'];
+        if (strlen($this->getRequest()->post['returnUrl'])) {
+            $returnUrl = Redirect::decode($this->getRequest()->post['returnUrl']);
         }
 
         if ($this->getRequest()->isXhr()) {
@@ -378,9 +379,9 @@ class Controller extends Base
                 [
                     'format' => 'json',
                     'data'   => [
-                        'item'        => $item,
-                        'errors'      => $errors,
-                        'callbackUrl' => $callbackUrl,
+                        'item'      => $item,
+                        'errors'    => $errors,
+                        'returnUrl' => $returnUrl,
                     ],
                 ]
             );
@@ -388,7 +389,7 @@ class Controller extends Base
             // Redirect back to previous page, or read page if not set.
             // (let's have a better interface than backToTheFuture too)
             // Consider storing redirect URL in form or GET?
-            $this->getResponse()->redirect->afterPost($this->getSession()->getHistory(2));
+            $this->getResponse()->redirect->afterPost($returnUrl ?? $this->getSession()->getHistory(2));
         }
     }
 
@@ -698,8 +699,8 @@ class Controller extends Base
                 'data'     => [
                     'item'              => $item,
                     'campusList'        => $this->getCampusList(),
-                    'callbackUrl'       => $this->getRequest()->query['callbackUrl'],
-                    'cancelCallbackUrl' => $this->session->getHistory(),
+                    'returnUrl'         => $this->getRequest()->query['returnUrl'],
+                    'cancelReturnUrl'   => $this->session->getHistory(),
                     'allowOverride'     => $item->getResource()->canUserModerateThisItem($this->getUser()),
                     'currentTerm'       => $this->getTermMapper()->findForToday(),
                     'validationData'    => [
@@ -796,7 +797,7 @@ class Controller extends Base
      */
     protected function getStatusChangeCallbackUrl()
     {
-        return $this->request->post['callbackUrl'] ?: $this->getSession()->getHistory();
+        return $this->request->post['returnUrl'] ?: $this->getSession()->getHistory();
     }
 
     /**

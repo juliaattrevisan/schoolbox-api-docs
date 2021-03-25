@@ -184,7 +184,7 @@ function renderStudent(
         } else {
             $externalUser['AlertMessages'] = empty(trim($externalUser['AlertMessage'])) ? [] : [$externalUser['AlertMessage']];
         }
-        if (strlen(trim($externalUser["CourtOrderType"])) !== 0) {
+        if (trim($externalUser["CourtOrderType"]) !== '') {
             $externalUser['AlertMessages'][] = "Court Order - " . trim($externalUser["CourtOrderType"]);
         }
     }
@@ -529,38 +529,47 @@ function renderStudent(
      */
     $showClasses = $showDetails && !$student->getHideTimetable();
 
+    /* Decide whether the current user can comment on this student's learning moments
+     *
+     * Staff and student can always comment
+     * Parents can comment if the config allows
+     * Everyone else cannot
+     */
+    $learningMomentCanComment = ($sessionUser->getRole()->isStaff() || $sessionUser->getRole()->isStudent() || ($sessionUser->getRole()->isParent() && $config->get('evidence_parent_comment')));
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
             'user/student.twig',
             [
-                'session'            => $_SESSION,
-                'user'               => $student,
-                'externalUser'       => $externalUser,
-                'showPastoral'       => $showPastoral,
-                'eportfolioAuth'     => $authenticator->canView(),
-                'hideContacts'       => $hideContacts,
-                'showClasses'        => $showClasses,
-                'now'                => Alaress_Date_Format::now(),
-                'boarderType'        => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
-                'contacts'           => $contacts,
-                'subjects'           => $subjects,
-                'customButtons'      => $customButtons,
-                'groups'             => $groups,
-                'formTeacher'        => $formTeacher,
-                'tutorTeacher'       => $tutorTeacher,
-                'hohTeacher'         => $hohTeacher,
-                'coordTeacher'       => $coordTeacher,
-                'studentCoach'       => $studentCoach,
-                'isParentOfStudent'  => $isParentOfStudent,
-                'isPrimaryCarer'     => $isPrimaryCarer,
-                'allTeacherEmails'   => $allTeacherEmails,
-                'pdStates'           => $pdMapper->getStates(),
-                'pd'                 => $pd,
-                'emailSeparator'     => AbstractMailer::implodeGlue(),
-                'showDetails'        => $showDetails,
-                'showEmail'          => $showEmails,
-                'travelLogs'         => $travelLogs,
+                'session'                  => $_SESSION,
+                'user'                     => $student,
+                'externalUser'             => $externalUser,
+                'showPastoral'             => $showPastoral,
+                'eportfolioAuth'           => $authenticator->canView(),
+                'hideContacts'             => $hideContacts,
+                'showClasses'              => $showClasses,
+                'now'                      => Alaress_Date_Format::now(),
+                'boarderType'              => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
+                'contacts'                 => $contacts,
+                'subjects'                 => $subjects,
+                'customButtons'            => $customButtons,
+                'groups'                   => $groups,
+                'formTeacher'              => $formTeacher,
+                'tutorTeacher'             => $tutorTeacher,
+                'hohTeacher'               => $hohTeacher,
+                'coordTeacher'             => $coordTeacher,
+                'studentCoach'             => $studentCoach,
+                'isParentOfStudent'        => $isParentOfStudent,
+                'isPrimaryCarer'           => $isPrimaryCarer,
+                'allTeacherEmails'         => $allTeacherEmails,
+                'pdStates'                 => $pdMapper->getStates(),
+                'pd'                       => $pd,
+                'emailSeparator'           => AbstractMailer::implodeGlue(),
+                'showDetails'              => $showDetails,
+                'showEmail'                => $showEmails,
+                'travelLogs'               => $travelLogs,
+                'learningMomentCanComment' => $learningMomentCanComment
             ]
         )
     );

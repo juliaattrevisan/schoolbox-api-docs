@@ -1,0 +1,77 @@
+/* Shows a list of Units for a particular Course
+ */
+ul.unit-list {
+    margin-bottom: 1rem;
+
+    li {
+        list-style: none;
+        padding: 0.25rem 0 0.25rem 0.75rem;
+
+        @media #{$medium-down} {
+            padding-left: 1rem;
+        }
+
+        @media #{$small-only} {
+            padding-left: 1.25rem;
+        }
+    }
+}
+
+/* Overpower foundation rules
+ *
+ * Positioning for the little ajax spinny when ajaxing
+ * search results for a course
+ */
+input.course-selector-loader:focus {
+    background-repeat:no-repeat;
+    background-position: 99% 50%;
+
+    &.course-selector-search-loading {
+        background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
+        background-size: 16px 16px;
+    }
+}
+
+.course-new-unit-icon {
+    display: block;
+    margin-top: 0.5rem;
+}
+
+fieldset {
+    transition: opacity 360ms cubic-bezier(0.2,1,0,1);
+}
+
+fieldset[disabled] {
+    opacity: 0.9;
+}
+
+input[type="submit"][readonly] {
+    background-color: css-change-color($content-ui-submit-background, $alpha: 0.4);
+    background-image: url("#{$cdn-prefix}/images/foundation/preloader.gif");
+    background-repeat: no-repeat;
+    background-size: 1rem;
+    background-position: 0.75rem 50%;
+}
+
+/* Label elements with no text content
+ */
+.course-import {
+    &.icon-next {
+        padding-top: 1.75rem;
+
+        &:before {
+            padding-right: 0;
+        }
+    }
+}
+
+.course-use-unit-date {
+    margin: -0.8rem 0 1rem 0;
+    display: block;
+}
+// Medium down
+@media #{$small-only} {
+    .course-use-unit-date {
+        margin: 0 0 1rem 0;
+    }
+}

@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\File;
 
+use League\Flysystem\FilesystemInterface;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\File\Mimetype;
 
@@ -196,5 +197,27 @@ trait StorableTrait
     public function readStream()
     {
         return $this->storage->readStream();
+    }
+
+    /**
+     * Get this file's filesystem.
+     *
+     * @inherited from Flysystem\File
+     * @return FilesystemInterface
+     */
+    public function getFilesystem()
+    {
+        return $this->storage->getFilesystem();
+    }
+
+    /**
+     * Get the path to the file on its filesystem.
+     *
+     * @inherited from Flysystem\File
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->storage->getPath();
     }
 }

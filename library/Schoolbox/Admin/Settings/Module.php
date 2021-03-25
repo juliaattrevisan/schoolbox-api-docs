@@ -25,6 +25,7 @@ class Module extends \Alaress\Module\Module
     protected function registerRoutes(): void
     {
         $isSuper = new Rule\IsSuperuser();
+        $this->register('GET', '/search', 'searchSettings', $isSuper);
         $this->register('GET', '{/typeLabel}', 'getSettings', $isSuper);
         $this->register('POST', '/{typeLabel}', 'postSettings', $isSuper);
     }

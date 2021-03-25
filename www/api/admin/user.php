@@ -95,8 +95,6 @@ $setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMappe
                 array_map('trim', explode(',', $getValues['campus']))
             )
         );
-    } else {
-        $user->setCampusCollection($campusMapper->createCollection());
     }
 
     if (isset($getValues['display_grade_graph'])) {
@@ -145,7 +143,7 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
         }
 
         // Enable new user by default
-        $user = $setUserFields($userMapper->createModel(), $_GET)
+        $user = $setUserFields($userMapper->createModel()->setCampusCollection($campusMapper->createCollection()), $_GET)
             ->setWebmail(false)
             ->setUseInternalMail(false)
             ->setEnabled(true);

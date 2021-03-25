@@ -29,7 +29,7 @@
                                 {% if numProfiles %}
                                     <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-export button">Export Relationship Data</a>
                                 {% else %}
-                                    <a href="/adminv2/import/profile/relationship.csv" class="icon-download button">Download Relationship Template</a>
+                                    <a href="{{ CDN_PREFIX }}/adminv2/import/profile/relationship.csv" class="icon-download button">Download Relationship Template</a>
                                 {% endif %}
                             </li>
                             <li>

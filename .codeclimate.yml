@@ -52,5 +52,5 @@ exclude_patterns:
   - "updates/"
   - "debian/"
   - "www/"
-  - "!www/css/**/*"
+  - "!www/static/css/**/*"
   - "tools/"

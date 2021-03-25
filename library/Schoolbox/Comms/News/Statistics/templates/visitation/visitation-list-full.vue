@@ -44,7 +44,7 @@ export default {
                 {
                     label: 'Last Visited',
                     field: 'occursAt.absolute',
-					formatFn: this.formatLastVisited
+                    formatFn: this.formatLastVisited
                 },
             ],
             rows: [] //Will hold the row data once it's loaded

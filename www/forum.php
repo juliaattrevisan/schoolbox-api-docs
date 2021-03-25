@@ -93,7 +93,7 @@ if (!$pageNum) {
 }
 
 $threadPerPage = FORUM_THREADS_PER_PAGE;
-$totalPages = ceil(count($threadList) / $threadPerPage);
+$totalPages = is_array($threadList) ? ceil(count($threadList) / $threadPerPage) : 0;
 $threadIndex = $threadPerPage * ($pageNum - 1);
 
 $this->setVar(array(

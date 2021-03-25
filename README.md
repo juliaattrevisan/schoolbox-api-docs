@@ -16,13 +16,18 @@ This file is internal use and is not shipped to clients.
 * docs - documentation for developers
 * library - Schoolbox code base
 * node_modules - directory for external libraries loaded via NPM
+* resources - directory for storing static assets which may be compiled or used
+  by scripts, and which do not directly relate to a module within `library/`
 * sql - initial sql schema configuration for new installations
 * templates - default and per client skins
 * test - PHP and other tests (not deployed to clients)
 * tools - Build, update and maintenance tools. Also includes cli scripts for sync.
 * updates - per release update files, primarily sql schema changes
-* www - files and scripts accessible directly via the web
+* www - web root directory
+* www/static - web root directory for static assets (JS, CSS, images) only
 * vendor - directory for external libraries loaded via Composer
+* vue - directory for storing Vue components that are not directly related to a
+  module within `library/`
 
 ## Installation
 
@@ -34,7 +39,7 @@ This file is internal use and is not shipped to clients.
 * Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github
 ```
   git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox (for example git clone git@github.com:low613/schoolbox.git schoolbox)
-  cd schoolbox 
+  cd schoolbox
   git remote add upstream git@github.com:alaress/schoolbox.git
   git fetch upstream
   git checkout origin/master
@@ -105,7 +110,7 @@ For full information on the build process of making a APT package and deploying 
   * [Meriden: Pastoral](./library/Custom/Meriden/Pastoral/README.md)
 * Javascript
   * [Vue](./docs/vue/00-intro.md)
-  * [Selectize](./www/css/core/selectize/README.md)
+  * [Selectize](./www/static/css/core/selectize/README.md)
 * Custom Templates:
   * [For Aura modules](./docs/custom/custom-templates-for-aura-modules.md)
   * [Outside Aura modules](./docs/custom/custom-templates-outside-aura-modules.md)

@@ -16,7 +16,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
-$path = '/images/core/icons/activity-icons-64x64px.png';
+$path = '/static/images/icons/activity-icons-64x64px.png';
 
 $icon = isset($_GET['icon']) ? $_GET['icon'] : '';
 $size = isset($_GET['size']) ? $_GET['size'] : 32;

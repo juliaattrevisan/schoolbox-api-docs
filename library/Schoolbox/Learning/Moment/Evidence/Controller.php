@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -254,7 +255,7 @@ class Controller extends Base
                 $evidenceCollection->map(
                     new Translator\ModelToArray\Base(
                         new User\Translator\Author\ModelToArray(),
-                        new Storage\Translator\ModelToArray(),
+                        new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
                         new ScrubAdapter(),
                     ),
                 )
@@ -320,7 +321,7 @@ class Controller extends Base
 
         $responseTranslator = new Translator\ModelToArray\Base(
             new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
         $this->response->content->set(
@@ -450,7 +451,8 @@ class Controller extends Base
             $this->router,
             $this->authorizer,
             $this->getUser(),
-            $this->commentMapper
+            $this->commentMapper,
+            new PrefixGenerator($this->getConfigLoader()),
         ))->buildWithComments($commentLimit);
     }
 

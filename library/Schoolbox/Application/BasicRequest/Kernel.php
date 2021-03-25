@@ -10,6 +10,7 @@ namespace Schoolbox\Application\BasicRequest;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Psr\Log\NullLogger;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
@@ -175,6 +176,7 @@ class Kernel extends WebKernelAbstract
             )
         );
 
+        // Localisation
         $di->set(
             'l10n',
             $di->lazy(
@@ -183,6 +185,12 @@ class Kernel extends WebKernelAbstract
                     return $stoneFactory->build($di->get('mapperFactory')->get(L10nMapper::class));
                 }
             )
+        );
+
+        // CDN prefix generator
+        $di->set(
+            'cdnPrefixGenerator',
+            $di->lazyNew(PrefixGenerator::class, ['config' => $di->lazyGet('config')])
         );
 
         // Enable mappers to be injectable, but instantiated only when required

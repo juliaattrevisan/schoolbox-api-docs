@@ -269,31 +269,6 @@ class Controller extends Base
     }
 
     /**
-     * Download CSV templates
-     * @param string $template
-     * @throws \Exception
-     */
-    public function getUploadTemplate($template)
-    {
-        $filename = "./fixtures/import/{$template}.csv";
-
-        if (file_exists($filename)) {
-            header('Content-Description: File Transfer');
-            header('Content-Type: text/csv');
-            header('Content-Disposition: attachment; filename="' . $template . '.csv"');
-            header('Expires: 0');
-            header('Cache-Control: must-revalidate');
-            header('Pragma: public');
-            header('Content-Length: ' . filesize($filename));
-
-            readfile($filename);
-            exit;
-        }
-
-        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
-    }
-
-    /**
      * Insert an attach zone into the template
      *
      * @param Collection $attachments

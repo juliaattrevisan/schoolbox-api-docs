@@ -64,7 +64,7 @@ tar xzf ../bower-artifact/"$branch"-bower.tar.gz;
 
 echo "Validating checksums";
 checksum=`sha1sum bower.json`;
-if [ "$checksum" != "`cat www/javascript/components/bower.checksum`" ];
+if [ "$checksum" != "`cat www/static/javascript/components/bower.checksum`" ];
 then
         echo "Bower checksum does not match";
         exit 1;

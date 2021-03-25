@@ -73,6 +73,7 @@
             }
         }],
         resources: {{ resources|json_encode|raw }},
+        returnUrl: '{{ RETURN_URL.name }}={{ RETURN_URL.current }}'
     };
 </script>
 {% autoescape 'js' %}
@@ -90,4 +91,4 @@
     </section>
 </div>
 
-<script type="text/javascript" src="/javascript/components/resourceBookingCategoryCalendar.bundle.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/resourceBookingCategoryCalendar.bundle.js"></script>

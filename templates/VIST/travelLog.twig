@@ -27,7 +27,7 @@
             {% set type = log.event_type|capitalize %}
             <tr>
                 <td>
-                    <img src="/images/VIST/{{ log.icon }}"
+                    <img src="{{ CDN_PREFIX }}/images/VIST/{{ log.icon }}"
                          title="{{ type }}, {{ direction }}"
                          alt="{{ type }}, {{ direction }}"
                          style="height: 24px;" />

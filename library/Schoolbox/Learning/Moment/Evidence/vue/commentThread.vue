@@ -8,6 +8,7 @@ import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
+import cdnPrefixMixin from '@schoolbox/cdn-prefix-mixin';
 
 export default {
     components: {
@@ -16,6 +17,7 @@ export default {
         Toast,
         RevealModal
     },
+    mixins: [cdnPrefixMixin],
     props: {
         thread: {
             type: Object,
@@ -31,7 +33,7 @@ export default {
         },
         createThreadEndpoint: {
             type: String,
-        }
+        },
     },
     data() {
         return {
@@ -39,7 +41,7 @@ export default {
             pendingComment: '',
             saveInProgress: false,
             commentIndexToDelete: null,
-            editorUrl: "/javascript/ckeditor/ckeditor.js",
+            editorUrl: this.cdnPrefix + "/javascript/ckeditor/ckeditor.js",
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
             isCKEditorReady: false,
@@ -55,7 +57,7 @@ export default {
                 ],
                 contentsCss: [
                     '/css/core/skin.css.php',
-                    '/css/core/editor.css',
+                    this.cdnPrefix + '/css/core/editor.css',
                 ],
                 height: '4rem',
                 resize_enabled: false,
@@ -125,6 +127,15 @@ export default {
          */
         allCommentsLoaded() {
             return this.commentTotalCount === this.commentLoadedCount;
+        },
+
+        /**
+         * Whether the current user is allowed to comment
+         *
+         * @returns {Boolean}
+         */
+        canComment() {
+            return window.learningEvidenceFeedConfig.canComment;
         },
 
         /**
@@ -286,14 +297,16 @@ export default {
         <section id="threads-section" class="discussion">
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
-                <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
-                <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
-                    <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
-                    <a class="button submit"
-                    @click="postComment"
-                    :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
-                </div>
+                <template v-if="canComment">
+                    <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
+                    <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
+                    <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">
+                        <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
+                        <a class="button submit"
+                        @click="postComment"
+                        :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
+                    </div>
+                </template>
                 <template v-if="hasComments">
                     <ul class="information-list">
                         <li class="actions-small-1" v-for="(comment, index) in comments" :key="index">

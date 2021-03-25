@@ -1,0 +1,215 @@
+#start_date,
+#finish_date {
+    margin: 0;
+}
+
+.calendar-list {
+    @include information-list;
+
+    .column, .columns {
+        @extend .no-pad;
+    }
+
+    label {
+        @extend .content;
+    }
+
+    li.row {
+        cursor: pointer;
+        @extend .content;
+    }
+}
+
+/* Destroy FullCalendar icons...
+ */
+.fc-icon-chevron-right:before,
+.fc-icon-chevron-left:before{
+    font-family: $font-family-icon;
+}
+/* Add SB icons instead
+ */
+.fc-button .fc-icon{
+  font-family: $font-family-icon;
+  font-size: 1rem !important;
+}
+
+.fc-icon-chevron-left:before{
+    content: '\e655' !important;
+}
+
+.fc-icon-chevron-right:before{
+    content: '\e64b' !important;
+}
+
+/* Force FullCalendar control buttons to absorb
+ * Skin Builder choices
+ */
+.fc-toolbar {
+    border: 1px solid #ededed;
+    margin: 0 !important;
+    padding: 1rem;
+
+    .fc-left .fc-button-group {
+        margin: 0 !important;
+    }
+
+    .fc-center {
+      flex-basis: 80%;
+      margin: 0 1rem;
+      padding: 0 !important;
+
+      h2 {
+        font-size: 1.125rem;
+      }
+    }
+
+    .fc-right .fc-button-group {
+        margin: 0;
+    }
+
+    button {
+        @include button-dimensions();
+        color: $content-ui-foreground;
+        background-color: $content-ui-background;
+        border-radius: 0;
+        padding: 0 .875rem !important;
+        margin: 0 1px 0 0 !important;
+
+        &.fc-button-primary:disabled {
+          @extend .disabled;
+        }
+        &:hover, &.fc-button-active {
+          background-color: $content-ui-hover !important;
+          color: $content-ui-foreground !important;
+        }
+    }
+}
+
+.fc-unthemed th,
+.fc-unthemed td,
+.fc-unthemed thead,
+.fc-unthemed tbody,
+.fc-unthemed .fc-divider,
+.fc-unthemed .fc-row,
+.fc-unthemed .fc-content,
+.fc-unthemed .fc-popover,
+.fc-unthemed .fc-list-view,
+.fc-unthemed .fc-list-heading td,
+.fc .fc-row .fc-content-skeleton td {
+    border-color: #ededed !important;
+}
+
+.fc-widget-header span {
+    display: block;
+    font-size: .875rem;
+    margin: .25rem;
+}
+
+.fc-day-header {
+    font-weight: 400 !important;
+    text-transform: uppercase !important;
+}
+
+.fc-day-top {
+    text-align: center;
+    span {
+        float: none !important;
+    }
+}
+
+.fc-day-grid-event {
+    padding: 3px 2px !important;
+}
+
+.fc-event {
+    border-radius: 0 !important;
+    color: $black !important;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+}
+
+@media #{$medium-down} {
+    .fc-toolbar {
+        flex-direction: column;
+        .fc-center {
+            margin: 1rem;
+        }
+    }
+    .fc-right {
+        width: 100%;
+    }
+    .fc-center h2 {
+        font-size: 1rem;
+    }
+    .fc-right .fc-button-group {
+        width: 100%;
+        button {
+            padding: .5rem !important;
+        }
+    }
+}
+
+.fc-custom-group.row .small-4.columns {
+  padding-left: 0;
+  @-moz-document url-prefix() {
+    padding-right: 2.5rem;
+  }
+}
+.fc-custom-group.row {
+  margin-left: 0 !important;
+  width: 100% !important;
+}
+
+.fc-custom-group .input-group {
+  flex-wrap: nowrap !important;
+}
+
+@media #{$small-only} {
+  .fc-custom-group div:last-child {
+    padding-right: 0;
+  }
+}
+
+.fc-custom-group.row {
+  padding-left: 0;
+  @media #{$medium-up} {
+    top: .5rem;
+    position: relative;
+  }
+}
+
+// FullCalendar homepage and dashboard components
+.component-container {
+  // Otherwise it has an irritating 1px border
+  .fc-list-view {
+    border-width: 0;
+  }
+
+  // Explicitly define the background color, because it's prone to a < 1px white right border. Go figure
+  .fc-view-container {
+    background-color: $body-bg;
+  }
+
+  // Remove the empty state: use our own state messages instead
+  .fc-list-empty-wrap2 {
+    display: none;
+  }
+
+  // The entire event is clickable
+  .fc-list-item {
+    cursor: pointer;
+  }
+}
+
+/* Dashboard component indents this heading for some reason
+ */
+.Schoolbox_Calendar_Component_Dashboard_Controller {
+  .fc-widget-header {
+    padding: 0;
+
+    .fc-list-heading-main {
+      @extend h2;
+      @extend .subheader;
+    }
+  }
+}

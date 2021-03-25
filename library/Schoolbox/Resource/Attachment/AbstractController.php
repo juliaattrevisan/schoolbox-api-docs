@@ -114,6 +114,7 @@ abstract class AbstractController implements ControllerInterface
     {
         $page->setAjax();
         $page->setFile(TEMPLATE_content, "/resources/{$this->template}.html");
+        $page->injectGlobalVars();
 
         $this->pparse($page);
 
