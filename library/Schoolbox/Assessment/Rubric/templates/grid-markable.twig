@@ -242,15 +242,17 @@
                         letterGrades
                     );
 
-                // Don't change the scaled mark if the capability now has a null value,
-                // AND a descriptor was selected.
-                // The capability's scaled mark should only be null if all of its
-                // indicator's descriptors are null or not selected.
-                let isAnyDescriptorSelected = $descriptorCheckboxes.filter(':checked') > 0;
-                if (scaledGroupMark !== null || isAnyDescriptorSelected) {
-                    $groupSummary.attr('data-scaled-mark', scaledGroupMark);
-                    $groupSummary.attr('data-mark', scaledGroupMark);
-                }
+                // Always set the marks after all, even if no descriptors are
+                // selected.
+                // This fixes the issue where unselecting a descriptor doesn't
+                // change the capability mark selector, but could reintroduce an
+                // issue where selecting a null descriptor on a
+                // mark-per-capability descriptor causes the overall mark to
+                // disappear once a descriptor for all capabilities is selected.
+                // (This happened prior to SA-11271 too, I don't think it was
+                //  caused by the fix for that issue.)
+                $groupSummary.attr('data-scaled-mark', scaledGroupMark);
+                $groupSummary.attr('data-mark', scaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
