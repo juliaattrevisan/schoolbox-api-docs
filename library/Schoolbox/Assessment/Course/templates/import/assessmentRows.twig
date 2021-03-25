@@ -106,7 +106,7 @@
                 <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][spec_id]" value="{{ assessmentSpec ? assessmentSpec.id : '' }}" />
                 <input type="hidden" name="{{ inputPrefix }}[{{ assessment.id }}][impl_id]" value="{{ assessmentImpl ? assessmentImpl.id : '' }}" />
 
-                <div class="compact card small-12">
+                <div class="small-12 columns">
                     <input type="checkbox"
                            id="a_import-{{ assessment.id}}"
                             {% if isChecked %} checked="checked" {% endif %}
@@ -118,8 +118,8 @@
                             {% if isImplOnly %}disabled data-mage-disabled{% endif %}
                     />
                     <label for="a_import-{{ assessment.id}}" class="checkbox-label" {% if isImplOnly %}title="Created in class. Not imported from Course"{% endif %}>
-                        <span class="{{ icon.renderClass(assessment) }}"></span>
-                        <span>{{ assessment.title }}</span>
+                        <span class="{{ icon.renderClass(assessment) }}" title="{{ assessment.defaultTypeName }}"></span>
+                        <span>{{ assessment.title }} {% if assessment.workType.name %}<span class="pipe meta">{{ assessment.workType.name }}</span>{% endif %}</span>
                         {% if assessmentImpl and assessmentSpec and assessmentImpl.title != assessmentSpec.title %}
                             <br><span class="meta">Copied from '{{ assessmentSpec.title }}'</span>
                         {% endif %}

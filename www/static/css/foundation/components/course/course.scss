@@ -17,6 +17,41 @@ ul.unit-list {
     }
 }
 
+#import_assessments {
+  .unit {
+    background-color: var(--accent-background);
+    padding: 1rem;
+
+    @media #{$medium-only} {
+      padding: .75rem;
+    }
+
+    h3, label {
+      margin: 0;
+    }
+    .checkbox-label {
+      padding: 0 0 0 2.65rem;
+    }
+  }
+  span[class^='icon-']:before,
+  span[class*=' icon-']:before {
+    padding-right: 5px;
+  }
+  [data-assessment] {
+    span[class^='icon-']:before,
+    span[class*=' icon-']:before {
+      padding-left: 10px;
+    }
+  }
+  [data-assessment-dates] {
+    padding-left: 2.65rem;
+  }
+}
+
+label .unit-heading {
+    @extend h3;
+}
+
 /* Overpower foundation rules
  *
  * Positioning for the little ajax spinny when ajaxing

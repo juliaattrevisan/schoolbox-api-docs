@@ -277,14 +277,16 @@ Usages:
                                 <div class="small-12 column">
                                     <div class="alert alert-box icon-alert" data-mage-error></div>
                                 </div>
-                                <input
-                                    type="submit"
-                                    name="part-1"
-                                    value="Next"
-                                    data-mage-next="part-2"
-                                    data-mage-working="Working..."
-                                    formaction="{{ routeLookup('courseImport.postClasses') }}"
-                                />
+                                <div class="small-12 column">
+                                    <input
+                                        type="submit"
+                                        name="part-1"
+                                        value="Next"
+                                        data-mage-next="part-2"
+                                        data-mage-working="Working..."
+                                        formaction="{{ routeLookup('courseImport.postClasses') }}"
+                                    />
+                                </div>
                             </div>
                         </div>
                     {% endif %}

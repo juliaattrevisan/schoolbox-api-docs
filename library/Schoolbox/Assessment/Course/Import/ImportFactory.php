@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskAssessment;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 
 /**
  * Direct DB access to generate a data structure of UnitSpecs, UnitImpls, AssessmentSpecs + AssessmentImpls.
@@ -45,7 +46,7 @@ class ImportFactory
      */
     public function __construct()
     {
-        $this->database = \Database::getInstance();
+        $this->database        = \Database::getInstance();
         $this->assessmentCache = new GenericCollection(IAssessable::class);
     }
 
@@ -56,8 +57,8 @@ class ImportFactory
      * AssessmentImpls will have no id, but will have dates populated according to previous stage
      * All AssessmentImpls will link to an AssessmentSpec
      *
-     * @param UnitImplementation[]|GenericCollection $unitImpls Each UnitImpl links to a UnitSpec to get Assessments for
-     * @param string|null $defaultDueTime Adjust due date time to this, if set in H:i format
+     * @param UnitImplementation[]|GenericCollection $unitImpls      Each UnitImpl links to a UnitSpec to get Assessments for
+     * @param string|null                            $defaultDueTime Adjust due date time to this, if set in H:i format
      * @return DataTransferObject
      * @throws InvalidDataStateException If broken data encountered
      */
@@ -67,14 +68,14 @@ class ImportFactory
          * Extract all UnitSpecs into a cache, indexed by unitSpec.id
          * @var UnitSpecification[] $unitSpecCache
          */
-        $unitSpecCache = [];
+        $unitSpecCache   = [];
         $assessmentSpecs = new GenericCollection(GenericCollection::class);
         $assessmentImpls = new GenericCollection(GenericCollection::class);
         $assessmentPairs = new GenericCollection(GenericCollection::class);
 
         // Instantiate empty sets for each UnitSpecId
         foreach ($unitImpls as $unitImpl) {
-            $courseSpecId = $unitImpl->getSpecification()->getId();
+            $courseSpecId                 = $unitImpl->getSpecification()->getId();
             $unitSpecCache[$courseSpecId] = $unitImpl->getSpecification();
             $assessmentSpecs->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
             $assessmentImpls->setOffset($courseSpecId, new GenericCollection(IAssessable::class));
@@ -97,6 +98,8 @@ class ImportFactory
                 sa.title              AS 'sa.title',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sa.sequence           AS 'sa.sequence',
+                sa.work_type_id       AS 'sa.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
                 sdw.multi_submission  AS 'sdw.multi_submission',
@@ -107,6 +110,7 @@ class ImportFactory
             LEFT JOIN folder usf ON usf.id = us.folder_id
             LEFT JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
             LEFT JOIN assessment sa ON sa.id = aus.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = sa.work_type_id
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz ON sqz.assessment_id = sa.id
             LEFT JOIN task stk ON stk.assessment_id = sa.id
@@ -116,7 +120,7 @@ class ImportFactory
         $pb = new Builder($this->database->getQuoter(), '');
         $pb->in('us.id', array_keys($unitSpecCache));
         $pb->isNull('sa.deleted_at');
-        $query .= 'WHERE' . implode(' AND ', $pb->getWhere());
+        $query     .= 'WHERE' . implode(' AND ', $pb->getWhere());
         $statement = $this->database->prepare($query);
         $statement->execute($pb->getParams());
 
@@ -128,7 +132,7 @@ class ImportFactory
             if (!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification) {
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
                 $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
-                $folder = new Folder();
+                $folder                       = new Folder();
                 $folder->setName($row['usf.name']);
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
@@ -143,7 +147,7 @@ class ImportFactory
 
         // No AssessmentImpl to AssessmentSpec mapping (this is a new import)
         $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, []);
-        $dto = new DataTransferObject(false, [], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs, $defaultDueTime);
+        $dto             = new DataTransferObject(false, [], $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs, $defaultDueTime);
 
         return $dto;
     }
@@ -156,7 +160,7 @@ class ImportFactory
      * UnitImpls will link to extant UnitSpecs
      *
      * @param UnitImplementation[]|GenericCollection $unitImpls
-     * @param string|null $defaultDueTime Adjust due date time to this, if set in H:i format
+     * @param string|null                            $defaultDueTime Adjust due date time to this, if set in H:i format
      * @return DataTransferObject
      * @throws InvalidDataStateException If broken course data detected
      */
@@ -202,7 +206,7 @@ class ImportFactory
 
         // Instantiate empty sets for each UnitSpecId
         foreach ($unitImpls as $unitImpl) {
-            $unitSpecId = $unitImpl->getSpecification()->getId();
+            $unitSpecId                 = $unitImpl->getSpecification()->getId();
             $unitSpecCache[$unitSpecId] = $unitImpl->getSpecification();
             $assessmentSpecs->setOffset($unitSpecId, new GenericCollection(IAssessable::class));
             $assessmentImpls->setOffset($unitSpecId, new GenericCollection(IAssessable::class));
@@ -231,7 +235,7 @@ class ImportFactory
         $innerQuery1 .= 'WHERE ' . implode(' AND ', $pbInner1->getWhere());
 
         // AssessmentSpecs in UnitSpecs, optionally with corresponding AssessmentImpl if it exists
-        $query1 = "
+        $query1   = "
             SELECT
                 us.id                 AS 'us.id',
                 usf.name              AS 'usf.name',
@@ -239,6 +243,8 @@ class ImportFactory
                 sa.title              AS 'sa.title',
                 sa.deleted_at         AS 'sa.deleted_at',
                 sa.sequence           AS 'sa.sequence',
+                sa.work_type_id       AS 'sa.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
@@ -253,6 +259,7 @@ class ImportFactory
                 ia.due_date           AS 'ia.due_date',
                 ia.close_date         AS 'ia.close_date',
                 ia.sequence           AS 'ia.sequence',
+                ia.work_type_id       AS 'ia.work_type_id',
                 idw.assessment_id     AS 'idw.id',
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
@@ -263,6 +270,7 @@ class ImportFactory
             JOIN folder usf                               ON usf.id = us.folder_id
             JOIN assessment_course_unit_specification aus ON aus.course_unit_specification_id = us.id
             JOIN assessment sa                            ON sa.id = aus.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = sa.work_type_id
             LEFT JOIN submission_box sdw                  ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz                          ON sqz.assessment_id = sa.id
             LEFT JOIN task stk                            ON stk.assessment_id = sa.id
@@ -280,7 +288,7 @@ class ImportFactory
 
         // Get the following Assessments:
         // 5. AssessmentImpls created directly in UnitImpl, no corresponding AssessmentSpec
-        $query2 = "
+        $query2   = "
             SELECT
                 us.id             AS 'us.id',
                 usf.name          AS 'usf.name',
@@ -288,6 +296,8 @@ class ImportFactory
                 null              AS 'sa.title',
                 null              AS 'sa.deleted_at',
                 null              AS 'sa.sequence',
+                null              AS 'sa.work_type_id',
+                null			  AS 'lwt.name',
                 null              AS 'sa.default_open_span',
                 null              AS 'sdw.id',
                 null              AS 'sdw.accept_submission',
@@ -302,6 +312,7 @@ class ImportFactory
                 ia.due_date       AS 'ia.due_date',
                 ia.close_date     AS 'ia.close_date',
                 ia.sequence       AS 'ia.sequence',
+                ia.work_type_id   AS 'ia.work_type_id',
                 idw.assessment_id AS 'idw.id',
                 idw.accept_submission AS 'idw.accept_submission',
                 idw.multi_submission  AS 'idw.multi_submission',
@@ -313,6 +324,7 @@ class ImportFactory
             JOIN folder usf ON usf.id = us.folder_id
             JOIN assessment_course_unit_implementation aui ON aui.course_unit_implementation_id = ui.id
             JOIN assessment ia ON ia.id = aui.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = ia.work_type_id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz ON iqz.assessment_id = ia.id
             LEFT JOIN task itk ON itk.assessment_id = ia.id
@@ -335,7 +347,7 @@ class ImportFactory
             if (!$unitSpecDBCache[$unitSpecId] instanceof UnitSpecification) {
                 // Add a Folder and name it so we can later render out this UnitSpec's name.
                 $unitSpecDBCache[$unitSpecId] = $unitSpecCache[$unitSpecId];
-                $folder = new Folder();
+                $folder                       = new Folder();
                 $folder->setName($row['usf.name']);
                 $unitSpecCache[$unitSpecId]->setFolder($folder);
             }
@@ -349,24 +361,28 @@ class ImportFactory
             if ($assessmentSpec instanceof IAssessable && $assessmentImpl instanceof IAssessable) {
                 $assessmentImpl->setSpecificationAssessment($assessmentSpec);
                 $assessmentPairs->getOffset($unitSpecId)->add(new AssessmentPair($assessmentSpec, $assessmentImpl));
-            } else if ($assessmentSpec instanceof IAssessable) {
-                // Don't add deleted AssessmentSpecs
-                if (!$assessmentSpec->isDeleted()) {
-                    $assessmentSpecs->getOffset($unitSpecId)->setOffset($assessmentSpec->getId(), $assessmentSpec);
-                }
-            } else if ($assessmentImpl instanceof IAssessable) {
-                $assessmentImpls->getOffset($unitSpecId)->setOffset($assessmentImpl->getId(), $assessmentImpl);
             } else {
-                // If unable to build a pair, spec-only, or impl-only, something has gone wrong!
-                throw new InvalidDataStateException("Unable to build any assessments. spec.id: {$row['sa.id']}, impl.id: {$row['ia.id']}");
+                if ($assessmentSpec instanceof IAssessable) {
+                    // Don't add deleted AssessmentSpecs
+                    if (!$assessmentSpec->isDeleted()) {
+                        $assessmentSpecs->getOffset($unitSpecId)->setOffset($assessmentSpec->getId(), $assessmentSpec);
+                    }
+                } else {
+                    if ($assessmentImpl instanceof IAssessable) {
+                        $assessmentImpls->getOffset($unitSpecId)->setOffset($assessmentImpl->getId(), $assessmentImpl);
+                    } else {
+                        // If unable to build a pair, spec-only, or impl-only, something has gone wrong!
+                        throw new InvalidDataStateException("Unable to build any assessments. spec.id: {$row['sa.id']}, impl.id: {$row['ia.id']}");
+                    }
+                }
             }
         }
 
         $assessmentImplToSpecMap = $this->getAssessmentImplToSpecMap($unitImplIds);
-        $assessmentSpecs = $this->loadProjectSpecAssessables($assessmentSpecs, $assessmentImplToSpecMap);
-        $assessmentImpls = $this->loadProjectImplAssessables($assessmentImpls, $assessmentImplToSpecMap);
-        $assessmentPairs = $this->loadProjectPairAssessables($assessmentPairs, $assessmentImplToSpecMap);
-        $dto = new DataTransferObject(true, $assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs, $defaultDueTime);
+        $assessmentSpecs         = $this->loadProjectSpecAssessables($assessmentSpecs, $assessmentImplToSpecMap);
+        $assessmentImpls         = $this->loadProjectImplAssessables($assessmentImpls, $assessmentImplToSpecMap);
+        $assessmentPairs         = $this->loadProjectPairAssessables($assessmentPairs, $assessmentImplToSpecMap);
+        $dto                     = new DataTransferObject(true, $assessmentImplToSpecMap, $unitImpls, $assessmentSpecs, $assessmentImpls, $assessmentPairs, $defaultDueTime);
         return $dto;
     }
 
@@ -405,6 +421,8 @@ class ImportFactory
                 sa.title              AS 'sa.title',
                 sa.deleted_at         AS 'sa.deleted_at',
                 sa.sequence           AS 'sa.sequence',
+                sa.work_type_id       AS 'sa.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 sa.default_open_span  AS 'sa.default_open_span',
                 sdw.assessment_id     AS 'sdw.id',
                 sdw.accept_submission AS 'sdw.accept_submission',
@@ -414,11 +432,12 @@ class ImportFactory
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment sa           ON sa.id = pa.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = sa.work_type_id
             LEFT JOIN assessment_course_unit_implementation pui ON pui.assessment_id = p.assessment_id
             LEFT JOIN submission_box sdw ON sdw.assessment_id = sa.id
             LEFT JOIN assess sqz         ON sqz.assessment_id = sa.id
             LEFT JOIN task stk           ON stk.assessment_id = sa.id";
-        $pb = new Builder($this->database->getQuoter(), '');
+        $pb    = new Builder($this->database->getQuoter(), '');
         $pb->in('p.assessment_id', $projectSpecs->keys());
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
 
@@ -481,6 +500,8 @@ class ImportFactory
                 ia.id                 AS 'ia.id',
                 ia.title              AS 'ia.title',
                 ia.sequence           AS 'ia.sequence',
+                ia.work_type_id       AS 'ia.work_type_id',
+                lwt.name			  AS 'lwt.name',
                 ia.publish_date       AS 'ia.publish_date',
                 ia.open_date          AS 'ia.open_date',
                 ia.due_date           AS 'ia.due_date',
@@ -494,11 +515,12 @@ class ImportFactory
             FROM project p
             JOIN project_assessment pa   ON pa.project_id = p.id
             JOIN assessment ia           ON ia.id = pa.assessment_id
+            LEFT JOIN lu_work_type lwt ON lwt.id = ia.work_type_id
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN submission_box idw ON idw.assessment_id = ia.id
             LEFT JOIN assess iqz         ON iqz.assessment_id = ia.id
             LEFT JOIN task itk           ON itk.assessment_id = ia.id";
-        $pb = new Builder($this->database->getQuoter(), '');
+        $pb    = new Builder($this->database->getQuoter(), '');
         $pb->in('p.assessment_id', $projectImpls->keys());
         $pb->isNull('ia.deleted_at');
         $query .= ' WHERE' . implode(' AND ', $pb->getWhere());
@@ -534,8 +556,8 @@ class ImportFactory
     /**
      * Load all Assessment Specs + Impls for Projects that have been imported
      *
-     * @param GenericCollection|AssessmentPair[][] $assessmentPairs   - Sets of AssessmentPairs, indexed by UnitSpec.id
-     * @param int[] $assessmentImplToSpecMap
+     * @param GenericCollection|AssessmentPair[][] $assessmentPairs - Sets of AssessmentPairs, indexed by UnitSpec.id
+     * @param int[]                                $assessmentImplToSpecMap
      * @return GenericCollection
      */
     protected function loadProjectPairAssessables(GenericCollection $assessmentPairs, array $assessmentImplToSpecMap)
@@ -627,7 +649,7 @@ class ImportFactory
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
         ";
-        $pb1 = new Builder($this->database->getQuoter(), '');
+        $pb1    = new Builder($this->database->getQuoter(), '');
         $pb1->in('aui.course_unit_implementation_id', $unitImplIds);
         $query1 .= ' WHERE ' . implode(' AND ', $pb1->getWhere());
 
@@ -645,11 +667,11 @@ class ImportFactory
             LEFT JOIN assessment_specification_implementation asi ON asi.implementation_assessment_id = ia.id
             LEFT JOIN assessment sa ON sa.id = asi.specification_assessment_id
         ";
-        $pb2 = new Builder($this->database->getQuoter(), '');
+        $pb2    = new Builder($this->database->getQuoter(), '');
         $pb2->in('pui.course_unit_implementation_id', $unitImplIds);
         $query2 .= ' WHERE ' . implode(' AND ', $pb2->getWhere());
 
-        $query = "$query1 UNION $query2";
+        $query     = "$query1 UNION $query2";
         $statement = $this->database->prepare($query);
         $statement->execute(array_merge($pb1->getParams(), $pb2->getParams()));
 
@@ -666,7 +688,6 @@ class ImportFactory
      */
     protected function createDate($dateString)
     {
-
         if (is_null($dateString)) {
             return new \Alaress_Date_NullDate();
         } else {
@@ -681,7 +702,7 @@ class ImportFactory
      * the system has broken data. In this case the caller should throw and exception which
      * halts the import, can be caught by controller, logged to sentry, and used to inform the end-user.
      *
-     * @param string $row
+     * @param array $row
      * @return IAssessable|null
      * @throws InvalidDataStateException if the assessment has no determinable type
      */
@@ -716,6 +737,15 @@ class ImportFactory
         $assessmentSpec->setId($row['sa.id']);
         $assessmentSpec->setTitle($row['sa.title']);
         $assessmentSpec->setSequence($row['sa.sequence']);
+
+        $workType   = new WorkType();
+        $workTypeId = $row['sa.work_type_id'];
+        if (!is_null($workTypeId)) {
+            $workType->setId($workTypeId);
+            $workType->setName($row['lwt.name']);
+        }
+        $assessmentSpec->setWorkType($workType);
+
         $assessmentSpec->setDefaultOpenSpan($row['sa.default_open_span']);
         if (is_null($row['sa.deleted_at'])) {
             $assessmentSpec->setDeletedAt(new \Alaress_Date_NullDate());
@@ -765,6 +795,15 @@ class ImportFactory
         $assessmentImpl->setId($row['ia.id']);
         $assessmentImpl->setTitle($row['ia.title']);
         $assessmentImpl->setSequence($row['ia.sequence']);
+
+        $workType   = new WorkType();
+        $workTypeId = $row['ia.work_type_id'];
+        if (!is_null($workTypeId)) {
+            $workType->setId($workTypeId);
+            $workType->setName($row['lwt.name']);
+        }
+        $assessmentImpl->setWorkType($workType);
+
         $assessmentImpl->setPublishAt($this->createDate($row['ia.publish_date']));
         $assessmentImpl->setOpenAt($this->createDate($row['ia.open_date']));
         $assessmentImpl->setDueAt($this->createDate($row['ia.due_date']));
