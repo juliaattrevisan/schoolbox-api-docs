@@ -26,7 +26,7 @@
 
 {% block newsContent %}
     {# has to live here instead of the scripts block below :( #}
-    <script src="{{ CDN_PREFIX }}/javascript/components/vueInline.bundle.js"></script>
+    <script src="{{ CDN_PREFIX }}/javascript/vueInline.bundle.js"></script>
 
     {% include '@commsNews/article-list.twig' with {
         initialPage: initialPage,

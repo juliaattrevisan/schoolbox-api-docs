@@ -6,7 +6,7 @@ This is already included in a special minified file `vueInline.bundle.js` which 
 
 ```html
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="{{ CDN_PREFIX }}/javascript/components/vueInline.bundle.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/vueInline.bundle.js"></script>
 <script src="{{ CDN_PREFIX }}/javascript/components/userList.bundle.js"></script>
 ```
 
