@@ -39,7 +39,7 @@ class Interactions
      *
      * Default: you have to wait one day (60*60*24 seconds) between visits for it to start recording more data
      */
-    private const UNIQUE_VISIT_THRESHOLD = 60*60*24;
+    private const UNIQUE_VISIT_THRESHOLD = 60*60;
 
     /**
      * @var IConnector
