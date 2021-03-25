@@ -33,10 +33,10 @@
             <input type="hidden" name="id" value="{{ item.id ?? '' }}">
             <div class="row">
                 <div class="small-12 island">
-                    {% if item is not defined %}
-                        <h2 class="subheader">Create Menu Item</h2>
-                    {% else %}
+                    {% if item is defined %}
                         <h2 class="subheader">Modify Menu Item</h2>
+                    {% else %}
+                        <h2 class="subheader">Create Menu Item</h2>
                     {% endif %}
                     <section>
                         <fieldset class="content">

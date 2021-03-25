@@ -200,7 +200,10 @@ class Controller extends Base
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
+                    [['Modify', null]]
+                ),
                 'item' => $this->getMenuSideMapper()->findById($id),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'rolesSelected' => $rolesSelected,
@@ -224,7 +227,10 @@ class Controller extends Base
             'data'     => [
                 'resource' => $this->getDi()->get('sitePage')->getLocalisedTerm('resource', true, true),
                 'pageCurrent' => $this->router->generate('adminMenuSide.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMenuSide.getIndex')),
+                    [['Create', null]]
+                ),
                 'roles' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
             ],

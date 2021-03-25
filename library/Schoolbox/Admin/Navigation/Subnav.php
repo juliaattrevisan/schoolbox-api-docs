@@ -193,7 +193,48 @@ class Subnav
             '/adminv2/filters' => [
                 'name' => 'Filters',
                 'visible' =>  true,
-                'children' => []
+                'children' => [
+                    '/adminv2/filters/assessmentCal' => [
+                        'name' => 'Assessments Calendar',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/filters/badgeList' => [
+                        'name' => 'Badge List',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/filters/classMarkbook' => [
+                        'name' => 'Class Markbook',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/filters/courseMarkbook' => [
+                        'name' => 'Course Markbook',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/filters/dueWorkCal' => [
+                        'name' => 'Upcoming Due Work',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/filters/grades' => [
+                        'name' => 'Grades',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/filters/pending' => [
+                        'name' => 'Pending Assessments',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                    '/adminv2/filters/rubricMarkbook' => [
+                        'name' => 'Rubric Markbook',
+                        'visible' =>  true,
+                        'children' => []
+                    ],
+                ]
             ],
             '/adminv2/import/directImport' => [
                 'name' => 'Import',

@@ -151,8 +151,8 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/settings.twig', [
             'page'               => $page,
-            'pageCurrent'        => $this->router->generate('filters.getIndex'),
-            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('filters.getIndex')),
+            'pageCurrent'        => $this->router->generate('filters.getPageSettings', ['page' => $page]),
+            'allBreadcrumbs'     => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('filters.getPageSettings', ['page' => $page])),
             'definitions'        => $definitions,
             'pageFilters'        => $pageFilters,
             'roleTypes'          => $roleTypes,
