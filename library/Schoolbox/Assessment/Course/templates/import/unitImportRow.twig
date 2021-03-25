@@ -18,72 +18,70 @@
 <input type="hidden" name="unit[{{ unitSpec.id }}][open_date]"    value="{{ unitImpl.openDate.localShort }}" />
 <input type="hidden" name="unit[{{ unitSpec.id }}][close_date]"   value="{{ unitImpl.dueDate.localShort }}" />
 <div class="row" data-unit="{{ unitSpec.id }}">
+    {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
+
+    {#
+     # No read perm on unit spec? don't show the full assessment count, just what was selected.
+     # This is so that users don't see a count that's greater than what they can actually affect.
+    #}
+    {% if not canReadUnitSpec %}
+        {% set unitAssessmentCount = countSelected %}
+    {% endif %}
+    <div class="unit">
+        {# Unit title and select-all checkbox for unit asesssments #}
+        {# Don't show the select-all checkbox if we are modifying a unit implementation #}
+        {% if unitAction == 'modify' %}
+        <div class="card small-12">
+            <h3>
+                <span class="icon-unit"></span>{{ unitSpec.folder.name }}
+                <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+            </h3>
+        </div>
+        {% else %}
+        <input id="select-all-unit-assessments-{{ unitSpec.id }}"
+               type="checkbox"
+               checked=""
+               data-select-all-unit-assessments="unit-spec-{{ unitSpec.id }}"
+        >
+        <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
+            <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
+            <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
+        </label>
+        {% endif %}
+    </div>
     <div class="small-12 columns">
-        <section>
-            <ul class="action-list">
-                <li>
-                    <div class="list-item">
-                        {% set countSelected = 'import' == unitAction ? unitAssessmentCount : unitAssessmentCountSelected %}
-
-                        {##
-                         # No read perm on unit spec? don't show the full assessment count, just what was selected.
-                         # This is so that users don't see a count that's greater than what they can actually affect.
-                        #}
-                        {% if not canReadUnitSpec %}
-                            {% set unitAssessmentCount = countSelected %}
-                        {% endif %}
-
-                        {# Unit title and select-all checkbox for unit asesssments #}
-                        {# Don't show the select-all checkbox if we are modifying a unit implementation #}
-                        {% if unitAction == 'modify' %}
-                            <div class="card small-12">
-                                <h3>
-                                    <span class="icon-unit"></span>{{ unitSpec.folder.name }}
-                                    <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
-                                </h3>
-                            </div>
-                        {% else %}
-                            <input id="select-all-unit-assessments-{{ unitSpec.id }}"
-                                   type="checkbox"
-                                   checked=""
-                                   data-select-all-unit-assessments="unit-spec-{{ unitSpec.id }}"
-                            >
-                            <label class="checkbox-label" for="select-all-unit-assessments-{{ unitSpec.id }}">
-                                <span class="icon-unit"></span><span class="unit-heading">{{ unitSpec.folder.name }}</span>
-                                <span class="pipe meta">{{ unitAssessmentCount ?: "No" }} assessments{% if unitAssessmentCount %}, <span data-show-count="{{ countSelected }}"> selected</span>{% endif %}</span>
-                            </label>
-                        {% endif %}
-
-                        {# Unit assessments #}
-                        <div class="row">
-                            <section>
-                                {% if unitAssessmentCount %}
-                                    {% include '@course/import/assessmentRows.twig' with {
-                                        assessmentPairs: assessmentPairs,
-                                        inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
-                                        depth:           0,
-                                        unitAction:      unitAction,
-                                        project:         null,
-                                        hideRows:        false,
-                                        unitSpec:        unitSpec,
-                                        unitImpl:        unitImpl,
-                                        defaultDueDate:  unitDefaultDueDates[unitSpec.id],
-                                        canReadUnitSpec: canReadUnitSpec,
-                                    } only %}
-                                {% else %}
-                                    <p class="content">This {{ locale.unit }} contains no coursework.</p>
-                                {% endif %}
-                            </section>
-                        </div>
+        <ul class="action-list">
+            <li>
+                <div class="list-item">
+                    {# Unit assessments #}
+                    <div class="row">
+                        <section>
+                            {% if unitAssessmentCount %}
+                                {% include '@course/import/assessmentRows.twig' with {
+                                    assessmentPairs: assessmentPairs,
+                                    inputPrefix:     'unit[' ~ unitSpec.id ~ '][a]',
+                                    depth:           0,
+                                    unitAction:      unitAction,
+                                    project:         null,
+                                    hideRows:        false,
+                                    unitSpec:        unitSpec,
+                                    unitImpl:        unitImpl,
+                                    defaultDueDate:  unitDefaultDueDates[unitSpec.id],
+                                    canReadUnitSpec: canReadUnitSpec,
+                                } only %}
+                            {% else %}
+                                <p class="content">This {{ locale.unit }} contains no coursework.</p>
+                            {% endif %}
+                        </section>
                     </div>
-                </li>
-            </ul>
-            <div id="unit-{{ unitSpec.id }}"
-                 data-start_date="{{ unitImpl.openDate.localShort }}"
-                 data-finish_date="{{ unitImpl.dueDate.localShort }}"
-            >
-            </div>
-        </section>
+                </div>
+            </li>
+        </ul>
+        <div id="unit-{{ unitSpec.id }}"
+             data-start_date="{{ unitImpl.openDate.localShort }}"
+             data-finish_date="{{ unitImpl.dueDate.localShort }}"
+        >
+        </div>
     </div>
 </div>
 

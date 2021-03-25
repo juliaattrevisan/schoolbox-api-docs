@@ -17,6 +17,22 @@ ul.unit-list {
     }
 }
 
+#import_assessments {
+  .unit {
+    background-color: $ghost;
+    padding: 1rem;
+
+    label {
+      margin: 0;
+    }
+  }
+  span[class^='icon-']:before,
+  span[class*=' icon-']:before {
+    padding-left: 10px;
+    padding-right: 5px;
+  }
+}
+
 label .unit-heading {
     @extend h3;
 }
