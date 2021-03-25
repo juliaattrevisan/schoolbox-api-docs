@@ -181,7 +181,7 @@ class Worker extends CliTool\App
      */
     private function fetchHashObject(): ?Storage\Model
     {
-        /** @var Storage\Model $hashObject */
+        /** @var Storage\Model|null $hashObject */
         $hashObject = Storage\Mapper::getInstance()->findByColumn('hash', $this->hash)->first();
         if (!$hashObject) {
             // This is most likely the rare case where we failed to transcode a static image.

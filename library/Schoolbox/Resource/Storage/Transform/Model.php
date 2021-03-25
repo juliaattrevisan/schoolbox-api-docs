@@ -56,7 +56,7 @@ class Model
      */
     private $size;
 
-    private string $state;
+    private ?string $state;
 
     /**
      * @param string $hash
