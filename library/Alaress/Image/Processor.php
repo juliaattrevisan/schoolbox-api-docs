@@ -8,25 +8,43 @@
 
 namespace Alaress\Image;
 
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress_Byte_Format;
+use Alaress_Date_Format;
 use DomainException;
+use Imagick;
 use Imagine\Exception as ImagineException;
 use Alaress\Image\Transform\RotateOrientation;
 use Imagine\Image\ImageInterface;
 use Imagine\Image\Metadata\ExifMetadataReader;
 use Imagine\Imagick\Imagine;
+use InvalidArgumentException;
 use League\Flysystem;
 use League\Flysystem\FileExistsException;
+use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FilesystemInterface;
 use OverflowException;
 use PDOException;
 use Schoolbox\Config\Loader;
 use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage;
 use UnexpectedValueException;
 
+/**
+ * Transforms images and persists to database + disk.
+ */
 class Processor
 {
+    /**
+     * Number of seconds that ImageMagick should timeout after by default.
+     * We may specify a longer time in some cases, eg from CLI, but for php-fpm requests
+     * we need this value to be less than the request execution time limit (usually 60s)
+     * to prevent temp files being left behind when the process is killed.
+     */
+    private const IMAGE_MAGICK_TIMEOUT_DEFAULT = 45;
+
     /**
      * Original un-transformed file. Contents may be local or remote.
      *
@@ -51,6 +69,17 @@ class Processor
     /** @var ITransform */
     private $transform;
 
+    /**
+     * Number of seconds to allow image magick to process the transform.
+     *
+     * * For web requests, this value must be less than the php-fpm request timeout to prevent temp files
+     *   being left on disk.
+     * * For CLI requests, it should be less than the Lock + max execution times.
+     *
+     * @var int
+     */
+    private int $imageMagickTimeout;
+
 
     /**
      * Constructor
@@ -58,12 +87,18 @@ class Processor
      * @param Storage\Model $file
      * @param string        $cacheKey
      * @param ITransform    $transform
+     * @param int           $imageMagickTimeout
      */
-    public function __construct(Storage\Model $file, string $cacheKey, ITransform $transform)
-    {
-        $this->file      = $file;
-        $this->cacheKey  = $cacheKey;
-        $this->transform = $transform;
+    public function __construct(
+        Storage\Model $file,
+        string $cacheKey,
+        ITransform $transform,
+        int $imageMagickTimeout = self::IMAGE_MAGICK_TIMEOUT_DEFAULT
+    ) {
+        $this->file               = $file;
+        $this->cacheKey           = $cacheKey;
+        $this->transform          = $transform;
+        $this->imageMagickTimeout = $imageMagickTimeout;
     }
 
     /**
@@ -72,19 +107,24 @@ class Processor
      * If the transform does not yet exist, it is generated using the supplied transforms
      * and saved to disk and the database.
      *
-     * @param int $maxAttempts
+     * @param int      $maxAttempts
+     * @param null|int $retryAfter If non-null, retry any incomplete transformations older than this value (in seconds)
      * @return StreamableFile
      * @throws DomainException
      * @throws Flysystem\FileNotFoundException
      * @throws Flysystem\FilesystemNotFoundException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
+     * @throws InsufficientHydrationException
+     * @throws InvalidArgumentException
      * @throws Mapper\Exception
      * @throws OverflowException if file's too big
      * @throws PDOException
      * @throws UnexpectedValueException
+     * @throws ConcurrentTransformationException
+     * @throws FileExistsException
      */
-    public function load(int $maxAttempts = 1): StreamableFile
+    public function load(int $maxAttempts = 1, ?int $retryAfter = null): StreamableFile
     {
         // ensure file format is actually a string (it may have been a mimetype object)
         $fileFormat = $this->getFormatFromMime((string)$this->file->getMimetype());
@@ -92,50 +132,107 @@ class Processor
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ($fileFormat === 'svg') {
             // Assume the stream to the base SVG exists
-            return new StreamableFile(
-                true,
-                (string)$this->file->getMimetype(),
-                $this->file->getSize(),
-                $this->file->readStream()
-            );
+            return new StreamableFile(true, $fileFormat, $this->file->getSize(), $this->file->readStream());
         }
 
         // TODO SA-8354 inject dependencies
         $mountManager   = (new FilesystemFactory())->build((new Loader())->get('storage_dir'));
         $fileSystem     = $mountManager->getFilesystem(Storage\Manager::FS_STORAGE);
-        $storageManager = new Storage\Manager($mountManager, new Alaress_Byte_Format());
-        $transformPath  = $storageManager::getTransformPath($this->file->getHash(), $this->cacheKey);
+        $transformPath  = Storage\Manager::getTransformPath($this->file->getHash(), $this->cacheKey);
 
         // Fastest check (particularly when using S3)
         $transformMapper = Storage\Transform\Mapper::getInstance();
         $transformModel  = $transformMapper->findByHashAndCacheKey($this->file->getHash(), $this->cacheKey);
-        if ($transformModel) {
+        if ($transformModel && $transformModel->isStateDone()) {
             // We cannot assume if the transform exists in the database that it
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
-            return new StreamableFile(
-                true,
-                (string)$this->file->getMimetype(),
-                $transformModel->getSize(),
-                self::readStream($fileSystem, $transformPath)
-            );
+            try {
+                return new StreamableFile(true, $fileFormat, $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
+            } catch (Flysystem\FileNotFoundException $e) {
+                // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
+                $state = $fileSystem->has($this->file->getPath())
+                    ? Storage\Transform\Model::STATE_PROCESSING
+                    : Storage\Transform\Model::STATE_FAILED;
+                $transformMapper->save($transformModel->setSize(null)->setState($state));
+                if ($state === Storage\Transform\Model::STATE_PROCESSING) {
+                    throw new ConcurrentTransformationException($transformModel);
+                }
+                throw $e;
+            }
         }
 
         // Transform exists on (local|s3) disk, but not yet in database.
         // This can occur on systems where we have not yet run the transform seeder tool
         if ($fileSystem->has($transformPath)) {
             $transformSize = $fileSystem->getSize($transformPath);
-            $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize);
-            return new StreamableFile(
-                true,
-                (string)$this->file->getMimetype(),
-                $transformSize,
-                self::readStream($fileSystem, $transformPath)
-            );
+            if ($transformModel) {
+                $transformMapper->save($transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE));
+            } else {
+                $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
+            }
+            return new StreamableFile(true, $fileFormat, $transformSize, self::readStream($fileSystem, $transformPath));
         }
 
-        $image = $this->loadImageFromFile($maxAttempts);
+        // Transform does not exist on disk. Has the transformation been attempted before?
+        if (!$transformModel) {
+            // Transformation has NOT been attempted before. We will attempt it now.
+            $transformModel = $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, null, Storage\Transform\Model::STATE_PROCESSING);
+        } else {
+            // Transformation HAS been attempted before.
+            // If we are not retrying, or it's possible the prior attempt is still running, just return a placeholder
+            if ($retryAfter === null || $transformModel->getUpdatedAt()->diffInSeconds(Alaress_Date_Format::now()) < $retryAfter) {
+                throw new ConcurrentTransformationException($transformModel);
+            }
+            // Assume the prior execution failed. We will retry it.
+            $transformMapper->save($transformModel->setState(Storage\Transform\Model::STATE_PROCESSING));
+        }
 
+        // Actually attempt the transformation.
+        // If php-fpm times out, it WILL leave temp files on disk
+        // If ImageMagick times out, it will NOT temp files on disk
+        // In both cases the process is killed and does not return to the catch block, so both cases leave the transform with a 'processing' state.
+        // If ImageMagick cannot write to temp dir, it will die without throwing an exception, so will not be caught.
+        // If we're in a web request, we're constrained by a memory limit. This is often exceeded when ImageMagick finishes and returns the contents which
+        // are then base64 encoded. This will not throw an exception. We could catch it in a custom shutdown handler, but it's fine to leave in the
+        // 'processing' state so this is not required
+        try {
+            $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
+        } catch (FileNotFoundException | FileExistsException | ImagineException\OutOfBoundsException | ImagineException\RuntimeException | OverflowException $e) {
+            $transformModel->setState(Storage\Transform\Model::STATE_FAILED);
+            $transformMapper->save($transformModel);
+            throw $e;
+        }
+
+        $transformModel->setSize($transformSize)->setState(Storage\Transform\Model::STATE_DONE);
+        $transformMapper->save($transformModel);
+
+        return new StreamableFile(
+            false,
+            $fileFormat,
+            $transformModel->getSize(),
+            self::readStream($fileSystem, $transformPath)
+        );
+    }
+
+
+    /**
+     * Transforms the image, writes it to disk, and return the transformed file's size
+     *
+     * @param int                 $maxAttempts How many times should we attempt to read the original file into memory
+     * @param string              $fileFormat
+     * @param FilesystemInterface $fileSystem
+     * @param string              $transformPath
+     * @return int
+     * @throws FileExistsException
+     * @throws ImagineException\OutOfBoundsException
+     * @throws ImagineException\RuntimeException
+     * @throws OverflowException
+     * @throws FileNotFoundException If original storage file not found on disk
+     */
+    private function generateTransformation(int $maxAttempts, string $fileFormat, FilesystemInterface $fileSystem, string $transformPath): int
+    {
+        $image = $this->loadImageFromFile($maxAttempts);
         $image = (new RotateOrientation())->manipulate($image);
         $image = $this->transform->manipulate($image);
 
@@ -145,29 +242,8 @@ class Processor
             $options['animated.loops'] = 0;
         }
         $imageContents = $image->get($fileFormat, $options);
-
-        try {
-            // TODO This occurs because we can have multiple processes simultaneously doing the same  transform.
-            // TODO We will add a mutex to fix this.
-            // @see https://schoolbox.atlassian.net/browse/SA-11227
-            $fileSystem->write($transformPath, $imageContents);
-        } catch (FileExistsException $e) {
-            // Just ignore for now.
-        }
-
-        $transformSize = strlen($imageContents);
-        $transformMapper->createRecord(
-            $this->file->getHash(),
-            $this->cacheKey,
-            $transformSize
-        );
-
-        return new StreamableFile(
-            false,
-            (string)$this->file->getMimetype(),
-            $transformSize,
-            self::readStream($fileSystem, $transformPath)
-        );
+        $fileSystem->write($transformPath, $imageContents);
+        return strlen($imageContents);
     }
 
 
@@ -180,6 +256,8 @@ class Processor
      * @return ImageInterface
      * @throws OverflowException If file contents are too big
      * @throws ImagineException\RuntimeException If cannot read file into an image
+     * @throws FileNotFoundException If original storage file not found on disk
+     * @noinspection PhpDocRedundantThrowsInspection
      */
     private function loadImageFromFile(int $maxAttempts): ImageInterface
     {
@@ -210,6 +288,7 @@ class Processor
             }
         }
 
+        Imagick::setResourceLimit(Imagick::RESOURCETYPE_TIME, $this->imageMagickTimeout);
         $imagine  = (new Imagine())->setMetadataReader(new ExifMetadataReader());
         $image    = null;
         $attempts = 0;
@@ -233,27 +312,7 @@ class Processor
      */
     private function parseImageMagickResourceLimits(): array
     {
-        // Map resource limits (domain="resource") from name to value
-        $resourceLimitMap  = [];
-        $imageMagickConfig = simplexml_load_string(file_get_contents("/etc/ImageMagick-6/policy.xml"));
-        foreach ($imageMagickConfig->xpath('policy') as $policyTag) {
-            $policyTagAttributes = $policyTag->attributes();
-            $isResourcePolicyTag = false;
-            $name                = $value = null;
-            foreach ($policyTagAttributes as $attributeName => $attributeValue) {
-                if ($attributeName === 'domain' && (string)$attributeValue === 'resource') {
-                    $isResourcePolicyTag = true;
-                } elseif ($attributeName === 'name') {
-                    $name = (string)$attributeValue;
-                } elseif ($attributeName === 'value') {
-                    $value = (string)$attributeValue;
-                }
-            }
-            if ($isResourcePolicyTag) {
-                $resourceLimitMap[$name] = $value;
-            }
-        }
-        return $resourceLimitMap;
+        return (new ImagickConfigParser())->parseImageMagickResourceLimits();
     }
 
 

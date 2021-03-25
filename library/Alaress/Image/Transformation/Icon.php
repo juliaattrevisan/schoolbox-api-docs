@@ -15,12 +15,10 @@ use Alaress\Image\Transform\Square;
 use InvalidArgumentException;
 use Schoolbox\Realtime\Message\NSMapper;
 
-use function array_flip;
-use function array_key_exists;
-use function count;
-use function in_array;
-
-class Icon
+/**
+ * Produces 'icon' transforms
+ */
+class Icon implements ITransformFactory
 {
     // map namespaces to appropriate icons
     private const NAMESPACE_MAP = [
@@ -106,5 +104,57 @@ class Icon
         $bottom = (($index + 1) * $step);
 
         return new Sequence(new Crop(0, $top, 100, $bottom), new Square($size));
+    }
+
+
+    /**
+     * Returns a cache key for a transformation
+     *
+     * @param string $icon
+     * @param int    $size
+     * @return string
+     */
+    public function getCacheKey(string $icon, int $size): string
+    {
+        return "$icon-$size";
+    }
+
+    /**
+     * Returns whether this class generated the specified cache key
+     *
+     * @param string $cacheKey
+     * @return bool
+     */
+    public function recognisesCacheKey(string $cacheKey): bool
+    {
+        if (!preg_match('/([a-z]+)-(\d+)/', $cacheKey, $matches)) {
+            return false;
+        }
+        array_shift($matches);
+        [$icon, $size] = $matches;
+
+        return
+            (in_array($icon, self::VALID_CROPS, true) || array_key_exists($icon, self::NAMESPACE_MAP)) &&
+            in_array($size, self::VALID_SIZES, false);
+    }
+
+    /**
+     * Returns a Transform for the given cache key
+     *
+     * @param string $cacheKey
+     * @return ITransform
+     * @throws InvalidArgumentException
+     */
+    public function retrieveForCacheKey(string $cacheKey): ITransform
+    {
+        [$icon, $size] = explode('-', $cacheKey);
+        return $this->retrieve($icon, (int)$size);
+    }
+
+
+    /** @inheritDoc */
+    public static function getSlug(): string
+    {
+        return 'icon';
     }
 }

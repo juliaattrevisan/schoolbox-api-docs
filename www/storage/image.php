@@ -9,6 +9,7 @@
  */
 
 use Alaress\Image;
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
@@ -45,10 +46,13 @@ try {
             }
         }
 
-        $imageProcessor = new Image\Processor($resource, $size, (new Transformation\Storage())->retrieve($size));
+        $transforms     = new Transformation\Storage();
+        $imageProcessor = new Image\Processor($resource, $transforms->getCacheKey($size), $transforms->retrieve($size));
         $imageProcessor->load()->stream();
         exit;
     }
+} catch (ConcurrentTransformationException $e) {
+    SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], $e->getHttpStatusCode());
 } catch (Exception $e) {
     // fall through
 }

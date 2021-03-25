@@ -88,8 +88,11 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $processor = new Image\Processor($storage, $size, (new Image\Transformation\Storage())->retrieve($size));
+    $transforms = new Image\Transformation\Storage();
+    $processor  = new Image\Processor($storage, $transforms->getCacheKey($size), $transforms->retrieve($size));
     $processor->load()->stream();
+} catch (Image\Exception\ConcurrentTransformationException $e) {
+    \SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
 } catch (\Throwable $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);
 }

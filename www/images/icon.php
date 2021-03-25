@@ -10,6 +10,7 @@
 
 use Alaress\Image\Cache\LocalFS;
 use Alaress\Image;
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Schoolbox\Config\ConfigMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -26,10 +27,13 @@ $size = str_replace('square', '', $size);
 
 // Try to output the fail image. If even THAT fails, just redirect to the image.
 try {
-    $transform      = (new Image\Transformation\Icon())->retrieve($icon, $size);
-    $cache_key      = "$icon-$size";
+    $iconTransform  = new Image\Transformation\Icon();
+    $transform      = $iconTransform->retrieve($icon, $size);
+    $cache_key      = $iconTransform->getCacheKey($icon, $size);
     $imageProcessor = new Image\Processor(LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
     $imageProcessor->load()->stream();
+} catch (ConcurrentTransformationException $e) {
+    SitePage::redirectToBrokenImage($e->getHttpStatusCode());
 } catch (Exception $e) {
 //  echo $e;
     SitePage::redirectToBrokenImage();

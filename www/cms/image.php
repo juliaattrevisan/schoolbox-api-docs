@@ -8,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Processor;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -29,7 +30,7 @@ session_start();
 
 /* Choose a caching method to use
  */
-$cacheKey = $_GET['width'] . 'x' . $_GET['height'];
+
 
 try {
     $file = Schoolbox\Resource\File\Mapper::getInstance()->findById($_GET['id']);
@@ -46,6 +47,8 @@ try {
 
 /* Process and stream image
  */
+$myImage  = new Transformation\MyImage();
+$cacheKey = $myImage->getCacheKey((int)$_GET['width'], (int)$_GET['height']);
 try {
     /** @var Schoolbox\Resource\File\Model $file */
     /** @var Schoolbox\Resource\Storage\Model $resource */
@@ -72,9 +75,11 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $transform      = (new Transformation\MyImage())->retrieve((int)$_GET['width'], (int)$_GET['height']);
+    $transform      = $myImage->retrieve((int)$_GET['width'], (int)$_GET['height']);
     $imageProcessor = new Processor($resource, $cacheKey, $transform);
     $imageProcessor->load()->stream();
+} catch (ConcurrentTransformationException $e) {
+    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);
 } catch (Exception $e) {

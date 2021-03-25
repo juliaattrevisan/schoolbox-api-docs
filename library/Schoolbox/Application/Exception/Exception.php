@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Exception
+ * Runtime exception with a HTTP status code.
  *
  * A generic exception that encapsulates the rudest of all Exceptions
  *

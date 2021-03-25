@@ -12,6 +12,12 @@
 # m h dom mon dow user command
 MAILTO="support@schoolbox.com.au"
 
+# Image Processing - Every 5 minutes. Standard transforms + timed-out web request transforms
+*/5 * * * *	www-data    /usr/share/schoolbox/tools/image/processor.php -vvv >> /var/lib/schoolbox/cache/logs/image-processor.log 2>&1
+
+# Image Processing - Nightly at 1am. Failed transforms are retried.
+0 1 * * *	www-data    /usr/share/schoolbox/tools/image/processor.php --retry-failed -vvv >> /var/lib/schoolbox/cache/logs/image-processor-failed.log 2>&1
+
 # Video Processing
 */2 * * * *	www-data	php /usr/share/schoolbox/tools/video/processor.php >> /var/lib/schoolbox/cache/logs/transcode.log 2>&1
 

@@ -9,6 +9,7 @@
  */
 
 use Alaress\Image;
+use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Transformation;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
@@ -58,11 +59,11 @@ if (!(array_key_exists($logo, $logoSizes) && array_key_exists($size, $logoSizes[
     SitePage::redirectToBrokenImageOfSize(80, 80, 404);
 }
 
-
+$myImage = new Transformation\MyImage();
+$key     = $myImage->getCacheKey($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
 try {
     /* Choose a caching method to use
      */
-    $key            = $logoSizes[$logo][$size][0] . 'x' . $logoSizes[$logo][$size][1];
     $hash           = Config::get($logo);
     if (!$hash) {
         // Quick hack to prevent avoidable db query (shouldn't be throwing exceptions for this)
@@ -92,9 +93,19 @@ try {
 
     /* Process and stream image
      */
-    $transform      = (new Transformation\MyImage())->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
+    $transform      = $myImage->retrieve($logoSizes[$logo][$size][0], $logoSizes[$logo][$size][1]);
     $imageProcessor = new Image\Processor($resource, $key, $transform);
     $imageProcessor->load()->stream();
+    exit;
+} catch (ConcurrentTransformationException $e) {
+    $responseCode = $e->getHttpStatusCode();
+    $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
+    if (is_readable($placeHolderFile)) {
+        header('Content-type: image/png');
+        readfile($placeHolderFile);
+        exit;
+    }
+    SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $responseCode);
 } catch (Exception $e) {
     // redirect to the placeholder
     /** @var PrefixGenerator $cdnPrefixGenerator */

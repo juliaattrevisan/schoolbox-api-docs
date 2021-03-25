@@ -30,6 +30,7 @@ switch ($_GET['code']) {
     case 403:
     case 404:
     case 500:
+    case 503:
         $code = $_GET['code'];
         break;
 
@@ -56,37 +57,45 @@ switch ($code) {
 $transform = null;
 $cache_key = null;
 switch ($_GET['transform_type']) {
-    case 'portrait':
-        $path          = '/images/placeholders/portrait.png';
-        $transforms     = new Image\Transformation\Portrait();
-        $transform_key = $_GET['transform'];
+    case Image\Transformation\Portrait::getSlug():
+        $path       = '/images/placeholders/portrait.png';
+        $transforms = new Image\Transformation\Portrait();
+        $size       = $_GET['transform'] ?? '';
         try {
-            $transform = $transforms->retrieve($transform_key ?? '');
+            $transform = $transforms->retrieve($size);
+            $cache_key = $transforms->getCacheKey($size);
         } catch (\OutOfBoundsException $e) {
             $transform = $transforms->retrieve('profile');
+            $cache_key = $transforms->getCacheKey('profile');
         }
-        $cache_key = "portrait-$transform_key";
         break;
 
-    case 'storage':
-        $transforms     = new Image\Transformation\Storage();
-        $transform_key = $_GET['transform'];
+    case Image\Transformation\Storage::getSlug():
+        $transforms = new Image\Transformation\Storage();
+        $size       = $_GET['transform'] ?? '';
         try {
-            $transform = $transforms->retrieve($transform_key ?? '');
+            $transform = $transforms->retrieve($size);
+            $cache_key = $transforms->getCacheKey($size);
         } catch (\OutOfBoundsException $e) {
             $transform = $transforms->retrieve('maxsize');
+            $cache_key = $transforms->getCacheKey('maxsize');
         }
-        $cache_key = "storage-$transform_key";
         break;
 
+    case Image\Transformation\MyImage::getSlug():
     default:
         $width     = intval($_GET['width']) ?: 100;
         $height    = intval($_GET['height']) ?: 100;
-        $transform = (new Image\Transformation\MyImage())->retrieve($width, $height);
-        $cache_key = "{$width}x{$height}";
+        $myImage   = new Image\Transformation\MyImage();
+        $transform = $myImage->retrieve($width, $height);
+        $cache_key = $myImage->getCacheKey($width, $height);
         break;
 }
 
+// If transient (503), otherwise likely a 200, regardless if a 4/5xx, to enable caching of broken images
+if ($code === 503) {
+    http_response_code($code);
+}
 // Try to transform the fail image in /resources
 // If even THAT fails, just redirect to the static version.
 // (The redirect should never happen anymore, as an invalid transform falls back
@@ -98,6 +107,8 @@ try {
         $transform
     );
     $imageProcessor->load()->stream();
+} catch (Image\Exception\ConcurrentTransformationException $e) {
+    SitePage::localRedir($path, false, $e->getHttpStatusCode());
 } catch (Exception $e) {
     /** @var PrefixGenerator $prefixGenerator */
     $prefixGenerator = $kernel->get('cdnPrefixGenerator');
