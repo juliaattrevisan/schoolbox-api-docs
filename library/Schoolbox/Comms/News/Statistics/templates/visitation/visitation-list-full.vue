@@ -29,19 +29,13 @@ export default {
     },
 
     data () {
-
         return {
-
-            /* True, when data is currently isLoading; used to show skeleton
-             */
-            isLoading: true,
-               
-            /* The table headings to display and thus row data to show
-             */
-            columns: [
+            isLoading: true, //used to show skeleton
+            columns: [ //The table headings to display and thus row data to show
                 {
                     label: 'Name',
-                    field: 'fullname'
+                    field: 'fullname',
+                    sortFn: this.sortName
                 },
                 {
                     label: 'Role',
@@ -53,17 +47,12 @@ export default {
                     formatFn: this.formatLastVisited
                 },
             ],
-
-            /* Will hold the row data once it's loaded
-                */
-            rows: []
-
+            rows: [] //Will hold the row data once it's loaded
         }
-
     },
 
     created () {
-        dayjs.extend(relativeTime);
+        dayjs.extend(relativeTime); //add the relativeTime plugin to be able to use fromNow() in formatLastVisited
     },
 
     mounted () {
@@ -77,33 +66,36 @@ export default {
          *
          */
         loadRows () {
-
             fetchAsJson(ENDPOINTS.payloadFullPath(this.payload.article.id))
                 .then((response) => {
-                    
-                    /* Load into vue component
-                        */
-                    this.rows = response;
-                    
-                    /* Hide skeleton
-                        */
-                    this.isLoading = false;
-
+                    this.rows = response; //Load into vue component
+                    this.isLoading = false; //Hide skeleton
+                
                 }).catch((error) => {
                     this.isLoading = false; //display error note in the DOM
                 }); 
+        },
 
+        /**
+         * use the last name for formatting the full name
+         * https://xaksis.github.io/vue-good-table/guide/configuration/column-options.html#sortfn
+         *
+         */
+        sortName (x, y, col, rowX, rowY) {
+            return (rowX.lastname < rowY.lastname ? -1 : (rowX.lastname > rowY.lastname ? 1 : 0));
         },
 
         /**
          * format the ISO date for better readability
-         *
+         * https://xaksis.github.io/vue-good-table/guide/configuration/column-options.html#formatfn
+         *          
+         * @returns {String} - eg: Mar 19, 2021 08:52am (4 minutes ago)
          */
         formatLastVisited (value) {
             const nice = dayjs(value).format('MMM D, YYYY hh:mma');
             const relative = dayjs(value).fromNow();
             return nice + ' (' + relative + ')';
-        },
+        }
         
     }
 
@@ -134,7 +126,7 @@ export default {
                             :rows="rows"
                             :search-options="{
                                 enabled: true,
-                                placeholder: 'Search for users...',
+                                placeholder: 'Search for visitors...',
                             }"
                             :sort-options="{
                                 initialSortBy: { 
@@ -149,7 +141,11 @@ export default {
                                 rowsPerPageLabel: 'Users per page',
                                 infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
                             }"
-                        />
+                        >
+                            <div slot="emptystate">
+                                <p>No visitors found</p>
+                            </div>
+                        </vue-good-table>
                     </section>
                 </template>
             </div>

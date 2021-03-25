@@ -18,7 +18,7 @@ module.exports = {
         resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js",
         eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
         calendarComponent: "./library/Schoolbox/Calendar/vue/component.main.js",
-        visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/init-visitation-list-full.js',
+        visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
