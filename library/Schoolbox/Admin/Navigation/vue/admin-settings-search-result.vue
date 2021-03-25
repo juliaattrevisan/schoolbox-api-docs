@@ -9,7 +9,7 @@
 import { getIndex } from '@shared/util/domTools';
 
 export default {
-	
+
 	props: {
     	result: {
       		type: Object,
@@ -75,7 +75,7 @@ export default {
 
 
   	methods: {
-		
+
 		/**
 		 * to highlight the current selection relative to key events
 		 * needs to be updated once the animations have completed
@@ -130,8 +130,8 @@ export default {
 </script>
 
 <template>
-	<a class="search-result" 
-		:href="result.url" 
+	<a class="search-result"
+		:href="result.url"
 		:class="{ searchResultActive: isActive }"
 		@mouseover="mouseOverResult"
 		@click.prevent="selectResult"
@@ -147,8 +147,6 @@ export default {
 
 .search-result {
   display: block;
-  margin-top: -1px; //so don't get double borders when stacked
-  border: 1px solid #0066b0;
   padding: .75rem;
   background: white;
   transition: back ground 0.2s;

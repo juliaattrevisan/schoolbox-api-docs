@@ -57,7 +57,7 @@ export default {
 
         /**
          * the search string broken into words, to search for each word
-         * 
+         *
          * @returns {Array} the search string broken into single words
          */
         searchStringWordList () {
@@ -134,31 +134,31 @@ export default {
          * find all those results that match EACH search word
          * within the the title field
          *
-         * @params {Object} 
-         * 
-         * @return {Boolean} true if found 
+         * @params {Object}
+         *
+         * @return {Boolean} true if found
          */
         searchForTitle (setting) {
             let wordMatchCount = 0;
             this.searchStringWordList.forEach(wordInSearch => {
                 if (setting.title?.toLowerCase().includes(wordInSearch.toLowerCase())) {
                     wordMatchCount++;
-                } 
+                }
             });
             if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
                 return true;
             } else {
-                return false; 
+                return false;
             }
 		},
 
         /**
          * find all those results that match EACH search word
          * within the name and description fields
-         * 
-         * @params {Object} 
          *
-         * @return {Boolean} true if found 
+         * @params {Object}
+         *
+         * @return {Boolean} true if found
          */
         searchForNameAndDescription (setting) {
             let wordMatchCount = 0;
@@ -167,12 +167,12 @@ export default {
                     || setting.description?.toLowerCase().includes(wordInSearch.toLowerCase()))
                     && (!setting.title?.toLowerCase().includes(wordInSearch.toLowerCase()))) {
                     wordMatchCount++;
-                } 
+                }
             });
             if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
                 return true;
             } else {
-                return false; 
+                return false;
             }
 		},
 
@@ -183,13 +183,13 @@ export default {
 		initKeyboardEvents () {
 			document.addEventListener('keyup', (event) => {
                 const keyName = event.key;
-                
+
                 if (keyName === 'Enter') {
                     this.selectResult(this.filteredSearchList[this.activeIndex].url);
-                
+
                 } else if (keyName === 'ArrowUp') {
                     this.decrementActiveIndex();
-               
+
                 } else if (keyName === 'ArrowDown') {
                     this.incrementActiveIndex();
 
@@ -220,7 +220,7 @@ export default {
 		},
 
         /**
-         * to be able to close the menu when something else 
+         * to be able to close the menu when something else
          * is selected outside the menu
          *
          */
@@ -228,7 +228,7 @@ export default {
 			document.addEventListener('click', (event) => {
                 if (!this.$el.contains(event.target)) {
                     this.clearInput();
-                } 
+                }
             });
 		},
 
@@ -339,7 +339,7 @@ export default {
 		},
 
         /**
-         * to move to the page the selected search result is on 
+         * to move to the page the selected search result is on
          * which will have the result highlighted
          */
         selectResult (url) {
@@ -401,13 +401,15 @@ export default {
 
 <style lang="scss" scoped>
 
+@import 'www/static/css/foundation/utils/_variables.scss';
+
 .admin-search-container {
   position: relative;
 
   > div {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: absolute;
-    top: 41px;
+    top: 40px;
     z-index: 10;
   }
 }
@@ -422,7 +424,17 @@ ul {
   }
 
   li {
+    border-bottom: 1px solid $body-bg;
+    border-left: 1px solid $navigation-hover;
+    border-right: 1px solid $navigation-hover;
     transform: none !important;
+
+    &:first-child {
+      border-top: 1px solid $navigation-hover;
+    }
+    &:last-child {
+      border-bottom: 1px solid $navigation-hover;
+    }
   }
 }
 
