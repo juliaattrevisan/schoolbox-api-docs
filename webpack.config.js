@@ -110,6 +110,7 @@ module.exports = {
 
             // This is a Webpack-built module for strtotime
             './www/static/javascript/components/strtotime.bundle.js',
+            // './node_modules/strtotime/index.js',
 
             // Allow deference of form submit actions
             './www/static/javascript/shared/jquery.stallSubmit.js',
@@ -118,10 +119,6 @@ module.exports = {
             // Various javascripts that are so tiny they didn't get
             // their own files/plugins
             './www/static/javascript/shared/miscellaneous.js',
-
-            //Maths formulas
-            //'www/static/javascript/math/jscurry-0.3.0.js',
-            //'www/static/javascript/math/jqmath-0.4.0.js'
 
             // Feature tours
             './www/static/javascript/components/intro.js/intro.js',
@@ -143,13 +140,13 @@ module.exports = {
             './www/static/javascript/shared/masonry/jquery.masonry.js',
             './www/static/javascript/shared/masonry/jquery.masonry.spectrum.js'
         ],
-        fullcalendarOld: [
+        fullcalendarInline: [
             // Required for the datepicker calendar for now
             './node_modules/@fullcalendar/core/main.js',
             './node_modules/@fullcalendar/list/main.js'
         ],
-        vue: [ // Death to jQuery!
-            './node_modules/vue/dist/vue.min.js',
+        vueInline: [ // Death to jQuery!
+            './node_modules/vue/dist/vue.js',
             './node_modules/vuejs-paginate/dist/index.js',
             './node_modules/axios/dist/axios.js'
         ],
@@ -203,6 +200,46 @@ module.exports = {
     },
     module: {
         rules: [
+            {
+                test: require.resolve("jquery"),
+                loader: "expose-loader", //see https://webpack.js.org/loaders/expose-loader/ - expose to outside the bundles (JS in twig files)
+                options: {
+                    exposes: [
+                        {
+                            globalName: "$",
+                            override: true
+                        },
+                        {
+                            globalName: "jQuery",
+                            override: true
+                        },
+                    ],
+                },
+            },
+            {
+                test: require.resolve("dropzone"),
+                loader: "expose-loader", //see https://webpack.js.org/loaders/expose-loader/ - expose to outside the bundles (JS in twig files)
+                options: {
+                    exposes: [
+                        {
+                            globalName: "Dropzone",
+                            override: true
+                        }
+                    ],
+                },
+            },
+            {
+                test: require.resolve("vue"),
+                loader: "expose-loader", 
+                options: {
+                   exposes: [
+                        {
+                            globalName: "Vue",
+                            override: true
+                        }
+                    ],
+                },
+            },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
@@ -263,7 +300,7 @@ module.exports = {
                                     outputPath: "../../css/core/"
                                 }
                             },
-                            {loader: "extract-loader"},
+                            { loader: "extract-loader" },
                             {
                                 loader: "css-loader",
                                 options: {
@@ -298,10 +335,11 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            Dropzone: 'dropzone'
+        new webpack.ProvidePlugin({ //see https://webpack.js.org/plugins/provide-plugin/ - expose within the bundles
+            Vue: 'vue',
+            VuejsPaginate: 'vuejs-paginate',
+            axios: 'axios',
+            moment: 'moment',
         }),
         new VueLoaderPlugin()
         // new FixStyleOnlyEntriesPlugin() --refer to https://stackoverflow.com/questions/65270741/webpack-5-chunkgroup-api-with-multiple-entries

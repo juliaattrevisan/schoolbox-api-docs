@@ -2,11 +2,11 @@
 
 Sometimes you're working with a large data se and it's not nice to show it all at the same time. We can paginate it using a third party component `VuejsPaginate`.
 
-This is already included in a special minified file `vue.bundle.js` which is secretly compiled elsewhere. You can just use it, for now, like this:
+This is already included in a special minified file `vueInline.bundle.js` which is secretly compiled elsewhere. You can just use it, for now, like this:
 
 ```html
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="{{ CDN_PREFIX }}/javascript/components/vue.bundle.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/components/vueInline.bundle.js"></script>
 <script src="{{ CDN_PREFIX }}/javascript/components/userList.bundle.js"></script>
 ```
 
