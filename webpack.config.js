@@ -145,11 +145,11 @@ module.exports = {
             './node_modules/@fullcalendar/core/main.js',
             './node_modules/@fullcalendar/list/main.js'
         ],
-        vueInline: [ // Death to jQuery!
-            './node_modules/vue/dist/vue.js',
-            './node_modules/vuejs-paginate/dist/index.js',
-            './node_modules/axios/dist/axios.js'
-        ],
+        // vueInline: [ // Omit to avoid issues with loading both Vue via src and via import Vue from 'Vue' - moving all Vue to modules is in progress
+        //     './node_modules/vue/dist/vue.js',
+        //     './node_modules/vuejs-paginate/dist/index.js',
+        //     './node_modules/axios/dist/axios.js'
+        // ],
 
         // Libraries
         clipboard: "./www/static/javascript/shared/clipboard/clipboard.main.js",
@@ -223,18 +223,6 @@ module.exports = {
                     exposes: [
                         {
                             globalName: "Dropzone",
-                            override: true
-                        }
-                    ],
-                },
-            },
-            {
-                test: require.resolve("vue"),
-                loader: "expose-loader", 
-                options: {
-                   exposes: [
-                        {
-                            globalName: "Vue",
                             override: true
                         }
                     ],
@@ -336,7 +324,6 @@ module.exports = {
     },
     plugins: [
         new webpack.ProvidePlugin({ //see https://webpack.js.org/plugins/provide-plugin/ - expose within the bundles
-            Vue: 'vue',
             VuejsPaginate: 'vuejs-paginate',
             axios: 'axios',
             moment: 'moment',
