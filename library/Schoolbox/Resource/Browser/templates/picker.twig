@@ -1,7 +1,7 @@
 {% import '@resourceBrowser/macro/nodeIcon.twig' as nodeIcon %}
 
 {# Load in required JS/CSS as we are not inside the chrome #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/schoolbox.min.js?v={{ site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/main.bundle.js?v={{ site_version }}"></script>
 {% include 'include/skin.twig' with { config: config } only %}
 
 {# Load JS for treeview #}
