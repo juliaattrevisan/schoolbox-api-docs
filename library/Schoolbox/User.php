@@ -1445,4 +1445,13 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         $this->pastoralGroupsMemberships->replaceWith($pastoralGroupsMemberships);
         return $this;
     }
+
+    /**
+     * @return bool
+     */
+    public function getLearningMomentsEnabled(): bool
+    {
+        // If year is not set, fall back to global config
+        return (null === $this->getYear()) || $this->getYear()->getLearningMomentsEnabled();
+    }
 }

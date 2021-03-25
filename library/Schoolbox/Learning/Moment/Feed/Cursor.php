@@ -97,7 +97,7 @@ class Cursor implements ICursor
         $this->user                   = $user;
         $this->limit                  = $limit;
         $this->codec                  = $codec ?? new Base64();
-        $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED);
+        $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED) && $user->getLearningMomentsEnabled();
         $this->badgesEnabled          = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
     }
 
@@ -169,7 +169,7 @@ class Cursor implements ICursor
             'limit' => $this->limit,
         ];
         $wherePart = '';
-        
+
         if (isset($encodedCursor)) {
             // the cursor contains 'date', 'id', 'discriminator' fields
             $cursor = $this->codec->decode($encodedCursor);
@@ -189,9 +189,9 @@ class Cursor implements ICursor
             $params['discriminator3'] = $cursor['discriminator'];
             $params['id3']            = $cursor['id'];
         }
-        
+
         $queries = [];
-        
+
         if ($this->learningMomentsEnabled) {
             $queries[]                       = '
                 SELECT

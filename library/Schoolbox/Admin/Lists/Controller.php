@@ -770,7 +770,7 @@ class Controller extends Base
             'fields' => [
                 YearLevel\Mapper::COL_NAME => [
                     'caption'   => 'Name',
-                    'width'     => 2,
+                    'width'     => 1,
                     'maxLength' => 150,
                     'mandatory' => true,
                 ],
@@ -836,6 +836,13 @@ class Controller extends Base
                 'lmsCohortComparison' => [
                     'caption'   => 'Enable Cohort Comparison',
                     'tooltip'   => 'If toggled \'ON\', the graphs in the Grades page will use marks from the entire cohort instead of just the class.',
+                    'checkbox'  => true,
+                    'width'     => 1,
+                    'mandatory' => true,
+                ],
+                'learningMomentsEnabled' => [
+                    'caption'   => 'Learning Moments Enabled',
+                    'tooltip'   => 'If toggled \'ON\', learning moments will be enabled for the students in this year level.',
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
