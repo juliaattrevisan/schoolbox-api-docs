@@ -14,11 +14,22 @@
 
 <script type="text/javascript">
     $(function() {
+        let settingsForm = $('#settings');
 
-        var settingsForm = $('#settings');
+        /* Used to preselect a field when you come from search results
+         * which has the capability to highlight an input field with a colour
+         *
+         * This colour and style setting is arbitrarily defined here but is
+         * optionally extant (you might be here without using search)
+         */
+        let hash = window.location.hash.substr(1);
+
+        if (hash.length) {
+            document.getElementById(hash).parentElement.style.backgroundColor = "#ffa";
+        }
 
         /**
-         * checks if a search result has been selected from #admin-settings-search.vue 
+         * checks if a search result has been selected from #admin-settings-search.vue
          * so can highlight the result accordingly
          */
         const checkForAdminSearchHighlight = () => {
@@ -26,21 +37,21 @@
             const element = document.getElementById(hash);
             if (element) {
                 element.parentElement.classList.add('highlight-admin-search-selection');
-                setTimeout(() => { 
+                setTimeout(() => {
                     element.parentElement.classList.remove('highlight-admin-search-selection');
                 }, 5000);
             }
             return element;
-        } 
+        }
         let currentHighlightedElement = checkForAdminSearchHighlight();
 
         /**
          * to handle additional search results selected that exist
          * on the same page
          */
-        document.addEventListener('admin-settings-search__on-result-selected', (event) => { 
+        document.addEventListener('admin-settings-search__on-result-selected', (event) => {
             if (currentHighlightedElement) {
-                currentHighlightedElement.parentElement.classList.remove('highlight-admin-search-selection'); 
+                currentHighlightedElement.parentElement.classList.remove('highlight-admin-search-selection');
             }
             currentHighlightedElement = checkForAdminSearchHighlight();
         });
