@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\YearLevel;
@@ -80,6 +82,11 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
      * @var bool
      */
     private $lmsCohortComparison;
+
+    /**
+     * @var bool
+     */
+    private $learningMomentsEnabled;
 
     /**
      * @return string
@@ -273,10 +280,29 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 
     /**
      * @param bool $lmsCohortComparison
+     * @return static`
      */
     public function setLmsCohortComparison(bool $lmsCohortComparison): self
     {
         $this->lmsCohortComparison = $lmsCohortComparison;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLearningMomentsEnabled(): bool
+    {
+        return $this->learningMomentsEnabled;
+    }
+
+    /**
+     * @param bool $learningMomentsEnabled
+     * @return static
+     */
+    public function setLearningMomentsEnabled(bool $learningMomentsEnabled): self
+    {
+        $this->learningMomentsEnabled = $learningMomentsEnabled;
         return $this;
     }
 

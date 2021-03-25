@@ -44,7 +44,7 @@ class Module extends BaseModule
         );
 
         // In addition: if posting a moment for someone else,
-        // that someone else must be a student
+        // that someone else must be a student in a year level which learning_moments_enabled is true
         $isTargetUserSelfOrStudentRule = new Rule\Callback(function (array $params, User $user) {
             $this->authorizeAllUsersAreSelfOrStudent($params, $user);
         });
@@ -326,6 +326,9 @@ class Module extends BaseModule
         foreach ($params['users'] ?? [] as $user) {
             if (!$user instanceof User) {
                 continue;
+            }
+            if (!$user->getLearningMomentsEnabled()) {
+                throw new Forbidden();
             }
             if ($currentUser->getId() === $user->getId()) {
                 continue;

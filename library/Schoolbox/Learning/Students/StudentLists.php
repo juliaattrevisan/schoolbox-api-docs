@@ -113,6 +113,7 @@ class StudentLists
                 $students[$key]['id'] = $user->getId();
                 $students[$key]['email'] = $user->getEmail();
                 $students[$key]['lastAccessTime'] = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
+                $students[$key]['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();
 
                 $students[$key]['routes'] = [
                     // Due work

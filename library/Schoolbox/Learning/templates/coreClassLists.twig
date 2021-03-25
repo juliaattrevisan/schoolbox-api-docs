@@ -19,7 +19,7 @@ Data:
             <ul class="flex-list flex-wrap buttons">
                 {% if learningMomentsEnabled %}
                     <li><a @click.prevent="openShareLearningMomentDialog"
-                           :class="{disabled: selectedStudentIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
+                           :class="{disabled: selectedStudentLearningMomentsEnabledIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
                 {% endif %}
                 {% if badgesEnabled %}
                     <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set Goals</a></li>
@@ -298,14 +298,14 @@ Data:
                 dialog.find('a[data-action="shareLearningMoment"]').each(function () {
                     let url      = new URL(this.href);
                     url.pathname = self.getCreateEvidenceFormEndpoint;
-                    url.searchParams.append('userIds', self.selectedStudentIds.join(','));
+                    url.searchParams.append('userIds', self.selectedStudentLearningMomentsEnabledIds.join(','));
                     this.href = url.href;
                 });
 
                 // Also update the "sharing on behalf of" part here
                 let selectedStudents = [];
                 self.studentLists.forEach(function (student) {
-                    if (student.id && self.selectedStudentIds.includes(student.id)) {
+                    if (student.id && self.selectedStudentLearningMomentsEnabledIds.includes(student.id)) {
                         selectedStudents.push(student);
                     }
                 });
@@ -373,6 +373,16 @@ Data:
                     self = this;
                 self.studentLists.forEach(function (student) {
                     if (student.isChecked && student.id) {
+                        ids.push(student.id);
+                    }
+                });
+                return ids;
+            },
+            selectedStudentLearningMomentsEnabledIds: function () {
+                let ids  = [],
+                        self = this;
+                self.studentLists.forEach(function (student) {
+                    if (student.isChecked && student.learningMomentsEnabled) {
                         ids.push(student.id);
                     }
                 });
