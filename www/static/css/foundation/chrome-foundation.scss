@@ -4,7 +4,7 @@
 // applied before all url() CSS rules
 // The CDN prefix relative to the compiled stylesheet
 // (currently CDN_PREFIX + '/css/core/chrome-foundation.css')
-$cdn-prefix: '../..';
+$cdn-prefix: "../..";
 
 // Utils
 @import "utils/colors";
@@ -154,3 +154,14 @@ $cdn-prefix: '../..';
 // jQuery UI
 @import "../../javascript/components/jquery-ui/themes/base/draggable";
 @import "../../javascript/components/jquery-ui/themes/base/sortable";
+
+// client custom CSS overrides:
+// no longer required, as they're included by www/css/core/skin.css.php
+//@import 'utils/custom';
+
+html {
+  scroll-behavior: smooth;
+}
+.highlight-admin-search-selection {
+  background-color: #ffa;
+}

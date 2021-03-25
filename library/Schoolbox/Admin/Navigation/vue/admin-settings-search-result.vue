@@ -6,71 +6,139 @@
  *
  */
 
+import { getIndex } from '@shared/util/domTools';
+
 export default {
 
-  props: {
-    result: {
-      type: Object,
-      required: true,
-      default: () => {
-        return {
-          name: 'name',
-          title: 'title',
-          description: 'description',
-          module: 'module',
-          url: 'url'
-        }
-      }
-    },
-    currentSearchString: {
-      type: String,
-      required: true,
-      default: ''
-    }
-  },
+	props: {
+    	result: {
+      		type: Object,
+      		required: true,
+      		default: () => {
+				return {
+					name: 'name',
+					title: 'title',
+					description: 'description',
+					module: 'module',
+					url: 'url'
+				}
+      		}
+    	},
+    	searchStringWordList: {
+     		type: Array,
+      		required: true,
+      		default: []
+    	},
+		activeIndex: {
+     		type: Number,
+      		required: true,
+      		default: 0
+    	}
+  	},
 
-  computed: {
+	data () {
+    	return {
+			itemIndex: -1,
+			isActive: false
+    	}
+  	},
 
-    linkUrl() {
-      return this.result.url;
-    },
+  	computed: {
 
-    highlightTitleSearch() {
-      return this.highlightSearchInElement(this.result.title);
-    },
+    	highlightTitleSearch () {
+      		return this.highlightSearchInElement(this.result.title);
+    	},
 
-    highlightDescriptionSearch() {
-      return this.highlightSearchInElement(this.result.description);
-    }
+    	highlightDescriptionSearch () {
+      		return this.highlightSearchInElement(this.result.description);
+    	}
 
-  },
+  	},
 
-  methods: {
+	watch: {
+		activeIndex () {
+			this.checkIndex();
+		}
+	},
 
-    /**
-     * To highlight where the search string matches within the settings result
-     *
-     * @params {String} the string to find all instanced of the current search string in
-     *
-     * @returns {String} string for v-html with <span></span> wrapped around each found result
-     */
-    highlightSearchInElement(toHighlight) {
-      return toHighlight?.replace(new RegExp(this.currentSearchString, "gi"), match => {
-        return '<mark>' + match + '</mark>';
-      });
-    }
+	mounted () {
+		this.checkIndex();
+	},
 
-  }
+	updated () {
+		this.checkIndex();
+	},
+
+	beforeDestroy () {
+		this.checkIndex();
+	},
+
+
+  	methods: {
+
+		/**
+		 * to highlight the current selection relative to key events
+		 * needs to be updated once the animations have completed
+		 *
+		 */
+		checkIndex() {
+			this.itemIndex = getIndex(this.$el.parentElement);
+			if (this.itemIndex === this.activeIndex) {
+				this.isActive = true;
+			} else {
+				this.isActive = false;
+			}
+		},
+
+		/**
+		 * To highlight where the search string matches within the settings result
+		 *
+		 * @params {String} the string to find all instanced of the current search string in
+		 *
+		 * @returns {String} string for v-html with <mark></mark> wrapped around each found result
+		 */
+		highlightSearchInElement(toHighlight) {
+			let highlighted = toHighlight;
+			this.searchStringWordList.forEach(wordInSearch => {
+				highlighted = highlighted.replace(new RegExp(wordInSearch, "gi"), match => {
+					return '<mark>' + match + '</mark>';
+				});
+			});
+			return highlighted;
+		},
+
+		/**
+		 * so mouse selection takes precendence over the arrow/enter selection
+		 *
+		 */
+		mouseOverResult() {
+			this.$emit('on-mouse-over-result');
+		},
+
+		/**
+		 * dispatch to parent so can move to relevant settings page
+		 *
+		 */
+		selectResult() {
+			this.$emit('on-selected-result', this.result.url);
+		}
+
+  	}
 
 }
 
 </script>
 
 <template>
-  <a class="search-result" :href="linkUrl">
-    <h4 class="result-title" v-html="highlightTitleSearch"></h4>
-    <p class="result-description" v-html="highlightDescriptionSearch"></p>
-  </a>
+	<a class="search-result"
+		:href="result.url"
+		:class="{ searchResultActive: isActive }"
+		@mouseover="mouseOverResult"
+		@click.prevent="selectResult"
+	>
+    	<h4 class="result-title" v-html="highlightTitleSearch"></h4>
+    	<p class="result-description" v-if="result.description" v-html="highlightDescriptionSearch"></p>
+  	</a>
 </template>
 
 <style lang="scss" scoped>
@@ -79,8 +147,6 @@ export default {
 
 .search-result {
   display: block;
-  margin-top: -1px; //so don't get double borders when stacked
-  border: 1px solid #0066b0;
   padding: .75rem;
   background: white;
   transition: back ground 0.2s;
@@ -100,4 +166,9 @@ export default {
     margin-bottom: 0;
   }
 }
+
+.searchResultActive {
+	background: $content-ui-hover;
+}
+
 </style>

@@ -24,30 +24,31 @@ export default {
 			settingsList: [],
             isLoaded: false,
 			hasLoadError: false,
-			currentSearchString: '',
-			minSearchStringLength: 3,
-            searchResultsShownLimit: 6
-    	};
+			searchQuery: '',
+			minSearchQueryLength: 3,
+            searchResultsShownLimit: 6,
+            activeIndex: 0 //to track which index is selected
+    	}
   	},
 
     computed: {
 
         /**
-         * no notify whether still loading the results or not
+         * to notify whether still loading the results or not
          */
         searchInputPlaceholder () {
-			if (!this.isLoaded) {
-                return 'Loading settings, please wait...'
+			if (this.isLoaded) {
+                return 'Search administration settings...';
             } else {
-                return 'Search admin settings...';
+                return 'Loading settings, please wait...'
             }
 		},
 
         /**
-         * only when started typing beyond minSearchStringLength count and there's actual results
+         * only when started typing beyond minSearchQueryLength count and there's actual results
          */
         isSearchActive () {
-			if ((this.currentSearchString.length >= this.minSearchStringLength) && (this.filteredSearchList.length > 0)) {
+			if ((this.searchQuery.length >= this.minSearchQueryLength) && (this.filteredSearchList.length > 0)) {
                 return true
             } else {
                 return false;
@@ -55,21 +56,26 @@ export default {
 		},
 
         /**
+         * the search string broken into words, to search for each word
+         *
+         * @returns {Array} the search string broken into single words
+         */
+        searchStringWordList () {
+			const allWords = this.searchQuery.match(/\b(\w+)\b/g);
+            const onlyWordsAboveTwoLetters = allWords.filter(word => word.length > 1);
+            return onlyWordsAboveTwoLetters;
+		},
+
+        /**
          * the settings relevant to the search input
          */
 		filteredSearchList () {
-			if (this.currentSearchString.length < this.minSearchStringLength) {
+			if (this.searchQuery.length < this.minSearchQueryLength) {
 				return [];
 			}
-			return this.settingsList.filter(setting => { //retrieve all settings that match
-				if (setting.title?.toLowerCase().includes(this.currentSearchString.toLowerCase())
-					|| setting.name?.toLowerCase().includes(this.currentSearchString.toLowerCase())
-					|| setting.description?.toLowerCase().includes(this.currentSearchString.toLowerCase())) {
-					return true;
-				} else {
-					return false;
-				}
-			});
+            const matchedTitleList = this.settingsList.filter(this.searchForTitle);
+            const matchedNameAndDescriptionList = this.settingsList.filter(this.searchForNameAndDescription);
+            return matchedTitleList.concat(matchedNameAndDescriptionList); //so those that have title matches take precedence
 		},
 
         /**
@@ -78,10 +84,9 @@ export default {
 		filteredSearchListLimited () {
             if (this.filteredSearchList.length > this.searchResultsShownLimit) { //return the capped results
                 return this.filteredSearchList.filter((setting, index) => index < this.searchResultsShownLimit);
-            } else { //otherwise just return
+            } else { //otherwise just return the whole list
                 return this.filteredSearchList;
             }
-
 		},
 
         /**
@@ -96,7 +101,7 @@ export default {
 		},
 
         /**
-         * to show how many aren't appearing in the search
+         * to show the count of how many aren't appearing in the search
          */
         resultsBeydondSearchResultsShownLimitCount () {
 			return this.filteredSearchList.length - this.searchResultsShownLimit;
@@ -104,11 +109,128 @@ export default {
 
 	},
 
+    watch: {
+
+        /**
+         * reset the active index when the list changes as the index may become out of range
+         */
+		filteredSearchList (newValue, oldValue) {
+			if ((newValue.length !== oldValue.length) && (this.activeIndex > 0)) {
+                this.activeIndex = 0;
+            }
+		}
+
+	},
+
     mounted () {
+        this.initKeyboardEvents();
+        this.initMouseEvents();
         this.loadSettings();
     },
 
     methods: {
+
+        /**
+         * find all those results that match EACH search word
+         * within the the title field
+         *
+         * @params {Object}
+         *
+         * @return {Boolean} true if found
+         */
+        searchForTitle (setting) {
+            let wordMatchCount = 0;
+            this.searchStringWordList.forEach(wordInSearch => {
+                if (setting.title?.toLowerCase().includes(wordInSearch.toLowerCase())) {
+                    wordMatchCount++;
+                }
+            });
+            if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
+                return true;
+            } else {
+                return false;
+            }
+		},
+
+        /**
+         * find all those results that match EACH search word
+         * within the name and description fields
+         *
+         * @params {Object}
+         *
+         * @return {Boolean} true if found
+         */
+        searchForNameAndDescription (setting) {
+            let wordMatchCount = 0;
+            this.searchStringWordList.forEach(wordInSearch => {
+                if ((setting.name?.toLowerCase().includes(wordInSearch.toLowerCase())
+                    || setting.description?.toLowerCase().includes(wordInSearch.toLowerCase()))
+                    && (!setting.title?.toLowerCase().includes(wordInSearch.toLowerCase()))) {
+                    wordMatchCount++;
+                }
+            });
+            if (wordMatchCount === this.searchStringWordList.length) { //all words have to match
+                return true;
+            } else {
+                return false;
+            }
+		},
+
+        /**
+         * to be able to select by enter and navigate by up/down arrows
+         *
+         */
+		initKeyboardEvents () {
+			document.addEventListener('keyup', (event) => {
+                const keyName = event.key;
+
+                if (keyName === 'Enter') {
+                    this.selectResult(this.filteredSearchList[this.activeIndex].url);
+
+                } else if (keyName === 'ArrowUp') {
+                    this.decrementActiveIndex();
+
+                } else if (keyName === 'ArrowDown') {
+                    this.incrementActiveIndex();
+
+                }
+            });
+		},
+
+        /**
+         * to be able to move up and down through the selections
+         * with the arrow keys
+         *
+         */
+        decrementActiveIndex () {
+            if (this.activeIndex > 0) {
+                this.activeIndex--;
+            }
+		},
+
+        /**
+         * to be able to move up and down through the selections
+         * with the arrow keys
+         *
+         */
+        incrementActiveIndex () {
+            if (this.activeIndex < (this.filteredSearchListLimited.length-1)) {
+			    this.activeIndex++;
+            }
+		},
+
+        /**
+         * to be able to close the menu when something else
+         * is selected outside the menu
+         *
+         */
+		initMouseEvents () {
+			document.addEventListener('click', (event) => {
+                if (!this.$el.contains(event.target)) {
+                    this.clearInput();
+                }
+            });
+		},
 
         /**
          * load the settings for possible retrieval
@@ -120,7 +242,7 @@ export default {
 				this.settingsList = response;
 				this.isLoaded = true;
 			}).catch((error) => {
-				this.hasLoadError = true; //display error note in the DOM
+				this.hasLoadError = true; //hide search bar in the dom
 			});
 		},
 
@@ -137,8 +259,22 @@ export default {
          *
          */
 		clearInput () {
-			this.currentSearchString = '';
+			this.searchQuery = '';
+            this.activeIndex = -1;
 		},
+
+        /**
+         * how the element animates off
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        checkEachResultIndex () {
+            this.$refs.searchResults.forEach(searchResult => {
+                searchResult.checkIndex();
+            });
+        },
 
         /**
          * animate settings to help context when filtering
@@ -149,7 +285,7 @@ export default {
          *
          */
         onBeforeOnEnter (element) {
-            gsap.set(element, { opacity: 0, y: 10, height: 0 });
+            gsap.set(element, { opacity: 0, y: 10, height: 0 } );
         },
 
         /**
@@ -171,9 +307,53 @@ export default {
          * @param {Function} done - to be called once animation is complete
          *
          */
-        onLeaveResult (element, done) {
+        onLeave (element, done) {
             gsap.to(element, 0.3, { opacity: 0, y: 10, height: 0, onComplete: done } );
         },
+
+        /**
+         * how the element animates off
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onAfterLeave (element) {
+            this.$refs.searchResults.forEach(searchResult => {
+                searchResult.test();
+            });
+        },
+
+        /**
+         * a result has been moused over via #admin-settings-search-result
+         */
+        onMouseOverResult () {
+            this.activeIndex = -1; //disable the keyboard selection, mouse takes precedence until search is updated
+		},
+
+        /**
+         * a result has been selected via #admin-settings-search-result
+         */
+        onSelectedResult (url) {
+            this.selectResult(url);
+		},
+
+        /**
+         * to move to the page the selected search result is on
+         * which will have the result highlighted
+         */
+        selectResult (url) {
+            this.clearInput();
+            window.location.href = url;
+            if (window.location.href != url) { //only dispatch if on the same page, otherwise handled in page load in #moduleConfig.twig
+                var event = new CustomEvent('admin-settings-search__on-result-selected', {
+                    detail: {
+                        url: url
+                    }
+                });
+                document.dispatchEvent(event);
+            }
+		}
 
     }
 
@@ -184,7 +364,8 @@ export default {
 <template>
     <div class="admin-search-container">
         <input
-            v-model="currentSearchString"
+            v-if="!hasLoadError"
+            v-model="searchQuery"
             :readonly="!isLoaded"
             :placeholder="searchInputPlaceholder"
             type="text"
@@ -197,12 +378,19 @@ export default {
                 v-bind:css="false"
                 @before-enter="onBeforeOnEnter"
                 @enter="onEnter"
-                @leave="onLeaveResult"
+                @enter-cancelled="checkEachResultIndex"
+                @leave="onLeave"
+                @after-leave="checkEachResultIndex"
+                @leave-cancelled="checkEachResultIndex"
             >
                 <li v-for="(result, index) in filteredSearchListLimited" :key="result.name" :data-index="index">
                     <admin-settings-search-result
+                        ref="searchResults"
                         :result="result"
-                        :current-search-string="currentSearchString"
+                        :search-string-word-list="searchStringWordList"
+                        :active-index="activeIndex"
+                        @on-mouse-over-result="onMouseOverResult"
+                        @on-selected-result="onSelectedResult"
                     />
                 </li>
             </transition-group>
@@ -213,13 +401,15 @@ export default {
 
 <style lang="scss" scoped>
 
+@import 'www/static/css/foundation/utils/_variables.scss';
+
 .admin-search-container {
   position: relative;
 
   > div {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     position: absolute;
-    top: 41px;
+    top: 40px;
     z-index: 10;
   }
 }
@@ -234,7 +424,17 @@ ul {
   }
 
   li {
+    border-bottom: 1px solid $body-bg;
+    border-left: 1px solid $navigation-hover;
+    border-right: 1px solid $navigation-hover;
     transform: none !important;
+
+    &:first-child {
+      border-top: 1px solid $navigation-hover;
+    }
+    &:last-child {
+      border-bottom: 1px solid $navigation-hover;
+    }
   }
 }
 
