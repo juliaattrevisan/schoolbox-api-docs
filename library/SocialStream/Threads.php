@@ -293,67 +293,61 @@ class Threads
         $page->setBlock('socialstream_reply', 'replier_deleted', 'replier_deleted_block');
 
 
-        $page->setVar(
-            array(
-                'socialstream_post_block'                      => '',
-                'socialstream_comment_block'                   => '',
-                'socialstream_comment_list_block'              => '',
-                'socialstream_reply_block'                     => '',
-                'socialstream_reply_list_block'                => '',
-                'socialstream_post_has_attachment_block'       => '',
-                'socialstream_post_has_icon_block'             => '',
-                'socialstream_post_has_image_block'            => '',
-                'socialstream_post_has_thumbnail_block'        => '',
-                'socialstream_post_has_link_block'             => '',
-                'socialstream_post_has_player_block'           => '',
-                'socialstream_post_has_video_block'            => '',
-                'socialstream_post_has_video_pending_block'    => '',
-                'socialstream_post_has_metadata_block'         => '',
-                'socialstream_post_has_delete_block'           => '',
-                'socialstream_comment_has_attachment_block'    => '',
-                'socialstream_comment_has_icon_block'          => '',
-                'socialstream_comment_has_image_block'         => '',
-                'socialstream_comment_has_thumbnail_block'     => '',
-                'socialstream_comment_has_link_block'          => '',
-                'socialstream_comment_has_player_block'        => '',
-                'socialstream_comment_has_video_block'         => '',
-                'socialstream_comment_has_video_pending_block' => '',
-                'socialstream_comment_has_metadata_block'      => '',
-                'socialstream_comment_has_delete_block'        => '',
-                'socialstream_reply_has_attachment_block'      => '',
-                'socialstream_reply_has_icon_block'            => '',
-                'socialstream_reply_has_image_block'           => '',
-                'socialstream_reply_has_thumbnail_block'       => '',
-                'socialstream_reply_has_link_block'            => '',
-                'socialstream_reply_has_player_block'          => '',
-                'socialstream_reply_has_video_block'           => '',
-                'socialstream_reply_has_video_pending_block'   => '',
-                'socialstream_reply_has_metadata_block'        => '',
-                'socialstream_reply_has_delete_block'          => '',
-            )
-        );
+        $page->setVar([
+            'socialstream_post_block'                      => '',
+            'socialstream_comment_block'                   => '',
+            'socialstream_comment_list_block'              => '',
+            'socialstream_reply_block'                     => '',
+            'socialstream_reply_list_block'                => '',
+            'socialstream_post_has_attachment_block'       => '',
+            'socialstream_post_has_icon_block'             => '',
+            'socialstream_post_has_image_block'            => '',
+            'socialstream_post_has_thumbnail_block'        => '',
+            'socialstream_post_has_link_block'             => '',
+            'socialstream_post_has_player_block'           => '',
+            'socialstream_post_has_video_block'            => '',
+            'socialstream_post_has_video_pending_block'    => '',
+            'socialstream_post_has_metadata_block'         => '',
+            'socialstream_post_has_delete_block'           => '',
+            'socialstream_comment_has_attachment_block'    => '',
+            'socialstream_comment_has_icon_block'          => '',
+            'socialstream_comment_has_image_block'         => '',
+            'socialstream_comment_has_thumbnail_block'     => '',
+            'socialstream_comment_has_link_block'          => '',
+            'socialstream_comment_has_player_block'        => '',
+            'socialstream_comment_has_video_block'         => '',
+            'socialstream_comment_has_video_pending_block' => '',
+            'socialstream_comment_has_metadata_block'      => '',
+            'socialstream_comment_has_delete_block'        => '',
+            'socialstream_reply_has_attachment_block'      => '',
+            'socialstream_reply_has_icon_block'            => '',
+            'socialstream_reply_has_image_block'           => '',
+            'socialstream_reply_has_thumbnail_block'       => '',
+            'socialstream_reply_has_link_block'            => '',
+            'socialstream_reply_has_player_block'          => '',
+            'socialstream_reply_has_video_block'           => '',
+            'socialstream_reply_has_video_pending_block'   => '',
+            'socialstream_reply_has_metadata_block'        => '',
+            'socialstream_reply_has_delete_block'          => '',
+        ]);
 
         /* Traverse everything
          */
-        $i = 0;
-
         foreach ($this->tree as $currentPost) {
-            $page->setVar(
-                array(
-                    'COMPONENT_INSTANCE_ID'              => Scrub::text($this->instance->getId()),
-                    'SOCIALSTREAM_POST_POST_ID'          => Scrub::text($currentPost->getPostId()),
-                    'SOCIALSTREAM_POST_BODY'             => nl2br(Scrub::linkifyText($currentPost->getBody())),
-                    'SOCIALSTREAM_POST_CREATED_AT'       => Scrub::text($currentPost->getCreatedAt()->getRelativeTime()),
-                    'SOCIALSTREAM_POST_CREATED_AT_LONG'  => Scrub::text($currentPost->getCreatedAt()->getLong()),
-                    'SOCIALSTREAM_POST_USER_ID'          => Scrub::text($currentPost->getOwner()->getId()),
-                    'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => Scrub::text($currentPost->getOwner()->getExternalId()),
-                    'SOCIALSTREAM_POST_USER_FULLNAME'    => Scrub::text($currentPost->getOwner()->getFullname()),
-                    'SOCIALSTREAM_POST_TIMESTAMP'        => Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
-                )
-            );
+            $page->setVar([
+                'COMPONENT_INSTANCE_ID'              => Scrub::text($this->instance->getId()),
+                'SOCIALSTREAM_POST_POST_ID'          => Scrub::text($currentPost->getPostId()),
+                'SOCIALSTREAM_POST_BODY'             => nl2br(Scrub::linkifyText($currentPost->getBody())),
+                'SOCIALSTREAM_POST_CREATED_AT'       => Scrub::text($currentPost->getCreatedAt()->getRelativeTime()),
+                'SOCIALSTREAM_POST_CREATED_AT_LONG'  => Scrub::text($currentPost->getCreatedAt()->getLong()),
+                'SOCIALSTREAM_POST_USER_ID'          => Scrub::text($currentPost->getOwner()->getId()),
+                'SOCIALSTREAM_POST_USER_EXTERNAL_ID' => Scrub::text($currentPost->getOwner()->getExternalId()),
+                'SOCIALSTREAM_POST_USER_FULLNAME'    => Scrub::text($currentPost->getOwner()->getFullname()),
+                'SOCIALSTREAM_POST_TIMESTAMP'        => Scrub::text($currentPost->getCreatedAt()->getUnixTimestamp()),
+            ]);
 
             // Owner name and optional link
-            if($currentPost->getOwner()->isDeleted()){
+            if ($currentPost->getOwner()->isDeleted()){
                 $page->setVar('owner_exists_block', '');
                 $page->parse('owner_deleted_block', 'owner_deleted');
             } else {
@@ -366,11 +360,9 @@ class Threads
             if ($canComment) {
                 $page->parse('socialstream_post_has_add_block', 'socialstream_post_has_add');
             } else {
-                $page->setVar(
-                    array(
-                        'socialstream_post_has_add_block' => '',
-                    )
-                );
+                $page->setVar([
+                    'socialstream_post_has_add_block' => '',
+                ]);
             }
 
             /* Ability to delete posts
@@ -380,53 +372,50 @@ class Threads
             if ($authenticator->canDelete()) {
                 $page->parse('socialstream_post_has_delete_block', 'socialstream_post_has_delete');
             } else {
-                $page->setVar(
-                    array(
-                        'socialstream_post_has_delete_block' => '',
-                    )
-                );
+                $page->setVar([
+                    'socialstream_post_has_delete_block' => '',
+                ]);
             }
 
             /* Thumbnails
              */
-            $page->setVar(
-                array(
-                    'socialstream_post_has_attachment_block'    => '',
-                    'socialstream_post_has_icon_block'          => '',
-                    'socialstream_post_has_image_block'         => '',
-                    'socialstream_post_has_thumbnail_block'     => '',
-                    'socialstream_post_has_link_block'          => '',
-                    'socialstream_post_has_player_block'        => '',
-                    'socialstream_post_has_video_block'         => '',
-                    'socialstream_post_has_video_pending_block' => '',
-                    'socialstream_post_has_metadata_block'      => '',
-                )
-            );
+            $page->setVar([
+                'socialstream_post_has_icon_block'          => '',
+                'socialstream_post_has_image_block'         => '',
+                'socialstream_post_has_thumbnail_block'     => '',
+                'socialstream_post_has_link_block'          => '',
+                'socialstream_post_has_player_block'        => '',
+                'socialstream_post_has_video_block'         => '',
+                'socialstream_post_has_video_pending_block' => '',
+                'socialstream_post_has_metadata_block'      => '',
+            ]);
 
             $hasAttachment = $currentPost->renderThumbnail('post', $page);
 
             if ($hasAttachment) {
                 $page->parse('socialstream_post_has_attachment_block', 'socialstream_post_has_attachment');
+            } else {
+                $page->setVar([
+                    'socialstream_post_has_attachment_block' => ''
+                ]);
             }
 
             /* Descendents
              */
             foreach ($currentPost->getChildren() as $currentComment) {
-                $page->setVar(
-                    array(
-                        'COMPONENT_INSTANCE_ID'                 => Scrub::text($this->instance->getId()),
-                        'SOCIALSTREAM_COMMENT_POST_ID'          => Scrub::text($currentComment->getPostId()),
-                        'SOCIALSTREAM_COMMENT_BODY'             => nl2br(Scrub::linkifyText($currentComment->getBody())),
-                        'SOCIALSTREAM_COMMENT_CREATED_AT'       => Scrub::text($currentComment->getCreatedAt()->getRelativeTime()),
-                        'SOCIALSTREAM_COMMENT_CREATED_AT_LONG'  => Scrub::text($currentComment->getCreatedAt()->getLong()),
-                        'SOCIALSTREAM_COMMENT_USER_ID'          => Scrub::text($currentComment->getOwner()->getId()),
-                        'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => Scrub::text($currentComment->getOwner()->getExternalId()),
-                        'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => Scrub::text($currentComment->getOwner()->getFullname()),
-                    )
-                );
+                $page->setVar([
+                    'COMPONENT_INSTANCE_ID'                 => Scrub::text($this->instance->getId()),
+                    'SOCIALSTREAM_COMMENT_POST_ID'          => Scrub::text($currentComment->getPostId()),
+                    'SOCIALSTREAM_COMMENT_BODY'             => nl2br(Scrub::linkifyText($currentComment->getBody())),
+                    'SOCIALSTREAM_COMMENT_CREATED_AT'       => Scrub::text($currentComment->getCreatedAt()->getRelativeTime()),
+                    'SOCIALSTREAM_COMMENT_CREATED_AT_LONG'  => Scrub::text($currentComment->getCreatedAt()->getLong()),
+                    'SOCIALSTREAM_COMMENT_USER_ID'          => Scrub::text($currentComment->getOwner()->getId()),
+                    'SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID' => Scrub::text($currentComment->getOwner()->getExternalId()),
+                    'SOCIALSTREAM_COMMENT_USER_FULLNAME'    => Scrub::text($currentComment->getOwner()->getFullname()),
+                ]);
 
                 // Commenter name and optional link
-                if($currentComment->getOwner()->isDeleted()){
+                if ($currentComment->getOwner()->isDeleted()){
                     $page->setVar('commenter_exists_block', '');
                     $page->parse('commenter_deleted_block', 'commenter_deleted');
                 } else {
@@ -439,11 +428,9 @@ class Threads
                 if ($canComment) {
                     $page->parse('socialstream_comment_has_add_block', 'socialstream_comment_has_add');
                 } else {
-                    $page->setVar(
-                        array(
-                            'socialstream_comment_has_add_block' => '',
-                        )
-                    );
+                    $page->setVar([
+                        'socialstream_comment_has_add_block' => '',
+                    ]);
                 }
 
                 /* Ability to delete posts
@@ -453,51 +440,47 @@ class Threads
                 if ($authenticator->canDelete()) {
                     $page->parse('socialstream_comment_has_delete_block', 'socialstream_comment_has_delete');
                 } else {
-                    $page->setVar(
-                        array(
-                            'socialstream_comment_has_delete_block' => '',
-                        )
-                    );
+                    $page->setVar([
+                        'socialstream_comment_has_delete_block' => '',
+                    ]);
                 }
 
                 /* Thumbnails
                  */
-                $page->setVar(
-                    array(
-                        'socialstream_comment_has_attachment_block'    => '',
-                        'socialstream_comment_has_icon_block'          => '',
-                        'socialstream_comment_has_image_block'         => '',
-                        'socialstream_comment_has_thumbnail_block'     => '',
-                        'socialstream_comment_has_link_block'          => '',
-                        'socialstream_comment_has_player_block'        => '',
-                        'socialstream_comment_has_video_block'         => '',
-                        'socialstream_comment_has_video_pending_block' => '',
-                        'socialstream_comment_has_metadata_block'      => '',
-                    )
-                );
+                $page->setVar([
+                    'socialstream_comment_has_icon_block'          => '',
+                    'socialstream_comment_has_image_block'         => '',
+                    'socialstream_comment_has_thumbnail_block'     => '',
+                    'socialstream_comment_has_link_block'          => '',
+                    'socialstream_comment_has_player_block'        => '',
+                    'socialstream_comment_has_video_block'         => '',
+                    'socialstream_comment_has_video_pending_block' => '',
+                    'socialstream_comment_has_metadata_block'      => '',
+                ]);
 
                 $hasAttachment = $currentComment->renderThumbnail('comment', $page);
 
                 if ($hasAttachment) {
                     $page->parse('socialstream_comment_has_attachment_block', 'socialstream_comment_has_attachment');
+                } else {
+                    $page->setVar([
+                        'socialstream_comment_has_attachment_block' => ''
+                    ]);
                 }
 
                 /* Descendents
                  */
-                $page->setVar('socialstream_reply_list_block', '');
                 foreach ($currentComment->getChildren() as $currentReply) {
-                    $page->setVar(
-                        array(
-                            'COMPONENT_INSTANCE_ID'               => Scrub::text($this->instance->getId()),
-                            'SOCIALSTREAM_REPLY_POST_ID'          => Scrub::text($currentReply->getPostId()),
-                            'SOCIALSTREAM_REPLY_BODY'             => nl2br(Scrub::linkifyText($currentReply->getBody())),
-                            'SOCIALSTREAM_REPLY_CREATED_AT'       => Scrub::text($currentReply->getCreatedAt()->getRelativeTime()),
-                            'SOCIALSTREAM_REPLY_CREATED_AT_LONG'  => Scrub::text($currentReply->getCreatedAt()->getLong()),
-                            'SOCIALSTREAM_REPLY_USER_ID'          => Scrub::text($currentReply->getOwner()->getId()),
-                            'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => Scrub::text($currentReply->getOwner()->getExternalId()),
-                            'SOCIALSTREAM_REPLY_USER_FULLNAME'    => Scrub::text($currentReply->getOwner()->getFullname()),
-                        )
-                    );
+                    $page->setVar([
+                        'COMPONENT_INSTANCE_ID'               => Scrub::text($this->instance->getId()),
+                        'SOCIALSTREAM_REPLY_POST_ID'          => Scrub::text($currentReply->getPostId()),
+                        'SOCIALSTREAM_REPLY_BODY'             => nl2br(Scrub::linkifyText($currentReply->getBody())),
+                        'SOCIALSTREAM_REPLY_CREATED_AT'       => Scrub::text($currentReply->getCreatedAt()->getRelativeTime()),
+                        'SOCIALSTREAM_REPLY_CREATED_AT_LONG'  => Scrub::text($currentReply->getCreatedAt()->getLong()),
+                        'SOCIALSTREAM_REPLY_USER_ID'          => Scrub::text($currentReply->getOwner()->getId()),
+                        'SOCIALSTREAM_REPLY_USER_EXTERNAL_ID' => Scrub::text($currentReply->getOwner()->getExternalId()),
+                        'SOCIALSTREAM_REPLY_USER_FULLNAME'    => Scrub::text($currentReply->getOwner()->getFullname()),
+                    ]);
 
                     /* Ability to delete posts
                      */
@@ -506,28 +489,23 @@ class Threads
                     if ($authenticator->canDelete()) {
                         $page->parse('socialstream_reply_has_delete_block', 'socialstream_reply_has_delete');
                     } else {
-                        $page->setVar(
-                            array(
-                                'socialstream_reply_has_delete_block' => '',
-                            )
-                        );
+                        $page->setVar([
+                            'socialstream_reply_has_delete_block' => '',
+                        ]);
                     }
 
                     /* Thumbnails
                      */
-                    $page->setVar(
-                        array(
-                            'socialstream_reply_has_attachment_block'    => '',
-                            'socialstream_reply_has_icon_block'          => '',
-                            'socialstream_reply_has_image_block'         => '',
-                            'socialstream_reply_has_thumbnail_block'     => '',
-                            'socialstream_reply_has_link_block'          => '',
-                            'socialstream_reply_has_player_block'        => '',
-                            'socialstream_reply_has_video_block'         => '',
-                            'socialstream_reply_has_video_pending_block' => '',
-                            'socialstream_reply_has_metadata_block'      => '',
-                        )
-                    );
+                    $page->setVar([
+                        'socialstream_reply_has_icon_block'          => '',
+                        'socialstream_reply_has_image_block'         => '',
+                        'socialstream_reply_has_thumbnail_block'     => '',
+                        'socialstream_reply_has_link_block'          => '',
+                        'socialstream_reply_has_player_block'        => '',
+                        'socialstream_reply_has_video_block'         => '',
+                        'socialstream_reply_has_video_pending_block' => '',
+                        'socialstream_reply_has_metadata_block'      => '',
+                    ]);
 
                     // Replier name and optional link
                     if($currentReply->getOwner()->isDeleted()){
@@ -542,82 +520,84 @@ class Threads
 
                     if ($hasAttachment) {
                         $page->parse('socialstream_reply_has_attachment_block', 'socialstream_reply_has_attachment');
+                    } else {
+                        $page->setVar([
+                            'socialstream_reply_has_attachment_block' => ''
+                        ]);
                     }
 
                     /* Clear children after parsing out the parent
                      */
                     $page->parse('socialstream_reply_block', 'socialstream_reply', true);
 
-                    $page->setVar(
-                        array(
-                            'socialstream_reply_has_attachment_block'    => '',
-                            'socialstream_reply_has_icon_block'          => '',
-                            'socialstream_reply_has_thumbnail_block'     => '',
-                            'socialstream_reply_has_link_block'          => '',
-                            'socialstream_reply_has_image_block'         => '',
-                            'socialstream_reply_has_player_block'        => '',
-                            'socialstream_reply_has_video_block'         => '',
-                            'socialstream_reply_has_video_pending_block' => '',
-                            'socialstream_reply_has_metadata_block'      => '',
-                            'socialstream_reply_has_add_block'           => '',
-                            'socialstream_reply_has_delete_block'        => '',
-                        )
-                    );
+                    $page->setVar([
+                        'socialstream_reply_has_icon_block'          => '',
+                        'socialstream_reply_has_thumbnail_block'     => '',
+                        'socialstream_reply_has_link_block'          => '',
+                        'socialstream_reply_has_image_block'         => '',
+                        'socialstream_reply_has_player_block'        => '',
+                        'socialstream_reply_has_video_block'         => '',
+                        'socialstream_reply_has_video_pending_block' => '',
+                        'socialstream_reply_has_metadata_block'      => '',
+                        'socialstream_reply_has_add_block'           => '',
+                        'socialstream_reply_has_delete_block'        => '',
+                    ]);
                 }
+                
                 if (count($currentComment->getChildren())) {
                     $page->parse('socialstream_reply_list_block', 'socialstream_reply_list');
+                } else {
+                    $page->setVar([
+                        'socialstream_reply_list_block' => ''
+                    ]);
                 }
 
                 /* Clear children after parsing out the parent
                  */
                 $page->parse('socialstream_comment_block', 'socialstream_comment', true);
 
-                $page->setVar(
-                    array(
-                        'socialstream_comment_has_attachment_block'    => '',
-                        'socialstream_comment_has_icon_block'          => '',
-                        'socialstream_comment_has_image_block'         => '',
-                        'socialstream_comment_has_thumbnail_block'     => '',
-                        'socialstream_comment_has_link_block'          => '',
-                        'socialstream_comment_has_player_block'        => '',
-                        'socialstream_comment_has_video_block'         => '',
-                        'socialstream_comment_has_video_pending_block' => '',
-                        'socialstream_comment_has_metadata_block'      => '',
-                        'socialstream_comment_has_add_block'           => '',
-                        'socialstream_comment_has_delete_block'        => '',
-                        'socialstream_reply_block'                     => '',
-                    )
-                );
+                $page->setVar([
+                    'socialstream_comment_has_attachment_block'    => '',
+                    'socialstream_comment_has_icon_block'          => '',
+                    'socialstream_comment_has_image_block'         => '',
+                    'socialstream_comment_has_thumbnail_block'     => '',
+                    'socialstream_comment_has_link_block'          => '',
+                    'socialstream_comment_has_player_block'        => '',
+                    'socialstream_comment_has_video_block'         => '',
+                    'socialstream_comment_has_video_pending_block' => '',
+                    'socialstream_comment_has_metadata_block'      => '',
+                    'socialstream_comment_has_add_block'           => '',
+                    'socialstream_comment_has_delete_block'        => '',
+                    'socialstream_reply_block'                     => '',
+                ]);
             }
+
             if (count($currentPost->getChildren())) {
                 $page->parse('socialstream_comment_list_block', 'socialstream_comment_list');
+            } else {
+                $page->setVar([
+                    'socialstream_comment_list_block' => ''
+                ]);
             }
 
             /* Clear children after parsing out the parent
              */
             $page->parse('socialstream_post_block', 'socialstream_post', true);
 
-            $page->setVar(
-                array(
-                    'socialstream_post_has_attachment_block'    => '',
-                    'socialstream_post_has_icon_block'          => '',
-                    'socialstream_post_has_image_block'         => '',
-                    'socialstream_post_has_thumbnail_block'     => '',
-                    'socialstream_post_has_link_block'          => '',
-                    'socialstream_post_has_player_block'        => '',
-                    'socialstream_post_has_video_block'         => '',
-                    'socialstream_post_has_video_pending_block' => '',
-                    'socialstream_post_has_metadata_block'      => '',
-                    'socialstream_post_has_add_block'           => '',
-                    'socialstream_post_has_delete_block'        => '',
-                    'socialstream_comment_block'                => '',
-                    'socialstream_reply_block'                  => '',
-                )
-            );
-
-            /* Alternating colours -_-
-             */
-            $i++;
+            $page->setVar([
+                'socialstream_post_has_icon_block'          => '',
+                'socialstream_post_has_image_block'         => '',
+                'socialstream_post_has_thumbnail_block'     => '',
+                'socialstream_post_has_link_block'          => '',
+                'socialstream_post_has_player_block'        => '',
+                'socialstream_post_has_video_block'         => '',
+                'socialstream_post_has_video_pending_block' => '',
+                'socialstream_post_has_metadata_block'      => '',
+                'socialstream_post_has_add_block'           => '',
+                'socialstream_post_has_delete_block'        => '',
+                'socialstream_comment_block'                => '',
+                'socialstream_reply_block'                  => '',
+            ]);
         }
 
         /* Save output for later!
