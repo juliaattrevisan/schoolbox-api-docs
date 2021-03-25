@@ -37,9 +37,9 @@ class Interactions
     /**
      * This threshold indicates how long to wait before we can record more data for this open, in days
      *
-     * Default: you have to wait one day between visits for it to start recording more data
+     * Default: you have to wait one day (60*60*24 seconds) between visits for it to start recording more data
      */
-    private const UNIQUE_VISIT_THRESHOLD = 1;
+    private const UNIQUE_VISIT_THRESHOLD = 60*60*24;
 
     /**
      * @var IConnector
@@ -135,7 +135,7 @@ class Interactions
             /* If this (user, referrer) combination already exists, don't record duplicate data; just leave
              * Otherwise, this (user, referrer) combination indicates a new Open for this particular user
              */
-            if ($open && $open->getOccursAt()->diffInDays($date) < self::UNIQUE_VISIT_THRESHOLD) {
+            if ($open && $open->getOccursAt()->diffInSeconds($date) < self::UNIQUE_VISIT_THRESHOLD) {
                 return false;
             }
         } catch (NotFound $e) {
