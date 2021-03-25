@@ -162,7 +162,10 @@ class Controller extends Base
             'template' => '@adminProfileButton/modify.twig',
             'data' => [
                 'pageCurrent' => $this->router->generate('adminProfileButton.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminProfileButton.getIndex')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminProfileButton.getIndex')),
+                    [['Modify', null]]
+                ),
                 'item' => $this->profileButtonMapper->findOneByColumn($this->profileButtonMapper->getIdentifierColumn(), $id, [ 'cache' => false ]),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
@@ -190,7 +193,10 @@ class Controller extends Base
             'template' => '@adminProfileButton/modify.twig',
             'data'     => [
                 'pageCurrent' => $this->router->generate('adminProfileButton.getIndex'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminProfileButton.getIndex')),
+                'allBreadcrumbs' => array_merge(
+                    (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminProfileButton.getIndex')),
+                    [['Create', null]]
+                ),
                 'icons' => $this->iconMapper->findAll()->sortBy('title', 'asc'),
                 'roles' => $this->roleMapper->findAll()->sortBy('name', 'asc'),
                 'campuses' => $this->campusMapper->findAll()->sortBy('name', 'asc')
