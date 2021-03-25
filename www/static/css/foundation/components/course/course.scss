@@ -22,6 +22,10 @@ ul.unit-list {
     background-color: $ghost;
     padding: 1rem;
 
+    @media #{$medium-only} {
+      padding: .75rem;
+    }
+
     label {
       margin: 0;
     }
