@@ -1,6 +1,7 @@
 const path = require('path');
-const {VueLoaderPlugin} = require('vue-loader');
-const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries'); //https://www.npmjs.com/package/webpack-fix-style-only-entries
+const webpack = require('webpack'); //to access built-in plugins
+const { VueLoaderPlugin } = require('vue-loader');
+// const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries'); //https://www.npmjs.com/package/webpack-fix-style-only-entries
 
 module.exports = {
     entry: {
@@ -8,7 +9,7 @@ module.exports = {
         main: [
 
             // jQuery
-            './www/static/javascript/components/jquery/dist/jquery.js',
+            './node_modules/jquery/dist/jquery.js',
 
             // jQuery Validation
             './www/static/javascript/components/jquery-validation/dist/jquery.validate.js',
@@ -69,10 +70,10 @@ module.exports = {
 
             // Files And Resource Browser
             './www/static/socialstream/browser/browser.js',
-            './www/static/javascript/components/dropzone/dist/dropzone.js',
+            './node_modules/dropzone/dist/dropzone.js',
 
             // Magnific Popup Lightbox
-            './www/static/javascript/components/magnific-popup/dist/jquery.magnific-popup.js',
+            './node_modules/magnific-popup/dist/jquery.magnific-popup.js',
 
             // Notifier
             './www/static/javascript/shared/notifications/jquery.notifier.js',
@@ -297,7 +298,12 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new VueLoaderPlugin(),
-        new FixStyleOnlyEntriesPlugin()
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            Dropzone: 'dropzone'
+        }),
+        new VueLoaderPlugin()
+        // new FixStyleOnlyEntriesPlugin() --refer to https://stackoverflow.com/questions/65270741/webpack-5-chunkgroup-api-with-multiple-entries
     ]
 };
