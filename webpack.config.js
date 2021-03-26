@@ -110,7 +110,6 @@ module.exports = {
 
             // This is a Webpack-built module for strtotime
             './www/static/javascript/components/strtotime.bundle.js',
-            // './node_modules/strtotime/index.js',
 
             // Allow deference of form submit actions
             './www/static/javascript/shared/jquery.stallSubmit.js',
@@ -205,27 +204,30 @@ module.exports = {
                 loader: "expose-loader", //see https://webpack.js.org/loaders/expose-loader/ - expose to outside the bundles (JS in twig files)
                 options: {
                     exposes: [
-                        {
-                            globalName: "$",
-                            override: true
-                        },
-                        {
-                            globalName: "jQuery",
-                            override: true
-                        },
+                        { globalName: "$", override: true },
+                        { globalName: "jQuery", override: true },
                     ],
                 },
             },
             {
                 test: require.resolve("dropzone"),
-                loader: "expose-loader", //see https://webpack.js.org/loaders/expose-loader/ - expose to outside the bundles (JS in twig files)
+                loader: "expose-loader", 
                 options: {
-                    exposes: [
-                        {
-                            globalName: "Dropzone",
-                            override: true
-                        }
-                    ],
+                    exposes: { globalName: "Dropzone", override: true }
+                },
+            },
+            {
+                test: require.resolve("moment"),
+                loader: "expose-loader", 
+                options: {
+                    exposes: { globalName: "moment", override: true }
+                },
+            },
+            {
+                test: require.resolve("axios"),
+                loader: "expose-loader", 
+                options: {
+                    exposes: { globalName: "axios", override: true }
                 },
             },
             {
@@ -323,11 +325,6 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new webpack.ProvidePlugin({ //see https://webpack.js.org/plugins/provide-plugin/ - expose within the bundles
-            VuejsPaginate: 'vuejs-paginate',
-            axios: 'axios',
-            moment: 'moment',
-        }),
         new VueLoaderPlugin()
         // new FixStyleOnlyEntriesPlugin() --refer to https://stackoverflow.com/questions/65270741/webpack-5-chunkgroup-api-with-multiple-entries
     ]
