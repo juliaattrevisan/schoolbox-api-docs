@@ -308,14 +308,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         // cannot believe the something like 'LEFT(CONVERT(VARCHAR...' is needed
         $query = "
-            SELECT t.TimeFrom, t.TimeTo, t.PeriodNumber, t.PeriodNumberSeq
+            SELECT TOP 1 t.TimeFrom, t.TimeTo, t.PeriodNumber, t.PeriodNumberSeq
             FROM TimetableDefinition t
             WHERE t.FileSemester = '%s'
             AND t.FileYear = '%s'
             AND t.TimetableGroup = '%s'
-            AND t.DayNumber = '%d'
+            AND (t.DayNumber = '%d' OR t.DayNumber = '0')
             AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, " . self::FORMAT_ISO8601 . "), 10), t.TimeFrom) < '%d'
             AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, " . self::FORMAT_ISO8601 . "), 10), t.TimeTo) > '%d'
+            ORDER BY t.DayNumber DESC
         ";
 
         return $this->getDatabase()->getRow(
