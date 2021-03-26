@@ -1,7 +1,6 @@
 const path = require('path');
-const webpack = require('webpack'); //to access built-in plugins
 const { VueLoaderPlugin } = require('vue-loader');
-// const FixStyleOnlyEntriesPlugin = require('webpack-fix-style-only-entries'); //https://www.npmjs.com/package/webpack-fix-style-only-entries
+const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
 module.exports = {
     entry: {
@@ -325,7 +324,7 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     plugins: [
-        new VueLoaderPlugin()
-        // new FixStyleOnlyEntriesPlugin() --refer to https://stackoverflow.com/questions/65270741/webpack-5-chunkgroup-api-with-multiple-entries
+        new VueLoaderPlugin(),
+        new RemoveEmptyScriptsPlugin()
     ]
 };
