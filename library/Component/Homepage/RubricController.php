@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rubric view and edit component for teachers.
  *
@@ -31,7 +32,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 
         // get rubric details
         $this->criteria = Mapper::getInstance()->findForFolder($this->getContext()->getId());
-        return !(count($this->criteria) === 0 && !$this->hasContextWriteAccess());
+        return !(count($this->criteria) === 0 && ($this->getContentPermission() < UserAccess::ACCESS_WRITE));
     }
 
     /**
@@ -49,36 +50,28 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if (count($this->criteria) === 0) {
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'rubric_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-            ]);
-
-            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_write_block', 'empty_write');
-            } else {
-                $this->parse('empty_read_block', 'empty_read');
-            }
+            $this->setVar(
+                [
+                    'rubric_block'      => '',
+                    'empty_read_block'  => '',
+                    'empty_write_block' => '',
+                ]
+            );
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setVar('empty_state_block', '');
 
             $this->setBlock('rubric', 'rubric_criterion', 'rubric_criterion_block');
             $this->setBlock('rubric_criterion', 'rubric_descriptor', 'rubric_descriptor_block');
             $this->setBlock('rubric', 'modify_rubric', 'modify_rubric_block');
 
-            $this->setVar([
-                'rubric_criterion_block' => '',
-                'modify_rubric_block' => '',
-            ]);
+            $this->setVar(
+                [
+                    'rubric_criterion_block' => '',
+                    'modify_rubric_block'    => '',
+                ]
+            );
 
             $i = 0;
 
@@ -91,10 +84,12 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             }
 
             foreach ($criteriaList as $criterion_group => $criterions) {
-                $this->setVar([
-                    'CRITERION_GROUP' => Scrub::text($criterion_group),
-                    'rubric_descriptor_block' => '',
-                ]);
+                $this->setVar(
+                    [
+                        'CRITERION_GROUP'         => Scrub::text($criterion_group),
+                        'rubric_descriptor_block' => '',
+                    ]
+                );
 
                 foreach ($criterions as $crit) {
                     if (trim($crit->getName()) !== '') {

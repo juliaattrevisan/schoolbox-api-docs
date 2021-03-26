@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Enables embedding of wolfram alpha widgets into homepages
  *
@@ -6,8 +7,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use Schoolbox\Permission\Access\UserAccess;
 
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_WolframController extends Component_Homepage_ControllerAbstract
 {
@@ -29,18 +30,15 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         $emptyState = false;
-        $noConfig = false;
+        $noConfig   = false;
 
         /* If no url is specified it might time out -_-
          * So just hide all this instead
          */
         if (strlen(trim($this->getConfig('url'))) == 0) {
-
             $emptyState = true;
-            $noConfig = true;
-
+            $noConfig   = true;
         } else {
-
             /* Pattern match the necessary code out of a url given to us
              * by the Wolfram Alpha
              *
@@ -50,7 +48,7 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
              */
             $pattern = '/(\?|&)id=([a-zA-Z0-9]+)/';
 
-            $matches = array();
+            $matches = [];
 
             $url = $this->getConfig('url');
             if (!preg_match($pattern, $url, $matches)) {
@@ -59,23 +57,19 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
         }
 
         if ($emptyState) {
-            if (!$this->hasContextWriteAccess()) {
-                return false;
-            }
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
             $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
-            $this->setVar([
-                'has_widget_block' => '',
-                'empty_read_block' => '',
-                'empty_config_block' => '',
-                'empty_invalid_block' => '',
-            ]);
+            $this->setVar(
+                [
+                    'has_widget_block'    => '',
+                    'empty_config_block'  => '',
+                    'empty_invalid_block' => '',
+                ]
+            );
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
+                return false;
             } elseif ($noConfig) {
                 $this->parse('empty_config_block', 'empty_config');
             } else {
@@ -83,13 +77,13 @@ class Component_Homepage_WolframController extends Component_Homepage_Controller
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
-            $this->setVar([
-                'empty_state_block' => '',
-                'WIDGET_ID' => $matches[2],
-            ]);
+            $this->setVar(
+                [
+                    'empty_state_block' => '',
+                    'WIDGET_ID'         => $matches[2],
+                ]
+            );
 
             // Allow output type to be set too
             $outputType = 'lightbox';

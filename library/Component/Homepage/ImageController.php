@@ -100,22 +100,12 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
                 $this->setVar('submit_image_block', '');
             }
             $this->parse('has_image_block', 'has_image');
-        } elseif (!$this->hasContextWriteAccess()) {
-            return false;
         } else {
             // No Image - render the empty state
-
-            $this->setVar('has_image_block', '');
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
             if ($this->getContextPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-                $this->setVar('empty_write_block', '');
-            } else {
-                $this->parse('empty_write_block', 'empty_write');
-                $this->setVar('empty_read_block', '');
+                return false;
             }
+            $this->setVar('has_image_block', '');
             $this->parse('empty_state_block', 'empty_state');
         }
 

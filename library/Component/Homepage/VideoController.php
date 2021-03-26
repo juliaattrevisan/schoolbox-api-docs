@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -49,21 +50,14 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
      */
     private function buildEmptyState()
     {
-        $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-        $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-        $this->setVar([
-            'has_video_block' => '',
-            'empty_read_block' => '',
-            'empty_write_block' => '',
-            'SOURCE_ID' => '',
-        ]);
-
-        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-            $this->parse('empty_read_block', 'empty_read');
-        } else {
-            $this->parse('empty_write_block', 'empty_write');
-        }
+        $this->setVar(
+            [
+                'has_video_block'   => '',
+                'empty_read_block'  => '',
+                'empty_write_block' => '',
+                'SOURCE_ID'         => '',
+            ]
+        );
 
         $this->parse('empty_state_block', 'empty_state');
     }
@@ -111,22 +105,20 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->outputList = $videoResourceMapper->findByCategory(
             $this->getSource()->getId(),
             [
-                'sort' => $this->getConfig('sort'),
+                'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
-                'mime' => 'video',
+                'mime'    => 'video',
             ],
             $limit
         );
 
         // Set up component name
-        $this->setVar([
-            'FILE_CAT_ID' => $this->getSource()->getId(),
-        ]);
+        $this->setVar('FILE_CAT_ID', $this->getSource()->getId());
 
         /* No videos found
          */
         if (!$this->outputList->count()) {
-            if (!$this->hasContextWriteAccess()) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 return false;
             }
             $this->buildEmptyState();
@@ -146,13 +138,15 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->setBlock('video_list', 'owner_deleted', 'owner_deleted_block');
         $this->setBlock('video_list', 'video_edit', 'video_edit_block');
 
-        $this->setVar([
-            'empty_state_block' => '',
-            'source_folder_deleted_block' => '',
-            'video_list_block' => '',
-            'video_pending_list_block' => '',
-            'default_video_block' => '',
-        ]);
+        $this->setVar(
+            [
+                'empty_state_block'           => '',
+                'source_folder_deleted_block' => '',
+                'video_list_block'            => '',
+                'video_pending_list_block'    => '',
+                'default_video_block'         => '',
+            ]
+        );
 
         // Select a video to play by default.
         // Only show a video that has actually finished encoding, though.
@@ -198,25 +192,26 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         foreach ($this->outputList as $video) {
             // Display the list of videos if the user has permission to view them.
             if ($this->isVisibleToCurrentUser($video)) {
-
                 /* Apply values only if you can see them
                  */
-                $this->setVar([
-                    'VIDEO_LIST_ID' =>          $video->getFile()->getId(),
-                    'VIDEO_LIST_TITLE' =>       Scrub::text($video->getFile()->getTitle()),
-                    'VIDEO_LIST_DURATION' =>    gmdate($video->getDuration() >= 3600 ? 'H:i:s' : 'i:s', $video->getDuration()),
-                    'VIDEO_LIST_COMMENT' =>     Scrub::text($video->getFile()->getDescription()),
-                    'VIDEO_LIST_HIDDEN' =>      $video->getFile()->getHidden() ? 'hidden' : '',
-                    'VIDEO_LIST_POSTER_ID' =>   $video->getFile()->getOwner()->getId(),
-                    'VIDEO_LIST_POSTER' =>      $video->getFile()->getOwner()->getFullName(),
-                ]);
+                $this->setVar(
+                    [
+                        'VIDEO_LIST_ID'        => $video->getFile()->getId(),
+                        'VIDEO_LIST_TITLE'     => Scrub::text($video->getFile()->getTitle()),
+                        'VIDEO_LIST_DURATION'  => gmdate($video->getDuration() >= 3600 ? 'H:i:s' : 'i:s', $video->getDuration()),
+                        'VIDEO_LIST_COMMENT'   => Scrub::text($video->getFile()->getDescription()),
+                        'VIDEO_LIST_HIDDEN'    => $video->getFile()->getHidden() ? 'hidden' : '',
+                        'VIDEO_LIST_POSTER_ID' => $video->getFile()->getOwner()->getId(),
+                        'VIDEO_LIST_POSTER'    => $video->getFile()->getOwner()->getFullName(),
+                    ]
+                );
 
 
                 // Owner and edit blocks are children of the video list item,
                 // so should not appear unless we are parsing the list item.
 
                 // Owner name and optional link
-                if ($video->getFile()->getOwner()->isDeleted()){
+                if ($video->getFile()->getOwner()->isDeleted()) {
                     $this->setVar('owner_exists_block', '');
                     $this->parse('owner_deleted_block', 'owner_deleted');
                 } else {
@@ -245,7 +240,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 $numVideosListed++;
             }
         }
-        if ($numVideosListed === 0 && !$this->hasContextWriteAccess()) {
+        if ($numVideosListed === 0 && ($this->getContentPermission() < UserAccess::ACCESS_WRITE)) {
             return false;
         }
         if (is_object($this->defaultVideo) && $this->defaultVideo->isComplete()) {
@@ -265,10 +260,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
          * Hide the list of videos that would otherwise have rendered
          */
         if (!$numVideosListed) {
-            $this->setVar([
-                'has_video_block' => ''
-            ]);
-
+            $this->setVar('has_video_block', '');
             $this->buildEmptyState();
         } else {
             $this->parse('has_video_block', 'has_video');

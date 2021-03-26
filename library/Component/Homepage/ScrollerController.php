@@ -1,12 +1,13 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\File\Model;
 
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
@@ -30,7 +31,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $allFiles = $this->getFolderMapper()->findImages($this->getSource(), (int)$this->getConfigLoader()->get('image_slideshow_max'));
 
         // Sort in a human way
-        $allFiles = $allFiles->sortByCallback( function (Model $a, Model $b) {return strnatcasecmp($a->getTitle(), $b->getTitle());} );
+        $allFiles = $allFiles->sortNaturally('title');
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
@@ -39,29 +40,19 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if (count($allFiles) === 0) {
-            if (!$this->hasContextWriteAccess()) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 return false;
             }
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'has_images_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-            ]);
-
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-            } else {
-                $this->parse('empty_write_block', 'empty_write');
-            }
+            $this->setVar(
+                [
+                    'has_images_block'  => '',
+                    'empty_read_block'  => '',
+                    'empty_write_block' => '',
+                ]
+            );
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setBlock('has_images', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_images', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'submit_image_scroller', 'submit_image_scroller_block');
@@ -81,11 +72,13 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
 
-                $this->setVar([
-                    'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
-                    'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
-                    'COMPONENT_CONFIG_IMAGE_RATIO' => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
-                ]);
+                $this->setVar(
+                    [
+                        'COMPONENT_CONFIG_TIMING_VALUE_MS'       => $this->getConfig('timing') ? $this->getConfig('timing') * 1000 : '2000',
+                        'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
+                        'COMPONENT_CONFIG_IMAGE_RATIO'           => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square',
+                    ]
+                );
 
                 /* Prevent multiple galleries from other categories stacking up in the wrong place
                  * and initialise empty gallery by default
@@ -107,7 +100,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
 
                 // Iterate
                 foreach ($allFiles as $currentFile) {
-
                     $url = '';
 
                     // sanitise url
@@ -115,17 +107,19 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                         $description = $currentFile->getDescription();
                         if (filter_var($description, FILTER_VALIDATE_URL)) {
                             $url = $description;
-                        } // it might be referencing inside schoolbox, so simulate that to the validator
-                        elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
+                        } elseif (filter_var('http://localhost/' . $description, FILTER_VALIDATE_URL)) {
+                            // it might be referencing inside schoolbox, so simulate that to the validator
                             $url = $description;
                         }
                     }
 
-                    $this->setVar([
-                        'IMAGE_ID' => $currentFile->getId(),
-                        'IMAGE_NAME' => Scrub::text($currentFile->getTitle()),
-                        'IMAGE_URL' => $url,
-                    ]);
+                    $this->setVar(
+                        [
+                            'IMAGE_ID'   => $currentFile->getId(),
+                            'IMAGE_NAME' => Scrub::text($currentFile->getTitle()),
+                            'IMAGE_URL'  => $url,
+                        ]
+                    );
 
                     /* Link image */
                     if ($url) {

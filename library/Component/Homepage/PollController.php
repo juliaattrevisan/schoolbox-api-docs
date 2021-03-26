@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -30,7 +32,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if ($this->getConfig('poll') && is_numeric($this->getConfig('poll'))) {
-
             $this->setBlock('has_poll', "poll_question", "poll_question_block");
             $this->setBlock('has_poll', "response_count", "response_count_block");
             $this->setBlock('has_poll', 'new_poll', 'new_poll_block');
@@ -49,11 +50,13 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             $this->setBlock('poll_question', "modify_poll", "modify_poll_block");
 
 
-            $this->setVar([
-                'empty_state_block' => '',
-                'poll_question_block' => '',
-                'show_results_block' => '',
-            ]);
+            $this->setVar(
+                [
+                    'empty_state_block'   => '',
+                    'poll_question_block' => '',
+                    'show_results_block'  => '',
+                ]
+            );
 
             $poll = $pollHandler->getByID($this->getConfig('poll'));
 
@@ -69,14 +72,16 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             if ($poll['id']) {
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
-                $this->setVar([
-                    'POLL_ID' => $poll['id'],
-                    'POLL_QUESTION' => Scrub::text($poll['question']),
-                    'POLL_AUTHOR_ID' => $author->getId(),
-                    'POLL_AUTHOR_THUMB' => "/portrait.php?userId={$author->getExternalId()}&size=square64",
-                    'POLL_AUTHOR_NAME' => $author->getFullName(),
-                    'POLL_CREATED' => $created->getRelativeTime(),
-                ]);
+                $this->setVar(
+                    [
+                        'POLL_ID'           => $poll['id'],
+                        'POLL_QUESTION'     => Scrub::text($poll['question']),
+                        'POLL_AUTHOR_ID'    => $author->getId(),
+                        'POLL_AUTHOR_THUMB' => "/portrait.php?userId={$author->getExternalId()}&size=square64",
+                        'POLL_AUTHOR_NAME'  => $author->getFullName(),
+                        'POLL_CREATED'      => $created->getRelativeTime(),
+                    ]
+                );
 
                 // Owner name and optional link
                 if ($author->isDeleted()) {
@@ -92,14 +97,16 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 if ($pollHandler->hasVoted($poll['id']) || !$pollHandler->open($poll['id']) || $this->getSitePage()->arg[1] == 'pollResults') {
                     /* Show poll as user has voted or the poll has closed to votes */
 
-                    $this->setVar([
-                        'POLL_HEIGHT' => count($pollData) * 30 + 70,
-                        'poll_vote_block' => '',
-                        'response_count' => count($pollData),
-                    ]);
+                    $this->setVar(
+                        [
+                            'POLL_HEIGHT'     => count($pollData) * 30 + 70,
+                            'poll_vote_block' => '',
+                            'response_count'  => count($pollData),
+                        ]
+                    );
 
                     if (is_array($pollData)) {
-                        $i = 0;
+                        $i        = 0;
                         $pollJson = [];
                         foreach ($pollData as $data) {
                             $pollJson[] = [
@@ -119,11 +126,13 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         $i = 0;
 
                         foreach ($pollData as $data) {
-                            $this->setVar([
-                                'POLL_OPTION_INDEX' => $i,
-                                'POLL_OPTION' => Scrub::text($data['option']),
-                                'POLL_ON_OFF' => $i % 2 ? 'polloff' : '',
-                            ]);
+                            $this->setVar(
+                                [
+                                    'POLL_OPTION_INDEX' => $i,
+                                    'POLL_OPTION'       => Scrub::text($data['option']),
+                                    'POLL_ON_OFF'       => $i % 2 ? 'polloff' : '',
+                                ]
+                            );
 
                             $this->parse('poll_options_block', 'poll_options', true);
 
@@ -131,7 +140,6 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                         }
 
                         $this->parse('show_results_block', 'show_results');
-
                     }
                     $this->setVar('poll_chart_block', '');
                     $this->parse('poll_vote_block', 'poll_vote');
@@ -147,42 +155,36 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
                 $this->parse('poll_question_block', 'poll_question');
             } else {
-                $this->setVar([
-                    'POLL_ID' => '',
-                    'POLL_TITLE' => 'Poll',
-                    'POLL_QUESTION' => '',
-                    'poll_chart_block' => '',
-                    'poll_vote_block' => '',
-                    'modify_poll_block' => '',
-                    'new_poll_block' => '',
-                ]);
+                $this->setVar(
+                    [
+                        'POLL_ID'           => '',
+                        'POLL_TITLE'        => 'Poll',
+                        'POLL_QUESTION'     => '',
+                        'poll_chart_block'  => '',
+                        'poll_vote_block'   => '',
+                        'modify_poll_block' => '',
+                        'new_poll_block'    => '',
+                    ]
+                );
 
                 if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     $this->parse('new_poll_block', 'new_poll');
                 }
-
             }
 
             $this->parse('has_poll_block', 'has_poll');
 
             $current = $poll;
-        } elseif (!$this->hasContextWriteAccess()) {
+        } elseif ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             return false;
         } else {
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'has_poll_block' => '',
-                'empty_write_block' => '',
-                'empty_read_block' => '',
-            ]);
-
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-            } else {
-                $this->parse('empty_write_block', 'empty_write');
-            }
+            $this->setVar(
+                [
+                    'has_poll_block'    => '',
+                    'empty_write_block' => '',
+                    'empty_read_block'  => '',
+                ]
+            );
 
             $this->parse('empty_state_block', 'empty_state');
         }

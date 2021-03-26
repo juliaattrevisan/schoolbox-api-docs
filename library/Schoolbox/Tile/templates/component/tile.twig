@@ -15,8 +15,6 @@
         {% set addTileUrl = routeLookupIfAuthorized("tile.addToComponent", routeParams) %}
         {% if writeAccess and addTileUrl %}
             <p><a href="{{ addTileUrl }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Add a tile</a> to create buttons or banners that link to other pages.</p>
-        {% else %}
-            <p>There are no tiles available at this time.</p>
         {% endif %}
 
     </div>

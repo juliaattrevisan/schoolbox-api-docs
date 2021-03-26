@@ -17,7 +17,6 @@ use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
 use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -62,7 +61,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 ->sortBy('createdAt', 'desc')
                 ->limit($limit);
 
-            if (!$this->hasContextWriteAccess() && !count($blogs)) {
+            if (($this->getContentPermission() < UserAccess::ACCESS_WRITE) && !count($blogs)) {
                 return false;
             }
 

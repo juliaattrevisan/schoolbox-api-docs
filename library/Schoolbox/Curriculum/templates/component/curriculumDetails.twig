@@ -22,12 +22,6 @@
     <div class="empty-state">
         <i class="icon-curriculum-details"></i>
 
-        {% if readonly %}
-
-            <p>There is no curriculum description to view at this time.</p>
-
-        {% else %}
-
             {% if not curriculumTagging %}
 
                 {% if USER.isSuperuser %}
@@ -40,7 +34,6 @@
                 <p><a href="{{ routeLookup('folder.getFolderModify', {id: context.id}) }}#curriculum-codes">Map a curriculum or an area of the curriculum</a> to your course or {{ locale.unit }} page to display the associated description of your curriculum.</p>
             {% endif %}
 
-        {% endif %}
     </div>
 
 {% endif %}

@@ -1,12 +1,13 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
-
 
 class Component_Homepage_SurveyController extends Component_Homepage_ControllerAbstract
 {
@@ -20,7 +21,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if (!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
 
@@ -41,36 +42,26 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
         $this->parseConfig();
 
         $surveyHandler = new Survey_Main();
-        $allSurveys = $surveyHandler->getList($this->getContext()->getId());
+        $allSurveys    = $surveyHandler->getList($this->getContext()->getId());
 
         $this->setBlock($templateHandle, 'has_survey', 'has_survey_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if (!is_array($allSurveys)) {
-            if (!$this->hasContextWriteAccess()) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 return false;
             }
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'has_survey_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-                'SOURCE_ID' => $this->getSource()->getId(),
-            ]);
-
-            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-            } else {
-                $this->parse('empty_write_block', 'empty_write');
-            }
+            $this->setVar(
+                [
+                    'has_survey_block'  => '',
+                    'empty_read_block'  => '',
+                    'empty_write_block' => '',
+                    'SOURCE_ID'         => $this->getSource()->getId(),
+                ]
+            );
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setBlock('has_survey', 'survey', 'survey_block');
             $this->setBlock('has_survey', 'createSurvey', 'createSurvey_block');
             $this->setBlock('survey', 'teacherLink', 'teacherLink_block');
@@ -81,12 +72,14 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             $this->setBlock('survey', 'authorLinkOpen', 'authorLinkOpen_block');
             $this->setBlock('survey', 'authorLinkClose', 'authorLinkClose_block');
 
-            $this->setVar([
-                'empty_state_block' => '',
-                'resumeLink_block' => '',
-                'reviewLink_block' => '',
-                'createSurvey_block' => '',
-            ]);
+            $this->setVar(
+                [
+                    'empty_state_block'  => '',
+                    'resumeLink_block'   => '',
+                    'reviewLink_block'   => '',
+                    'createSurvey_block' => '',
+                ]
+            );
 
             $attemptHandler = new Survey_Attempt();
             $sectionHandler = new Survey_Section();
@@ -107,26 +100,28 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
                         $author = UserMapper::getInstance()->findByIdWithFallback($currentSurvey['user_id']);
 
-                        $this->setVar([
-                            'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
-                            'SURVEY_TITLE' => Scrub::text($currentSurvey['title']),
-                            'SURVEY_START_DATE' => date('jS M Y', strtotime($currentSurvey['start'])),
-                            'SURVEY_FINISH_DATE' => 'Due ' . date('jS M Y', strtotime($currentSurvey['finish'])),
-                            'SURVEY_DESCRIPTION' => Scrub::html($currentSurvey['description']),
-                            'SURVEY_CREATED' => $createdTime->getRelativeTime(),
-                            'SURVEY_USER_ID' => $author->getId(),
-                            'SURVEY_USER_FIRSTNAME' => $author->getFirstname(),
-                            'SURVEY_USER_LASTNAME' => $author->getLastname(),
-                        ]);
+                        $this->setVar(
+                            [
+                                'SURVEY_ASSESS_ID'      => $currentSurvey['assess_id'],
+                                'SURVEY_TITLE'          => Scrub::text($currentSurvey['title']),
+                                'SURVEY_START_DATE'     => date('jS M Y', strtotime($currentSurvey['start'])),
+                                'SURVEY_FINISH_DATE'    => 'Due ' . date('jS M Y', strtotime($currentSurvey['finish'])),
+                                'SURVEY_DESCRIPTION'    => Scrub::html($currentSurvey['description']),
+                                'SURVEY_CREATED'        => $createdTime->getRelativeTime(),
+                                'SURVEY_USER_ID'        => $author->getId(),
+                                'SURVEY_USER_FIRSTNAME' => $author->getFirstname(),
+                                'SURVEY_USER_LASTNAME'  => $author->getLastname(),
+                            ]
+                        );
 
                         /* Check if you have completed an assessment already
                          *
                          * Set up Attempt vars
                          */
-                        $attempt = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
-                        $attemptStartTime = strtotime($attempt['start']);
+                        $attempt              = $attemptHandler->getLatestForUser($currentSurvey['assess_id'], $_SESSION['id']);
+                        $attemptStartTime     = strtotime($attempt['start']);
                         $attemptTimeRemaining = $attemptStartTime + $currentSurvey['duration'] - time();
-                        $attemptEndTime = $attemptStartTime + $currentSurvey['duration'];
+                        $attemptEndTime       = $attemptStartTime + $currentSurvey['duration'];
 
                         /* Tests can be undertaken if:
                            *
@@ -136,7 +131,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                          * 4. You aren't the owner of the test
                             */
                         if (is_array($attempt)) {
-                            $numAttempts = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
+                            $numAttempts  = $attemptHandler->userHasAttempted($currentSurvey['assess_id'], $_SESSION['id']);
                             $firstSection = $sectionHandler->getFirst($currentSurvey['assess_id']);
 
                             // If the last assess is not completed provide resume link
@@ -145,11 +140,13 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                                     || $currentSurvey['duration'] == Assess_Main::UNLIMITED_DURATION
                                 )
                             ) {
-                                $this->setVar([
-                                    'SURVEY_ASSESS_ID' => $currentSurvey['assess_id'],
-                                    'SURVEY_SECTION_ID' => $firstSection['section_id'],
-                                    'SURVEY_FINISH_DATE' => 'In progress',
-                                ]);
+                                $this->setVar(
+                                    [
+                                        'SURVEY_ASSESS_ID'   => $currentSurvey['assess_id'],
+                                        'SURVEY_SECTION_ID'  => $firstSection['section_id'],
+                                        'SURVEY_FINISH_DATE' => 'In progress',
+                                    ]
+                                );
 
                                 $this->parse('resumeLink_block', 'resumeLink');
                                 $this->setVar('surveyLink_block', '');
@@ -173,28 +170,34 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                             /* Find out if you have recently completed an attempt - if so
                              * allow you to review what you just did
                              */
-                            $this->setVar([
-                                'SURVEY_ATTEMPT_ID' => $attempt['attempt_id'],
-                                'SURVEY_SECTION_ID' => $firstSection['section_id'],
-                            ]);
+                            $this->setVar(
+                                [
+                                    'SURVEY_ATTEMPT_ID' => $attempt['attempt_id'],
+                                    'SURVEY_SECTION_ID' => $firstSection['section_id'],
+                                ]
+                            );
 
                             $this->parse('reviewLink_block', 'reviewLink');
                         } else {
                             // show to everyone unless expired
                             if (strtotime($currentSurvey['finish']) < time()) {
                                 $this->parse('surveyNoLink_block', 'surveyNoLink');
-                                $this->setVar([
-                                    'surveyLink_block' => '',
-                                    'resumeLink_block' => '',
-                                    'reviewLink_block' => '',
-                                ]);
+                                $this->setVar(
+                                    [
+                                        'surveyLink_block' => '',
+                                        'resumeLink_block' => '',
+                                        'reviewLink_block' => '',
+                                    ]
+                                );
                             } else {
                                 $this->parse('surveyLink_block', 'surveyLink');
-                                $this->setVar([
-                                    'surveyNoLink_block' => '',
-                                    'resumeLink_block' => '',
-                                    'reviewLink_block' => '',
-                                ]);
+                                $this->setVar(
+                                    [
+                                        'surveyNoLink_block' => '',
+                                        'resumeLink_block'   => '',
+                                        'reviewLink_block'   => '',
+                                    ]
+                                );
                             }
                         }
 

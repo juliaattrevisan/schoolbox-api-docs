@@ -9,6 +9,7 @@
 
 use Schoolbox\Feed\Feed;
 use Schoolbox\Feed\StandardFeed;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_FeedController extends Component_Homepage_ControllerAbstract
 {
@@ -56,20 +57,16 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
         if (!$this->feed->count()) {
-            if (!$this->hasContextWriteAccess()) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 return false;
             }
 
             $this->setVar('has_activity_block', '');
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setBlock('has_activity', 'event', 'event_block');
 
-            $this->setVar([
-                'empty_state_block' => ''
-            ]);
+            $this->setVar('empty_state_block', '');
 
             if (!$this->feed->count()) {
                 $this->setVar('event_block', '');
@@ -78,13 +75,15 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
 
             foreach ($this->feed->renderAsFeedArray() as $n) {
                 $date = new Alaress_Date_Format($n['time'], 'U');
-                $this->setVar([
-                    'EVENT_HREF' => $n['href'],
-                    'EVENT_ICON' => $n['icon'],
-                    'EVENT_BODY' => $n['title'],
-                    'EVENT_TIME' => $date->getShort(),
-                    'EVENT_LONGTIME' => $date->getLong(),
-                ]);
+                $this->setVar(
+                    [
+                        'EVENT_HREF'     => $n['href'],
+                        'EVENT_ICON'     => $n['icon'],
+                        'EVENT_BODY'     => $n['title'],
+                        'EVENT_TIME'     => $date->getShort(),
+                        'EVENT_LONGTIME' => $date->getLong(),
+                    ]
+                );
                 $this->parse('event_block', 'event', true);
             }
 

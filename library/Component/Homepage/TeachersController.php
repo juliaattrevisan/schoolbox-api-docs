@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
 use Schoolbox\Role;
 
@@ -34,32 +36,30 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
 
         if (($this->getContext()->getCodeString() != '') && $this->getConfigLoader()->get('external_enable')) {
             $externalClassHandler = new External_Class();
-            $listSyns = $externalClassHandler->getTeachers($this->getContext()->getCodeString());
+            $listSyns             = $externalClassHandler->getTeachers($this->getContext()->getCodeString());
         }
 
         if (empty($listSyns)) {
-            if (!$this->hasContextWriteAccess()) {
-                return false;
-            }
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_is_group', 'empty_is_group_block');
             $this->setBlock('empty_state', 'empty_code', 'empty_code_block');
             $this->setBlock('empty_state', 'empty_code_admin', 'empty_code_admin_block');
             $this->setBlock('empty_state', 'empty_students', 'empty_students_block');
             $this->setBlock('empty_state', 'empty_students_admin', 'empty_students_admin_block');
 
-            $this->setVar([
-                'has_teachers_block' => '',
-                'empty_read_block' => '',
-                'empty_is_group_block' => '',
-                'empty_code_block' => '',
-                'empty_code_admin_block' => '',
-                'empty_students_block' => '',
-                'empty_students_admin_block' => '',
-            ]);
+            $this->setVar(
+                [
+                    'has_teachers_block'         => '',
+                    'empty_is_group_block'       => '',
+                    'empty_code_block'           => '',
+                    'empty_code_admin_block'     => '',
+                    'empty_students_block'       => '',
+                    'empty_students_admin_block' => '',
+                ]
+            );
 
-            if ($this->getSource()->getFolder()->getCodes()->count() == 0 and !$this->getSource()->getFolder()->isGroup()) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                return false;
+            } elseif ($this->getSource()->getFolder()->getCodes()->count() == 0 and !$this->getSource()->getFolder()->isGroup()) {
                 if ($this->getUser()->isSuperuser()) {
                     $this->parse('empty_code_admin_block', 'empty_code_admin');
                 } else {
@@ -76,42 +76,40 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             // gets teachers involved in subject, outputs links to their addressbook page
             $this->setBlock('has_teachers', "person", "person_block");
             $this->setBlock('person', 'photo', 'photo_block');
 
-            $this->setVar([
-                'empty_state_block' => '',
-                'has_thumbnail_block' => '',
-                'photo_block' => '',
-                'person_block' => '',
-            ]);
-
-            $displayOptions = array(
-                'grid' => array(
-                    'name' => 'Grid',
-                    'value' => 'grid',
-                    'css' => 'grid',
-                ),
-                'list' => array(
-                    'name' => 'List',
-                    'value' => 'list',
-                    'css' => '',
-                ),
+            $this->setVar(
+                [
+                    'empty_state_block'   => '',
+                    'has_thumbnail_block' => '',
+                    'photo_block'         => '',
+                    'person_block'        => '',
+                ]
             );
+
+            $displayOptions = [
+                'grid' => [
+                    'name'  => 'Grid',
+                    'value' => 'grid',
+                    'css'   => 'grid',
+                ],
+                'list' => [
+                    'name'  => 'List',
+                    'value' => 'list',
+                    'css'   => '',
+                ],
+            ];
 
             $display = $this->getConfig('displayPortraits') ? $this->getConfig('displayPortraits') : 'grid';
 
-            $this->setVar([
-                'LIST_STYLE' => $displayOptions[$display]['css'],
-            ]);
+            $this->setVar('LIST_STYLE', $displayOptions[$display]['css']);
 
             if (($this->getContext()->getCodeString() != '') && $this->getConfigLoader()->get('external_enable')) {
                 $externalClassHandler = new External_Class();
-                $userMapper = \Schoolbox\UserMapper::getInstance();
+                $userMapper           = \Schoolbox\UserMapper::getInstance();
                 $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
 
                 // If the config flag is enabled:
@@ -154,23 +152,21 @@ class Component_Homepage_TeachersController extends Component_Homepage_Controlle
                             continue;
                         }
 
-                        $this->setVar([
-                            'PERSON_UID'         => $teacher->getId(),
-                            'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
-                            'PERSON_EXTERNAL_ID' => $synid,
-                            'PERSON_GROUP'       => Scrub::text($teacher->getPreferredTitle()),
-                        ]);
+                        $this->setVar(
+                            [
+                                'PERSON_UID'         => $teacher->getId(),
+                                'PERSON_NAME'        => Scrub::text($teacher->getFullName()),
+                                'PERSON_EXTERNAL_ID' => $synid,
+                                'PERSON_GROUP'       => Scrub::text($teacher->getPreferredTitle()),
+                            ]
+                        );
 
                         /* Don't display images in list view
                          */
                         if ($this->getConfig('displayPortraits') == 'grid') {
-                            $this->setVar([
-                                'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
-                            ]);
+                            $this->setVar('GRID_VIEW_CLASSES', 'medium-block-grid-2');
                         } else {
-                            $this->setVar([
-                                'GRID_VIEW_CLASSES' => ''
-                            ]);
+                            $this->setVar('GRID_VIEW_CLASSES', '');
                         }
 
                         if ($teacher->getRole()->isStaff()) {

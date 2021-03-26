@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Curriculum information component
  *
@@ -15,7 +16,6 @@ use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
 {
@@ -63,7 +63,7 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
                     break;
                 }
             }
-        } elseif (!$this->hasContextWriteAccess()) {
+        } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
         }
 
@@ -80,12 +80,11 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@curriculum/component/curriculumDetails.twig',
-            array(
-                'context'  => $this->getContext(),
-                'node'     => $this->curriculumNode,
-                'readonly' => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
+            [
+                'context'           => $this->getContext(),
+                'node'              => $this->curriculumNode,
                 'curriculumTagging' => $this->curriculumTagging,
-            )
+            ]
         );
     }
 }
