@@ -33,6 +33,11 @@ export default {
             isLoading: true, //used to show skeleton
             columns: [ //The table headings to display and thus row data to show
                 {
+                    label: 'id',
+                    field: 'id',
+                    hidden: true
+                },
+                {
                     label: 'Name',
                     field: 'fullname',
                     sortFn: this.sortName
@@ -145,6 +150,14 @@ export default {
                             <div slot="emptystate">
                                 <p>No visitors found</p>
                             </div>
+                            <template slot="table-row" slot-scope="props">
+                                <span v-if="props.column.field === 'fullname'">
+                                    <a :href="'/search/user/' + props.row.id" :title="props.row.fullname">{{props.row.fullname}}</a> 
+                                </span>
+                                <span v-else>
+                                    {{ props.formattedRow[props.column.field] }}
+                                </span>
+                            </template>
                         </vue-good-table>
                     </section>
                 </template>
