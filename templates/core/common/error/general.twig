@@ -4,7 +4,13 @@
             <div class="row">
                 <div>
                     {# raw HTML reluctantly sanctioned - this should not be HTML, but maybe some error codes are? #}
-                    <h1>{{ (message ?? '')|raw }}</h1>
+
+                    {% if message %}
+                    <h1>
+                        {{ message|striptags }}
+                    </h1>
+                    {% endif %}
+
                     <h2>Sorry, we are unable to complete this request </h2>
 
                     {% if url is defined %}
