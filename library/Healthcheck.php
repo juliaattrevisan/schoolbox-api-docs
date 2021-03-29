@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -136,14 +137,14 @@ class Healthcheck
      */
     private function externalTest(): void
     {
-        if(in_array($this->externalType, ['schoolbox', 'denbigh'], true)){
+        if (in_array($this->externalType, ['schoolbox', 'denbigh'], true)) {
             $this->errors[] = 'Sorry, no health check is currently available for this external connector.';
             return;
         }
         $this->logger->info(str_pad(str_pad('METHOD', 15) . 'DATABASE OBJECT', 50) . "TEST RESULT");
         $this->logger->info("------------------------------------------------------------------------------------------------------------------");
 
-        switch($this->externalType){
+        switch ($this->externalType) {
             case 'synergetic':
                 $this->synergeticTest();
                 break;
@@ -324,8 +325,7 @@ class Healthcheck
         $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:object, 'OBJECT', :permission)");
 
         foreach ($objects as $object) {
-
-            $log = str_pad(str_pad($permission, 15). $object, 50);
+            $log = str_pad(str_pad($permission, 15) . $object, 50);
 
             try {
                 $statement->execute(['object' => $object, 'permission' => $permission]);
@@ -345,7 +345,6 @@ class Healthcheck
                     $this->logger->info("$log OK");
                 }
             } catch (\Alaress\Database\Exception $e) {
-
                 $error = "EXECUTE {$object}\n{$e->getMessage()}\n";
 
                 $error .= "\n{$statement->getSql()}\n";
@@ -623,9 +622,9 @@ class Healthcheck
             $prefix = $mediaDb ? ($mediaDb . '.') : '';
             $this->insertTest(
                 [
-                    $prefix.$mediaSchema.'.tDocuments',
-                    $prefix.$mediaSchema.'.DocumentReferences',
-                    $prefix.$mediaSchema.'.tDocumentReferences',
+                    $prefix . $mediaSchema . '.tDocuments',
+                    $prefix . $mediaSchema . '.DocumentReferences',
+                    $prefix . $mediaSchema . '.tDocumentReferences',
                 ]
             );
         }

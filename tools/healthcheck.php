@@ -1,10 +1,12 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
@@ -49,7 +51,7 @@ HELP;
 
         $this->getLogger()->info('Running health check script');
 
-        if (!$this->getConfig()->get('external_enable')){
+        if (!$this->getConfig()->get('external_enable')) {
             $this->getLogger()->warning('External Database is currently disabled');
         }
 
