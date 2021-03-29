@@ -35,7 +35,7 @@ $app = new class extends CliTool\App {
         $instances = parse_ini_file("/etc/$package/instances.ini", true);
 
         if (!count($instances)) {
-            $this->getLogger()->error("No instances found for package: $package");
+            $this->getLogger()->warning("No instances found for package: $package");
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
         if (count($instances) > 1) {
