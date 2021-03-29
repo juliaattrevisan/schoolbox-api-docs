@@ -2652,11 +2652,11 @@
       }
     },
     "datatables.net-fixedcolumns": {
-      "version": "3.3.2",
-      "resolved": "https://registry.npmjs.org/datatables.net-fixedcolumns/-/datatables.net-fixedcolumns-3.3.2.tgz",
-      "integrity": "sha512-LKWJZDSU9R8Z7rz/YSxSyAhxvtBvrA08oCY7y9h8ExynfEG3XUzAPejb2Y1I0YznPcnaYEnukUXLRHU6DjTnWQ==",
+      "version": "3.2.2",
+      "resolved": "https://registry.npmjs.org/datatables.net-fixedcolumns/-/datatables.net-fixedcolumns-3.2.2.tgz",
+      "integrity": "sha1-KWwkS/blX84LraNeJ02MKTL+6DI=",
       "requires": {
-        "datatables.net": "^1.10.15",
+        "datatables.net": ">=1.10.9",
         "jquery": ">=1.7"
       }
     },
@@ -3253,9 +3253,12 @@
       "integrity": "sha1-vLQEXI3QU5wTS8FIjN0+dop6nlE="
     },
     "jquery-validation": {
-      "version": "1.19.3",
-      "resolved": "https://registry.npmjs.org/jquery-validation/-/jquery-validation-1.19.3.tgz",
-      "integrity": "sha512-iXxCS5W7STthSTMFX/NDZfWHBLbJ1behVK3eAgHXAV8/0vRa9M4tiqHvJMr39VGWHMGdlkhrtrkBuaL2UlE8yw=="
+      "version": "1.15.1",
+      "resolved": "https://registry.npmjs.org/jquery-validation/-/jquery-validation-1.15.1.tgz",
+      "integrity": "sha1-fBZXEbYR9tzloSrj5IVcELWj4zE=",
+      "requires": {
+        "jquery": "^1.7 || ^2.0"
+      }
     },
     "js-tokens": {
       "version": "4.0.0",

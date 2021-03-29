@@ -11,29 +11,29 @@ module.exports = {
             './node_modules/jquery/dist/jquery.js',
 
             // jQuery Validation
-            './www/static/javascript/components/jquery-validation/dist/jquery.validate.js',
+            './node_modules/jquery-validation/dist/jquery.validate.js',
             './www/static/javascript/jquery.alaressValidate.js',
 
             // jQuery UI
             // dependencies
-            './www/static/javascript/components/jquery-ui/ui/version.js',
-            './www/static/javascript/components/jquery-ui/ui/plugin.js',
-            './www/static/javascript/components/jquery-ui/ui/widget.js',
-            './www/static/javascript/components/jquery-ui/ui/data.js',
-            './www/static/javascript/components/jquery-ui/ui/disable-selection.js',
-            './www/static/javascript/components/jquery-ui/ui/ie.js',
-            './www/static/javascript/components/jquery-ui/ui/keycode.js',
-            './www/static/javascript/components/jquery-ui/ui/safe-active-element.js',
-            './www/static/javascript/components/jquery-ui/ui/safe-blur.js',
-            './www/static/javascript/components/jquery-ui/ui/scroll-parent.js',
-            './www/static/javascript/components/jquery-ui/ui/widgets/mouse.js',
+            './node_modules/jquery-ui/ui/version.js',
+            './node_modules/jquery-ui/ui/plugin.js',
+            './node_modules/jquery-ui/ui/widget.js',
+            './node_modules/jquery-ui/ui/data.js',
+            './node_modules/jquery-ui/ui/disable-selection.js',
+            './node_modules/jquery-ui/ui/ie.js',
+            './node_modules/jquery-ui/ui/keycode.js',
+            './node_modules/jquery-ui/ui/safe-active-element.js',
+            './node_modules/jquery-ui/ui/safe-blur.js',
+            './node_modules/jquery-ui/ui/scroll-parent.js',
+            './node_modules/jquery-ui/ui/widgets/mouse.js',
             // interactions
-            './www/static/javascript/components/jquery-ui/ui/widgets/draggable.js',
-            './www/static/javascript/components/jquery-ui/ui/widgets/resizable.js',
-            './www/static/javascript/components/jquery-ui/ui/widgets/sortable.js',
+            './node_modules/jquery-ui/ui/widgets/draggable.js',
+            './node_modules/jquery-ui/ui/widgets/resizable.js',
+            './node_modules/jquery-ui/ui/widgets/sortable.js',
 
             // jQueryUI Touch Punch
-            './www/static/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
+            './node_modules/@andxor/jquery-ui-touch-punch-fix/jquery.ui.touch-punch.js',
 
             // Reforge The Shards of Foundation
             // Choose the specific things we are utilising, rather
@@ -62,7 +62,7 @@ module.exports = {
             // CKEditor
             './www/static/javascript/shared/editor/jquery.modal.js',
             './www/static/javascript/shared/editor/jquery.proxy-replacement.js',
-            './www/static/javascript/components/mediaelement/build/mediaelement-and-player.min.js',
+            './node_modules/mediaelement/build/mediaelement-and-player.min.js',
 
             // DateTime
             './node_modules/moment/moment.js',
@@ -81,8 +81,8 @@ module.exports = {
             './www/static/javascript/shared/jquery.confirm-dialog.js',
 
             // Data tables
-            './www/static/javascript/components/datatables/media/js/jquery.dataTables.min.js',
-            './www/static/javascript/components/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
+            './node_modules/datatables.net/js/jquery.dataTables.min.js',
+            './node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
 
             // Toasts, popups to notify something has happened
             './www/static/javascript/shared/jquery.toast-timeout.js',
@@ -132,7 +132,8 @@ module.exports = {
         ],
         masonry: [
             // Colour handling
-            './www/static/javascript/components/spectrum/spectrum.js',
+            // './www/static/javascript/components/spectrum/spectrum.js',
+            './node_modules/spectrum-colorpicker/spectrum.js',
 
             // homepage editing
             './www/static/javascript/shared/masonry/jquery.masonry.js',
