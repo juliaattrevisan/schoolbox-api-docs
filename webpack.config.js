@@ -119,7 +119,7 @@ module.exports = {
             './www/static/javascript/shared/miscellaneous.js',
 
             // Feature tours
-            './www/static/javascript/components/intro.js/intro.js',
+            './node_modules/intro.js/intro.js',
             './www/static/javascript/shared/tour/tour.js',
 
             // Lodash
