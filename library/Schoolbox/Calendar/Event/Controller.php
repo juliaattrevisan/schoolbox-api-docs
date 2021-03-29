@@ -230,7 +230,9 @@ class Controller extends Base
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
         $selectedUser = $this->getSelectedUser();
-        $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
+        $campusList   = $this->getUser()->isSuperuser()
+            ? $this->campusMapper->findAll()
+            : $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
         /* Guest List is initially on
          */
@@ -320,7 +322,9 @@ class Controller extends Base
         /* Only provide Campus options in Level dropdown if campuses have been defined
          */
         $selectedUser = $this->getSelectedUser();
-        $campusList = $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
+        $campusList = $this->getUser()->isSuperuser()
+            ? $this->campusMapper->findAll()
+            : $this->campusMapper->getAvailableCampusesForUser($selectedUser, UserAccess::ACCESS_WRITE);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@calendarEvent/create.twig', [
             'event' => $event,

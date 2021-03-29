@@ -1,12 +1,14 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox;
 
-use \PDO;
+use PDO;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
 
@@ -14,8 +16,8 @@ use Schoolbox\Sync\Effect\Type\Mapper as UPSEffectMapper;
  * Class CampusMapper
  *
  * @method Campus hydrate(array $row, $alias = '', $callback = null)
- * @method GenericCollection|Campus[] findAll($options = array())
- * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = array())
+ * @method GenericCollection|Campus[] findAll($options = [])
+ * @method GenericCollection|Campus[]findByColumn($columnName, $columnValue, $options = [])
  */
 class CampusMapper extends Mapper
 {
@@ -25,7 +27,7 @@ class CampusMapper extends Mapper
      *
      * @throws \InvalidArgumentException
      */
-    protected function mapping ()
+    protected function mapping()
     {
         $this->hasTable('luCampus');
         $this->hasModel(Campus::class);
@@ -50,6 +52,7 @@ class CampusMapper extends Mapper
      *
      * @param Campus $campus
      * @return bool
+     * @throws Mapper\Exception
      */
     public function campusHasUsers(Campus $campus): bool
     {
@@ -74,29 +77,24 @@ class CampusMapper extends Mapper
     }
 
 
-	/**
-	 * Get a list of campuses that is accessible by $user
-	 *
-	 * According to the pipe:
-	 * "I know what this is. This allows you to control which campuses you can post events to.
-	 * No idea what userAccess.sid = 0 means.
-	 * $type actually means Read/Write/Moderate, but contextually could mean anything."
-	 *
-	 * @param User $user
-	 * @param int $accessType
-	 * @return GenericCollection|Campus[]
-	 */
-	public function getAvailableCampusesForUser(User $user, $accessType = UserAccess::ACCESS_READ)
+    /**
+     * Get a list of campuses that is accessible by $user
+     *
+     * According to the pipe:
+     * "I know what this is. This allows you to control which campuses you can post events to.
+     * No idea what userAccess.sid = 0 means.
+     * $type actually means Read/Write/Moderate, but contextually could mean anything."
+     *
+     * @param User $user
+     * @param int  $accessType
+     * @return GenericCollection|Campus[]
+     * @throws Mapper\Exception
+     */
+    public function getAvailableCampusesForUser(User $user, $accessType = UserAccess::ACCESS_READ)
     {
-		$calendarService = UserAccess::SERVICE_CALENDAR;
+        $calendarService = UserAccess::SERVICE_CALENDAR;
 
-		/* Superusers get access to all campuses
-		 */
-		if ($_SESSION['su']) {
-			$collection = $this->findAll();
-		}
-		else {
-			$query = "
+        $query = "
 				SELECT *
 				FROM luCampus
 				INNER JOIN userAccess ON luCampus.id = userAccess.sid
@@ -107,45 +105,51 @@ class CampusMapper extends Mapper
                 ORDER BY luCampus.sequence
 			";
 
-			$statement = $this->database->prepare($query);
+        $statement = $this->database->prepare($query);
 
-			$statement->bindParam(':calendarService', $calendarService);
-			$statement->bindParam(':userId', $user->getId());
-			$statement->bindParam(':accessType', $accessType);
-			$statement->execute();
+        $statement->execute(
+            [
+                'calendarService' => $calendarService,
+                'userId'          => $user->getId(),
+                'accessType'      => $accessType,
+            ]
+        );
 
-			$collection = $this->createCollection();
+        $collection = $this->createCollection();
 
-			foreach ($statement as $row) {
-				$campus = $this->hydrate($row);
+        foreach ($statement as $row) {
+            $campus = $this->hydrate($row);
+            $collection->add($campus);
+        }
 
-				$collection->add($campus);
-			}
-		}
-
-		return $collection;
-	}
+        return $collection;
+    }
 
 
     /**
      * @param Campus $campus
      * @return GenericCollection|User[]
+     * @throws Mapper\Exception
      */
     public function findUsersInCampus(Campus $campus)
     {
         $uMap = UserMapper::getInstance();
 
-        $stmt = $this->database->prepare("
+        $stmt = $this->database->prepare(
+            "
             SELECT {$uMap->getColumnString('u')}
             FROM userCampus c
             RIGHT JOIN `user` u on c.uid = u.id
             WHERE c.campus = :campus
             AND u.deleted_at IS NULL
-        ");
+        "
+        );
 
-        $stmt->execute(array(
-            'campus' => $campus->getId()
-        ));
+        $stmt->execute(
+            [
+                'campus' => $campus->getId(),
+            ]
+        );
 
         $c = $uMap->createCollection();
 
@@ -156,19 +160,20 @@ class CampusMapper extends Mapper
         return $c;
     }
 
-	/**
-	 * Find all campuses matching a certain name
-	 *
-	 * @param string $name
-	 * @return GenericCollection|Campus[]
-	 */
-	public function findCampuses($name = '')
+    /**
+     * Find all campuses matching a certain name
+     *
+     * @param string $name
+     * @return GenericCollection|Campus[]
+     * @throws Mapper\Exception
+     */
+    public function findCampuses($name = '')
     {
-		$allCampuses = $this->createCollection();
+        $allCampuses = $this->createCollection();
 
-		/* if $name is empty, the LIKE returns everything anyway
+        /* if $name is empty, the LIKE returns everything anyway
          */
-		$query = "
+        $query = "
             SELECT
                 {$this->getColumnString('c')}
             FROM
@@ -177,30 +182,33 @@ class CampusMapper extends Mapper
             ORDER BY c.name
         ";
 
-		$statement = $this->database->prepare($query);
-		$statement->execute([
-			'name' => "%{$name}%"
-		]);
+        $statement = $this->database->prepare($query);
+        $statement->execute(
+            [
+                'name' => "%{$name}%",
+            ]
+        );
 
-		while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-			$allCampuses->add($this->hydrate($row, 'c'));
-		}
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $allCampuses->add($this->hydrate($row, 'c'));
+        }
 
-		return $allCampuses;
-	}
+        return $allCampuses;
+    }
 
-	/**
-	 * Find the campuses with which this user is involved
-	 *
-	 * @param User $user
-	 * @return GenericCollection|Campus[]
-	 */
-	public function findCampusInvolvement(User $user)
-	{
-	    $pb = $this->getPredicateBuilder();
+    /**
+     * Find the campuses with which this user is involved
+     *
+     * @param User $user
+     * @return GenericCollection|Campus[]
+     * @throws Mapper\Exception
+     */
+    public function findCampusInvolvement(User $user)
+    {
+        $pb = $this->getPredicateBuilder();
         $pb->equals('userCampus.uid', $user->getId());
 
-		$query = "
+        $query = "
             SELECT
             	userCampus.*,
             	{$this->getColumnString('c')}
@@ -212,12 +220,12 @@ class CampusMapper extends Mapper
         $statement = $this->getDatabase()->query($query, $pb->getParams());
 
         $campusCollection = $this->createCollection();
-		while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-			$campus = $this->hydrate($row, 'c');
-			$campusCollection->setOffset($campus->getId(), $campus);
-		}
-		return $campusCollection;
-	}
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $campus = $this->hydrate($row, 'c');
+            $campusCollection->setOffset($campus->getId(), $campus);
+        }
+        return $campusCollection;
+    }
 
     /** @inheritDoc */
     protected function getDefaultOrderByParams(): array

@@ -42,14 +42,17 @@ class Campus extends Base
 
     /**
      * @return Campus
+     * @throws \Schoolbox\Mapper\Exception
      */
     public function generate(): self
     {
+        $campusList = $this->user->isSuperuser()
+            ? $this->campusMapper->findAll()
+            : $this->campusMapper->findCampusInvolvement($this->user)->merge($this->campusMapper->getAvailableCampusesForUser($this->user));
         $this->data = $this->format(
-            $this->campusMapper->findCampusInvolvement($this->user)
-                               ->merge($this->campusMapper->getAvailableCampusesForUser($this->user))
-                               ->indexBy('id')
-                               ->sortBy('sequence', 'ASC')
+            $campusList
+                ->indexBy('id')
+                ->sortBy('sequence', 'ASC')
         );
 
         return $this;
