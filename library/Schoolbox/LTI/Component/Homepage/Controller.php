@@ -62,8 +62,24 @@ class Controller extends Component_Homepage_ControllerAbstract
         // or none is set up for this component.
         $providerId = $this->getConfig('ltiprovider');
         $readOnly   = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
-        if ($readOnly && (!$providerId || $providers->count() === 0)) {
-            return false;
+
+        if ($readOnly) {
+
+            /* No provider selected, or no providers exist
+             * Don't render the component
+             */
+            if (!$providerId || $providers->count() === 0) {
+                return false;
+            }
+
+            /* A provider was selected, but it might be deleted or otherwise nonexistent
+             * Don't render the component
+             */
+            try {
+                $this->providerMapper->findById($providerId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                return false;
+            }
         }
 
         // Render launcher form
