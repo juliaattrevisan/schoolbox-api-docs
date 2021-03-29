@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
-use Alaress\Session\Session;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Psr\Log\NullLogger;
@@ -16,7 +15,6 @@ use Schoolbox\Collection;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
-use Alaress\Session\Factory;
 use Alaress\Redis;
 use Schoolbox\Instance;
 use Schoolbox\Mapper;
@@ -36,7 +34,6 @@ use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Alaress_Date_Locale_Config;
 use Alaress_Date_Format;
 use Schoolbox\Learning\Assessment\Redirect;
-use Predis;
 
 /**
  * This kernel is a stripped down version of the full web request kernel.  It is designed for use when there is

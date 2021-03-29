@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Alaress\Lumberjack;
-use Aura\Di\Container;
 use ErrorException;
 use InvalidArgumentException;
 use function get_class;

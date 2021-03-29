@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
-use Alaress\Session\Factory;
 use Alaress\Session\Session;
 use \Database;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
@@ -18,8 +17,6 @@ use Aura\Di;
 use Schoolbox\IConfigLoader;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Output;
-use Predis;
-use Schoolbox\Realtime\Pipe\PipeManager;
 
 /**
  * Common ancestor for all Web Requests

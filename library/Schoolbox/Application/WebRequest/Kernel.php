@@ -35,7 +35,6 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
 use Throwable;
-use UnexpectedValueException;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
