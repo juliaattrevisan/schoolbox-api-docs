@@ -133,12 +133,25 @@ class Controller extends Base
 
         $item = $translator($evidence);
 
+        /* Decide whether the current user can comment on this student's learning moments
+         *
+         * Staff and student can always comment
+         * Parents can comment if the config allows
+         * Everyone else cannot
+         */
+        $learningMomentCanComment = (
+            $this->getUser()->getRole()->isStaff()
+            || $this->getUser()->getRole()->isStudent()
+            || ($this->getUser()->getRole()->isParent() && $this->getConfigLoader()->get('evidence_parent_comment'))
+        );
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningMomentEvidence/detail.twig',
                 [
                     'evidence'                 => $item,
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
+                    'learningMomentCanComment' => $learningMomentCanComment,
                 ]
             )
         );
