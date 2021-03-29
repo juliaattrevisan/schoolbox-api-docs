@@ -1,0 +1,15 @@
+{##
+ # Unavailable
+ #
+ # For when your LTI provider was previously set, but is now deleted or
+ # otherwise unavailable; instead of displaying a 404 page in an iframe
+ # give them this semblance of hope
+ #
+ # @param Provider $provider
+ #}
+{% include 'include/skin.twig' with { config: config } only %}
+
+<div class="empty-state">
+    <i class="icon-news"></i>
+    <p>{{ provider.name }} is no longer available.</p>
+</div>
