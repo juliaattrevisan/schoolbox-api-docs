@@ -71,9 +71,7 @@ class StateMapper extends Mapper
      */
     public function verifyUniqueCode(State $object): bool
     {
-        $existing = $this->findByColumn('code', $object->getCode(), [
-            'deleted' => true
-        ])->first();
+        $existing = $this->findByColumn('code', $object->getCode())->first();
 
         /* Detect if this submission state already exists
          *
