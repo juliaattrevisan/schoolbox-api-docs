@@ -222,6 +222,7 @@ class Scrub
                     'feed'    => true,
                     'dvcplay' => true,
                     'data'    => true,
+                    'tel'     => true,
                 )
             );
 
