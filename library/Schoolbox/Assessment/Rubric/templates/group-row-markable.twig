@@ -67,11 +67,15 @@
 
                             <option value="" {% if letterGradeBracket is null %}selected{% endif %}>(no grade)</option>
                             {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
-                                <option value="{{ gradeLevel.lowerBound }}"
+                                <option value="{{ gradeLevel.rawGrade }}"
+                                        data-upper-bound="{{ lastGradeLevel is defined ? lastGradeLevel.lowerBound : 100 }}"
+                                        data-lower-bound="{{ gradeLevel.lowerBound }}"
                                         {% if letterGradeBracket is not null and letterGradeBracket == gradeLevel.lowerBound %}selected{% endif %}
                                         data-letter="{{ gradeLevel.caption }}">
                                     {{ gradeLevel.caption }}
                                 </option>
+                                {# Ouptut the last grade level's lower bound as the upper bound #}
+                                {% set lastGradeLevel = gradeLevel %}
                             {% endfor %}
                         </select>
 
