@@ -16,7 +16,7 @@
 
         {# TODO skip this if not displaying counts, eg to teacher #}
         {# count students which have completed this #}
-        {% for participant in assessment.allParticipants|filter(participant => participant.isExcluded)  %}
+        {% for participant in assessment.allParticipants|filter(participant => participant.isExcluded == false)  %}
             {% if not participant.responseRequired %}
                 {% set completionCount = completionCount + 1 %}
             {% endif %}
