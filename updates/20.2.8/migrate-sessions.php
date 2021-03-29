@@ -36,7 +36,7 @@ $app = new class extends CliTool\App {
 
         if (!count($instances)) {
             $this->getLogger()->warning("No instances found for package: $package");
-            exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
+            exit(CliTool\Kernel::EXIT_STATUS_OK);
         }
         if (count($instances) > 1) {
             $this->getLogger()->warning("Multiple instances found for package: $package, cannot re-key sessions");
@@ -44,6 +44,12 @@ $app = new class extends CliTool\App {
         }
         if ($this->isSharedOnPrem()) {
             $this->getLogger()->warning("This is a shared onprem STG/PRD box, cannot re-key sessions");
+            exit(CliTool\Kernel::EXIT_STATUS_OK);
+        }
+
+        // This will occur on installation of a second instance to a package that already contains exactly one instance
+        if (INSTANCE_ID !== array_keys($instances)[0]) {
+            $this->getLogger()->warning(sprintf("Sole pre-existing instance (%s) != this instance (%s)", array_keys($instances)[0], INSTANCE_ID));
             exit(CliTool\Kernel::EXIT_STATUS_OK);
         }
 
