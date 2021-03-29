@@ -8,6 +8,7 @@
 
 declare(strict_types=1);
 
+use Monolog\Logger;
 use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliTool;
 
@@ -102,4 +103,4 @@ $app = new class extends CliTool\App {
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
-(new Schoolbox\Application\CliTool\Kernel($app))->runApp();
+(new Schoolbox\Application\CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Logger::DEBUG]))->runApp();
