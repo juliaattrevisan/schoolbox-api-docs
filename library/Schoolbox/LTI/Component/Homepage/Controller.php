@@ -73,17 +73,17 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         if ($providerId) {
             try {
-                $this->providerMapper->findById($providerId);
+                $provider = $this->providerMapper->findById($providerId);
             } catch (\Schoolbox\Mapper\Exception $e) {
 
                 // noop
             }
         }
 
-        /* No provider selected, or no providers exist
+        /* No provider selected, selected provider is nonexistent, or no providers exist
          * Don't render the component
          */
-        if ($readOnly && (!$providerId || $providers->count() === 0)) {
+        if ($readOnly && (!$providerId || !$provider || $providers->count() === 0)) {
             return false;
         }
 
