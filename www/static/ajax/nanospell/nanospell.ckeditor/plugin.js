@@ -411,9 +411,10 @@
 
 	function render() {
 
-
-		if(window.getSelection && editor.getWin().getSelection().toString()){
-			return;
+		if (editor.getWin().getSelection()) {
+			if (window.getSelection && editor.getWin().getSelection().toString()){
+				return;
+			}
 		}
 
 	    if(!state){
