@@ -18,8 +18,8 @@
 {% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
-{% set showContacts = (isStaff or isParentOfStudent) and not hideContacts %}
-{% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaff %}
+{% set showContacts = (isStaff or isParentOfStudent) and not hideContacts and contacts|length > 0 %}
+{% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaff and externalUser is defined %}
 
 {# Emergency Contact Information, due to non-normalisation, must be manually inspected
  # for contents in three possible places; name, phone, phone alt. Information can exist
@@ -46,7 +46,7 @@
     and hasEmergencyContacts
 %}
 {% set showContactsTab =
-    (showContacts and contacts|length > 0)
+    showContacts
     or showContactsAlert
     or showEmergencyContacts
 %}
@@ -898,7 +898,7 @@
                                             </div>
                                     {% endblock contacts_alert %}
                                 {% endfor %}
-                                {% if externalUser.ParentsSeparatedFlag == 1 %}
+                                {% if externalUser.ParentsSeparatedFlag ?? false %}
                                 <div class="alert-box highlight icon-info">Parents Separated</div>
                                 {% endif %}
                             {% endif %}
