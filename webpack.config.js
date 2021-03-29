@@ -230,6 +230,13 @@ module.exports = {
                 },
             },
             {
+                test: require.resolve("lodash"),
+                loader: "expose-loader", 
+                options: {
+                    exposes: { globalName: "_", override: true }
+                },
+            },
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
