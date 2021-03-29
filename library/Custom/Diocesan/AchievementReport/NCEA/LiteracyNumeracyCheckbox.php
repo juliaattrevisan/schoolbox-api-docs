@@ -34,6 +34,7 @@ class LiteracyNumeracyCheckbox extends Base
             'id2' => $this->getExternalUserId(),
             'id3' => $this->getExternalUserId(),
             'id4' => $this->getExternalUserId(),
+            'id5' => $this->getExternalUserId(),
         ];
 
         $query = "
@@ -43,23 +44,29 @@ class LiteracyNumeracyCheckbox extends Base
                  WHERE id = :id1
                  AND UELiteracyMet = 'Y'
                  GROUP BY UELiteracyMet
-                ) AS 'Level 2 Literacy',
+                ) AS 'UE Literacy',
                 (SELECT TOP 1 COUNT(*)
                  FROM dbo.uvSchoolBoxNCEAResults
                  WHERE id = :id2
+                 AND UENumeracyMet = 'Y'
+                 GROUP BY UENumeracyMet
+                ) AS 'UE Numeracy',
+                (SELECT TOP 1 COUNT(*)
+                 FROM dbo.uvSchoolBoxNCEAResults
+                 WHERE id = :id3
                  AND Level1LiteracyMet = 'Y'
                  GROUP BY Level1LiteracyMet
                 ) AS 'Level 1 Literacy',
                 (SELECT TOP 1 COUNT(*)
                  FROM dbo.uvSchoolBoxNCEAResults
-                 WHERE id = :id3
+                 WHERE id = :id4
                  AND Level1NumeracyMet = 'Y'
                  GROUP BY Level1NumeracyMet
                 ) AS 'Level 1 Numeracy'
             FROM
                 dbo.uvSchoolBoxNCEAResults
             WHERE
-                id = :id4
+                id = :id5
         ";
 
         $result = $this->db->getRow($query, $params);
@@ -81,7 +88,8 @@ class LiteracyNumeracyCheckbox extends Base
         }
 
         return [
-            'Level 2 Literacy' => 0,
+            'UE Literacy' => 0,
+            'UE Numeracy' => 0,
             'Level 1 Literacy' => 0,
             'Level 1 Numeracy' => 0
         ];
