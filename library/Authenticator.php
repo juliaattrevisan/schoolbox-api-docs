@@ -50,19 +50,6 @@ class Authenticator
         throw new SchoolboxAccessDeniedException('Username or password is incorrect');
     }
 
-    /**
-     * Explicitly deauthenticates any existing authentication and retests
-     *
-     * @param string $username
-     * @param string $password
-     * @param bool   $remember
-     * @return User
-     */
-    public function reauthenticate(string $username, string $password, bool $remember = false): User
-    {
-        $this->authenticated = false;
-        return $this->authenticate($username, $password, $remember);
-    }
 
     /* Session Functions */
 
