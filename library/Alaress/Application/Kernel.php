@@ -146,7 +146,7 @@ use Twig\TwigFunction;
 abstract class Kernel
 {
     /** @var Di\Container */
-    protected $di;
+    protected Di\Container $di;
 
     /** @var callable */
     protected $shutdown;
@@ -170,12 +170,15 @@ abstract class Kernel
      */
     public function __construct()
     {
+        $this->di = new Di\Container(new Di\Factory());
+
         // run the launch sequence
         $this->initialiseExternalConnections();
         $this->registerErrorHandling();
         $this->registerExceptionHandling();
         $this->registerShutdownHandling();
-        $this->installDependencies();
+        $this->installDependencies($this->di);
+        $this->postInstallDependencies();
         $this->initialiseDebugging();
         $this->checkServerApiEnvironment();
     }
@@ -199,6 +202,16 @@ abstract class Kernel
      * @throws \Schoolbox\External\Exception
      */
     abstract protected function initialiseExternalConnections(): void;
+
+    /**
+     * Called after DI services are registered.
+     */
+    protected function postInstallDependencies(): void
+    {
+        /** @var IConfigLoader $config */
+        $config = $this->get('config');
+        session_save_path(PipeManager::getSessionSavePath($config->get('redis_url')));
+    }
 
     /**
      * Initialise debugging
@@ -230,24 +243,9 @@ abstract class Kernel
 
 
     /**
-     * @param Di\Container $di
-     * @throws RuntimeException
-     */
-    protected function setDependencyInjector(Di\Container $di): void
-    {
-        // only allow once
-        if ($this->di === null) {
-            $this->di = $di;
-        } else {
-            throw new RuntimeException("Dependency injector has already been set, cannot set again");
-        }
-    }
-
-
-    /**
      * @return Di\Container
      */
-    public function getDependencyInjector()
+    public function getDependencyInjector(): Di\Container
     {
         return $this->di;
     }
@@ -257,19 +255,12 @@ abstract class Kernel
      * Convenience method to retrieve service from DI
      *
      * @param string $service
-     * @throws RuntimeException if the DI has not been initialised
      * @throws Di\Exception\ServiceNotFound
      * @return mixed
      */
     public function get($service)
     {
-        $di = $this->getDependencyInjector();
-
-        if ($di instanceof Di\Container) {
-            return $di->get($service);
-        }
-
-        throw new RuntimeException("Dependency injector has not been set, cannot retrieve service");
+        return $this->getDependencyInjector()->get($service);
     }
 
 
@@ -321,7 +312,11 @@ abstract class Kernel
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
-     * @return void
+     * TODO. This method should probably just SET services, not GET any of them.
+     *       Usage of services should be in subsequent methods.
+     *
+     * @param Di\Container $di
+     * @return Di\Container $di
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
      * @throws Di\Exception\ServiceNotFound
@@ -329,11 +324,8 @@ abstract class Kernel
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      */
-    protected function installDependencies(): void
+    protected function installDependencies(Di\Container $di): Di\Container
     {
-        // Set up the dependency injector
-        $di = new Di\Container(new Di\Factory());
-
         // Config loader
         $di->set('config', $di->lazyNew(ConfigLoader::class));
 
@@ -423,28 +415,7 @@ abstract class Kernel
             )
         );
 
-        // Session
-        // TODO Session things shouldn't be on the top-level abstract (it's also a duplicate copy/paste of the BasicRequest version)
-        //      Should be implemented once-only on the WebKernel Abstract
-        $di->set(
-            'session',
-            $di->lazy(
-                function () use ($di) {
-                    /** @var IConfigLoader $config */
-                    $config = $di->get('config');
-                    session_save_path(sprintf('%s?prefix=%s', $this->get('config')->get('redis_url'), PipeManager::REDIS_SESSION_PREFIX));
-                    /** @var Predis\ClientInterface $redis */
-                    $redis = $di->get('redis');
-                    $factory = new Factory(
-                        $_COOKIE,
-                        $config,
-                        $redis,
-                        $_SERVER['REQUEST_TIME']
-                    );
-                    return $factory->build();
-                }
-            )
-        );
+        $this->installSessionService($di);
 
         // User from session
         $di->set(
@@ -1482,9 +1453,39 @@ abstract class Kernel
             })
         );
 
+        return $di;
+    }
 
-        // load dependencies into the kernel itself
-        $this->setDependencyInjector($di);
+
+    /**
+     * Consistently register the 'session' DI service
+     *
+     * @param Di\Container $di
+     * @return Di\Container
+     * @throws Di\Exception\ContainerLocked
+     * @throws Di\Exception\ServiceNotObject
+     */
+    protected function installSessionService(Di\Container $di): Di\Container
+    {
+        $di->set(
+            'session',
+            $di->lazy(
+                function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+                    /** @var Predis\ClientInterface $redis */
+                    $redis = $di->get('redis');
+                    $factory = new Factory(
+                        $_COOKIE,
+                        $config,
+                        $redis,
+                        $_SERVER['REQUEST_TIME']
+                    );
+                    return $factory->build();
+                }
+            )
+        );
+        return $di;
     }
 
 

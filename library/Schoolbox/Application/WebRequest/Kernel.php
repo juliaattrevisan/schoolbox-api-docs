@@ -18,6 +18,7 @@ use Alaress\Web\Output\Json;
 use Alaress\Web\Output\OutputInterface;
 use Alaress\Web\Request\IsJson;
 use Alaress\Web\Request\IsXhr;
+use Aura\Di\Container;
 use Aura\Router\Route;
 use Aura\Web\Request;
 use Aura\Web\Response;
@@ -522,7 +523,8 @@ class Kernel extends WebKernelAbstract
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
-     * @return void
+     * @param Container $di
+     * @return Container
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -530,11 +532,9 @@ class Kernel extends WebKernelAbstract
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      */
-    protected function installDependencies(): void
+    protected function installDependencies(Container $di): Container
     {
-        parent::installDependencies();
-
-        $di = $this->getDependencyInjector();
+        parent::installDependencies($di);
 
         // register an empty logger to maintain interfaces as required
         $di->values['logger'] = new NullLogger();
@@ -542,18 +542,20 @@ class Kernel extends WebKernelAbstract
         // Mapper notifications:
         // They rely upon the session being injected into them, so do that.
         $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
-            /** @var \Alaress\Session\Session $session */
-            $session = $di->get('session');
-            if (!$session->isStarted()) {
-                $session->start();
-            }
-            return isset($_SESSION) ? $_SESSION : array();
+            $di->get('session');
+            return $_SESSION ?? [];
         });
 
-        // initialise session
-        /** @var \Alaress\Session\Session $session */
-        $session = $di->get('session');
-        $session->start();
+        return $di;
+    }
+
+    /**
+     * @inheritDoc
+     * @throws \Throwable
+     */
+    protected function postInstallDependencies(): void
+    {
+        parent::postInstallDependencies();
 
         $this->initModules();
     }

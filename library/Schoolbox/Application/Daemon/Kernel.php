@@ -12,6 +12,7 @@ use Alaress\Async\Stomp\Implementation\Stream as Stomp;
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Redis\Async\Client as AsyncRedisClient;
+use Aura\Di\Container;
 use ErrorException;
 use Exception;
 use PDOException;
@@ -102,7 +103,7 @@ class Kernel extends CliKernelAbstract
         $this->loop = $this->di->values['react.loop'] = Factory::create();
 
         foreach (posix_getrlimit() as $key => $value) {
-            list ($strength, $attr) = explode(' ', $key);
+            [$strength, $attr] = explode(' ', $key);
             $this->limits[$attr][$strength] = $value === 'unlimited' ? null : $value;
         }
     }
@@ -360,7 +361,8 @@ EOL;
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
-     * @return void
+     * @param Container $di
+     * @return Container
      * @throws RuntimeException
      * @throws \Aura\Di\Exception
      * @throws \Aura\Di\Exception\ContainerLocked
@@ -368,11 +370,9 @@ EOL;
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \InvalidArgumentException
      */
-    protected function installDependencies(): void
+    protected function installDependencies(Container $di): Container
     {
-        parent::installDependencies();
-
-        $di = $this->getDependencyInjector();
+        parent::installDependencies($di);
 
         $di->set('stomp', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
@@ -395,5 +395,6 @@ EOL;
             $conf = $di->get('config');
             return new AsyncRedisClient($conf->get('redis_url'), $this->loop);
         }));
+        return $di;
     }
 }

@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
+use Alaress\Session\Session;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Psr\Log\NullLogger;
@@ -25,7 +26,6 @@ use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Realtime\Pipe\PipeManager;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -56,18 +56,16 @@ class Kernel extends WebKernelAbstract
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
      *
-     * @return void
+     * @param Di\Container $di
+     * @return Di\Container
      * @throws Di\Exception
      * @throws Di\Exception\ContainerLocked
      * @throws Di\Exception\ServiceNotFound
      * @throws Di\Exception\ServiceNotObject
      * @throws \RuntimeException
      */
-    protected function installDependencies(): void
+    protected function installDependencies(Di\Container $di): Di\Container
     {
-        // Set up the dependency injector
-        $di = new Di\Container(new Di\Factory());
-
         // Config loader
         $di->set('config', $di->lazyNew(ConfigLoader::class));
 
@@ -146,26 +144,7 @@ class Kernel extends WebKernelAbstract
         );
 
         // Session
-        $di->set(
-            'session',
-            $di->lazy(
-                function () use ($di) {
-                    /** @var IConfigLoader $config */
-                    $config = $di->get('config');
-                    session_save_path(sprintf('%s?prefix=%s', $config->get('redis_url'), PipeManager::REDIS_SESSION_PREFIX));
-                    /** @var Predis\ClientInterface $redis */
-                    $redis = $di->get('redis');
-
-                    $factory = new Factory(
-                        $_COOKIE,
-                        $config,
-                        $redis,
-                        $_SERVER['REQUEST_TIME']
-                    );
-                    return $factory->build();
-                }
-            )
-        );
+        $this->installSessionService($di);
 
         // User from session
         $di->set(
@@ -206,17 +185,10 @@ class Kernel extends WebKernelAbstract
         // They rely upon the session being injected into them, so do that.
         $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
             /** @var \Alaress\Session\Session $session */
-            $session = $di->get('session');
-            $session->start();
-            return isset($_SESSION) ? $_SESSION : array();
-        });
+            $di->get('session');
 
-        // initialise session
-        /** @var \Alaress\Session\Session $session */
-        $session = $di->get('session');
-        if (!$session->isStarted()) {
-            $session->start();
-        }
+            return $_SESSION ?? [];
+        });
 
         // install sentry
         $sentryToken   = \defined('SENTRY_TOKEN') ? SENTRY_TOKEN : '';
@@ -368,8 +340,6 @@ class Kernel extends WebKernelAbstract
         $di->params[TwigMethod\RequireModule::class]['di'] = $di;
         $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
 
-
-        // load dependencies into the kernel itself
-        $this->setDependencyInjector($di);
+        return $di;
     }
 }

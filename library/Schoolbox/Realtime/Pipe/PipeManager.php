@@ -122,6 +122,17 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $this->log->debug('Instantiated PipeManager');
     }
 
+    /**
+     * Returns an instance-specific session save path
+     *
+     * @param string $redisUrl
+     * @return string
+     */
+    public static function getSessionSavePath(string $redisUrl): string
+    {
+        return sprintf('%s?prefix=%s', $redisUrl, self::REDIS_SESSION_PREFIX);
+    }
+
 
     /**
      * When a new connection is opened it will be passed to this method

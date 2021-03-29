@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
+use Aura\Di\Container;
 use Database;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
@@ -395,11 +396,12 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /** @inheritDoc */
-    protected function installDependencies(): void
+    protected function installDependencies(Container $di): Container
     {
-        parent::installDependencies();
+        parent::installDependencies($di);
 
-        $this->getDependencyInjector()->values['logger'] = $this->logger();
+        $di->values['logger'] = $this->logger();
+        return $di;
     }
 
 
