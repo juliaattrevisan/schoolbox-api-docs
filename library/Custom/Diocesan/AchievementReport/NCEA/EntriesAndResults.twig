@@ -34,8 +34,8 @@
                 <tbody>
                 <tr>
                     <td class="subheading centered numeric">Std</td>
-                    <td class="subheading centered numeric">Int/Ext</td>
                     <td class="subheading">Title</td>
+                    <td class="subheading centered numeric">Int/Ext</td>
                     <td class="subheading centered numeric">Lvl</td>
                     <td class="subheading centered numeric">Lit</td>
                     <td class="subheading centered numeric">Num</td>
@@ -46,8 +46,8 @@
                     {% if (currentEntry.Result|length > 0) or (entriesAndResults.year == entriesAndResults.currentYear) %}
                         <tr>
                             <td class="centered numeric">{{ currentEntry.NCEAStandardNumber }}</td>
-                            <td class="centered numeric">{{ currentEntry.InternalorExternalAssessment }}</td>
                             <td>{{ currentEntry.StandardTitle }}</td>
+                            <td class="centered numeric">{{ currentEntry.InternalorExternalAssessment }}</td>
                             <td class="centered numeric">{{ currentEntry.Level }}</td>
                             <td class="centered numeric">{{ currentEntry.Lit }}</td>
                             <td class="centered numeric">{{ currentEntry.Num }}</td>
