@@ -96,11 +96,11 @@ $cdn-prefix: "../..";
 @import "components/image-gallery";
 
 // Slider
-@import "../../javascript/components/swiper/dist/css/swiper";
+@import "../../javascript/shared/swiper/dist/css/swiper";
 @import "ui/slider";
 
 // Feature Tour
-@import "../../javascript/components/intro.js/introjs";
+@import "../../javascript/shared/intro.js/introjs";
 @import "components/feature-tour/feature-tour";
 
 // Select Source shard
