@@ -6,6 +6,7 @@
  */
 namespace Schoolbox\Learning\DueWork;
 
+use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Mapper;
 
 /**
@@ -15,6 +16,7 @@ use Schoolbox\Mapper;
  *
  * @method State findOneByColumn($columnName, $columnValue, array $options = [])
  * @method \Schoolbox\Collection|State[] findByColumn($columnName, $columnValue, array $options = [])
+ * @method State findOneByPredicates(PredicateBuilder $pb, array $options = [])
  */
 class StateMapper extends Mapper
 {
@@ -65,20 +67,38 @@ class StateMapper extends Mapper
     /**
      * Ensure that Submission States are unique
      *
+     * Detect if this submission state already exists
+     *
+     * If it already exists,
+     * throw a mapper exception because you're not meant to have dupes
+     *
      * @param State $object
      * @return bool
      * @throws Mapper\Exception
      */
     public function verifyUniqueCode(State $object): bool
     {
-        $existing = $this->findByColumn('code', $object->getCode())->first();
+        if ($object->getId()) {
 
-        /* Detect if this submission state already exists
-         *
-         * If it already exists,
-         * throw a mapper exception because you're not meant to have dupes
-         */
-        if (!$existing) {
+            /* If the object existed in the past,
+             * see if any exist with the same name that -isn't- that particular instance
+             * because renaming it is a possibility that should be allowed
+             */
+            $pb = $this->getPredicateBuilder()
+                ->notEquals('id', $object->getId())
+                ->equals('code', $object->getCode());
+        } else {
+
+            /* Otherwise you're creating a new row and we just need to check
+             * if that code was previously in use
+             */
+            $pb = $this->getPredicateBuilder()
+                ->equals('code', $object->getCode());
+        }
+
+        $existing = $this->findByPredicates($pb)->first();
+
+        if (null === $existing) {
             return true;
         }
 
