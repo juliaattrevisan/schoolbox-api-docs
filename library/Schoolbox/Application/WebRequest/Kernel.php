@@ -534,7 +534,11 @@ class Kernel extends WebKernelAbstract
         // Mapper notifications:
         // They rely upon the session being injected into them, so do that.
         $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(
-            function () {
+            function () use ($di) {
+                $session = $di->get('session');
+                if (!$session->isStarted()) {
+                    $session->start();
+                }
                 return $_SESSION ?? [];
             }
         );
