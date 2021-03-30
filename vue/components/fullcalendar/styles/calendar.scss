@@ -8,6 +8,11 @@
     border-radius: 0;
     color: $content-ui-foreground;
     margin: 0 1px 0 0 !important;
+
+    &:focus {
+      box-shadow: none !important;
+      outline: 0;
+    }
   }
   .flatpickr-input {
     padding: 0 !important;
@@ -199,9 +204,7 @@
   box-shadow: none;
 }
 
-/**
- * Booking-related CSS
- */
+// Booking
 .fc .fc-event.booking {
   /** Default booking color, if you don't have a event type called "Booking" **/
   background-color: #eeeeee;
@@ -233,6 +236,29 @@
 }
 .fc-toolbar {
   margin-bottom: 0;
+}
+
+// Homepage and Dashboard components
+.component-container {
+  // Otherwise it has an irritating 1px border
+  .fc-list-view {
+    border-width: 0;
+  }
+
+  // Explicitly define the background color, because it's prone to a < 1px white right border. Go figure
+  .fc-view-container {
+    background-color: $body-bg;
+  }
+
+  // Remove the empty state: use our own state messages instead
+  .fc-list-empty-wrap2 {
+    display: none;
+  }
+
+  // The entire event is clickable
+  .fc-list-item {
+    cursor: pointer;
+  }
 }
 
 /* Overcome specificity

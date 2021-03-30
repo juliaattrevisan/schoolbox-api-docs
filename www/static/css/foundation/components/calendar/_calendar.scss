@@ -67,20 +67,9 @@
 @media #{$medium-down} {
   .fc-toolbar {
     flex-direction: column;
-    .fc-center {
-      margin: 1rem;
-    }
-  }
-  .fc-right {
-    width: 100%;
-  }
-  .fc-center h2 {
-    font-size: 1rem;
-  }
-  .fc-right .fc-button-group {
-    width: 100%;
-    button {
-      padding: 0.5rem !important;
+
+    .fc-toolbar-chunk .fc-toolbar-title {
+      margin: .75rem 0;
     }
   }
 }
@@ -96,29 +85,6 @@
   @media #{$medium-up} {
     top: 0.5rem;
     position: relative;
-  }
-}
-
-// FullCalendar homepage and dashboard components
-.component-container {
-  // Otherwise it has an irritating 1px border
-  .fc-list-view {
-    border-width: 0;
-  }
-
-  // Explicitly define the background color, because it's prone to a < 1px white right border. Go figure
-  .fc-view-container {
-    background-color: $body-bg;
-  }
-
-  // Remove the empty state: use our own state messages instead
-  .fc-list-empty-wrap2 {
-    display: none;
-  }
-
-  // The entire event is clickable
-  .fc-list-item {
-    cursor: pointer;
   }
 }
 
