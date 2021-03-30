@@ -86,7 +86,7 @@ class RolePayload
                  GROUP BY `groups`.id)
               ) allTotals ON `groups`.id = allTotals.id
             GROUP BY `groups`.name
-            ORDER BY `groups`.id
+            ORDER BY `groups`.sequence
         ';
 
         $result = $this->database->executeQuery($query);
