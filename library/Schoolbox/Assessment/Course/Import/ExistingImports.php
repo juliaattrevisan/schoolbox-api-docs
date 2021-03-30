@@ -65,9 +65,11 @@ class ExistingImports
             INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
             INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
             INNER JOIN course_implementation ON cci.value = course_implementation.id
+            INNER JOIN folder f ON ci.identifier = f.id
             WHERE cd.class = :controller
             AND ccd.key = :key
             AND course_specification_id = :courseSpecificationId
+            AND f.deleted_at IS NULL
             ORDER BY identifier
         ";
 
