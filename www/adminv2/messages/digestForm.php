@@ -6,11 +6,16 @@
  * @link        https://schoolbox.com.au/
  */
 
+// If in SitePage context
+if (isset($this)) {
+    SitePage::localRedir('/adminv2/messages');
+}
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-if(isset($this) || empty($_POST)) {
-	SitePage::localRedir('/adminv2/messages');
+if (empty($_POST)) {
+    SitePage::localRedir('/adminv2/messages');
 }
 
 if (!$kernel->getDependencyInjector()->get('session')->get('user')->isSuperuser()) {

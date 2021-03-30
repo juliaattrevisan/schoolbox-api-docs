@@ -6,6 +6,6 @@ if(!isset($this)){
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir(\preg_replace('/.php$/', '', $_SERVER['SCRIPT_NAME']));
 }
-
+/** @var SitePage $this */
 $parentReport = new Report_Boarder($this);
 $parentReport->render();

@@ -11,7 +11,7 @@ use Schoolbox\Realtime\Message\NSMapper;
  * @link        https://schoolbox.com.au/
  */
 
-
+// Are we not in SitePage context?
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();

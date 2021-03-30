@@ -24,6 +24,12 @@ use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
 
+// Enforce direct script access
+if (isset($this)) {
+    /** @var SitePage $this */
+    $this->pageNotFound();
+}
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new WebRequest\Kernel();
 

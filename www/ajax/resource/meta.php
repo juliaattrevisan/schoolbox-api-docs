@@ -12,17 +12,17 @@ use Schoolbox\UserMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new Kernel();
-
-// kickstart a session
-new SitePage();
-
 // disallow SitePage context, this is an ajax script
 if (isset($this)) {
     SitePage::localRedir('/ajax/resource/meta.php');
     exit;
 }
+
+require_once __DIR__ . '/../../../conf/core/require.php';
+$kernel = new Kernel();
+
+// kickstart a session
+new SitePage();
 
 // check 1: folder specified and sane
 if (!(isset($_POST['folderId']) && is_numeric($_POST['folderId']))) {

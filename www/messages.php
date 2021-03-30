@@ -4,20 +4,20 @@ use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
 
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-/** @var SitePage $this */
-
+// not in SitePage context?
 if(!isset($this)) {
 	require_once __DIR__ . '/../conf/core/require.php';
 	$kernel = new \Schoolbox\Application\WebRequest\Kernel();
 	error(2);
 	exit;
 }
+/** @var SitePage $this */
 
 $this->setFile(TEMPLATE_content, 'messages.html');
 

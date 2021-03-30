@@ -12,7 +12,7 @@ if(!isset($this)) {
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir('/modules/tuckshop/staff_enter');
 }
-
+/** @var SitePage $this */
 // mask this from all installs but Cathedral
 if(Config::get('site_location') != 'cathedral') {
     $this->pageNotFound();

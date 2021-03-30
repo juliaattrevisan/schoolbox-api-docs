@@ -14,10 +14,13 @@ use Schoolbox\Resource\Storage;
  * @link        https://schoolbox.com.au/
  */
 
-if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
+if (empty($this)) {
     require_once __DIR__ . '/../../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     // nope. go away
+    SitePage::localRedir('/resource/external/google');
+}
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     SitePage::localRedir('/resource/external/google');
 }
 

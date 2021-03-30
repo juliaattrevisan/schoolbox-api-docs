@@ -5,7 +5,7 @@ if(!isset($this)){
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir(\preg_replace('/.php$/', '', $_SERVER['SCRIPT_NAME']));
 }
-
+/** @var SitePage $this */
 
 // Check if module is enabled
 if( !Config::get('staff_directory_enabled')) {

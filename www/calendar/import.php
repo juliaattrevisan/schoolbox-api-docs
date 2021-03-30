@@ -11,8 +11,12 @@ use Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Breadcrumbs;
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Kernel();
+// not in SitePage context?
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+/** @var SitePage $this */
 
 $groupHandler = new Group();
 
