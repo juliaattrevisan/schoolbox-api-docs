@@ -134,7 +134,7 @@ class Controller extends Base\Base
          * $exists is truthy in this circumstance
          */
         $existingInFolderIds = (new ExistingImports($this->getDi()->get('databaseInternal')))->generate($courseSpec->getId());
-        $exists = (bool)\count(array_intersect($existingInFolderIds, [$targetClass->getId()]));
+        $exists = (bool)\count(array_intersect($existingInFolderIds, $targetClass ? [$targetClass->getId()] : []));
 
         $data = [
             'action'           => 'import',
