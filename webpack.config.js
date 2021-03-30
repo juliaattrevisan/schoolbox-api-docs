@@ -145,6 +145,7 @@ module.exports = {
             './node_modules/@fullcalendar/core/main.js',
             './node_modules/@fullcalendar/list/main.js'
         ],
+        // fileDrop: "./www/static/javascript/jquery.fileDrop.js",
         // vueInline: [ // Omit to avoid issues with loading both Vue via src and via import Vue from 'Vue' - moving all Vue to modules is in progress
         //     './node_modules/vue/dist/vue.js',
         //     './node_modules/vuejs-paginate/dist/index.js',
@@ -214,7 +215,7 @@ module.exports = {
                 test: require.resolve("dropzone"),
                 loader: "expose-loader", 
                 options: {
-                    exposes: { globalName: "dropzone", override: true }
+                    exposes: { globalName: "dropzone",  override: true }
                 },
             },
             {
@@ -341,6 +342,10 @@ module.exports = {
     },
     plugins: [
         new VueLoaderPlugin(),
+        // new webpack.ProvidePlugin({
+        //     $: 'jquery',
+        //     jQuery: 'jquery',
+        // }),
         new RemoveEmptyScriptsPlugin()
     ]
 };
