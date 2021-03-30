@@ -100,7 +100,7 @@ $cdn-prefix: "../..";
 @import "ui/slider";
 
 // Feature Tour
-@import "../../javascript/shared/intro.js/introjs";
+@import "/node_modules/intro.js/introjs";
 @import "components/feature-tour/feature-tour";
 
 // Select Source shard
@@ -142,7 +142,7 @@ $cdn-prefix: "../..";
 @import "ui/selectize.customisation";
 
 //Magnific Popup
-@import "../../javascript/components/magnific-popup/src/css/main";
+@import "/node_modules/magnific-popup/src/css/main";
 @import "components/magnific/settings";
 
 // combobox relies on selectize styles
@@ -152,8 +152,8 @@ $cdn-prefix: "../..";
 @import "../../javascript/math/jqmath-0.4.0";
 
 // jQuery UI
-@import "../../javascript/components/jquery-ui/themes/base/draggable";
-@import "../../javascript/components/jquery-ui/themes/base/sortable";
+@import "/node_modules/jquery-ui/themes/base/draggable";
+@import "/node_modules/jquery-ui/themes/base/sortable";
 
 // client custom CSS overrides:
 // no longer required, as they're included by www/css/core/skin.css.php

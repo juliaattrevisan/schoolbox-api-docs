@@ -238,6 +238,13 @@ module.exports = {
                 },
             },
             {
+                test: require.resolve("intro.js"),
+                loader: "expose-loader", 
+                options: {
+                    exposes: { globalName: "introJs", override: true }
+                },
+            },
+            {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
