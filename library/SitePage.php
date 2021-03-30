@@ -9,6 +9,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
 
 class SitePage extends Page
@@ -63,6 +64,7 @@ class SitePage extends Page
         } else {
             $this->config = ConfigLoader::getInstance();
         }
+
 
         if(isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
@@ -334,6 +336,7 @@ class SitePage extends Page
     public function initSession()
     {
         if (PHP_SESSION_NONE === session_status()) {
+            session_save_path(PipeManager::getSessionSavePath($this->config->get('redis_url')));
             session_start();
         }
 

@@ -254,16 +254,11 @@ class Kernel extends CliKernelAbstract
 
 
     /**
-     * @throws InvalidArgumentException
-     * @throws \Aura\Di\Exception
-     * @throws \Aura\Di\Exception\ContainerLocked
-     * @throws \Aura\Di\Exception\ServiceNotFound
-     * @throws \Aura\Di\Exception\ServiceNotObject
-     * @throws \RuntimeException
+     * @inheritDoc
+     * @throws \Throwable
      */
-    protected function installDependencies(): void
+    protected function postInstallDependencies(): void
     {
-        parent::installDependencies();
         $this->initModules();
     }
 

@@ -9,6 +9,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Predis\Collection\Iterator\Keyspace;
 use Predis\ClientInterface;
+use Schoolbox\Realtime\Pipe\PipeManager;
 
 require_once __DIR__ . '/../conf/core/require.php';
 
@@ -23,10 +24,7 @@ $app = new class extends CliTool\App
         /** @var ClientInterface $redis */
         $redis = $this->getDi()->get('redis');
 
-        /**
-         * @see \Schoolbox\Realtime\Pipe\PipeManager
-         */
-        $search = new Keyspace($redis, 'PHPREDIS_SESSION:*');
+        $search = new Keyspace($redis, PipeManager::REDIS_SESSION_PREFIX . '*');
         $count = 0;
         foreach ($search as $key) {
             $count += $redis->del($key);

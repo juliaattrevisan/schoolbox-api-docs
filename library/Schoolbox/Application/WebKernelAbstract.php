@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
+use Alaress\Session\Session;
 use \Database;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Crell\ApiProblem\ApiProblem;
@@ -194,6 +195,19 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     {
         if (PHP_SAPI === 'cli') {
             throw new WrongSapiException('Cannot use Web Kernel in CLI environment.');
+        }
+    }
+
+
+    protected function postInstallDependencies(): void
+    {
+        parent::postInstallDependencies();
+
+        // initialise session
+        /** @var Session $session */
+        $session = $this->getDependencyInjector()->get('session');
+        if (!$session->isStarted()) {
+            $session->start();
         }
     }
 

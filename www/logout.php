@@ -10,7 +10,6 @@ if (Config::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
     exit;
 }
 
-session_start();
 session_regenerate_id(true);
 session_destroy();
 

@@ -21,11 +21,6 @@ parameters:
 			path: library/AjaxChat.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Alaress/Application/Kernel.php
-
-		-
 			message: "#^Property Alaress\\\\Async\\\\AMQP\\\\AMQPConnector\\:\\:\\$conn \\(PhpAmqpLib\\\\Connection\\\\AMQPStreamConnection\\) does not accept null\\.$#"
 			count: 2
 			path: library/Alaress/Async/AMQP/AMQPConnector.php

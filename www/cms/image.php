@@ -24,10 +24,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 
-/* Preserve old checks
- */
-session_start();
-
 /* Choose a caching method to use
  */
 

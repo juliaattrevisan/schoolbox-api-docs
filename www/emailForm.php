@@ -18,8 +18,6 @@ use Schoolbox\Mail\TwigEmail;
 require_once __DIR__ . '/../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-session_start();
-
 $recaptcha = new ReCaptcha(Config::get('recaptcha_public_api_key'), Config::get('recaptcha_private_api_key'));
 
 if (!isset($_SESSION['id']) && !$recaptcha->verify($_POST['g-recaptcha-response'])) {

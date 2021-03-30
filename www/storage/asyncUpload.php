@@ -13,21 +13,12 @@ use Schoolbox\Resource\Storage\Translator\ModelToArray;
  * @link      https://schoolbox.com.au/
  */
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+// TODO, this file should be using the Basic Kernel, but is actually using the WebRequest Kernel
+//require_once __DIR__ . '/../../conf/core/require.php';
+//$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 /** @var PrefixGenerator $prefixGenerator */
 $prefixGenerator = $kernel->get('cdnPrefixGenerator');
-
-// Force session usage due to flash audio recorder.
-// (Uploadify will die, but this is still needed for flash audio upload.)
-$session     = new Session();
-$sessionName = session_name();
-if (isset($_REQUEST[$sessionName]) && $session->validateSessionId($_REQUEST[$sessionName])) {
-    session_id($_REQUEST[$sessionName]);
-}
-
-session_start();
 
 $result = array(
     'success' => false,
