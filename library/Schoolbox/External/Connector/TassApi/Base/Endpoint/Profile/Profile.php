@@ -755,6 +755,7 @@ class Profile implements IStrategy
          */
         foreach ($teachers['teachers'] as &$teacher) {
             $teacher['category'] = self::TEACHER;
+
             if ('' !== (string)$teacher['employee_code']) {
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
@@ -765,6 +766,8 @@ class Profile implements IStrategy
                 ));
             }
         }
+
+        unset($teacher);
 
         /* Reformat the Employee struct to be similar to teaching struct
          */
@@ -782,6 +785,7 @@ class Profile implements IStrategy
                 'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
                 'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
                 'first_name' => $employee['first_name'],
+                'preferred_name' => $employee['preferred_name'],
                 'surname' => $employee['surname'],
                 'school_email_address' => $employee['school_email'],
                 'email_address' => $employee['e_mail'],
@@ -819,7 +823,10 @@ class Profile implements IStrategy
              */
             $email = trim((string)(array_values(array_filter([$staff['school_email_address'], $staff['email_address']]))[0] ?? ''));
 
-            $firstname = trim((string)$staff['first_name']);
+            /* Preferred Name (if it contains a truthy value) takes precedence over First Name
+             * Both preferred_name and first_name are provided in the unified output of findStaff()
+             */
+            $firstname = trim((string)($staff['preferred_name'] ?: $staff['first_name']));
             $lastname = trim((string)$staff['surname']);
             $phone = '';
             $position = '';
