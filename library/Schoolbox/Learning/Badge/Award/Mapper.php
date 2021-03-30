@@ -391,6 +391,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param array       $userIds
      * @param Badge\Model $badge
      * @return array
+     * @throws \UnexpectedValueException
      */
     public function findHistories(array $userIds, \Schoolbox\Learning\Badge\Model $badge): array
     {
@@ -403,10 +404,21 @@ class Mapper extends \Schoolbox\Mapper
             ]
         ]);
 
-        /* Index histories by user id
-         */
-        $stack = array_fill_keys($userIds, new GenericCollection(Model::class));
 
+        /* Index histories by user id by initialising a new GenericCollection for each user
+         *
+         * A previous method using array_fill_keys initialised one GenericCollection that
+         * was inadvertently shared among all users rather than initialising a new one for
+         * each user as intended (object pass by reference, sigh)
+         */
+        $stack = [];
+
+        foreach ($userIds as $userId) {
+            $stack[$userId] = new GenericCollection(Model::class);
+        }
+
+        /* Stack up each person's history
+         */
         foreach ($history as $item) {
             $stack[$item->getRecipient()->getId()]->add($item);
         }
