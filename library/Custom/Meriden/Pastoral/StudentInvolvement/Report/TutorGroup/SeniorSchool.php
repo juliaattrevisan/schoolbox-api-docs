@@ -36,7 +36,7 @@ class SeniorSchool extends Base
         '/^Year\\s+12\\s+Tutor\\s+Group$/i',
         '/^English\\s+Language\\s+Skills$/i',
         '/^Senior\\s+Study\\s+1[012]$/i',
-        '/^Senior\\s+Study\\s+[a-z0-9]$/i',
+        '/^Senior\\s+Study\\s+[a-z1-9]$/i',
     ];
 
     /**
