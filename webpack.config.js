@@ -1,5 +1,6 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
+const webpack = require('webpack');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
 module.exports = {
@@ -205,7 +206,7 @@ module.exports = {
                 options: {
                     exposes: [
                         { globalName: "$", override: true },
-                        { globalName: "jQuery", override: true },
+                        { globalName: "jQuery", override: true }
                     ],
                 },
             },
@@ -213,7 +214,7 @@ module.exports = {
                 test: require.resolve("dropzone"),
                 loader: "expose-loader", 
                 options: {
-                    exposes: { globalName: "Dropzone", override: true }
+                    exposes: { globalName: "dropzone", override: true }
                 },
             },
             {
