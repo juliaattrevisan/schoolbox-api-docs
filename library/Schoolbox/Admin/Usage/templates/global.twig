@@ -11,11 +11,20 @@
             <h2 class="subheader">Usage</h2>
         </div>
 
+        {# This chart doesn't display anything if you're using S3 adapter because
+         # you've technically got a scalable and unrestricted storage space that
+         # you can expand on demand - though you might want to change how that
+         # is represented visually inside the vue component itself
+         #
+         # Also it's a kind of obscure notion so this brings it front and center
+         #}
+        {% if isS3Adapter %}
         <div class="small-12 island">
             <div id="usage-global-total-container" class="usage-chart">
                 <usage-global-total :endpoint="'{{ routeLookupIfAuthorized('adminUsage.getTotalPayload') }}'" :is-s3-adapter="{{ isS3Adapter }}"></usage-global-total>
             </div>
         </div>
+        {% endif %}
 
         <div class="small-12 large-6 island">
             <div id="usage-global-system-container" class="usage-chart">
