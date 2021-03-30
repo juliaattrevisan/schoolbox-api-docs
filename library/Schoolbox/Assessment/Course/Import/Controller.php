@@ -211,10 +211,15 @@ class Controller extends Base\Base
             'action'           => 'import',
             'courseSpecId'     => $courseSpecId,
             'folderIds'        => $targetFolderIds,
-            'importedAlready'  => $exists,
             'componentId'      => $componentId,
             'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
             'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
+
+            /* Go to the redirect destination if you've already imported this course
+             * and you chose to cancel what you were doing
+             */
+            'importedAlready' => $exists,
+            'importedAlreadyRedirect' => '/course/list',
         ]);
     }
 
