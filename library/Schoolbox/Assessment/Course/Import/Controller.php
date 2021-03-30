@@ -200,11 +200,18 @@ class Controller extends Base\Base
             return;
         }
 
+        /* Find out if $courseSpecId already exists in one or more of the target folder ids
+         * $exists is truthy in this circumstance
+         */
+        $existingInFolderIds = (new ExistingImports($this->getDi()->get('databaseInternal')))->generate($courseSpecId);
+        $exists = (bool)\count(array_intersect($existingInFolderIds, $targetFolderIds));
+
         // respond with stage 2: units
         $this->tpl('course', 'unitImportForm', [
             'action'           => 'import',
             'courseSpecId'     => $courseSpecId,
             'folderIds'        => $targetFolderIds,
+            'importedAlready'  => $exists,
             'componentId'      => $componentId,
             'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
             'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
