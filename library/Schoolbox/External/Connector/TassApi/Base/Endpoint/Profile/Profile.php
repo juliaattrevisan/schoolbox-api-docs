@@ -781,7 +781,7 @@ class Profile implements IStrategy
             $employeeSetReformatted[] = [
                 'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
                 'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
-                'given_names' => $employee['first_name'],
+                'first_name' => $employee['first_name'],
                 'surname' => $employee['surname'],
                 'school_email_address' => $employee['school_email'],
                 'email_address' => $employee['e_mail'],
@@ -819,7 +819,7 @@ class Profile implements IStrategy
              */
             $email = trim((string)(array_values(array_filter([$staff['school_email_address'], $staff['email_address']]))[0] ?? ''));
 
-            $firstname = trim((string)$staff['given_names']);
+            $firstname = trim((string)$staff['first_name']);
             $lastname = trim((string)$staff['surname']);
             $phone = '';
             $position = '';
