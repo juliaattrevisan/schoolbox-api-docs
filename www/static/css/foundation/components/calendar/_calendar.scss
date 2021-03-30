@@ -46,7 +46,7 @@
  * Skin Builder choices
  */
 .fc-toolbar {
-  border-bottom: 1px solid #ededed;
+  border-bottom: 2px solid #ededed;
   margin: 0 !important;
   padding: 1rem;
 
@@ -83,21 +83,6 @@
       padding: 0.5rem !important;
     }
   }
-}
-
-.fc-custom-group.row .small-4.columns {
-  padding-left: 0;
-  @-moz-document url-prefix() {
-    padding-right: 2.5rem;
-  }
-}
-.fc-custom-group.row {
-  margin-left: 0 !important;
-  width: 100% !important;
-}
-
-.fc-custom-group .input-group {
-  flex-wrap: nowrap !important;
 }
 
 @media #{$small-only} {
