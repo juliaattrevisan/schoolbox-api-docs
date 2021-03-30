@@ -27,6 +27,19 @@ class SeniorSchool extends Base
     ];
 
     /**
+     * Regular expressions for the names of subjects to exclude from the senior
+     * report.
+     */
+    private const EXCLUDED_SENIOR_SUBJECT_NAME_REGEXS = [
+        '/^Year\\s+10\\s+Tutor\\s+Group$/i',
+        '/^Year\\s+11\\s+Tutor\\s+Group$/i',
+        '/^Year\\s+12\\s+Tutor\\s+Group$/i',
+        '/^English\\s+Language\\s+Skills$/i',
+        '/^Senior\\s+Study\\s+1[012]$/i',
+        '/^Senior\\s+Study\\s+[a-z0-9]$/i',
+    ];
+
+    /**
      * A list of endeavor grades, collated for this report.
      */
     private array $endeavorGrades = [];
@@ -83,6 +96,22 @@ class SeniorSchool extends Base
         });
 
         return $this;
+    }
+
+    /**
+     * Should this subject be displayed on the senior school tutor group report?
+     *
+     * @param string $subjectName
+     * @return bool
+     */
+    public function isSubjectDisplayed(string $subjectName): bool
+    {
+        foreach (self::EXCLUDED_SENIOR_SUBJECT_NAME_REGEXS as $regex) {
+            if (preg_match($regex, $subjectName)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
