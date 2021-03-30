@@ -1,4 +1,5 @@
 <?php
+
 /**
  * search.php
  *
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 /** @var SitePage $this */
 if (!isset($this)) {
     http_response_code(404);
@@ -96,7 +98,6 @@ if (!$count['all']) {
      * are tied in to the keys in the array, which really isn't nice.
      */
     if (!empty($handle[$type])) {
-
         /* Particular ordering and sorting for Categories
          */
         if ($type != 'all') {

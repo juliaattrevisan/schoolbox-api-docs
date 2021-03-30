@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -22,16 +23,15 @@ new \EOTC\Authenticator($this);
 $sessionUser = $_SESSION['user'];
 
 if (!$sessionUser->isSuperuser()) {
-	error(19);
+    error(19);
 }
 
 try {
-	/** @var \Schoolbox\User $user */
-	$userMapper = \Schoolbox\UserMapper::getInstance();
-	$user = $userMapper->findById($this->arg[0]);
-}
-catch (\Schoolbox\Mapper\Exception $e) {
-	error(31);
+    /** @var \Schoolbox\User $user */
+    $userMapper = \Schoolbox\UserMapper::getInstance();
+    $user = $userMapper->findById($this->arg[0]);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(31);
 }
 
 /* Delete all perms for this user, and re-add new ones

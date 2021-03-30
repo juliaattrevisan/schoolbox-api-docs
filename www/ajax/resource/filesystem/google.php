@@ -54,7 +54,6 @@ foreach ($_POST['docs'] as $doc) {
 
         $dest = $grive->fetchToFile($doc['id']);
     } catch (DomainException $e) {
-
         /* - Some mysterious error - skip this file, leave a bootprint in sentry
          *
          * - Someone tried to access a restricted file, leave a bootprint in sentry
@@ -64,7 +63,6 @@ foreach ($_POST['docs'] as $doc) {
 
         continue;
     } catch (Mapper\Exception $e) {
-
         /* noop: unknown file extension: silently disregard for now
          * because deriveFileName() couldn't figure out the extension
          */
@@ -82,9 +80,7 @@ foreach ($_POST['docs'] as $doc) {
         $meta['mimeType'] = $grive->determineMimeIcon($meta);
 
         $files[] = $meta;
-    }
-    catch (Schoolbox\File\Exception $e) {
-
+    } catch (Schoolbox\File\Exception $e) {
         /* TODO: Find out how to handle this "successful error"
          * TODO: UI doesn't understand this payload
          */
@@ -95,9 +91,7 @@ foreach ($_POST['docs'] as $doc) {
 //            'err'   => $e->getMessage()
 //        );
     }
-
 }
 
 header('Content-Type: application/json');
 die(json_encode($files));
-

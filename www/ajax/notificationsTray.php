@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -23,8 +24,7 @@ if (in_array($_POST['state'], ['show', 'hide'])) {
         if ($_POST['state'] == 'show') {
             $user->showNotificationsTray();
             $_SESSION['user']->showNotificationsTray();
-        }
-        else {
+        } else {
             $user->hideNotificationsTray();
             $_SESSION['user']->hideNotificationsTray();
         }
@@ -32,8 +32,7 @@ if (in_array($_POST['state'], ['show', 'hide'])) {
         /* Save setting
          */
         $userMapper->save($user);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
     }
 }
 

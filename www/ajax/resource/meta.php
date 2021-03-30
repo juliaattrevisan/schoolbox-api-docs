@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ajax callback for retrieving metadata about a folder / file (or files) in the resource browser view
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
@@ -226,12 +228,11 @@ function getFolderMeta($folderId)
     );
 
     if ($type) {
-        $folder['admins'] = array('externalID'=>$admin->getExternalId(), 'name'=>$admin->getFullName());
+        $folder['admins'] = array('externalID' => $admin->getExternalId(), 'name' => $admin->getFullName());
         $folder['manage'] = $_SESSION['id'] == $admin->getId() || $_SESSION['user']->isSuperuser() ? true : false;
     }
 
     return $folder;
-
 }
 
 

@@ -1,4 +1,5 @@
 <?php
+
 use Alaress\Redis;
 use Schoolbox\Realtime\MessageList\ListFactory;
 use Schoolbox\Realtime\Notification\Decorator;
@@ -11,11 +12,11 @@ use Schoolbox\Realtime\Notification\Decorator;
  */
 
 // not in SitePage context?
-if(!isset($this)) {
-	require_once __DIR__ . '/../conf/core/require.php';
-	$kernel = new \Schoolbox\Application\WebRequest\Kernel();
-	error(2);
-	exit;
+if (!isset($this)) {
+    require_once __DIR__ . '/../conf/core/require.php';
+    $kernel = new \Schoolbox\Application\WebRequest\Kernel();
+    error(2);
+    exit;
 }
 /** @var SitePage $this */
 
@@ -43,77 +44,71 @@ $unread = $decorator->renderAsSitePageArray();
 
 $msgsByDay = array();
 
-foreach($listed as $id => $notification) {
+foreach ($listed as $id => $notification) {
     $notification['unread'] = isset($unread[$id]);
-	$timestamp = $notification['time'];
-	$day = date('Y-m-d', $timestamp);
-	$msgsByDay[$day][$timestamp][$id] = $notification;
-
+    $timestamp = $notification['time'];
+    $day = date('Y-m-d', $timestamp);
+    $msgsByDay[$day][$timestamp][$id] = $notification;
 }
 
 krsort($msgsByDay);
 
 $this->setVar('day_block', '');
 
-foreach($msgsByDay as $day => $timestamps) {
-	$i = 0;
-	krsort($timestamps);
+foreach ($msgsByDay as $day => $timestamps) {
+    $i = 0;
+    krsort($timestamps);
 
-	$custom = array(
-		date('Y-m-d')                 => 'today',
-		date('Y-m-d', time() - 86400) => 'yesterday'
-	);
+    $custom = array(
+        date('Y-m-d')                 => 'today',
+        date('Y-m-d', time() - 86400) => 'yesterday'
+    );
 
-	if(isset($custom[$day])) {
-		$fday = $custom[$day];
-	}
-	else {
-		$fday = date('D M jS Y', strtotime($day));
-	}
+    if (isset($custom[$day])) {
+        $fday = $custom[$day];
+    } else {
+        $fday = date('D M jS Y', strtotime($day));
+    }
 
-	$this->setVar('DAY', ucfirst($fday));
+    $this->setVar('DAY', ucfirst($fday));
 
-	$this->setVar('events_block', '');
-	foreach($timestamps as $timestamp => $notifs) {
-		$this->setVar('event_block', '');
-		foreach($notifs as $n) {
-			$this->setVar(array(
-				'EVENT_BODY'     => $n['title'],
-				'EVENT_HREF'     => $n['href'],
-				'EVENT_ICON'     => $n['icon'],
-				'EVENT_TIME'     => $n['timeonly'],
-				'EVENT_LONGTIME' => $n['longtime'],
+    $this->setVar('events_block', '');
+    foreach ($timestamps as $timestamp => $notifs) {
+        $this->setVar('event_block', '');
+        foreach ($notifs as $n) {
+            $this->setVar(array(
+                'EVENT_BODY'     => $n['title'],
+                'EVENT_HREF'     => $n['href'],
+                'EVENT_ICON'     => $n['icon'],
+                'EVENT_TIME'     => $n['timeonly'],
+                'EVENT_LONGTIME' => $n['longtime'],
                 'EVENT_CLASS'    => $n['unread'] ? 'unread' : ''
-			));
+            ));
 
-			if(isset($n['meta']['body']) && strlen($n['meta']['body'])) {
-				$this->setVar('EVENT_ABSTRACT', TextFormatter::cutSentence($n['meta']['body'], 48));
-				$this->parse('abstract_block', 'abstract');
-			}
-			else {
-				$this->setVar('abstract_block', '');
-			}
+            if (isset($n['meta']['body']) && strlen($n['meta']['body'])) {
+                $this->setVar('EVENT_ABSTRACT', TextFormatter::cutSentence($n['meta']['body'], 48));
+                $this->parse('abstract_block', 'abstract');
+            } else {
+                $this->setVar('abstract_block', '');
+            }
 
 
-			$this->parse('event_block', 'event', true);
-		}
-		$this->parse('events_block', 'events', true);
-	}
-	$this->parse('day_block', 'day', true);
+            $this->parse('event_block', 'event', true);
+        }
+        $this->parse('events_block', 'events', true);
+    }
+    $this->parse('day_block', 'day', true);
 }
 
-if(count($listed)) {
-	$this->parse('days_block', 'days');
+if (count($listed)) {
+    $this->parse('days_block', 'days');
     $this->setVar(array(
         'no_messages_block' => ''
     ));
-}
-else {
+} else {
     $this->setVar(array(
         'days_block' => ''
     ));
 
     $this->parse('no_messages_block', 'no_messages');
 }
-
-

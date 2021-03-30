@@ -27,7 +27,7 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     ));
 
     /* Set up permissions options
-	 */
+     */
     $roleMapper = new \Schoolbox\RoleMapper();
     $allRoles = $roleMapper->findAll();
 
@@ -42,11 +42,11 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     if ($allRoles->count()) {
         foreach ($allRoles as $currentRole) {
             $this->setVar(array(
-                'GROUP_NAME'		=> Scrub::text($currentRole->getName()),
-                'GROUP_ID'			=> $currentRole->getId(),
-                'PERM_0_SELECTED'	=> 'checked="checked"',
-                'PERM_1_SELECTED'	=> '',
-                'PERM_2_SELECTED'	=> '',
+                'GROUP_NAME'        => Scrub::text($currentRole->getName()),
+                'GROUP_ID'          => $currentRole->getId(),
+                'PERM_0_SELECTED'   => 'checked="checked"',
+                'PERM_1_SELECTED'   => '',
+                'PERM_2_SELECTED'   => '',
             ));
 
             $this->parse('perm_table_block', 'perm_table', true);
