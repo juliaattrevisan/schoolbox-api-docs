@@ -192,7 +192,7 @@
                     // Compare letter grades by their string value (easier since we're dealing with brackets)
 
                     var grades = getLetterGrades($this);
-                    customMark = getGradeFromNumeric($this.find("[data-group-mark]").val(), grades).letter;
+                    customMark = getLetterGradeFromNumeric($this.find("[data-group-mark]").val(), grades);
                     if (displayedMark !== customMark) {
                         markIsDifferent = true;
                     }
@@ -224,47 +224,27 @@
 
         // Update the per-capability and overall marks when descriptor selection is changed
         $rb.on('change change.preload', '[data-rubric], [data-rubric-group]', function (e) {
-            let $changed             = $(this),
-                groupId              = $changed.attr('data-rubric-group'),
-                rubricId             = $changed.attr('data-rubric'),
-                rowSelector          = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
-                $groupRows           = $(rowSelector),
-                groupSummarySelector = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
-                $groupSummary        = $rb.find(groupSummarySelector),
-                rubricTotalMark      = null;
+            var $changed        = $(this),
+                groupId         = $changed.attr('data-rubric-group'),
+                rubricId        = $changed.attr('data-rubric'),
+                rowSelector     = '[data-group="rb-' + rubricId + '-' + groupId + '"]',
+                $groupRows      = $(rowSelector),
+                rubricTotalMark = null;
 
             if ($groupRows.length) {
-                let $descriptorCheckboxes = $groupRows.find('input'),
-                    letterGrades          = getLetterGrades($groupSummary.find("[data-group-mark]")),
-                    scaledGroupMark       = scale(
-                        $groupSummary,
-                        summateDescriptors($descriptorCheckboxes),
-                        letterGrades
-                    );
+                var groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
+                    $groupSummary         = $rb.find(groupSummarySelector),
+                    $descriptorCheckboxes = $groupRows.find('input'),
+                    scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
-                // Always set the marks after all, even if no descriptors are
-                // selected.
-                // This fixes the issue where unselecting a descriptor doesn't
-                // change the capability mark selector, but could reintroduce an
-                // issue where selecting a null descriptor on a
-                // mark-per-capability descriptor causes the overall mark to
-                // disappear once a descriptor for all capabilities is selected.
-                // (This happened prior to SA-11271 too, I don't think it was
-                //  caused by the fix for that issue.)
                 $groupSummary.attr('data-scaled-mark', scaledGroupMark);
                 $groupSummary.attr('data-mark', scaledGroupMark);
 
                 // Update button text with mark calculated from descriptors
                 switch (markType) {
                     case 'letter':
-                        let currentGrade = getGradeFromNumeric(
-                            getPercentage($groupSummary, $groupSummary.attr('data-mark')),
-                            letterGrades
-                        );
-
-                        // scaledGroupMark needs to be rounded to the nearest value in grades
-                        $groupSummary.find("[data-group-descriptor-sum]").text(currentGrade.letter);
-
+                        var grades = getLetterGrades($groupSummary.find("[data-group-mark]"));
+                        $groupSummary.find("[data-group-descriptor-sum]").text(getLetterGradeFromNumeric(getPercentage($groupSummary, $groupSummary.attr('data-mark')), grades));
                         break;
 
                     case 'percent':
@@ -303,8 +283,8 @@
 
                 rubricTotalMark = getTotalMark();
             }
-            let rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]',
-                rubricSummary         = $rb.find(rubricSummarySelector);
+            var rubricSummarySelector = '[data-final-summary="rb-' + rubricId + '"]';
+            var rubricSummary = $rb.find(rubricSummarySelector);
             rubricSummary.attr('data-scaled-mark', rubricTotalMark);
 
             // Only update the overall mark if we haven't customised the cap mark
@@ -337,12 +317,7 @@
             var customMark = $changed.val();
 
             if ($groupSummary.length) {
-                var normalisedMark = getNormalisedCustomMark(
-                    $groupRows,
-                    customMark,
-                    $groupSummary.attr('data-row-max-sum'),
-                    $groupSummary.attr('data-max')
-                );
+                var normalisedMark = getNormalisedCustomMark($groupRows, customMark, $groupSummary.attr('data-row-max-sum'), $groupSummary.attr('data-max'));
                 $groupSummary.attr('data-scaled-mark', normalisedMark);
                 $groupSummary.attr('data-mark', normalisedMark);
                 $groupSummary.find('[data-db-mark]').val(normalisedMark);
@@ -360,8 +335,7 @@
             disableEnableAssignFromDescs();
         });
 
-        // Custom marks reach us as either a scaled numeric mark or a percentage.
-        // Turn them into an unscaled raw mark for data-mark
+        // Custom marks reach us as either a scaled numeric mark or a percentage. Turn them into an unscaled raw mark for data-mark
         function getNormalisedCustomMark($groupRows, customMark, rowMaxSum, capMax) {
             // The custom mark may be empty. This is null, not zero
             if (customMark === '') {
@@ -401,11 +375,7 @@
                 groupSummarySelector  = '[data-group-summary="rb-' + rubricId + '-' + groupId + '"]',
                 $groupSummary         = $rb.find(groupSummarySelector),
                 $descriptorCheckboxes = $groupRows.find('input'),
-                scaledGroupMark       = scale(
-                    $groupSummary,
-                    summateDescriptors($descriptorCheckboxes),
-                    getLetterGrades($groupSummary.find("[data-group-mark]"))
-                );
+                scaledGroupMark       = scale($groupSummary, summateDescriptors($descriptorCheckboxes));
 
             $groupSummary.attr('data-scaled-mark', scaledGroupMark);
             $groupSummary.attr('data-mark', scaledGroupMark);
@@ -413,10 +383,7 @@
 
             switch (markType) {
                 case 'letter':
-                    assignLetterGrade(
-                        getPercentage($groupSummary, $groupSummary.attr('data-mark')),
-                        $gradeInput.val(scaledGroupMark)
-                    );
+                    assignLetterGrade(getPercentage($groupSummary, $groupSummary.attr('data-mark')), $gradeInput.val(scaledGroupMark));
                     break;
 
                 case 'percent':
@@ -451,7 +418,7 @@
 
         // Get an array of letter grade {value : letter} pairs
         function getLetterGrades($dropdown) {
-            let grades = [];
+            var grades = [];
             $dropdown.find("option[data-letter]").each(function(index, option) {
                 let $option = $(option);
                 grades.push({
@@ -487,26 +454,23 @@
             });
         }
 
-        // Given a percentage mark, find the grade object that corresponds to
-        // its bracket in the marking scheme.
+        // Given a percentage mark, find the letter grade that corresponds to its bracket in the marking scheme
         // TODO this function seems to not be calculating brackets the same way twig is; who is wrong?
-        function getGradeFromNumeric(numericMark, grades) {
-            let gradesLength = grades.length,
-                numberMark   = Number(numericMark),
-                nullGrade    = {value: null, lowerBound: null, letter: '(no grade)'};
+        function getLetterGradeFromNumeric(numericMark, grades) {
             if (numericMark === null || numericMark === undefined || numericMark === '') {
-                return nullGrade;
+                return '(no grade)';
             }
+            var gradesLength = grades.length,
+                numberMark   = Number(numericMark);
             for (var i = 0; i < gradesLength; i++) {
                 // TODO assumes values are always descending which might not be the case?
                 if (numberMark >= Number(grades[i].lowerBound)) {
-                    return grades[i];
+                    return grades[i].letter;
                 }
             }
 
-            // Did I fall through to here? Use the last grade, or nothing at all
-            // that case should never happen
-            return gradesLength > 0 ? grades[gradesLength-1] : nullGrade;
+            // Did I fall through to here? Use the last grade
+            return gradesLength > 0 ? grades[gradesLength-1].letter : '';
         }
 
         // Turn a specified value into a percentage of the max marks for a group
@@ -554,34 +518,15 @@
             }
         }
 
-        /**
-         * Scale an unscaled mark based on a group's max mark.
-         *
-         * @param {Object} $groupSummary a jQuery object which stores the group
-         *                               max and row max sum as data attributes
-         * @param {Number} value         the value to scale, proportionate to
-         *                               the max value for the group
-         * @param {Array}  grades        if not empty: adjust the value to the
-         *                               raw value of the grade that this value
-         *                               is in
-         */
-        function scale($groupSummary, value, grades) {
+        // Scale an unscaled mark based on a group's max mark
+        function scale($groupSummary, value) {
             if (value === null) {
                 return null;
             }
 
-            let groupMax       = $groupSummary.attr('data-max'),
+            var groupMax = $groupSummary.attr('data-max'),
                 groupRowMaxSum = $groupSummary.attr('data-row-max-sum'),
                 scaledGroupSum;
-
-            // If there's grades: round up the value to the next highest grade
-            if (grades.length) {
-                let percent     = (value / groupRowMaxSum * 100),
-                    letterGrade = getGradeFromNumeric(percent, grades);
-                if (letterGrade.value !== null) {
-                    value = letterGrade.value / 100 * groupRowMaxSum;
-                }
-            }
 
             if (groupRowMaxSum > 0) {
                 scaledGroupSum = value * (groupMax / groupRowMaxSum);
