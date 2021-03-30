@@ -1,10 +1,12 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
@@ -49,7 +51,7 @@ HELP;
 
         $this->getLogger()->info('Running health check script');
 
-        if (!$this->getConfig()->get('external_enable')){
+        if (!$this->getConfig()->get('external_enable')) {
             $this->getLogger()->warning('External Database is currently disabled');
         }
 
@@ -58,11 +60,9 @@ HELP;
         /** @var IConnector $databaseExternal */
         $databaseExternal = $this->getDi()->get('databaseExternal');
 
-        $healthCheck = new Healthcheck($databaseExternal, $factory, $this->getConfig());
+        $healthCheck = new Healthcheck($databaseExternal, $factory, $this->getConfig(), $this->getLogger());
         $healthCheck->run();
         $results = $healthCheck->results();
-
-        $this->getLogger()->info($results['log']);
 
         foreach ($results['errors'] ?? [] as $error) {
             $this->getLogger()->error($error);
@@ -70,5 +70,5 @@ HELP;
     }
 };
 
-$kernel = new CliTool\Kernel($app);
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]);
 $kernel->runApp();

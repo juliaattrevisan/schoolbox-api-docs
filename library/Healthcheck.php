@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Sam Bailey <sam.bailey@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -6,6 +7,7 @@
  */
 
 use Alaress\Database\Connector\IConnector;
+use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Database;
 
@@ -19,9 +21,6 @@ class Healthcheck
     /** @var string $db External database connector type */
     private $externalType;
 
-    /** @var string $log Contains log of check output */
-    private $log = '';
-
     /** @var string[] $errors */
     private $errors = [];
 
@@ -34,6 +33,8 @@ class Healthcheck
     /** @var IConfigLoader  */
     private $configMapper;
 
+    /** @var LoggerInterface */
+    private LoggerInterface $logger;
 
     /**
      * Constructor
@@ -41,11 +42,17 @@ class Healthcheck
      * @param IConnector|null  $databaseExternal
      * @param Database\Factory $databaseFactory
      * @param IConfigLoader    $configMapper
+     * @param LoggerInterface  $logger
      * @throws InvalidArgumentException
      * @throws \Alaress\Database\Exception
      */
-    public function __construct(?IConnector $databaseExternal, Database\Factory $databaseFactory, IConfigLoader $configMapper)
-    {
+    public function __construct(
+        ?IConnector $databaseExternal,
+        Database\Factory $databaseFactory,
+        IConfigLoader $configMapper,
+        LoggerInterface $logger
+    ) {
+        $this->logger = $logger;
         $databaseExternal = $databaseExternal ?? $databaseFactory->getExternalDatabase($configMapper, true);
 
         // Ensure we can connect to external database
@@ -81,8 +88,7 @@ class Healthcheck
 
         if (!$this->connector->beginTransaction()) {
             // Transactions not supported
-
-            $this->log .= "ERROR: Database ({$this->connector->getDatabase()}) does not support transactions";
+            $this->logger->warning("ERROR: Database ({$this->connector->getDatabase()}) does not support transactions");
             $transactionsSupported = false;
         }
         $this->rollbackIfInTransaction($this->connector);
@@ -90,12 +96,12 @@ class Healthcheck
         /** @var IConnector $connector */
         foreach ($this->secondaryConnectors as $connector) {
             if ($connector == null) {
-                $this->log .= "ERROR: Unable to connect to database '{$connector->getDatabase()}' (Hostname: {$connector->getHostname()})\n";
+                $this->logger->warning("ERROR: Unable to connect to database '{$connector->getDatabase()}' (Hostname: {$connector->getHostname()})");
             } else {
                 if (!$connector->beginTransaction()) {
                     // Transactions not supported
 
-                    $this->log .= "ERROR: Database ({$connector->getDatabase()}) does not support transactions";
+                    $this->logger->warning("ERROR: Database ({$connector->getDatabase()}) does not support transactions");
                     $transactionsSupported = false;
                 }
                 $this->rollbackIfInTransaction($connector);
@@ -117,7 +123,6 @@ class Healthcheck
     public function results(): array
     {
         return [
-            'log'          => trim($this->log),
             'errors'       => $this->errors,
             'externalType' => $this->externalType,
         ];
@@ -132,14 +137,14 @@ class Healthcheck
      */
     private function externalTest(): void
     {
-        if(in_array($this->externalType, ['schoolbox', 'denbigh'], true)){
+        if (in_array($this->externalType, ['schoolbox', 'denbigh'], true)) {
             $this->errors[] = 'Sorry, no health check is currently available for this external connector.';
             return;
         }
-        $this->log .= str_pad(str_pad('METHOD', 15) . 'DATABASE OBJECT', 50) . "TEST RESULT\n";
-        $this->log .= "------------------------------------------------------------------------------------------------------------------\n";
+        $this->logger->info(str_pad(str_pad('METHOD', 15) . 'DATABASE OBJECT', 50) . "TEST RESULT");
+        $this->logger->info("------------------------------------------------------------------------------------------------------------------");
 
-        switch($this->externalType){
+        switch ($this->externalType) {
             case 'synergetic':
                 $this->synergeticTest();
                 break;
@@ -213,7 +218,7 @@ class Healthcheck
             $objectName  = $objectNamePrefix . $object;
             $objectParam = $objectParamPrefix . $quoter->quoteIdentifier($object);
 
-            $this->log .= str_pad(str_pad($method, 15) . $objectName, 50);
+            $log = str_pad(str_pad($method, 15) . $objectName, 50);
 
             $sql = str_replace(':object', $objectParam, $query);
             $statement = $this->connector->prepareQuery($sql);
@@ -223,9 +228,9 @@ class Healthcheck
             }
             try {
                 $statement->execute();
-                $this->log .= "OK\n";
+                $this->logger->info("$log OK");
             } catch (\Alaress\Database\Exception $e) {
-                $this->log .= "FAILED\n";
+                $this->logger->warning("$log FAILED");
                 $this->errors[] = "$sql\n{$e->getMessage()}";
             }
             if ($wrapInTransaction) {
@@ -320,8 +325,7 @@ class Healthcheck
         $statement = $this->connector->prepareQuery("SELECT HAS_PERMS_BY_NAME(:object, 'OBJECT', :permission)");
 
         foreach ($objects as $object) {
-
-            $this->log .= str_pad(str_pad($permission, 15). $object, 50);
+            $log = str_pad(str_pad($permission, 15) . $object, 50);
 
             try {
                 $statement->execute(['object' => $object, 'permission' => $permission]);
@@ -336,18 +340,17 @@ class Healthcheck
                         $object,
                         $permission
                     );
-                    $this->log .= "FAILED\n";
+                    $this->logger->warning("$log FAILED");
                 } else {
-                    $this->log .= "OK\n";
+                    $this->logger->info("$log OK");
                 }
             } catch (\Alaress\Database\Exception $e) {
-
                 $error = "EXECUTE {$object}\n{$e->getMessage()}\n";
 
                 $error .= "\n{$statement->getSql()}\n";
 
                 $this->errors[] = $error;
-                $this->log .= "FAILED\n";
+                $this->logger->warning("$log FAILED");
             }
         }
     }
@@ -619,9 +622,9 @@ class Healthcheck
             $prefix = $mediaDb ? ($mediaDb . '.') : '';
             $this->insertTest(
                 [
-                    $prefix.$mediaSchema.'.tDocuments',
-                    $prefix.$mediaSchema.'.DocumentReferences',
-                    $prefix.$mediaSchema.'.tDocumentReferences',
+                    $prefix . $mediaSchema . '.tDocuments',
+                    $prefix . $mediaSchema . '.DocumentReferences',
+                    $prefix . $mediaSchema . '.tDocumentReferences',
                 ]
             );
         }
