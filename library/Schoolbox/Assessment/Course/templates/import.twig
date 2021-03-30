@@ -15,7 +15,12 @@ Usages:
     destinations[]['name']: string
     returnUrlName:          string                       - (optional) GET key
     encodedReturnUrl:       string                       - (optional) GET value
-#}
+
+ # @param string $importedAlreadyRedirect  Redirect here if you cancel the import
+ # @param bool $importedAlready            Whether your course spec exists in at least one Course Outline in at least
+ #                                         one of your target folders (nominally cast as a bool, but is actullay a
+ #                                         list of folder ids)
+ #}
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
@@ -308,6 +313,8 @@ Usages:
                                     componentId:      componentId is defined ? componentId : null,
                                     unitsImpls:       unitsImpls,
                                     canReadUnitSpecs: canReadUnitSpecs,
+                                    importedAlreadyRedirect: importedAlreadyRedirect,
+                                    importedAlready: importedAlready
                                 } only %}
                             {% endif %}
                         </div>
