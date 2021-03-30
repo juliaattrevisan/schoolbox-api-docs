@@ -420,9 +420,13 @@
         function getLetterGrades($dropdown) {
             var grades = [];
             $dropdown.find("option[data-letter]").each(function(index, option) {
-                grades.push(
-                    {'value' : $(option).prop("value"), 'letter' : $(option).attr('data-letter')}
-                );
+                let $option = $(option);
+                grades.push({
+                    value:      $option.prop("value"),
+                    upperBound: $option.attr('data-upper-bound'),
+                    lowerBound: $option.attr('data-lower-bound'),
+                    letter:     $option.attr('data-letter'),
+                });
             });
 
             return grades;
@@ -438,7 +442,7 @@
                     numberMark = Number(numericMark);
                 for (var i = 0; i < grades.length; i++) {
                     // TODO assumes values are always descending which might not be the case?
-                    if (numberMark >= Number(grades[i].value)) {
+                    if (numberMark >= Number(grades[i].lowerBound)) {
                         // Offset the selected option by +1, to take into account empty grade
                         optionIndex = i + 1;
                         break;
@@ -461,7 +465,7 @@
                 numberMark   = Number(numericMark);
             for (var i = 0; i < gradesLength; i++) {
                 // TODO assumes values are always descending which might not be the case?
-                if (numberMark >= Number(grades[i].value)) {
+                if (numberMark >= Number(grades[i].lowerBound)) {
                     return grades[i].letter;
                 }
             }
