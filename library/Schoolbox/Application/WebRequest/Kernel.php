@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -177,11 +178,10 @@ class Kernel extends WebKernelAbstract
                     ->getSegment(LoginController::class)
                     ->setFlash(LoginController::LOGIN_ERROR_FLASH, get_class($e));
                 $output = $this->di->get("webOutput:noContent");
-                $response->redirect->to($this->di->get('router')->generate('login.getLogin').'?page='.urlencode($uri));
+                $response->redirect->to($this->di->get('router')->generate('login.getLogin') . '?page=' . urlencode($uri));
             }
             $output->output($response);
-
-        } catch (\Schoolbox\Mapper\Exception\NotFound|Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception\NotFound | Deleted $e) {
             // Mapper exception: something was either deleted or never existed.
             // Output something plain
             /** @var Request $request */
@@ -207,24 +207,20 @@ class Kernel extends WebKernelAbstract
             } else {
                 $this->outputError($e, $e->getMessage(), '', [], $code);
             }
-
         } catch (Forbidden $e) {
             // Not allowed
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
             $this->outputError($e, $errorMessage, '', [], 403);
-
         } catch (NotFound $e) {
             // "That which you are looking for cannot be found"
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
             $this->outputError($e, $errorMessage, '', [], 404);
-
         } catch (Unauthorized $e) {
             // This seems to be the most appropriate error code for unauthorized calls.
             // TODO set headers on $response instead of calling header()
             header('WWW-Authenticate: FormBased');
             $errorMessage = ErrorMapper::getInstance()->getMessageById($e->getCode());
             $this->outputError($e, $errorMessage, '', [], 401);
-
         } catch (SchoolboxException $e) {
             /* Generic Schoolbox Exception spawned by ErrorMapper,
              * thrown by Controllers. ErrorMapper already did the
@@ -334,7 +330,6 @@ class Kernel extends WebKernelAbstract
 
         try {
             $params = $preloader->check($route->name, $route->params);
-
         } catch (\Exception $preloaderException) {
             // Store the preloader exception for later
         }
@@ -356,12 +351,10 @@ class Kernel extends WebKernelAbstract
 
         try {
             $auth->authorizePathForUser($route->name, $params, $user);
-
         } catch (Unauthenticated $ue) {
             // Unauthenticated:
             // always throw this, even if there was preloader exception
             throw $ue;
-
         } catch (Throwable $ae) {
             // Some other exception (including unauthorized):
             // throw the preloader exception in preference to this
@@ -487,7 +480,7 @@ class Kernel extends WebKernelAbstract
      * @throws \DebugBar\DebugBarException
      * @throws \Schoolbox\External\Exception
      */
-    protected function initialiseDebugging():void
+    protected function initialiseDebugging(): void
     {
         // Set up the debug bar, and add listeners for various parts of the debug bar
         // (database calls, XHProf)
@@ -588,22 +581,24 @@ class Kernel extends WebKernelAbstract
         $fqdn           = trim($config->get('site_hostname') . '.' . $config->get('site_domain'), ';.');
         $csrfCheck      = new Csrf\HeaderCheck($_SERVER, $fqdn);
         $csrfMiddleware = new Csrf\Middleware($csrfCheck);
-        if (!$csrfMiddleware->verify(
-            $_SERVER,
-            ['*/dav/index.php'],
-            [
+        if (
+            !$csrfMiddleware->verify(
+                $_SERVER,
+                ['*/dav/index.php'],
+                [
                 '/saml/consume.php*',
                 '/api/*',
                 '/loginForm.php*',
                 '/liss/liss.php',
                 '/lti-consumer/*',
-            ]
-        )) {
+                ]
+            )
+        ) {
             // Let's just say 403 Forbidden for now
             // TODO replace the call to Sitepage::error() method
             /** @var \SitePage $page */
             $page = $di->get('layoutEngine');
-            $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Your request has been blocked as a proactive security measure. Please review your browser plugins and disable any that you do not need, and try again; if you continue to receive this message, please report the issue to '.$config->get('feedback_text').'.', 403);
+            $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Your request has been blocked as a proactive security measure. Please review your browser plugins and disable any that you do not need, and try again; if you continue to receive this message, please report the issue to ' . $config->get('feedback_text') . '.', 403);
         }
     }
 }
