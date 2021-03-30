@@ -106,6 +106,7 @@ class SeniorSchool extends Base
      */
     public function isSubjectDisplayed(string $subjectName): bool
     {
+        $subjectName = trim($subjectName);
         foreach (self::EXCLUDED_SENIOR_SUBJECT_NAME_REGEXS as $regex) {
             if (preg_match($regex, $subjectName)) {
                 return false;
