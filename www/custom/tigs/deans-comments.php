@@ -413,20 +413,20 @@ function getLogger(): LoggerInterface
         private function getColour(string $level): string
         {
             switch ($level) {
-                case LogLevel::EMERGENCY;
-                case LogLevel::ALERT;
-                case LogLevel::CRITICAL;
-                case LogLevel::ERROR;
+                case LogLevel::EMERGENCY:
+                case LogLevel::ALERT:
+                case LogLevel::CRITICAL:
+                case LogLevel::ERROR:
                     $this->hasErrors = true;
                     return 'red';
-                case LogLevel::WARNING;
+                case LogLevel::WARNING:
                     return 'orange';
-                case LogLevel::NOTICE;
+                case LogLevel::NOTICE:
                     return 'cyan';
-                case LogLevel::INFO;
-                default;
+                case LogLevel::INFO:
+                default:
                     return 'black';
-                case LogLevel::DEBUG;
+                case LogLevel::DEBUG:
                     return 'green';
             }
         }

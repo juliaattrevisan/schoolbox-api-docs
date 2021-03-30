@@ -1,15 +1,15 @@
 <?php
 
-use Alaress\Redis;
-use Schoolbox\Realtime\MessageList\ListFactory;
-use Schoolbox\Realtime\Notification\Decorator;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Alaress\Redis;
+use Schoolbox\Realtime\MessageList\ListFactory;
+use Schoolbox\Realtime\Notification\Decorator;
 
 // not in SitePage context?
 if (!isset($this)) {

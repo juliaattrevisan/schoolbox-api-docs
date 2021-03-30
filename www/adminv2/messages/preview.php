@@ -1,16 +1,16 @@
 <?php
 
-use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Realtime\Message\NSMapper;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Message\NSMapper;
 
 // Are we not in SitePage context?
 if (!isset($this)) {

@@ -1,18 +1,18 @@
 <?php
 
-use Schoolbox\File\ExtensionMapper;
-use Schoolbox\File\Remote\GDriveFetcher;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper;
-use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\Resource\Storage;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
+use Schoolbox\File\ExtensionMapper;
+use Schoolbox\File\Remote\GDriveFetcher;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Storage;
 
 if (empty($this)) {
     require_once __DIR__ . '/../../../../conf/core/require.php';
