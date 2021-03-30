@@ -46,9 +46,9 @@ class Model implements ISoftDeletable
     /**
      * A string denoting whether this Award was a Goal or an Achievement
      *
-     * @var string
+     * @var string|null
      */
-    private string $status;
+    private ?string $status = null;
 
 
     /**
@@ -58,9 +58,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var \Alaress_Date_Format
+     * @var \Alaress_Date_Format|null
      */
-    private \Alaress_Date_Format $awardedAt;
+    private ?\Alaress_Date_Format $awardedAt = null;
 
 
     /**
