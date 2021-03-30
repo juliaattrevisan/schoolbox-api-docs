@@ -179,6 +179,13 @@ class Factory
             // In this case, add a fake folder to the list so it still shows.
             $fakeFolderId = -1;
             foreach ($subjectList as $subject) {
+                // First determine if the subject should even show on the senior
+                // report: don't load it if it shouldn't.
+                $subjectName = $subject->getName();
+                if (!$tutorGroup->isSubjectDisplayed($subjectName)) {
+                    continue;
+                }
+
                 $folderWithGrades = $this->getFolderWithGrades(
                     $subject->getSubjectCode(),
                     $student,
@@ -192,12 +199,12 @@ class Factory
                     // Set the subject's name into the folder,
                     // so that it doesn't have any rolled-over codes.
                     // (Clone so this doesn't inadvertently affect any caches)
-                    $allFolders[] = (clone $folder)->setName($subject->getName());
+                    $allFolders[] = (clone $folder)->setName($subjectName);
                     $allGrades[]  = $folderWithGrades['grades'];
                 } else {
                     $allFolders[] = (new Folder())
                         ->setId($fakeFolderId--)
-                        ->setName($subject->getName());
+                        ->setName($subjectName);
                     $allGrades[]  = [];
                 }
             }
