@@ -208,7 +208,7 @@ class Importer
 
             $n = $this->processOne(
                 new Reader(
-                    $this->streamFactory->buildSeekableStreamFromStorage($this->file),
+                    $this->file->readStream(),
                     true
                 )
             );

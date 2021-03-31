@@ -114,10 +114,9 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     try {
         $factory = new CollectorFactory();
         $files = $factory->build($attachments)->getAll();
-        $streamFactory = new Schoolbox\Resource\Storage\SeekableStream\Factory($config);
 
         foreach ($files as $storage) {
-            $stream   = new AttachmentStream($streamFactory->buildSeekableStreamFromStorage($storage));
+            $stream   = new AttachmentStream($storage->readStream());
             $basename = $storage->getBasename();
             $attach   = new Swift_Attachment($stream, $basename, $storage->getMime());
             $mail->attach($attach);

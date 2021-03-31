@@ -128,9 +128,8 @@ if (isset($type) && isset($id)) {
     // storage structures, some of which may not support chunking). We need to work around this for S3 (and other
     // future adapters we use) and open our own stream which we can stream back to the user.
     $videoStream   = null;
-    $streamFactory = new Schoolbox\Resource\Storage\SeekableStream\Factory($config);
     try {
-        $videoStream = $streamFactory->buildSeekableStream($fileSystem, $video->getTranscodePath());
+        $videoStream = $fileSystem->readStream($video->getTranscodePath());
     } catch (FileNotFoundException $e) {
         fail();
     }
