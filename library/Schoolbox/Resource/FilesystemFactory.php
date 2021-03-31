@@ -18,6 +18,7 @@ use League\Flysystem\MountManager;
 use LogicException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Manager;
+use Schoolbox\Resource\Storage\S3\Adapter;
 use UnexpectedValueException;
 
 use function trim;
@@ -108,6 +109,13 @@ class FilesystemFactory
             'version'     => $otfs_s3_version,
         ]);
 
-        return new Filesystem(new AwsS3Adapter($client, $otfs_s3_bucket, $prefix), $fsConfig);
+        // Register the S3 stream wrapper, so that the S3 filesystem adapter
+        // may use it
+        $client->registerStreamWrapper();
+
+        return new Filesystem(
+            new Adapter(new AwsS3Adapter($client, $otfs_s3_bucket, $prefix)),
+            $fsConfig
+        );
     }
 }
