@@ -1,6 +1,29 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
 
+{# Decide whether certain fields are readonly due to being Course Managed
+ # Some users can change the values; some can't
+#}
+{% if USER.superUser  %}
+
+    {# Superusers can always change this setting
+     # and all the other related settings too
+    #}
+    {% set courseManagedReadonly = false %}
+{% elseif isSpecificationContext %}
+
+    {# If you're editing this assessment in a Specification context
+     # then you can change all the settings
+    #}
+    {% set courseManagedReadonly = false %}
+{% else %}
+
+    {# Assessment implementation
+     # A nonsuperuser cannot change this setting or any of the other settings
+    #}
+    {% set courseManagedReadonly = true %}
+{% endif %}
+
 {# ----------------------------------------------------------- #}
 {# Basic Details #}
 {# ----------------------------------------------------------- #}
@@ -158,14 +181,8 @@
     <legend>Common Assessment</legend>
     <label for="courseManaged" class="checkbox-label">Common assessment</label>
 
-    {% if isSpecificationContext %}
-        {% set readonly = true %}
-    {% else %}
-        {% set readonly = false %}
-    {% endif %}
-
     <div class="switch">
-        <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} readonly />
+        <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} />
         <label for="courseManaged">
             <span class="icon-approve"></span>
             <span class="icon-cancel"></span>
