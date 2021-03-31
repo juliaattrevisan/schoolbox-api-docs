@@ -9,6 +9,12 @@
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
+// Enforce direct script access
+if (isset($this)) {
+    /** @var SitePage $this */
+    $this->pageNotFound();
+}
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -37,9 +43,7 @@ if (!empty($residentialHouseID)) {
 $filterParents = false;
 
 if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (strlen($groupID) || strlen($roleTypeID))) {
-
     if (strlen($roleTypeID)) {
-
         // Search in a list of role types.
 
         $groupID = [];
@@ -67,15 +71,11 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
 
             $groupID = array_merge($groupID, $thisRoleGroups);
         }
-
     } elseif (strstr($groupID, ';')) {
-
         // Search in a list of role types.
 
         $groupID = explode(';', $groupID);
-
     } else {
-
         // Search group 0 (all groups)
 
         $groupID = 0;
@@ -101,7 +101,6 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
 
     if (is_array($userList)) {
         foreach ($userList as $user) {
-
             if ($user['uid'] == $excludeID) {
                 continue;
             }
@@ -132,7 +131,6 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
                     ];
                 }
             } else {
-
                 $person = "{$user['firstname']} {$user['lastname']} - ";
 
                 if ($user['year']) {

@@ -8,8 +8,11 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+/** @var SitePage $this */
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -71,11 +74,9 @@ if (is_numeric($this->arg[0])) {
 
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($post->getThread()->getId());
-        }
-        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -124,19 +125,15 @@ if (is_numeric($this->arg[0])) {
                 'class' => 'active',
             ]
         ]);
-    }
-    elseif (is_numeric($this->arg[1])) {
-
+    } elseif (is_numeric($this->arg[1])) {
         /* Add new reply
          */
         try {
             /** @var \Schoolbox\Forum\Thread $thread */
             $thread = ThreadMapper::getInstance()->findById($this->arg[1]);
-        }
-        catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
             //There is cases where you need to edit deleted stuff so letting this go through..
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             error(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
@@ -166,8 +163,7 @@ if (is_numeric($this->arg[0])) {
                         'QUOTE_AUTHOR_ID' => $quote->getOwner()->getId()
                     ));
                 $this->parse('quote_block', 'quote');
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
             }
         }
 
@@ -198,8 +194,7 @@ if (is_numeric($this->arg[0])) {
                 'class' => 'active',
             ]
         ]);
-    }
-    else {
+    } else {
         $output['ACTION']       = 'Post';
         $output['ACTION_CLASS'] = 'icon-add';
         $output['THREAD_POST']  = 'Thread';
@@ -229,7 +224,6 @@ if (is_numeric($this->arg[0])) {
     }
 
     $this->setVar($output);
-}
-else {
+} else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }

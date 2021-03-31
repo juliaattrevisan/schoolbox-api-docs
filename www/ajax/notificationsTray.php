@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -9,8 +10,10 @@
 
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
 
 if (in_array($_POST['state'], ['show', 'hide'])) {
     try {
@@ -21,8 +24,7 @@ if (in_array($_POST['state'], ['show', 'hide'])) {
         if ($_POST['state'] == 'show') {
             $user->showNotificationsTray();
             $_SESSION['user']->showNotificationsTray();
-        }
-        else {
+        } else {
             $user->hideNotificationsTray();
             $_SESSION['user']->hideNotificationsTray();
         }
@@ -30,8 +32,7 @@ if (in_array($_POST['state'], ['show', 'hide'])) {
         /* Save setting
          */
         $userMapper->save($user);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
     }
 }
 

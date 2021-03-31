@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -95,9 +96,10 @@ class Kernel extends WebKernelAbstract
         date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));
 
         // Notification factory
-        $di->set('notif',
+        $di->set(
+            'notif',
             $di->lazy(
-                function() {
+                function () {
                     // replace this with $di->lazyGetCall() once we upgrade Aura.Di
                     return Notifactory::create();
                 }
@@ -107,7 +109,7 @@ class Kernel extends WebKernelAbstract
         // Database connection factory
         $di->set(
             'databaseFactory',
-            function() use ($di) {
+            function () use ($di) {
                 return new SchoolboxDatabaseFactory(
                     new AlaressDatabaseFactory()
                 );
@@ -117,7 +119,7 @@ class Kernel extends WebKernelAbstract
         // Schoolbox internal database connection
         $di->set(
             'databaseInternal',
-            function() use ($di) {
+            function () use ($di) {
                 /** @var SchoolboxDatabaseFactory $factory */
                 $factory = $di->get('databaseFactory');
                 return $factory->getInternalDatabase();
@@ -128,7 +130,7 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'databaseExternal',
             $di->lazy(
-                function() use ($di) {
+                function () use ($di) {
                     /** @var SchoolboxDatabaseFactory $factory */
                     $factory = $di->get('databaseFactory');
 
@@ -180,9 +182,11 @@ class Kernel extends WebKernelAbstract
 
         // Mapper notifications:
         // They rely upon the session being injected into them, so do that.
-        $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
-            $di->get('session');
-
+        $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function () use ($di) {
+            $session = $di->get('session');
+            if (!$session->isStarted()) {
+                $session->start();
+            }
             return $_SESSION ?? [];
         });
 
@@ -208,7 +212,7 @@ class Kernel extends WebKernelAbstract
             $di->set('sentry', $sentryClient);
         }
 
-        $di->set('layoutEngine', $di->lazy(function() use ($di) {
+        $di->set('layoutEngine', $di->lazy(function () use ($di) {
             $sitepage = new SitePage(false);
             $sitepage->setDi($di);
             return $sitepage;
@@ -281,7 +285,7 @@ class Kernel extends WebKernelAbstract
 
                     // Global access to config object and localisation
                     $twig->addGlobal('config', $config);
-                    $twig->addGlobal('locale',  $di->get('l10n'));
+                    $twig->addGlobal('locale', $di->get('l10n'));
                     $dateFormats = new Alaress_Date_Locale_Config();
                     $dateFormats->setConfig($config);
                     $twig->addGlobal('dateFormats', $dateFormats);
@@ -318,9 +322,9 @@ class Kernel extends WebKernelAbstract
                     $config      = $di->get('config');
                     $baseLoader  = new FilesystemLoader(array());
                     // Paths: prefer templates/{site_location} over templates/core
-                    $basePath     = SITE_root.'/templates/';
-                    $overridePath = $basePath.$config->get('site_location');
-                    $corePath     = $basePath.'core';
+                    $basePath     = SITE_root . '/templates/';
+                    $overridePath = $basePath . $config->get('site_location');
+                    $corePath     = $basePath . 'core';
                     if (is_dir($overridePath)) {
                         $baseLoader->addPath($overridePath);
                     }

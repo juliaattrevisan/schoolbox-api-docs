@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,19 +8,19 @@
  */
 
 // enforce SitePage context for authentication
-if(!isset($this)) {
+if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir('/modules/tuckshop/parent_enter');
 }
-
+/** @var SitePage $this */
 // mask this from all installs but Cathedral
-if(Config::get('site_location') != 'cathedral') {
+if (Config::get('site_location') != 'cathedral') {
     $this->pageNotFound();
 }
 
-$tassID = 'P'.$_SESSION['username'];
-$hash = md5('L@goon1917'.$tassID);
+$tassID = 'P' . $_SESSION['username'];
+$hash = md5('L@goon1917' . $tassID);
 
 $destination = "https://msawebportal.cathedral.qld.edu.au/?id=$tassID&key=$hash";
 header("Location: $destination");

@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * ${NAME}
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2019, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\Event\Access;
 use Schoolbox\Calendar\Event\Attendance;
@@ -11,15 +19,11 @@ use Schoolbox\UserMapper;
 use Calendar\Event\Type\Day\Renderer\Javascript;
 use Schoolbox\Permission\Access\Access as FolderAccess;
 
-/**
- * ${NAME}
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
- */
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+/** @var SitePage|null $this */
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
 
 $user    = $_SESSION['user'];
 $ownerId = $_POST['userId'];
@@ -108,8 +112,8 @@ if (count($affectedIds) == 1) {
         /** @var \Schoolbox\User $user */
         $user     = $_SESSION['user'];
         $renderer = new Javascript(
-            $kernel->getDependencyInjector()->get('authorizer'),
-            $kernel->getDependencyInjector()->get('router'),
+            $this->getDi()->get('authorizer'),
+            $this->getDi()->get('router'),
             $calendarEvent,
             $user,
             $user

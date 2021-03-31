@@ -1,8 +1,4 @@
 <?php
-use Alaress\Async\Notification\Parameter\Param;
-use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Realtime\Message\NSMapper;
 
 /**
  *
@@ -11,7 +7,12 @@ use Schoolbox\Realtime\Message\NSMapper;
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Realtime\Message\NSMapper;
 
+// Are we not in SitePage context?
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -56,9 +57,8 @@ switch ($this->arg[0]) {
             ->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
             ->setByline('Due 24th April, 2014')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_DUEWORK)
-            ->build()
-        );
+            ->setIcon('/images/icon.php?size=32&icon=' . NSMapper::NS_DUEWORK)
+            ->build());
         break;
 
     case 'digest':
@@ -79,9 +79,8 @@ switch ($this->arg[0]) {
             ->setBody('You will conduct a chemistry lab experiment to test acid based compounds and their reactions to a range of other elements.')
             ->setByline('Due 24th April, 2014')
             ->setHref('#')
-            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_DUEWORK)
-            ->build()
-        );
+            ->setIcon('/images/icon.php?size=32&icon=' . NSMapper::NS_DUEWORK)
+            ->build());
 
         $due = date('D, jS M', strtotime('tomorrow'));
         $decorator->appendInstance($bob
@@ -95,9 +94,8 @@ switch ($this->arg[0]) {
             ->setTimestamp(strtotime('-3 days'))
             ->setBody('')
             ->setByline("Due $due")
-            ->setIcon('/images/icon.php?size=32&icon='.NSMapper::NS_DUEWORK)
-            ->build()
-        );
+            ->setIcon('/images/icon.php?size=32&icon=' . NSMapper::NS_DUEWORK)
+            ->build());
 
         $decorator->appendInstance($bob
             ->setTitle(':author marked your Oral Presentation :name in :subj')
@@ -106,8 +104,7 @@ switch ($this->arg[0]) {
                 'name'   => new Param("Star-cross'd Lovers: "),
                 'subj'   => new Param('Yr 10 English Literature'),
             ))
-            ->build()
-        );
+            ->build());
 
         $decorator->appendInstance($bob->clear()
             ->setTitle(':name is due :when in :subj')
@@ -119,8 +116,7 @@ switch ($this->arg[0]) {
             ->setTimestamp(strtotime('yesterday'))
             ->setNamespace(NSMapper::NS_DUEWORK)
             ->setHref('#')
-            ->build()
-        );
+            ->build());
 
         $articles = \Schoolbox\Comms\News\Mapper::getInstance()->findAll(array(
             'limit' => 3,
@@ -168,8 +164,7 @@ switch ($this->arg[0]) {
                 ->setByline("{$article->getPublishAt()->getDateOnly()} by {$article->getAuthor()->formatName()}")
                 ->setTimestamp($article->getPublishAt()->getUnixTimeStamp())
                 ->setNamespace(NSMapper::NS_NEWS)
-                ->build()
-            );
+                ->build());
         }
 
 
@@ -209,8 +204,7 @@ switch ($this->arg[0]) {
             ))
             ->setNamespace(NSMapper::NS_WIKI)
             ->setHref('#')
-            ->build()
-        );
+            ->build());
 
         break;
 }

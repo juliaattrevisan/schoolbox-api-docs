@@ -1,4 +1,5 @@
 <?php
+
 /**
  * search.php
  *
@@ -8,8 +9,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
 
 /* Old handler junk
  */

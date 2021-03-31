@@ -1,4 +1,7 @@
-<?php /** @noinspection PhpUnhandledExceptionInspection */
+<?php
+
+/** @noinspection PhpUnhandledExceptionInspection */
+
 /**
  * This is a temporary hack mechanism by which to insert dean's comments until the feature is built properly.
  *
@@ -23,6 +26,12 @@ use Schoolbox\Application\WebRequest;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Schoolbox\UserMapper;
+
+// Enforce direct script access
+if (isset($this)) {
+    /** @var SitePage $this */
+    $this->pageNotFound();
+}
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new WebRequest\Kernel();
@@ -74,7 +83,7 @@ function authenticateUser(array $session, IConfigLoader $config): void
         $function->call($config);
     }
 
-    if($config->get('site_location') !== 'tigs'){
+    if ($config->get('site_location') !== 'tigs') {
         throw new NotFound();
     }
 }
@@ -332,7 +341,6 @@ function getPastoralRecordCreateDate(LoggerInterface $logger, int $yearLevel, in
             break;
         default:
             $logger->error("Unknown year level: $yearLevel");
-
     }
     $logger->info("Month and Day: $monthAndDay");
 
@@ -364,7 +372,6 @@ function validateYearLevelYearSemester(LoggerInterface $logger, int $yearLevel, 
     if (!in_array($semester, [1, 2], false)) {
         $logger->error("Semester must be 1 or 2, found '$semester'");
     }
-
 }
 
 function processLiveRun(WebRequest\Kernel $kernel)
@@ -406,20 +413,20 @@ function getLogger(): LoggerInterface
         private function getColour(string $level): string
         {
             switch ($level) {
-                case LogLevel::EMERGENCY;
-                case LogLevel::ALERT;
-                case LogLevel::CRITICAL;
-                case LogLevel::ERROR;
+                case LogLevel::EMERGENCY:
+                case LogLevel::ALERT:
+                case LogLevel::CRITICAL:
+                case LogLevel::ERROR:
                     $this->hasErrors = true;
                     return 'red';
-                case LogLevel::WARNING;
+                case LogLevel::WARNING:
                     return 'orange';
-                case LogLevel::NOTICE;
+                case LogLevel::NOTICE:
                     return 'cyan';
-                case LogLevel::INFO;
-                default;
+                case LogLevel::INFO:
+                default:
                     return 'black';
-                case LogLevel::DEBUG;
+                case LogLevel::DEBUG:
                     return 'green';
             }
         }
@@ -550,7 +557,8 @@ function renderLogResults(string $logResults): void
  * Renders page header HTML
  */
 function renderHeader(): void
-{ ?>
+{
+    ?>
     <html lang="en">
     <head>
         <title>TIGS Deans Comments Import tool</title>
@@ -567,7 +575,8 @@ function renderHeader(): void
  * Renders page instructions
  */
 function renderInstructions(): void
-{ ?>
+{
+    ?>
     <h3>Instructions:</h3>
     <ol>
         <li>Attach client-provided CSV of comments<br>
@@ -596,7 +605,8 @@ function renderInstructions(): void
  * Renders page footer HTML
  */
 function renderFooter(): void
-{ ?>
+{
+    ?>
     </body>
     </html>
 <?php }

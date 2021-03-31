@@ -1,13 +1,15 @@
 <?php
 
-use Schoolbox\Application\WebRequest\Kernel;
-use \Schoolbox\Breadcrumbs;
-use \Schoolbox\Mapper\Exception\Deleted as DeletedException;
-use \Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Breadcrumbs;
+use Schoolbox\Mapper\Exception\Deleted as DeletedException;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Kernel();
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+/** @var SitePage $this */
 
 $forumHandler = new Forum();
 $groupHandler = new Group();
@@ -149,7 +151,7 @@ if (is_array($postList)) {
     $j = 0;
 
 // Assign first array element to variable
-    $first = reset( $postList );
+    $first = reset($postList);
 
     foreach ($postList as $post) {
         $user = \Schoolbox\UserMapper::getInstance()->findByIdWithFallback($post['userID']);
@@ -191,9 +193,11 @@ if (is_array($postList)) {
 
         $this->setVar('delete_block', '');
 
-        if ((!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission(
-            $category->getId()
-        ) >= UserAccess::ACCESS_WRITE) {
+        if (
+            (!$threadLocked && $post['userID'] == $_SESSION['id']) || $groupHandler->getPermission(
+                $category->getId()
+            ) >= UserAccess::ACCESS_WRITE
+        ) {
             $this->parse('modify_block', 'modify');
 
             // delete post
@@ -218,7 +222,6 @@ if (is_array($postList)) {
 
         $this->parse('post_block', 'post', true);
     }
-
 } else {
     $this->setVar('post_block', '<p>There are no posts to display. Create a new post.</p>');
 }

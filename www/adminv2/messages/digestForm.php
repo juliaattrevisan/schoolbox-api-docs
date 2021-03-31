@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,36 +7,40 @@
  * @link        https://schoolbox.com.au/
  */
 
+// If in SitePage context
+if (isset($this)) {
+    SitePage::localRedir('/adminv2/messages');
+}
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-if(isset($this) || empty($_POST)) {
-	SitePage::localRedir('/adminv2/messages');
+if (empty($_POST)) {
+    SitePage::localRedir('/adminv2/messages');
 }
 
 if (!$kernel->getDependencyInjector()->get('session')->get('user')->isSuperuser()) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
 }
 
-foreach($_POST['role'] as $roleId => $data) {
-	if(isset($data['day']) && is_array($data['day'])) {
-		// set to $data
-		$days = implode(',', $data['day']);
-		list($hour, $min) = explode(':', $data['time'], 2);
-		$hour = intval($hour);
-		$min  = intval($min);
+foreach ($_POST['role'] as $roleId => $data) {
+    if (isset($data['day']) && is_array($data['day'])) {
+        // set to $data
+        $days = implode(',', $data['day']);
+        list($hour, $min) = explode(':', $data['time'], 2);
+        $hour = intval($hour);
+        $min  = intval($min);
 
-		$schedule = "$min $hour * * $days";
-	}
-	else {
-		// unset the schedule for this role
-		$schedule = "0";
-	}
+        $schedule = "$min $hour * * $days";
+    } else {
+        // unset the schedule for this role
+        $schedule = "0";
+    }
 
-	/** @var \Schoolbox\Role $role */
-	$role = \Schoolbox\RoleMapper::getInstance()->findById($roleId);
-	$role->setDigestSchedule($schedule);
-	\Schoolbox\RoleMapper::getInstance()->save($role);
+    /** @var \Schoolbox\Role $role */
+    $role = \Schoolbox\RoleMapper::getInstance()->findById($roleId);
+    $role->setDigestSchedule($schedule);
+    \Schoolbox\RoleMapper::getInstance()->save($role);
 }
 
 $redis    = \Alaress\Redis::getClientInstance();

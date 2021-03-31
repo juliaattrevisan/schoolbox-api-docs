@@ -1,18 +1,20 @@
 <?php
 
-use Schoolbox\Application\WebRequest\Kernel;
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new Kernel();
+// not in SitePage context?
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+/** @var SitePage $this */
 
-$pollHandler = new Poll;
+$pollHandler = new Poll();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (is_numeric($this->arg[0])) {
-
     $poll = $pollHandler->getByID($this->arg[0]);
 
     if (!isset($poll['id'])) {
@@ -58,8 +60,7 @@ if (is_numeric($this->arg[0])) {
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($poll['folder_id']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(13);
     }
 
@@ -76,9 +77,7 @@ if (is_numeric($this->arg[0])) {
             'class' => 'active',
         ]
     ]);
-
 } else if (is_numeric($this->arg[1])) {
-
     // check permission
     if ($groupHandler->getPermission($this->arg[1]) < UserAccess::ACCESS_WRITE) {
         error(19);
@@ -116,8 +115,7 @@ if (is_numeric($this->arg[0])) {
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($this->arg[1]);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(13);
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * search.php
  *
@@ -8,9 +9,12 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 /** @var SitePage $this */
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
 
 /* Old handler junk
  */
@@ -94,7 +98,6 @@ if (!$count['all']) {
      * are tied in to the keys in the array, which really isn't nice.
      */
     if (!empty($handle[$type])) {
-
         /* Particular ordering and sorting for Categories
          */
         if ($type != 'all') {

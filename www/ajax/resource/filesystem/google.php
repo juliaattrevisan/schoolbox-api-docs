@@ -1,12 +1,5 @@
 <?php
 
-use Schoolbox\File\ExtensionMapper;
-use Schoolbox\File\Remote\GDriveFetcher;
-use Schoolbox\IConfigLoader;
-use Schoolbox\Mapper;
-use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\Resource\Storage;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -14,10 +7,20 @@ use Schoolbox\Resource\Storage;
  * @link        https://schoolbox.com.au/
  */
 
-if (empty($this) || $_SERVER['REQUEST_METHOD'] != 'POST') {
+use Schoolbox\File\ExtensionMapper;
+use Schoolbox\File\Remote\GDriveFetcher;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper;
+use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Storage;
+
+if (empty($this)) {
     require_once __DIR__ . '/../../../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     // nope. go away
+    SitePage::localRedir('/resource/external/google');
+}
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     SitePage::localRedir('/resource/external/google');
 }
 
@@ -51,7 +54,6 @@ foreach ($_POST['docs'] as $doc) {
 
         $dest = $grive->fetchToFile($doc['id']);
     } catch (DomainException $e) {
-
         /* - Some mysterious error - skip this file, leave a bootprint in sentry
          *
          * - Someone tried to access a restricted file, leave a bootprint in sentry
@@ -61,7 +63,6 @@ foreach ($_POST['docs'] as $doc) {
 
         continue;
     } catch (Mapper\Exception $e) {
-
         /* noop: unknown file extension: silently disregard for now
          * because deriveFileName() couldn't figure out the extension
          */
@@ -79,9 +80,7 @@ foreach ($_POST['docs'] as $doc) {
         $meta['mimeType'] = $grive->determineMimeIcon($meta);
 
         $files[] = $meta;
-    }
-    catch (Schoolbox\File\Exception $e) {
-
+    } catch (Schoolbox\File\Exception $e) {
         /* TODO: Find out how to handle this "successful error"
          * TODO: UI doesn't understand this payload
          */
@@ -92,9 +91,7 @@ foreach ($_POST['docs'] as $doc) {
 //            'err'   => $e->getMessage()
 //        );
     }
-
 }
 
 header('Content-Type: application/json');
 die(json_encode($files));
-

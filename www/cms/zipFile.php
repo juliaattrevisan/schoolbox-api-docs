@@ -1,7 +1,11 @@
 <?php
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+// not in SitePage context?
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+/** @var SitePage $this */
 
 $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
@@ -23,7 +27,7 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     ));
 
     /* Set up permissions options
-	 */
+     */
     $roleMapper = new \Schoolbox\RoleMapper();
     $allRoles = $roleMapper->findAll();
 
@@ -38,11 +42,11 @@ if (($isSuperuser || $isAllowedTeacher) && is_numeric($this->arg[0])) {
     if ($allRoles->count()) {
         foreach ($allRoles as $currentRole) {
             $this->setVar(array(
-                'GROUP_NAME'		=> Scrub::text($currentRole->getName()),
-                'GROUP_ID'			=> $currentRole->getId(),
-                'PERM_0_SELECTED'	=> 'checked="checked"',
-                'PERM_1_SELECTED'	=> '',
-                'PERM_2_SELECTED'	=> '',
+                'GROUP_NAME'        => Scrub::text($currentRole->getName()),
+                'GROUP_ID'          => $currentRole->getId(),
+                'PERM_0_SELECTED'   => 'checked="checked"',
+                'PERM_1_SELECTED'   => '',
+                'PERM_2_SELECTED'   => '',
             ));
 
             $this->parse('perm_table_block', 'perm_table', true);

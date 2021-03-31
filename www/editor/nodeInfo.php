@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -7,17 +8,17 @@
  * @link        https://schoolbox.com.au/
  */
 
-require_once __DIR__ . '/../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
-
-// kickstart a session
-new SitePage();
-
 // disallow SitePage context, this is an ajax script
 if (isset($this)) {
     SitePage::localRedir('/editor/nodeInfo.php');
     exit;
 }
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+
+// kickstart a session
+new SitePage();
 
 $factory = new \Schoolbox\Editor\FileFactory($_GET['identifier']);
 

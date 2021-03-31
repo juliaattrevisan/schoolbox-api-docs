@@ -1,15 +1,20 @@
 <?php
+
 /**
  * Delete
  *
  * Softdeletes a Questionbank Category
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+
+// Direct access not permitted, 404
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
 
 $groupHandler = new Group();
 
@@ -20,7 +25,7 @@ if (!$groupHandler->isStaff()) {
 $categoryHandler = new Assess_Question_Category();
 
 if (is_numeric($this->arg[0])) {
-	$categoryHandler->delete($categoryHandler->getByID($this->arg[0]));
+    $categoryHandler->delete($categoryHandler->getByID($this->arg[0]));
 }
 
 /* Back to the future -_-
