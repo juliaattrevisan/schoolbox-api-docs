@@ -286,6 +286,21 @@ class Factory
 
 
     /**
+     * If you're not a superuser and CourseManaged is on and you're not in a Specification context,
+     * Don't update any of the fields that were readonly
+     *
+     * @param IAssessable $assessment
+     * @return bool
+     */
+    private function isCourseManagedFieldsOnly(IAssessable $assessment): bool
+    {
+        /* I'm a regular teacher, editing a CourseManaged implementation
+         */
+        return !$this->creator->isSuperuser() && $this->getCourseManaged() && !$assessment->getContext()->isSpecificationContext();
+    }
+
+
+    /**
      * Produce object from an existing assessment
      *
      * @param IAssessable $assessment
@@ -313,6 +328,7 @@ class Factory
             );
         } elseif ($assessment instanceof DueWork) {
             /** @var DueWork $originalDueWork */
+
             $originalDueWork = $this->original;
             $decorator = new DueWorkDecorator(
                 $this->getAcceptOnline(),
@@ -355,39 +371,56 @@ class Factory
 
         /* Start manufacturing
          */
-        $assessment
-            ->setTitle($this->getTitle())
-            ->setDescription($this->getDescription())
-            ->setCreator($this->getCreator())
-            ->setWeight($this->getWeight())
-            ->setDefaultOpenSpan($this->getDefaultOpenSpan())
-            ->setCourseManaged($this->getCourseManaged())
-            ->setMarkVisibility($this->getMarkVisibility())
-            ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
-            ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
-            ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
-            ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+        if ($this->isCourseManagedFieldsOnly($assessment)) {
 
-        if ($this->workType){
-            $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
+            /* Only these fields can be updated by regular guys editing implementations
+             */
+            $assessment
+                ->setDescription($this->getDescription())
+                ->setCreator($this->getCreator())
+                ->setDefaultOpenSpan($this->getDefaultOpenSpan())
+                ->setMarkVisibility($this->getMarkVisibility())
+                ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
+                ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
+                ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
+                ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
+                ->setCreatedAt(Alaress_Date_Format::now())
+                ->setUpdatedAt(Alaress_Date_Format::now());
         } else {
-            $assessment->setWorkType(null);
+            $assessment
+                ->setTitle($this->getTitle())
+                ->setDescription($this->getDescription())
+                ->setCreator($this->getCreator())
+                ->setWeight($this->getWeight())
+                ->setDefaultOpenSpan($this->getDefaultOpenSpan())
+                ->setCourseManaged($this->getCourseManaged())
+                ->setMarkVisibility($this->getMarkVisibility())
+                ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
+                ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
+                ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
+                ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
+                ->setCreatedAt(Alaress_Date_Format::now())
+                ->setUpdatedAt(Alaress_Date_Format::now());
+
+            if ($this->workType){
+                $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
+            } else {
+                $assessment->setWorkType(null);
+            }
+
+            /* Assemble curriculum nodes
+             */
+            $selectedNodesCsv = $this->getCurriculumNodes();
+
+            if (isset($selectedNodesCsv[0])) {
+                $selectedNodes = explode(',', $selectedNodesCsv[0]);
+
+                $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
+            }
         }
 
         // find out if the dates are all g - if not, a mage-friendly exception will be thrown
         $assessment->assertValidDates();
-
-        /* Assemble curriculum nodes
-         */
-        $selectedNodesCsv = $this->getCurriculumNodes();
-
-        if (isset($selectedNodesCsv[0])) {
-            $selectedNodes = explode(',', $selectedNodesCsv[0]);
-
-            $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
-        }
 
         /* Decorate with Assessable-specific data
          */
