@@ -642,21 +642,21 @@ interface IAssessable extends ISoftDeletable
 
 
     /**
-     * A flag denoting whether this assessment is course managed (1) to prevent teachers
-     * from getting too creative with the assessment's details; or not course managed (0)
+     * A flag denoting whether this assessment is course managed (true) to prevent teachers
+     * from getting too creative with the assessment's details; or not course managed (false)
      * which will let teachers customise the assessment's fields in the modify screen
      * after it's been imported
      *
-     * @return int|null
+     * @return bool|null
      */
-    public function getCourseManaged(): ?int;
+    public function getCourseManaged(): ?bool;
 
 
     /**
-     * @param int|null $courseManaged
+     * @param bool|null $courseManaged
      * @return $this
      */
-    public function setCourseManaged(?int $courseManaged): self;
+    public function setCourseManaged(?bool $courseManaged): self;
 
 
     /**

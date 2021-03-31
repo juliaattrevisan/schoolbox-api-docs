@@ -850,19 +850,19 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @return int|null
+     * @return bool|null
      */
-    public function getCourseManaged(): ?int
+    public function getCourseManaged(): ?bool
     {
         return $this->courseManaged;
     }
 
 
     /**
-     * @param int|null $courseManaged
+     * @param bool|null $courseManaged
      * @return $this
      */
-    public function setCourseManaged(?int $courseManaged): self
+    public function setCourseManaged(?bool $courseManaged): self
     {
         $this->courseManaged = $courseManaged;
 
