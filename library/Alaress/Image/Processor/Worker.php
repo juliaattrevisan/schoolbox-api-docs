@@ -293,9 +293,12 @@ class Worker extends CliTool\App
                 $this->captureException($e);
             }
             // Print all exceptions in chain
+            $this->getLogger()->error($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, "Failed")));
             while ($e) {
-                $this->getLogger()->error($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, $e->getMessage())));
-                $this->getLogger()->error($this->prefixLog(sprintf("%s: %s", $hash . '-' . $cacheKey, $e->getTraceAsString())));
+                $this->getLogger()->error($this->prefixLog($e->getMessage()));
+                foreach (explode("\n", $e->getTraceAsString()) as $line) {
+                    $this->getLogger()->error($this->prefixLog($line));
+                }
                 $e = $e->getPrevious();
             }
         }
