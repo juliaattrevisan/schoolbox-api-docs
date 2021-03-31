@@ -120,12 +120,12 @@
     </ul>
 </nav>
 
-<script tsype="text/javascript">
-    const mq = window.matchMedia( "(max-width: 640px)" );
+<script type="text/javascript">
+    const mq = window.matchMedia( "(max-width: 1023px)" );
     if (mq.matches) {
-        $(".parent-item a").click(function(e) {
+        $('.parent-item a').click(function(e) {
             e.preventDefault();
-            var $target = $(this).closest('li').find("ul.flyout").slideToggle();
+            var $target = $(this).closest('li').find('ul.flyout').slideToggle();
             $('ul.flyout').not($target).slideUp();
         });
     }

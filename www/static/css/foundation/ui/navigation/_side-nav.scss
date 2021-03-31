@@ -94,7 +94,7 @@ $border-bottom-width: 2px;
       overflow: auto;
     }
     // flyout menus near bottom of the nav - 'drop up'
-    > li:nth-child(n+12) {
+    > li:nth-last-child(-n+5) {
       position: relative;
 
       .flyout {
@@ -107,7 +107,7 @@ $border-bottom-width: 2px;
     width: 100%;
     background-color: $white;
     padding: .75rem;
-    display: block;
+    display: none;
 
     &:after {
       font-family: $font-family-icon;
@@ -115,13 +115,10 @@ $border-bottom-width: 2px;
       float: right;
     }
   }
-
-  @media #{$large-up} {
-    .dropdown-btn {
-      display: none;
-    }
-  }
   @media #{$medium-down} {
+    .dropdown-btn {
+      display: block;
+    }
     .admin {
       border-top: 1px solid $accent-foreground;
       display: none;

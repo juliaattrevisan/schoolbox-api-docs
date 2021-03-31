@@ -189,7 +189,7 @@
 	&:hover:-ms-input-placeholder		{ color: $color; }
 }
 
-@mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 4, $large-adjust: 0, $importance: "") {
+@mixin responsive-sides($multiplier: 1, $property: padding, $small-adjust: 8, $medium-adjust: 8, $large-adjust: 0, $importance: "") {
   @media #{$small-up} {
     #{$property}-left: rem-calc(($multiplier * ($base-font-size - $small-adjust))) #{$importance};
     #{$property}-right: rem-calc(($multiplier * ($base-font-size - $small-adjust))) #{$importance};
