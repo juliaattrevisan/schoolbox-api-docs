@@ -12,6 +12,7 @@ use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -40,7 +41,11 @@ try {
             $basename = urldecode($_GET['name']);
         }
 
-        if (!$bypassPresignedUrls && $fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
+        if (
+            !$bypassPresignedUrls
+            && $fileSystem instanceof Flysystem\Filesystem
+            && $fileSystem->getAdapter() instanceof S3Adapter
+        ) {
             /** @var IConfigLoader $config */
             $config = $kernel->get('config');
 

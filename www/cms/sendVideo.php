@@ -8,15 +8,15 @@
  * @link        https://schoolbox.com.au/
  */
 
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
-use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
 use Schoolbox\Video\Factory\Video as VideoFactory;
 use Schoolbox\Video\ResourceVideo;
 use Schoolbox\Video\ResourceVideoMapper;
@@ -98,24 +98,24 @@ if (isset($type) && isset($id)) {
 
 
     // Redir to the presigned URL if it is enabled
-    if ($fileSystem->getAdapter() instanceof AwsS3Adapter) {
-        // AWS S3
-        if ($config->get('otfs_s3_presigned_urls_enabled')) {
-            $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
+    if (
+        $fileSystem->getAdapter() instanceof S3Adapter
+        && $config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)
+    ) {
+        $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
 
-            $preSignedUrlService = new PreSignedUrlService($config);
+        $preSignedUrlService = new PreSignedUrlService($config);
 
-            $preSignedUrlDataObject = $preSignedUrlService->generate(
-                $video->getStorage(),
-                Alaress_Date_Format::now()->addDays(1),
-                $video->getTranscodePath(),
-                $cacheControl,
-                $mimeType
-            );
+        $preSignedUrlDataObject = $preSignedUrlService->generate(
+            $video->getStorage(),
+            Alaress_Date_Format::now()->addDays(1),
+            $video->getTranscodePath(),
+            $cacheControl,
+            $mimeType
+        );
 
-            $preSignedUrlService->download($preSignedUrlDataObject);
-            exit;
-        }
+        $preSignedUrlService->download($preSignedUrlDataObject);
+        exit;
     }
 
     // ----------------------------------------------------------------------------------------------------------------
