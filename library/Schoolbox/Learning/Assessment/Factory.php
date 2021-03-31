@@ -103,6 +103,11 @@ class Factory
     protected $defaultOpenSpan;
 
     /**
+     * @var int
+     */
+    protected $courseManaged;
+
+    /**
      * @var string
      */
     protected $publishAt;
@@ -154,6 +159,7 @@ class Factory
         $this->setWeight(trim($post['weight']));
         $this->setCurriculumNodes($post['curriculumCodes']);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
+        $this->setCourseManaged($post['courseManaged']);
         $this->setPublishAt(trim($post['publishDate']));
         $this->setOpenAt(trim($post['openDate']));
         $this->setDueAt(trim($post['dueDate']));
@@ -355,6 +361,7 @@ class Factory
             ->setCreator($this->getCreator())
             ->setWeight($this->getWeight())
             ->setDefaultOpenSpan($this->getDefaultOpenSpan())
+            ->setCourseManaged($this->getCourseManaged())
             ->setMarkVisibility($this->getMarkVisibility())
             ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
             ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
@@ -540,6 +547,27 @@ class Factory
         $this->defaultOpenSpan = $defaultOpenSpan;
         return $this;
     }
+
+
+    /**
+     * @return int
+     */
+    public function getCourseManaged(): int
+    {
+        return $this->courseManaged;
+    }
+
+
+    /**
+     * @param int $courseManaged
+     * @return $this
+     */
+    public function setCourseManaged(int $courseManaged): self
+    {
+        $this->courseManaged = $courseManaged;
+        return $this;
+    }
+
 
     /**
      * @return string

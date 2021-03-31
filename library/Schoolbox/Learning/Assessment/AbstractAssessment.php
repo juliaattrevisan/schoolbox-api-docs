@@ -82,6 +82,13 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $defaultOpenSpan;
 
+
+    /**
+     * @var int|null
+     */
+    private ?int $courseManaged = null;
+
+
     /**
      * The person who created this Assessable
      *
@@ -838,6 +845,27 @@ abstract class AbstractAssessment implements IAssessable
     public function setDefaultOpenSpan($defaultOpenSpan)
     {
         $this->defaultOpenSpan = $defaultOpenSpan;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getCourseManaged(): ?int
+    {
+        return $this->courseManaged;
+    }
+
+
+    /**
+     * @param int|null $courseManaged
+     * @return $this
+     */
+    public function setCourseManaged(?int $courseManaged): self
+    {
+        $this->courseManaged = $courseManaged;
+
         return $this;
     }
 

@@ -272,6 +272,7 @@ class Translator
             ->setDueDate($domainObject->getDueAt())
             ->setCloseDate($domainObject->getCloseAt())
             ->setDefaultOpenSpan($domainObject->getDefaultOpenSpan())
+            ->setCourseManaged($domainObject->getCourseManaged())
             ->setWeight($domainObject->getWeight())
             ->setSequence($domainObject->getSequence())
             ->setWorkType($domainObject->getWorkType())
@@ -410,6 +411,7 @@ class Translator
                      ->setTitle($assessmentModel->getTitle())
                      ->setDescription($assessmentModel->getDescription())
                      ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
+                     ->setCourseManaged($assessmentModel->getCourseManaged())
                      ->setDeletedAt($assessmentModel->getDeletedAt());
 
         // Non-nullable properties

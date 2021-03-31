@@ -640,6 +640,25 @@ interface IAssessable extends ISoftDeletable
      */
     public function setDefaultOpenSpan($defaultOpenSpan);
 
+
+    /**
+     * A flag denoting whether this assessment is course managed (1) to prevent teachers
+     * from getting too creative with the assessment's details; or not course managed (0)
+     * which will let teachers customise the assessment's fields in the modify screen
+     * after it's been imported
+     *
+     * @return int|null
+     */
+    public function getCourseManaged(): ?int;
+
+
+    /**
+     * @param int|null $courseManaged
+     * @return $this
+     */
+    public function setCourseManaged(?int $courseManaged): self;
+
+
     /**
      * Get the weight
      *
