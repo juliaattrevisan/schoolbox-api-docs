@@ -1,34 +1,20 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-
 {# Decide whether certain fields are readonly due to being Course Managed
  # Some users can change the values; some can't
+ #
+ # courseMangedReadonly = false
+ # * Superusers can always change the Course Managed setting and all the other related settings too
+ # * If you're editing this assessment in a Specification context then you can change all the settings
+ # * Assessment implementation, but courseManaged is off so you can change this as you want
+ #
+ # courseManagedReadonly = true
+ # * Assessment implementation, but courseManaged is on, so you cannot change this setting nor any of the other ones
  #}
-{% if USER.superUser  %}
+{% set courseManagedReadonly = false %}
 
-    {# Superusers can always change this setting
-     # and all the other related settings too
-     #}
-    {% set courseManagedReadonly = false %}
-{% elseif isSpecificationContext %}
-
-    {# If you're editing this assessment in a Specification context
-     # then you can change all the settings
-     #}
-    {% set courseManagedReadonly = false %}
-{% elseif assessment.courseManaged %}
-
-    {# Assessment implementation
-     # ...but courseManaged is on, so you cannot change this setting
-     # nor any of the other ones
-     #}
+{% if assessment.courseManaged %}
     {% set courseManagedReadonly = true %}
-{% else %}
-
-    {# Assessment implementation
-     # ...but courseManaged is off so you can change this as you want
-     #}
-    {% set courseManagedReadonly = false %}
 {% endif %}
 
 {# ----------------------------------------------------------- #}
@@ -182,7 +168,7 @@
     <label for="courseManaged" class="checkbox-label">Common assessment</label>
 
     <div class="switch">
-        <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} %}/>
+        <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %}/>
         <label for="courseManaged">
             <span class="icon-approve"></span>
             <span class="icon-cancel"></span>
