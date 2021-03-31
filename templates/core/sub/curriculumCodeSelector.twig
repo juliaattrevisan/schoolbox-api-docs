@@ -1,5 +1,7 @@
 {##
  # Curriculum code selector
+ #
+ # @param bool courseManagedReadonly
  #}
 <script type="text/javascript">
     // Set up the curriculum code selection
@@ -10,7 +12,7 @@
     });
 </script>
 
-<select id="curriculum-code-select" name="curriculumCodes[]" multiple></select>
+<select id="curriculum-code-select" name="curriculumCodes[]" multiple {% if courseManagedReadonly %}disabled{% endif %}></select>
 
 {# Synchronous: Empty code so that when no code is selected something is actually sent to form.
  # This distinguishes between all codes being cleared and this input not existing at all.

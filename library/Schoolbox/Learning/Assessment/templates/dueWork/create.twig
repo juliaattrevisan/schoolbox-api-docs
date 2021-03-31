@@ -3,25 +3,32 @@
 
 {# Decide whether certain fields are readonly due to being Course Managed
  # Some users can change the values; some can't
-#}
+ #}
 {% if USER.superUser  %}
 
     {# Superusers can always change this setting
      # and all the other related settings too
-    #}
+     #}
     {% set courseManagedReadonly = false %}
 {% elseif isSpecificationContext %}
 
     {# If you're editing this assessment in a Specification context
      # then you can change all the settings
-    #}
+     #}
     {% set courseManagedReadonly = false %}
+{% elseif assessment.courseManaged %}
+
+    {# Assessment implementation
+     # ...but courseManaged is on, so you cannot change this setting
+     # nor any of the other ones
+     #}
+    {% set courseManagedReadonly = true %}
 {% else %}
 
     {# Assessment implementation
-     # A nonsuperuser cannot change this setting or any of the other settings
-    #}
-    {% set courseManagedReadonly = true %}
+     # ...but courseManaged is off so you can change this as you want
+     #}
+    {% set courseManagedReadonly = false %}
 {% endif %}
 
 {# ----------------------------------------------------------- #}
@@ -29,10 +36,10 @@
 {# ----------------------------------------------------------- #}
 <fieldset>
     <label class="required" for="title">Title</label>
-    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
+    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255" {% if courseManagedReadonly %}readonly{% endif %} />
     <label>
         Work Type
-        <select name="workType">
+        <select name="workType" {% if courseManagedReadonly %}readonly{% endif %} >
             <option value="" selected>None</option>
             {% for workType in allWorkTypes %}
                 <option value="{{ workType.id }}" {% if assessment.workType.id ?? '' == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
@@ -99,7 +106,10 @@
 <fieldset>
     <legend>{{ locale.grading.proper }}</legend>
 
-    {% include '@learningAssessment/fragments/weight.twig' %}
+    {% include '@learningAssessment/fragments/weight.twig' with {
+        assessment: assessment,
+        courseManagedReadonly: courseManagedReadonly
+    } %}
 
     {% if selfAssessmentEnabled %}
         <label>{{ locale.selfReflection.proper }} <span data-tooltip class="hint has-tip tip-top"  title="Enabling '{{ locale.selfReflection.proper }}' allows students to reflect on their work with a comment, and rubric if provided. Also enabling '{{ locale.selfAssessment.proper }}' gives students the ability to provide themselves a grade.">?</span>
@@ -133,6 +143,7 @@
         defaultGradeGroup: defaultGradeGroup,
         renderMaxMark: true,
         markTypeLabel: 'Mark Type',
+        courseManagedReadonly: courseManagedReadonly
     } %}
 
     {% include '@learningAssessment/fragments/rubric.twig' with {
@@ -145,7 +156,8 @@
         capabilityMarkTypes: capabilityMarkTypes,
         capabilityGradingSchemes: capabilityGradingSchemes,
         defaultGradeGroup: defaultGradeGroup,
-        markTypeNone: markTypeNone
+        markTypeNone: markTypeNone,
+        courseManagedReadonly: courseManagedReadonly
     } only %}
 </fieldset>
 
@@ -160,29 +172,17 @@
 {# ----------------------------------------------------------- #}
 {# Curriculum #}
 {# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.dueWork.proper} %}
-
-
-<div class="row">
-    <div class="small-12 columns">
-        <label for="useRubric">Use Rubric?</label>
-        <div class="switch">
-            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} />
-            <label for="useRubric">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-</div>
-
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: locale.dueWork.proper,
+    courseManagedReadonly: courseManagedReadonly
+} %}
 
 <fieldset>
     <legend>Common Assessment</legend>
     <label for="courseManaged" class="checkbox-label">Common assessment</label>
 
     <div class="switch">
-        <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} />
+        <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} %}/>
         <label for="courseManaged">
             <span class="icon-approve"></span>
             <span class="icon-cancel"></span>
@@ -287,12 +287,23 @@
             function processUseRubricClick($element)
             {
                 if ($element.is(':checked')) {
+
                     disableMaxMark();
                     calculateGridTotal();
                 } else {
-                    enableMaxMark();
-                    // Need to validate the max mark
-                    $maxMarkInput.valid();
+
+                    {# Only enable it if course managed setting allows you
+                     # Otherwise Mark Type can be disabled and this input is enabled,
+                     # a very strange outcome
+                     #}
+                    if (!Boolean('{{ courseManagedReadonly }}')) {
+                        enableMaxMark();
+
+                        // Need to validate the max mark
+                        $maxMarkInput.valid();
+                    } else {
+                        $element.attr('disabled', true);
+                    }
                 }
             }
 

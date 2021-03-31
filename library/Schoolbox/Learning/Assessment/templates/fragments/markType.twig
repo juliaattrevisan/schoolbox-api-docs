@@ -5,15 +5,16 @@
  # and a set of Grade Group instances. The latter conditionally shows,
  # depending on the setting of the former.
  #
- # @param $context            string       A string prefix for namespacing, so you can reuse this fragment in the same template
- # @param $assessment         IAssessable  An assessment instance
- # @param $allMarkTypes       array        tuples for (id, name) of mark types
- # @param $allGradeSchemes    array        tuples for (id, name) of grading schemes
- # @param $selectedMarkType   int|null     The mark type currently selected
- # @param $selectedGradeGroup int|null     The grade group currently selected
- # @param $defaultGradeGroup  int          Set in admin via default_grade_group config var
- # @param $renderMaxMark      bool         True allows the maxMark input field to exist
- # @param $markTypeLabel      string       The label text for the mark type selector
+ # @param string $context               A string prefix for namespacing, so you can reuse this fragment in the same template
+ # @param IAssessable $assessment       An assessment instance
+ # @param array $allMarkTypes           tuples for (id, name) of mark types
+ # @param array $allGradeSchemes        tuples for (id, name) of grading schemes
+ # @param int|null $selectedMarkType    The mark type currently selected
+ # @param int|null $selectedGradeGroup  The grade group currently selected
+ # @param int $defaultGradeGroup        Set in admin via default_grade_group config var
+ # @param bool $renderMaxMark           True allows the maxMark input field to exist
+ # @param string $markTypeLabel         The label text for the mark type selector
+ # @param bool $courseManagedReadonly   A bool to decide if this is readonly or not
  #}
 
 {# Letter Grade enables Grading Scheme
@@ -46,9 +47,15 @@
     <div class="small-12 medium-6 columns">
         <label>
             {{ markTypeLabel | default('Mark Type') }}
-            <select id="{{ context }}markType" name="{{ context }}markType">
+            <select id="{{ context }}markType" name="{{ context }}markType" {% if courseManagedReadonly %}readonly{% endif %}>
                 {% for index, title in allMarkTypes %}
-                    <option value="{{ index }}"{% if index == (selectedMarkType ?? markTypeNone) %} selected{% endif %}>{{ title }}</option>
+                    <option value="{{ index }}"
+                        {% if index == (selectedMarkType ?? markTypeNone) %}
+                            selected
+                        {% elseif courseManagedReadonly %}
+                            disabled
+                        {% endif %}
+                    >{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
@@ -58,7 +65,7 @@
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark="{{ context }}">
         <label for="{{ context }}maxMark">
             Maximum Available Marks
-            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" />
+            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" {% if courseManagedReadonly %}readonly{% endif %} />
         </label>
     </div>
     {% endif %}
@@ -73,6 +80,7 @@
                 name: context ~ 'gradingScheme',
                 options: allGradeSchemes,
                 preselected: selectedGradeGroup ?: defaultGradeGroup,
+                readonly: courseManagedReadonly,
                 pairs: {
                     value: 'id',
                     label: 'name'
