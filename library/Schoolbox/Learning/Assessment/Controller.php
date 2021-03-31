@@ -216,6 +216,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // Relocation is available only for update
         $data['canRelocate'] = false;
 
+        /* This is in a Specification context which grants the availability of Course Managed checkbox
+         */
+        $data['isSpecificationContext'] = $context->isSpecificationContext();
+
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
             $content = $this->buildUnthemedHtmlOutput("@learningAssessment/$type/create.twig", $data);
@@ -240,6 +244,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+
         $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment,$this->getUser())->add([$assessment->getTitle()]);
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
@@ -254,6 +259,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
 
         $data['canRelocate'] = $assessment->isSpecification() && !($assessment instanceof Project);
+
+        /* This is in a Specification context which grants the availability of Course Managed checkbox
+         */
+        $data['isSpecificationContext'] = $assessment->getContext()->isSpecificationContext();
+
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
     }

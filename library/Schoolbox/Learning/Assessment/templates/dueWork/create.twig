@@ -70,7 +70,6 @@
     {% endif %}
 </fieldset>
 
-
 {# ----------------------------------------------------------- #}
 {# Grading #}
 {# ----------------------------------------------------------- #}
@@ -140,6 +139,39 @@
 {# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.dueWork.proper} %}
 
+
+<div class="row">
+    <div class="small-12 columns">
+        <label for="useRubric">Use Rubric?</label>
+        <div class="switch">
+            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} />
+            <label for="useRubric">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+
+<fieldset>
+    <legend>Common Assessment</legend>
+    <label for="courseManaged" class="checkbox-label">Common assessment</label>
+
+    {% if isSpecificationContext %}
+        {% set readonly = true %}
+    {% else %}
+        {% set readonly = false %}
+    {% endif %}
+
+    <div class="switch">
+        <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} readonly />
+        <label for="courseManaged">
+            <span class="icon-approve"></span>
+            <span class="icon-cancel"></span>
+        </label>
+    </div>
+</fieldset>
 
 {# ----------------------------------------------------------- #}
 {# Submit #}
