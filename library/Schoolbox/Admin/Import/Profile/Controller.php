@@ -17,7 +17,6 @@ use Schoolbox\External;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Storage\SeekableStream\Factory as StreamFactory;
 
 /**
  * Class Controller
@@ -190,7 +189,6 @@ class Controller extends Base
                         $this->staffProfileMapper,
                         $this->relationshipMapper,
                         null,
-                        new StreamFactory($this->getConfigLoader()),
                     );
 
                     /* Actually persist changes
