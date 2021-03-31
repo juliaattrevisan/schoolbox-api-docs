@@ -9,6 +9,7 @@
 namespace Alaress\Image;
 
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Alaress\Image\Exception\LayeredNonGifException;
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
 use DomainException;
@@ -198,7 +199,14 @@ class Processor
         // 'processing' state so this is not required
         try {
             $transformSize = $this->generateTransformation($maxAttempts, $fileFormat, $fileSystem, $transformPath);
-        } catch (FileNotFoundException | FileExistsException | ImagineException\OutOfBoundsException | ImagineException\RuntimeException | OverflowException $e) {
+        } catch (
+            FileNotFoundException |
+            FileExistsException |
+            ImagineException\OutOfBoundsException |
+            ImagineException\RuntimeException |
+            OverflowException |
+            LayeredNonGifException $e
+        ) {
             $transformModel->setState(Storage\Transform\Model::STATE_FAILED);
             $transformMapper->save($transformModel);
             throw $e;
@@ -229,6 +237,7 @@ class Processor
      * @throws ImagineException\RuntimeException
      * @throws OverflowException
      * @throws FileNotFoundException If original storage file not found on disk
+     * @throws LayeredNonGifException
      */
     private function generateTransformation(int $maxAttempts, string $fileFormat, FilesystemInterface $fileSystem, string $transformPath): int
     {
@@ -238,6 +247,9 @@ class Processor
 
         $options = [];
         if ($image->layers()->count() > 1) {
+            if ($fileFormat !== 'gif') {
+                throw new LayeredNonGifException('Animated picture is currently only supported on gif');
+            }
             $options['animated']       = true;
             $options['animated.loops'] = 0;
         }
