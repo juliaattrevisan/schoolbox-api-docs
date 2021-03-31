@@ -234,7 +234,7 @@ class Controller extends Base\Base
              * and you chose to cancel what you were doing
              */
             'importedAlready' => $exists,
-            'importedAlreadyRedirect' => '/course/list',
+            'importedAlreadyRedirect' => $this->getRouteIfAuthorized('course.courseList'),
         ]);
     }
 
