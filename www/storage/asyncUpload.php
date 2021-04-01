@@ -14,11 +14,14 @@ use Schoolbox\Resource\Storage\Translator\ModelToArray;
  */
 
 // TODO, this file should be using the Basic Kernel, but is actually using the WebRequest Kernel
-//require_once __DIR__ . '/../../conf/core/require.php';
-//$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
+/** @var SitePage|null $this **/
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
 
 /** @var PrefixGenerator $prefixGenerator */
-$prefixGenerator = $kernel->get('cdnPrefixGenerator');
+$prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
 
 $result = array(
     'success' => false,
