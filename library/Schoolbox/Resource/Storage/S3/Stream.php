@@ -1,14 +1,8 @@
 <?php
+
 /**
- * Flysystem is unable to chunk a file from storage which makes streaming of videos from S3 impossible. This makes
- * video playback from S3 a non-starter as you have to wait for the entire video to download to the server before it
- * can start being streamed to the user.
- * This class is a kludge to connect to S3 directly and download the file using their native async methods with a
- * progress callback that streams it out to the user as we receive it.
- *
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\Storage\S3;
@@ -17,6 +11,19 @@ use Aws\S3\S3Client;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\FilesystemFactory;
 
+/**
+ * Flysystem is unable to chunk a file from storage which makes streaming of
+ * videos from S3 impossible. This makes video playback from S3 a non-starter as
+ * you have to wait for the entire video to download to the server before it can
+ * start being streamed to the user.
+ *
+ * This class is a kludge to connect to S3 directly and download the file using
+ * their native async methods with a progress callback that streams it out to
+ * the user as we receive it.
+ *
+ * @deprecated replaced with a S3 filesystem adapter which always returns az`
+ *             seekable stream
+ */
 class Stream
 {
     /**
