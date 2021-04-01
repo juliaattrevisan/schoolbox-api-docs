@@ -1,10 +1,5 @@
 <?php
 
-use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Resource\Browser\NodeFactory;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use Schoolbox\Resource\Storage\Translator\ModelToArray;
-
 /**
  * Asynchronous upload of a brownhole file.
  *
@@ -13,15 +8,16 @@ use Schoolbox\Resource\Storage\Translator\ModelToArray;
  * @link      https://schoolbox.com.au/
  */
 
-// TODO, this file should be using the Basic Kernel, but is actually using the WebRequest Kernel
-/** @var SitePage|null $this **/
-if (!isset($this)) {
-    http_response_code(404);
-    die('No direct access permitted');
-}
+use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Translator\ModelToArray;
+
+require_once __DIR__ . '/../../conf/core/require.php';
+$kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 /** @var PrefixGenerator $prefixGenerator */
-$prefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
+$prefixGenerator = $kernel->get('cdnPrefixGenerator');
 
 $result = array(
     'success' => false,

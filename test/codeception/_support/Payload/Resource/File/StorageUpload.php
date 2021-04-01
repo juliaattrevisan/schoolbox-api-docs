@@ -26,6 +26,6 @@ class StorageUpload extends Request
     /** @inheritDoc*/
     public function getUrl(): string
     {
-        return "/storage/asyncUpload";
+        return "/storage/asyncUpload.php";
     }
 }
