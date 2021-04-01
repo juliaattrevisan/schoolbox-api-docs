@@ -192,7 +192,7 @@
     {# For when the checkbox itself is disabled, since that won't submit to backend
      # under those circumstances, inadvertently unlocking this setting
      #}
-    <input type="hidden" name="courseManaged" value="{% if assessment.courseManaged %}on{% else %}off{% endif %}" />
+    <input type="hidden" name="courseManaged" value="0" />
 
     <label for="courseManaged" class="checkbox-label">Common assessment</label>
 

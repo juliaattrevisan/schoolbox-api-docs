@@ -300,7 +300,7 @@
         {# For when the checkbox itself is disabled, since that won't submit to backend
          # under those circumstances, inadvertently unlocking this setting
          #}
-        <input type="hidden" name="useRubric" value="{% if assessment.courseManaged %}on{% else %}off{% endif %}" />
+        <input type="hidden" name="useRubric" value="0" />
 
         <div class="switch">
             <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
@@ -335,7 +335,7 @@
                 {# For when the checkbox itself is disabled, since that won't submit to backend
                  # under those circumstances, inadvertently unlocking this setting
                  #}
-                <input type="hidden" name="useMarkRange" value="{% if assessment.courseManaged %}on{% else %}off{% endif %}" />
+                <input type="hidden" name="useMarkRange" value="0" />
 
                 <div class="switch">
                     <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
