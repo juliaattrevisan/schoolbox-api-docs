@@ -13,6 +13,12 @@ use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Translator\ModelToArray;
 
+// disallow SitePage context, only direct access is allowed
+if (isset($this)) {
+    http_response_code(404);
+    die('Only direct access permitted');
+}
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
