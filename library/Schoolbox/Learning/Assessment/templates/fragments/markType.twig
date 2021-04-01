@@ -47,12 +47,12 @@
     <div class="small-12 medium-6 columns">
         <label>
             {{ markTypeLabel | default('Mark Type') }}
-            <select id="{{ context }}markType" name="{{ context }}markType" {% if courseManagedReadonly %}readonly{% endif %}>
+            <select id="{{ context }}markType" name="{{ context }}markType" {% if courseManagedReadonly ?? false %}readonly{% endif %}>
                 {% for index, title in allMarkTypes %}
                     <option value="{{ index }}"
                         {% if index == (selectedMarkType ?? markTypeNone) %}
                             selected
-                        {% elseif courseManagedReadonly %}
+                        {% elseif courseManagedReadonly ?? false %}
                             disabled
                         {% endif %}
                     >{{ title }}</option>
@@ -65,7 +65,7 @@
     <div class="small-12 medium-6 columns" style="display:none;" data-max-mark="{{ context }}">
         <label for="{{ context }}maxMark">
             Maximum Available Marks
-            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" {% if courseManagedReadonly %}readonly{% endif %} />
+            <input id="{{ context }}maxMark" type="text" name="{{ context }}maxMark" value="{{ assessment.maxMark ?? '' }}" {% if courseManagedReadonly ?? false %}readonly{% endif %} />
         </label>
     </div>
     {% endif %}
@@ -80,7 +80,7 @@
                 name: context ~ 'gradingScheme',
                 options: allGradeSchemes,
                 preselected: selectedGradeGroup ?: defaultGradeGroup,
-                readonly: courseManagedReadonly,
+                readonly: courseManagedReadonly ?? false,
                 pairs: {
                     value: 'id',
                     label: 'name'

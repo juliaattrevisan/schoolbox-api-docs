@@ -17,7 +17,7 @@
                 {% include 'sub/curriculumCodeSelector.twig' with {
                     'codeList': curriculumNodes,
                     'renderButton': true,
-                    courseManagedReadonly: courseManagedReadonly
+                    courseManagedReadonly: courseManagedReadonly ?? false
                 } %}
                 </div>
             </div>
