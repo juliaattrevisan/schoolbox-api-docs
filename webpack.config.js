@@ -1,10 +1,9 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
-const webpack = require('webpack');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
 module.exports = {
-    entry: {
+    entry: { //https://webpack.js.org/configuration/entry-context/
 
         main: [
 
@@ -82,7 +81,7 @@ module.exports = {
             './www/static/javascript/shared/jquery.confirm-dialog.js',
 
             // Data tables
-            './node_modules/datatables.net/js/jquery.dataTables.min.js',
+            './node_modules/datatables.net/js/jquery.dataTables.js',
             './node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
 
             // Toasts, popups to notify something has happened
@@ -131,40 +130,31 @@ module.exports = {
 
             './www/static/javascript/shared/calendar/jquery.getExportCalendarLink.js'
         ],
-        masonry: [
+        masonry: {
+            import: [
             // Colour handling
-            // './www/static/javascript/components/spectrum/spectrum.js',
             './node_modules/spectrum-colorpicker/spectrum.js',
 
             // homepage editing
             './www/static/javascript/shared/masonry/jquery.masonry.js',
             './www/static/javascript/shared/masonry/jquery.masonry.spectrum.js'
-        ],
-        fullcalendarInline: [
-            // Required for the datepicker calendar for now
-            './node_modules/@fullcalendar/core/main.js',
-            './node_modules/@fullcalendar/list/main.js'
-        ],
-        // fileDrop: "./www/static/javascript/jquery.fileDrop.js",
-        // vueInline: [ // Omit to avoid issues with loading both Vue via src and via import Vue from 'Vue' - moving all Vue to modules is in progress
-        //     './node_modules/vue/dist/vue.js',
-        //     './node_modules/vuejs-paginate/dist/index.js',
-        //     './node_modules/axios/dist/axios.js'
-        // ],
+            ],
+            dependOn: 'main' //ensures jQuery is loaded prior
+        },
 
         // Libraries
-        clipboard: "./www/static/javascript/shared/clipboard/clipboard.main.js",
-        strtotime: "./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js",
+        clipboard: './www/static/javascript/shared/clipboard/clipboard.main.js',
+        strtotime: './www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js',
 
         // Vue components
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
-        fullCalendar: "./library/Schoolbox/Calendar/vue/fullCalendar.main.js",
-        assessmentCalendar: "./library/Schoolbox/Learning/Assessment/Calendar/vue/calendar.main.js",
-        upcomingDueworkCalendar: "./library/Schoolbox/Learning/Upcoming/vue/calendar.main.js",
-        resourceBookingItemCalendar: "./library/Schoolbox/ResourceBooking/Item/vue/calendar.main.js",
-        resourceBookingCategoryCalendar: "./library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js",
-        eventDetails: "./library/Schoolbox/Calendar/Event/templates/vue/index.js",
-        calendarComponent: "./library/Schoolbox/Calendar/vue/component.main.js",
+        fullCalendar: './library/Schoolbox/Calendar/vue/fullCalendar.main.js',
+        assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/calendar.main.js',
+        upcomingDueworkCalendar: './library/Schoolbox/Learning/Upcoming/vue/calendar.main.js',
+        resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/calendar.main.js',
+        resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js',
+        eventDetails: './library/Schoolbox/Calendar/Event/templates/vue/index.js',
+        calendarComponent: './library/Schoolbox/Calendar/vue/component.main.js',
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
@@ -199,58 +189,58 @@ module.exports = {
         publicPath: "/static/javascript/components/",
         filename: "[name].bundle.js"
     },
-    module: {
+    module: { //https://webpack.js.org/configuration/module/
         rules: [
             {
-                test: require.resolve("jquery"),
-                loader: "expose-loader", //see https://webpack.js.org/loaders/expose-loader/ - expose to outside the bundles (JS in twig files)
+                test: require.resolve('jquery'),
+                loader: 'expose-loader', //see https://webpack.js.org/loaders/expose-loader/ - expose these to the glocal scope, allowing access to the properties in twig / other JS files
                 options: {
                     exposes: [
-                        { globalName: "$", override: true },
-                        { globalName: "jQuery", override: true }
+                        { globalName: '$', override: true },
+                        { globalName: 'jQuery', override: true }
                     ],
                 },
             },
             {
-                test: require.resolve("dropzone"),
-                loader: "expose-loader", 
+                test: require.resolve('dropzone'),
+                loader: 'expose-loader', 
                 options: {
-                    exposes: { globalName: "dropzone",  override: true }
+                    exposes: { globalName: 'Dropzone', override: true }
                 },
             },
             {
-                test: require.resolve("moment"),
-                loader: "expose-loader", 
+                test: require.resolve('moment'),
+                loader: 'expose-loader', 
                 options: {
-                    exposes: { globalName: "moment", override: true }
+                    exposes: { globalName: 'moment', override: true }
                 },
             },
             {
-                test: require.resolve("axios"),
-                loader: "expose-loader", 
+                test: require.resolve('axios'),
+                loader: 'expose-loader', 
                 options: {
-                    exposes: { globalName: "axios", override: true }
+                    exposes: { globalName: 'axios', override: true }
                 },
             },
             {
-                test: require.resolve("lodash"),
-                loader: "expose-loader", 
+                test: require.resolve('lodash'),
+                loader: 'expose-loader', 
                 options: {
-                    exposes: { globalName: "_", override: true }
+                    exposes: { globalName: '_', override: true }
                 },
             },
             {
-                test: require.resolve("intro.js"),
-                loader: "expose-loader", 
+                test: require.resolve('intro.js'),
+                loader: 'expose-loader', 
                 options: {
-                    exposes: { globalName: "introJs", override: true }
+                    exposes: { globalName: 'IntroJs', moduleLocalName: 'introJs', override: true }
                 },
             },
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
                 use: {
-                    loader: "babel-loader",
+                    loader: 'babel-loader', //to transpile JS code to ensure everything is compatiable with all targeted browsers
                     options: {
                         presets: [
                             [
@@ -258,10 +248,10 @@ module.exports = {
                                 {
                                     targets: {
                                         browsers: [
-                                            ">0.25%",
-                                            "not dead",
-                                            "not op_mini all",
-                                            "not ie 11"
+                                            '>0.25%',
+                                            'not dead',
+                                            'not op_mini all',
+                                            'not ie 11'
                                         ],
                                     },
                                     useBuiltIns: 'usage',
@@ -270,20 +260,20 @@ module.exports = {
                             ]
                         ],
                         plugins: [
-                            "@babel/plugin-proposal-optional-chaining",
+                            '@babel/plugin-proposal-optional-chaining',
                         ]
                     }
                 },
             },
             {
                 test: /\.vue$/,
-                loader: 'vue-loader',
+                loader: 'vue-loader', //to handle .vue files
                 options: {
                     appendTsSuffixTo: [/\.vue$/]
                 }
             },
             {
-                test: /\.css$/,
+                test: /\.css$/, 
                 use: ['vue-style-loader', 'css-loader'],
             },
             {
@@ -300,26 +290,26 @@ module.exports = {
                     {
                         use: [
                             {
-                                loader: "file-loader",
+                                loader: 'file-loader',
                                 options: {
-                                    name: "[name].css",
-                                    outputPath: "../../css/core/"
+                                    name: '[name].css',
+                                    outputPath: '../../css/core/'
                                 }
                             },
-                            { loader: "extract-loader" },
+                            { loader: 'extract-loader' },
                             {
-                                loader: "css-loader",
+                                loader: 'css-loader',
                                 options: {
                                     url: false,
                                     modules: false
                                 }
                             },
                             {
-                                loader: "sass-loader",
+                                loader: 'sass-loader', //to load the sass and export it to css
                                 options: {
                                     sassOptions: {
                                         indentWidth: 4,
-                                        includePaths: ["../../css/foundation/"],
+                                        includePaths: ['../../css/foundation/'],
                                     },
                                 },
                             }
@@ -329,23 +319,19 @@ module.exports = {
             }
         ]
     },
-    resolve: {
+    resolve: { //https://webpack.js.org/configuration/resolve/
         alias: {
             'vue$': 'vue/dist/vue.esm.js',
-            '@schoolbox': path.resolve(__dirname, "vue/components"),
-            '@schoolboxCalendarEvent': path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
+            '@schoolbox': path.resolve(__dirname, 'vue/components'),
+            '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
             '@shared': path.resolve(__dirname, 'www/static/javascript/shared'),
         },
         extensions: ['*', '.js', '.vue', '.json']
     },
-    plugins: [
+    plugins: [ //https://webpack.js.org/configuration/plugins/
         new VueLoaderPlugin(),
-        // new webpack.ProvidePlugin({
-        //     $: 'jquery',
-        //     jQuery: 'jquery',
-        // }),
         new RemoveEmptyScriptsPlugin()
     ]
 };
