@@ -146,8 +146,9 @@ module.exports = {
         clipboard: './www/static/javascript/shared/clipboard/clipboard.main.js',
         strtotime: './www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js',
 
-        // Vue components
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
+        
+        //Calendars
         fullCalendar: './library/Schoolbox/Calendar/vue/fullCalendar.main.js',
         assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/calendar.main.js',
         upcomingDueworkCalendar: './library/Schoolbox/Learning/Upcoming/vue/calendar.main.js',
@@ -155,16 +156,21 @@ module.exports = {
         resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js',
         eventDetails: './library/Schoolbox/Calendar/Event/templates/vue/index.js',
         calendarComponent: './library/Schoolbox/Calendar/vue/component.main.js',
+        
+        //News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
-        adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
+        
+        //Learning
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/feeds.main.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
-        authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
+        
+        //Admin
+        adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
         staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/initStaleUsersReport.js',
 
