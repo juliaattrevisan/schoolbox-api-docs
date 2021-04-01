@@ -296,8 +296,14 @@
 <div class="row">
     <div class="small-12 columns">
         <label for="useRubric">Use Rubric?</label>
+
+        {# For when the checkbox itself is disabled, since that won't submit to backend
+         # under those circumstances, inadvertently unlocking this setting
+         #}
+        <input type="hidden" name="useRubric" value="{% if assessment.courseManaged %}on{% else %}off{% endif %}" />
+
         <div class="switch">
-            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %}/>
+            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
             <label for="useRubric">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
