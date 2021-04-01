@@ -219,6 +219,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* This is in a Specification context which grants the availability of Course Managed checkbox
          */
         $data['isSpecificationContext'] = $context->isSpecificationContext();
+        $data['isFolderContext'] = $assessment->getContext() instanceof \Schoolbox\Resource\Folder\Model;
 
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
@@ -263,6 +264,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* This is in a Specification context which grants the availability of Course Managed checkbox
          */
         $data['isSpecificationContext'] = $assessment->getContext()->isSpecificationContext();
+        $data['isFolderContext'] = $assessment->getContext() instanceof \Schoolbox\Resource\Folder\Model;
 
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
