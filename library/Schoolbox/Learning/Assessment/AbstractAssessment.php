@@ -691,7 +691,7 @@ abstract class AbstractAssessment implements IAssessable
      * If you're not a superuser and CourseManaged is on and you're not in a Specification context,
      * Don't update any of the fields that were readonly
      *
-     * @param User        $user
+     * @param User $user
      * @return bool
      */
     public function isCourseManagedFieldsOnly(User $user): bool

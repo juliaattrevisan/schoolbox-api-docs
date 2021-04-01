@@ -86,22 +86,32 @@ class MapperProxy
      */
     private $notifier;
 
+
+    /**
+     * @var User|null
+     */
+    private ?\Schoolbox\User $sessionUser = null;
+
+
     /**
      * Constructor
      *
      * @param Mapper                $baseMapper
      * @param Translator            $translator
      * @param ParticipantDataSource $participantDataSource
+     * @param User                  $sessionUser
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        ParticipantDataSource $participantDataSource
+        ParticipantDataSource $participantDataSource,
+        \Schoolbox\User $sessionUser
     ) {
         $this->baseMapper            = $baseMapper;
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
         $this->model                 = IAssessable::class;
+        $this->sessionUser           = $sessionUser;
     }
 
 
@@ -986,7 +996,12 @@ class MapperProxy
                 $boxMapper->save($subObject);
 
                 if ($dueWork->getRubricGrid()) {
-                    $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
+
+                    /* Disregard grid changes if CourseManaged is on
+                     */
+                    if (!$assessable->isCourseManagedFieldsOnly($this->sessionUser)) {
+                        $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
+                    }
                 }
             } else {
                 // No rubric? Just save the due work
