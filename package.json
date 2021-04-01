@@ -1,6 +1,6 @@
 {
   "name": "schoolbox",
-  "version": "20.2.0",
+  "version": "20.2.8",
   "author": "Schoolbox Pty Ltd",
   "description": "Schoolbox LMS",
   "dependencies": {
