@@ -19,6 +19,17 @@ use Schoolbox\Resource\FilesystemFactory;
  *
  * This wrapper overrides `readStream` to always return a seekable stream,
  * whilst leaving the rest of the S3 adapter untouched.
+ *
+ * Previous commentary on this issue:
+ *
+ * Flysystem is unable to chunk a file from storage which makes streaming of
+ * videos from S3 impossible. This makes video playback from S3 a non-starter as
+ * you have to wait for the entire video to download to the server before it can
+ * start being streamed to the user.
+ *
+ * This class is a kludge to connect to S3 directly and download the file using
+ * their native async methods with a progress callback that streams it out to
+ * the user as we receive it.
  */
 class Adapter extends AbstractAdapter implements CanOverwriteFiles
 {
@@ -44,7 +55,8 @@ class Adapter extends AbstractAdapter implements CanOverwriteFiles
      * Overrides the S3 adapter's implementation to use a direct stream open.
      *
      * This stream is seekable, but the returned array doesn't contain all of
-     * the metadata that the S3 adapter would return.
+     * the metadata that the S3 adapter would return. That doesn't matter for
+     * a file's `readStream` method, as it returns only the stream.
      *
      * @param string $path
      * @return array|bool
