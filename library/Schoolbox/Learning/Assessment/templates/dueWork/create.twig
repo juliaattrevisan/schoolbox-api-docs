@@ -64,7 +64,13 @@
                 <select name="workType" {% if courseManagedReadonly %}readonly{% endif %} >
                     <option value="" selected>None</option>
                     {% for workType in allWorkTypes %}
-                        <option value="{{ workType.id }}" {% if assessment.workType.id ?? '' == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
+                        <option value="{{ workType.id }}"
+                            {% if assessment.workType.id ?? '' == workType.id %}
+                                selected="selected"
+                            {% elseif courseManagedReadonly %}
+                                disabled
+                            {% endif %}
+                        >{{ workType.name }}</option>
                     {% endfor %}
                 </select>
             </label>
