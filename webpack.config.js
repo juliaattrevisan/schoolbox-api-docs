@@ -163,7 +163,8 @@ module.exports = {
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
         newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/initNewsItemAudienceSelect.js',
-        
+        createNewsFormActions: './library/Schoolbox/Comms/News/vue/initCreateNewsFormActions.js',
+
         //Learning
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/feeds.main.js',
