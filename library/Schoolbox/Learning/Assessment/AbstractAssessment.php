@@ -686,6 +686,22 @@ abstract class AbstractAssessment implements IAssessable
         return $subTypeName ?: $this::getDefaultTypeName();
     }
 
+
+    /**
+     * If you're not a superuser and CourseManaged is on and you're not in a Specification context,
+     * Don't update any of the fields that were readonly
+     *
+     * @param User        $user
+     * @return bool
+     */
+    public function isCourseManagedFieldsOnly(User $user): bool
+    {
+        /* I'm a regular teacher, editing a CourseManaged implementation
+         */
+        return !$user->isSuperuser() && $this->getCourseManaged() && !$this->getContext()->isSpecificationContext();
+    }
+
+
     /* Getters/Setters
      */
 

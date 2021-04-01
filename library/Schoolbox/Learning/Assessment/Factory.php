@@ -25,6 +25,7 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 
 use \Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
 use \Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
+use \Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
 
 use \Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
 use \Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
@@ -286,21 +287,6 @@ class Factory
 
 
     /**
-     * If you're not a superuser and CourseManaged is on and you're not in a Specification context,
-     * Don't update any of the fields that were readonly
-     *
-     * @param IAssessable $assessment
-     * @return bool
-     */
-    private function isCourseManagedFieldsOnly(IAssessable $assessment): bool
-    {
-        /* I'm a regular teacher, editing a CourseManaged implementation
-         */
-        return !$this->creator->isSuperuser() && $this->getCourseManaged() && !$assessment->getContext()->isSpecificationContext();
-    }
-
-
-    /**
      * Produce object from an existing assessment
      *
      * @param IAssessable $assessment
@@ -327,24 +313,46 @@ class Factory
                 $this->getSummator()
             );
         } elseif ($assessment instanceof DueWork) {
-            /** @var DueWork $originalDueWork */
 
+            /** @var DueWork $originalDueWork */
             $originalDueWork = $this->original;
-            $decorator = new DueWorkDecorator(
-                $this->getAcceptOnline(),
-                $this->getMarkType(),
-                $this->getGradingScheme(),
-                $this->getUseRubric(),
-                $this->getCapabilityMarkType(),
-                $this->getCapabilityGradeGroup(),
-                $this->getUseMarkRange(),
-                $this->getMaxMark(),
-                $this->getRubricData(),
-                $this->getAttachedFiles(),
-                $this->getSelfReviewable(),
-                $this->getSimilarityCheckEnabled(),
-                $originalDueWork
-            );
+
+            /* Pick a decorator since the Course Managed fields should remain unchanged
+             * if you're modifying a Due Work in that way
+             */
+            if ($assessment->isCourseManagedFieldsOnly($this->creator)) {
+                $decorator = new DueWorkCourseManagedDecorator(
+                    $this->getAcceptOnline(),
+                    $this->getMarkType(),
+                    $this->getGradingScheme(),
+                    $this->getUseRubric(),
+                    $this->getCapabilityMarkType(),
+                    $this->getCapabilityGradeGroup(),
+                    $this->getUseMarkRange(),
+                    $this->getMaxMark(),
+                    $this->getRubricData(),
+                    $this->getAttachedFiles(),
+                    $this->getSelfReviewable(),
+                    $this->getSimilarityCheckEnabled(),
+                    $originalDueWork
+                );
+            } else {
+                $decorator = new DueWorkDecorator(
+                    $this->getAcceptOnline(),
+                    $this->getMarkType(),
+                    $this->getGradingScheme(),
+                    $this->getUseRubric(),
+                    $this->getCapabilityMarkType(),
+                    $this->getCapabilityGradeGroup(),
+                    $this->getUseMarkRange(),
+                    $this->getMaxMark(),
+                    $this->getRubricData(),
+                    $this->getAttachedFiles(),
+                    $this->getSelfReviewable(),
+                    $this->getSimilarityCheckEnabled(),
+                    $originalDueWork
+                );
+            }
         } elseif ($assessment instanceof Task) {
             $decorator = new TaskDecorator(
                 $this->getHasSelfAssessed(),
@@ -371,7 +379,7 @@ class Factory
 
         /* Start manufacturing
          */
-        if ($this->isCourseManagedFieldsOnly($assessment)) {
+        if ($assessment->isCourseManagedFieldsOnly($this->creator)) {
 
             /* Only these fields can be updated by regular guys editing implementations
              */
