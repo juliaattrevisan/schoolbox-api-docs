@@ -80,7 +80,7 @@ class Base
      *
      * @var array
      */
-    protected $namedGrades;
+    protected $namedGrades = [];
 
     /**
      * Moves a grade from $this->grades and puts it in $this->namedGrades.
