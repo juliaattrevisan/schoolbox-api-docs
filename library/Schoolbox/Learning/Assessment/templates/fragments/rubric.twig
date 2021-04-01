@@ -349,7 +349,24 @@
     </div>
 </fieldset>
 
-<div class="row">
+{# Sare away this entire rubric div off the viewport - there are too many interactable elements
+ # to disable each of them reliably and sensibly, even though the grid itself doesn't perist.
+ # Note that rubric grids can be insanely long and wide and distinguished
+ #
+ # ...so just boot it off your screen instead. I'm sure people will laugh, but whatevers
+ # Show an informative instead
+ #}
+{% set viewportStyle = '' %}
+
+{% if courseManagedReadonly %}
+    {% set viewportStyle = 'position:absolute;margin-left:-9999px;' %}
+{% endif %}
+
+{% if courseManagedReadonly %}
+    <div class="alert-box warning">This rubric can only be modified via the course.</div>
+{% endif %}
+
+<div class="row" style="{{ viewportStyle }}">
     <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
         <div class="small-12 columns no-pad">
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
