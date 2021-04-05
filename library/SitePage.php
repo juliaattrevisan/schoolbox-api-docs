@@ -50,23 +50,16 @@ class SitePage extends Page
     /**
      * Constructor
      *
-     * @param \Aura\Di\ContainerInterface|null $di
+     * @param Aura\Di\ContainerInterface $di
      */
-    public function __construct(?Aura\Di\ContainerInterface $di = null)
+    public function __construct(Aura\Di\ContainerInterface $di)
     {
         parent::__construct();
 
-        // TODO SA-8354: ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
-        // We're almost there: only one use in \Survey_Answer_Signature::resultsForQuestion doesn't need this
-        if ($di) {
-            $this->di = $di;
-            $this->config = $di->get('config');
-        } else {
-            $this->config = ConfigLoader::getInstance();
-        }
+        $this->di     = $di;
+        $this->config = $di->get('config');
 
-
-        if(isset($_SESSION['user'])) {
+        if (isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
         }
 
@@ -74,24 +67,10 @@ class SitePage extends Page
     }
 
     /**
-     * @param  Aura\Di\ContainerInterface $di
-     * @return $this
-     */
-    public function setDi($di)
-    {
-        $this->di = $di;
-        return $this;
-    }
-
-    /**
      * @return Aura\Di\ContainerInterface
-     * @throws RuntimeException if this SitePage has no DI container.
      */
     public function getDi()
     {
-        if (!($this->di instanceof Aura\Di\ContainerInterface)) {
-            throw new RuntimeException('This SitePage does not have a dependency injector');
-        }
         return $this->di;
     }
 

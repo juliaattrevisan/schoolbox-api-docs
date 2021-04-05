@@ -16,8 +16,6 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$page->setDi($kernel->getDependencyInjector());
-
 $groupHandler = new Group;
 $externalHandler = new External_User();
 $userMapper = UserMapper::getInstance();

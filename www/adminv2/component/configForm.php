@@ -22,7 +22,6 @@ if (!($user->isSuperuser())) {
     error(19);
 }
 
-$page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (!($user->isSuperuser())) {

@@ -31,8 +31,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$page->setDi($kernel->getDependencyInjector());
-
 $eventMapper = EventMapper::getInstance();
 
 $event = false;

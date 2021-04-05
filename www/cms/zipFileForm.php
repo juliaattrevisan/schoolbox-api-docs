@@ -9,7 +9,6 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
-$page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group();
 
 $isSuperuser = $groupHandler->isSuperuser();
