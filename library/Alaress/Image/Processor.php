@@ -257,10 +257,17 @@ class Processor
      * @throws OverflowException If file contents are too big
      * @throws ImagineException\RuntimeException If cannot read file into an image
      * @throws FileNotFoundException If original storage file not found on disk
-     * @noinspection PhpDocRedundantThrowsInspection
      */
     private function loadImageFromFile(int $maxAttempts): ImageInterface
     {
+        // If using local FileSystem + otfs_verify_previous_file is ON, and the file is missing from disk, fopen()
+        // will generate a Warning that will be handled by the kernel's registered Error handler, which will throw an
+        // ErrorException. This will be caught by the Kernel's ExceptionHandler and sent to Sentry, flooding it.
+        // Let's detect this case and throw an exception before we attempt to open the file.
+        if (!$this->file->exists()) {
+            throw new FileNotFoundException("File not found");
+        }
+
         // Die extremely early if this is corrupted or giant
         //
         // It is important to check this here prior to attempting to read the file with ImageMagick because
