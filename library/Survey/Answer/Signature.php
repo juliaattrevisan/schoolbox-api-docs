@@ -56,24 +56,38 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     public function resultsForQuestion($attempt_id, $question_id) {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
-        // TODO remove this if at all possible
-        /* This is called to manufacture $sectionValues, but that's really
-         * high up to keep passing around a sitepage just for one question
-         */
-        $page = new SitePage();
-        $page->setLite(true);
-        $page->setFile('signaturePad', 'survey/answer/signature/rendered.html');
+        // Inject signature SVG template directly,
+        // instead of using a SitePage to render it
+        $template = <<<TEMPLATE
+            <script type="text/javascript">
+                $(function() {
+                    // {RESPONSE} can be empty - function wrapper caters for that possibility.
+                    (function (response) {
+                        $('[data-signature="{ID}"]').alaressSignaturePad({
+                            displayOnly: true,
+                            rescale: true,
+                            init: response
+                        });
+                    })({RESPONSE});
+                });
+            </script>
+            <div class="answer-given-container">
+                <div class="sigPad readonly" data-signature="{ID}">
+                    <div class="sigPadWrapper">
+                        <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
+                    </div>
+                </div>
+            </div>
+            TEMPLATE;
 
-        $page->setVar(array(
-            'ID'       => $attempt_id,
-            'RESPONSE' => $this->makeResponseValid($response['response']),
-        ));
+        $data['responses'] = strtr(
+            $template,
+            [
+                 '{ID}'       => $attempt_id,
+                 '{RESPONSE}' => $this->makeResponseValid($response['response'])
+            ]
+        );
 
-        $page->parse('renderedSignature', 'signaturePad');
-
-        /* SVG data
-         */
-        $data['responses'] = $page->getVar('renderedSignature');
         // Signatures are never duplicated
         $data['responsesData'] = $attempt_id;
 
