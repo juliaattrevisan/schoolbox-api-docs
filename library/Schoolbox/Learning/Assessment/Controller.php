@@ -220,6 +220,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['isSpecificationContext'] = $context->isSpecificationContext();
         $data['isFolderContext'] = $assessment->getContext() instanceof \Schoolbox\Resource\Folder\Model;
+        $data['courseManagedReadonly'] = $assessment->isCourseManagedFieldsOnly($this->getUser());
 
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
@@ -265,6 +266,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $data['isSpecificationContext'] = $assessment->getContext()->isSpecificationContext();
         $data['isFolderContext'] = $assessment->getContext() instanceof \Schoolbox\Resource\Folder\Model;
+        $data['courseManagedReadonly'] = $assessment->isCourseManagedFieldsOnly($this->getUser());
 
         $template = "@learningAssessment/update.twig";
         $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
