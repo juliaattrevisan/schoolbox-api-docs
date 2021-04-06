@@ -6,6 +6,7 @@ import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
 import momentPlugin               from '@fullcalendar/moment'
+import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
 import CreateEventModal           from './create-event-modal';
 import ExportModal                from "./export-modal";
@@ -114,7 +115,7 @@ export default {
 
     beforeMount () {
         this.calendarOptions = {
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
             views: {
                 day: {
                     titleFormat: this.$_fullCalendarHelper_dayTitleFormat,
