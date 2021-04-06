@@ -1,6 +1,7 @@
 {% autoescape 'js' %}
     <script type="text/javascript">
         window.fullCalendarConfig = {
+            schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
             userId: Number('{{ user.id }}') || null,
             folderId: null,
             // Days: 0 = max, must be at least 1.

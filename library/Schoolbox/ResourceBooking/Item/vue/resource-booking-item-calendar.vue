@@ -6,6 +6,7 @@ import dayGridPlugin              from '@fullcalendar/daygrid'
 import timeGridPlugin             from '@fullcalendar/timegrid'
 import listPlugin                 from '@fullcalendar/list'
 import momentPlugin               from '@fullcalendar/moment'
+import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
 import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/create-booking-modal';
 import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/export-booking-modal';
@@ -74,7 +75,8 @@ export default {
 
     beforeMount() {
         this.calendarOptions = {
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin ],
+            schedulerLicenseKey: this.config.schedulerLicenseKey,
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
             views: {
                 day: {
                     titleFormat: this.dayTitleFormat,

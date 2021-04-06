@@ -30,6 +30,7 @@
     }
 
     window.fullCalendarConfig = {
+        schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
         userId:             Number('{{ user.id }}'),
         canInvite:          Boolean('{{ canInvite }}'),
         token:              '{{ user.key }}',

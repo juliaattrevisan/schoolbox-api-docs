@@ -50,8 +50,8 @@
     text-align: center;
   }
   .fc-list-day-text {
-    margin: .25rem 0;
-    font-size: .875rem;
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
   }
   .fc-list-event:hover td {
     background-color: $content-ui-hover;
@@ -98,7 +98,9 @@
 }
 
 .fc-list-table {
-  td, th, tr {
+  td,
+  th,
+  tr {
     border: 0;
   }
 }
@@ -151,16 +153,16 @@
   padding: 1rem 0 0;
 }
 
-.fc .fc-button-group>*{
+.fc .fc-button-group > * {
   margin: 0 1px 0 0;
   border: 0;
 }
 
-.fc .fc-button-group>*:last-child{
+.fc .fc-button-group > *:last-child {
   margin: 0;
 }
 
-.fc .fc-axis{
+.fc .fc-axis {
   padding: 0;
 }
 
@@ -186,21 +188,22 @@
 }
 
 .fc-state-default.fc-corner-left,
-.fc-state-default.fc-corner-right{
+.fc-state-default.fc-corner-right {
   border-top-left-radius: 0px;
   border-bottom-left-radius: 0px;
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
 }
 
-.fc-state-default{
+.fc-state-default {
   text-shadow: none;
   box-shadow: none;
   background-image: none;
   text-transform: capitalize;
 }
 
-.fc-state-down, .fc-state-active {
+.fc-state-down,
+.fc-state-active {
   box-shadow: none;
 }
 
@@ -212,14 +215,14 @@
 }
 .fc .fc-event.booking.approved .fc-event-inner:before {
   /** Put a tick mark before confirmed bookings **/
-  content: '✓';
+  content: "✓";
 }
 .fc .fc-event.booking.rejected {
   font-style: italic;
 }
 .fc .fc-event.booking.rejected .fc-event-inner:before {
   /** Put a cross before rejected bookings **/
-  content: '✗';
+  content: "✗";
 }
 .fc .fc-event.booking.cancelled {
   /** Cancelled events - currently not shown, but put a line through them **/
@@ -251,6 +254,7 @@
   }
 
   // Remove the empty state: use our own state messages instead
+  .fc-list-empty,
   .fc-list-empty-wrap2 {
     display: none;
   }
@@ -265,8 +269,7 @@
  */
 #content > .row > .small-12 table .fc-day-header.fc-widget-header,
 #content > .row > .small-12 table .fc-head .fc-widget-header,
-#content > .row > .small-12 table .fc-body .fc-widget-content
-{
+#content > .row > .small-12 table .fc-body .fc-widget-content {
   padding: 0;
 }
 

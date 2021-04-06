@@ -92,6 +92,7 @@
         }
 
         window.fullCalendarConfig = {
+            schedulerLicenseKey:    {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
             token:                  '{{ token }}',
             selectedFilters:        [1,2],
             defaultDate:            '{{ selectedDate|date('Y-m-d') }}',

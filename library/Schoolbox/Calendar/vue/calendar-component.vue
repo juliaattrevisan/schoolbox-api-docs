@@ -6,6 +6,7 @@ import ExportUrlModal     from './export-url-modal';
 import interactionPlugin  from "@fullcalendar/interaction";
 import listPlugin         from "@fullcalendar/list";
 import momentPlugin       from "@fullcalendar/moment";
+import adaptivePlugin     from "@fullcalendar/adaptive";
 import axios              from "axios";
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
@@ -62,7 +63,8 @@ export default {
 
     beforeMount () {
         this.calendarOptions = {
-            plugins: [ interactionPlugin, listPlugin, momentPlugin ],
+            schedulerLicenseKey: this.config.schedulerLicenseKey,
+            plugins: [ interactionPlugin, listPlugin, momentPlugin, adaptivePlugin ],
             views: {
                 list: {
                     type: 'list',

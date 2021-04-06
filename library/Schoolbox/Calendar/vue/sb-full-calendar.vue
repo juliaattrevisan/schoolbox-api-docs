@@ -115,6 +115,7 @@ export default {
 
     beforeMount () {
         this.calendarOptions = {
+            schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
             views: {
                 day: {

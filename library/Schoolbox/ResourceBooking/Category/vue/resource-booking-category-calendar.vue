@@ -3,6 +3,7 @@
 import FullCalendar               from '@fullcalendar/vue'
 import interactionPlugin          from '@fullcalendar/interaction'
 import momentPlugin               from '@fullcalendar/moment'
+import adaptivePlugin             from '@fullcalendar/adaptive'
 import ViewEventModal             from '@schoolbox/fullcalendar/view-event-modal';
 import CreateBookingModal         from '@schoolbox/fullcalendar/resourceBooking/create-booking-modal';
 import ExportModal                from '@schoolbox/fullcalendar/resourceBooking/export-booking-modal';
@@ -67,7 +68,8 @@ export default {
 
     beforeMount () {
         this.calendarOptions = {
-            plugins: [ interactionPlugin, momentPlugin, resourceTimelinePlugin ],
+            schedulerLicenseKey: this.config.schedulerLicenseKey,
+            plugins: [ interactionPlugin, momentPlugin, resourceTimelinePlugin, adaptivePlugin ],
             views: {
                 resourceTimelineMonth: {
                     slotLabelFormat: ['ddd D']
@@ -120,7 +122,6 @@ export default {
             resources: this.config.resources,
             resourceOrder: this.resourceOrder,
             resourceAreaColumns: this.config.resourceColumns,
-            schedulerLicenseKey: this.config.schedulerLicenseKey,
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView,
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,

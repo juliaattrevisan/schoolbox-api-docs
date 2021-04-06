@@ -5,6 +5,7 @@ import interactionPlugin  from '@fullcalendar/interaction'
 import dayGridPlugin      from '@fullcalendar/daygrid'
 import timeGridPlugin     from '@fullcalendar/timegrid'
 import momentPlugin       from '@fullcalendar/moment'
+import adaptivePlugin     from '@fullcalendar/adaptive'
 import RevealModal        from '@schoolbox/reveal-modal'
 import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
 import axios              from 'axios'
@@ -158,7 +159,8 @@ export default {
             filterResourcesWithEvents: true,
         },
         this.calendarOptions = {
-            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin ],
+            schedulerLicenseKey: this.config.schedulerLicenseKey,
+            plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin, adaptivePlugin ],
             views: { 
                 resourceTimelineSemester: this.resourceTimelineSemester, 
                 resourceTimelineWeek: this.resourceTimelineWeek
@@ -205,7 +207,6 @@ export default {
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
             eventDidMount: this.eventRender,
             resources: this.resources,
-            schedulerLicenseKey: this.config.schedulerLicenseKey,
             firstDay: '1',
             initialDate: this.termStartDate,
             viewDidMount: this.viewDidMount,
