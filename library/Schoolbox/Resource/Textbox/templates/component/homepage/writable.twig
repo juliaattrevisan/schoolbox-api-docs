@@ -46,10 +46,6 @@
                     data-processing-text="Saving..."
                     class="hide">Save</button>
             <button data-action="modify" data-processing-text="Modifying">Modify</button>
-            <button data-action="delete"
-                    data-form-method="delete"
-                    data-form-action="{{ routeLookupIfAuthorized('textbox.deleteTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
-                    data-processing-text="Deleting...">Delete</button>
         </section>
     </div>
 {% else %}
