@@ -37,7 +37,7 @@
 
         <div class="alert-box">You can mass-rename your textboxes here.</div>
 
-        <form>
+        <form method="post" action="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}">
             <section>
                 <ul class="information-list expandable-card">
                     {% for usage in usages %}
@@ -73,6 +73,8 @@
                     {% endfor %}
                 </ul>
             </section>
+
+            <input type="submit" value="Save" />
         </form>
     </div>
 </div>

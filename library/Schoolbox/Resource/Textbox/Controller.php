@@ -159,4 +159,23 @@ class Controller extends Base
             'usages' => $usages
         ]));
     }
+
+
+    /**
+     * Mass rename textboxes from a set of ids
+     */
+    public function postRename(\Schoolbox\Resource\Folder\Model $folder): void
+    {
+        $tuples = $this->getRequest()->post['textbox'] ?? [];
+
+        foreach ($tuples as $textboxId => $name) {
+            new \Alaress_Probe(sprintf(
+                'Rename %s to %s',
+                $textboxId,
+                $name
+            ));
+        }
+
+        new \Alaress_Probe("Back to /homepage/{$folder->getId()}");
+    }
 }
