@@ -190,9 +190,15 @@ class Controller extends Base
          * the POST payload
          */
         foreach ($textboxes as $textbox) {
-            $textbox->setHeading($this->getRequest()->post['textbox'][$textbox->getId()]);
+            $newHeading = trim((string)$this->getRequest()->post['textbox'][$textbox->getId()]);
 
-            $this->mapper->save($textbox);
+            /* Only save headings if they had length (ignore empties)
+             */
+            if ('' !== $newHeading) {
+                $textbox->setHeading($newHeading);
+
+                $this->mapper->save($textbox);
+            }
         }
 
         /* I guess you go back to the homepage instead of the Textbox Usage index...?
