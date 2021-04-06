@@ -10,17 +10,33 @@
 namespace Schoolbox\Resource\Textbox;
 
 use Schoolbox\Comms\News\Audience\ArticleResolver;
+use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Textbox\Search\Result;
 use Schoolbox\User;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
+
 
 /**
  * @method Model createModel($idValue = null)
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
+
+    /**
+     * Textbox Homepage Controller
+     */
+    private const COMPONENT_CONTROLLER = Controller::class;
+
+
+    /**
+     * Component configuration key - alt source textboxes seem to share this config value too
+     */
+    private const COMPONENT_KEY = 'textbox';
+
+
     /**
      * Mapping
      *
@@ -37,6 +53,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->joins('categoryID', FolderMapper::class, 'id', null, null, 'category', 'category');
     }
 
+
     /**
      * @return string
      */
@@ -49,6 +66,69 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             JOIN {$this->getJoinSql('category', '', 'f')}
         ";
     }
+
+
+    /**
+     * Get a list of all the components and their homepage locations
+     * that have alt-sourced a set of textboxes that exist in $folderId
+     *
+     * @param int $folderId
+     * @return array
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function findUsage(int $folderId): array
+    {
+        $query = "
+            SELECT 
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('category', 'f')},
+                COUNT(*) AS numUsages
+            FROM component_definition cd
+            INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
+            INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
+            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+            INNER JOIN textBox ON cci.value = textBox.textBoxID
+            INNER JOIN folder f ON ci.identifier = f.id
+            WHERE cd.`class` = :controller
+            AND ccd.`key` = :key
+            AND textBox.categoryID = :folderId
+            AND textBox.deleted IS NULL
+            AND f.deleted_at IS NULL
+            GROUP BY f.id
+        ";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute([
+            'controller' => self::COMPONENT_CONTROLLER,
+            'key' => self::COMPONENT_KEY,
+            'folderId' => $folderId,
+        ]);
+
+        $stack = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $textbox = $this->hydrate($row);
+            $folder = $this->getJoinMapper('category')->hydrate($row, 'f');
+
+            if (!isset($stack[$textbox->getId()])) {
+                $stack[$textbox->getId()] = [
+                    'textbox' => $textbox,
+                    'folders' => [],
+                ];
+            }
+
+            $stack[$textbox->getId()]['folders'][$folder->getId()] = [
+                'folder' => $folder,
+                'numUsages' => $row['numUsages']
+            ];
+        }
+
+        return $stack;
+    }
+
 
     /**
      * Search the user table for particular user(s)
