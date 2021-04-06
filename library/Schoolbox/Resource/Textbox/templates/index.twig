@@ -49,12 +49,23 @@
                                             <input type="text" name="textbox[{{ usage.textbox.id }}]" value="{{ usage.textbox.heading }}" placeholder="Previously: {{ usage.textbox.heading }}">
                                         </label>
 
+                                        {% if usage.folders|length %}
                                         <p class="meta">
                                             Folder usages:
                                             {% for folderUsage in usage.folders %}
                                                 <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }} ({{ folderUsage.numUsages }})</a>{% if not loop.last %}, {% endif %}
                                             {% endfor %}
                                         </p>
+                                        {% endif %}
+
+                                        {% if usage.dashboards|length %}
+                                        <p class="meta">
+                                            Dashboard usages:
+                                            {% for dashboardUsage in usage.dashboards %}
+                                                {{ dashboardUsage.name }} ({{ dashboardUsage.numUsages }}){% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 <nav>
@@ -76,7 +87,3 @@
         </form>
     </div>
 </div>
-
-
-
-

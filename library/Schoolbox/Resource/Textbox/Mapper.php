@@ -93,7 +93,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      */
     public function findUsage(int $folderId): array
     {
-        $query = "
+        $stack = [];
+
+        /* Find homepage usages
+         */
+        $homepageUsageQuery = "
             SELECT 
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('category', 'f')},
@@ -112,17 +116,15 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             GROUP BY f.id, textBox.textBoxID
         ";
 
-        $statement = $this->database->prepare($query);
+        $homepageUsageStatement = $this->database->prepare($homepageUsageQuery);
 
-        $statement->execute([
+        $homepageUsageStatement->execute([
             'controller' => self::COMPONENT_CONTROLLER,
             'key' => self::COMPONENT_KEY,
             'folderId' => $folderId,
         ]);
 
-        $stack = [];
-
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $homepageUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
             $textbox = $this->hydrate($row);
             $folder = $this->getJoinMapper('category')->hydrate($row, 'f');
 
@@ -130,11 +132,58 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 $stack[$textbox->getId()] = [
                     'textbox' => $textbox,
                     'folders' => [],
+                    'dashboards' => [],
                 ];
             }
 
             $stack[$textbox->getId()]['folders'][$folder->getId()] = [
                 'folder' => $folder,
+                'numUsages' => $row['numUsages']
+            ];
+        }
+
+        /* Find dashboard usages too
+         */
+        $dashboardUsageQuery = "
+            SELECT 
+                {$this->getColumnString()},
+                groups.id, groups.name,
+                COUNT(*) AS numUsages
+            FROM component_definition cd
+            INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
+            INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
+            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+            INNER JOIN textBox textBox ON cci.value = textBox.textBoxID
+            INNER JOIN groups ON groups.id = ci.identifier
+            WHERE cd.`class` = 'Component_Dashboard_TextboxController'
+            AND ccd.`key` = 'textboxSearch'
+            AND textBox.deleted IS NULL
+            AND groups.deleted_at IS NULL
+            GROUP BY groups.id, textBox.textBoxID
+        ";
+
+        $dashboardUsageStatement = $this->database->prepare($dashboardUsageQuery);
+
+        $dashboardUsageStatement->execute([
+            'controller' => self::COMPONENT_CONTROLLER,
+            'key' => self::COMPONENT_KEY,
+            'folderId' => $folderId,
+        ]);
+
+        while ($row = $dashboardUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
+            $textbox = $this->hydrate($row);
+            $dashboardId = $row['id'];
+
+            if (!isset($stack[$textbox->getId()])) {
+                $stack[$textbox->getId()] = [
+                    'textbox' => $textbox,
+                    'folders' => [],
+                    'dashboards' => [],
+                ];
+            }
+
+            $stack[$textbox->getId()]['dashboards'][$dashboardId] = [
+                'name' => $row['name'],
                 'numUsages' => $row['numUsages']
             ];
         }
