@@ -22,6 +22,8 @@ use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
+use Schoolbox\Pastoral\Authorizer\Rule\IsParentCommentAllowed;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -71,7 +73,18 @@ class Module extends BaseModule
                     new Rule\IsParentOfUser(
                         $this->getExternalUser(),
                         UserMapper::getInstance(),
-                        'studentId'
+                        static function (array $params) {
+                            if (isset($params['studentId'])) {
+                                return $params['studentId'];
+                            } elseif (isset($params['recordId'])) {
+                                try {
+                                    $record = PastoralMapper::getInstance()->findById($params['recordId']);
+                                    return $record->getStudent()->getId();
+                                } catch (MapperException $e) {
+                                }
+                            }
+                            return null;
+                        }
                     )
                 );
             });
@@ -140,12 +153,21 @@ class Module extends BaseModule
             $permissionStaff
         );
 
-        $permissionCommentInsert = new Rule\All(
-            $permissionStaff,
-            new Rule\Any(
-                $permissionPastoralModeratorWrite,
+        $permissionParentCommentAllowed = new IsParentCommentAllowed();
+
+        $permissionCommentInsert = new Rule\Any(
+            new Rule\All(
+                $permissionStaff,
+                new Rule\Any(
+                    $permissionPastoralModeratorWrite,
+                    $permissionInRecordAudience,
+                    $permissionRecordOwner
+                )
+            ),
+            new Rule\All(
+                $permissionParentOfStudent,
                 $permissionInRecordAudience,
-                $permissionRecordOwner
+                $permissionParentCommentAllowed
             )
         );
 
@@ -290,11 +312,10 @@ class Module extends BaseModule
                     /** @var User $user */
                     $user = $this->getInjector()->get('user');
 
-                    $injectedValues['record'] = $pastoralDataSource->findById($user, $params['recordId']);
-
-                    /** @var PastoralAccessMapper $pastoralAccessMapper */
-                    $pastoralAccessMapper = $this->getMapperFactory()->get(PastoralAccessMapper::class);
-                    $injectedValues['access'] = $pastoralAccessMapper->findByColumn('pastoral_id', $params['recordId']);
+                    $record = $pastoralDataSource->findById($user, $params['recordId']);
+                    $injectedValues['record'] = $record;
+                    $injectedValues['access'] = $record->getAccess();
+                    $injectedValues['studentId'] = $record->getStudent()->getId();
                 } catch (MapperException $e) {
                     throw $this->generateError(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }

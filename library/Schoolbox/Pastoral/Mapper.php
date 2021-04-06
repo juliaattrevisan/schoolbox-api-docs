@@ -75,6 +75,7 @@ class Mapper extends BaseMapper
         $this->uses('body_public', self::TYPE_STRING);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('points', self::TYPE_DECIMAL);
+        $this->uses('parent_comments_allowed', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -279,6 +280,10 @@ class Mapper extends BaseMapper
         // Only hydrate related records if we're specifically told to
         if ($hydrateRelatedRecords) {
             $model->setRelatedRecords($this->getRelatedRecords($model));
+        }
+
+        if (!$model->getParentCommentsAllowed()) {
+            $model->setParentCommentsAllowed(false);
         }
 
         // Return hydrated model

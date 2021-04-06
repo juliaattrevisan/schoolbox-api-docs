@@ -73,6 +73,9 @@ class Model implements ISoftDeletable, IModel
     /** @var null|float */
     protected $points;
 
+    /** @var bool */
+    protected bool $parentCommentsAllowed;
+
     /**
      * The user who created the record.
      *
@@ -114,6 +117,7 @@ class Model implements ISoftDeletable, IModel
         $this->tags = new Collection();
         $this->relatedRecords = new Collection();
         $this->revisions = new Collection();
+        $this->parentCommentsAllowed = false;
     }
 
     /**
@@ -234,6 +238,24 @@ class Model implements ISoftDeletable, IModel
     public function getPoints()
     {
         return $this->points;
+    }
+
+    /**
+     * @param bool $parentCommentsAllowed
+     * @return self
+     */
+    public function setParentCommentsAllowed(bool $parentCommentsAllowed): self
+    {
+        $this->parentCommentsAllowed = $parentCommentsAllowed;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getParentCommentsAllowed(): bool
+    {
+        return $this->parentCommentsAllowed;
     }
 
     /**
