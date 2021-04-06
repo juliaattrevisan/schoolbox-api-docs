@@ -9157,26 +9157,6 @@ parameters:
 
 		-
 			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Pastoral/Controller.php
-
-		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Controller.php
-
-		-
-			message: "#^Ternary operator condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Controller.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Controller.php
-
-		-
-			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Management/Controller.php
 

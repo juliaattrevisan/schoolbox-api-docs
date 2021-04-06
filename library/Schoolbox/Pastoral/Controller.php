@@ -803,34 +803,24 @@ class Controller extends Base
 
         // Check if we need to create any duplicates
 
-        if (is_array($duplicateStudentIds)) {
-            $duplicates = [];
+        $duplicates = [];
 
-            foreach ($duplicateStudentIds as $duplicateStudentId) {
-                if (trim($duplicateStudentId) != '' && $duplicateStudentId != $studentId) {
-                    $duplicates[] = $duplicateStudentId;
-                }
+        foreach ($duplicateStudentIds as $duplicateStudentId) {
+            if (trim($duplicateStudentId) != '' && $duplicateStudentId != $studentId) {
+                $duplicates[] = $duplicateStudentId;
             }
-
-            // Create new pastoral record with duplicates
-
-            $this->processPastoralRecords($studentId, $post, $duplicates);
-        } else {
-            // Create new pastoral record
-
-            $this->processPastoralRecords($studentId, $post);
         }
+
+        // Create new pastoral record with duplicates
+
+        $this->processPastoralRecords($studentId, $post, $duplicates);
 
         // Go back to students pastoral record
         $encodedReturnUrl = $post->get(Redirect::RETURN_URL);
         if (!empty($encodedReturnUrl)) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
-            $returnUrl = $this->getRouter()->generate(
-                'pastoral.getStudent', [
-                'studentId' => $studentId,
-            ]
-            );
+            $returnUrl = $this->getRouter()->generate('pastoral.getStudent', ['studentId' => $studentId,]);
         }
         $this->getResponse()->redirect->afterPost($returnUrl);
     }
@@ -861,11 +851,9 @@ class Controller extends Base
 
         $duplicates = [];
 
-        if (is_array($duplicateStudentIds)) {
-            foreach ($duplicateStudentIds as $duplicateStudentId) {
-                if (trim($duplicateStudentId) != '') {
-                    $duplicates[] = $duplicateStudentId;
-                }
+        foreach ($duplicateStudentIds as $duplicateStudentId) {
+            if (trim($duplicateStudentId) != '') {
+                $duplicates[] = $duplicateStudentId;
             }
         }
 
@@ -874,11 +862,7 @@ class Controller extends Base
         // Go back to students pastoral record
 
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'pastoral.getStudent', [
-                'studentId' => $studentId,
-            ]
-            )
+            $this->getRouter()->generate('pastoral.getStudent', ['studentId' => $studentId,])
         );
     }
 
@@ -915,6 +899,7 @@ class Controller extends Base
         try {
             $type = $this->pastoralTypeMapper->findById($post->get('typeId'));
         } catch (MapperException\Deleted $e) {
+            /** @var Type\Model $type */
             $type = $e->getDeletedObject();
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
@@ -927,6 +912,7 @@ class Controller extends Base
             try {
                 $subtype = $this->pastoralSubTypeMapper->findById($subtypeId);
             } catch (MapperException\Deleted $e) {
+                /** @var SubType\Model $subtype */
                 $subtype = $e->getDeletedObject();
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
@@ -944,6 +930,7 @@ class Controller extends Base
             try {
                 $severity = $this->pastoralSeverityMapper->findById($post->get('severityId'));
             } catch (MapperException\Deleted $e) {
+                /** @var Severity\Model $severity */
                 $severity = $e->getDeletedObject();
             } catch (MapperException $e) {
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
