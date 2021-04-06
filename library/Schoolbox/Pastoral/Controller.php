@@ -479,14 +479,12 @@ class Controller extends Base
      * @param User $student
      * @throws MapperException
      */
-    public function getStudentRecordInsertForm($student): void
+    public function getStudentRecordInsertForm(User $student): void
     {
         // Throw in a blank pastoral record with the student populated
 
         $record = $this->pastoralDataSource->createModel();
-        if ($student) {
-            $record->setStudent($student);
-        }
+        $record->setStudent($student);
 
         $this->getStudentRecordUpdateForm($record);
     }
@@ -531,11 +529,9 @@ class Controller extends Base
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = 0;
-                if ($record->getStudent()) {
-                    foreach ($record->getStudent()->getParents() as $parent) {
-                        if ($parent->getRole()->getId() == $roleCurrent->getId()) {
-                            $roleUsers[$roleCurrent->getId()]++;
-                        }
+                foreach ($record->getStudent()->getParents() as $parent) {
+                    if ($parent->getRole()->getId() == $roleCurrent->getId()) {
+                        $roleUsers[$roleCurrent->getId()]++;
                     }
                 }
             }
