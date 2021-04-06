@@ -23,17 +23,27 @@
 
     <div class="admin-content">
         <div class="small-12 columns">
-            <ul class="sub-nav">
-                <li>
-                    <a href="{{ routeLookup('shaps.getAll') }}">Staff Provisioning</a>
-                </li>
-                <li class="active">
-                    <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Help Courses</a>
-                </li>
-            </ul>
+            <h2 class="subheader">Accounts</h2>
         </div>
-
         <div class="small-12 island">
+            <dl class="tabs">
+                {% block pageAll %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getAll') }}">All</a>
+                </dd>
+                {% block pageProvisioned %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getProvisioned') }}">Provisioned</a>
+                </dd>
+                {% block pageUnprovisioned %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getUnprovisioned') }}">Not Provisioned</a>
+                </dd>
+                {% block pageSearch %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getUserProvisioningSearch') }}">Search</a>
+                </dd>
+                {% block pageHelpCourses %}<dd class="active">{% endblock %}
+                    <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Courses</a>
+                </dd>
+            </dl>
+
             {% if errorMessage %}
                 <div class="empty-state">
                     <i class="icon-info"></i>

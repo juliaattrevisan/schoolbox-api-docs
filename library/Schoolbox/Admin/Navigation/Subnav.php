@@ -685,7 +685,7 @@ class Subnav
                         'children' => []
                     ],
                     '/adminv2/shaps' => [
-                        'name' => 'Schoolbox Help Provisioning',
+                        'name' => 'Schoolbox Help',
                         'visible' =>  true,
                         'children' => []
                     ],

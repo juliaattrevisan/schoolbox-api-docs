@@ -209,8 +209,8 @@
 
     <div class="admin-content">
         <div class="small-12 columns">
-            <div class="row actions-small-1">
-                <div class="small-12">
+            <div class="actions-small-1">
+                <div class="list-item">
                     <h2 class="subheader">{{ pageName }}</h2>
                 </div>
                 <nav>
@@ -224,122 +224,120 @@
             </div>
         </div>
 
-        <form data-filter-settings>
+        <form data-filter-settings class="small-12 island">
             {% for class, pageFilter in pageFilters %}
-                <div class="small-12 island">
-                    {% set definition = definitions[class] %}
-                    {% set options    = pageFilter.options %}
-                    {% set isMandatory = definition.isMandatory(pageFilter.page) %}
-                    <section data-filter="{{ definition.filter.id }}">
-                        {# Header #}
-                        <fieldset class="content">
-                            <div class="small-4 columns">
-                                <h2>{{ definition.name }}{% if isMandatory %}<span data-tooltip="" class="hint has-tip tip-top" title="This filter is mandatory for this page.">?</span>{% endif %}</h2>
-                            </div>
-                            <div class="small-4 columns" {% if isMandatory %} title="This filter is mandatory for this page."{% endif %}>
+                {% set definition = definitions[class] %}
+                {% set options    = pageFilter.options %}
+                {% set isMandatory = definition.isMandatory(pageFilter.page) %}
+                <section data-filter="{{ definition.filter.id }}">
+                    {# Header #}
+                    <fieldset class="content">
+                        <div class="small-4 columns">
+                            <h2>{{ definition.name }}{% if isMandatory %}<span data-tooltip="" class="hint has-tip tip-top" title="This filter is mandatory for this page.">?</span>{% endif %}</h2>
+                        </div>
+                        <div class="small-4 columns" {% if isMandatory %} title="This filter is mandatory for this page."{% endif %}>
+                            <input
+                                    id="checkbox_enabled_{{ definition.filter.id }}"
+                                    type="checkbox"
+                                    name="filter_enabled[{{ definition.filter.id }}]"
+                                    {% if isMandatory or pageFilter.enabled %}checked{% endif %}
+                                    {% if isMandatory %}disabled{% endif %}
+                                    data-filter-enable
+                            >
+                            <label for="checkbox_enabled_{{ definition.filter.id }}" class="checkbox-label">Enabled</label>
+
+                        </div>
+                        <div class="small-4 columns">
+                            <span data-filter-user-configurable-wrap {% if not pageFilter.enabled %} style="display:none;"{% endif %}>
                                 <input
-                                        id="checkbox_enabled_{{ definition.filter.id }}"
+                                        id="checkbox_user_configurable_{{ definition.filter.id }}"
                                         type="checkbox"
-                                        name="filter_enabled[{{ definition.filter.id }}]"
-                                        {% if isMandatory or pageFilter.enabled %}checked{% endif %}
-                                        {% if isMandatory %}disabled{% endif %}
-                                        data-filter-enable
+                                        name="filter_user_configurable[{{ definition.filter.id }}]"
+                                        {% if pageFilter.userConfigurable %}checked{% endif %}
+                                        data-filter-user-configurable
                                 >
-                                <label for="checkbox_enabled_{{ definition.filter.id }}" class="checkbox-label">Enabled</label>
-
-                            </div>
-                            <div class="small-4 columns">
-                                <span data-filter-user-configurable-wrap {% if not pageFilter.enabled %} style="display:none;"{% endif %}>
-                                    <input
-                                            id="checkbox_user_configurable_{{ definition.filter.id }}"
-                                            type="checkbox"
-                                            name="filter_user_configurable[{{ definition.filter.id }}]"
-                                            {% if pageFilter.userConfigurable %}checked{% endif %}
-                                            data-filter-user-configurable
-                                    >
-                                    <label for="checkbox_user_configurable_{{ definition.filter.id }}" class="checkbox-label">User-configurable</label>
-                                </span>
-                            </div>
-                        </fieldset>
-                        <fieldset data-filter-settings class="content"{% if not pageFilter.enabled %} style="display:none;"{% endif %}>
-                            <legend>
-                                <span data-hard-coded{% if pageFilter.userConfigurable %} style="display: none;"{% endif %}>
-                                    <strong>Hard-Coded Selections</strong>: Users' reports will be filtered to these settings. Users will be unable to view or alter these selections.
-                                </span>
-                                <span data-configurable{% if not pageFilter.userConfigurable %} style="display: none;"{% endif %}>
-                                    <strong>Default Selections</strong>: Select which options should be available to the user, and whether they are selected by default.
-                                </span>
-                            </legend>
+                                <label for="checkbox_user_configurable_{{ definition.filter.id }}" class="checkbox-label">User-configurable</label>
+                            </span>
+                        </div>
+                    </fieldset>
+                    <fieldset data-filter-settings class="content"{% if not pageFilter.enabled %} style="display:none;"{% endif %}>
+                        <legend>
+                            <span data-hard-coded{% if pageFilter.userConfigurable %} style="display: none;"{% endif %}>
+                                <strong>Hard-Coded Selections</strong>: Users' reports will be filtered to these settings. Users will be unable to view or alter these selections.
+                            </span>
+                            <span data-configurable{% if not pageFilter.userConfigurable %} style="display: none;"{% endif %}>
+                                <strong>Default Selections</strong>: Select which options should be available to the user, and whether they are selected by default.
+                            </span>
+                        </legend>
 
 
 
-                            <table>
-                                <colgroup>
-                                    <col class="column-options-label">
-                                    <col class="column-options">
-                                    <col class="column-available">
-                                    <col class="column-role-type" span="4">
-                                </colgroup>
-                                <tr>
-                                    <th colspan="3"></th>
-                                    <th colspan="{{ roleTypes | length }}">Role Types</th>
-                                </tr>
-                                <tr>
-                                    <th colspan="2"></th>
-                                    <th><span data-available-col{% if not pageFilter.userConfigurable %} style="display:none;"{% endif %}>Available</span></th>
+                        <table>
+                            <colgroup>
+                                <col class="column-options-label">
+                                <col class="column-options">
+                                <col class="column-available">
+                                <col class="column-role-type" span="4">
+                            </colgroup>
+                            <tr>
+                                <th colspan="3"></th>
+                                <th colspan="{{ roleTypes | length }}">Role Types</th>
+                            </tr>
+                            <tr>
+                                <th colspan="2"></th>
+                                <th><span data-available-col{% if not pageFilter.userConfigurable %} style="display:none;"{% endif %}>Available</span></th>
+                                {% for roleType in roleTypes %}
+                                    <th>{{ roleType | capitalize }}</th>
+                                {% endfor %}
+                            </tr>
+                            {% for option in options %}
+                                <tr data-options-row>
+                                    <th>{% if loop.first %}Options:{% endif %}</th>
+                                    <th>{{ definition.label(option.key) }}</th>
+                                    <td>
+                                        <span data-available-col {% if not pageFilter.userConfigurable %} style="display:none;"{% endif %}>
+                                            <input
+                                                    id="checkbox_{{ definition.filter.id }}_{{ option.key }}"
+                                                    type="checkbox"
+                                                    name="filter_options[{{ definition.filter.id }}][{{ option.key }}]"
+                                                    {% if option.available %}checked{% endif %}
+                                                    data-option-available
+                                                    data-filter-id="{{ definition.filter.id }}"
+                                                    data-option-key="{{ option.key }}"
+                                            >
+                                            <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}" class="checkbox-label"></label>
+                                        </span>
+                                    </td>
                                     {% for roleType in roleTypes %}
-                                        <th>{{ roleType | capitalize }}</th>
+                                        <td>
+                                            {% set default = option.defaults[roleType] ?? null %}
+                                            {% if not default %}
+                                                <span title="This role type does not have access to this page">NA</span>
+                                            {% else %}
+                                                <span data-role-type-available {% if not option.available and pageFilter.userConfigurable %}style="display: none;"{% endif %}>
+                                                    <input
+                                                            id="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}"
+                                                            type="checkbox"
+                                                            name="filter_defaults[{{ definition.filter.id }}][{{ option.key }}][{{ roleType }}]"
+                                                            {% if default.selected %}checked{% endif %}
+                                                            data-option-default
+                                                            data-filter-id="{{ definition.filter.id }}"
+                                                            data-option-key="{{ option.key }}"
+                                                            data-role-type="{{ roleType }}"
+                                                    >
+                                                    <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}" class="checkbox-label"></label>
+                                                </span>
+                                                <span data-role-type-unavailable {% if option.available or not pageFilter.userConfigurable %}style="display: none;"{% endif %}>
+                                                    <span title="Option not available on this page">-</span>
+                                                </span>
+                                            {% endif %}
+                                        </td>
                                     {% endfor %}
                                 </tr>
-                                {% for option in options %}
-                                    <tr data-options-row>
-                                        <th>{% if loop.first %}Options:{% endif %}</th>
-                                        <th>{{ definition.label(option.key) }}</th>
-                                        <td>
-                                            <span data-available-col {% if not pageFilter.userConfigurable %} style="display:none;"{% endif %}>
-                                                <input
-                                                        id="checkbox_{{ definition.filter.id }}_{{ option.key }}"
-                                                        type="checkbox"
-                                                        name="filter_options[{{ definition.filter.id }}][{{ option.key }}]"
-                                                        {% if option.available %}checked{% endif %}
-                                                        data-option-available
-                                                        data-filter-id="{{ definition.filter.id }}"
-                                                        data-option-key="{{ option.key }}"
-                                                >
-                                                <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}" class="checkbox-label"></label>
-                                            </span>
-                                        </td>
-                                        {% for roleType in roleTypes %}
-                                            <td>
-                                                {% set default = option.defaults[roleType] ?? null %}
-                                                {% if not default %}
-                                                    <span title="This role type does not have access to this page">NA</span>
-                                                {% else %}
-                                                    <span data-role-type-available {% if not option.available and pageFilter.userConfigurable %}style="display: none;"{% endif %}>
-                                                        <input
-                                                                id="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}"
-                                                                type="checkbox"
-                                                                name="filter_defaults[{{ definition.filter.id }}][{{ option.key }}][{{ roleType }}]"
-                                                                {% if default.selected %}checked{% endif %}
-                                                                data-option-default
-                                                                data-filter-id="{{ definition.filter.id }}"
-                                                                data-option-key="{{ option.key }}"
-                                                                data-role-type="{{ roleType }}"
-                                                        >
-                                                        <label for="checkbox_{{ definition.filter.id }}_{{ option.key }}_{{ roleType }}" class="checkbox-label"></label>
-                                                    </span>
-                                                    <span data-role-type-unavailable {% if option.available or not pageFilter.userConfigurable %}style="display: none;"{% endif %}>
-                                                        <span title="Option not available on this page">-</span>
-                                                    </span>
-                                                {% endif %}
-                                            </td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                        </fieldset>
-                    </section>
-                </div>
+                            {% endfor %}
+                        </table>
+                    </fieldset>
+                </section>
             {% endfor %}
 
             <div class="small-12 island">

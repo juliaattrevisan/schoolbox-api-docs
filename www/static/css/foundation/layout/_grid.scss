@@ -108,22 +108,22 @@ $align-block-grid-to-grid: true;
   @media #{$small-only} {
     padding: 0;
   }
-
-  @media #{$medium-only} {
-    padding: 0 ($wide-margin + $narrow-margin);
-  }
 }
 
 // yes, these are really really really specific, but it's for the greater good
 #content {
   > .row {
+    > .admin-content > .small-12,
+    > .admin-content > .medium-12,
     > .small-12,
     > .medium-12,
     > .list-item > .small-12,
     > .list-item > .medium-12 {
       @include mobile-padding();
     }
-    .small-12,
+    > .admin-content > .small-12,
+    > .admin-content > .medium-12,
+    > .small-12,
     .medium-12 {
       > [class*="actions-"] {
         margin-right: 0;

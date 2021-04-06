@@ -23,19 +23,26 @@
 }
 
 .admin-container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 240px auto;
+  grid-template-areas: "header header" "nav content";
+
+  @media #{$medium-down} {
+    grid-template-columns: auto;
+    grid-template-areas: "header" "nav" "content";
+  }
+  // Title area
+  > .small-12 {
+    grid-area: header;
+  }
 
   #admin-nav {
-    flex: 0 0 240px;
-    @include responsive-sides(1, padding);
-
-    @media #{$medium-down} {
-      flex: 1 100%;
-    }
+    grid-area: nav;
+    @include mobile-padding();
   }
 
   .admin-content {
-    flex: 1;
+    grid-area: content;
+    min-width: 0;
   }
 }

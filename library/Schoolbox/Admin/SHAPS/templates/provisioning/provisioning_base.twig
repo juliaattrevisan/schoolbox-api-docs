@@ -8,10 +8,10 @@
 
     <div class="admin-content">
         <div class="small-12 columns">
-            <h2 class="subheader">Schoolbox Help Provisioning</h2>
+            <h2 class="subheader">Accounts</h2>
         </div>
         <div class="small-12 island">
-            <dl class="tabs" data-tab>
+            <dl class="tabs">
                 {% block pageAll %}<dd>{% endblock %}
                     <a href="{{ routeLookup('shaps.getAll') }}">All</a>
                 </dd>
@@ -21,12 +21,13 @@
                 {% block pageUnprovisioned %}<dd>{% endblock %}
                     <a href="{{ routeLookup('shaps.getUnprovisioned') }}">Not Provisioned</a>
                 </dd>
-                {% block pageHelpCourses %}<dd>{% endblock %}
-                    <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Help Courses</a>
-                </dd>
                 {% block pageSearch %}<dd>{% endblock %}
                     <a href="{{ routeLookup('shaps.getUserProvisioningSearch') }}">Search</a>
                 </dd>
+                {% block pageHelpCourses %}<dd>{% endblock %}
+                    <a href="{{ routeLookup('shaps.getUsersInCourses') }}">Courses</a>
+                </dd>
+
             </dl>
 
             {% if errorMessage %}
