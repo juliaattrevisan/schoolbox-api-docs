@@ -22,7 +22,7 @@
                                         </label>
 
                                         <p class="meta">
-                                            Usages:
+                                            Folder usages:
                                             {% for folderUsage in usage.folders %}
                                                 <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }} ({{ folderUsage.numUsages }})</a>{% if not loop.last %}, {% endif %}
                                             {% endfor %}
