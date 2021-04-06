@@ -607,7 +607,10 @@
                                 elementDOM.classList.add('dz-max-files-reached');
                             }
                         }
-                        elementDOM.querySelector('.progress').style.display = 'none';
+                        if (elementDOM.querySelector('.progress')) {
+                            elementDOM.querySelector('.progress').style.display = 'none';
+                        }
+                        
                     }
 
                     //to display an existing file within the drop zone view, as the file has already been loaded
