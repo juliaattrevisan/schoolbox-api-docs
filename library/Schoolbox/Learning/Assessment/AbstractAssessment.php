@@ -84,9 +84,9 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @var int|null
+     * @var bool|null
      */
-    private ?int $courseManaged = null;
+    private ?bool $courseManaged = null;
 
 
     /**

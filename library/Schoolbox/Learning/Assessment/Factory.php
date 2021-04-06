@@ -104,7 +104,7 @@ class Factory
     protected $defaultOpenSpan;
 
     /**
-     * @var int
+     * @var bool
      */
     protected $courseManaged;
 

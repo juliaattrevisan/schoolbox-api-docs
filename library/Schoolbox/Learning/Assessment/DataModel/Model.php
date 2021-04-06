@@ -117,9 +117,9 @@ class Model implements ISoftDeletable
      * which will let teachers customise the assessment's fields in the modify screen
      * after it's been imported
      *
-     * @var int|null
+     * @var bool|null
      */
-    private ?int $courseManaged = null;
+    private ?bool $courseManaged = null;
 
     /**
      * The task which may or may not be associated with this assessment.
