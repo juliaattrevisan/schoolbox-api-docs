@@ -6,6 +6,7 @@
 <div class="row">
     <div class="small-12 island">
         <h1>Textbox Usages for {{ folder.name }}</h1>
+        <div class="alert-box">You can mass-rename your textboxes here.</div>
 
         <form>
             <section>
@@ -20,15 +21,18 @@
                                             <input type="text" name="textbox[{{ usage.textbox.id }}]" value="{{ usage.textbox.heading }}" placeholder="Previously: {{ usage.textbox.heading }}">
                                         </label>
 
-                                        <article>
-                                            {{ usage.textbox.body|purify }}
-                                        </article>
                                         <p class="meta">
                                             Usages:
                                             {% for folderUsage in usage.folders %}
                                                 <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }} ({{ folderUsage.numUsages }})</a>{% if not loop.last %}, {% endif %}
                                             {% endfor %}
                                         </p>
+
+                                        <hr />
+
+                                        <article>
+                                            {{ usage.textbox.body|purify }}
+                                        </article>
                                     </div>
                                 </div>
                                 <nav>
