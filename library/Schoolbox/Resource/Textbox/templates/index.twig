@@ -38,7 +38,7 @@
         {% if usages|length %}
         <form method="post" action="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}">
             <section>
-                <ul class="information-list expandable-card">
+                <ul class="information-list unsortable expandable-card">
                     {% for usage in usages %}
                         <li>
                             <div class="actions-small-2">
