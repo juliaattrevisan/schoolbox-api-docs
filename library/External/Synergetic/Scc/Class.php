@@ -24,14 +24,14 @@ class External_Synergetic_Scc_Class extends External_Synergetic_Class
         /** @var Schoolbox\User $sessionUser */
         $sessionUser = isset($_SESSION['user']) ? $_SESSION['user'] : null;
         $userExternalId = $sessionUser instanceof \Schoolbox\User ? $sessionUser->getExternalId() : null;
-        $fileSemester = $this->getDatabase()->quote($this->getExternalUser()->getCurrentSemester($userExternalId));
-        $fileYear = $this->getDatabase()->quote($this->getExternalUser()->getCurrentYear($userExternalId));
+        $fileSemester = $this->getDatabase()->smartQuote($this->getExternalUser()->getCurrentSemester($userExternalId));
+        $fileYear = $this->getDatabase()->smartQuote($this->getExternalUser()->getCurrentYear($userExternalId));
 
         $query = "
         SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel,
                         StudentClasses.StudentHouseDescription as house,
-                        vStudents.StudentMedicalAlert, 
+                        vStudents.StudentMedicalAlert,
                         vStudents.StudentSpecialNeedsFlag,
                         vStudents.StudentNonResidentFlag,
                         vStudents.StudentIBFlag,
@@ -47,8 +47,8 @@ class External_Synergetic_Scc_Class extends External_Synergetic_Class
             vStudents.FileSemester = StudentClasses.FileSemester AND
             vStudents.ID = StudentClasses.StudentID)
         WHERE $classQuery
-            AND (StudentClasses.FileYear='" . $fileYear . "')
-            AND (StudentClasses.FileSemester='" . $fileSemester . "')
+            AND (StudentClasses.FileYear={$fileYear})
+            AND (StudentClasses.FileSemester={$fileSemester})
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
         ORDER BY StudentClasses.StudentSurname, StudentClasses.StudentPreferred";

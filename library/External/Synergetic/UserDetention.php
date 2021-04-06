@@ -44,18 +44,18 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             'ID = :externalId'
         );
         $params = array(
-            ':externalId' => "'".$this->database->quote($externalId)."'",
+            ':externalId' => $this->database->smartQuote($externalId),
         );
 
         // Apply date checks
         if ($dateField) {
             if ($fromDate) {
-                $whereParts[]        = $dateField.' >= :fromDate';
-                $params[':fromDate'] = "'".$this->database->quote($fromDate->format('Y-m-d'))."'";
+                $whereParts[]        = $dateField . ' >= :fromDate';
+                $params[':fromDate'] = $this->database->smartQuote($fromDate->format('Y-m-d'));
             }
             if ($toDate) {
-                $whereParts[]      = $dateField.' <= :toDate';
-                $params[':toDate'] = "'".$this->database->quote($toDate->format('Y-m-d'))."'";
+                $whereParts[]      = $dateField . ' <= :toDate';
+                $params[':toDate'] = $this->database->smartQuote($toDate->format('Y-m-d'));
             }
         }
 
@@ -95,9 +95,9 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         $query = strtr(
             $query,
             array(
-                ':externalId' => "'".$this->database->quote($externalId)."'",
-                ':year'       => "'".$this->database->quote($year)."'",
-                ':semester'   => "'".$this->database->quote($semester)."'",
+                ':externalId' => $this->database->smartQuote($externalId),
+                ':year'       => $this->database->smartQuote($year),
+                ':semester'   => $this->database->smartQuote($semester),
             )
         );
 

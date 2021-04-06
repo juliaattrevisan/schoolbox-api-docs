@@ -61,8 +61,8 @@ class External_Tass_Class implements External_ClassInterface {
         }
 
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->smartQuote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->smartQuote($this->externalUser->getCurrentYear());
         $query = "
             SELECT DISTINCT
                 studsub.stud_code as synergy_id,
@@ -76,8 +76,8 @@ class External_Tass_Class implements External_ClassInterface {
                 '' as StudentTutorDescription
             FROM studsub
             JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
-            WHERE semester = '{$fileSemester}'
-                AND yr_study = '{$fileYear}'
+            WHERE semester = {$fileSemester}
+                AND yr_study = {$fileYear}
                 AND next_yr_ind != 'F'
                 AND student.doe <= CAST(GETDATE() AS DATE)
                 AND (student.dol IS NULL OR student.dol >= CAST(GETDATE() AS DATE))
@@ -110,10 +110,10 @@ class External_Tass_Class implements External_ClassInterface {
         }
         $classQuery = implode(' OR ', $classQueries);
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->smartQuote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->smartQuote($this->externalUser->getCurrentYear());
         $query = "SELECT DISTINCT tch_code FROM tchsub
-                    WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
+                    WHERE semester = {$fileSemester} AND year_num = {$fileYear}
                     AND ( $classQuery )";
 
         $statement = $this->database->query($query);

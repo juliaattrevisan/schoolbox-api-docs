@@ -195,7 +195,7 @@ class External_Tass_User implements External_UserInterface
         LEFT JOIN studqcaa ON s.stud_code = studqcaa.stud_code
         LEFT JOIN studscsa ON s.stud_code = studscsa.stud_code
         LEFT JOIN studvsn ON s.stud_code = studvsn.stud_code
-        WHERE s.stud_code = '{$this->database->quote($externalUserId)}'
+        WHERE s.stud_code = {$this->database->smartQuote($externalUserId)}
         ";
         $student = $this->database->trimRow($this->database->getRow($query));
         if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
@@ -232,11 +232,11 @@ class External_Tass_User implements External_UserInterface
         $charIndexQuery = [];
 
         $ids = implode(',', array_map(function ($val) {
-                return sprintf("'%s'", $this->database->quote($val));
+                return $this->database->smartQuote($val);
         }, $externalUserId));
 
         foreach ($externalUserId as $externalId) {
-            $charIndexQuery[] = "(CHARINDEX(','+ '{$this->database->quote($externalId)}' +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
+            $charIndexQuery[] = "(CHARINDEX(','+ {$this->database->smartQuote($externalId)} +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
         }
 
         $charIndexQueryString = implode(' OR ', $charIndexQuery);
@@ -435,9 +435,9 @@ class External_Tass_User implements External_UserInterface
                     FROM studsub
                     JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                     JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
-                    WHERE studsub.stud_code = '{$this->database->quote($externalId)}'
-                    AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
-                    AND yr_study = '{$this->database->quote($this->getCurrentYear($externalId))}'
+                    WHERE studsub.stud_code = {$this->database->smartQuote($externalId)}
+                    AND semester = {$this->database->smartQuote($this->getCurrentSemester($externalId))}
+                    AND yr_study = {$this->database->smartQuote($this->getCurrentYear($externalId))}
                     AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                     AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                     ORDER BY studsub.sub_code ASC, studsub.class ASC
@@ -446,9 +446,9 @@ class External_Tass_User implements External_UserInterface
             $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, ISNULL(tchsub.year_grp,subtab.year_grp) as year_grp, sub_desc, sub_type
                     FROM tchsub
                     JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
-                    WHERE tch_code = '{$this->database->quote($externalId)}'
-                    AND semester = '{$this->database->quote($this->getCurrentSemester($externalId))}'
-                    AND year_num = '{$this->database->quote($this->getCurrentYear($externalId))}'
+                    WHERE tch_code = {$this->database->smartQuote($externalId)}
+                    AND semester = {$this->database->smartQuote($this->getCurrentSemester($externalId))}
+                    AND year_num = {$this->database->smartQuote($this->getCurrentYear($externalId))}
                     ORDER BY tchsub.sub_code ASC, tchsub.class ASC
             ";
         } else {
@@ -655,7 +655,7 @@ class External_Tass_User implements External_UserInterface
                     $wherePositionText .= " AND ";
                 }
 
-                $wherePositionText .= " dbo.tel_vw_telemf.position_text NOT LIKE '" . $db->quote($category) . "'";
+                $wherePositionText .= " dbo.tel_vw_telemf.position_text NOT LIKE " . $db->smartQuote($category);
                 $count++;
             }
 
@@ -680,7 +680,7 @@ class External_Tass_User implements External_UserInterface
                     $wherePositionTitle .= " AND ";
                 }
 
-                $wherePositionTitle .= " dbo.tel_vw_telemf.position_title NOT LIKE '" . $db->quote($category) . "'";
+                $wherePositionTitle .= " dbo.tel_vw_telemf.position_title NOT LIKE " . $db->smartQuote($category);
                 $count++;
             }
 
@@ -704,7 +704,7 @@ class External_Tass_User implements External_UserInterface
                     $whereAward .= " AND ";
                 }
 
-                $whereAward .= " dbo.tel_vw_telemf.awd_code NOT LIKE '" . $db->quote($award) . "'";
+                $whereAward .= " dbo.tel_vw_telemf.awd_code NOT LIKE " . $db->smartQuote($award);
                 $count++;
             }
 
@@ -721,7 +721,7 @@ class External_Tass_User implements External_UserInterface
 
             $countAwardMappers = count($awardMappings);
             for ($i = 0; $i < $countAwardMappers; $i += 2) {
-                $caseAwardMappings .= " WHEN '" . $db->quote($awardMappings[$i]) . "' THEN '" . $db->quote($awardMappings[$i + 1]) . "'";
+                $caseAwardMappings .= " WHEN " . $db->smartQuote($awardMappings[$i]) . " THEN " . $db->smartQuote($awardMappings[$i + 1]);
             }
 
             $caseAwardMappings .= " ELSE '' END AS StaffCategoryType";

@@ -519,7 +519,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         // Split the requested room codes into a CSV string for use in the query
         array_walk($roomCodes, function (&$value, &$key) {
-            $value = "'" . $this->getDatabase()->quote($value) . "'";
+            $value = $this->getDatabase()->smartQuote($value);
         });
 
         $roomCodesCsv = implode(",", $roomCodes);
@@ -542,7 +542,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $timePeriod = $this->getDatabase()->quote($timePeriod);
+        $quotedTimePeriod = $this->getDatabase()->smartQuote($timePeriod);
 
         // Run this mess
 
@@ -573,7 +573,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
                 WHEN LEFT(TIMEPDHD.RESTRICT_YR, 1) = '*' AND TIMEPDHD.INCLUDES LIKE '%|' + TIMEFILE.YEAR + '|%' THEN 1
                 ELSE 0
               END = 1
-            WHERE TIME_PERIOD = '{$timePeriod}' AND TIMEFILE.ROOM IN ({$roomCodesCsv})
+            WHERE TIME_PERIOD = {$quotedTimePeriod} AND TIMEFILE.ROOM IN ({$roomCodesCsv})
         ";
 
         $classes = $this->getDatabase()->getAll($sql);
