@@ -63,12 +63,18 @@
                                         </label>
 
                                         {% if usage.folders|length %}
-                                        <p class="meta">
-                                            Folder usages:
-                                            {% for folderUsage in usage.folders %}
-                                                <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }} ({{ folderUsage.numUsages }})</a>{% if not loop.last %}, {% endif %}
-                                            {% endfor %}
-                                        </p>
+
+                                            {# If this folder is the only usage of it, don't display the meta
+                                             # You'd be stating the obvious
+                                             #}
+                                            {% if not (usage.folders|length == 1 and usage.folders[folder.id] is not null) %}
+                                            <p class="meta">
+                                                Folder usages:
+                                                {% for folderUsage in usage.folders %}
+                                                    <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }} ({{ folderUsage.numUsages }})</a>{% if not loop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </p>
+                                            {% endif %}
                                         {% endif %}
 
                                         {% if usage.dashboards|length %}
