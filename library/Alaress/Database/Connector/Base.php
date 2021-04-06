@@ -561,7 +561,7 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function query(string $sql, array $parameters = null): IStatement
+    public function query(string $sql, array $parameters = null): IQuery
     {
         $result = $this->prepareQuery($sql, $parameters);
         $result->execute();
