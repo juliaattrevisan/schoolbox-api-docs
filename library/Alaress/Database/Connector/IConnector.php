@@ -399,16 +399,11 @@ interface IConnector
     public function prepareProcedure(string $name): IStoredProcedure;
 
     /**
-     * Temporary implementation of `\MSSQL::quote`, to ease transition.
+     * Temporary implementation of `\MSSQL::smartQuote`, to ease transition:
+     * this function escapes a value for safe usage in a query, and wraps in
+     * quotes so that it can be interpolated directly into a string.
      *
-     * @deprecated Replace with query parameters
-     * @param mixed $value
-     * @return string
-     */
-    public function quote($value): string;
-
-    /**
-     * Temporary implementation of `\MSSQL::smartQuote`, to ease transition.
+     * Renamed to `legacyQuote` so that its legacy nature is well-communicated.
      *
      * @deprecated Replace with query parameters
      * @param mixed $value
