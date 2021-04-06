@@ -90,7 +90,7 @@ class MapperProxy
     /**
      * @var User|null
      */
-    private ?\Schoolbox\User $sessionUser = null;
+    private ?User $sessionUser;
 
 
     /**
@@ -105,7 +105,7 @@ class MapperProxy
         Mapper $baseMapper,
         Translator $translator,
         ParticipantDataSource $participantDataSource,
-        \Schoolbox\User $sessionUser
+        User $sessionUser
     ) {
         $this->baseMapper            = $baseMapper;
         $this->translator            = $translator;
