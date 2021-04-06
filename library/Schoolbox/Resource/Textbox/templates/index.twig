@@ -36,7 +36,19 @@
         <h1>Manage Textboxes</h1>
 
         {% if usages|length %}
-        <form method="post" action="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}">
+        <script type="text/javascript">
+            $(function() {
+                $('#textboxForm').alaressValidate();
+
+                $('#textboxForm input[type=text]').each(function(index, element) {
+                    $(element).rules('add', {
+                        requiredNotBlank: true
+                    });
+                });
+            })
+        </script>
+
+        <form id='textboxForm' method="post" action="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}">
             <section>
                 <ul class="information-list unsortable expandable-card">
                     {% for usage in usages %}
