@@ -72,6 +72,18 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Get a list of all the components and their homepage locations
      * that have alt-sourced a set of textboxes that exist in $folderId
      *
+     * Returns an indexed array of tuples:
+     *
+     * [
+     *     textbox id => [
+     *         'textbox' => textbox instance,
+     *         'folders' => [
+     *             'folder' => folder instance,
+     *             'numUsages' => number of occurrences in this folder
+     *         ]
+     *     ]
+     * ]
+     *
      * @param int $folderId
      * @return array
      * @throws \PDOException
