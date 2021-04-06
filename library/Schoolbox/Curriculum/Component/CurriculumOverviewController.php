@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Curriculum information component
  *
@@ -16,7 +17,6 @@ use Component_Homepage_ControllerAbstract;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
 {
@@ -43,7 +43,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
 
@@ -64,7 +64,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
                     break;
                 }
             }
-        } elseif (!$this->hasReadAccess()) {
+        } elseif ($this->getContentPermission() <= UserAccess::ACCESS_READ) {
             return false;
         }
 
@@ -85,12 +85,11 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
         return $this->renderTwigTemplate(
             $templateHandle,
             '@curriculum/component/curriculumOverview.twig',
-            array(
-                'context'  => $this->getContext(),
-                'node'     => $this->curriculumNode,
-                'readonly' => ($this->getContentPermission() <= UserAccess::ACCESS_READ),
+            [
+                'context'           => $this->getContext(),
+                'node'              => $this->curriculumNode,
                 'curriculumTagging' => $this->curriculumTagging,
-            )
+            ]
         );
     }
 }

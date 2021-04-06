@@ -6,7 +6,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ClickviewController extends Component_Homepage_ControllerAbstract
 {
@@ -37,20 +38,21 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             $this->setVar('CLICKVIEW_URL', 'online.clickview.com.au');
         }
 
-        $showEmpty = false;
+        $showEmpty    = false;
         $emptyInvalid = false;
 
         if (!strlen(trim($this->getConfig('url')))) {
             $showEmpty = true;
         } else {
-
-            $this->setVar([
-                'empty_state_block' => '',
-                'has_clickview_block' => '',
-                'online_clickview_block' => '',
-                'iframe_clickview_block' => '',
-                'HIDE_CLICKVIEW' => '',
-            ]);
+            $this->setVar(
+                [
+                    'empty_state_block'      => '',
+                    'has_clickview_block'    => '',
+                    'online_clickview_block' => '',
+                    'iframe_clickview_block' => '',
+                    'HIDE_CLICKVIEW'         => '',
+                ]
+            );
 
             /* Pattern match the necessary code out of a url given to us
              * by the Clickview web interface
@@ -76,15 +78,17 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
              * ></iframe>
              */
 
-            $patternRedir = '/clickv\.ie\/w\/[a-zA-Z0-9\-]+(?:(?:\?t=([0-9]+))?(?:\&et=([0-9]+))?)?/';
+            $patternRedir  = '/clickv\.ie\/w\/[a-zA-Z0-9\-]+(?:(?:\?t=([0-9]+))?(?:\&et=([0-9]+))?)?/';
             $patternIframe = '/(\?|&)shareCode=([a-zA-Z0-9\-]+)/i';
 
-            $matches = array();
+            $matches = [];
 
-            $this->setVar([
-                'START' => '',
-                'END' => '',
-            ]);
+            $this->setVar(
+                [
+                    'START' => '',
+                    'END'   => '',
+                ]
+            );
 
             if (preg_match($pattern, $this->getConfig('url'), $matches)) {
                 $this->setVar('VIDEO_ID', $matches[2]);
@@ -121,31 +125,29 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                     $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
             } else {
-                $showEmpty = true;
+                $showEmpty    = true;
                 $emptyInvalid = true;
             }
-
         }
 
         if ($showEmpty) {
-
             $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_config', 'empty_config_block');
             $this->setBlock('empty_state', 'empty_invalid', 'empty_invalid_block');
 
-            $this->setVar([
-                'has_clickview' => '',
-                'online_clickview' => '',
-                'iframe_clickview' => '',
-                'empty_read_block' => '',
-                'empty_config_block' => '',
-                'empty_invalid_block' => '',
-                'HIDE_CLICKVIEW' => 'hide',
-            ]);
+            $this->setVar(
+                [
+                    'has_clickview'       => '',
+                    'online_clickview'    => '',
+                    'iframe_clickview'    => '',
+                    'empty_config_block'  => '',
+                    'empty_invalid_block' => '',
+                    'HIDE_CLICKVIEW'      => 'hide',
+                ]
+            );
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
+                return false;
             } else {
                 if ($emptyInvalid) {
                     $this->parse('empty_invalid_block', 'empty_invalid');

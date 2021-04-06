@@ -99,6 +99,9 @@
                             // self.$refs.emptyState.style.removeProperty('display');
                             // self.$refs.fullCalendar.getApi().destroy();
                             self.hasEvents = false;
+                            if (!self.config.canCreateEvent && document.querySelector('#component'+self.config.componentId)) {
+                                document.querySelector('#component'+self.config.componentId).setAttribute('class', 'hide');
+                            }
                         } else {
                             self.hasEvents = true;
                         }
@@ -224,23 +227,16 @@
         </div>
 
         <!-- Empty state: show only if events have loaded, but none are shown -->
-        <div ref="emptyState" class="empty-state" v-if="eventsLoaded && !hasEvents">
+        <div ref="emptyState" class="empty-state" v-if="eventsLoaded && !hasEvents && config.canCreateEvent">
             <!-- Different variants of empty state for dashboard (no folder ID) and homepage -->
             <template v-if="config.folderId">
-                <i class="icon-calendar"></i>
-                <p v-if="config.canCreateEvent">
+                <p>
+                    <i class="icon-calendar"></i>
                     <a :href="config.createEventUrl">Add an event</a>
                     or <a :href="config.importEventsUrl">import events in bulk</a>
                     to show in this component and in group members' calendars.
                 </p>
-                <p v-else>
-                    There are no upcoming events to display at this time.
-                </p>
             </template>
-            <span v-else>
-                <i class="icon-calendar"></i>
-                <p>There are no upcoming calendar events</p>
-            </span>
         </div>
 
         <!-- Component panel: show only for homepage variant, events are loaded and some are shown -->

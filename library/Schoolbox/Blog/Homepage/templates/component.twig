@@ -57,11 +57,7 @@
 
     <div class="empty-state">
         <i class="icon-blog"></i>
-        {% if readonly %}
-            <p>There are no blog posts to view at this time.</p>
-        {% else %}
-            <p><a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}">Add a blog post</a> to share content with others and allow them to comment.</p>
-        {% endif %}
+        <p><a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}">Add a blog post</a> to share content with others and allow them to comment.</p>
     </div>
 
 {% else %}

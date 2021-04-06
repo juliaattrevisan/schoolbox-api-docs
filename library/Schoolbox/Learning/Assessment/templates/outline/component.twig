@@ -53,17 +53,11 @@
         </div>
         {% endif %}
 
-    {% else %}
+    {% elseif not readOnly %}
 
         <div class="empty-state">
             <i class="icon-course-outline"></i>
-
-            {% if readOnly %}
-                <p>There is no course to complete at this time.</p>
-            {% else %}
-                <p><a href="#" data-add-button data-instance-id="{{ componentInstance.id }}" data-intesction="homepage_selector" data-course-selector="{{ componentInstance.id }}">Import a course</a> to your class page to make tasks, {{ locale.dueWork }}, quizzes, and {{ locale.project.plural }} available for your students to complete.</p>
-            {% endif %}
-
+            <p><a href="#" data-add-button data-instance-id="{{ componentInstance.id }}" data-intesction="homepage_selector" data-course-selector="{{ componentInstance.id }}">Import a course</a> to your class page to make tasks, {{ locale.dueWork }}, quizzes, and {{ locale.project.plural }} available for your students to complete.</p>
         </div>
 
     {% endif %}

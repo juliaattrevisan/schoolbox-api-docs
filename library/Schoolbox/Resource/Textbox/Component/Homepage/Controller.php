@@ -49,7 +49,11 @@ class Controller extends Component_Homepage_ControllerAbstract
         try {
             $this->textbox = $textboxMapper->findById($this->getConfig('textbox'));
         } catch (\Schoolbox\Mapper\Exception $e) {
-            // didn't find it or it's been deleted: create a blank template box instead
+            // didn't find it or it's been deleted
+            // display this component only if current user has WRITE+ permission to this folder
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContextPermission() < UserAccess::ACCESS_WRITE) {
+                return false;
+            }
             $this->textbox = $textboxMapper
                 ->createModel()
                 ->setCategory(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));

@@ -30,9 +30,4 @@
     <div class="content">
         <article id="textBoxBody{{ textbox.id }}">{{ textbox.body | purify }}</article>
     </div>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-textbox"></i>
-        <p>There is no content to view at this time.</p>
-    </div>
 {% endif %}

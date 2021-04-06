@@ -46,7 +46,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
     /**
      * Loads the grid component into its set configuration.
      *
-     * @return true
+     * @return bool
      */
     public function execute()
     {
@@ -57,6 +57,10 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
         }
 
         $this->layout = $this->delegate->fetchLayout($this);
+        // If tile is empty and current user is read only, do not render this component
+        if ((!$this->layout || $this->layout->getTileList()->count() === 0) && !$this->hasWriteAccess()) {
+            return false;
+        }
         return true;
     }
 

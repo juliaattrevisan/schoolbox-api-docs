@@ -107,7 +107,7 @@
                                 {{ gradeLevel.lowerBound }}{% apply spaceless %}
                                 {% if loop.index0 == 0 and gradeLevel.lowerBound != 100 %}
                                     +
-                                {% elseif scheme.gradeLevels[loop.index0 - 1].lowerBound - 0.01 > gradeLevel.lowerBound %}
+                                {% elseif scheme.gradeLevels[loop.index0 - 1] is defined and scheme.gradeLevels[loop.index0 - 1].lowerBound - 0.01 > gradeLevel.lowerBound %}
                                     -{{ scheme.gradeLevels[loop.index0 - 1].lowerBound - 0.01 }}
                                 {% endif %}
                             {% endapply %}</td>

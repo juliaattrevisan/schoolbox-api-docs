@@ -17,7 +17,6 @@ use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
 use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -50,10 +49,9 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
-
             // Limit to the number specified in blog component config (0 == 'ALL')
             $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
 
@@ -62,6 +60,10 @@ class Controller extends Component_Homepage_ControllerAbstract
                 ->findByColumn("folder_id", $this->getSource()->getId())
                 ->sortBy('createdAt', 'desc')
                 ->limit($limit);
+
+            if (($this->getContentPermission() < UserAccess::ACCESS_WRITE) && !count($blogs)) {
+                return false;
+            }
 
             // Grab comments and image gallery items for each blog post
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -24,26 +25,26 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      * @see Component_Config_Filter for how this data is passed in/out of the database
      * @var array
      */
-    protected $filterFields = array('document', 'audio', 'video', 'image', 'other');
+    protected $filterFields = ['document', 'audio', 'video', 'image', 'other'];
 
     /**
      * Available sort fields for this component.
      *
      * @var array
      */
-    protected $sortFields = array('name', 'date');
+    protected $sortFields = ['name', 'date'];
 
     /**
      * Component_Homepage_FileListController constructor.
      * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param User               $user
+     * @param SitePage           $sitepage
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
 
-        $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
+        $this->fileMapper = Schoolbox\Resource\File\Mapper::getInstance();
     }
 
     /**
@@ -55,7 +56,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
 
@@ -74,7 +75,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'fileList')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -85,8 +86,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setBlock($templateHandle, 'has_file', 'has_file_block');
         $this->setBlock($templateHandle, 'empty_state', 'empty_state_block');
 
-        $configValue = (int)$this->getConfig('filter');
-        $filter = array();
+        $configValue       = (int)$this->getConfig('filter');
+        $filter            = [];
         $countFilterFields = count($this->filterFields);
         for ($i = 0; $i < $countFilterFields; $i++) {
             $j = $configValue % 2;
@@ -99,39 +100,25 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
         $fileList = $this->fileMapper->findForFolders(
             [$this->getSource()->getId()],
-            array(
-                'size' => $this->getConfig('size'),
-                'filter' => $filter,
-                'sort' => $this->getConfig('sort'),
-                'sortdir' => $this->getConfig('sortdir'),
+            [
+                'size'      => $this->getConfig('size'),
+                'filter'    => $filter,
+                'sort'      => $this->getConfig('sort'),
+                'sortdir'   => $this->getConfig('sortdir'),
                 'getHidden' => $this->getContentPermission() >= UserAccess::ACCESS_WRITE,
-            )
+            ]
         );
 
         //setup block for submission button
         $this->setVar('FILE_CAT_ID', $this->getSource()->getId());
 
-        if (count($fileList) == 0) {
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'has_file_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-            ]);
-
+        if (count($fileList) === 0) {
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-            } else {
-                $this->parse('empty_write_block', 'empty_write');
+                return false;
             }
-
+            $this->setVar('has_file_block', '');
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             /* Set up component name
              */
             $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
@@ -149,28 +136,31 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
             $this->setVar('empty_state_block', '');
 
-            $this->setVar([
-                // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
-                    ? 'Local'
-                    : Scrub::text($this->getSource()->getName()),
-                'FILES_CATEGORY_ID' => $this->getSource()->getId(),
-            ]);
+            $this->setVar(
+                [
+                    // These are for the Select Alternate Source resourcebrowser
+                    'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+                    'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
+                        ? 'Local'
+                        : Scrub::text($this->getSource()->getName()),
+                    'FILES_CATEGORY_ID'         => $this->getSource()->getId(),
+                ]
+            );
 
 
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-
-                $this->setVar([
-                    'source_folder_deleted_block' => '',
-                    'files_block'                 => '',
-                ]);
+                $this->setVar(
+                    [
+                        'source_folder_deleted_block' => '',
+                        'files_block'                 => '',
+                    ]
+                );
 
                 /** @var Schoolbox\Resource\File\Model[] $fileList */
                 if (count($fileList)) {
-                    $folderId =$this->getContext()->getId();
+                    $folderId = $this->getContext()->getId();
                     foreach ($fileList as $file) {
                         if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                             continue;
@@ -180,27 +170,27 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         $message          = $file->getModifiedBy() ? 'Last updated' : 'Posted';
                         $mostRecentDate   = $file->getModifiedAt() ?: $file->getCreatedAt();
 
-                        $this->setVar([
-                            'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
-                            'FILE_ID'              => $file->getId(),
-                            'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
-                            'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
-                            'FILE_POSTED_BY'       => $mostRecentEditor->getFullName(),
-                            'FILE_POSTED_BY_ID'    => $mostRecentEditor->getId(),
-                            'FILE_POSTED_DATE'     => $mostRecentDate->getShort(),
-                            'FILE_POSTED_RELATIVE' => $mostRecentDate->getRelativeTime(),
-                            'FILE_POSTED_MESSAGE'  => $message,
-                            'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
-                            'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
-                            'RETURN_URL'           => Redirect::RETURN_URL . '=' . Redirect::encode("/homepage/$folderId"),
-                        ]);
+                        $this->setVar(
+                            [
+                                'FILE_DESCRIPTION'     => Scrub::text($file->getTitle()),
+                                'FILE_ID'              => $file->getId(),
+                                'FILE_MIME_IMAGE'      => $file->getStorage()->getMimetype()->getIconFile(),
+                                'FILE_MIME_TYPE'       => $file->getStorage()->getMimetype()->getDescription(),
+                                'FILE_POSTED_BY'       => $mostRecentEditor->getFullName(),
+                                'FILE_POSTED_BY_ID'    => $mostRecentEditor->getId(),
+                                'FILE_POSTED_DATE'     => $mostRecentDate->getShort(),
+                                'FILE_POSTED_RELATIVE' => $mostRecentDate->getRelativeTime(),
+                                'FILE_POSTED_MESSAGE'  => $message,
+                                'FILE_COMMENT'         => nl2br(Scrub::text($file->getDescription())),
+                                'HIDDEN'               => $file->isHidden() ? 'translucent' : '',
+                                'RETURN_URL'           => Redirect::RETURN_URL . '=' . Redirect::encode("/homepage/$folderId"),
+                            ]
+                        );
 
                         if (!$this->getConfig('compactMode')) {
-                            $this->setVar(['FILE_COMPACT' => '']);
+                            $this->setVar('FILE_COMPACT', '');
                         } else {
-                            $this->setVar([
-                                'FILE_COMPACT' => 'compact',
-                            ]);
+                            $this->setVar('FILE_COMPACT', 'compact');
                         }
 
                         $this->setVar('file_modify_user_block', '');
@@ -214,11 +204,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
                         //set name
                         if ($file->getFilename() != "") {
-                            $this->setVar([
-                                'FILE_URL'          => '/send.php?id=' . $file->getId(),
-                                'FILE_TARGET'       => '_blank',
-                                'file_no_url_block' => '',
-                            ]);
+                            $this->setVar(
+                                [
+                                    'FILE_URL'          => '/send.php?id=' . $file->getId(),
+                                    'FILE_TARGET'       => '_blank',
+                                    'file_no_url_block' => '',
+                                ]
+                            );
                             $this->parse('file_url_block', 'file_url');
                         } else {
                             $this->setVar('file_url_block', '');
@@ -231,7 +223,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         }
 
                         $this->parse('files_block', 'files', true);
-
                     }
                 } else {
                     $this->setVar('files_block', '');

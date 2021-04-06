@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_WikiController extends Component_Homepage_ControllerAbstract
 {
@@ -14,7 +16,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
      *
      * @var array
      */
-    protected $sortFields = array('Heading', 'Created', 'Modified');
+    protected $sortFields = ['Heading', 'Created', 'Modified'];
 
     /**
      * Prepares data for the render function. Business logic.
@@ -25,7 +27,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
 
@@ -42,7 +44,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         if (!parent::loadTemplate($templateHandle, 'wiki')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
@@ -56,35 +58,29 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         $wikiHandler = new Wiki();
         $userHandler = new User();
 
-        $wikiList = $wikiHandler->getByCategory($this->getSource()->getId(), strtolower($this->getConfig('sort')),
-            $this->getConfig('sortdir'), $this->getConfig('size'));
+        $wikiList = $wikiHandler->getByCategory(
+            $this->getSource()->getId(), strtolower($this->getConfig('sort')),
+            $this->getConfig('sortdir'), $this->getConfig('size')
+        );
 
-        $this->setVar([
-            'WIKI_CATEGORY_ID' => $this->getSource()->getId(),
-        ]);
+        $this->setVar('WIKI_CATEGORY_ID', $this->getSource()->getId());
 
         if (!is_array($wikiList)) {
-
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'has_wiki_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-                'SOURCE_ID' => $this->getSource()->getId(),
-            ]);
+            $this->setVar(
+                [
+                    'has_wiki_block'    => '',
+                    'empty_read_block'  => '',
+                    'empty_write_block' => '',
+                    'SOURCE_ID'         => $this->getSource()->getId(),
+                ]
+            );
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-            } else {
-                $this->parse('empty_write_block', 'empty_write');
+                return false;
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setBlock('has_wiki', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_wiki', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'wiki_row', 'wiki_row_block');
@@ -129,33 +125,33 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                 foreach ($wikiList as $wiki) {
                     $modifiedTime = new Alaress_Date_Format($wiki['modified'], 'U');
 
-                    $this->setVar([
-                        'WIKI_ID' => $wiki['wikiID'],
-                        'WIKI_CATEGORYID' => $wiki['categoryID'],
-                        'WIKI_SLUG' => $wiki['slug'],
-                        'WIKI_HEADING' => Scrub::text($wiki['heading']),
-                        'WIKI_AUTHOR' => $userHandler->formatName($wiki),
-                        'WIKI_AUTHOR_ID' => $wiki['userID'],
-                        'WIKI_MODIFIED' => $modifiedTime->getRelativeTime(),
-                        'WIKI_BODY' => TextFormatter::cutSentence(Scrub::html($wiki['body']), 500),
-                    ]);
+                    $this->setVar(
+                        [
+                            'WIKI_ID'         => $wiki['wikiID'],
+                            'WIKI_CATEGORYID' => $wiki['categoryID'],
+                            'WIKI_SLUG'       => $wiki['slug'],
+                            'WIKI_HEADING'    => Scrub::text($wiki['heading']),
+                            'WIKI_AUTHOR'     => $userHandler->formatName($wiki),
+                            'WIKI_AUTHOR_ID'  => $wiki['userID'],
+                            'WIKI_MODIFIED'   => $modifiedTime->getRelativeTime(),
+                            'WIKI_BODY'       => TextFormatter::cutSentence(Scrub::html($wiki['body']), 500),
+                        ]
+                    );
 
                     if ($this->getConfig('compactMode')) {
-                        $this->setVar([
-                            'compact_hide_block' => '',
-                            'WIKI_COMPACT' => 'compact'
-                        ]);
+                        $this->setVar(
+                            [
+                                'compact_hide_block' => '',
+                                'WIKI_COMPACT'       => 'compact',
+                            ]
+                        );
                     } else {
-                        $this->setVar([
-                            'WIKI_COMPACT' => ''
-                        ]);
+                        $this->setVar('WIKI_COMPACT', '');
 
                         $this->parse('compact_hide_block', 'compact_hide');
                     }
 
-                    $this->setVar([
-                        'modify_wiki_block' => '',
-                    ]);
+                    $this->setVar('modify_wiki_block', '');
 
                     if (($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
                         || $this->getContentPermission() >= UserAccess::ACCESS_WRITE

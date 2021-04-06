@@ -18,12 +18,6 @@
                 </div>
                 <div class="empty-state" id="empty-state{COMPONENT_INSTANCE_ID}">
                     <i class="icon-image"></i>
-
-                    <!-- BEGIN empty_read -->
-                    <p>There is no image to view at this time.</p>
-                    <!-- END empty_read -->
-
-                    <!-- BEGIN empty_write -->
                     <p><a href="/cms/file/new/{ID}/{COMPONENT_INSTANCE_ID}">Post an image</a>, <a href="#" class="edit empty-edit" data-target="settings" data-state="closed">select an existing image</a> or drag and drop one on this component to display here.</p>
                     <script type="text/javascript">
                         $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
@@ -75,7 +69,6 @@
                             }
                         });
                     </script>
-                    <!-- END empty_write -->
                 </div>
             </div>
             <!-- END empty_state -->

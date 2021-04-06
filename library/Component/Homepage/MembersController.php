@@ -54,53 +54,51 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
         // Get collection of members
         $userMapper = UserMapper::getInstance();
-        if($this->getContext()->getInherit()) {
+        if ($this->getContext()->getInherit()) {
             // Find nearest nian folder
             $folderMapper = FolderMapper::getInstance();
-            $nianFolder = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
-            $userList   = $userMapper->findByAccess(
+            $nianFolder   = NNIAN::getInstance($folderMapper)->findNearestNonInheritingAncestralNode($this->getContext());
+            $userList     = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_READ,
                 $nianFolder->getId(),
-                ['lastname' => 'asc']);
-        }
-        else {
-            $userList   = $userMapper->findByAccess(
+                ['lastname' => 'asc']
+            );
+        } else {
+            $userList = $userMapper->findByAccess(
                 UserAccess::SERVICE_HOMEPAGE,
                 UserAccess::ACCESS_READ,
                 $this->getContext()->getId(),
-                ['lastname' => 'asc']);
+                ['lastname' => 'asc']
+            );
         }
 
-        if (count($userList) == 0) {
-
-            $this->setBlock('empty_state', 'empty_read_members', 'empty_read_members_block');
-            $this->setBlock('empty_state', 'empty_read_managers', 'empty_read_managers_block');
+        if (count($userList) === 0) {
             $this->setBlock('empty_state', 'empty_class', 'empty_class_block');
             $this->setBlock('empty_state', 'empty_not_group_members', 'empty_not_group_members_block');
             $this->setBlock('empty_state', 'empty_not_group_managers', 'empty_not_group_managers_block');
             $this->setBlock('empty_state', 'empty_members', 'empty_members_block');
             $this->setBlock('empty_state', 'empty_managers', 'empty_managers_block');
 
-            $this->setVar([
-                'has_members_block'              => '',
-                'empty_read_members_block'       => '',
-                'empty_read_managers_block'      => '',
-                'empty_class_block'              => '',
-                'empty_not_group_members_block'  => '',
-                'empty_not_group_managers_block' => '',
-                'empty_members_block'            => '',
-                'empty_managers_block'           => '',
-                'TYPE_NAME'                      => self::TYPE_NAME,
-                'COMPONENT_ICON'                 => 'group',
-                'ALT_COMPONENT'                  => 'class list',
-                'FOLDER_ID'                      => $this->getSource()
-                                                         ->getFolder()
-                                                         ->getId(),
-            ]);
+            $this->setVar(
+                [
+                    'has_members_block'              => '',
+                    'empty_class_block'              => '',
+                    'empty_not_group_members_block'  => '',
+                    'empty_not_group_managers_block' => '',
+                    'empty_members_block'            => '',
+                    'empty_managers_block'           => '',
+                    'TYPE_NAME'                      => self::TYPE_NAME,
+                    'COMPONENT_ICON'                 => 'group',
+                    'ALT_COMPONENT'                  => 'class list',
+                    'FOLDER_ID'                      => $this->getSource()
+                                                             ->getFolder()
+                                                             ->getId(),
+                ]
+            );
 
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getInherit()) {
-                $block = 'empty_read_members';
+                return false;
             } elseif ($this->getSource()->getFolder()->getCodes()->count()) {
                 $block = 'empty_class';
             } elseif (!$this->getSource()->getFolder()->isGroup()) {
@@ -111,21 +109,21 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
 
             $this->parse($block . '_block', $block);
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             //output users of group
             $this->setBlock('has_members', "member_email", "member_email_block");
             $this->setBlock('has_members', "person", "person_block");
             $this->setBlock('has_members', 'people_hidden', 'people_hidden_block');
             $this->setBlock('person', 'photo', 'photo_block');
 
-            $this->setVar([
-                'empty_state_block'   => '',
-                'person_block'        => '',
-                'people_hidden_block' => '',
-                'MAX_MEMBERS'         => self::MAX_MEMBERS,
-            ]);
+            $this->setVar(
+                [
+                    'empty_state_block'   => '',
+                    'person_block'        => '',
+                    'people_hidden_block' => '',
+                    'MAX_MEMBERS'         => self::MAX_MEMBERS,
+                ]
+            );
 
             /* Display options
              */
@@ -162,18 +160,17 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
             $userAccessMapper = new UserAccessMapper();
             $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
 
-            $emailObj = new Email();
+            $emailObj     = new Email();
             $emailVisible = new ValidEmailVisible($this->getExternalUser(), $this->getConfigLoader());
-            $emailall = [];
+            $emailall     = [];
 
             $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
             $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
-            $viewer = $this->getUser();
+            $viewer               = $this->getUser();
 
             if ($userListCount > 0) {
                 $i = 0;
                 foreach ($userList as $user) {
-
                     /* Member bulk email
                      */
                     if ($emailVisible->isSatisfiedBy($user, $viewer)) {
@@ -183,7 +180,6 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                     /* Member cards
                      */
                     if ($i < self::MAX_MEMBERS) {
-
                         $name = $user->getFullName();
 
                         if (count($admins)) {
@@ -207,17 +203,13 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                         /* Don't display images in list view
                          */
                         if ($this->getConfig('displayPortraits') == 'grid') {
-                            $this->setVar([
-                                'GRID_VIEW_CLASSES' => 'medium-block-grid-2',
-                            ]);
+                            $this->setVar('GRID_VIEW_CLASSES', 'medium-block-grid-2');
                         } else {
-                            $this->setVar([
-                                'GRID_VIEW_CLASSES' => '',
-                            ]);
+                            $this->setVar('GRID_VIEW_CLASSES', '');
                         }
 
                         //Hide Student Photo
-                        if($user->getRole()->isStudent()) {
+                        if ($user->getRole()->isStudent()) {
                             if ($viewer->getRole()->isStudent() && $studentPhotoHidden) {
                                 $this->setVar('photo_block', '');
                             } elseif ($viewer->getRole()->isParent() && !$viewer->isParentOf($user->loadParents())) {
@@ -225,8 +217,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             } else {
                                 $this->parse('photo_block', 'photo');
                             }
-                        }
-                        else if($user->getRole()->isStaff()) {
+                        } elseif ($user->getRole()->isStaff()) {
                             //Hide Staff Photo
                             if ($staffPhotoVisibility == 2 && $viewer->getRole()->isStudent()) {
                                 $this->setVar('photo_block', '');
@@ -235,11 +226,9 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                             } else {
                                 $this->parse('photo_block', 'photo');
                             }
-                        }
-                        else {
+                        } else {
                             $this->parse('photo_block', 'photo');
                         }
-
 
                         $this->parse('person_block', 'person', true);
                     }
@@ -253,9 +242,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 if ($this->getConfigLoader()->get('mail_enable')) {
                     $this->parse("member_email_block", "member_email");
                 } else {
-                    $this->setVar([
-                        'member_email_block' => '',
-                    ]);
+                    $this->setVar('member_email_block', '');
                 }
             } else {
                 $this->setVar('member_email_block', '');

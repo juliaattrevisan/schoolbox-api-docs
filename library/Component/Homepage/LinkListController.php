@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LinkMapper;
 
 /**
@@ -40,7 +42,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return $this->hasContextWriteAccess();
         }
 
@@ -63,27 +65,30 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         if (!parent::loadTemplate($templateHandle, 'linkList')) {
             return false;
         }
-        if(!$this->isSourceRenderable()) {
-           return $this->renderSourceUnavailableTwig($templateHandle);
+        if (!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
         // Set up component name
-        $this->setVar([
-            // These are for the Select Alternate Source resourcebrowser
-            'COMPONENT_CONFIG_SRC_ID'   => Scrub::text($this->getSource()->getId()),
-            'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
+        $this->setVar(
+            [
+                // These are for the Select Alternate Source resourcebrowser
+                'COMPONENT_CONFIG_SRC_ID'   => Scrub::text($this->getSource()->getId()),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
                     ? 'Local'
                     : Scrub::text($this->getSource()->getName()),
-            'LINK_CATEGORY_ID'          => Scrub::text($this->getSource()->getId()),
-        ]);
+                'LINK_CATEGORY_ID'          => Scrub::text($this->getSource()->getId()),
+            ]
+        );
 
         $includeHiddenLinks = $this->getContentPermission() > UserAccess::ACCESS_READ;
 
         /** @var Schoolbox\Resource\Link[] $allLinks */
         $allLinks = $this->linkMapper->findAllInCategory(
-            $this->getSource(), [
+            $this->getSource(),
+            [
                 'size'    => $this->getConfig('size'),
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),
@@ -103,6 +108,10 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         $linkCount = $this->linkMapper->countByColumnList($countParams);
 
+        if ($linkCount === 0 && ($this->getContentPermission() < UserAccess::ACCESS_WRITE)) {
+            return false;
+        }
+
         /* Need title injected here
          */
         $this->parseConfig();
@@ -113,28 +122,20 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         //setup block for submission button
         $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
 
-        if (\count($allLinks) === 0) {
+        if (count($allLinks) === 0) {
+            $this->setVar(
+                [
+                    'has_link_block' => '',
+                    'SOURCE_ID'      => Scrub::text($this->getSource()->getId()),
+                ]
+            );
 
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'has_link_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-                'SOURCE_ID' => Scrub::text($this->getSource()->getId()),
-            ]);
-
-            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_write_block', 'empty_write');
-            } else {
-                $this->parse('empty_read_block', 'empty_read');
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
+                return false;
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             //link output
             $this->setBlock('has_link', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_link', 'source_folder_exists', 'source_folder_exists_block');
@@ -150,22 +151,26 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-                $this->setVar([
-                    'source_folder_deleted_block' => '',
-                    'link_block'                  => '',
-                ]);
+                $this->setVar(
+                    [
+                        'source_folder_deleted_block' => '',
+                        'link_block'                  => '',
+                    ]
+                );
 
                 foreach ($allLinks as $currentLink) {
-                    $this->setVar([
-                        'LINK_ID'           => Scrub::text($currentLink->getId()),
-                        'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
-                        'LINK_TARGET'       => Scrub::text($currentLink->getLinkTarget()),
-                        'LINK_POSTED_BY'    => Scrub::text($currentLink->getOwner()->formatName()),
-                        'LINK_POSTED_BY_ID' => Scrub::text($currentLink->getOwner()->getId()),
-                        'LINK_POSTED_DATE'  => Scrub::text($currentLink->getSubmitted()->getShort()),
-                        'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
-                        'HIDDEN'            => $currentLink->getHidden() ? 'translucent' : '',
-                    ]);
+                    $this->setVar(
+                        [
+                            'LINK_ID'           => Scrub::text($currentLink->getId()),
+                            'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
+                            'LINK_TARGET'       => Scrub::text($currentLink->getLinkTarget()),
+                            'LINK_POSTED_BY'    => Scrub::text($currentLink->getOwner()->formatName()),
+                            'LINK_POSTED_BY_ID' => Scrub::text($currentLink->getOwner()->getId()),
+                            'LINK_POSTED_DATE'  => Scrub::text($currentLink->getSubmitted()->getShort()),
+                            'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
+                            'HIDDEN'            => $currentLink->getHidden() ? 'translucent' : '',
+                        ]
+                    );
 
                     // Owner name and optional link
                     if ($currentLink->getOwner()->isDeleted()) {

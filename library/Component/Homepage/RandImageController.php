@@ -1,10 +1,12 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RandImageController extends Component_Homepage_ControllerAbstract
@@ -50,42 +52,38 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
         // get image id
         $fileList = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
             [$this->getContext()->getId()],
-            array(
+            [
                 'size'      => 1,
                 'filter'    => ['image'],
                 'sort'      => 'random',
                 'getHidden' => false,
-            )
+            ]
         );
 
         if (!count($fileList)) {
-            $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
-            $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
-
-            $this->setVar([
-                'has_rand_image_block' => '',
-                'empty_read_block' => '',
-                'empty_write_block' => '',
-            ]);
-
             if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                $this->parse('empty_read_block', 'empty_read');
-            } else {
-                $this->parse('empty_write_block', 'empty_write');
+                return false;
             }
+            $this->setVar(
+                [
+                    'has_rand_image_block' => '',
+                    'empty_read_block'     => '',
+                    'empty_write_block'    => '',
+                ]
+            );
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             //outputs an custom image and link to the homepage
             $this->setBlock('has_rand_image', "preview_image", "preview_image_block");
             $this->setBlock('has_rand_image', 'submit_image_randimage', 'submit_image_randimage_block');
 
-            $this->setVar([
-                'empty_state_block' => '',
-                'submit_image_randimage_block' => '',
-            ]);
+            $this->setVar(
+                [
+                    'empty_state_block'            => '',
+                    'submit_image_randimage_block' => '',
+                ]
+            );
 
             if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 $this->parse('submit_image_randimage_block', 'submit_image_randimage');

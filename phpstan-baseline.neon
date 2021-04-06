@@ -10436,11 +10436,6 @@ parameters:
 			path: library/Schoolbox/Tile/Component/DashboardTileController.php
 
 		-
-			message: "#^Method Schoolbox\\\\Tile\\\\Component\\\\HomepageTileController\\:\\:execute\\(\\) should return true but returns false\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Component/HomepageTileController.php
-
-		-
 			message: "#^Method Schoolbox\\\\Tile\\\\Layout\\\\Mapper\\:\\:findById\\(\\) invoked with 2 parameters, 1 required\\.$#"
 			count: 1
 			path: library/Schoolbox/Tile/Component/TileControllerDelegate.php
