@@ -51,6 +51,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
+     * @var array
+     */
+    private $semesters;
+
+
+    /**
      * @var Cache
      */
     private static $timetableDefinitionCache;
@@ -258,23 +264,35 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function isDateWithinCurrentFileSemester(int $date): bool
     {
-        $query      = '
-            SELECT COUNT(*)
-            FROM   FileSemesters
-            WHERE  FileYear                 =  :year
-            AND    FileSemester             =  :semester
-            AND    CONVERT(DATE, StartDate) <= :startDate
-            AND    CONVERT(DATE, EndDate)   >= :endDate
+        if (!$this->semesters) {
+            $query  = '
+            SELECT FileYear, FileSemester, CONVERT(DATE, StartDate) as SemesterStart, CONVERT(DATE, EndDate) as SemesterEnd
+            FROM FileSemesters
+            WHERE ActivatedFlag = 1
+            AND EndDate >= (SELECT TOP 1 StartDate FROM FileSemesters WHERE FileYear = :year AND FileSemester = :semester ORDER BY StartDate)
         ';
-        $dateObject = Alaress_Date_Format::newFromTimestamp($date);
-        $params     = [
-            'year'      => $this->externalUser->getCurrentYear(),
-            'semester'  => $this->externalUser->getCurrentSemester(),
-            'startDate' => $dateObject->getDatabaseDate(),
-            'endDate'   => $dateObject->getDatabaseDate(),
-        ];
+            $params = [
+                'year'     => $this->externalUser->getCurrentYear(),
+                'semester' => $this->externalUser->getCurrentSemester(),
+            ];
 
-        return $this->database->query($query, $params)->fetchColumn() > 0;
+            $semesters = $this->database->query($query, $params)->fetchAll();
+
+            foreach ($semesters as $semester) {
+                $this->semesters[] = [
+                    'start' => new Alaress_Date_Format($semester['SemesterStart'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+                    'end'   => new Alaress_Date_Format($semester['SemesterEnd'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+                ];
+            }
+        }
+
+        $dateObject = Alaress_Date_Format::newFromTimestamp($date);
+        foreach ($this->semesters as $semester) {
+            if ($dateObject->between($semester['start'], $semester['end'])) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
