@@ -152,11 +152,19 @@ class Controller extends Base
      */
     public function getIndexForFolder(\Schoolbox\Resource\Folder\Model $folder): void
     {
+        $allBreadcrumbs = [
+            [$folder->getNameWithCodes(), "/homepage/{$folder->getId()}"],
+            ['Textbox', null]
+        ];
+
+        /* Textbox usage data struct
+         */
         $usages = $this->mapper->findUsage($folder->getId());
 
         $this->response->content->set($this->buildHtmlOutput('@textbox/index.twig', [
             'folder' => $folder,
-            'usages' => $usages
+            'allBreadcrumbs' => $allBreadcrumbs,
+            'usages' => $usages,
         ]));
     }
 

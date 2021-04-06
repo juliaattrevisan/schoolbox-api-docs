@@ -27,15 +27,15 @@
         });
     });
 </script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
 <div class="row">
     <div class="small-12 island">
         <h1>Manage Textboxes</h1>
 
-        <ul class="meta">
-            <li class="icon-folder"><a href="/homepage/{{ folder.id }}">{{ folder.name }}</a></li>
-        </ul>
-
-        <div class="alert-box">You can mass-rename your textboxes here.</div>
+        <div class="alert-box">You can manage your textboxes here.</div>
 
         <form method="post" action="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}">
             <section>
