@@ -4,7 +4,45 @@
  # @param array $usages  A list of textboxes in this homepage and their usage information
  #}
 <div class="row">
-    <div class="small-12 columns">
+    <div class="small-12 island">
         <h1>Textbox Usages for {{ folder.name }}</h1>
+
+        <form>
+            <section>
+                <ul class="information-list unsortable">
+                    {% for usage in usages %}
+                        <li>
+                            <div class="actions-small-2">
+                                <div class="list-item">
+                                    <div class="small-12 column">
+                                        <label>
+                                            <span class="hide-for-medium-up">Textbox</span>
+                                            <input type="text" name="textbox[{{ usage.textbox.id }}]" value="{{ usage.textbox.heading }}" placeholder="Previously: {{ usage.textbox.heading }}">
+                                        </label>
+
+                                        <article>
+                                            {{ usage.textbox.body|purify }}
+                                        </article>
+                                        <p class="meta">
+                                            Usages:
+                                            {% for folderUsage in usage.folders %}
+                                                <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }} ({{ folderUsage.numUsages }})</a>{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a class="icon-delete" data-delete="{{ usage.textbox.id }}"></a>
+                                </nav>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </form>
     </div>
 </div>
+
+
+
+

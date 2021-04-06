@@ -108,7 +108,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             AND textBox.categoryID = :folderId
             AND textBox.deleted IS NULL
             AND f.deleted_at IS NULL
-            GROUP BY f.id
+            GROUP BY f.id, textBox.textBoxID
         ";
 
         $statement = $this->database->prepare($query);
