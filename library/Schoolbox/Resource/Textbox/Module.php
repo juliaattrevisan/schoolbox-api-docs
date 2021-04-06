@@ -81,6 +81,7 @@ class Module extends BaseModule
             ];
         };
 
+        $this->register('GET', '/folder/{folderId}', 'getIndexForFolder', $folderAuth, $folderPreload);
         $this->register('POST', '/folder/{folderId:\d+}', 'createTextboxInFolder', $folderAuth, $folderPreload);
         $this->register(
             'POST',

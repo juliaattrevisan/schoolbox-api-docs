@@ -33,7 +33,8 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper                 $mapper
+     * @param Component_ConfigMapper $componentConfigMapper
      */
     public function __construct(Mapper $mapper, Component_ConfigMapper $componentConfigMapper)
     {
@@ -139,5 +140,23 @@ class Controller extends Base
         return $model->setHeading($data->heading)
                      ->setBody($data->body)
                      ->setDeletedAt(null);
+    }
+
+
+    /**
+     * A list of all the textboxes that exist in $folderId
+     * Also get an index of their usages
+     *
+     * @api GET /textbox/folder/{id}
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     */
+    public function getIndexForFolder(\Schoolbox\Resource\Folder\Model $folder): void
+    {
+        $usages = $this->mapper->findUsage($folder->getId());
+
+        $this->response->content->set($this->buildHtmlOutput('@textbox/index.twig', [
+            'folder' => $folder,
+            'usages' => $usages
+        ]));
     }
 }
