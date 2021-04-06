@@ -317,6 +317,7 @@ export default {
                             <div class="feed-comments small-12 columns">
                                 <comment-thread :thread="evidence.object.discussionThread"
                                                 :create-thread-endpoint="evidence.object._links.createThread"
+                                                :can-comment="config.canComment"
                                                 :cdn-prefix="cdnPrefix"
                                 />
                             </div>

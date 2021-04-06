@@ -29,6 +29,7 @@ export default {
     props: [
         'evidence',
         'returnUrl',
+        'canComment',
     ],
 
     /**
@@ -173,6 +174,7 @@ export default {
                         <!-- Discussion thread -->
                         <comment-thread :thread="evidence.discussionThread"
                                         :create-thread-endpoint="evidence._links.createThread"
+                                        :can-comment="this.canComment"
                                         :cdn-prefix="cdnPrefix"
                         />
                     </div>

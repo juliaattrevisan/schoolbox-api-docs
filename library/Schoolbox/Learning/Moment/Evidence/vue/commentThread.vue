@@ -34,6 +34,9 @@ export default {
         createThreadEndpoint: {
             type: String,
         },
+        canComment: {
+            type: Boolean,
+        }
     },
     data() {
         return {
@@ -127,15 +130,6 @@ export default {
          */
         allCommentsLoaded() {
             return this.commentTotalCount === this.commentLoadedCount;
-        },
-
-        /**
-         * Whether the current user is allowed to comment
-         *
-         * @returns {Boolean}
-         */
-        canComment() {
-            return window.learningEvidenceFeedConfig.canComment;
         },
 
         /**

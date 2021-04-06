@@ -49,7 +49,7 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, "www/static/javascript/components"),
-        publicPath: "/javascript/components/",
+        publicPath: "/static/javascript/components/",
         filename: "[name].bundle.js"
     },
     module: {
