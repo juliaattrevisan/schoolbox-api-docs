@@ -405,7 +405,7 @@ class Manager
                     }
                 }
                 if (!count($recognised)) {
-                    $this->logger->error($this->prefixLog("No transform factory recognises cache key: '$cacheKey'"));
+                    $this->logger->error($this->prefixLog("No transform factory recognises cache key. Hash: '$hash', CacheKey: '$cacheKey'"));
                     continue;
                 }
                 if (count($recognised) > 1) {
