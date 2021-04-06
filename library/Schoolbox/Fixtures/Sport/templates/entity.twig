@@ -48,6 +48,21 @@
                 }
             });
         });
+
+        $('#fdrop-sport').on('click', '[data-post-action]', function(event) {
+            event.preventDefault();
+
+            let element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Sport?',
+                confirmEvent: function() {
+                    $.post(element.attr('data-post-action'), function(responseText) {
+                        window.location.href = '{{ routeLookup('sportsfixturesSport.getList') }}';
+                    });
+                }
+            });
+        });
     });
 </script>
 
