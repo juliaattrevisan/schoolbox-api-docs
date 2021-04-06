@@ -33,3 +33,6 @@ v8-compile-cache-0/
 # For now, these files exist in site root. In future will be moved to /etc/[package]/
 /config.ini
 /instances.ini
+# < 21.0 static assets: exclude from <= 21.0 so it's not committed by accident
+www/css/core/*.css
+www/javascript
