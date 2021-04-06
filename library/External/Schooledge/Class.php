@@ -43,9 +43,9 @@ class External_Schooledge_Class implements External_ClassInterface
         foreach ($subCodeArray as $code) {
             if (strpos($code, '/') !== false) {
                 $codeArray = explode('/', $code, 2);
-                $classQuery .= "(tc.Name = {$this->database->smartQuote($codeArray[1])} AND t.Name = {$this->database->smartQuote($codeArray[0])}) OR ";
+                $classQuery .= "(tc.Name = {$this->database->legacyQuote($codeArray[1])} AND t.Name = {$this->database->legacyQuote($codeArray[0])}) OR ";
             } else {
-                $classQuery .= "tc.Name = {$this->database->smartQuote($code)} OR ";
+                $classQuery .= "tc.Name = {$this->database->legacyQuote($code)} OR ";
             }
         }
         return substr($classQuery, 0, -3) . ')';
@@ -63,7 +63,7 @@ class External_Schooledge_Class implements External_ClassInterface
         $quotedCode     = [];
         foreach ($allCampusCodes as $code) {
             if (strlen($code) > 0) {
-                $quotedCode[$code] = $this->database->smartQuote($code);
+                $quotedCode[$code] = $this->database->legacyQuote($code);
             }
         }
 

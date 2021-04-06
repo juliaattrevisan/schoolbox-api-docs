@@ -71,7 +71,7 @@ class External_Tass_User implements External_UserInterface
     {
         $emailList = array();
         $db = $this->database;
-        $idList    = implode(',', array_map(array($db, 'smartQuote'), $externalUserIds));
+        $idList    = implode(',', array_map(array($db, 'legacyQuote'), $externalUserIds));
 
         if (empty($idList)) {
             return array();
@@ -195,7 +195,7 @@ class External_Tass_User implements External_UserInterface
         LEFT JOIN studqcaa ON s.stud_code = studqcaa.stud_code
         LEFT JOIN studscsa ON s.stud_code = studscsa.stud_code
         LEFT JOIN studvsn ON s.stud_code = studvsn.stud_code
-        WHERE s.stud_code = {$this->database->smartQuote($externalUserId)}
+        WHERE s.stud_code = {$this->database->legacyQuote($externalUserId)}
         ";
         $student = $this->database->trimRow($this->database->getRow($query));
         if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
@@ -232,11 +232,11 @@ class External_Tass_User implements External_UserInterface
         $charIndexQuery = [];
 
         $ids = implode(',', array_map(function ($val) {
-                return $this->database->smartQuote($val);
+                return $this->database->legacyQuote($val);
         }, $externalUserId));
 
         foreach ($externalUserId as $externalId) {
-            $charIndexQuery[] = "(CHARINDEX(','+ {$this->database->smartQuote($externalId)} +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
+            $charIndexQuery[] = "(CHARINDEX(','+ {$this->database->legacyQuote($externalId)} +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
         }
 
         $charIndexQueryString = implode(' OR ', $charIndexQuery);
@@ -380,7 +380,7 @@ class External_Tass_User implements External_UserInterface
              */
             if ($parent['StudentContactAddressNumber'] == '1') {
                 foreach ($parents as $key2 => $parent2) {
-                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_mother or $this->database->smartQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_father)) {
+                    if ($parent['StudentContactID'] == $parent2['StudentContactID'] && ($this->database->legacyQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_mother or $this->database->legacyQuote(trim($parent2['StudentContactAddressNumber'])) == $addnum_father)) {
                         unset($parents[$key]);
                     }
                 }
@@ -435,9 +435,9 @@ class External_Tass_User implements External_UserInterface
                     FROM studsub
                     JOIN student ON studsub.stud_code = student.stud_code AND studsub.cmpy_code=student.cmpy_code
                     JOIN subtab ON subtab.sub_code=studsub.sub_code AND subtab.cmpy_code=studsub.cmpy_code
-                    WHERE studsub.stud_code = {$this->database->smartQuote($externalId)}
-                    AND semester = {$this->database->smartQuote($this->getCurrentSemester($externalId))}
-                    AND yr_study = {$this->database->smartQuote($this->getCurrentYear($externalId))}
+                    WHERE studsub.stud_code = {$this->database->legacyQuote($externalId)}
+                    AND semester = {$this->database->legacyQuote($this->getCurrentSemester($externalId))}
+                    AND yr_study = {$this->database->legacyQuote($this->getCurrentYear($externalId))}
                     AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                     AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                     ORDER BY studsub.sub_code ASC, studsub.class ASC
@@ -446,9 +446,9 @@ class External_Tass_User implements External_UserInterface
             $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, ISNULL(tchsub.year_grp,subtab.year_grp) as year_grp, sub_desc, sub_type
                     FROM tchsub
                     JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
-                    WHERE tch_code = {$this->database->smartQuote($externalId)}
-                    AND semester = {$this->database->smartQuote($this->getCurrentSemester($externalId))}
-                    AND year_num = {$this->database->smartQuote($this->getCurrentYear($externalId))}
+                    WHERE tch_code = {$this->database->legacyQuote($externalId)}
+                    AND semester = {$this->database->legacyQuote($this->getCurrentSemester($externalId))}
+                    AND year_num = {$this->database->legacyQuote($this->getCurrentYear($externalId))}
                     ORDER BY tchsub.sub_code ASC, tchsub.class ASC
             ";
         } else {
@@ -522,8 +522,8 @@ class External_Tass_User implements External_UserInterface
                     ON p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
                     AND (s.dol IS NULL OR s.dol >= getdate())
-                WHERE sf.par_code = {$this->database->smartQuote($parentCode)}
-                AND   sf.sfa_num  = {$this->database->smartQuote($parentNum)}
+                WHERE sf.par_code = {$this->database->legacyQuote($parentCode)}
+                AND   sf.sfa_num  = {$this->database->legacyQuote($parentNum)}
             ";
             $params = [];
 
@@ -535,7 +535,7 @@ class External_Tass_User implements External_UserInterface
                         RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
                     WHERE cmpy_code = :companyCode
-                    AND par_code = {$this->database->smartQuote($parentCode)}
+                    AND par_code = {$this->database->legacyQuote($parentCode)}
                     AND add_num IN({$addnum})
                 ";
                 $params['companyCode'] = $this->companyCode;
@@ -565,7 +565,7 @@ class External_Tass_User implements External_UserInterface
                 LEFT JOIN parent p
                     ON  p.par_code = s.par_code
                     AND p.cmpy_code = s.cmpy_code
-                WHERE s.par_code = {$this->database->smartQuote($id)}
+                WHERE s.par_code = {$this->database->legacyQuote($id)}
                 AND (s.dol IS NULL OR s.dol >= getdate())
             ";
             $params = [];
@@ -577,7 +577,7 @@ class External_Tass_User implements External_UserInterface
                         RTRIM(scr.stud_code) AS RelatedID
                     FROM studcommrules as scr
                     WHERE cmpy_code = :companyCode
-                    AND par_code = {$this->database->smartQuote($id)}
+                    AND par_code = {$this->database->legacyQuote($id)}
                     AND add_num IN ({$addnum})
                 ";
                 $params['companyCode'] = $this->companyCode;
@@ -655,7 +655,7 @@ class External_Tass_User implements External_UserInterface
                     $wherePositionText .= " AND ";
                 }
 
-                $wherePositionText .= " dbo.tel_vw_telemf.position_text NOT LIKE " . $db->smartQuote($category);
+                $wherePositionText .= " dbo.tel_vw_telemf.position_text NOT LIKE " . $db->legacyQuote($category);
                 $count++;
             }
 
@@ -680,7 +680,7 @@ class External_Tass_User implements External_UserInterface
                     $wherePositionTitle .= " AND ";
                 }
 
-                $wherePositionTitle .= " dbo.tel_vw_telemf.position_title NOT LIKE " . $db->smartQuote($category);
+                $wherePositionTitle .= " dbo.tel_vw_telemf.position_title NOT LIKE " . $db->legacyQuote($category);
                 $count++;
             }
 
@@ -704,7 +704,7 @@ class External_Tass_User implements External_UserInterface
                     $whereAward .= " AND ";
                 }
 
-                $whereAward .= " dbo.tel_vw_telemf.awd_code NOT LIKE " . $db->smartQuote($award);
+                $whereAward .= " dbo.tel_vw_telemf.awd_code NOT LIKE " . $db->legacyQuote($award);
                 $count++;
             }
 
@@ -721,7 +721,7 @@ class External_Tass_User implements External_UserInterface
 
             $countAwardMappers = count($awardMappings);
             for ($i = 0; $i < $countAwardMappers; $i += 2) {
-                $caseAwardMappings .= " WHEN " . $db->smartQuote($awardMappings[$i]) . " THEN " . $db->smartQuote($awardMappings[$i + 1]);
+                $caseAwardMappings .= " WHEN " . $db->legacyQuote($awardMappings[$i]) . " THEN " . $db->legacyQuote($awardMappings[$i + 1]);
             }
 
             $caseAwardMappings .= " ELSE '' END AS StaffCategoryType";

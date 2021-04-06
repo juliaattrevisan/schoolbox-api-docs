@@ -505,7 +505,7 @@ class External_Maze_User implements External_UserInterface
             $splitNames = explode(' ', $name);
 
             foreach ($splitNames as $splitName) {
-                $splitName = $this->getDb()->smartQuote('%' . $splitName . '%');
+                $splitName = $this->getDb()->legacyQuote('%' . $splitName . '%');
                 $query .= "
                     AND (
                         (ST.SURNAME LIKE {$splitName})
@@ -534,7 +534,7 @@ class External_Maze_User implements External_UserInterface
         /* Search for a particular form
          */
         if ($form) {
-            $form = $this->getDb()->smartQuote($form);
+            $form = $this->getDb()->legacyQuote($form);
 
             $query .= "
 				AND KGC.DESCRIPTION = {$form}
@@ -755,7 +755,7 @@ class External_Maze_User implements External_UserInterface
     public function getPortrait(User $user): ?Storage\Model
     {
 
-        $externalId = $this->getDb()->smartQuote($user->getExternalId());
+        $externalId = $this->getDb()->legacyQuote($user->getExternalId());
 
         /* Students and staff store their pics in different places
          */

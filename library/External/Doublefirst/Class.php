@@ -98,7 +98,7 @@ class External_Doublefirst_Class implements External_ClassInterface
         $subCodeArray = array_filter(explode(",", $subCode));
 
         foreach ($subCodeArray as &$code) {
-            $code = $this->database->smartQuote($code);
+            $code = $this->database->legacyQuote($code);
         }
 
         return "ygsd.SubjectDivisionName IN (" . implode(',', $subCodeArray) . ")";

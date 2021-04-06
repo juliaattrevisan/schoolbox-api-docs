@@ -579,7 +579,7 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function smartQuote($value): string
+    public function legacyQuote($value): string
     {
         return $this->broker->getPdo()->quote($value);
     }

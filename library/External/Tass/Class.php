@@ -61,8 +61,8 @@ class External_Tass_Class implements External_ClassInterface {
         }
 
 
-        $fileSemester = $this->database->smartQuote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->smartQuote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear());
         $query = "
             SELECT DISTINCT
                 studsub.stud_code as synergy_id,
@@ -110,8 +110,8 @@ class External_Tass_Class implements External_ClassInterface {
         }
         $classQuery = implode(' OR ', $classQueries);
 
-        $fileSemester = $this->database->smartQuote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->smartQuote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear());
         $query = "SELECT DISTINCT tch_code FROM tchsub
                     WHERE semester = {$fileSemester} AND year_num = {$fileYear}
                     AND ( $classQuery )";

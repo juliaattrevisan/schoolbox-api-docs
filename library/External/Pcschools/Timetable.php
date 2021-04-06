@@ -153,7 +153,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
         }
 
         $result = $this->getDatabase()
-                       ->getOne("SELECT TIMETABLE_DAY FROM CALENDAR WHERE [DATE] = {$this->getDatabase()->smartQuote($day)}");
+                       ->getOne("SELECT TIMETABLE_DAY FROM CALENDAR WHERE [DATE] = {$this->getDatabase()->legacyQuote($day)}");
 
         return intval($result) ?: 0;
     }
@@ -519,7 +519,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     {
         // Split the requested room codes into a CSV string for use in the query
         array_walk($roomCodes, function (&$value, &$key) {
-            $value = $this->getDatabase()->smartQuote($value);
+            $value = $this->getDatabase()->legacyQuote($value);
         });
 
         $roomCodesCsv = implode(",", $roomCodes);
@@ -542,7 +542,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $quotedTimePeriod = $this->getDatabase()->smartQuote($timePeriod);
+        $quotedTimePeriod = $this->getDatabase()->legacyQuote($timePeriod);
 
         // Run this mess
 

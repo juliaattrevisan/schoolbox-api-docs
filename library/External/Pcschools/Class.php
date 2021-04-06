@@ -109,9 +109,9 @@ class External_Pcschools_Class implements External_ClassInterface
             if (count($parts) > 1) {
                 [$timePeriod, $code] = $parts;
             }
-            $filter = "(tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($code)}";
+            $filter = "(tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->legacyQuote($code)}";
             if (isset($timePeriod)) {
-                $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->smartQuote($timePeriod)}";
+                $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->legacyQuote($timePeriod)}";
             }
 
             $query[] = '('.$filter.')';

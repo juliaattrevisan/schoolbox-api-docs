@@ -50,7 +50,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition(?string $externalUserId, CampusModel $campus, $day = 1, $date = null): array
     {
-        $fileYear = $this->database->smartQuote($this->externalUser->getCurrentYear($externalUserId));
+        $fileYear = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
 
         /**
          * Doublefirst has timetable definitions for each year level. This is likely to cause
@@ -430,7 +430,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             $type = 'student';
         }
 
-        $fileYear = $this->database->smartQuote($this->externalUser->getCurrentYear($externalUserId));
+        $fileYear = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
 
         $query =
             "
@@ -652,7 +652,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             }
         }
 
-        $fileYear = $this->database->smartQuote($this->externalUser->getCurrentYear($externalUserId));
+        $fileYear = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
 
         $query =
             "

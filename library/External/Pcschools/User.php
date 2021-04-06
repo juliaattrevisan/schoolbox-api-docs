@@ -97,7 +97,7 @@ class External_Pcschools_User implements External_UserInterface
         }
 
         [ $sql, $params ] = $this->queryHelper->getGetStudentContactListQuery(
-            array_map([$this->database, 'smartQuote'], $externalUserId)
+            array_map([$this->database, 'legacyQuote'], $externalUserId)
         );
 
         // Split contacts into separate father/mother/guardian/carer records
@@ -231,7 +231,7 @@ class External_Pcschools_User implements External_UserInterface
 
         $whereParts = [];
         foreach ($externalUserIds as $id) {
-            $whereParts[] = "S.STUDKEY = {$this->getDatabase()->smartQuote($id)}";
+            $whereParts[] = "S.STUDKEY = {$this->getDatabase()->legacyQuote($id)}";
         }
         $query .= ' AND ('.implode(' OR ', $whereParts) . ')';
 
@@ -302,7 +302,7 @@ class External_Pcschools_User implements External_UserInterface
                     '' AS StaffHouseDescription
                 FROM TEACHER T
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
-                WHERE T.TEACHER_CODE = {$this->getDatabase()->smartQuote($externalUserId)}
+                WHERE T.TEACHER_CODE = {$this->getDatabase()->legacyQuote($externalUserId)}
             ")
         ) ?: [];
     }

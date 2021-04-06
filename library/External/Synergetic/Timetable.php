@@ -631,10 +631,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?array $fileTypes, string $fileSemester, string $fileYear, Campus $campus): array
     {
-        $externalUserId = $this->database->smartQuote($externalUserId);
-        $fileSemester   = $this->database->smartQuote($fileSemester);
-        $fileYear       = $this->database->smartQuote($fileYear);
-        $dayNumber      = $this->database->smartQuote($dayNumber);
+        $externalUserId = $this->database->legacyQuote($externalUserId);
+        $fileSemester   = $this->database->legacyQuote($fileSemester);
+        $fileYear       = $this->database->legacyQuote($fileYear);
+        $dayNumber      = $this->database->legacyQuote($dayNumber);
         $campusString   = $campus->getExtTimetableCode();
 
         // Get file types to limit the data to
@@ -645,7 +645,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $quotedFileTypes    = empty($allowedFileTypes)
             ? ''
-            : implode("','", array_map([$this->database, 'smartQuote',], $allowedFileTypes));
+            : implode("','", array_map([$this->database, 'legacyQuote',], $allowedFileTypes));
         $allowedFileTypeSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
 
         if ($this->groupHandler->isStudent($userId)) {
@@ -718,13 +718,13 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $campusString = $campus->getExtTimetableCode();
 
-        $fileSemester = $this->database->smartQuote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->smartQuote($this->externalUser->getCurrentYear($externalUserId));
+        $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
 
         $allowedFileTypes    = $this->getAllowedFileTypes();
         $quotedFileTypes     = empty($allowedFileTypes)
             ? ''
-            : implode("','", array_map([$this->getDatabase(), 'smartQuote',], $allowedFileTypes));
+            : implode("','", array_map([$this->getDatabase(), 'legacyQuote',], $allowedFileTypes));
         $allowedFileTypesSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
 
         if ($this->groupHandler->isStudent($userId)) {
@@ -915,9 +915,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $query = strtr(
             $query,
             [
-                ':semester' => $this->database->smartQuote($this->externalUser->getCurrentSemester()),
-                ':year'     => $this->database->smartQuote($this->externalUser->getCurrentYear()),
-                ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $filteredRoomCodes)),
+                ':semester' => $this->database->legacyQuote($this->externalUser->getCurrentSemester()),
+                ':year'     => $this->database->legacyQuote($this->externalUser->getCurrentYear()),
+                ':rooms'    => implode(',', array_map([$this->database, 'legacyQuote'], $filteredRoomCodes)),
             ]
         );
 

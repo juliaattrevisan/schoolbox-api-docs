@@ -409,7 +409,7 @@ interface IConnector
      * @param mixed $value
      * @return string
      */
-    public function smartQuote($value): string;
+    public function legacyQuote($value): string;
 
     /**
      * Temporary implementation of `\MSSQL::trimAll`, to ease transition.

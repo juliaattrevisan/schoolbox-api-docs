@@ -64,7 +64,7 @@ class External_Doublefirst_User implements External_UserInterface
         $query = "
             SELECT  LastUpdated
             FROM    PupilPhoto
-            WHERE   PupilID = {$this->getDatabase()->smartQuote($user->getExternalId())}
+            WHERE   PupilID = {$this->getDatabase()->legacyQuote($user->getExternalId())}
         ";
 
         if ($photo = $this->getDatabase()->getRow($query)) {
@@ -80,7 +80,7 @@ class External_Doublefirst_User implements External_UserInterface
                 $queryPhoto = "
                     SELECT  Photo
                     FROM    PupilPhoto
-                    WHERE   PupilID = {$this->getDatabase()->smartQuote($user->getExternalId())}
+                    WHERE   PupilID = {$this->getDatabase()->legacyQuote($user->getExternalId())}
                 ";
 
                 $photo = $this->getDatabase()->getRow($queryPhoto);
@@ -107,7 +107,7 @@ class External_Doublefirst_User implements External_UserInterface
                 "
                 SELECT  LastUpdated
                 FROM    StaffPersonalDetails
-                WHERE   StaffID = {$this->getDatabase()->smartQuote($user->getExternalId())}
+                WHERE   StaffID = {$this->getDatabase()->legacyQuote($user->getExternalId())}
             ";
 
             if ($photo = $this->getDatabase()->getRow($query)) {
@@ -123,7 +123,7 @@ class External_Doublefirst_User implements External_UserInterface
                     $queryPhoto = "
                         SELECT  StaffPhoto AS Photo
                         FROM    StaffPersonalDetails
-                        WHERE   StaffID = {$this->getDatabase()->smartQuote($user->getExternalId())}
+                        WHERE   StaffID = {$this->getDatabase()->legacyQuote($user->getExternalId())}
                     ";
 
                     $photo = $this->getDatabase()->getRow($queryPhoto);
@@ -162,7 +162,7 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getParent(string $externalUserId): array
     {
-        $externalUserId = $this->database->smartQuote($externalUserId);
+        $externalUserId = $this->database->legacyQuote($externalUserId);
 
         $query =
             "
@@ -305,7 +305,7 @@ class External_Doublefirst_User implements External_UserInterface
         foreach ($ecRelationship as $relat) {
             $relationships[] = $relat["LookupDetailsID"];
         }
-        $assignation = implode(",", array_map([$this->database, 'smartQuote'], $relationships));
+        $assignation = implode(",", array_map([$this->database, 'legacyQuote'], $relationships));
 
         // TODO: The query is going to return multiple rows because there is potentially more than one emergency contact- so we are just
         // taking the first row. This is a total hack.
@@ -372,7 +372,7 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation ecmPhoneMobile4   ON ecmPhoneMobile4.ContactID = ecm.ContactID AND ecmPhoneMobile4.TelephoneType = '005'
             LEFT JOIN ContactTelephoneInformation ecmPhoneMobile5   ON ecmPhoneMobile5.ContactID = ecm.ContactID AND ecmPhoneMobile5.TelephoneType = '006'
             LEFT JOIN ContactTelephoneInformation ecmPhoneHome      ON ecmPhoneHome.ContactID = ecm.ContactID AND ecmPhoneHome.TelephoneType = 'H'
-            WHERE p.PupilID = " . $this->database->smartQuote($externalUserId) . ";
+            WHERE p.PupilID = " . $this->database->legacyQuote($externalUserId) . ";
         ";
 
         $student = [];
@@ -413,7 +413,7 @@ class External_Doublefirst_User implements External_UserInterface
             JOIN            CurrentStaff cs ON cs.StaffID = s.StaffID
             LEFT JOIN       LookupDetails cat ON cat.LookupID = 1203 AND cat.LookupDetailsID = s.StaffCategory
             LEFT JOIN       StaffTelephones tMobile on tMobile.StaffID = s.StaffID AND TelephoneType = 'M'
-            WHERE           s.StaffId = {$this->database->smartQuote($externalUserId)}
+            WHERE           s.StaffId = {$this->database->legacyQuote($externalUserId)}
         ";
 
         return $this->getDatabase()->getRow($query) ?: [];
@@ -548,7 +548,7 @@ class External_Doublefirst_User implements External_UserInterface
         // Search for a particular year level
 
         if (strlen($yearLevel)) {
-            $query .= " {$whereAnd} p.YearGroup = {$this->getDatabase()->smartQuote($yearLevel)}";
+            $query .= " {$whereAnd} p.YearGroup = {$this->getDatabase()->legacyQuote($yearLevel)}";
             $whereAnd = " AND ";
         }
 
@@ -559,7 +559,7 @@ class External_Doublefirst_User implements External_UserInterface
             $splitNames = explode(' ', $name);
 
             foreach ($splitNames as $splitName) {
-                $splitName = $this->getDatabase()->smartQuote('%' . $splitName . '%');
+                $splitName = $this->getDatabase()->legacyQuote('%' . $splitName . '%');
                 $query .= " {$whereAnd} (StudentSurname LIKE {$splitName} OR StudentPreferred LIKE {$splitName}) ";
                 $whereAnd = " AND ";
             }
@@ -572,7 +572,7 @@ class External_Doublefirst_User implements External_UserInterface
         } elseif ($boardingStatus == 'yes') {
             $codes = "";
             foreach ($this->helper->getBoardingStatuses() as $status) {
-                $status = $this->getDatabase()->smartQuote($status);
+                $status = $this->getDatabase()->legacyQuote($status);
                 if ($codes != "") {
                     $codes .= ",";
                 }
@@ -583,7 +583,7 @@ class External_Doublefirst_User implements External_UserInterface
         } else {
             $codes = "";
             foreach ($this->helper->getBoardingStatuses() as $status) {
-                $status = $this->getDatabase()->smartQuote($status);
+                $status = $this->getDatabase()->legacyQuote($status);
                 if ($codes != "") {
                     $codes .= ",";
                 }
@@ -594,7 +594,7 @@ class External_Doublefirst_User implements External_UserInterface
         }
 
         if ($form) {
-            $form = $this->getDatabase()->smartQuote($form);
+            $form = $this->getDatabase()->legacyQuote($form);
             $query .= "{$whereAnd} p.Form = {$form}";
         }
 
@@ -644,7 +644,7 @@ class External_Doublefirst_User implements External_UserInterface
             return [];
         }
 
-        $ids = implode(',', array_map([$this->database, 'smartQuote'], $externalUserId));
+        $ids = implode(',', array_map([$this->database, 'legacyQuote'], $externalUserId));
 
         $query =
             "
