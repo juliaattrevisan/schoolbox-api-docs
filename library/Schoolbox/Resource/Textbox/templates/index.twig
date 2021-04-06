@@ -35,6 +35,7 @@
     <div class="small-12 island">
         <h1>Manage Textboxes</h1>
 
+        {% if usages|length %}
         <form method="post" action="{{ routeLookupIfAuthorized('textbox.postRename', {folderId: folder.id, folder: folder}) }}">
             <section>
                 <ul class="information-list expandable-card">
@@ -85,5 +86,12 @@
 
             <input type="submit" value="Save" />
         </form>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-textbox"></i>
+                <p>There aren't any textboxes associated with this folder.</p>
+            </div>
+
+        {% endif %}
     </div>
 </div>
