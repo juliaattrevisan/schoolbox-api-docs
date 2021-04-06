@@ -151,7 +151,11 @@
 
     {% else %}
         <iframe id="ltiFrame{{ componentInstanceId }}"
+
+                {% if provider %}
                 style="height:{{ height }}px;"
+                {% endif %}
+
                 src="{{ routeLookup('ltiConsumer.getLaunch', {
                     providerId: providerId,
                     componentId: componentInstanceId,

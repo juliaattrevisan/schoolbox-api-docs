@@ -62,7 +62,28 @@ class Controller extends Component_Homepage_ControllerAbstract
         // or none is set up for this component.
         $providerId = $this->getConfig('ltiprovider');
         $readOnly   = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
-        if ($readOnly && (!$providerId || $providers->count() === 0)) {
+
+        /* A provider was selected, but it might be deleted or otherwise nonexistent
+         * Don't render the component
+         *
+         * If you're a staff member, you'll get an error screen from a nonexistent provider
+         * but we check here, so we can set the iframe height accordingly
+         */
+        $provider = null;
+
+        if ($providerId) {
+            try {
+                $provider = $this->providerMapper->findById($providerId);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                // noop
+            }
+        }
+
+        /* No provider selected, selected provider is nonexistent, or no providers exist
+         * Don't render the component
+         */
+        if ($readOnly && (!$providerId || !$provider || $providers->count() === 0)) {
             return false;
         }
 
@@ -74,6 +95,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'componentInstanceId' => $this->getInstance()->getId(),
                 'providerId' => $this->getConfig('ltiprovider'),
                 'providers' => $providers,
+                'provider' => $provider,
                 'folderId' => $this->getContext()->getId(),
                 'height' => preg_replace("/[^0-9]/", "", $this->getConfig('pixel')),
                 'user' => $this->getUser()

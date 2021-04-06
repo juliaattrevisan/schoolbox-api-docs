@@ -83,7 +83,7 @@ class Module extends BaseModule
                 // Preload LTI provider record
 
                 if (array_key_exists('providerId', $params)) {
-                    $returnArray['provider'] = $providerMapper->findById($params['providerId']);
+                    $returnArray['provider'] = $providerMapper->findByIdWithFallback($params['providerId']);
                 }
 
                 // Preload homepage component

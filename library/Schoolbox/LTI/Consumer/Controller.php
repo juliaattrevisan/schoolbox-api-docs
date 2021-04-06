@@ -297,8 +297,25 @@ class Controller extends Base
      *
      * @throws AuraRouteNotFound
      */
-    public function getLaunch($provider, $component, $folder)
+    public function getLaunch(Provider $provider, Component_ControllerAbstract $component, Folder $folder)
     {
+
+        /* Provider might have been deleted, despite existing here
+         * despite being specified - this means it's been deleted one way or another
+         * so return a generic error template instead
+         */
+        if ($provider->isDeleted()) {
+            $this->getResponse()->content->set([
+                'template' => '@ltiConsumer/unavailable.twig',
+                'format'   => 'nochrome',
+                'data'     => [
+                    'provider'  => $provider,
+                ],
+            ]);
+
+            return;
+        }
+
         $this->user = $this->getUser();
 
         switch ($provider->getLaunchType()) {
