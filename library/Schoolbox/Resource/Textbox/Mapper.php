@@ -21,6 +21,7 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
 
 /**
  * @method Model createModel($idValue = null)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  */
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {

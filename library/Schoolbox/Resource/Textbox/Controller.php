@@ -162,20 +162,33 @@ class Controller extends Base
 
 
     /**
-     * Mass rename textboxes from a set of ids
+     * Mass rename textboxes from a set of (textboxId, name) tuples
+     *
+     * @param FolderModel $folder
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
      */
     public function postRename(\Schoolbox\Resource\Folder\Model $folder): void
     {
         $tuples = $this->getRequest()->post['textbox'] ?? [];
 
-        foreach ($tuples as $textboxId => $name) {
-            new \Alaress_Probe(sprintf(
-                'Rename %s to %s',
-                $textboxId,
-                $name
-            ));
+        $textboxes = $this->mapper->findByColumn('textboxID', array_keys($tuples))->indexBy('id');
+
+        /* Update heading for every textbox requested
+         *
+         * If someone else deletes a textbox in the meantime it's okay,
+         * because findByColumn won't retrieve it despite it being in
+         * the POST payload
+         */
+        foreach ($textboxes as $textbox) {
+            $textbox->setHeading($this->getRequest()->post['textbox'][$textbox->getId()]);
+
+            $this->mapper->save($textbox);
         }
 
-        new \Alaress_Probe("Back to /homepage/{$folder->getId()}");
+        /* I guess you go back to the homepage instead of the Textbox Usage index...?
+         */
+        $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
     }
 }
