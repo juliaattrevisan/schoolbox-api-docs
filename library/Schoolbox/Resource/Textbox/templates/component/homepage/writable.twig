@@ -34,6 +34,12 @@
 
             {# This has a button-like styling, but isn't actually a button #}
             <button data-role="dirty-indicator" class="hide" disabled>Changes not saved</button>
+
+            {% set manageAllRoute = routeLookupIfAuthorized('textbox.getIndexForFolder', {folderId: textbox.category.id, folder: textbox.category}) %}
+            {% if manageAllRoute %}
+            <a class='button' href="{{ manageAllRoute }}">Manage All</a>
+            {% endif %}
+
             <button data-action="save"
                     data-form-method="put"
                     data-form-action="{{ routeLookupIfAuthorized('textbox.updateTextbox', {id: textbox.id, textbox: textbox, folder: textbox.category}) }}"
