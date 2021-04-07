@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\CourseManagedFields;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
@@ -999,7 +1000,9 @@ class MapperProxy
 
                     /* Disregard grid changes if CourseManaged is on
                      */
-                    if (!$assessable->isCourseManagedFieldsOnly($this->sessionUser)) {
+                    $courseManagedFields = new CourseManagedFields($this->sessionUser, $assessable);
+
+                    if (!$courseManagedFields->isReadonly()) {
                         $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
                     }
                 }

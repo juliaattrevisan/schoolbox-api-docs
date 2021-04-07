@@ -306,6 +306,10 @@ class Factory
             $this->context->setAssessables(new GenericCollection(IAssessable::class, [$assessment]));
         }
 
+        /* Some facts about Course Managed Fields
+         */
+        $courseManagedFields = new CourseManagedFields($this->creator, $assessment);
+
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
@@ -320,7 +324,7 @@ class Factory
             /* Pick a decorator since the Course Managed fields should remain unchanged
              * if you're modifying a Due Work in that way
              */
-            if ($assessment->isCourseManagedFieldsOnly($this->creator)) {
+            if ($courseManagedFields->isReadonly()) {
                 $decorator = new DueWorkCourseManagedDecorator(
                     $this->getAcceptOnline(),
                     $this->getMarkType(),
@@ -379,7 +383,7 @@ class Factory
 
         /* Start manufacturing
          */
-        if ($assessment->isCourseManagedFieldsOnly($this->creator)) {
+        if ($courseManagedFields->isReadonly()) {
 
             /* Only these fields can be updated by regular guys editing implementations
              */

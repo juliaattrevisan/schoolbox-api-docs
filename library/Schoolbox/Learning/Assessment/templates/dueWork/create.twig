@@ -4,19 +4,11 @@
  # Used to create a new assessment or update an existing one
  # Used in multiple ocntexts: creating due work in a homepage or in a course
  #
- # @param bool $isCourseManagedFieldsOnly
+ # @param CourseManagedFields courseManaged
  #     Decide whether certain fields are readonly due to being Course Managed
  #     Some users can change the values; some can't. Note also this template
- #     is shared among multiple workflows and use cases so I've expanded the
- #     usages here instead of trying to be ninja
- #
- #     courseMangedReadonly = false
- #     * Superusers can always change the Course Managed setting and all the other related settings too
- #     * If you're editing this assessment in a Specification context then you can change all the settings
- #     * Assessment implementation, but courseManaged is off so you can change this as you want
- #
- #     courseManagedReadonly = true
- #     * Assessment implementation, but courseManaged is on, so you cannot change this setting nor any of the other ones
+ #     is shared among multiple workflows and use cases - see the class docblock
+ #     for more details on how these facts play out
 #}
 
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
