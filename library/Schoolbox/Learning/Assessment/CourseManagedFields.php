@@ -103,6 +103,28 @@ class CourseManagedFields
      */
     public function isMutable(): bool
     {
+        $context = $this->assessment->getContext();
+
+        /* Assessments directly inside a folder aren't part of a course
+         */
+        if ($context instanceof Folder\Model) {
+            return false;
+        }
+
+        /* You're editing an implementation that doesn't have the course managed restriction applied
+         * You can freely mutate its special fields as you wish
+         */
+        if ($context->isImplementationContext() && !$this->assessment->getCourseManaged()) {
+            return true;
+        }
+
+        /* You're editing a specification context, so you can apply this Course Managed setting and
+         * inflict it upon whomever imports your course
+         */
+        if ($context->isSpecificationContext()) {
+            return true;
+        }
+
         return false;
     }
 
