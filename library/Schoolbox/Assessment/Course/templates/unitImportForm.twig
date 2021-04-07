@@ -1,18 +1,20 @@
-{# Usage:
-    {% include '@course/unitImportForm.twig' with {
-        action:           string                       - {'import'|'modify'}
-        courseSpecId:     int
-        folderIds:        null|int[]                   - null if a 'modify''. List of folder IDs if 'import'
-        courseImplId:     int|null                     - null if an 'import', int if 'modify'
-        unitsImpls:       UnitImplementation[]         - with null IDs if an 'import'.
-        componentId:      int|null                     - (optional)
-    } only %}
-#}
-
+{##
+ # Unit Import Form
+ #
+ # action:           string                       - {'import'|'modify'}
+ # courseSpecId:     int
+ # folderIds:        null|int[]                   - null if a 'modify''. List of folder IDs if 'import'
+ # courseImplId:     int|null                     - null if an 'import', int if 'modify'
+ # unitsImpls:       UnitImplementation[]         - with null IDs if an 'import'.
+ # componentId:      int|null                     - (optional)
+ #
+ # @param string $importedAlreadyRedirect  Redirect here if you cancel the import
+ # @param bool $importedAlready            Whether your course spec exists in at least one Course Outline in at least
+ #                                         one of your target folders (nominally cast as a bool, but is actullay a
+ #                                         list of folder ids)
+ #}
 <!-- BEGIN custom_head -->
-
 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/attacher.hide-watch.js"></script>
-
 <script>
     $(function() {
         $('[data-warn-removal]').click(function(e) {
@@ -30,7 +32,6 @@
         });
     });
 </script>
-
 <!-- END custom_head -->
 
 {% if units is defined and units.length > 0 %}
@@ -45,90 +46,111 @@
 
 {% else %}
 
-    {# There were units in the selected course, create import form #}
+    {# If this course was imported already, trigger a confirm dialog which
+     # redirects you back to Course List
+     #}
+    {% if importedAlready %}
+        <script>
+            $(function() {
+                $.fn.confirmDialog({
+                    header: 'Import Duplicate Course',
+                    text: '<div class="alert-box warning">The course you are importing has already been imported to the class(es) selected. Continuing will result in duplicated content.</div><p>If you are trying to update an existing course outline with new activities, please use the "Copy this activity into classes" button on the course modify page instead of re-importing.',
+                    format: 'html',
+                    confirmLabel: 'Continue',
+                    cancelLabel: 'Cancel',
+                    confirmEvent: function() {
+                        // noop (keep going in the mage)
+                    },
+                    cancelEvent: function() {
+                        window.location.href = '{{ importedAlreadyRedirect }}';
+                    }
+                });
+            });
+        </script>
+    {% endif %}
 
+    {# There were units in the selected course, create import form #}
     <input type="hidden" name="action" value="{{ action|e }}"/>
     <input type="hidden" name="course_spec_id" value="{{ courseSpecId }}"/>
     <input type="hidden" name="import_folders" value="{{ folderIds|join(',') }}" />
     <input type="hidden" name="course_impl_id" value="{{ courseImplId is defined ? courseImplId : '' }}"/>
     <input type="hidden" name="component_id" value="{{ componentId }}"/>
+    <p data-mage-helptext class="meta">Select the {{ locale.unit.plural }} to be imported, and their open and close dates.</p>
+    <ul class="information-list">
 
-        <p data-mage-helptext class="meta">Select the {{ locale.unit.plural }} to be imported, and their open and close dates.</p>
-        <ul class="information-list">
+        {# Iterate each unit and create checkbox and dates #}
 
-            {# Iterate each unit and create checkbox and dates #}
+        {% for unitImpl in unitsImpls %}
+            {% set canReadUnitSpec = canReadUnitSpecs[unitImpl.specification.id] %}
+            {% set showUnitRow     = canReadUnitSpec or unitImpl.id %}
+            {% if showUnitRow %}
+                <li>
+                    <input name="unit[{{ loop.index }}][unit_spec_id]" type="hidden" value="{{ unitImpl.specification.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_impl_id]" type="hidden" value="{{ unitImpl.id }}" />
 
-            {% for unitImpl in unitsImpls %}
-                {% set canReadUnitSpec = canReadUnitSpecs[unitImpl.specification.id] %}
-                {% set showUnitRow     = canReadUnitSpec or unitImpl.id %}
-                {% if showUnitRow %}
-                    <li>
-                        <input name="unit[{{ loop.index }}][unit_spec_id]" type="hidden" value="{{ unitImpl.specification.id }}" />
-                        <input name="unit[{{ loop.index }}][unit_impl_id]" type="hidden" value="{{ unitImpl.id }}" />
+                    <div class="list-item" data-type="unit_row">
 
-                        <div class="list-item" data-type="unit_row">
+                        {# Checkbox & Unit Name #}
 
-                            {# Checkbox & Unit Name #}
-
-                            <div class="card small-12 large-4">
-                                <input id="import-{{ loop.index }}"
-                                       name="unit[{{ loop.index }}][import]"
-                                       {% if unitImpl.id %}checked="checked" data-warn-removal {% endif %}
-                                       type="checkbox"
-                                       data-interaction="enable"
-                                       data-checkbox-group="unit" />
-                                <label for="import-{{ loop.index }}" class="checkbox-label">
-                                    {{ unitImpl.title }}<span class="icon-unit"></span>
-                                </label>
-                            </div>
-
-                            {# Open Date #}
-
-                            <div class="small-12 medium-6 large-4 columns" data-hide-watch="#import-{{ loop.index }}">
-                                <label for="open_date-{{ loop.index }}">Open</label>
-                                <input id="open_date-{{ loop.index }}"
-                                       name="unit[{{ loop.index }}][open_date]"
-                                       type="text"
-                                       value="{{ unitImpl.openDate ? unitImpl.openDate.localShort : '' }}"
-                                       data-role="open_date"
-                                       data-index="{{ loop.index }}"
-                                       data-datepicker
-                                       data-datepicker-buttontext=""
-                                       data-datesync-enddate="#due_date-{{ loop.index }}" />
-                            </div>
-
-                            {# Close Date #}
-
-                            <div class="small-12 medium-6 large-4 columns" data-hide-watch="#import-{{ loop.index }}">
-                                <label for="due_date-{{ loop.index }}">Close</label>
-                                <input id="due_date-{{ loop.index }}"
-                                       name="unit[{{ loop.index }}][close_date]"
-                                       type="text"
-                                       value="{{ unitImpl.dueDate ? unitImpl.dueDate.localShort : '' }}"
-                                       data-role="due_date"
-                                       data-index="{{ loop.index }}"
-                                       data-datepicker
-                                       data-datesync-startdate="#open_date-{{ loop.index }}"
-                                       data-datepicker-buttontext="" />
-                            </div>
-
-
-                            {% if not canReadUnitSpec %}
-                                <div class="small-12 columns" data-hide-watch="#import-{{ loop.index }}">
-                                    <p class="alert-box warning">
-                                        You don't have read permission on this unit. You can modify the dates on assessments,
-                                        and remove them from your course, but you can't add assessments that aren't already in
-                                        your course.
-                                    </p>
-                                </div>
-                            {% endif %}
-
+                        <div class="card small-12 large-4">
+                            <input id="import-{{ loop.index }}"
+                                   name="unit[{{ loop.index }}][import]"
+                                   {% if unitImpl.id %}checked="checked" data-warn-removal {% endif %}
+                                   type="checkbox"
+                                   data-interaction="enable"
+                                   data-checkbox-group="unit" />
+                            <label for="import-{{ loop.index }}" class="checkbox-label">
+                                {{ unitImpl.title }}<span class="icon-unit"></span>
+                            </label>
                         </div>
-                    </li>
-                {% endif %}
-            {% endfor %}
 
-        </ul>
+                        {# Open Date #}
+
+                        <div class="small-12 medium-6 large-4 columns" data-hide-watch="#import-{{ loop.index }}">
+                            <label for="open_date-{{ loop.index }}">Open</label>
+                            <input id="open_date-{{ loop.index }}"
+                                   name="unit[{{ loop.index }}][open_date]"
+                                   type="text"
+                                   value="{{ unitImpl.openDate ? unitImpl.openDate.localShort : '' }}"
+                                   data-role="open_date"
+                                   data-index="{{ loop.index }}"
+                                   data-datepicker
+                                   data-datepicker-buttontext=""
+                                   data-datesync-enddate="#due_date-{{ loop.index }}" />
+                        </div>
+
+                        {# Close Date #}
+
+                        <div class="small-12 medium-6 large-4 columns" data-hide-watch="#import-{{ loop.index }}">
+                            <label for="due_date-{{ loop.index }}">Close</label>
+                            <input id="due_date-{{ loop.index }}"
+                                   name="unit[{{ loop.index }}][close_date]"
+                                   type="text"
+                                   value="{{ unitImpl.dueDate ? unitImpl.dueDate.localShort : '' }}"
+                                   data-role="due_date"
+                                   data-index="{{ loop.index }}"
+                                   data-datepicker
+                                   data-datesync-startdate="#open_date-{{ loop.index }}"
+                                   data-datepicker-buttontext="" />
+                        </div>
+
+
+                        {% if not canReadUnitSpec %}
+                            <div class="small-12 columns" data-hide-watch="#import-{{ loop.index }}">
+                                <p class="alert-box warning">
+                                    You don't have read permission on this unit. You can modify the dates on assessments,
+                                    and remove them from your course, but you can't add assessments that aren't already in
+                                    your course.
+                                </p>
+                            </div>
+                        {% endif %}
+
+                    </div>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+    </ul>
 {% endif %}
 
 

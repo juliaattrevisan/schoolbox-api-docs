@@ -129,7 +129,14 @@ class Controller extends Base\Base
     ): void {
         // If the URL specified both a CourseSpec or Import destination (ie a Folder), then skip to step 2
         $initialStage = $courseSpec && $targetClass ? self::IMPORT_STAGE_UNITS : self::IMPORT_STAGE_COURSE_AND_CLASSES;
-        $data         = [
+
+        /* Find out if $courseSpecId already exists in one or more of the target folder ids
+         * $exists is truthy in this circumstance
+         */
+        $existingInFolderIds = (new ExistingImports($this->getDi()->get('databaseInternal')))->generate($courseSpec->getId());
+        $exists = (bool)\count(array_intersect($existingInFolderIds, $targetClass ? [$targetClass->getId()] : []));
+
+        $data = [
             'action'           => 'import',
             'initialStage'     => $initialStage,
             'courseSpec'       => $courseSpec,
@@ -141,7 +148,14 @@ class Controller extends Base\Base
             'componentId'      => $component ? $component->getId() : null,
             'returnUrlName'    => Redirect::RETURN_URL,
             'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
+
+            /* Go to the redirect destination if you've already imported this course
+             * and you chose to cancel what you were doing
+             */
+            'importedAlready' => $exists,
+            'importedAlreadyRedirect' => Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL)),
         ];
+
         if (self::IMPORT_STAGE_UNITS === $initialStage) {
             // If jumping straight to step2, generate a list of units for the specified course
             $data = array_merge($data, [
@@ -151,6 +165,7 @@ class Controller extends Base\Base
                 'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
             ]);
         }
+
         $this->tpl('course', 'import', $data);
     }
 
@@ -200,6 +215,12 @@ class Controller extends Base\Base
             return;
         }
 
+        /* Find out if $courseSpecId already exists in one or more of the target folder ids
+         * $exists is truthy in this circumstance
+         */
+        $existingInFolderIds = (new ExistingImports($this->getDi()->get('databaseInternal')))->generate($courseSpecId);
+        $exists = (bool)\count(array_intersect($existingInFolderIds, $targetFolderIds));
+
         // respond with stage 2: units
         $this->tpl('course', 'unitImportForm', [
             'action'           => 'import',
@@ -208,6 +229,12 @@ class Controller extends Base\Base
             'componentId'      => $componentId,
             'unitsImpls'       => $this->findUnitImplementationsForCourseSpecId($courseSpecId),
             'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
+
+            /* Go to the redirect destination if you've already imported this course
+             * and you chose to cancel what you were doing
+             */
+            'importedAlready' => $exists,
+            'importedAlreadyRedirect' => $this->getRouteIfAuthorized('course.courseList'),
         ]);
     }
 
