@@ -145,6 +145,22 @@ class CourseManagedFields
      */
     public function isReadonly(): bool
     {
+        $context = $this->assessment->getContext();
+
+        /* Assessments directly inside a folder aren't part of a course
+         */
+        if ($context instanceof Folder\Model) {
+            return false;
+        }
+
+        /* You're editing in an implementation context and the assessment got its fields
+         * locked in the course specification, so you can't change stuff...unless you're
+         * a superuser, then you can change stuff
+         */
+        if ($context->isImplementationContext() && $this->assessment->getCourseManaged()) {
+            return !$this->viewer->isSuperuser();
+        }
+
         return false;
     }
 }
