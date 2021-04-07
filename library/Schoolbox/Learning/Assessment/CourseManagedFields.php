@@ -83,7 +83,12 @@ class CourseManagedFields
             return false;
         }
 
-        return $context->isSpecificationContext() || $context->isImplementationContext();
+        /* Implementations must come with a Specification for it to be considered
+         * as part of a course. Otherwise you're ramming a new assessment into an
+         * already-imported course; this will be considered an implementation but
+         * it will have a null specification.
+         */
+        return $context->isSpecificationContext() || ($context->isImplementationContext() && $this->assessment->getSpecificationAssessment());
     }
 
 
