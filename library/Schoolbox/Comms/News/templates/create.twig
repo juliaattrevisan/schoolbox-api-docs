@@ -407,7 +407,7 @@
             <div class="row">
                 <div class="small-12 columns">
                     <div id="create-form-actions">
-                        <create-news-form-actions 
+                        <news-item-form-actions 
                             :initial-article-id="{{ article.id ?? '0' }}"
                             initial-approve-route="{{ approveRoute ?? '' }}"
                             :global-moderation="{{ config.global_moderation ? 'true' : 'false' }}"
@@ -418,7 +418,7 @@
                             locale-news="{{ locale.news }}"
                         />
                     </div>
-                    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/createNewsFormActions.bundle.js"></script>
+                    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsItemFormActions.bundle.js"></script>
                 </div>
             </div>
         </form>

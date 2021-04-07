@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import CreateNewsFormActions from './create-news-form-actions';
+import NewsItemFormActions from './news-item-form-actions';
 
 new Vue({
 	el: '#create-form-actions',
 	components: {
-		CreateNewsFormActions
+		NewsItemFormActions
     }
 });
