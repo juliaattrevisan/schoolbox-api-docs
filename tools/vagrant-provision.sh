@@ -260,10 +260,6 @@ tar xzf tls-vagrant.dev.schoolbox.cloud.tar.gz;
 cp -f vagrant.dev.schoolbox.cloud/fullchain.pem /etc/nginx/certs/schoolbox-fullchain.crt;
 cp -f vagrant.dev.schoolbox.cloud/privkey.pem /etc/nginx/certs/schoolbox-private.key;
 
-
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed";
-/vagrant/tools/grunt.sh;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing npx if not already installed";
 /vagrant/tools/npx.sh
 
@@ -357,14 +353,8 @@ then
 fi
 cd /vagrant;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed (a second time)";
-/vagrant/tools/grunt.sh;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
 npm run build;
-
-#echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files (Grunt)";
-#grunt build.js;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 

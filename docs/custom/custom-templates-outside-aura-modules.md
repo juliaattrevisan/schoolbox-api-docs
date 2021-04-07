@@ -8,16 +8,15 @@
 
 ## A quick example
 
-> An extremely common customisation is to change the layout or buttons on the 
+> An extremely common customisation is to change the layout or buttons on the
 > student profile screen, and the related search results;
 > that is the example we'll use here.
 >
 > This example involves updating both Twig and PHPLib templates.
 
-Switch school to MGGS, and rebuild CSS:
+Switch school to MGGS:
 
     tools/switch-school.sh mggs
-    tools/passthru.sh grunt -vvv build.sass
 
 Visit [http://192.168.36.10/search/user/15](http://192.168.36.10/search/user/15)
 * the title will be "Import Users"
@@ -68,7 +67,7 @@ instead.
 
 ### Extending a base template
 
-> If you're unfamiliar with Twig template extension, further reading 
+> If you're unfamiliar with Twig template extension, further reading
   may be found within Twig's online documentation;
   [https://twig.symfony.com/doc/2.x/tags/extends.html](https://twig.symfony.com/doc/2.x/tags/extends.html).
 
