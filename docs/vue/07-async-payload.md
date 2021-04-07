@@ -55,43 +55,31 @@ And finally in `container.twig` we don't need to pass a payload data structure a
 We need to import the `axios` library at the top of `user-list.vue`,
 
 ```js
-import axios from 'axios';
+import axios from "axios";
 ```
 
 Then in `mounted()` (the Vue equivalent of window.onload), we need to set up a few things.
 
-* A var to indicate that we're currently loading data `loading`
-* A var to store the data we'll load `allUsers`
+-   A var to indicate that we're currently loading data `loading`
+-   A var to store the data we'll load `allUsers`
 
 > The `data` node returns an object literal containing vars that you want to access throughout your view component, like local vars.
 
 ```js
 data() {
     return {
-
-        /* True, when data is currently loading; used to show skeleton
-         */
-        loading: true,
-
-        /* A list of all the users
-         */
-        allUsers: []
+        loading: true, //true, when data is currently loading; used to show skeleton
+        allUsers: [] //A list of all the users
     }
 },
 ```
 
 In `mounted`, when Vue has finished fooling around getting itself started:
 
-* Remember a reference to `this` which you'll need inside callbacks
-* Initiate the async request
-
 ```js
-mounted: function () {
-    let self = this;
+mounted () {
 
-    /* Show skeleton
-     */
-    this.loading = true;
+    this.loading = true; //Show skeleton
 
     /* Fetch payload asynchronously
      */
@@ -102,45 +90,44 @@ mounted: function () {
     }
 
     axios.request(request)
-        .then(function (response) {
-
-            /* Load into vue component
-             */
-            self.allUsers = response.data;
+        .then((response) => {
+            this.allUsers = response.data; //Load into vue component
         })
-        .catch(error => {
+
+        .catch((error) => {
             if (error.response) {
-                self.loading = false;
+                this.loading = false;
             }
         })
-        .then(function () {
 
-            /* Hide skeleton
-             */
-            self.loading = false;
+        .then(() => {
+            this.loading = false; //Hide skeleton
         });
+
 }
 ```
 
 In `user-list.vue`,
 
-* Show an element to tell people we're loading things
+-   Show an element to tell people we're loading things
 
 ```html
-<template v-if="this.loading">
+<template v-if="loading">
     <div>
         <h2>Loading data, wait</h2>
     </div>
 </template>
 <template v-else>
     <ul class="information-list">
-        <li v-for="user in this.allUsers">
-            <user :fullname="user.fullname"
-                  :firstname="user.firstname"
-                  :lastname="user.lastname"
-                  :role="user.role"
-                  :route="user.route"
-                  :nameLength="nameLength(user.fullname)">
+        <li v-for="(user, index) in this.allUsers" :key="index">
+            <user
+                :fullname="user.fullname"
+                :firstname="user.firstname"
+                :lastname="user.lastname"
+                :role="user.role"
+                :route="user.route"
+                :nameLength="nameLength(user.fullname)"
+            >
             </user>
         </li>
     </ul>
@@ -152,6 +139,3 @@ If you compile and reload the screen, you'll briefly see a `Loading` message whi
 > Don't forget to dress up the Loading screen with skeletons or other ui fancyness.
 
 > You can also handle errors inside the `axios.request` call, just like you would with the jQuery equivalents.
-
-
-

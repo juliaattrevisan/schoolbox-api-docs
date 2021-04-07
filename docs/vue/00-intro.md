@@ -13,12 +13,13 @@ We'll pass values from the backend to the frontend, and then from there, to Vue 
 Once you're in a Vue application, all the usual theory applies. We'll explore those as we go. We'll render the data we passed to Vue and do some things with it.
 
 ## Table of Contents
-* [Intro](00-intro.md)
-* [Setup Twig Container](01-setup-twig-container.md)
-* [Setup Entry](02-setup-entry.md)
-* [Payload](03-payload.md)
-* [Generate Payload](04-generate-payload.md)
-* [Computed Methods](05-computed-methods.md)
-* [Subcomponents](06-subcomponents.md)
-* [Async Payload](07-async-payload.md)
-* [Pagination](08-pagination.md)
+
+-   [Intro](00-intro.md)
+-   [Setup Twig Container](01-setup-twig-container.md)
+-   [Setup Entry](02-setup-entry.md)
+-   [Payload](03-payload.md)
+-   [Generate Payload](04-generate-payload.md)
+-   [Computed Methods](05-computed-methods.md)
+-   [Subcomponents](06-subcomponents.md)
+-   [Async Payload](07-async-payload.md)
+-   [Pagination](08-pagination.md)

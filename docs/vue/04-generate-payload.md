@@ -56,7 +56,7 @@ In `user-list.vue`;
 
 ```html
 <ul>
-    <li v-for="user in this.payload">
+    <li v-for="(user, index) in this.payload" :key="index">
         {{ user.fullname }} {{ user.role }}
     </li>
 </ul>
@@ -64,4 +64,4 @@ In `user-list.vue`;
 
 After recompiling and refreshing, this will load a list of people next to their role names, in an unordered list.
 
-> You can take that php and encapsulate it in a class whose purpose is specifically to produce that $data payload. This becomes a highly cohesive, reusable class which can service a vue context and a non-vue context identically. If you're particularly attentive you can make it unit-testable too.
+> You can take that php and encapsulate it in a class whose purpose is specifically to produce that \$data payload. This becomes a highly cohesive, reusable class which can service a vue context and a non-vue context identically. If you're particularly attentive you can make it unit-testable too.
