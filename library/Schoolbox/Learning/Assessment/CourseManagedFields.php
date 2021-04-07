@@ -69,7 +69,7 @@ class CourseManagedFields
      *
      *    - Folders are considered an Implementation context, but this is a special case
      *      and the checkbox shouldn't be visible here. You're creating an assessment
-     *      outside of a course context so all this stuff is irrelevant in that usge.
+     *      outside of a course context so all this stuff is irrelevant in that usage.
      *
      * @return bool
      */
@@ -136,10 +136,7 @@ class CourseManagedFields
      * CourseManagedFieldsReadonly is true if:
      *
      *     - You're a regular joe editing an assessment in an implementation context and
-     *       Course Managed is off
-     *
-     *     - You're NOT (a superuser and you're creating/editing an assessment in a
-     *       specification or implementation context)
+     *       Course Managed is on
      *
      * @return bool
      */
