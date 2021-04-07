@@ -249,8 +249,8 @@ export default {
          *
          */
 		loadSettings () {
-			if (localStorage.getItem('sb_settingsList')) {
-                this.loadLocalSettings();
+			if (sessionStorage.getItem('sb_settingsList')) {
+                this.loadSessionSettings();
             } else {
                 this.loadRemoteSettings();
             }
@@ -260,9 +260,9 @@ export default {
          * pull the settings from local storage
          *
          */
-		loadLocalSettings () {
-            const localStorageSettingsList  = localStorage.getItem('sb_settingsList');
-            this.settingsList = JSON.parse(localStorageSettingsList);
+		loadSessionSettings () {
+            const sessionStorageSettingsList  = sessionStorage.getItem('sb_settingsList');
+            this.settingsList = JSON.parse(sessionStorageSettingsList); //conver the saved string var back to JSON
             this.isLoaded = true;
         },
 
@@ -274,7 +274,7 @@ export default {
 			fetchAsJson('/adminv2/setting/search')
 			.then((response) => {
 				this.settingsList = response;
-                localStorage.setItem('sb_settingsList', JSON.stringify(this.settingsList));
+                sessionStorage.setItem('sb_settingsList', JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
 				this.isLoaded = true;
 			}).catch((error) => {
 				this.hasLoadError = true; //hide search bar in the dom
