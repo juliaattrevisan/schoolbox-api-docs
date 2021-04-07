@@ -197,7 +197,7 @@ This will let you access the new `UserListUser` subcomponent via `<single-user>`
 
 If you compile it and reload the screen, it'll tell you a lot of `User data is represented using this component`. Perfect.
 
-> Note that we didn't have to make a `singleUser.js` file or fiddle with webpack. That's because the new `SingleUser` component isn't something that launches from a twig environment; it's only used from within another Vue component.
+> Note that we didn't have to make a `single-user.js` file or fiddle with webpack. That's because the new `SingleUser` component isn't something that launches from a twig environment; it's only used from within another Vue component.
 
 ## 6.2 Defining subcomponent behaviour
 

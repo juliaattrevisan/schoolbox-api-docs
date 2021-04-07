@@ -1,7 +1,13 @@
-# Schoolbox
+# Schoolbox Developer Documentation
 
 This folder and its subfolders contain various documents that are pertinent to
 the Schoolbox product team.
+
+## Expanded Documentation on:
+
+-   [MVC](mvc/README.md)
+-   [Notifications](notifications/README.md)
+-   [Vue](vue/README.md)
 
 ## Where should documentation exist?
 
