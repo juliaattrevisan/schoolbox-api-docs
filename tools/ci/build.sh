@@ -53,14 +53,6 @@ then
         exit 1;
 fi
 
-echo "Validating checksums";
-checksum=`sha1sum bower.json`;
-if [ "$checksum" != "`cat www/static/javascript/components/bower.checksum`" ];
-then
-        echo "Bower checksum does not match";
-        exit 1;
-fi
-
 echo "Removing undeployable files";
 if [ -f tools/ci/undeployable.list ];
 then
