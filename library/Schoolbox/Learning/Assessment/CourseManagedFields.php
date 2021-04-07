@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-
 
 /**
  * Class CourseManagedFields
@@ -67,11 +67,23 @@ class CourseManagedFields
      *      Any other context means the checkbox should not be presented on the ui,
      *      because you're creating an assessment outside a Course.
      *
+     *    - Folders are considered an Implementation context, but this is a special case
+     *      and the checkbox shouldn't be visible here. You're creating an assessment
+     *      outside of a course context so all this stuff is irrelevant in that usge.
+     *
      * @return bool
      */
     public function isVisible(): bool
     {
-        return false;
+        $context = $this->assessment->getContext();
+
+        /* Assessments directly inside a folder aren't part of a course
+         */
+        if ($context instanceof Folder\Model) {
+            return false;
+        }
+
+        return $context->isSpecificationContext() || $context->isImplementationContext();
     }
 
 
