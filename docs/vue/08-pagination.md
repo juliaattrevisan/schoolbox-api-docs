@@ -6,7 +6,7 @@ This is already included in a special minified file `schoolbox-vue.min.js` which
 
 ```html
 <!-- You need this; spawns after you "npm run build" for the first time -->
-<script src="{{ CDN_PREFIX }}/javascript/components/schoolbox-vue.min.js"></script>
+<script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script>
 <script src="{{ CDN_PREFIX }}/javascript/components/userList.bundle.js"></script>
 ```
 
@@ -51,6 +51,7 @@ Underneath your `axios` request to obtain a payload, we can add a little thing w
  *
  * https://stackoverflow.com/questions/50647136/forward-button-not-working-after-history-pushstate
  */
+<<<<<<< HEAD
 window.onpopstate = event => {
     if (!event.state) {
         // Return to defaults
@@ -115,8 +116,13 @@ The `users` method is a computed property that takes a _subset_ of `this.allUser
 In `user-list.vue`,
 
 ```html
+<<<<<<< HEAD
 <li v-for="(user, index) in this.users" :key="index">
-    ...
+    =======
+</li>
+
+<li v-for="user in this.users">
+    >>>>>>> 16dbe5c93d... add in the four grunt packages and rename each to X.bundle.js [SA-11796] ...
 </li>
 ```
 
@@ -132,8 +138,13 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
 </template>
 <template v-else>
     <ul class="information-list">
+<<<<<<< HEAD
         <li v-for="(user, index) in this.users" :key="index">
             <single-user
+=======
+        <li v-for="user in this.users">
+            <user
+>>>>>>> 16dbe5c93d... add in the four grunt packages and rename each to X.bundle.js [SA-11796]
                 :fullname="user.fullname"
                 :firstname="user.firstname"
                 :lastname="user.lastname"
@@ -141,10 +152,17 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
                 :route="user.route"
                 :nameLength="nameLength(user.fullname)"
             >
+<<<<<<< HEAD
             </single-user>
         </li>
     </ul>
     <v-paginate
+=======
+            </user>
+        </li>
+    </ul>
+    <Paginate
+>>>>>>> 16dbe5c93d... add in the four grunt packages and rename each to X.bundle.js [SA-11796]
         v-model="page"
         :page-count="pageCount"
         :container-class="'pagination'"
@@ -154,7 +172,11 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
         :next-link-class="'arrow'"
         :disabled-class="'unavailable'"
         :click-handler="onPaginate"
+<<<<<<< HEAD
     ></v-paginate>
+=======
+    ></Paginate>
+>>>>>>> 16dbe5c93d... add in the four grunt packages and rename each to X.bundle.js [SA-11796]
 </template>
 ```
 

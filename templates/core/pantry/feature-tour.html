@@ -1,5 +1,4 @@
 <!-- BEGIN custom_head -->
-<script src="{CDN_PREFIX}/javascript/components/intro.js/minified/intro.min.js"></script>
 <script>
     $(function() {
 
@@ -7,7 +6,7 @@
         // Initialisation should only happen when it's about to start, because of the filter that gets applied to the steps
         $('#tour-start').on('click', function() {
 
-            var pantryTour = introJs();
+            var pantryTour = IntroJs();
 
             pantryTour.setOptions({
 

@@ -1,4 +1,5 @@
 <script>
+    import VuejsPaginate from 'vuejs-paginate';
     import LayoutList from './layout-list.vue';
     import LayoutListReversed from './layout-list-reversed.vue';
     import LayoutCard from './layout-card.vue';

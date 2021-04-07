@@ -739,7 +739,7 @@
 
             <!--
                 Temporary solution to prevent a mysterious error:
-                schoolbox.min.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
+                main.bundle.js?v=19.1.alpha1:3710 Uncaught TypeError: elem.getAttribute is not a function
                 when there's a related booking. According to my research, it's not a sizzle error and  we'll
                 need to update jQuery to 3.x. However, doing so may potentially open un new issues.
              -->
