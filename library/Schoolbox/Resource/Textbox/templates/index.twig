@@ -14,6 +14,7 @@
 
             element.confirmDialog({
                 text: 'Are you sure you want to delete this item?',
+                confirmLabel: 'Delete',
                 confirmEvent: function() {
                     $.ajax({
                         url: element.attr('data-delete'),
