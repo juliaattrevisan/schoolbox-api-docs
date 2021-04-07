@@ -357,104 +357,14 @@ then
 fi
 cd /vagrant;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building Javascript";
-cd $cachedir;
-bowerfile='';
-bowerlocksha=`sha1sum /vagrant/bower.json 2>/dev/null | awk '{print $1}'`;
-if [ -f /vagrant/www/static/javascript/components/bower.checksum ];
-then
-    currentbowersha=`awk '{print $1}' /vagrant/www/static/javascript/components/bower.checksum`;
-    if [ "$currentbowersha" == "$bowerlocksha" ];
-    then
-        echo "[SB][`date +%Y-%m-%d\ %X`] Javascript build up to date, nothing to change ($bowerlocksha)";
-        bowerfile='ignore';
-    fi
-fi
-
-if [ "$bowerfile" != 'ignore' ];
-then
-    echo "[SB][`date +%Y-%m-%d\ %X`] Javascript build not correct or missing ($bowerlocksha)";
-    check=`grep $bowerlocksha bower.cache 2>/dev/null | wc -l`;
-    if [ $check -gt 0 ];
-    then
-        # Woo - we've located a matching cache file
-        bowerfile=`grep $bowerlocksha bower.cache 2>/dev/null | head -n1 | cut -d' ' -f2-100`;
-    else
-        # No cache files match - boo hoo - check to see if there are new versions
-        for branch in develop master;
-        do
-            # Check if we've already found a matching file
-            if [ "$bowerfile" == '' ];
-            then
-                etag=$(curl -I -H "Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz 2>/dev/null | grep ETag | cut -d'"' -f2);
-                if [ $? -eq 0 ];
-                then
-                    checketag=`grep $etag bower.etag.cache 2>/dev/null | wc -l`;
-                    if [ $checketag -eq 0 ];
-                    then
-                        # New/updated version available - download it
-                        echo "[SB][`date +%Y-%m-%d\ %X`] Downloading latest Javascript build: $branch-bower.tar.gz";
-                        wget --no-verbose --header="Referer: $s3Referer" https://s3-ap-southeast-2.amazonaws.com/schoolbox-ci/$branch-bower.tar.gz -O $branch-bower.tar.gz 2>&1;
-                        if [ $? -eq 0 ];
-                        then
-                            # This is a new file, so remove old references
-                            sed -i "/$branch-bower.tar.gz/d" bower.etag.cache 2>/dev/null;
-                            sed -i "/$branch-bower.tar.gz/d" bower.cache 2>/dev/null;
-                            # Add new file to etag cache
-                            echo "$etag $branch-bower.tar.gz" >> bower.etag.cache;
-                            # Cleanup for purity
-                            rm -fR /vagrant/vagrantcache/www/static/javascript/components 2>/dev/null;
-                            # Extract checksum
-                            tar xzf $branch-bower.tar.gz www/static/javascript/components/bower.checksum;
-                            bowerchecksum=`awk '{print $1}' www/static/javascript/components/bower.checksum`;
-                            rm -fR /vagrant/vagrantcache/www/static/javascript/components 2>/dev/null;
-                            # Add new file to Javascript cache
-                            echo "$bowerchecksum $branch-bower.tar.gz" >> bower.cache;
-                            # Check if this is file we need
-                            if [ "$bowerchecksum" == "$bowerlocksha" ];
-                            then
-                                bowerfile="$branch-bower.tar.gz";
-                            fi
-                        fi
-                    fi
-                fi
-            fi
-        done
-    fi
-    cd /vagrant;
-    if [ "$bowerfile" != '' ];
-    then
-        if [ -f /vagrant/vagrantcache/$bowerfile ];
-        then
-            # Extract content
-            echo "[SB][`date +%Y-%m-%d\ %X`] Found matching Javascript cache file ($bowerlocksha) '$bowerfile', now extracting";
-            rm -fR /vagrant/www/static/javascript/components/ 2>/dev/null;
-            tar xzf /vagrant/vagrantcache/$bowerfile;
-        else
-            # Still no luck, build from scratch with bower
-            echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-            cat /vagrant/vagrantcache/bower.cache;
-            echo "[SB][`date +%Y-%m-%d\ %X`] No matching Javascript cache found. Building with bower";
-            /vagrant/tools/pkg-build-bower.sh 2>&1;
-        fi
-    else
-        # Still no luck, build from scratch with bower
-        echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-        cat /vagrant/vagrantcache/bower.cache;
-        echo "[SB][`date +%Y-%m-%d\ %X`] No matching Javascript cache found. Building with bower";
-        /vagrant/tools/pkg-build-bower.sh 2>&1;
-    fi
-fi
-cd /vagrant;
-
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing grunt-cli if not already installed (a second time)";
 /vagrant/tools/grunt.sh;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files (Webpack)";
+echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
 npm run build;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files (Grunt)";
-grunt build.js;
+#echo "[SB][`date +%Y-%m-%d\ %X`] Building JS files (Grunt)";
+#grunt build.js;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 

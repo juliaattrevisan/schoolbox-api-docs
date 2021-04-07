@@ -30,11 +30,3 @@ then
 	echo "An error occurred";
 	exit 1;
 fi
-
-echo "Bower and Uglify/Min";
-tools/pkg-build-bower.sh;
-if [ $? -ne 0 ];
-then
-	echo "An error occurred";
-	exit 1;
-fi
