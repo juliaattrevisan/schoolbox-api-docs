@@ -1,4 +1,12 @@
 <script>
+
+/**
+ * The buttons at the bottom of the create news page
+ * There can be 1 or 2 depending on the status of the news
+ * They are also only active when the news is drafted
+ *
+ */
+
 export default {
     
     props: {
