@@ -90,7 +90,12 @@ class Module extends BaseModule
                     new Rule\All(
                         new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
                         new IsPublishedOrExpired()
-                    )
+                    ),
+                    new Rule\All(
+                        new IsArticleAuthor(),
+                        new CanModerateAudience($this->getStrategyFactory()),
+                        new IsPublishedOrExpired()
+                    ),
                 )
             );
         });
