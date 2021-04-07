@@ -50,7 +50,7 @@ class CoreContext
 
         // Create a fully-qualified CDN prefix
         $prefixGenerator = new PrefixGenerator($conf);
-        $this->context['config']['fqdn_cdn_prefix'] = 'https://' . $prefixGenerator->generateWithBaseUrl($fqdn);
+        $this->context['config']['fqdn_cdn_prefix'] = $prefixGenerator->generateWithBaseUrl('https://' . $fqdn);
         $this->context['config']['year']            = date('Y');
         $this->context['config']['padding']         = 4;
 
