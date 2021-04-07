@@ -45,10 +45,13 @@ Examples:
 
 ### www/static/javascript (legacy)
 
-Contains all our legacy JS/jQuery code.
+Contains all our legacy JS/jQuery code
 
-#### www/static/javascript/components (legacy)
+#### www/static/javascript/shared (legacy)
 
-This is the destination of packages installed via Bower package manager.
+This is the destination of packages which were previously installed via the
+Bower package manager, as well as for some of our previously created legacy
+JavaScript packages.
 
-One common beginner mistake is making code changes here. These packages are kept separate from the Schoolbox repo, any changes made here will not be committed or deployed.
+This folder _is_ committed to version control, so that we are no longer
+dependent on Bower's version of packages.
