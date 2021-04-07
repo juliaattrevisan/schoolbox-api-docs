@@ -310,7 +310,7 @@ Data:
         delimiters: ['${', '}'],
         mounted: function() {
             var vue          = this;
-            brickManager = new BrickManager(vue, codec, entityTypeLabelMap);
+            brickManager = new BrickManager(codec, entityTypeLabelMap);
 
             var audienceSegments = {{ encodedSegments|json_encode|raw }};
 
