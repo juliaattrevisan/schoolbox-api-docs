@@ -1,6 +1,6 @@
 {
   "name": "schoolbox",
-  "version": "20.2.0",
+  "version": "21.0.0",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -4427,12 +4427,6 @@
           "dev": true
         }
       }
-    },
-    "webpack-fix-style-only-entries": {
-      "version": "0.6.1",
-      "resolved": "https://registry.npmjs.org/webpack-fix-style-only-entries/-/webpack-fix-style-only-entries-0.6.1.tgz",
-      "integrity": "sha1-jlFwhcw0JszRyzf/KJe5k1Y6Qko=",
-      "dev": true
     },
     "webpack-merge": {
       "version": "5.7.3",
