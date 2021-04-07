@@ -192,7 +192,6 @@ class Worker extends CliTool\App
             $itr                = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(WEB_root, RecursiveDirectoryIterator::SKIP_DOTS));
             $excludedExtensions = [
                 '1',
-                'bowerrc',
                 'checksum',
                 'css',
                 'csv',

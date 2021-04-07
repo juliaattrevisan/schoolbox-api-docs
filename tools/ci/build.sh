@@ -53,23 +53,6 @@ then
         exit 1;
 fi
 
-if [ ! -f ../bower-artifact/"$branch"-bower.tar.gz ];
-then
-	echo "Unable to locate bower artifact: ../bower-artifact/"$branch"-bower.tar.gz";
-	exit 1;
-fi
-
-echo "Unpacking bower build";
-tar xzf ../bower-artifact/"$branch"-bower.tar.gz;
-
-echo "Validating checksums";
-checksum=`sha1sum bower.json`;
-if [ "$checksum" != "`cat www/static/javascript/components/bower.checksum`" ];
-then
-        echo "Bower checksum does not match";
-        exit 1;
-fi
-
 echo "Removing undeployable files";
 if [ -f tools/ci/undeployable.list ];
 then

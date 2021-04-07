@@ -21,7 +21,7 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * Controllers are arrangers and organisers of information, like a foreman at a construction site - they don't do the dirty work themselves, instead delegating as much as possible to Supporting Classes.
 
 * When possible, abstract away low-level details into other classes which can then be reused in various ways elsewhere. This segregation of details also helps prevent you making inadvertent changes that fly under the radar.
- 
+
 * One of the primary reasons to look at a Controller method is because we're pursuing a specific behaviour to change. The easier it is to find this, the better our lives become.
 
 * Use `getResponse()` to set up twig data and also to process redirects using Routes.
@@ -39,7 +39,7 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * In unit tests we can declare the outcomes such that we can automatically detect behavioural changes.
 
-* Design Patterns aren't rigid laws that absolutely must be obeyed and used at all times. They are (generally) simplified empirical solutions to particular *kinds* of problems that have consistently emerged. It is up to the author to determine whether a Design Pattern should be used, and if so, which one. 
+* Design Patterns aren't rigid laws that absolutely must be obeyed and used at all times. They are (generally) simplified empirical solutions to particular *kinds* of problems that have consistently emerged. It is up to the author to determine whether a Design Pattern should be used, and if so, which one.
 
 * To make testable code, it can't rely on database records existing. Use mock content instead and use dependency injection so we can substitute custom-built objects when testing various scenarios.
 
@@ -57,9 +57,9 @@ This is a collection of takeaways from each of the sections, distilled from thei
 * If you encounter strange mapper/instance behaviour, try turning off the mapper cache by passing the `cache => false` option.
 
 ## 7.5 Summary of Model
-* Regardless of their complexity, Models are narcissistic in that they only care about their own properties, behaviours and "possessions" (dependencies). You can expect to interrogate Models to ask them questions about themselves and their dependencies. 
+* Regardless of their complexity, Models are narcissistic in that they only care about their own properties, behaviours and "possessions" (dependencies). You can expect to interrogate Models to ask them questions about themselves and their dependencies.
 
-* Models are not responsible for performing any persisting work; these duties should be delegated to another class, such as a Mapper or a service class that utilises a Mapper.  
+* Models are not responsible for performing any persisting work; these duties should be delegated to another class, such as a Mapper or a service class that utilises a Mapper.
 
 ## 7.6 Summary of View
 * Render only the data that was provided - though twig is powerful, it can be dangerous in an indirect or obscure manner.
@@ -70,6 +70,6 @@ This is a collection of takeaways from each of the sections, distilled from thei
 
 * Check the `/pantry` for user interface elements that you can use, and their interactions with other elements and styles.
 
-* Note that when you add javascript to the compilation step (look in your `Gruntfile.js`) you're making it globally available at the cost of increasing the minified file's size.
+* Note that when you add javascript to the compilation step (look in your `webpack.config.js`) you're making it globally available at the cost of increasing the minified file's size.
 
 * Don't forget to sanitise content upon rendering.

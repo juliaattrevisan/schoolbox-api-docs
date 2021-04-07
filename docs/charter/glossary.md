@@ -27,7 +27,7 @@ Natalie Bakhtadze | Nat | | nataliebakhtadze
 
 ## Feature and Software Names
 Term | Definition
---- | --- 
+--- | ---
 Activity | (n.) In the context of the Schoolbox software - an assessment (Due Work, Task or Quiz). In the context of work the Product Team does - a type of ticket in Jira (see [issue-types.md](issue-types.md)).
 Attach Zone | (n.) An area where you can drag and drop files to upload them
 Aura (or mistakenly Aurora) | (n.) A collection of PHP libraries, some of which we use more recently in our codebase, like the router - http://auraphp.com/
@@ -35,7 +35,7 @@ Breadcrumbs | (n.) See https://en.wikipedia.org/wiki/Breadcrumb_(navigation)
 CK, CKE, CKEditor | (n.) An inline wysiwyg editor.
 Connector | (n.) Software that connects to a SIS from which it draws data.
 Date Picker | (n.) A modal that allows you to specify dates from a calendar-esque view.
-Dev Data | (n.) The test data set that developers usually use. Despite its name, it is named `legacy.tar.gz`  
+Dev Data | (n.) The test data set that developers usually use. Despite its name, it is named `legacy.tar.gz`
 Empty State | (n.) The grey block that displays when a component does not contain any content.
 EOTC | (n.) "Education Outside the Classroom". A module in Schoolbox. Search for eotc/README.md.
 eVi | (n.) MGGS' instance name.
@@ -44,7 +44,6 @@ Filters | (n.) Often refers to the Filters panel that exists in a few places in 
 Fixtures, Sports Fixtures | (n.) A feature in Schoolbox used for managing teams & games.
 Foundation | (n.) The CSS framework we use - https://foundation.zurb.com/
 Full Calendar | (n.) A JavaScript calendar we use throughout Schoolbox - https://fullcalendar.io/
-Grunt | (n.) A task runner we use for building JS and CSS - https://gruntjs.com/
 Inline Grader | (n.) A page in the LMS of Schoolbox that simultaneously shows a student's submission as well as the means to grade it
 Jellytot | (n.) Internal nomenclature for what the world calls a 'kebab' menu. The dropdown menu accessed by an icon that looks like 3 vertical dots. “Jellytot” comes from the Jelly Baby sweets, which someone thought resembled the icon.
 Jewellery | (n.) The colored blobs indicating an assessment's review/submission status
@@ -56,7 +55,7 @@ Mage | (n.) A progressive form that isn't as powerful as a wizard.
 Modal | (n.) https://en.wikipedia.org/wiki/Modal_window
 Nat Picker | (n.) The datepicker that Natalie built. See **Date Picker**.
 Notifications | (n.) Often refers to the notifications system in Schoolbox, which you can see on the top right of your page.
-Pantry | (n.) A collection of all the known user interface elements and example specimens. 
+Pantry | (n.) A collection of all the known user interface elements and example specimens.
 Pasta Care | (n.) See **Pastoral Care**.
 Pastoral, Pastoral Care | (n.) The Pastoral Care module.
 Plagscan | (n.) A plagiarism checker. Third party service.
@@ -66,24 +65,24 @@ Rubicon Atlas | (n.) A curriculum mapping software we are soon to integrate with
 Sales Data | (n.) The test data set that is used by sales and marketing to demo Schoolbox
 Selectize | (n.) A jQuery plugin we use for our autocomplete/tag selector inputs  - https://selectize.github.io/selectize.js/
 Sentry | (n.) An error reporting service that costs us money for everything it encounters.
-SBFS | (n.) Schoolbox File System - the virtual file system that Schoolbox uses for storing folders, as well as their homepages, files and subfolders. 
+SBFS | (n.) Schoolbox File System - the virtual file system that Schoolbox uses for storing folders, as well as their homepages, files and subfolders.
 SIS | (n.) Student Information System - an external database we integrate with
 SOBO | (v.) 'Submit on behalf of'. An action a teacher or admin can do in Schoolbox to submit due work on behalf of a student.
 Storage | (n.) The method through which all files uploaded to Schoolbox are stored on a file system. Sometimes colloquially referred to as _Brownhole_.
-Swamp | (n.) A set of classes that transform data in the LMS  
+Swamp | (n.) A set of classes that transform data in the LMS
 Synergetic | (n.) The most popular SIS used by our schools
 TASS | (n.) Another SIS
 Three Dot Menu | (n.) See **Jellytot**
-Toast | (n.) An animated javascript message to tell you about the most recent action you did 
-Tot | (n.) A three-dot menu; (v.) to place something into a three-dot menu. See **Jellytot**  
-Uglify | (n.) A javascript minifier. 
+Toast | (n.) An animated javascript message to tell you about the most recent action you did
+Tot | (n.) A three-dot menu; (v.) to place something into a three-dot menu. See **Jellytot**
+Uglify | (n.) A javascript minifier.
 UPS | (n.) User Provisioning System - a cron job that automatically creates/updates user accounts etc. based on data from the SIS
-Vaporwave | (n.) A set of related user interface elements that toggle on and off. 
+Vaporwave | (n.) A set of related user interface elements that toggle on and off.
 WebDAV | (n.) A HTTP extension for the creation and update of documents. Schoolbox can act as both a client (the Drives tab) and a server (upload of files into SBFS and due work submissions).
 
 ## Processes
 Term | Definition
---- | --- 
+--- | ---
 AC | (n.) Acceptance Criteria (for a Jira ticket)
 Backlog | (n.) The list of issues awaiting grooming
 Backlog Grooming | (v.) The process of making issues in the Backlog available for addition to the current sprint

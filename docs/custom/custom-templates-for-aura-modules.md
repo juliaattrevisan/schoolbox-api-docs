@@ -11,17 +11,16 @@
 > Aura supports only Twig templates; it does not, not will it ever, support
 > PHPLib templates.
 
-Switch school to MGGS, and rebuild CSS:
+Switch school to MGGS:
 
     tools/switch-school.sh mggs
-    tools/passthru.sh grunt -vvv build.sass
 
 Visit [http://192.168.36.10/adminv2/import/user](http://192.168.36.10/adminv2/import/user)
 * the title will be "Import Users"
 
 In your Schoolbox project:
 
-* create file 
+* create file
   `library/Schoolbox/Import/templates/adminImportUser/custom/mggs/upload.twig`
   * this template is within the `@adminImportUser` Twig namespace; we'll need
     to know that when we define our new template to extend another template
@@ -46,8 +45,8 @@ Visit [http://192.168.36.10/adminv2/import/user](http://192.168.36.10/adminv2/im
 
 Congratulations, you have created your first custom Twig template for an Aura
 module! Hopefully you will never have to do this, but occasions do occur when
-schools require template customisation. 
- 
+schools require template customisation.
+
 
 ## Technical details
 
@@ -76,7 +75,7 @@ Usually, this will be the `templates/` subfolder of the module, as shown below:
 
 ### Extending a base template
 
-> If you're unfamiliar with Twig template extension, further reading 
+> If you're unfamiliar with Twig template extension, further reading
   may be found within Twig's online documentation;
   [https://twig.symfony.com/doc/2.x/tags/extends.html](https://twig.symfony.com/doc/2.x/tags/extends.html).
 

@@ -161,7 +161,7 @@ In the event we need to test further into the past because we need to update dat
 1. run sudo tools/build-sql-update.sh
 1. run sudo tools/update-sql.sh
 1. run npm install
-1. run grunt build
+1. run npm run build
 
 **Observe**
 

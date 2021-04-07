@@ -2337,12 +2337,6 @@
       "integrity": "sha1-nyKcFb4nJFT/qXOs4NvueaGww28=",
       "dev": true
     },
-    "bower": {
-      "version": "1.8.12",
-      "resolved": "https://registry.npmjs.org/bower/-/bower-1.8.12.tgz",
-      "integrity": "sha1-RM/KKl4EuNmgZmIeJMixedisMh4=",
-      "dev": true
-    },
     "brace-expansion": {
       "version": "1.1.11",
       "resolved": "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz",

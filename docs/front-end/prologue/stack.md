@@ -6,8 +6,6 @@
 | [Sass](https://sass-lang.com/)                                  |        CSS syntactic sugar         |
 | [Foundation 5](https://foundation.zurb.com/sites/docs/v/5.5.3/) |             UI library             |
 | [jQuery](https://jquery.com/)                                   |         JS syntactic sugar         |
-| [Bower](https://bower.io/)                                      |         Package management         |
-| [Grunt](https://gruntjs.com/)                                   | Task runner for compiling JS & CSS |
 
 Most of the front-end code in Schoolbox is written with the technologies above.
 
@@ -23,7 +21,7 @@ Most of the front-end code in Schoolbox is written with the technologies above.
 | [Webpack](https://webpack.js.org/)                              |             Bundling              |
 | [NPM](https://www.npmjs.com/)                                   | Package management & task running |
 
-As of early 2019 we have moved from writing our JS in jQuery to Vue. We have also started to move off Bower for package management onto NPM, and switched to Webpack for bundling.
+As of early 2019 we have moved from writing our JS in jQuery to Vue. We have also moved off Bower for package management onto NPM, and switched to Webpack for bundling.
 
 Twig will still be used to load individual pages. All it will really do is just create a container element for Vue and pass through any required data from the PHP page load to Vue. At this point there is no plan to convert Schoolbox to a single page app (or a collection of module based single page apps).
 

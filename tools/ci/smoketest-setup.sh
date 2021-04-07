@@ -26,8 +26,7 @@ else
   apt install php7.1-fpm php7.1-pdo php7.1-mysql nginx -y
 fi
 
-apt install redis-server mysql-client grunt npm -y
-npm install grunt
+apt install redis-server mysql-client npm -y
 apt install mariadb-server -y
 
 ## Start database to initialise with a username and password
@@ -67,12 +66,12 @@ cp -f $initialdir/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
 cp -rf $initialdir/data/* /vagrant/data
 cp -rf $initialdir/configfiles/bin/* /usr/local/bin
 
-## Go to vagrant to initialise npm grunt and composer
+## Go to vagrant to initialise npm and composer
 cd /vagrant
 
 composer install
 npm install
-grunt build
+npm run build
 
 ## Make sure the data directory has no permissions issues.
 chmod 777 -R /vagrant/data/*

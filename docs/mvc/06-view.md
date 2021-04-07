@@ -53,9 +53,9 @@ There's a menagerie of user interface elements in `/pantry` which you can use as
 
 ## 6.5 Compiling CSS and Javascript
 We use compilers for css and javascript to manage imports and minify the result. If you're experiencing stylistic oddities or behavioural weirdness, try recompiling your styles and javascript files.
-`npm run build` compiles styles and most Javascript: `grunt uglify` compiles the remaining Javascript.
+`npm run build` compiles styles and Javascript.
 
-> Note that when you add javascript to the compilation step (look in your `Gruntfile.js`) you're making it globally available at the cost of increasing the minified file's size.
+> Note that when you add javascript to the compilation step (look in your `webpack.config.js`) you're making it globally available at the cost of increasing the minified file's size.
 
 ## 6.6 Data sanitisation, escaping dangerous content
 There are various philosophies regarding approach, but the one we use here is: we accept whatever the end user supplies (even if it's dangerous html/javascript content etc) and we "defuse" or colloquially, `scrub`, rendering this content harmless when outputting to the user.
