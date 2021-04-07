@@ -216,11 +216,15 @@ abstract class Controller extends ListController implements IAssessmentControlle
         // Relocation is available only for update
         $data['canRelocate'] = false;
 
-        /* This is in a Specification context which grants the availability of Course Managed checkbox
+        /* Course Managed Field and associated checkbox in the ui
          */
-        $data['isSpecificationContext'] = $context->isSpecificationContext();
-        $data['isFolderContext'] = $assessment->getContext() instanceof \Schoolbox\Resource\Folder\Model;
-        $data['courseManagedReadonly'] = $assessment->isCourseManagedFieldsOnly($this->getUser());
+        $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
+
+        $data['courseManaged'] = [
+            'isVisible' => $courseManagedFields->isVisible(),
+            'isMutable' => $courseManagedFields->isMutable(),
+            'isReadonly' => $courseManagedFields->isReadonly(),
+        ];
 
         // either output the fragment to the mage, or use the synchronous form
         if ($this->getRequest()->isXhr()) {
@@ -262,15 +266,19 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['canRelocate'] = $assessment->isSpecification() && !($assessment instanceof Project);
 
-        /* This is in a Specification context which grants the availability of Course Managed checkbox
+        /* Course Managed Field and associated checkbox in the ui
          */
-        $data['isSpecificationContext'] = $assessment->getContext()->isSpecificationContext();
-        $data['isFolderContext'] = $assessment->getContext() instanceof \Schoolbox\Resource\Folder\Model;
-        $data['courseManagedReadonly'] = $assessment->isCourseManagedFieldsOnly($this->getUser());
+        $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
 
-        $template = "@learningAssessment/update.twig";
-        $this->getResponse()->content->set($this->buildHtmlOutput($template, $data));
+        $data['courseManaged'] = [
+            'isVisible' => $courseManagedFields->isVisible(),
+            'isMutable' => $courseManagedFields->isMutable(),
+            'isReadonly' => $courseManagedFields->isReadonly(),
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/update.twig", $data));
     }
+
 
     /**
      * Gets a list of units and projects, to which the assessment can be moved

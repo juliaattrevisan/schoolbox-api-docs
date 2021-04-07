@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
-use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\User;
 
 
@@ -37,18 +36,18 @@ class CourseManagedFields
 
     /**
      *
-     * @var DueWork\Model
+     * @var IAssessable
      */
-    private DueWork\Model $assessment;
+    private IAssessable $assessment;
 
 
     /**
      * CourseManagedFields constructor.
      *
      * @param User          $viewer
-     * @param DueWork\Model $assessment
+     * @param IAssessable $assessment
      */
-    public function __construct(User $viewer, DueWork\Model $assessment)
+    public function __construct(User $viewer, IAssessable $assessment)
     {
         $this->viewer     = $viewer;
         $this->assessment = $assessment;

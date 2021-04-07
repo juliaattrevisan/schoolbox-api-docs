@@ -26,29 +26,29 @@
 {# ----------------------------------------------------------- #}
 <fieldset>
     <label class="required" for="title">Title</label>
-    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255" {% if courseManagedReadonly %}readonly{% endif %} />
+    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
 
     <div class="row">
 
         {# This Course Managed option shouldn't exist in a Folder context at all,
          # since that has nothing to do with an overarching course dominating its settings
          #}
-        {% if isFolderContext %}
-            {% set columnCss = '' %}
-        {% else %}
+        {% if courseManaged.isVisible %}
             {% set columnCss = 'medium-6' %}
+        {% else %}
+            {% set columnCss = '' %}
         {% endif %}
 
         <div class="small-12 {{ columnCss }} columns">
             <label>
                 Work Type
-                <select name="workType" {% if courseManagedReadonly %}readonly{% endif %} >
+                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %} >
                     <option value="" selected>None</option>
                     {% for workType in allWorkTypes %}
                         <option value="{{ workType.id }}"
                             {% if assessment.workType.id ?? '' == workType.id %}
                                 selected="selected"
-                            {% elseif courseManagedReadonly %}
+                            {% elseif courseManaged.isReadonly %}
                                 disabled
                             {% endif %}
                         >{{ workType.name }}</option>
@@ -57,7 +57,7 @@
             </label>
         </div>
 
-        {% if not isFolderContext %}
+        {% if courseManaged.isVisible %}
         <div class="small-12 {{ columnCss }} columns">
 
             {# For when the checkbox itself is disabled, since that won't submit to backend
@@ -69,7 +69,7 @@
             <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when due work is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span>
 
             <div class="switch">
-                <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %}/>
+                <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
                 <label for="courseManaged">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
@@ -78,7 +78,6 @@
         </div>
         {% endif %}
     </div>
-
 
     <label>
         Description
@@ -141,7 +140,7 @@
 
     {% include '@learningAssessment/fragments/weight.twig' with {
         assessment: assessment,
-        courseManagedReadonly: courseManagedReadonly
+        courseManagedReadonly: courseManaged.isReadonly
     } %}
 
     {% if selfAssessmentEnabled %}
@@ -176,7 +175,7 @@
         defaultGradeGroup: defaultGradeGroup,
         renderMaxMark: true,
         markTypeLabel: 'Mark Type',
-        courseManagedReadonly: courseManagedReadonly
+        courseManagedReadonly: courseManaged.isReadonly
     } %}
 
     {% include '@learningAssessment/fragments/rubric.twig' with {
@@ -190,7 +189,7 @@
         capabilityGradingSchemes: capabilityGradingSchemes,
         defaultGradeGroup: defaultGradeGroup,
         markTypeNone: markTypeNone,
-        courseManagedReadonly: courseManagedReadonly
+        courseManagedReadonly: courseManaged.isReadonly
     } only %}
 </fieldset>
 
@@ -207,7 +206,7 @@
 {# ----------------------------------------------------------- #}
 {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
     entityType: locale.dueWork.proper,
-    courseManagedReadonly: courseManagedReadonly
+    courseManagedReadonly: courseManaged.isReadonly
 } %}
 
 
@@ -317,7 +316,7 @@
                      # Otherwise Mark Type can be disabled and this input is enabled,
                      # a very strange outcome
                      #}
-                    if (!Boolean('{{ courseManagedReadonly }}')) {
+                    if (!Boolean('{{ courseManaged.isReadonly }}')) {
                         enableMaxMark();
 
                         // Need to validate the max mark
