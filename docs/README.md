@@ -5,7 +5,7 @@ the Schoolbox product team.
 
 ## Expanded Documentation on:
 
--   [MVC](mvc/README.md)
+-   [MVC](mvc/readme.md)
 -   [Notifications](notifications/README.md)
 -   [Vue](vue/README.md)
 

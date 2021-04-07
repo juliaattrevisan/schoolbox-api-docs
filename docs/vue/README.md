@@ -1,7 +1,6 @@
 # Vue in Schoolbox
 
-[Vue](https://vuejs.org/) is now being used increasingly more throughout Schoolbox. It's gradually replacing older code that relied more on jQuery and in particular Foundation. It's shown it does a pretty good job of parachuting in where ever you like and landing as soft or as heavy as needed.
-As the number of Vue files really starts to grow it's a good time to expand further on recommended best practices.
+[Vue](https://vuejs.org/) is now being used increasingly more throughout Schoolbox. It's gradually replacing older code that relied more on jQuery and in particular Foundation. It's shown it does a pretty good job of parachuting in where ever you like and landing as soft or as heavy as needed. As the number of Vue files really starts to grow it's a good time to expand further on recommended best practices.
 
 ## Setting up a new Vue in Schoolbox
 
