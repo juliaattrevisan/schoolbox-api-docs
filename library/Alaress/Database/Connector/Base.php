@@ -529,7 +529,7 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function getRow(string $sql, array $parameters = null): array
+    public function getRow(string $sql, array $parameters = null)
     {
         return $this->executeQuery($sql, $parameters)->fetch();
     }
@@ -561,7 +561,7 @@ class Base implements Serializable, IConnector
     /**
      * @inheritdoc
      */
-    public function query(string $sql, array $parameters = null): IQuery
+    public function query(string $sql, array $parameters = null): IStatement
     {
         $result = $this->prepareQuery($sql, $parameters);
         $result->execute();

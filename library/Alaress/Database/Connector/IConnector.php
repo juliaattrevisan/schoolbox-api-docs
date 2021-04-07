@@ -345,9 +345,9 @@ interface IConnector
      * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetch()`
      * @param string     $sql
      * @param array|null $parameters
-     * @return array
+     * @return array|bool The row, or false if no row is found
      */
-    public function getRow(string $sql, array $parameters = null): array;
+    public function getRow(string $sql, array $parameters = null);
 
     /**
      * Temporary implementation of `\MSSQL::getOne`, to ease transition.
@@ -385,9 +385,9 @@ interface IConnector
      * @deprecated Replace with `$this->executeQuery($sql, $parameters)`
      * @param string     $sql
      * @param array|null $parameters
-     * @return IQuery
+     * @return IStatement
      */
-    public function query(string $sql, array $parameters = null): IQuery;
+    public function query(string $sql, array $parameters = null): IStatement;
 
     /**
      * Temporary implementation of `\MSSQL::prepareProcedure`, to ease transition.
