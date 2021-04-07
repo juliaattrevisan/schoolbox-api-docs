@@ -110,6 +110,17 @@ class Model implements ISoftDeletable
      */
     private $defaultOpenSpan;
 
+
+    /**
+     * A flag denoting whether this assessment is course managed (1) to prevent teachers
+     * from getting too creative with the assessment's details; or not course managed (0)
+     * which will let teachers customise the assessment's fields in the modify screen
+     * after it's been imported
+     *
+     * @var bool|null
+     */
+    private ?bool $courseManaged = null;
+
     /**
      * The task which may or may not be associated with this assessment.
      *
@@ -800,5 +811,25 @@ class Model implements ISoftDeletable
             }
         }
         return null;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getCourseManaged(): ?bool
+    {
+        return $this->courseManaged;
+    }
+
+
+    /**
+     * @param bool|null $courseManaged
+     * @return $this
+     */
+    public function setCourseManaged(?bool $courseManaged): self
+    {
+        $this->courseManaged = $courseManaged;
+        return $this;
     }
 }

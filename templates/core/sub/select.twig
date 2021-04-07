@@ -13,11 +13,15 @@
  #     label: the object method that returns the name e.g. "name", or the array key containing the equivalent
  # selectData: a set of key-value pairs corresponding to data vars or element attributes
  # showPrompt: a boolean to determine whether to show the "Please Select" option
+ #
+ # @param bool readonly  A var to decide whether the options can be changed/clicked on
  #}
 <select {{ disabled ?? '' }} name="{{ name }}"
     {% for dataVar, dataValue in selectData ?? [] %}
         {{ dataVar }}="{{ dataValue }}"
     {% endfor %}
+
+    {% if readonly %}readonly{% endif %}
 >
     {% if showPrompt ?? false %}
     <option disabled selected="selected" value="">Please Select</option>
@@ -29,7 +33,13 @@
 
         {# If (value, label) was not specified, assume backwards-compatible defaults
          #}
-        <option value="{{ index }}" {% if index == preselected %}selected="selected"{% endif %}>
+        <option value="{{ index }}"
+                {% if index == preselected %}
+                    selected="selected"
+                {% elseif readonly ?? false %}
+                    disabled
+                {% endif %}
+        >
             {{ option }}
         </option>
 
@@ -38,7 +48,13 @@
         {# Object method exists; assume a set of objects
          # access their contents using the attribute() method
          #}
-        <option value="{{ attribute(option, pairs.value) }}" {% if attribute(option, pairs.value) == preselected %}selected="selected"{% endif %}>
+        <option value="{{ attribute(option, pairs.value) }}"
+                {% if attribute(option, pairs.value) == preselected %}
+                    selected="selected"
+                {% elseif readonly ?? false %}
+                    disabled
+                {% endif %}
+        >
             {{ attribute(option, pairs.label) }}
         </option>
 
@@ -47,7 +63,13 @@
         {# The (value, label) tuple was specified; access arrays accordingly
          # using the chosen settings
          #}
-        <option value="{{ option[pairs.value] }}" {% if option[pairs.value] == preselected %}selected="selected"{% endif %}>
+        <option value="{{ option[pairs.value] }}"
+            {% if option[pairs.value] == preselected %}
+                selected="selected"
+            {% elseif readonly ?? false %}
+                disabled
+            {% endif %}
+        >
             {{ option[pairs.label] }}
         </option>
     {% endif %}

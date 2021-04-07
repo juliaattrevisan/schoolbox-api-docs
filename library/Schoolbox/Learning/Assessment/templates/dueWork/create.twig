@@ -1,21 +1,75 @@
-{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+{##
+ # Create/Update form
+ #
+ # Used to create a new assessment or update an existing one
+ # Used in multiple ocntexts: creating due work in a homepage or in a course
+ #
+ # @param CourseManagedFields courseManaged
+ #     Decide whether certain fields are readonly due to being Course Managed
+ #     Some users can change the values; some can't. Note also this template
+ #     is shared among multiple workflows and use cases - see the class docblock
+ #     for more details on how these facts play out
+#}
 
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
 {# ----------------------------------------------------------- #}
 {# Basic Details #}
 {# ----------------------------------------------------------- #}
 <fieldset>
     <label class="required" for="title">Title</label>
-    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
-    <label>
-        Work Type
-        <select name="workType">
-            <option value="" selected>None</option>
-            {% for workType in allWorkTypes %}
-                <option value="{{ workType.id }}" {% if assessment.workType.id ?? '' == workType.id %}selected="selected"{% endif %}>{{ workType.name }}</option>
-            {% endfor %}
-        </select>
-    </label>
+    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
+
+    <div class="row">
+
+        {# This Course Managed option shouldn't exist in a Folder context at all,
+         # since that has nothing to do with an overarching course dominating its settings
+         #}
+        {% if courseManaged.isVisible %}
+            {% set columnCss = 'medium-6' %}
+        {% else %}
+            {% set columnCss = '' %}
+        {% endif %}
+
+        <div class="small-12 {{ columnCss }} columns">
+            <label>
+                Work Type
+                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %} >
+                    <option value="" selected>None</option>
+                    {% for workType in allWorkTypes %}
+                        <option value="{{ workType.id }}"
+                            {% if assessment.workType.id ?? '' == workType.id %}
+                                selected="selected"
+                            {% elseif courseManaged.isReadonly %}
+                                disabled
+                            {% endif %}
+                        >{{ workType.name }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+        </div>
+
+        {% if courseManaged.isVisible %}
+        <div class="small-12 {{ columnCss }} columns">
+
+            {# For when the checkbox itself is disabled, since that won't submit to backend
+             # under those circumstances, inadvertently unlocking this setting
+             #}
+            <input type="hidden" name="courseManaged" value="0" />
+
+            <label for="courseManaged" class="checkbox-label">Common assessment</label>
+            <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when due work is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span>
+
+            <div class="switch">
+                <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
+                <label for="courseManaged">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 
     <label>
         Description
@@ -32,7 +86,6 @@
     {% endif %}
 
 </fieldset>
-
 
 {# ----------------------------------------------------------- #}
 {# Submissions #}
@@ -71,14 +124,16 @@
     {% endif %}
 </fieldset>
 
-
 {# ----------------------------------------------------------- #}
 {# Grading #}
 {# ----------------------------------------------------------- #}
 <fieldset>
     <legend>{{ locale.grading.proper }}</legend>
 
-    {% include '@learningAssessment/fragments/weight.twig' %}
+    {% include '@learningAssessment/fragments/weight.twig' with {
+        assessment: assessment,
+        courseManagedReadonly: courseManaged.isReadonly
+    } %}
 
     {% if selfAssessmentEnabled %}
         <label>{{ locale.selfReflection.proper }} <span data-tooltip class="hint has-tip tip-top"  title="Enabling '{{ locale.selfReflection.proper }}' allows students to reflect on their work with a comment, and rubric if provided. Also enabling '{{ locale.selfAssessment.proper }}' gives students the ability to provide themselves a grade.">?</span>
@@ -112,6 +167,7 @@
         defaultGradeGroup: defaultGradeGroup,
         renderMaxMark: true,
         markTypeLabel: 'Mark Type',
+        courseManagedReadonly: courseManaged.isReadonly
     } %}
 
     {% include '@learningAssessment/fragments/rubric.twig' with {
@@ -124,7 +180,8 @@
         capabilityMarkTypes: capabilityMarkTypes,
         capabilityGradingSchemes: capabilityGradingSchemes,
         defaultGradeGroup: defaultGradeGroup,
-        markTypeNone: markTypeNone
+        markTypeNone: markTypeNone,
+        courseManagedReadonly: courseManaged.isReadonly
     } only %}
 </fieldset>
 
@@ -139,7 +196,10 @@
 {# ----------------------------------------------------------- #}
 {# Curriculum #}
 {# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.dueWork.proper} %}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: locale.dueWork.proper,
+    courseManagedReadonly: courseManaged.isReadonly
+} %}
 
 
 {# ----------------------------------------------------------- #}
@@ -239,12 +299,23 @@
             function processUseRubricClick($element)
             {
                 if ($element.is(':checked')) {
+
                     disableMaxMark();
                     calculateGridTotal();
                 } else {
-                    enableMaxMark();
-                    // Need to validate the max mark
-                    $maxMarkInput.valid();
+
+                    {# Only enable it if course managed setting allows you
+                     # Otherwise Mark Type can be disabled and this input is enabled,
+                     # a very strange outcome
+                     #}
+                    if (!Boolean('{{ courseManaged.isReadonly }}')) {
+                        enableMaxMark();
+
+                        // Need to validate the max mark
+                        $maxMarkInput.valid();
+                    } else {
+                        $element.prop('disabled', true);
+                    }
                 }
             }
 

@@ -25,6 +25,7 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 
 use \Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
 use \Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
+use \Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
 
 use \Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
 use \Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
@@ -103,6 +104,11 @@ class Factory
     protected $defaultOpenSpan;
 
     /**
+     * @var bool
+     */
+    protected $courseManaged;
+
+    /**
      * @var string
      */
     protected $publishAt;
@@ -154,6 +160,7 @@ class Factory
         $this->setWeight(trim($post['weight']));
         $this->setCurriculumNodes($post['curriculumCodes']);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
+        $this->setCourseManaged($post['courseManaged'] === 'on');
         $this->setPublishAt(trim($post['publishDate']));
         $this->setOpenAt(trim($post['openDate']));
         $this->setDueAt(trim($post['dueDate']));
@@ -299,6 +306,10 @@ class Factory
             $this->context->setAssessables(new GenericCollection(IAssessable::class, [$assessment]));
         }
 
+        /* Some facts about Course Managed Fields
+         */
+        $courseManagedFields = new CourseManagedFields($this->creator, $assessment);
+
         if ($assessment instanceof Project) {
             $decorator = new ProjectDecorator(
                 $this->getMarkType(),
@@ -306,23 +317,46 @@ class Factory
                 $this->getSummator()
             );
         } elseif ($assessment instanceof DueWork) {
+
             /** @var DueWork $originalDueWork */
             $originalDueWork = $this->original;
-            $decorator = new DueWorkDecorator(
-                $this->getAcceptOnline(),
-                $this->getMarkType(),
-                $this->getGradingScheme(),
-                $this->getUseRubric(),
-                $this->getCapabilityMarkType(),
-                $this->getCapabilityGradeGroup(),
-                $this->getUseMarkRange(),
-                $this->getMaxMark(),
-                $this->getRubricData(),
-                $this->getAttachedFiles(),
-                $this->getSelfReviewable(),
-                $this->getSimilarityCheckEnabled(),
-                $originalDueWork
-            );
+
+            /* Pick a decorator since the Course Managed fields should remain unchanged
+             * if you're modifying a Due Work in that way
+             */
+            if ($courseManagedFields->isReadonly()) {
+                $decorator = new DueWorkCourseManagedDecorator(
+                    $this->getAcceptOnline(),
+                    $this->getMarkType(),
+                    $this->getGradingScheme(),
+                    $this->getUseRubric(),
+                    $this->getCapabilityMarkType(),
+                    $this->getCapabilityGradeGroup(),
+                    $this->getUseMarkRange(),
+                    $this->getMaxMark(),
+                    $this->getRubricData(),
+                    $this->getAttachedFiles(),
+                    $this->getSelfReviewable(),
+                    $this->getSimilarityCheckEnabled(),
+                    $originalDueWork
+                );
+            } else {
+                $decorator = new DueWorkDecorator(
+                    $this->getAcceptOnline(),
+                    $this->getMarkType(),
+                    $this->getGradingScheme(),
+                    $this->getUseRubric(),
+                    $this->getCapabilityMarkType(),
+                    $this->getCapabilityGradeGroup(),
+                    $this->getUseMarkRange(),
+                    $this->getMaxMark(),
+                    $this->getRubricData(),
+                    $this->getAttachedFiles(),
+                    $this->getSelfReviewable(),
+                    $this->getSimilarityCheckEnabled(),
+                    $originalDueWork
+                );
+            }
         } elseif ($assessment instanceof Task) {
             $decorator = new TaskDecorator(
                 $this->getHasSelfAssessed(),
@@ -349,38 +383,56 @@ class Factory
 
         /* Start manufacturing
          */
-        $assessment
-            ->setTitle($this->getTitle())
-            ->setDescription($this->getDescription())
-            ->setCreator($this->getCreator())
-            ->setWeight($this->getWeight())
-            ->setDefaultOpenSpan($this->getDefaultOpenSpan())
-            ->setMarkVisibility($this->getMarkVisibility())
-            ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
-            ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
-            ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
-            ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+        if ($courseManagedFields->isReadonly()) {
 
-        if ($this->workType){
-            $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
+            /* Only these fields can be updated by regular guys editing implementations
+             */
+            $assessment
+                ->setDescription($this->getDescription())
+                ->setCreator($this->getCreator())
+                ->setDefaultOpenSpan($this->getDefaultOpenSpan())
+                ->setMarkVisibility($this->getMarkVisibility())
+                ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
+                ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
+                ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
+                ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
+                ->setCreatedAt(Alaress_Date_Format::now())
+                ->setUpdatedAt(Alaress_Date_Format::now());
         } else {
-            $assessment->setWorkType(null);
+            $assessment
+                ->setTitle($this->getTitle())
+                ->setDescription($this->getDescription())
+                ->setCreator($this->getCreator())
+                ->setWeight($this->getWeight())
+                ->setDefaultOpenSpan($this->getDefaultOpenSpan())
+                ->setCourseManaged($this->getCourseManaged())
+                ->setMarkVisibility($this->getMarkVisibility())
+                ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
+                ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
+                ->setDueAt($this->deriveDate($assessment->getBaseContext(), $this->getDueAt()))
+                ->setCloseAt($this->deriveDate($assessment->getBaseContext(), $this->getCloseAt()))
+                ->setCreatedAt(Alaress_Date_Format::now())
+                ->setUpdatedAt(Alaress_Date_Format::now());
+
+            if ($this->workType){
+                $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
+            } else {
+                $assessment->setWorkType(null);
+            }
+
+            /* Assemble curriculum nodes
+             */
+            $selectedNodesCsv = $this->getCurriculumNodes();
+
+            if (isset($selectedNodesCsv[0])) {
+                $selectedNodes = explode(',', $selectedNodesCsv[0]);
+
+                $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
+            }
         }
 
         // find out if the dates are all g - if not, a mage-friendly exception will be thrown
         $assessment->assertValidDates();
-
-        /* Assemble curriculum nodes
-         */
-        $selectedNodesCsv = $this->getCurriculumNodes();
-
-        if (isset($selectedNodesCsv[0])) {
-            $selectedNodes = explode(',', $selectedNodesCsv[0]);
-
-            $assessment->setCurriculumNodes(CurriculumNodeMapper::getInstance()->findByColumn('id', $selectedNodes));
-        }
 
         /* Decorate with Assessable-specific data
          */
@@ -540,6 +592,27 @@ class Factory
         $this->defaultOpenSpan = $defaultOpenSpan;
         return $this;
     }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getCourseManaged(): ?bool
+    {
+        return $this->courseManaged;
+    }
+
+
+    /**
+     * @param bool|null $courseManaged
+     * @return $this
+     */
+    public function setCourseManaged(?bool $courseManaged): self
+    {
+        $this->courseManaged = $courseManaged;
+        return $this;
+    }
+
 
     /**
      * @return string

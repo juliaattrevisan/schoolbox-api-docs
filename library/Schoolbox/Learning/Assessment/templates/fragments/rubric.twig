@@ -4,16 +4,17 @@
  # This is the assessment creational/updational section concerning the rubric grid.
  # It appears on the assessment modify screen at the bottom.
  #
- # @param $rubricGrid               Grid         An instance of Grid
- # @param $rubricAttachZone         array        An attachzone, for uploading rubric csvs
- # @param $resultSets               array        A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
- # @param $rubricHasMarks           bool         Whether students have a feedback using this rubric grid
- # @param $assessment               IAssessable  An assessment instance
- # @param $markTypeTotalMark        int          The id of the Total Mark instance
- # @param $capabilityMarkTypes      array        Tuples for (id, name) Mark Types available for rubric capabilities
- # @param $capabilityGradingSchemes array        Tuples for (id, name) Grading Schemes available for rubric capabilities
- # @param defaultGradeGroup         int          Set in admin via default_grade_group config var
- # @param markTypeNone              int          The id of the mark type "None" (usually int 6)
+ # @param Grid $rubricGrid                  An instance of Grid
+ # @param array $rubricAttachZone           An attachzone, for uploading rubric csvs
+ # @param array $resultSets                 A Result Set chosen on the assessment modify screen to prepopulate rubric grid levels
+ # @param bool $rubricHasMarks              Whether students have a feedback using this rubric grid
+ # @param IAssessable $assessment           An assessment instance
+ # @param int $markTypeTotalMark            The id of the Total Mark instance
+ # @param array $capabilityMarkTypes        Tuples for (id, name) Mark Types available for rubric capabilities
+ # @param array $capabilityGradingSchemes   Tuples for (id, name) Grading Schemes available for rubric capabilities
+ # @param int defaultGradeGroup             Set in admin via default_grade_group config var
+ # @param int markTypeNone                  The id of the mark type "None" (usually int 6)
+ # @param bool $courseManagedReadonly       A bool to decide if this is readonly or not
  #}
 <div class="reveal-modal" data-reveal id="reveal-resultset">
     <h2>Apply Result Set</h2>
@@ -295,8 +296,14 @@
 <div class="row">
     <div class="small-12 columns">
         <label for="useRubric">Use Rubric?</label>
+
+        {# For when the checkbox itself is disabled, since that won't submit to backend
+         # under those circumstances, inadvertently unlocking this setting
+         #}
+        <input type="hidden" name="useRubric" value="0" />
+
         <div class="switch">
-            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} />
+            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
             <label for="useRubric">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
@@ -317,14 +324,21 @@
         defaultGradeGroup: defaultGradeGroup,
         renderMaxMark: false,
         markTypeLabel: 'Capability Mark Type',
+        courseManagedReadonly: courseManagedReadonly
     } %}
 
     <div class="row">
         <div class="small-12 columns">
             <div id="useMarkRangePanel">
                 <label for="useMarkRange">Use Mark Range</label>
+
+                {# For when the checkbox itself is disabled, since that won't submit to backend
+                 # under those circumstances, inadvertently unlocking this setting
+                 #}
+                <input type="hidden" name="useMarkRange" value="0" />
+
                 <div class="switch">
-                    <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} />
+                    <input name="useMarkRange" id="useMarkRange" type="checkbox" {% if assessment.useMarkRange %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
                     <label for="useMarkRange">
                         <span class="icon-approve"></span>
                         <span class="icon-cancel"></span>
@@ -335,7 +349,24 @@
     </div>
 </fieldset>
 
-<div class="row">
+{# Sare away this entire rubric div off the viewport - there are too many interactable elements
+ # to disable each of them reliably and sensibly, even though the grid itself doesn't perist.
+ # Note that rubric grids can be insanely long and wide and distinguished
+ #
+ # ...so just boot it off your screen instead. I'm sure people will laugh, but whatevers
+ # Show an informative instead
+ #}
+{% set viewportStyle = '' %}
+
+{% if courseManagedReadonly %}
+    {% set viewportStyle = 'position:absolute;margin-left:-9999px;' %}
+{% endif %}
+
+{% if courseManagedReadonly %}
+    <div class="alert-box warning">This rubric can only be modified via the course.</div>
+{% endif %}
+
+<div class="row" style="{{ viewportStyle }}">
     <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
         <div class="small-12 columns no-pad">
             <a href="#" id="apply-resultset" class="button">Apply Result Set</a>

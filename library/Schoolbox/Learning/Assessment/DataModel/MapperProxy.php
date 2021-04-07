@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\CourseManagedFields;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
@@ -86,22 +87,32 @@ class MapperProxy
      */
     private $notifier;
 
+
+    /**
+     * @var User|null
+     */
+    private ?User $sessionUser;
+
+
     /**
      * Constructor
      *
      * @param Mapper                $baseMapper
      * @param Translator            $translator
      * @param ParticipantDataSource $participantDataSource
+     * @param User                  $sessionUser
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        ParticipantDataSource $participantDataSource
+        ParticipantDataSource $participantDataSource,
+        User $sessionUser
     ) {
         $this->baseMapper            = $baseMapper;
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
         $this->model                 = IAssessable::class;
+        $this->sessionUser           = $sessionUser;
     }
 
 
@@ -986,7 +997,14 @@ class MapperProxy
                 $boxMapper->save($subObject);
 
                 if ($dueWork->getRubricGrid()) {
-                    $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
+
+                    /* Disregard grid changes if CourseManaged is on
+                     */
+                    $courseManagedFields = new CourseManagedFields($this->sessionUser, $assessable);
+
+                    if (!$courseManagedFields->isReadonly()) {
+                        $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
+                    }
                 }
             } else {
                 // No rubric? Just save the due work
