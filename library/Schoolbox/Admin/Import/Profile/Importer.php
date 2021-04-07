@@ -13,7 +13,6 @@ use Schoolbox\External\Profile;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage\IStorage;
-use Schoolbox\Resource\Storage\SeekableStream\Factory as StreamFactory;
 use Schoolbox\Role;
 
 /**
@@ -127,15 +126,6 @@ class Importer
 
 
     /**
-     * The seekable stream factory: required to create a guaranteed seekable
-     * stream to $this->file`.
-     *
-     * @var StreamFactory
-     */
-    private StreamFactory $streamFactory;
-
-
-    /**
      * Importer constructor.
      *
      * @param string                      $type
@@ -147,7 +137,6 @@ class Importer
      * @param Profile\Staff\Mapper        $staffProfileMapper
      * @param Profile\Relationship\Mapper $relationshipMapper
      * @param LoggerInterface|null        $logger
-     * @param StreamFactory               $streamFactory
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -159,8 +148,7 @@ class Importer
         Profile\Student\Mapper $studentProfileMapper,
         Profile\Staff\Mapper $staffProfileMapper,
         Profile\Relationship\Mapper $relationshipMapper,
-        ?LoggerInterface $logger,
-        StreamFactory $streamFactory
+        ?LoggerInterface $logger
     ) {
         $this->mapping = new Mapping($type);
 
@@ -172,7 +160,6 @@ class Importer
 
         $this->database = $database;
         $this->logger = $logger;
-        $this->streamFactory = $streamFactory;
 
         $this->type = $type;
         $this->file = $file;
@@ -208,7 +195,7 @@ class Importer
 
             $n = $this->processOne(
                 new Reader(
-                    $this->streamFactory->buildSeekableStreamFromStorage($this->file),
+                    $this->file->readStream(),
                     true
                 )
             );

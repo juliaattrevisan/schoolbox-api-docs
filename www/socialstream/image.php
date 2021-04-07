@@ -12,12 +12,12 @@ namespace SocialStream;
 
 use Alaress\Image;
 use Alaress_Date_Format;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FilesystemInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -73,7 +73,7 @@ try {
     $config = $kernel->get('config');
     if (
         $fileSystem instanceof FilesystemInterface &&
-        $fileSystem->getAdapter() instanceof AwsS3Adapter &&
+        $fileSystem->getAdapter() instanceof S3Adapter &&
         $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);

@@ -9,7 +9,6 @@
 //rather than just octet stream
 
 //includes
-use Alaress\Authorizer\Failure\Unauthenticated;
 use League\Flysystem;
 use Schoolbox\Application\BasicRequest\Kernel;
 use Schoolbox\Config\ConfigMapper;
@@ -19,6 +18,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
@@ -72,7 +72,10 @@ if (is_numeric($_GET['id'])) {
     $fileSystem   = $storage->getFilesystem();
     $cacheControl = ($_GET['cache'] ?? '0') ? 'private' : 'no-store';
 
-    if ($fileSystem instanceof Flysystem\Filesystem && $fileSystem->getAdapter() instanceof Flysystem\AwsS3v3\AwsS3Adapter) {
+    if (
+        $fileSystem instanceof Flysystem\Filesystem
+        && $fileSystem->getAdapter() instanceof S3Adapter
+    ) {
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
 

@@ -256,7 +256,6 @@ class Controller extends Web\Controller\Base
                                 $this->staffProfileMapper,
                                 $this->relationshipMapper,
                                 $log,
-                                new Storage\SeekableStream\Factory($this->getConfigLoader()),
                             ))->setPerform(true)->process();
                         }
                     }

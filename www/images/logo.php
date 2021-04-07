@@ -11,11 +11,11 @@
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
 use Alaress\Image\Transformation;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -72,7 +72,7 @@ try {
     $resource       = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
     $fileSystem     = $resource->getFilesystem();
 
-    if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof AwsS3Adapter) {
+    if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof S3Adapter) {
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
 

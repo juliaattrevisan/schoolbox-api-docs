@@ -25,6 +25,9 @@ use Schoolbox\Resource\Storage\S3\Stream as S3Stream;
  * are guaranteed to return a stream which is readable: notably, the AWS S3
  * implementation does not.
  *
+ * @deprecated replaced with a S3 filesystem adapter which always returns a
+ *             seekable stream
+ *
  * @see https://www.php.net/manual/en/function.fseek.php
  * @see https://www.php.net/manual/en/function.rewind.php
  * @see https://flysystem.thephpleague.com/v1/docs/usage/filesystem-api/#read-files-as-a-stream

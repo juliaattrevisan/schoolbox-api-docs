@@ -13,10 +13,10 @@
 
 use Alaress\Image;
 use Alaress\Image\Exception\ConcurrentTransformationException;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\Filesystem;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
 use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 
 require_once __DIR__ . '/../conf/core/require.php';
@@ -59,7 +59,7 @@ try {
 
     if (
         $fileSystem instanceof Filesystem &&
-        $fileSystem->getAdapter() instanceof AwsS3Adapter &&
+        $fileSystem->getAdapter() instanceof S3Adapter &&
         $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
