@@ -282,10 +282,6 @@ class Mapper extends BaseMapper
             $model->setRelatedRecords($this->getRelatedRecords($model));
         }
 
-        if (!$model->getParentCommentsAllowed()) {
-            $model->setParentCommentsAllowed(false);
-        }
-
         // Return hydrated model
         return $model;
     }
