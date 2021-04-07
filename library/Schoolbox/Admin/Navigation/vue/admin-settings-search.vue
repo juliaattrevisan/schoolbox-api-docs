@@ -35,6 +35,8 @@ export default {
 
         /**
          * to notify whether still loading the results or not
+         * 
+         * @returns {String} loading status
          */
         searchInputPlaceholder () {
 			if (this.isLoaded) {
@@ -46,6 +48,8 @@ export default {
 
         /**
          * only when started typing beyond minSearchQueryLength count and there's actual results
+         * 
+         * @returns {String} start displaying results or not
          */
         isSearchActive () {
 			if ((this.searchQuery.length >= this.minSearchQueryLength) && (this.filteredSearchList.length > 0)) {
@@ -68,6 +72,8 @@ export default {
 
         /**
          * the settings relevant to the search input
+         * 
+         * @returns {Array} all relevant search results, with title matches first over those just with description matches
          */
 		filteredSearchList () {
 			if (this.searchQuery.length < this.minSearchQueryLength) {
@@ -80,6 +86,8 @@ export default {
 
         /**
          * the settings relevant to the search input and capped to searchResultsShownLimit
+         * 
+         * @returns {Array} 
          */
 		filteredSearchListLimited () {
             if (this.filteredSearchList.length > this.searchResultsShownLimit) { //return the capped results
@@ -91,6 +99,8 @@ export default {
 
         /**
          * to show the search refine note
+         * 
+         * @returns {Boolean}
          */
         hasResultsBeydondSearchResultsShownLimit () {
 			if (this.filteredSearchList.length > this.searchResultsShownLimit) {
@@ -102,6 +112,8 @@ export default {
 
         /**
          * to show the count of how many aren't appearing in the search
+         * 
+         * @returns {Number}
          */
         resultsBeydondSearchResultsShownLimitCount () {
 			return this.filteredSearchList.length - this.searchResultsShownLimit;
@@ -233,13 +245,36 @@ export default {
 		},
 
         /**
-         * load the settings for possible retrieval
+         * check if already loaded and saved, or load up
          *
          */
 		loadSettings () {
+			if (sessionStorage.getItem('sb_settingsList')) {
+                this.loadSessionSettings();
+            } else {
+                this.loadRemoteSettings();
+            }
+		},
+
+        /**
+         * pull the settings from local storage
+         *
+         */
+		loadSessionSettings () {
+            const sessionStorageSettingsList  = sessionStorage.getItem('sb_settingsList');
+            this.settingsList = JSON.parse(sessionStorageSettingsList); //conver the saved string var back to JSON
+            this.isLoaded = true;
+        },
+
+        /**
+         * load the settings for possible retrieval
+         *
+         */
+		loadRemoteSettings () {
 			fetchAsJson('/adminv2/setting/search')
 			.then((response) => {
 				this.settingsList = response;
+                sessionStorage.setItem('sb_settingsList', JSON.stringify(this.settingsList)); //session storage vars need to be saved as strings only
 				this.isLoaded = true;
 			}).catch((error) => {
 				this.hasLoadError = true; //hide search bar in the dom

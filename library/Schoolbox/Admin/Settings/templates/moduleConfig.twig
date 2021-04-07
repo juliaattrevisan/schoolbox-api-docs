@@ -14,23 +14,12 @@
 
 <script type="text/javascript">
     $(function() {
-        let settingsForm = $('#settings');
-
-        /* Used to preselect a field when you come from search results
-         * which has the capability to highlight an input field with a colour
-         *
-         * This colour and style setting is arbitrarily defined here but is
-         * optionally extant (you might be here without using search)
-         */
-        let hash = window.location.hash.substr(1);
-
-        if (hash.length) {
-            document.getElementById(hash).parentElement.style.backgroundColor = "#ffa";
-        }
-
+        
         /**
          * checks if a search result has been selected from #admin-settings-search.vue
-         * so can highlight the result accordingly
+         * so can highlight and scroll to the result accordingly
+         *
+         * @return {DOMElement} selected setting highlighted
          */
         const checkForAdminSearchHighlight = () => {
             const hash = window.location.hash.substr(1);
@@ -47,7 +36,7 @@
 
         /**
          * to handle additional search results selected that exist
-         * on the same page
+         * on the same page, dispatched from #admin-settings-search.vue
          */
         document.addEventListener('admin-settings-search__on-result-selected', (event) => {
             if (currentHighlightedElement) {
@@ -56,6 +45,8 @@
             currentHighlightedElement = checkForAdminSearchHighlight();
         });
 
+
+        let settingsForm = $('#settings');
 
         {% if hasColourPicker %}
         $("[data-colour-picker]").spectrum({
