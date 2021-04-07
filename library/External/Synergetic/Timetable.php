@@ -716,10 +716,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $campusString = $campus->getExtTimetableCode();
-
-        $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
+        $campusString   = $this->database->legacyQuote($campus->getExtTimetableCode());
+        $fileSemester   = $this->database->legacyQuote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear       = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
+        $externalUserId = $this->database->legacyQuote($externalUserId);
 
         $allowedFileTypes    = $this->getAllowedFileTypes();
         $quotedFileTypes     = empty($allowedFileTypes)
@@ -728,7 +728,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $allowedFileTypesSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
 
         if ($this->groupHandler->isStudent($userId)) {
-            $query = 'SELECT
+            $query = "SELECT
                         Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
                         Timetable.ClassCampus, Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
                         vStaff.StaffSurname
@@ -749,11 +749,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         StudentClasses.FileYear = SubjectClasses.FileYear AND
                         StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
                         StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                        ((Timetable.FileSemester={$fileSemester}) AND
-                        (Timetable.FileYear=' . $fileYear . ") AND
-                        Timetable.TimetableGroup = '$campusString' AND
+                        ((Timetable.FileSemester = {$fileSemester}) AND
+                        (Timetable.FileYear = {$fileYear}) AND
+                        Timetable.TimetableGroup = {$campusString} AND
                         {$allowedFileTypesSql}
-                        (StudentClasses.ID='$externalUserId'))
+                        (StudentClasses.ID = {$externalUserId}))
                         AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
                         AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . '
                     ORDER BY Timetable.PeriodNumber, Timetable.DayNumber';
@@ -775,10 +775,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         Timetable.FileSemester = SubjectClasses.FileSemester AND
                         Timetable.FileType = SubjectClasses.FileType AND
                         Timetable.FileYear = SubjectClasses.FileYear AND
-                        SubjectClasses.FileSemester='" . $fileSemester . "' AND
-                        SubjectClasses.FileYear='" . $fileYear . "' AND
-                        Timetable.TimetableGroup = '$campusString' AND
-                        Timetable.StaffID='$externalUserId' AND
+                        SubjectClasses.FileSemester = {$fileSemester} AND
+                        SubjectClasses.FileYear = {$fileYear} AND
+                        Timetable.TimetableGroup = {$campusString} AND
+                        Timetable.StaffID = {$externalUserId} AND
                         {$allowedFileTypesSql}
                         DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . '
                     ORDER BY Timetable.PeriodNumber, Timetable.DayNumber';
