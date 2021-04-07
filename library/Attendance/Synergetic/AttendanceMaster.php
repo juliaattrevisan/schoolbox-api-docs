@@ -195,6 +195,8 @@ class Attendance_Synergetic_AttendanceMaster
             $this->connector->executeDirectly('SET ANSI_WARNINGS ON');
         }
         $success = $statement->execute();
+        // closing this statement to ensure ansi_warnings to be set back.
+        $statement->close();
         if (!$isAnsiWarningsOn) {
             $this->connector->executeDirectly('SET ANSI_WARNINGS OFF');
         }
