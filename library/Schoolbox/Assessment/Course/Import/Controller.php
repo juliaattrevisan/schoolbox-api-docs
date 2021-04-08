@@ -775,6 +775,14 @@ class Controller extends Base\Base
             'returnUrlName'    => Redirect::RETURN_URL,
             'encodedReturnUrl' => $this->getRequest()->query->get(Redirect::RETURN_URL),
             'canReadUnitSpecs' => $this->canReadUnitSpecs($courseSpec),
+
+            /* You're modifying an already-imported course so don't worry about this warning
+             * You can turn it off by pretending it was never imported already (the Import
+             * and Modify Import share the same twig fragments...)
+             */
+            'importedAlready' => false,
+            'importedAlreadyRedirect' => null,
+
         ]);
     }
 
