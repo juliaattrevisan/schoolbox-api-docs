@@ -333,6 +333,30 @@ abstract class AbstractController extends BaseController
 
         $server = $this->getRequest()->server;
 
+        /* Find the transcode status for transcodable items
+         * Namely audio files and video files
+         */
+        $error = true;
+
+        if ($file->getMimetype()->isAudio() || $file->getMimetype()->isVideo()) {
+            try {
+                $videoQueueItem = (\Schoolbox\Video\QueueMapper::getInstance())
+                    ->findOneByColumn('hash', $file->getStorage()->getHash());
+
+                /* If it was in the queue, check its processing status
+                 * If it's complete, we can show it normally
+                 * Otherwise send the $error flag into the ui
+                 */
+                if ($videoQueueItem->isComplete()) {
+                    $error = false;
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                // noop: hash not found
+                // This file was never in the queue, so I guess we don't load it
+            }
+        }
+
         $data = [
             'file'   => $file,
             'type'   => 'file',
@@ -341,6 +365,7 @@ abstract class AbstractController extends BaseController
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
             'RETURN_URL'=> Redirect::RETURN_URL . '=' . Redirect::encode("/resources/$folderId"),
+            'error' => $error,
         ];
 
         $this->getResponse()->content->set([

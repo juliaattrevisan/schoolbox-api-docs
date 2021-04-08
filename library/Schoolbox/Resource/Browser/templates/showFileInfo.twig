@@ -104,6 +104,11 @@ These are its args, which is given for you
     $(function() {
         $('[data-plugin="preview"]','#content').preview();
         $('[data-audiocomponent], [data-videocomponent]').mediaelementplayer();
+
+        {# Transcode error? Hide the controls and interactables #}
+        {% if error ?? false %}
+        $('.mejs__overlay.mejs__layer.mejs__overlay-play, .mejs__overlay-button, .mejs__controls').remove();
+        {% endif %}
     });
 </script>
 {% endif %}
