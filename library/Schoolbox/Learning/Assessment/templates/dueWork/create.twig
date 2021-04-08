@@ -59,8 +59,10 @@
 
             {# For when the checkbox itself is disabled, since that won't submit to backend
              # under those circumstances, inadvertently unlocking this setting
+             #
+             # If it's been disabled, preserve whatever setting it currently has
              #}
-            <input type="hidden" name="courseManaged" value="0" />
+            <input type="hidden" name="courseManaged" value="{% if not courseManaged.isMutable %}{{ assessment.courseManaged }}{% else %}0{% endif %}" />
 
             <label for="courseManaged" class="checkbox-label">Common Assessment</label>
             <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span>
