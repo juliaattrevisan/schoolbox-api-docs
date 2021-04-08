@@ -127,7 +127,7 @@ class Icon implements ITransformFactory
      */
     public function recognisesCacheKey(string $cacheKey): bool
     {
-        if (!preg_match('/([a-z]+)-(\d+)/', $cacheKey, $matches)) {
+        if (!preg_match('/([a-z_]+)-(\d+)/', $cacheKey, $matches)) {
             return false;
         }
         array_shift($matches);

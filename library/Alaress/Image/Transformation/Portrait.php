@@ -88,7 +88,8 @@ class Portrait implements ITransformFactory
      */
     public function recognisesCacheKey(string $cacheKey): bool
     {
-        if (!preg_match('/portrait-([a-z\d]+)/', $cacheKey, $matches)) {
+        $matches = self::getMatches($cacheKey);
+        if (!count($matches)) {
             return false;
         }
         return in_array($matches[1], self::SIZES, true);
@@ -104,8 +105,8 @@ class Portrait implements ITransformFactory
      */
     public function retrieveForCacheKey(string $cacheKey): ITransform
     {
-        preg_match('/portrait-([a-z\d]+)/', $cacheKey, $matches);
-        $size = $matches[1];
+        $matches = self::getMatches($cacheKey);
+        $size    = $matches[1];
         return $this->retrieve($size);
     }
 
@@ -114,5 +115,16 @@ class Portrait implements ITransformFactory
     public static function getSlug(): string
     {
         return 'portrait';
+    }
+
+
+    /**
+     * @param string $cacheKey
+     * @return array
+     */
+    private static function getMatches(string $cacheKey): array
+    {
+        preg_match('/portrait-([a-z\d]+)/', $cacheKey, $matches);
+        return $matches;
     }
 }

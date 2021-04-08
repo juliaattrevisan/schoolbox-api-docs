@@ -15,6 +15,7 @@ use Alaress\Image\Transform\Square;
 use OutOfBoundsException;
 
 use function in_array;
+use function preg_match;
 
 /**
  * A list of all the 'storage' transformations used throughout the site
@@ -91,7 +92,6 @@ class Storage implements ITransformFactory
     }
 
 
-
     /**
      * Returns a cache key for a transformation
      *
@@ -112,7 +112,8 @@ class Storage implements ITransformFactory
      */
     public function recognisesCacheKey(string $cacheKey): bool
     {
-        if (!preg_match('/storage-([a-z\d]+)/', $cacheKey, $matches)) {
+        $matches = self::getMatches($cacheKey);
+        if (!count($matches)) {
             return false;
         }
         return in_array($matches[1], self::SIZES, true);
@@ -128,8 +129,8 @@ class Storage implements ITransformFactory
      */
     public function retrieveForCacheKey(string $cacheKey): ITransform
     {
-        preg_match('/storage-([a-z\d]+)/', $cacheKey, $matches);
-        $size = $matches[1];
+        $matches = self::getMatches($cacheKey);
+        $size    = $matches[1];
         return $this->retrieve($size);
     }
 
@@ -138,5 +139,16 @@ class Storage implements ITransformFactory
     public static function getSlug(): string
     {
         return 'storage';
+    }
+
+
+    /**
+     * @param string $cacheKey
+     * @return array
+     */
+    private static function getMatches(string $cacheKey): array
+    {
+        preg_match('/storage-([a-zA-Z\d]+)/', $cacheKey, $matches);
+        return $matches;
     }
 }
