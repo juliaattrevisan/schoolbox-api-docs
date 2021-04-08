@@ -10,6 +10,7 @@ namespace Alaress\Mail;
 
 
 use Alaress\Html\ToText as Html2Text;
+use Schoolbox\Cdn\PrefixGenerator;
 use Scrub;
 use TextFormatter;
 use Twig\Environment;
@@ -107,7 +108,9 @@ class TwigMailer extends AbstractMailer
             )
         );
 
-        // TODO figure out what to do about CDN_PREFIX
+        // CDN_PREFIX
+        $cdnPrefixGenerator = new PrefixGenerator($config);
+        $this->twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
     }
 
     /**
