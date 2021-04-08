@@ -292,6 +292,11 @@ class Kernel extends WebKernelAbstract
                     $twig->addGlobal('NOW', Alaress_Date_Format::now());
                     $twig->addGlobal('USER', $_SESSION['user']);
 
+                    // CDN_PREFIX
+                    /** @var PrefixGenerator $cdnPrefixGenerator */
+                    $cdnPrefixGenerator = $di->get('cdnPrefixGenerator');
+                    $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
+
                     // Global access to returnUrl vars
                     $encodedUrl = Redirect::encode($_GET["page"]);
                     $twig->addGlobal(
