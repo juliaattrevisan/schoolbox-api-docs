@@ -83,6 +83,15 @@
 {% endif %}
 {% set audiencePlaceholder = audienceIsReadOnly ? '' : 'Search for ' ~ availableNames|join(', ') ~ '...' %}
 
+{% if not audienceIsReadOnly %}
+{# custom HTML for the audience selecize dropdown options. Client-side to ensure consitent human-readable entity types #}
+<div id="audience-selectize-dropdown-option">
+    <span data-name></span>
+    <span data-entityType class="meta"></span>
+    <span data-modifier class="meta"></span>
+</div>
+{% endif %}
+
 {# le scripts #}
 <script src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
@@ -662,15 +671,6 @@
 </div>
 
 <div class="toast" id="saveDraft"></div>
-
-{% if not audienceIsReadOnly %}
-{# custom HTML for the audience selecize dropdown options. Client-side to ensure consitent human-readable entity types #}
-<div id="audience-selectize-dropdown-option">
-    <span data-name></span>
-    <span data-entityType class="meta"></span>
-    <span data-modifier class="meta"></span>
-</div>
-{% endif %}
 
 <script src="{{ CDN_PREFIX }}/javascript/components/schoolbox-vue.min.js"></script>
 {% autoescape 'js' %}

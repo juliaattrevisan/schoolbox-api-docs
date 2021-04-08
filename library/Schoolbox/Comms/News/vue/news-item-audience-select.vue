@@ -637,11 +637,11 @@ export default {
                 </template>
                 <template v-else>
                     This audience can no longer be updated because the article is published. If you wish to update the audience,
-                    <template v-if="rejectRoute === ''">
+                    <template v-if="rejectRoute !== ''">
                         <a id="unpublish-article" :href="rejectRoute" :data-reject="article.title">unpublish this {{ localeNews }}.</a>
                     </template>
                     <template v-else>
-                        {unpublish this {{ localeNews }}.
+                        unpublish this {{ localeNews }}.
                     </template>
                 </template>
             </p>
