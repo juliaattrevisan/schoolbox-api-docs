@@ -8,7 +8,6 @@
 {% block newsTitle %}Created By Me{% endblock %}
 
 {% block newsContent %}
-
     <div id="authored-container">
         <news-authored
             :page-number="{{ pageNum }}"
@@ -29,9 +28,5 @@
         >
         </news-authored>
     </div>
-
-{% endblock %}
-
-{% block newsScripts %}
     <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsAuthored.bundle.js?v={{ config.site_version }}"></script>
 {% endblock %}

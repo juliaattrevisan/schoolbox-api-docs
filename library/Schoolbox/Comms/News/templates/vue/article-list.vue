@@ -210,7 +210,7 @@
         <section>
             <dl class="tabs" v-if="this.allArticles.length || this.articlesLoading">
                 <dd v-for="(topic, index) in this.topics" :class="{active: tabSelected === topic.slug}" :key="index">
-                    <a @click="onTabChange(topic.slug, true, true, true)">{{ topic.name }}</a>
+                    <a @click="onTabChange(topic.slug, false, false, true)">{{ topic.name }}</a>
                 </dd>
                 <template v-if="this.articlesLoading">
                     <dd class="skeleton" v-for="n in 3" :key="n">
