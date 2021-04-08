@@ -13,7 +13,7 @@ INSERT INTO config(
     required
 ) VALUES (
     'gotenberg_host',
-    'http://localhost:3000',
+    'http://gotenberg.schoolbox.cloud',
     'Gotenberg host',
     'The URL for the Gotenberg PDF translation service',
     (SELECT id FROM lu_config_field WHERE field = 'input'),
