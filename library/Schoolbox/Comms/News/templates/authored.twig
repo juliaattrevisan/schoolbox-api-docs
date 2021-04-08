@@ -10,7 +10,7 @@
 {% block newsContent %}
 
     <div id="authored-container">
-        <authored
+        <news-authored
             :page-number="{{ pageNum }}"
             tab-selected="{{ status }}"
             news-route="{{ routeLookup('commsNews.getAuthoredArticles') }}"
@@ -27,11 +27,11 @@
             create-news-route=""
             {% endif %}
         >
-        </authored>
+        </news-authored>
     </div>
 
 {% endblock %}
 
 {% block newsScripts %}
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/authored.bundle.js?v={{ config.site_version }}"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsAuthored.bundle.js?v={{ config.site_version }}"></script>
 {% endblock %}

@@ -1,4 +1,11 @@
 <script>
+
+/**
+ * Provides a link for RSS feeds
+ * Changes depending on the current news feed tab selection
+ *
+ */
+
 export default {
     
     props: {
@@ -10,8 +17,16 @@ export default {
     computed: {
         
         link () {
-            return this.route + '?' + this.queryStringTopic + '=' + this.topic
+            return this.route + '?' + this.queryStringTopic + '=' + this.topic;
         }
+
+    },
+
+    mounted () {
+
+        document.addEventListener('article-list-mixin__onTabChange', (event) => {
+            console.log('oi');
+        });  
         
     }
 

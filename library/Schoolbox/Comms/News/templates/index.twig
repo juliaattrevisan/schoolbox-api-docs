@@ -32,9 +32,6 @@
 {% endblock %}
 
 {% block newsContent %}
-    {# has to live here instead of the scripts block below :( #}
-    {# <script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script> #}
-
     {% include '@commsNews/article-list.twig' with {
         initialPage: initialPage,
         queryStringPage: queryStringPage,
@@ -47,23 +44,3 @@
     } %}
 {% endblock %}
 
-{% block newsScripts %}
-    <script>
-        /*
-        var rssLink = new Vue({
-            el: '#news-rss-link',
-            delimiters: ['${', '}'],
-            data: {
-                route: '{{ rssRoute }}',
-                queryStringTopic: '{{ queryStringTopic }}',
-                topic: '{{ topic }}'
-            },
-            computed: {
-                link: function() {
-                    return this.route + '?' + this.queryStringTopic + '=' + this.topic
-                }
-            }
-        });
-        */
-    </script>
-{% endblock %}

@@ -159,9 +159,9 @@ module.exports = {
 
         //News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
-        articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
-        articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
-        authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
+        articleList: './library/Schoolbox/Comms/News/templates/vue/initArticleList.js',
+        articleThreads: './library/Schoolbox/Comms/News/templates/vue/initArticleThreads.js',
+        newsAuthored: './library/Schoolbox/Comms/News/vue/initNewsAuthored.js',
         newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/initNewsItemAudienceSelect.js',
         newsItemFormActions: './library/Schoolbox/Comms/News/vue/initNewsItemFormActions.js',
         newsRssLink: './library/Schoolbox/Comms/News/vue/initNewsRssLink.js',

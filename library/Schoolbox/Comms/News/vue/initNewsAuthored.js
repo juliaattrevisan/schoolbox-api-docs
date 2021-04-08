@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import Authored from './Authored';
+import NewsAuthored from './news-authored';
 
 new Vue({
 	el: '#authored-container',
 	components: {
-		Authored
+		NewsAuthored
     }
 });
