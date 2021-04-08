@@ -57,7 +57,7 @@ $border-bottom-width: 2px;
         width: 100%;
         z-index: 2;
 
-        @media #{$large-up} {
+        @media #{$mediumwide-up} {
           @include box-shadow(2px, 0, 4px, rgba(0,0,0,0.3));
           position: absolute;
           margin-top: -35px;
