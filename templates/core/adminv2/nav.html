@@ -121,15 +121,22 @@
 </nav>
 
 <script type="text/javascript">
-    const mq = window.matchMedia( "(max-width: 1023px)" );
-    if (mq.matches) {
-        $('.parent-item a').click(function(e) {
-            e.preventDefault();
-            var $target = $(this).closest('li').find('ul.flyout').slideToggle();
-            $('ul.flyout').not($target).slideUp();
+    $(function() {
+        const mq = window.matchMedia( "(max-width: 950px)" );
+        if (mq.matches) {
+            $("[data-parent-item] > a").on('click', function(event) {
+                event.preventDefault();
+
+                let $target = $(this).closest('[data-parent-item]').find("[data-admin-subnav-flyout]").slideToggle();
+
+                $('[data-admin-subnav-flyout]').not($target).slideUp();
+            });
+        }
+
+        $('[data-admin-subnav-dropdown]').on('click', function(event) {
+            event.preventDefault();
+
+            $('[data-admin]').toggle();
         });
-    }
-    $('.dropdown-btn').click(function(){
-        $('.admin').toggle();
     });
 </script>
