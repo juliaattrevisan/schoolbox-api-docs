@@ -476,6 +476,16 @@
         return null;
     };
     
+    // Audience audienceSelectize where user can search for simple audience segments. The first is the jQuery DOM wrapper, the latter the Selecize plugin.
+    /** @param {jQuery} $audienceSelectize */
+    var $audienceSelectize;
+    /** @param {Selectize} audienceSelectize */
+    var audienceSelectize;
+    /** @param {BrickManager} brickManager */
+    var brickManager;
+    /** @param {Codec} codec */
+    var codec = new Codec();
+
 </script>
 {% endautoescape %}
 
@@ -583,7 +593,7 @@
                         reject-route="{{ rejectRoute is defined ? rejectRoute : '' }}"
                         :article="{{ article | json_encode }}"
                         audience-placeholder="{{ audiencePlaceholder }}"
-                        :encoded-segments="{{ encodedSegments|json_encode|raw }}"
+                        :encoded-segments='{{ encodedSegments|json_encode|raw }}'
                     />
                 </fieldset>
                 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsItemAudienceSelect.bundle.js"></script>

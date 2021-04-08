@@ -201,16 +201,6 @@ export default {
 
     mounted () {
         
-        // Audience audienceSelectize where user can search for simple audience segments. The first is the jQuery DOM wrapper, the latter the Selecize plugin.
-        /** @param {jQuery} $audienceSelectize */
-        var $audienceSelectize;
-        /** @param {Selectize} audienceSelectize */
-        var audienceSelectize;
-        /** @param {BrickManager} brickManager */
-        var brickManager;
-        /** @param {Codec} codec */
-        var codec = new Codec();
-
         var vue          = this;
         brickManager = new BrickManager(codec, entityTypeLabelMap);
 
@@ -275,7 +265,7 @@ export default {
                         $item.addClass('hide');
 
                         // Selectize hides the placeholder once an item is added- we want to keep it, quite hacky
-                        $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+                        $('#audience-search-selectized').attr('placeholder', vue.audiencePlaceholder).css('width', '100%');
 
                         // The audienceSelectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
                         setTimeout(function () {
@@ -295,7 +285,7 @@ export default {
                 onItemRemove: function(key, $item) {
                     brickManager.onRemoveSegment(key, $item);
                     // Selectize hides the placeholder once an item is removed- we want to keep it, quite hacky
-                    $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+                    $('#audience-search-selectized').attr('placeholder', vue.audiencePlaceholder).css('width', '100%');
                 }
             },
             value: this.encodedSegments,
@@ -658,7 +648,7 @@ export default {
                 </template>
             </p>
             <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="audienceBricks.length">
-                <li v-for="audienceBrick in audienceBricks">
+                <li v-for="(audienceBrick, index) in audienceBricks" :key="index">
                     <div class="actions-small-1">
                         <div class="card small-12">
                             <h4 :title="audienceBrick.nameLabel">
@@ -700,8 +690,8 @@ export default {
             <a class="close-reveal-modal" aria-label="Close">×</a>
 
             <div v-show="pageShow.index" class="reveal-modal-tab-content">
-                <div class="small-12 medium-4 columns left" v-for="audienceOption in audienceOptions.base" v-if="!audienceOption.hideFromModal">
-                    <button class="button-block" @click="changePage(audienceOption)">
+                <div class="small-12 medium-4 columns left" v-for="(audienceOption, index) in audienceOptions.base" :key="index">
+                    <button v-if="!audienceOption.hideFromModal" class="button-block" @click="changePage(audienceOption)">
                         <i :class="'icon-' + audienceOption.icon"></i>
                         {{ audienceOption.namePlural }}
                     </button>
@@ -723,7 +713,7 @@ export default {
                         </div>
                         <div class="checklist checklist-container" v-show="!showEmptyState">
                             <div class="loader" v-show="showLoader"></div>
-                            <div class="checklist-wrapper" v-for="(audienceListItem, index) in audienceListItems">
+                            <div class="checklist-wrapper" v-for="(audienceListItem, index) in audienceListItems" :key="index">
                                 <input type="checkbox" :id="'audience-list-input-' + index" :value="index" v-model="audienceListChecked" />
                                 <label :for="'audience-list-input-' + index">{{ audienceListItem }}</label>
                             </div>
@@ -758,18 +748,20 @@ export default {
                 </div>
                 <div class="row">
                     <template v-for="(item, key, index) in intersect">
-                        <div class="small-12 medium-6 columns checklist">
+                        <div class="small-12 medium-6 columns checklist" :key="index">
                             <legend>
                                 <label for="">Audience Type {{ index + 1 }}:</label>
                                 <select @change="updateIntersectList(key)" v-model="intersect[key]">
-                                    <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[key]" v-if="!audienceOption.hideFromModal">
+                                    <template v-for="(audienceOption, index) in audienceOptions.intersect[key]">
+                                    <option :value="audienceOption" v-if="!audienceOption.hideFromModal" :key="index">
                                         {{ audienceOption.name }}
                                     </option>
+                                    </template>
                                 </select>
                             </legend>
                             <slot v-for="(item, key2) in audienceListItemsIntersect[key]">
-                                <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]">
-                                <label :for="key + '-' + key2" class="checkbox-label">{{ item }}</label>
+                                <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]" :key="key2">
+                                <label :for="key + '-' + key2" class="checkbox-label" :key="key2">{{ item }}</label>
                             </slot>
                         </div>
                     </template>
@@ -793,11 +785,11 @@ export default {
             </p>
             <hr />
             <div class="row">
-                <div class="small-12 medium-6 columns no-pad audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
+                <div class="small-12 medium-6 columns no-pad audience-composite-row" v-for="(dimensionData, index) in selectedCompositeBrick.modalData" :key="index">
                     <p><strong>{{ dimensionData.typeLabel.plural }}</strong></p>
                     <ul>
                         <template v-for="(label, index) in dimensionData.valueLabels">
-                            <li>{{ label }}</li>
+                            <li :key="index">{{ label }}</li>
                         </template>
                     </ul>
                 </div>
