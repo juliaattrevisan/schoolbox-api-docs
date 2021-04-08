@@ -135,6 +135,8 @@ class ConfigMapper extends Mapper
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
     public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
 
+    public const NAME_GOTENBERG_HOST = 'gotenberg_host';
+
     /**
      * @throws \InvalidArgumentException
      */

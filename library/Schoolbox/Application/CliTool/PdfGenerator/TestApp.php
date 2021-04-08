@@ -18,10 +18,28 @@ use Zend\Uri\UriInterface;
 /**
  * Test application for the CLI PDF generator.
  *
- * All this does is generate a PDF of the dashboard for the authenticated user.
+ * All this does is generate a PDF of any URLs passed in the command: defaults
+ * to only including the dashboard for the authenticated user.
  */
 class TestApp extends App
 {
+    /**
+     * Option for URLs to include within the generated PDF.
+     */
+    private const OPT_SHORT_URL = 'u:';
+    private const DEFAULT_URLS = ['/'];
+
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return array_merge(parent::getShortOpts(), [self::OPT_SHORT_URL]);
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function printHelp(): void
     {
         $file           = $this->getToolFilename();
@@ -36,14 +54,16 @@ SYNOPSIS:
     $green{$file} {$yellow}[OPTION]...$white
 
 DESCRIPTION
-    A proof-of-concept application for generating an archive of PDFs from
-    Schoolbox content.
-
-    This application simply generates a PDF of the dashboard for the
-    authenticated user.
+    A test application for generating an archive of PDFs from Schoolbox content.
 
 OPTIONS
 $baseOptionHelp
+
+    $yellow-u=URL$white
+        A URL to include within the PDF. This option may be provided multiple
+        times, but only URLs relative to the Schoolbox instance's base path will
+        be accepted.
+        Defaults to only including the user's dashboard.
 
 EXAMPLES:
  * Write log to terminal, output to archive.zip
@@ -52,6 +72,8 @@ EXAMPLES:
  * Append log to export.log, output to archive.zip
       $file 2>> export.log 1> archive.zip
       $file -l export.log -o archive.zip
+ * Output /, /calendar, /resources to archive.zip
+      $file -l export.log -o archive.zip -u / -u /calendar -u /resources
 ";
         fwrite(STDOUT, $help);
     }
@@ -82,14 +104,23 @@ EXAMPLES:
      */
     protected function generatePdfSources(UriInterface $baseUrl): GenericCollection
     {
+        $urls = $this->getOpt(self::OPT_SHORT_URL);
+        if (!isset($urls)) {
+            $urls = self::DEFAULT_URLS;
+        }
+        if (!is_array($urls)) {
+            $urls = [$urls];
+        }
+
+        $outputUrls = [];
+        foreach ($urls as $url) {
+            $outputUrls[] = $baseUrl->setPath($url)->toString();
+        }
+
         return new GenericCollection(
             SourceBundle::class,
             [
-                new SourceBundle(
-                    'test.pdf',
-                    [$baseUrl->setPath('/')->toString(),],
-                    'Generating test.pdf'
-                ),
+                new SourceBundle('test.pdf', $outputUrls, 'Generating test.pdf'),
             ]
         );
     }

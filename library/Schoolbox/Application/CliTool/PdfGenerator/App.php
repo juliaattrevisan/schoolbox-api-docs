@@ -13,15 +13,16 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
-use Knp\Snappy\Pdf;
 use Predis\ClientInterface as RedisClient;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\User;
+use TheCodingMachine\Gotenberg;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 use ZipArchive;
@@ -138,9 +139,8 @@ abstract class App extends BaseApp
         }
 
 
-        // Build a PDF generator object, put the session hash in it
-        $pdfGenerator = $this->buildPdfGenerator();
-        $pdfGenerator->setOption('cookie', [PipeManager::PHP_SESSION_PREFIX => $sessionHash]);
+        // Build a PDF generator object
+        $pdfGenerator = new Gotenberg\Client($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_HOST));
 
 
         // Generate all PDFs
@@ -159,7 +159,7 @@ abstract class App extends BaseApp
             }
             try {
                 $this->getLogger()->notice($pdfSource->getMessage());
-                $pdfFilenames[]      = $this->generatePdf($pdfSource, $tempDir, $pdfGenerator);
+                $pdfFilenames[]      = $this->generatePdf($pdfSource, $tempDir, $pdfGenerator, $sessionHash);
                 $consecutiveFailures = 0;
             } catch (RuntimeException $e) {
                 // Something went wrong: log it
@@ -193,10 +193,10 @@ abstract class App extends BaseApp
      */
     protected function generateHelpMessageForBaseOptions(): string
     {
-        $defaultMaxFails = self::DEFAULT_MAX_FAILS;
-        $defaultJsDelay  = self::DEFAULT_JS_DELAY;
-        $white           = self::COLOUR_WHITE;
-        $yellow          = self::COLOUR_YELLOW;
+        $defaultMaxFails        = self::DEFAULT_MAX_FAILS;
+        $defaultJsDelay         = self::DEFAULT_JS_DELAY;
+        $white                  = self::COLOUR_WHITE;
+        $yellow                 = self::COLOUR_YELLOW;
 
         return <<<BASE
     $yellow-h, --help$white
@@ -242,45 +242,19 @@ abstract class App extends BaseApp
 
     $yellow--user-style-sheet=STYLE_FILE$white
         Filename of a style sheet to load with every page.
+        This option is not currently supported: use custom print styles within
+        Schoolbox instead.
 
     $yellow--print-media-type$white
         If set, generate PDFs using the print media type and its styles;
         otherwise, PDFs will be generated using the screen media type.
+        This option is not currently supported: PDFs will always be generated
+        with the print media type.
 
     $yellow--orientation-landscape$white
         If set, generate PDFs in landscape orientation: by default, they will be
         generated in portrait orientation.
 BASE;
-    }
-
-
-    /**
-     * Build a PDF generator with sensible settings.
-     *
-     * @return Pdf
-     */
-    private function buildPdfGenerator(): Pdf
-    {
-        $pdfGenerator = new Pdf('/usr/local/bin/wkhtmltopdf');
-
-        // TODO expose more CLI options
-        $pdfGenerator->setTimeout(120);
-        $pdfGenerator->setOption(
-            'orientation',
-            ($this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE) ? 'Landscape' : 'Portrait')
-        );
-        $pdfGenerator->setOption('disable-external-links', true);
-        $pdfGenerator->setOption('viewport-size', 1024);
-
-        if ($this->getOpt(self::OPT_LONG_PRINT_MEDIA_TYPE)) {
-            $pdfGenerator->setOption('print-media-type', true);
-        }
-
-        $userStyleSheet = $this->getOpt(self::OPT_LONG_USER_STYLE_SHEET);
-        if (isset($userStyleSheet)) {
-            $pdfGenerator->setOption('user-style-sheet', $userStyleSheet);
-        }
-        return $pdfGenerator;
     }
 
 
@@ -469,20 +443,19 @@ BASE;
     /**
      * Generates a PDF for this source.
      *
-     * @param SourceBundle $pdfSource
-     * @param string       $tempDir
-     * @param Pdf          $pdfGenerator
+     * @param SourceBundle                       $pdfSource
+     * @param string                             $tempDir
+     * @param Gotenberg\GotenbergClientInterface $pdfGenerator
+     * @param string                             $sessionHash
      * @return string
      */
-    private function generatePdf(SourceBundle $pdfSource, string $tempDir, Pdf $pdfGenerator): string
-    {
-        // Create the PDF
-        $filename = $tempDir . '/' . $pdfSource->getFilename();
-        $fp       = fopen($filename, 'wb');
-        if (!$fp) {
-            throw new RuntimeException("Unable to create file: '{$filename}'");
-        }
-
+    private function generatePdf(
+        SourceBundle $pdfSource,
+        string $tempDir,
+        Gotenberg\GotenbergClientInterface $pdfGenerator,
+        string $sessionHash
+    ): string {
+        $filename          = $tempDir . '/' . $pdfSource->getFilename();
         $maxAttempts       = 10;
         $attempts          = 0;
         $previousException = null;
@@ -493,12 +466,34 @@ BASE;
                 throw new RuntimeException("Unable to generate PDF after $maxAttempts attempts, skipping", 0, $previousException);
             }
             try {
-                // Create the file, applying the increased delay if necessary
-                $pdfGenerator->setOption('javascript-delay', $jsDelay);
                 $this->getLogger()->debug(
                     "Generating PDF from the following URLs:\n* " . implode("\n* ", $pdfSource->getUrls())
                 );
-                fwrite($fp, $pdfGenerator->getOutput($pdfSource->getUrls()));
+
+                // Gotenberg needs to download each URL individually:
+                // merge appears to not work with URLs.
+                // Just generate a PDF for each URL, then merge them.
+                /** @var Gotenberg\Document[] $files */
+                $files = [];
+                foreach ($pdfSource->getUrls() as $i => $url) {
+                    $request = new Gotenberg\URLRequest($url);
+                    $request->setWaitDelay($jsDelay / 1000);
+                    $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
+                    $request->addRemoteURLHTTPHeader('Cookie', sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash));
+
+                    // Gotenberg doesn't seem to care about the response code.
+                    // Just have to hope that no requests are made with an
+                    // invalid URL.
+                    $pdfGenerator->store($request, $tempDir . "/$i.pdf");
+                    $files[] = Gotenberg\DocumentFactory::makeFromPath("$i.pdf", $tempDir . "/$i.pdf");
+                }
+
+                // Merge the intermediary PDFs together, then delete them
+                $request = new Gotenberg\MergeRequest($files);
+                $pdfGenerator->store($request, $filename);
+                foreach ($files as $file) {
+                    unlink($tempDir . '/' . $file->getFileName());
+                }
                 break;
             } catch (RuntimeException $e) {
                 $this->getLogger()->warning($e->getMessage());
@@ -509,7 +504,6 @@ BASE;
                 $previousException = $e;
             }
         }
-        fclose($fp);
         return $filename;
     }
 
