@@ -4,6 +4,7 @@
     import LayoutListReversed from './layout-list-reversed.vue';
     import LayoutCard from './layout-card.vue';
     import articleListMixin from './article-list-mixin';
+    import axios from 'axios';
 
     export default {
         name: "article-list",

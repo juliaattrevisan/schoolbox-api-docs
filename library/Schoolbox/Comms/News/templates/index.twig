@@ -20,13 +20,20 @@
 
 {% block rssLink %}
     {% if rssRoute and topic %}
-        <span id="news-rss-link"><a :href="link" class='icon-rss' title="Download RSS feed for this topic" id="rss"></a></span>
+        <span id="news-rss-link">
+            <news-rss-link 
+                route="{{ rssRoute }}"
+                query-string-topic="{{ queryStringTopic }}"
+                topic="{{ topic }}"
+            />
+        </span>
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsRssLink.bundle.js"></script>
     {% endif %}
 {% endblock %}
 
 {% block newsContent %}
     {# has to live here instead of the scripts block below :( #}
-    <script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script>
+    {# <script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script> #}
 
     {% include '@commsNews/article-list.twig' with {
         initialPage: initialPage,
@@ -42,6 +49,7 @@
 
 {% block newsScripts %}
     <script>
+        /*
         var rssLink = new Vue({
             el: '#news-rss-link',
             delimiters: ['${', '}'],
@@ -56,5 +64,6 @@
                 }
             }
         });
+        */
     </script>
 {% endblock %}
