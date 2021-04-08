@@ -4,6 +4,9 @@
  * To select who will be able to see the news item
  * Various options are presented within a modal to 
  * specifically target grades / groups / campuses etc
+ * 
+ * ATTENTION - There's quite a few global vars from library/Schoolbox/Comms/News/templates/create.twig being referenced here
+ *             When you can't find the origin of a var, just search in the create.twig file 
  *
  */
 
