@@ -38,7 +38,7 @@ class Media extends Base
                     'data' => [
                         'type' => $type,
                         'hash' => $id,
-                        'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($this->item),
+                        'error' => QueueMapper::getInstance()->hasError($this->item),
                     ]
                 ]
             ];
@@ -50,7 +50,7 @@ class Media extends Base
                     'data' => [
                         'type' => $type,
                         'hash' => $id,
-                        'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($this->item),
+                        'error' => QueueMapper::getInstance()->hasError($this->item),
                     ]
                 ]
             ];
