@@ -117,10 +117,11 @@ class CourseManagedFields
         }
 
         /* You're editing an implementation that doesn't have the course managed restriction applied
-         * You can freely mutate its special fields as you wish
+         * You can freely mutate its special fields as you wish, but the checkbox itself can't be changed
+         * since it was defined by the course
          */
-        if ($context->isImplementationContext() && $this->assessment->getSpecificationAssessment() && !$this->assessment->getCourseManaged()) {
-            return true;
+        if ($context->isImplementationContext() && $this->assessment->getSpecificationAssessment()) {
+            return false;
         }
 
         /* You're editing a specification context, so you can apply this Course Managed setting and
