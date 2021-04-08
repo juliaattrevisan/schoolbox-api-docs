@@ -70,9 +70,9 @@
                                              #}
                                             {% if not (usage.folders|length == 1 and usage.folders[folder.id] is not null) %}
                                             <p class="meta">
-                                                Folder usages:
+                                                Pages:
                                                 {% for folderUsage in usage.folders %}
-                                                    <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }} ({{ folderUsage.numUsages }})</a>{% if not loop.last %}, {% endif %}
+                                                    <a href="/homepage/{{ folderUsage.folder.id }}">{{ folderUsage.folder.name }}</a>{% if not loop.last %}, {% endif %}
                                                 {% endfor %}
                                             </p>
                                             {% endif %}
@@ -80,9 +80,9 @@
 
                                         {% if usage.dashboards|length %}
                                         <p class="meta">
-                                            Dashboard usages:
+                                            Dashboard:
                                             {% for dashboardUsage in usage.dashboards %}
-                                                {{ dashboardUsage.name }} ({{ dashboardUsage.numUsages }}){% if not loop.last %}, {% endif %}
+                                                {{ dashboardUsage.name }}{% if not loop.last %}, {% endif %}
                                             {% endfor %}
                                         </p>
                                         {% endif %}
@@ -92,12 +92,13 @@
                                     <a class="icon-delete" data-delete="{{ routeLookupIfAuthorized('textbox.deleteTextbox', {id: usage.textbox.id, textbox: usage.textbox, folder: usage.textbox.category}) }}"></a>
                                 </nav>
                             </div>
-
-                            <div class="hide" data-collapse-state="collapsed" data-collapsable="collapser-{{ usage.textbox.id }}">
+                            <div class="hide actions-small-1" data-collapse-state="collapsed" data-collapsable="collapser-{{ usage.textbox.id }}">
                                 <article class="content">
                                     {{ usage.textbox.body|purify }}
                                 </article>
                             </div>
+
+
                         </li>
                     {% endfor %}
                 </ul>
