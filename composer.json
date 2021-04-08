@@ -85,7 +85,6 @@
         "onelogin/php-saml": "~3.5.1",
         "karriere/json-decoder": "~4.0.3",
         "crell/api-problem": "^3.0",
-        "knplabs/knp-snappy": "^1.1",
         "ext-redis": "*",
         "ext-readline": "*",
         "ext-zip": "*",
@@ -113,7 +112,9 @@
         "symfony/yaml": "^5.2",
         "maennchen/zipstream-php": "^2.1",
         "ext-mbstring": "*",
-        "ext-intl": "^7.4"
+        "ext-intl": "^7.4",
+        "guzzlehttp/guzzle": "^7.3",
+        "thecodingmachine/gotenberg-php-client": "^6.3"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",
