@@ -58,7 +58,7 @@
             <input type="hidden" name="courseManaged" value="0" />
 
             <label for="courseManaged" class="checkbox-label">Common assessment</label>
-            <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when due work is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span>
+            <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span>
 
             <div class="switch">
                 <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
