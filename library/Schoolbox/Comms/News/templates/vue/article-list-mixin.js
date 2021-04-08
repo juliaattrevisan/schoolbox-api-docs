@@ -58,6 +58,7 @@ export default {
             if (dispatchEvent) {
                 const event = new CustomEvent('article-list-mixin__onTabChange', {
                     detail: {
+                        queryStringTopic: this.queryStringTopic,
                         tab: tab
                     }
                 });

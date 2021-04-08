@@ -10,8 +10,15 @@ export default {
     
     props: {
         route: String,
-        queryStringTopic: String,
-        topic: String
+        initialQueryStringTopic: String,
+        initialTopic: String
+    },
+
+    data () {
+        return {
+            queryStringTopic: '',
+            topic: ''
+        }
     },
 
     computed: {
@@ -23,11 +30,15 @@ export default {
     },
 
     mounted () {
+        
+        this.queryStringTopic = this.initialQueryStringTopic;
+        this.topic = this.initialTopic;
 
         document.addEventListener('article-list-mixin__onTabChange', (event) => {
-            console.log('oi');
+            this.queryStringTopic = event.detail.queryStringTopic;
+            this.topic = event.detail.tab;
         });  
-        
+
     }
 
 }
