@@ -65,7 +65,7 @@ else
   backup_dir_name='backup_dir'
 fi
 backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='$backup_dir_name' \G;" | grep 'value' | cut -d' ' -f2`;
-backupdir=`readlink -f $backupdir/../`
+backupdir=`readlink --canonicalize-missing $backupdir/../`
 if [ "$backupdir" == "" ]; then
     echo "Unable to detect backup dir"
     exit 1;
