@@ -34,8 +34,13 @@
         <div class="small-12 {{ columnCss }} columns">
             <label>
                 Work Type
-                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %} >
-                    <option value="" selected>None</option>
+                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %}>
+                    <option value="" selected
+                        {% if courseManaged.isReadonly %}
+                            disabled
+                        {% endif %}
+                    >None
+                    </option>
                     {% for workType in allWorkTypes %}
                         <option value="{{ workType.id }}"
                             {% if assessment.workType.id ?? '' == workType.id %}
