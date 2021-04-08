@@ -24,11 +24,12 @@ $zone->attachFiles($files)->setMulti(true);
 $zone->renderIntoSitePage($this, 'AFFIX_LIB_LABEL_HERE');
 
 // jam in a twigged attachzone
-$twig = new Twig\Environment(new Twig\Loader\FilesystemLoader(SITE_root . '/templates/core/sub'));
+/** @var Twig\Environment $twig */
+$twig = $this->getDi()->get('templateEngine');
 
 $zone = new Zone('affix-twig-label-here');
 $zone->attachFiles($files)->setMulti(true)->setAttachmentsLabel('Attach your files here');
-$this->setVar('AFFIX_TWIG_LABEL_HERE', $twig->render('attachzone.twig', [ 'attachzone' => $zone->getTwigContext() ]));
+$this->setVar('AFFIX_TWIG_LABEL_HERE', $twig->render('sub/attachzone.twig', [ 'attachzone' => $zone->getTwigContext() ]));
 
 // output a few common vars
 $this->setVar([
