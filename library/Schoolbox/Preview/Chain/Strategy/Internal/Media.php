@@ -31,30 +31,6 @@ class Media extends Base
         }
 
         if ($this->item->getMimetype()->isVideo()) {
-            $error = true;
-
-            /* Check its status. If it's processing we can send that flag out to
-             * frontend so we can hide the controls from the ui
-             *
-             * Seems like you can only have unique hashes in this table via business
-             * logic, but not by db constraints like UNIQUE keys?
-             */
-            try {
-                $videoQueueItem = (QueueMapper::getInstance())
-                    ->findOneByColumn('hash', $this->item->getHash());
-
-                /* If it was in the queue, check its processing status
-                 * If it's complete, we can show it normally
-                 * Otherwise send the $error flag into the ui
-                 */
-                if ($videoQueueItem->isComplete()) {
-                    $error = false;
-                }
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                // noop: hash not found
-                // This file was never in the queue, so I guess we don't load it
-            }
-
             return [
                 'type' => 'inline',
                 'twig' => [
@@ -62,7 +38,7 @@ class Media extends Base
                     'data' => [
                         'type' => $type,
                         'hash' => $id,
-                        'error' => $error
+                        'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($this->item),
                     ]
                 ]
             ];
@@ -73,7 +49,8 @@ class Media extends Base
                     'template' => '@preview/Strategy/Internal/Audio.twig',
                     'data' => [
                         'type' => $type,
-                        'hash' => $id
+                        'hash' => $id,
+                        'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($this->item),
                     ]
                 ]
             ];
