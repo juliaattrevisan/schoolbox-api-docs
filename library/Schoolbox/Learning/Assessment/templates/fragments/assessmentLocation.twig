@@ -32,7 +32,7 @@
 {% endautoescape %}
 <div class="row">
     <div class="small-12 columns">
-        <label>Assessment Location</label>
+        <label>{{ locale.assessment.proper }} Location</label>
         <div class="input-group">
             <input type="hidden" id="locationId" name="locationId" value="{{ assessment.context.locationId }}">
             <input id="locationTitle" name="locationTitle" type="text" value="{{ assessment.context.locationTitle }}"
