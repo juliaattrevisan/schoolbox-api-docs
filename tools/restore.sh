@@ -288,7 +288,7 @@ searchlist='/usr/share/schoolbox/conf.php /usr/share/schoolboxdev/conf.php /vagr
 rm -f $sbrl;
 
 ## Detect database backups for this install
-thisinstall=`ls -1 $thisdatadir/{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null`;
+thisinstall=$(ls -1 $thisdatadir/{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null);
 echo -e "Local installs \c"
 if [ ! -z "$thisinstall" ];
 then
