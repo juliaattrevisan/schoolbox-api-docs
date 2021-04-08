@@ -162,6 +162,7 @@ module.exports = {
         articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
         authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
+        newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/initNewsItemAudienceSelect.js',
         
         //Learning
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',
@@ -173,7 +174,7 @@ module.exports = {
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
         staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/initStaleUsersReport.js',
-
+        
         usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/total.main.js',
         usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/role.main.js',
         usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/system.main.js',

@@ -1138,16 +1138,13 @@ Brick.prototype.getModifiersBitMap = function(modifiers){
  * @param {Object|string[]} entityTypeLabelMap  Maps entity types to human-friendly labels
  * @constructor
  */
-function BrickManager(vue, codec, entityTypeLabelMap) {
+function BrickManager(codec, entityTypeLabelMap) {
     "use strict";
 
     // Validate construction
     var errors = [];
     if (!(this instanceof BrickManager)) {
         errors.push("BrickManager needs to be called with the new keyword");
-    }
-    if (!(vue instanceof Vue)) {
-        errors.push("vue needs to be an instance of Vue");
     }
     if (!(codec instanceof Codec)) {
         errors.push("codec needs to be an instance of Codec");
@@ -1160,7 +1157,6 @@ function BrickManager(vue, codec, entityTypeLabelMap) {
     }
 
     var self                = this;
-    this.vue                = vue;
     this.codec              = codec;
     this.entityTypeLabelMap = entityTypeLabelMap;
 

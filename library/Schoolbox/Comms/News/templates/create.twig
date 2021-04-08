@@ -83,347 +83,6 @@
 {% endif %}
 {% set audiencePlaceholder = audienceIsReadOnly ? '' : 'Search for ' ~ availableNames|join(', ') ~ '...' %}
 
-<div class="actions-small-2 row">
-    <div class="small-12 columns">
-        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
-        <ul class="meta">
-            {% if article.acceptedBy %}
-                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
-                    {% if article.acceptedAt %}
-                        on {{ article.acceptedAt.local }}
-                    {% endif %}
-                </li>
-            {% endif %}
-        </ul>
-    </div>
-    {% set hasDropDownRoutes = deleteRoute ?? null %}
-    {% if hasDropDownRoutes %}
-        <nav>
-            <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
-        </nav>
-        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-
-            {% if deleteRoute %}
-                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString ?? '' }}"
-                       data-delete="{{ article.title }}">Delete</a></li>
-            {% endif %}
-
-        </ul>
-    {% endif %}
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-
-        {% set createRoute = routeLookupIfAuthorized('commsNews.postCreate') %}
-        {% if article.id %}
-            {% set updateRoute = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
-            {% set submitRoute = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
-            {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
-            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
-        {% endif %}
-
-        {# Create two possible routes:
-              * formAction: used for draft saving by the draft jQuery plugin, and for the secondary action of preview
-              * formActionSubmit: used for the primary action- either submitting (an unsubmitted article), or updating (a submitted article)
-        #}
-        {% if article.id and isAutoSavable %}
-            {% set formAction = updateRoute %}
-            {% if approveRoute %}
-                {% set formActionSubmit = approveRoute %}
-            {% else %}
-                {% set formActionSubmit = submitRoute %}
-            {% endif %}
-        {% elseif article.id %}
-            {% set formAction = '' %} {# No drafting or previewing if the article is submitted (not auto-savable) #}
-            {% set formActionSubmit = updateRoute %}
-        {% else %}
-            {% set formAction = createRoute %}
-            {# No submitting allowed until a draft has saved #}
-            {% set formActionSubmit = '' %}
-        {% endif %}
-
-        <form id="createForm" action="{{ formAction }}" data-action-draft="{{ formAction }}" data-action-submit="{{ formActionSubmit }}" method="post">
-            <section>
-                <fieldset class="content">
-                    {% if returnUrl|length %}
-                        <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
-                    {% endif %}
-                    <div class="small-12 columns">
-                        <label for="news-title" class="required">Title</label>
-                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" required />
-                    </div>
-
-                    <div class="small-12 columns">
-                        <label for="body">Body</label>
-                        <textarea id="body" name="body">{{ article.body }}</textarea>
-                    </div>
-
-                    <legend data-collapser="optional-section" class="icon-down-arrow" >Include a blurb to be displayed alongside the title</legend>
-                    <div class="column small-12 hide" data-collapsable="optional-section" data-collapse-state="collapsed" >
-                        <label for="blurb">Blurb</label>
-                        <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
-                    </div>
-                </fieldset>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>Feature Image</label>
-                        <p class="meta">Images uploaded to {{ locale.news }} are recommended to be landscape and a minimum of 750x500 pixels for a favourable viewing experience.</p>
-                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
-                    </div>
-
-                    <div class="small-12 columns">
-                        <label>Attachments</label>
-                        <p class="meta">Attach any related files here. Images are displayed automatically in their own gallery.</p>
-                        {% include 'sub/attachzone.twig' with { attachzone: fileZone } %}
-                    </div>
-                </fieldset>
-
-                <fieldset class="content" id="audience-select-container" v-if="countModalSegmentTypes">
-
-                    <div class="small-12 columns">
-                        <label class="required">Audience</label>
-                        <p class="meta">
-                            {% if not audienceIsReadOnly %}
-                            Target your article to a specific audience. Use the input box below to search, or use the 'Browse' button to select from a list of available options.
-                            {% else %}
-                                This audience can no longer be updated because the article is published. If you wish to update the audience,
-                                {% set unpublishLabel = 'unpublish this ' ~ locale.news %}
-                                {% if rejectRoute %}
-                                    <a id="unpublish-article" href="{{ rejectRoute }}" data-reject="{{ article.title }}">{{ unpublishLabel }}.</a>
-                                {% else %}
-                                    {{ unpublishLabel }}.
-                                {% endif %}
-                            {% endif %}
-                        </p>
-
-                        <ul class="grid small-block-grid-1 medium-block-grid-2 large-block-grid-4 audience-grid" v-show="audienceBricks.length">
-                            <li v-for="audienceBrick in audienceBricks">
-                                <div class="actions-small-1">
-                                    <div class="card small-12">
-                                        <h4 :title="audienceBrick.nameLabel">
-                                            ${ audienceBrick.nameLabel }
-                                        </h4>
-                                        <p class="meta">
-                                            ${ audienceBrick.typeLabel }
-                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">(view details)</a>
-                                        </p>
-                                        <p class="meta" :title="audienceBrick.modifier">
-                                            <a href="#" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.modifierLabel }</a>
-                                            <template v-if="audienceBrick.isSimple()">${ audienceBrick.modifierLabel }</template>
-                                        </p>
-                                    </div>
-                                    {% if not audienceIsReadOnly %}
-                                    <nav>
-                                        <a class="icon-close size-8" :title="'Remove ' + audienceBrick.nameLabel + ' from audience'" @click="removeAudienceBrick(audienceBrick)"></a>
-                                    </nav>
-                                    {% endif %}
-                                </div>
-                            </li>
-                        </ul>
-
-                        <div class="input-group" id="audience-selectize-group">
-                            <input type="text" id="audience-search" name="audience" placeholder="{{ audiencePlaceholder }}" required />
-                            <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
-                        </div>
-                    </div>
-
-                    {% if not audienceIsReadOnly %}
-                    {# audience browser modal #}
-                    <div data-reveal id="audience-browse" class="reveal-modal no-pad">
-
-                        <template v-if="canCreateComplex">
-                            <dl class="tabs text-center" role="tablist">
-                                <dd :class="{ active: pageShow.index || pageShow.valueSelect }" role="presentation"><a @click="showPage('index')">Select Audience</a></dd>
-                                <dd :class="{ active: pageShow.intersect }" role="presentation"><a @click="advancedToggle()">Create Composite Audience</a></dd>
-                            </dl>
-                        </template>
-
-                        <a class="close-reveal-modal" aria-label="Close">×</a>
-
-                        <div v-show="pageShow.index" class="reveal-modal-tab-content">
-                            <div class="small-12 medium-4 columns left" v-for="audienceOption in audienceOptions.base" v-if="!audienceOption.hideFromModal">
-                                <button class="button-block" @click="changePage(audienceOption)">
-                                    <i :class="'icon-' + audienceOption.icon"></i>
-                                    ${ audienceOption.namePlural }
-                                </button>
-                            </div>
-                        </div>
-
-                        <div v-show="pageShow.valueSelect" class="reveal-modal-tab-content">
-                            <div class="row">
-                                <div class="small-12 columns">
-                                    <ul class="breadcrumb" v-show="countModalSegmentTypes > 1">
-                                        <li><a href="#" @click.prevent="showPage('index')">Audience Types</a></li>
-                                        <li class="active"><a>${ selectedAudienceOption.namePlural }</a></li>
-                                    </ul>
-
-                                    <template v-if="tooltipText">
-                                        <p class="meta">${tooltipText}</p>
-                                    </template>
-
-                                    <div class="empty-state" v-show="showEmptyState">
-                                        <p>No ${ selectedAudienceOption.namePlural } found.</p>
-                                    </div>
-
-                                    <div class="checklist checklist-container" v-show="!showEmptyState">
-                                        <div class="loader" v-show="showLoader"></div>
-                                        <div class="checklist-wrapper" v-for="(audienceListItem, index) in audienceListItems">
-                                            <input type="checkbox" :id="'audience-list-input-' + index" :value="index" v-model="audienceListChecked" />
-                                            <label :for="'audience-list-input-' + index">${ audienceListItem }</label>
-                                        </div>
-                                    </div>
-
-                                    <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
-                                        <template v-if="showModifierSelfCheckbox">
-                                            <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
-                                            <label for="audience-select-users">${ selectedAudienceOption.selfModifier }</label>
-                                        </template>
-                                        <template v-if="showModifierParentsCheckbox">
-                                            <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
-                                            <label for="audience-select-parents">Parents of students</label>
-                                        </template>
-                                        <template v-if="showModifierTeachersCheckbox">
-                                            <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
-                                            <label for="audience-select-teachers">Teachers of students</label>
-                                        </template>
-                                    </fieldset>
-
-                                    <button class="button submit" @click.prevent="addAudienceSimple" :disabled="!submitEnable">Add</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-show="pageShow.intersect" class="reveal-modal-tab-content">
-                            <div class="row">
-                                <div class="small-12 columns">
-                                    <p class="meta">Choose audience types and select the appropriate tickboxes to create a composite audience. E.g. Parents and Students only in the Senior Campus.</p>
-                                    <div class="alert-box alert" v-if="isTooManyAdvancedSelections">
-                                        Too many selections. Please deselect some options.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <template v-for="(item, key, index) in intersect">
-                                    <div class="small-12 medium-6 columns checklist">
-                                        <legend>
-                                            <label for="">Audience Type ${ index + 1 }:</label>
-                                            <select @change="updateIntersectList(key)" v-model="intersect[key]">
-                                                <option :value="audienceOption" v-for="audienceOption in audienceOptions.intersect[key]" v-if="!audienceOption.hideFromModal">
-                                                    ${ audienceOption.name }
-                                                </option>
-                                            </select>
-                                        </legend>
-                                        <slot v-for="(item, key2) in audienceListItemsIntersect[key]">
-                                            <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]">
-                                            <label :for="key + '-' + key2" class="checkbox-label">${ item }</label>
-                                        </slot>
-                                    </div>
-                                </template>
-                            </div>
-
-                            <div class="row">
-                                <div class="small-12 columns">
-                                    <button class="button submit" @click.prevent="addAudienceIntersect" :disabled="!submitEnableAdvanced">Add</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                    {% endif %}
-
-                    {# composite info modal #}
-                    <div data-reveal id="audience-composite" class="reveal-modal">
-                        <a class="close-reveal-modal" aria-label="Close">×</a>
-
-                        <p v-if="selectedCompositeBrick.modalData">
-                            This portion of the audience consists of users who are in <strong>both</strong> one or more of these
-                            <strong>${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() }</strong> and one or more of these
-                            <strong>${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }</strong>.
-                        </p>
-
-                        <hr />
-
-                        <div class="row">
-                            <div class="small-12 medium-6 columns no-pad audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
-                                <p><strong>${ dimensionData.typeLabel.plural }</strong></p>
-
-                                <ul>
-                                    <template v-for="(label, index) in dimensionData.valueLabels">
-                                        <li>${ label }</li>
-                                    </template>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-
-                {# Only news moderator or superuser can change this setting
-                 # This prevents teachers getting over eager about their content
-                 #}
-                {% if isNewsModerator %}
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label for="news-sticky">Priority {{ locale.news.proper }}</label>
-                        <p class="meta">Article will be pinned to the top of the feed. The audience will be directly notified via email, push and instant notifications, regardless of user settings.</p>
-                        <div class="switch">
-                            <input id="news-sticky" type="checkbox" name="sticky" {{ article.sticky }} {% if article.sticky %}checked="checked"{% endif %}>
-                            <label for="news-sticky">
-                                <span>On</span>
-                                <span>Off</span>
-                            </label>
-                        </div>
-                    </div>
-                </fieldset>
-                {% endif %}
-
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label for="news-topics">Topics</label>
-                        <p class="meta">You can assign multiple topics to this {{ locale.news }} to help identify its purpose.</p>
-                        <select data-topics name="topics[]" id="news-topics" multiple></select>
-                    </div>
-                </fieldset>
-
-                <fieldset class="content">
-                    <div class="small-12 large-6 columns">
-                        <label for="publishAt" class="required">
-                            Publish Date
-                        </label>
-                        <p class="meta">This article becomes available to its audience once this date is reached.</p>
-                        <input type="text" name="publishAt" id="publishAt" data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" />
-                    </div>
-                    <div class="small-12 large-6 columns">
-                        <label for="expiresAt" class="required">
-                            Expiry Date
-                        </label>
-                        <p class="meta">This article is automatically archived once this expiry date is reached.</p>
-                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" />
-                    </div>
-                </fieldset>
-            </section>
-
-            <div class="row">
-                <div class="small-12 columns">
-                    <ul class="flex-list buttons" id="create-form-actions">
-                        {% if isAutoSavable %}
-                        <li>
-                            <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
-                        </li>
-                        {% endif %}
-                        <li>
-                            <button type="submit" class="submit" id="news-submit" {% if not article.id %}disabled{% endif %}>${ submitText }</button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="toast" id="saveDraft"></div>
-
 {% if not audienceIsReadOnly %}
 {# custom HTML for the audience selecize dropdown options. Client-side to ensure consitent human-readable entity types #}
 <div id="audience-selectize-dropdown-option">
@@ -442,7 +101,6 @@
 <script src="{{ CDN_PREFIX }}/javascript/shared/comms/audience-bricks.js"></script>
 <script src="{{ CDN_PREFIX }}/javascript/shared/selectize/selectize.min.js"></script>
 <script src="{{ CDN_PREFIX }}/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script>
 {% autoescape 'js' %}
 <script>
     'use strict';
@@ -755,7 +413,6 @@
         {% endif %}
     {% endfor %}
 
-
     // Bricks need to render various human-friendly labels, so inject the entityType labels
     // into the BrickManager so it can supply it to Bricks that it creates.
     var entityTypeLabelMap = {
@@ -826,7 +483,7 @@
         }
         return null;
     };
-
+    
     // Audience audienceSelectize where user can search for simple audience segments. The first is the jQuery DOM wrapper, the latter the Selecize plugin.
     /** @param {jQuery} $audienceSelectize */
     var $audienceSelectize;
@@ -837,597 +494,186 @@
     /** @param {Codec} codec */
     var codec = new Codec();
 
-    var app = new Vue({
-        el: '#audience-select-container',
-        delimiters: ['${', '}'],
-        mounted: function() {
-            var vue          = this;
-            brickManager = new BrickManager(vue, codec, entityTypeLabelMap);
+</script>
+{% endautoescape %}
 
-            $audienceSelectize = $('#audience-search');
+<div class="actions-small-2 row">
+    <div class="small-12 columns">
+        <h1>{{ action|capitalize }} {{ locale.news }} {{ indicator.render(article) }}</h1>
+        <ul class="meta">
+            {% if article.acceptedBy %}
+                <li class="icon-staff">Last moderated by {{ article.acceptedBy.fullname }}
+                    {% if article.acceptedAt %}
+                        on {{ article.acceptedAt.local }}
+                    {% endif %}
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+    {% set hasDropDownRoutes = deleteRoute ?? null %}
+    {% if hasDropDownRoutes %}
+        <nav>
+            <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
 
-            // Audience Selectize
-            // A blend of Vue and jQuery, what a world
-            audienceSelectize = $audienceSelectize.selectizeSelector({
-                ajax: {
-                    url: '{{ routeLookup('commsNewsAudienceBrowser.getSearch') }}',
-                    type: 'GET',
-                    dataType: 'json'
-                },
-                selectize: {
-                    valueField: 'key',
-                    labelField: 'name',
-                    searchField: 'name',
-                    render: {
-                        /**
-                         * Called when ajax call returns to render each item into dropdown list
-                         *
-                         * @param {Object} item     - The selected item from the AJAX set
-                         * @param {function} escape - A function that replaces [&<>"] chars with HTML character entities
-                         * @return {string}
-                         */
-                        option: function (item, escape) {
-                            if (!audienceIsReadOnly) {
-                                var segment = codec.decode(item.key),
-                                    entityType = segment.getEntityType(),
-                                    modifier = segment.getModifier();
+            {% if deleteRoute %}
+                <li><a class="icon-delete" href="{{ deleteRoute }}{{ returnUrlQueryString ?? '' }}"
+                       data-delete="{{ article.title }}">Delete</a></li>
+            {% endif %}
 
-                                var $option = $audienceSelectizeItemTemplate.clone();
-                                $option.find('[data-name]').html(escape(item.name));
-                                $option.find('[data-entityType]').html('(' + audienceOptions[entityType].name + ')');
-                                if ('self' !== modifier) {
-                                    $option.find('[data-modifier]').html('[' + modifierLabelMap[modifier] + ']');
-                                } else {
-                                    $option.find('[data-modifier]').remove();
-                                }
-                                return '<div>' + $option.html() + '</div>';
-                            }
-                        }
-                    },
-                    /**
-                     * Called when an item is added to audienceSelectize. (either due to initial value, option selection, or manual addition)
-                     *
-                     * We want to add the simple/composite segment to our bricks in Vue's data model, Vue will then update the Brick DOM for us.
-                     *
-                     * @param {string} key - The audience segment identifier, eg 'folder:Mzgx:parents_of'
-                     * @param {jQuery} $item - The jQuery wrapper of the DOM element that is displayed in default audienceSelectize
-                     */
-                    onItemAdd: function(key, $item) {
-                        var selectize = this;
+        </ul>
+    {% endif %}
+</div>
 
-                        // Selectize doesn't give us all the data of the selected item, find the item in the full list -_-
-                        var selectedItem = this.options[key];
+<div class="row">
+    <div class="small-12 island">
 
-                        brickManager.onAddSegment(audienceSelectize, vue.audienceBricks, key, selectedItem.name, $item, selectedItem.labels);
+        {% set createRoute = routeLookupIfAuthorized('commsNews.postCreate') %}
+        {% if article.id %}
+            {% set updateRoute = routeLookupIfAuthorized('commsNews.postUpdate', {article: article, articleId: article.id}) %}
+            {% set submitRoute = routeLookupIfAuthorized('commsNewsModeration.postSubmit', {article: article, articleId: article.id}) %}
+            {% set approveRoute = routeLookupIfAuthorized('commsNewsModeration.postApprove', {article: article, articleId: article.id}) %}
+            {% set rejectRoute = routeLookupIfAuthorized('commsNewsModeration.postReject', {article: article, articleId: article.id}) %}
+        {% endif %}
 
-                        if (!audienceIsReadOnly) {
-                            // Hide this item from the audienceSelectize list
-                            $item.addClass('hide');
+        {# Create two possible routes:
+              * formAction: used for draft saving by the draft jQuery plugin, and for the secondary action of preview
+              * formActionSubmit: used for the primary action- either submitting (an unsubmitted article), or updating (a submitted article)
+        #}
+        {% if article.id and isAutoSavable %}
+            {% set formAction = updateRoute %}
+            {% if approveRoute %}
+                {% set formActionSubmit = approveRoute %}
+            {% else %}
+                {% set formActionSubmit = submitRoute %}
+            {% endif %}
+        {% elseif article.id %}
+            {% set formAction = '' %} {# No drafting or previewing if the article is submitted (not auto-savable) #}
+            {% set formActionSubmit = updateRoute %}
+        {% else %}
+            {% set formAction = createRoute %}
+            {# No submitting allowed until a draft has saved #}
+            {% set formActionSubmit = '' %}
+        {% endif %}
 
-                            // Selectize hides the placeholder once an item is added- we want to keep it, quite hacky
-                            $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
+        <form id="createForm" action="{{ formAction }}" data-action-draft="{{ formAction }}" data-action-submit="{{ formActionSubmit }}" method="post">
+            <section>
+                <fieldset class="content">
+                    {% if returnUrl|length %}
+                        <input type="hidden" name="{{ RETURN_URL.name }}" value="{{ returnUrl }}" />
+                    {% endif %}
+                    <div class="small-12 columns">
+                        <label for="news-title" class="required">Title</label>
+                        <input id="news-title" name="title" type="text" maxlength="255" value="{{ article.title }}" required />
+                    </div>
 
-                            // The audienceSelectize dropdown doesn't position correctly for some reason with this setup so force reposition again after a very short timeout
-                            setTimeout(function () {
-                                audienceSelectize.positionDropdown();
+                    <div class="small-12 columns">
+                        <label for="body">Body</label>
+                        <textarea id="body" name="body">{{ article.body }}</textarea>
+                    </div>
 
-                                // Trigger a blur on the selectize so that validation updates
-                                // This has to happen on a slight delay as well for some reason
-                                selectize.$input.blur();
-                            }, 1);
-                        }
-                    },
-                    /**
-                     * Called when we remove an item from audienceSelectize. (either because we clicked X icon on audienceSelectize item, or programmatically)
-                     * @param {string} key    - eg 'composite:508:campus:509:IjIi:self,role:510:IjYi:self:self'
-                     * @param {jQuery} $item - Wrapper of audienceSelectize item
-                     */
-                    onItemRemove: function(key, $item) {
-                        brickManager.onRemoveSegment(key, $item);
-                        // Selectize hides the placeholder once an item is removed- we want to keep it, quite hacky
-                        $('#audience-search-selectized').attr('placeholder', '{{ audiencePlaceholder }}').css('width', '100%');
-                    }
-                },
-                {% if encodedSegments|length %}
-                value: {{ encodedSegments|json_encode|raw }},
+                    <legend data-collapser="optional-section" class="icon-down-arrow" >Include a blurb to be displayed alongside the title</legend>
+                    <div class="column small-12 hide" data-collapsable="optional-section" data-collapse-state="collapsed" >
+                        <label for="blurb">Blurb</label>
+                        <textarea id="blurb" name="blurb">{{ article.blurb }}</textarea>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Feature Image</label>
+                        <p class="meta">Images uploaded to {{ locale.news }} are recommended to be landscape and a minimum of 750x500 pixels for a favourable viewing experience.</p>
+                        {% include 'sub/attachzone.twig' with { attachzone: featureImageZone } %}
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>Attachments</label>
+                        <p class="meta">Attach any related files here. Images are displayed automatically in their own gallery.</p>
+                        {% include 'sub/attachzone.twig' with { attachzone: fileZone } %}
+                    </div>
+                </fieldset>
+                
+                <fieldset class="content" id="audience-select-container">
+                    <news-item-audience-select 
+                        audience-browser-search-url="{{ routeLookup('commsNewsAudienceBrowser.getSearch') }}"
+                        :audience-is-read-only="{{ audienceIsReadOnly ? 'true' : 'false' }}"
+                        locale-news="{{ locale.news }}"
+                        reject-route="{{ rejectRoute is defined ? rejectRoute : '' }}"
+                        :article="{{ article | json_encode }}"
+                        audience-placeholder="{{ audiencePlaceholder }}"
+                        :encoded-segments='{{ encodedSegments|json_encode|raw }}'
+                    />
+                </fieldset>
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsItemAudienceSelect.bundle.js"></script>
+
+                {# Only news moderator or superuser can change this setting
+                 # This prevents teachers getting over eager about their content
+                 #}
+                {% if isNewsModerator %}
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="news-sticky">Priority {{ locale.news.proper }}</label>
+                        <p class="meta">Article will be pinned to the top of the feed. The audience will be directly notified via email, push and instant notifications, regardless of user settings.</p>
+                        <div class="switch">
+                            <input id="news-sticky" type="checkbox" name="sticky" {{ article.sticky }} {% if article.sticky %}checked="checked"{% endif %}>
+                            <label for="news-sticky">
+                                <span>On</span>
+                                <span>Off</span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
                 {% endif %}
-                multiple: true
-            }).data('selectize');
-        },
-        data: {
-            // Prevent the user from submitting the composite modal form if current selections would exceed this number of composite segments.
-            // eg a 10 x 10 selection will create (10 * 10)*(2+1) = 300 rows in the audience segment table!
-            limitSegmentsPerAddition: 300,
 
-            // The audience groups available in the main simple-segment panel, and the dropdowns on the intersect panel
-            audienceOptions: {
-                base: Object.assign({}, audienceOptions),
-                intersect: {
-                    'primary': Object.assign({}, audienceOptions),
-                    'secondary': Object.assign({}, audienceOptions)
-                }
-            },
-
-            // Modal sections showing and hiding
-            pageShow: {
-                'index': true,
-                'valueSelect': false,
-                'intersect': false
-            },
-
-            // The option selected by the user from the initial modal screen
-            selectedAudienceOption: {},
-
-            // The list of options populated by ajax after the user selects an initial option
-            audienceListItems: {},
-            audienceListItemsIntersect: {
-                'primary': [],
-                'secondary': []
-            },
-
-            // The checked state of the above list items
-            audienceListChecked: [],
-
-            /**
-             * The set of audience bricks for this article
-             * @param {Brick[]}
-             */
-            audienceBricks: [],
-
-            // Preloader and empty state showing/hiding for the 2nd screen
-            showLoader: true,
-            showEmptyState: false,
-
-            // The checked state of the three checkboxes at the bottom of the 2nd modal screen
-            includeUsers: true,
-            includeParents: false,
-            includeTeachers: false,
-
-            // The selected intersect groups
-            // Default to campus and role
-            intersect: {
-                'primary': getDefaultIntersectAudience('primary', audienceOptions),
-                'secondary': getDefaultIntersectAudience('secondary', audienceOptions)
-            },
-
-            // The models for the checkboxes
-            intersectList: {
-                'primary': [],
-                'secondary': []
-            },
-
-            // Just a marker to check if advanced has been clicked for (need to load defaults on first click)
-            hasLoadedAdvanced: false,
-
-            // the composite brick currently selected for display in the composite details modal
-            selectedCompositeBrick: {}
-        },
-        methods: {
-            /**
-             * Opening the 'browse...' modal
-             * If only one audience type is available, just shows that. Otherwise displays an index page.
-             */
-            openBrowseModal: function () {
-                this.resetModal();
-
-                if (1 === this.countModalSegmentTypes) {
-                    // If only one audience type available, jump straight to that
-                    var audienceOption = null;
-                    for (var type in this.audienceOptions.base) {
-                        if (this.audienceOptions.base.hasOwnProperty(type)) {
-                            audienceOption = this.audienceOptions.base[type];
-                            break;
-                        }
-                    }
-                    this.changePage(this.audienceOptions.base[audienceOption.entityType]);
-                } else {
-                    // Reset everythang
-                    this.showPage('index');
-                }
-
-                // Open the modal
-                $('#audience-browse').foundation('reveal', 'open');
-            },
-
-            /**
-             * Selecting one of the initial options
-             * @param {AudienceOption} audienceOption
-             */
-            changePage: function (audienceOption) {
-                var self = this;
-
-                // Reset everything
-                self.resetModal();
-
-                // Show the page
-                self.showPage('valueSelect');
-
-                // Update the selected option
-                self.selectedAudienceOption = audienceOption;
-
-                // Not yet loaded?
-                if (audienceOption.isLoaded) {
-                    this.populateAudienceList(audienceOption);
-                } else {
-                    var callback = function(){
-                        self.populateAudienceList(audienceOption);
-                    };
-                    this.loadAudienceOptions(audienceOption, callback);
-                }
-            },
-
-            /**
-             * Loads available options for the specific audience option, then calls the specified callback
-             *
-             * @param {AudienceOption} audienceOption
-             * @param {function} callback
-             */
-            loadAudienceOptions: function(audienceOption, callback){
-                // Request a list of options with the uri listed in the object above
-                axios.get(audienceOption.ajax).then(function(response) {
-                    // Ensure we received expected payload
-                    if(
-                        undefined === response.data.availableModifiers ||
-                        undefined === response.data.canTargetNull ||
-                        undefined === response.data.valueLabels
-                    ) {
-                        throw new Error('Unable to process AJAX payload: ' + response);
-                    }
-                    // Cache the options
-                    audienceOption.availableModifiers = response.data.availableModifiers;
-                    audienceOption.isLoaded           = true;
-
-                    audienceOption.canTargetNull      = response.data.canTargetNull;
-                    audienceOption.valueLabels        = response.data.valueLabels;
-
-                    callback();
-                }).catch(function (error) {
-                    console.log(error);
-                });
-            },
-
-            /**
-             * Show the list of items, or show the empty state
-             * @param {AudienceOption} audienceOption
-             */
-            populateAudienceList: function (audienceOption) {
-                // Hide the loader
-                app.showLoader = false;
-
-                if (Object.keys(audienceOption.valueLabels).length) {
-                    // Populate the list with cached version
-                    app.audienceListItems = audienceOption.valueLabels;
-                } else {
-                    // Show empty state
-                    app.showEmptyState = true;
-                }
-            },
-
-            /**
-             * Submitting the simple-segment modal form
-             */
-            addAudienceSimple: function () {
-                var self       = this,
-                    entityType = self.selectedAudienceOption.entityType;
-
-                // Add to audienceSelectize
-                self.audienceListChecked.forEach(function (encodedValue) {
-                    self.injectSimpleSegment(self.selectedAudienceOption, entityType, encodedValue, self.selectedModifiers);
-                });
-
-                brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, self.audienceBricks, entityType);
-
-                audienceSelectize.refreshItems();
-
-                // Close modal
-                $('#audience-browse').foundation('reveal', 'close');
-            },
-
-            // Inject a simple segment item into audienceSelectize
-            injectSimpleSegment: function(audienceOption, entityType, encodedValue, modifiers) {
-
-                var entityTypeHR = entityTypeLabelMap[entityType];
-                var label = audienceOption.valueLabels[encodedValue];
-                var labels = {};
-                labels[entityType] = {};
-                labels[entityType][encodedValue] = label;
-
-                modifiers.forEach(function (modifier) {
-                    var option = {
-                        key:    codec.encodeSimpleAttributes(entityType, encodedValue, modifier),
-                        name:  '[' + entityTypeHR + ':' + label + ']^' + modifier,
-                        labels: labels
-                    };
-                    audienceSelectize.addOption(option);
-                    audienceSelectize.addItem(option.key);
-                });
-            },
-
-            // Submitting the composite-segment modal form
-            addAudienceIntersect: function () {
-
-                if (this.isTooManyAdvancedSelections) {
-                    throw new Error('Too many selections');
-                }
-
-                // TODO move this to BrickManager method. Pass in reference to Vue data
-
-                var self = this,
-                    entityTypePrimary = self.intersect.primary.entityType,
-                    entityTypePrimaryHR = entityTypeLabelMap[entityTypePrimary],
-                    entityTypeSecondary = self.intersect.secondary.entityType,
-                    entityTypeSecondaryHR = entityTypeLabelMap[entityTypeSecondary],
-                    simplifiedValues = [];
-
-                // Go through both lists, and if any is used in both, create simplified segment.
-                // Since any intersection with a simple segment is a subset, don't bother adding the subset.
-                if (entityTypePrimary === entityTypeSecondary) {
-                    self.intersectList.primary.forEach(function (primaryValue) {
-                        self.intersectList.secondary.forEach(function (secondaryValue) {
-                            if (primaryValue === secondaryValue) {
-                                self.injectSimpleSegment(self.intersect.primary, entityTypePrimary, primaryValue, ['self']);
-                                simplifiedValues.push(primaryValue);
-                            }
-                        });
-                    });
-                }
-
-                // Each checkbox in first dimension
-                self.intersectList.primary.forEach(function (primaryValue) {
-
-                    if(-1 !== simplifiedValues.indexOf(primaryValue)){
-                        return true;
-                    }
-
-                    var labelPrimary = self.intersect.primary.valueLabels[primaryValue];
-
-                    // Each checkbox in second dimension
-                    self.intersectList.secondary.forEach(function (secondaryValue) {
-
-                        if(-1 !== simplifiedValues.indexOf(secondaryValue)){
-                            return true;
-                        }
-
-                        var labelSecondary = self.intersect.secondary.valueLabels[secondaryValue];
-
-                        // Create a audienceSelectize item. Adding it will cause audienceSelectize to inject a Segment into the BrickManager
-                        var labels = {};
-                        labels[entityTypePrimary] = {};
-                        labels[entityTypePrimary][primaryValue] = labelPrimary;
-                        if (entityTypePrimary !== entityTypeSecondary) {
-                            labels[entityTypeSecondary] = {};
-                        }
-                        labels[entityTypeSecondary][secondaryValue] = labelSecondary;
-
-                        self.selectedModifiers.forEach(function (modifier) {
-
-                            // composite children are hard-coded to 'self' for now
-                            var ss1 = new Segment(entityTypePrimary, primaryValue, 'self', null),
-                                ss2 = new Segment(entityTypeSecondary, secondaryValue, 'self', null),
-                                cs = new Segment('composite', null, modifier, [ss1, ss2]);
-
-                            // Composite names are not displayed to user, but helpful for debugging.
-                            var name1 = '[' + entityTypePrimaryHR + ':' + labelPrimary + ']^S',
-                                name2 = '[' + entityTypeSecondaryHR + ':' + labelSecondary + ']^S',
-                                option = {
-                                    key: codec.encode(cs),
-                                    name: '[' + name1 + ' ∩ ' + name2 + ']^' + modifier,
-                                    labels: labels
-                                };
-
-                            audienceSelectize.addOption(option);
-                            audienceSelectize.addItem(option.key);
-                        });
-                    });
-                });
-
-                if(simplifiedValues.length){
-                    brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, self.audienceBricks, entityType);
-                }
-
-                // Close modal
-                $('#audience-browse').foundation('reveal', 'close');
-                self.intersectList.primary = [];
-                self.intersectList.secondary = [];
-
-                audienceSelectize.refreshItems();
-            },
-
-            /**
-             * Show the page specified, hiding the other
-             * @param page
-             */
-            showPage: function (page) {
-                // Set all pages to false to start
-                var self = this;
-                Object.keys(this.pageShow).forEach(function(page) {
-                    self.pageShow[page] = false;
-                });
-
-                // Set the specified page to true
-                this.pageShow[page] = true;
-            },
-
-            /**
-             * Reset the second modal section back to a default state
-             */
-            resetModal: function () {
-                this.audienceListItems = {};
-                this.audienceListChecked = [];
-                this.includeUsers = true;
-                this.includeParents = false;
-                this.includeTeachers = false;
-                this.showLoader = true;
-                this.showEmptyState = false;
-            },
-
-            /**
-             * Remove an audience item
-             * TODO ask the brick manager to do this, and pass it selecize
-             */
-            removeAudienceBrick: function(brick) {
-                brickManager.removeBrick(audienceSelectize, this.audienceBricks, brick);
-                audienceSelectize.refreshItems();
-            },
-
-            /**
-             * Clicking the 'advanced' tab
-             */
-            advancedToggle: function() {
-                if (!this.hasLoadedAdvanced) {
-                    // Load the defaults
-                    this.updateIntersectList('primary');
-                    this.updateIntersectList('secondary');
-                    // Update the flag
-                    this.hasLoadedAdvanced = true;
-                }
-
-                // Show the page always
-                this.showPage('intersect');
-            },
-
-            /**
-             * Update an intersect list with possible options
-             * @param {string} list 'primary' or 'secondary'
-             */
-            updateIntersectList: function(list) {
-                var self = this;
-                var audienceOption = self.intersect[list];
-
-                // Reset checked item model
-                self.intersectList[list] = [];
-
-                // Urgh
-                var otherList = (list === 'primary') ? 'secondary' : 'primary';
-
-                // Remove this option from the other dropdown if it is not a 1:N relationship
-                self.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
-                if (!audienceOption.isMulti) {
-                    //console.log('deleting from other list: ' + otherList + ' ' + audienceOption.entityType);
-                    Vue.delete(self.audienceOptions.intersect[otherList], audienceOption.entityType);
-                }
-
-                // Try for cached list
-                if (audienceOption.isLoaded) {
-                    self.audienceListItemsIntersect[list] = audienceOption.valueLabels;
-                } else { // Nope, ajax time
-
-                    var callback = function(){
-                        self.audienceListItemsIntersect[list] = audienceOption.valueLabels;
-                    };
-
-                    this.loadAudienceOptions(audienceOption, callback);
-                }
-            },
-
-            /**
-             * Populate and show a modal with info on a composite audience segment
-             * @param {Brick} audienceBrick
-             */
-            showCompositeInfo: function(audienceBrick) {
-                this.selectedCompositeBrick = audienceBrick;
-                // Show modal
-                $('#audience-composite').foundation('reveal', 'open');
-            }
-        },
-        computed: {
-            showModifierSelfCheckbox: function(){
-                return this.selectedAudienceOption.availableModifiers && -1 !== this.selectedAudienceOption.availableModifiers.indexOf('self');
-            },
-            showModifierParentsCheckbox: function(){
-                return this.selectedAudienceOption.availableModifiers && -1 !== this.selectedAudienceOption.availableModifiers.indexOf('parents_of');
-            },
-            showModifierTeachersCheckbox: function(){
-                return this.selectedAudienceOption.availableModifiers && -1 !== this.selectedAudienceOption.availableModifiers.indexOf('teachers_of');
-            },
-            showModifierCheckboxes: function(){
-                return this.showModifierParentsCheckbox || this.showModifierTeachersCheckbox;
-            },
-            /**
-             * Disable the modal submit button until each of the checklists has something checked
-             */
-            submitEnable: function () {
-                return !!(this.audienceListChecked.length && (this.includeUsers || this.includeParents || this.includeTeachers));
-            },
-            submitEnableAdvanced: function () {
-                return !!(this.intersectList.primary.length && this.intersectList.secondary.length && !this.isTooManyAdvancedSelections);
-            },
-            isTooManyAdvancedSelections: function() {
-                return (this.intersectList.primary.length * this.intersectList.secondary.length) * 3 > this.limitSegmentsPerAddition;
-            },
-            selectedModifiers: function(){
-                var modifiers = [];
-                if (this.includeUsers) {
-                    modifiers.push('self');
-                }
-                if (this.includeParents) {
-                    modifiers.push('parents_of');
-                }
-                if (this.includeTeachers) {
-                    modifiers.push('teachers_of');
-                }
-                return modifiers;
-            },
-            // Returns the number of different audience segment entity-types available in the modal
-            countModalSegmentTypes: function(){
-                var count = 0;
-                for(var i in audienceOptions){
-                    if(audienceOptions.hasOwnProperty(i) && !audienceOptions[i].hideFromModal){
-                        count++;
-                    }
-                }
-                return count;
-            },
-            // Returns whether the user can create a complex audience
-            canCreateComplex: function(){
-                if(this.countModalSegmentTypes > 1){
-                    return true;
-                }
-                for(var i in audienceOptions){
-                    if(audienceOptions.hasOwnProperty(i) && !audienceOptions[i].hideFromModal && audienceOptions[i].isMulti){
-                        return true;
-                    }
-                }
-                return false;
-            },
-            tooltipText: function(){
-                var availableMods = [];
-                var tooltipPrefixText = '';
-                var tooltipSufixText = '';
-
-                for(var i in this.selectedAudienceOption.availableModifiers){
-                    if (this.selectedAudienceOption.availableModifiers.hasOwnProperty(i)) {
-                        availableMods.push(this.selectedAudienceOption.availableModifiers[i]);
-                    }
-                }
-
-                if (availableMods.length === 1 && availableMods[0] === 'self') {
-                    switch (this.selectedAudienceOption.name.toLowerCase()) {
-                        case 'campus':
-                            return 'Select ' + this.selectedAudienceOption.name.toLowerCase() + ' below, please note these include all members of the campus including staff, parents and students.';
-                            break;
-
-                        default:
-                            return false;
-                    }
-                }
-
-                if (availableMods.length > 1){
-                    var selectedMods = [];
-                    availableMods.forEach(function(element) {
-                        selectedMods.push(tooltipTextLabelMap[element]);
-                    });
-
-                    tooltipPrefixText = 'Select ' + this.selectedAudienceOption.namePlural + ' below, then choose whether you would like to include the ';
-                    tooltipSufixText = ', or a combination.';
-
-                    return tooltipPrefixText + selectedMods.join(', ') + tooltipSufixText;
-
-                }
-            }
-        }
-    });
-
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="news-topics">Topics</label>
+                        <p class="meta">You can assign multiple topics to this {{ locale.news }} to help identify its purpose.</p>
+                        <select data-topics name="topics[]" id="news-topics" multiple></select>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 large-6 columns">
+                        <label for="publishAt" class="required">
+                            Publish Date
+                        </label>
+                        <p class="meta">This article becomes available to its audience once this date is reached.</p>
+                        <input type="text" name="publishAt" id="publishAt" data-datepicker-time data-datesync-enddate="#expiresAt" maxlength="50" value="{{ article.publishAt.local }}" />
+                    </div>
+                    <div class="small-12 large-6 columns">
+                        <label for="expiresAt" class="required">
+                            Expiry Date
+                        </label>
+                        <p class="meta">This article is automatically archived once this expiry date is reached.</p>
+                        <input type="text" name="expiresAt" id="expiresAt" data-datepicker-time data-datesync-startdate="#publishAt" maxlength="50" value="{{ article.expiresAt.local }}" />
+                    </div>
+                </fieldset>
+            </section>
+
+            <div class="row">
+                <div class="small-12 columns">
+                    <ul class="flex-list buttons" id="create-form-actions">
+                        {% if isAutoSavable %}
+                        <li>
+                            <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
+                        </li>
+                        {% endif %}
+                        <li>
+                            <button type="submit" class="submit" id="news-submit" {% if not article.id %}disabled{% endif %}>${ submitText }</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="toast" id="saveDraft"></div>
+
+<script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script>
+{% autoescape 'js' %}
+<script>
     var formActionsApp = new Vue({
         el: '#create-form-actions',
         delimiters: ['${', '}'],
