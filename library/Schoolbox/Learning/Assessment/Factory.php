@@ -160,7 +160,7 @@ class Factory
         $this->setWeight(trim($post['weight']));
         $this->setCurriculumNodes($post['curriculumCodes']);
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
-        $this->setCourseManaged($post['courseManaged'] === 'on');
+        $this->setCourseManaged((bool)$post['courseManaged']);
         $this->setPublishAt(trim($post['publishDate']));
         $this->setOpenAt(trim($post['openDate']));
         $this->setDueAt(trim($post['dueDate']));

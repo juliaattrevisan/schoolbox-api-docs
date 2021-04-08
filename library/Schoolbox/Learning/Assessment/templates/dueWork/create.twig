@@ -34,8 +34,13 @@
         <div class="small-12 {{ columnCss }} columns">
             <label>
                 Work Type
-                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %} >
-                    <option value="" selected>None</option>
+                <select name="workType" {% if courseManaged.isReadonly %}readonly{% endif %}>
+                    <option value="" selected
+                        {% if courseManaged.isReadonly %}
+                            disabled
+                        {% endif %}
+                    >None
+                    </option>
                     {% for workType in allWorkTypes %}
                         <option value="{{ workType.id }}"
                             {% if assessment.workType.id ?? '' == workType.id %}
@@ -54,11 +59,13 @@
 
             {# For when the checkbox itself is disabled, since that won't submit to backend
              # under those circumstances, inadvertently unlocking this setting
+             #
+             # If it's been disabled, preserve whatever setting it currently has
              #}
-            <input type="hidden" name="courseManaged" value="0" />
+            <input type="hidden" name="courseManaged" value="{% if not courseManaged.isMutable %}{{ assessment.courseManaged }}{% else %}0{% endif %}" />
 
-            <label for="courseManaged" class="checkbox-label">Common assessment</label>
-            <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when due work is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span>
+            <label for="courseManaged" class="checkbox-label">Common Assessment</label>
+            <span class="hint has-tip tip-top"  title="To ensure consistency across the cohort, when {{ locale.dueWork.proper }} is imported to a class, the following fields will not be editable; Title, Type, Weight, Mark Type and Rubric." data-tooltip="">?</span>
 
             <div class="switch">
                 <input name="courseManaged" id="courseManaged" type="checkbox" {% if assessment.courseManaged %}checked="checked"{% endif %} {% if not courseManaged.isMutable %}disabled{% endif %}/>
