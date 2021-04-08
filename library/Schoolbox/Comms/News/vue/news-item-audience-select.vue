@@ -7,6 +7,8 @@
  *
  */
 
+import Vue from 'vue';
+
 export default {
 
     props: {
@@ -185,7 +187,7 @@ export default {
 
             if (availableMods.length > 1){
                 var selectedMods = [];
-                availableMods.forEach(function(element) {
+                availableMods.forEach((element) => {
                     selectedMods.push(tooltipTextLabelMap[element]);
                 });
 
@@ -327,23 +329,21 @@ export default {
          * @param {AudienceOption} audienceOption
          */
         changePage (audienceOption) {
-            var self = this;
-
             // Reset everything
-            self.resetModal();
+            this.resetModal();
 
             // Show the page
-            self.showPage('valueSelect');
+            this.showPage('valueSelect');
 
             // Update the selected option
-            self.selectedAudienceOption = audienceOption;
+            this.selectedAudienceOption = audienceOption;
 
             // Not yet loaded?
             if (audienceOption.isLoaded) {
                 this.populateAudienceList(audienceOption);
             } else {
-                var callback = function(){
-                    self.populateAudienceList(audienceOption);
+                var callback = () => {
+                    this.populateAudienceList(audienceOption);
                 };
                 this.loadAudienceOptions(audienceOption, callback);
             }
@@ -357,7 +357,7 @@ export default {
          */
         loadAudienceOptions (audienceOption, callback) {
             // Request a list of options with the uri listed in the object above
-            axios.get(audienceOption.ajax).then(function(response) {
+            axios.get(audienceOption.ajax).then((response) => {
                 // Ensure we received expected payload
                 if(
                     undefined === response.data.availableModifiers ||
@@ -374,7 +374,7 @@ export default {
                 audienceOption.valueLabels        = response.data.valueLabels;
 
                 callback();
-            }).catch(function (error) {
+            }).catch((error) => {
                 console.log(error);
             });
         },
@@ -400,15 +400,15 @@ export default {
          * Submitting the simple-segment modal form
          */
         addAudienceSimple () {
-            var self       = this,
-                entityType = self.selectedAudienceOption.entityType;
+            
+            let entityType = this.selectedAudienceOption.entityType;
 
             // Add to audienceSelectize
-            self.audienceListChecked.forEach(function (encodedValue) {
-                self.injectSimpleSegment(self.selectedAudienceOption, entityType, encodedValue, self.selectedModifiers);
+            this.audienceListChecked.forEach((encodedValue) => {
+                this.injectSimpleSegment(this.selectedAudienceOption, entityType, encodedValue, this.selectedModifiers);
             });
 
-            brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, self.audienceBricks, entityType);
+            brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, this.audienceBricks, entityType);
 
             audienceSelectize.refreshItems();
 
@@ -425,7 +425,7 @@ export default {
             labels[entityType] = {};
             labels[entityType][encodedValue] = label;
 
-            modifiers.forEach(function (modifier) {
+            modifiers.forEach((modifier) => {
                 var option = {
                     key:    codec.encodeSimpleAttributes(entityType, encodedValue, modifier),
                     name:  '[' + entityTypeHR + ':' + label + ']^' + modifier,
@@ -445,20 +445,19 @@ export default {
 
             // TODO move this to BrickManager method. Pass in reference to Vue data
 
-            var self = this,
-                entityTypePrimary = self.intersect.primary.entityType,
-                entityTypePrimaryHR = entityTypeLabelMap[entityTypePrimary],
-                entityTypeSecondary = self.intersect.secondary.entityType,
-                entityTypeSecondaryHR = entityTypeLabelMap[entityTypeSecondary],
-                simplifiedValues = [];
+            let entityTypePrimary = this.intersect.primary.entityType;
+            let entityTypePrimaryHR = entityTypeLabelMap[entityTypePrimary];
+            let entityTypeSecondary = this.intersect.secondary.entityType;
+            let entityTypeSecondaryHR = entityTypeLabelMap[entityTypeSecondary];
+            let simplifiedValues = [];
 
             // Go through both lists, and if any is used in both, create simplified segment.
             // Since any intersection with a simple segment is a subset, don't bother adding the subset.
             if (entityTypePrimary === entityTypeSecondary) {
-                self.intersectList.primary.forEach(function (primaryValue) {
-                    self.intersectList.secondary.forEach(function (secondaryValue) {
+                this.intersectList.primary.forEach((primaryValue) => {
+                    this.intersectList.secondary.forEach((secondaryValue) => {
                         if (primaryValue === secondaryValue) {
-                            self.injectSimpleSegment(self.intersect.primary, entityTypePrimary, primaryValue, ['self']);
+                            this.injectSimpleSegment(this.intersect.primary, entityTypePrimary, primaryValue, ['self']);
                             simplifiedValues.push(primaryValue);
                         }
                     });
@@ -466,22 +465,22 @@ export default {
             }
 
             // Each checkbox in first dimension
-            self.intersectList.primary.forEach(function (primaryValue) {
+            this.intersectList.primary.forEach((primaryValue) => {
 
                 if(-1 !== simplifiedValues.indexOf(primaryValue)){
                     return true;
                 }
 
-                var labelPrimary = self.intersect.primary.valueLabels[primaryValue];
+                var labelPrimary = this.intersect.primary.valueLabels[primaryValue];
 
                 // Each checkbox in second dimension
-                self.intersectList.secondary.forEach(function (secondaryValue) {
+                this.intersectList.secondary.forEach((secondaryValue) => {
 
                     if(-1 !== simplifiedValues.indexOf(secondaryValue)){
                         return true;
                     }
 
-                    var labelSecondary = self.intersect.secondary.valueLabels[secondaryValue];
+                    var labelSecondary = this.intersect.secondary.valueLabels[secondaryValue];
 
                     // Create a audienceSelectize item. Adding it will cause audienceSelectize to inject a Segment into the BrickManager
                     var labels = {};
@@ -492,7 +491,7 @@ export default {
                     }
                     labels[entityTypeSecondary][secondaryValue] = labelSecondary;
 
-                    self.selectedModifiers.forEach(function (modifier) {
+                    this.selectedModifiers.forEach((modifier) => {
 
                         // composite children are hard-coded to 'self' for now
                         var ss1 = new Segment(entityTypePrimary, primaryValue, 'self', null),
@@ -515,13 +514,13 @@ export default {
             });
 
             if(simplifiedValues.length){
-                brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, self.audienceBricks, entityType);
+                brickManager.onAddSetSimpleSegmentsViaUi(audienceSelectize, this.audienceBricks, entityType);
             }
 
             // Close modal
             $('#audience-browse').foundation('reveal', 'close');
-            self.intersectList.primary = [];
-            self.intersectList.secondary = [];
+            this.intersectList.primary = [];
+            this.intersectList.secondary = [];
 
             audienceSelectize.refreshItems();
         },
@@ -532,9 +531,8 @@ export default {
          */
         showPage (page) {
             // Set all pages to false to start
-            var self = this;
-            Object.keys(this.pageShow).forEach(function(page) {
-                self.pageShow[page] = false;
+            Object.keys(this.pageShow).forEach((page) => {
+                this.pageShow[page] = false;
             });
 
             // Set the specified page to true
@@ -584,29 +582,29 @@ export default {
          * @param {string} list 'primary' or 'secondary'
          */
         updateIntersectList (list) {
-            var self = this;
-            var audienceOption = self.intersect[list];
+            
+            var audienceOption = this.intersect[list];
 
             // Reset checked item model
-            self.intersectList[list] = [];
+            this.intersectList[list] = [];
 
             // Urgh
             var otherList = (list === 'primary') ? 'secondary' : 'primary';
 
             // Remove this option from the other dropdown if it is not a 1:N relationship
-            self.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
+            this.audienceOptions.intersect[otherList] = Object.assign({}, audienceOptions);
             if (!audienceOption.isMulti) {
                 //console.log('deleting from other list: ' + otherList + ' ' + audienceOption.entityType);
-                Vue.delete(self.audienceOptions.intersect[otherList], audienceOption.entityType);
+                Vue.delete(this.audienceOptions.intersect[otherList], audienceOption.entityType);
             }
 
             // Try for cached list
             if (audienceOption.isLoaded) {
-                self.audienceListItemsIntersect[list] = audienceOption.valueLabels;
+                this.audienceListItemsIntersect[list] = audienceOption.valueLabels;
             } else { // Nope, ajax time
 
-                var callback = function(){
-                    self.audienceListItemsIntersect[list] = audienceOption.valueLabels;
+                var callback = () => {
+                    this.audienceListItemsIntersect[list] = audienceOption.valueLabels;
                 };
 
                 this.loadAudienceOptions(audienceOption, callback);
@@ -760,8 +758,8 @@ export default {
                                 </select>
                             </legend>
                             <slot v-for="(item, key2) in audienceListItemsIntersect[key]">
-                                <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]" :key="key2">
-                                <label :for="key + '-' + key2" class="checkbox-label" :key="key2">{{ item }}</label>
+                                <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]" :key="key2 + '-input'">
+                                <label :for="key + '-' + key2" class="checkbox-label" :key="key2 + '-label'">{{ item }}</label>
                             </slot>
                         </div>
                     </template>
