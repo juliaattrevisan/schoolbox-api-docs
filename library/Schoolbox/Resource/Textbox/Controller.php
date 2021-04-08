@@ -33,7 +33,8 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper                 $mapper
+     * @param Component_ConfigMapper $componentConfigMapper
      */
     public function __construct(Mapper $mapper, Component_ConfigMapper $componentConfigMapper)
     {
@@ -139,5 +140,69 @@ class Controller extends Base
         return $model->setHeading($data->heading)
                      ->setBody($data->body)
                      ->setDeletedAt(null);
+    }
+
+
+    /**
+     * A list of all the textboxes that exist in $folderId
+     * Also get an index of their usages
+     *
+     * @api GET /textbox/folder/{id}
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     */
+    public function getIndexForFolder(\Schoolbox\Resource\Folder\Model $folder): void
+    {
+        $allBreadcrumbs = [
+            [$folder->getNameWithCodes(), "/homepage/{$folder->getId()}"],
+            ['Textbox', null]
+        ];
+
+        /* Textbox usage data struct
+         */
+        $usages = $this->mapper->findUsage($folder->getId());
+
+        $this->response->content->set($this->buildHtmlOutput('@textbox/index.twig', [
+            'folder' => $folder,
+            'allBreadcrumbs' => $allBreadcrumbs,
+            'usages' => $usages,
+        ]));
+    }
+
+
+    /**
+     * Mass rename textboxes from a set of (textboxId, name) tuples
+     *
+     * @param FolderModel $folder
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postRename(\Schoolbox\Resource\Folder\Model $folder): void
+    {
+        $tuples = $this->getRequest()->post['textbox'] ?? [];
+
+        $textboxes = $this->mapper->findByColumn('textboxID', array_keys($tuples))->indexBy('id');
+
+        /* Update heading for every textbox requested
+         *
+         * If someone else deletes a textbox in the meantime it's okay,
+         * because findByColumn won't retrieve it despite it being in
+         * the POST payload
+         */
+        foreach ($textboxes as $textbox) {
+            $newHeading = trim((string)$this->getRequest()->post['textbox'][$textbox->getId()]);
+
+            /* Only save headings if they had length (ignore empties)
+             */
+            if ('' !== $newHeading) {
+                $textbox->setHeading($newHeading);
+
+                $this->mapper->save($textbox);
+            }
+        }
+
+        /* I guess you go back to the homepage instead of the Textbox Usage index...?
+         */
+        $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
     }
 }

@@ -81,6 +81,7 @@ class Module extends BaseModule
             ];
         };
 
+        $this->register('GET', '/folder/{folderId}', 'getIndexForFolder', $folderAuth, $folderPreload);
         $this->register('POST', '/folder/{folderId:\d+}', 'createTextboxInFolder', $folderAuth, $folderPreload);
         $this->register(
             'POST',
@@ -89,6 +90,7 @@ class Module extends BaseModule
             $folderAuth,
             $componentPreload
         );
+        $this->register('POST', '/rename/{folderId:\d+}', 'postRename', $folderAuth, $folderPreload);
         $this->register('PUT', '/{id:\d+}', 'updateTextbox', $folderAuth, $textboxPreload);
         $this->register('DELETE', '/{id:\d+}', 'deleteTextbox', $folderAuth, $textboxPreload);
     }
