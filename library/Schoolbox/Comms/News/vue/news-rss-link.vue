@@ -23,6 +23,12 @@ export default {
 
     computed: {
         
+        /**
+         * the rss link, that changes on tab selection changes
+         *
+         * @returns {String} eg: https://vagrant.dev.schoolbox.cloud/news/feed/baf8da85532750735975e1809?topic=academic
+         *
+         */
         link () {
             return this.route + '?' + this.queryStringTopic + '=' + this.topic;
         }
@@ -30,14 +36,32 @@ export default {
     },
 
     mounted () {
-        
-        this.queryStringTopic = this.initialQueryStringTopic;
-        this.topic = this.initialTopic;
+        this.initData();
+        this.initTabChangeListener();
+    },
 
-        document.addEventListener('article-list-mixin__onTabChange', (event) => {
-            this.queryStringTopic = event.detail.queryStringTopic;
-            this.topic = event.detail.tab;
-        });  
+    methods: {
+
+        /**
+         * those that will change
+         *
+         */
+        initData () {
+            this.queryStringTopic = this.initialQueryStringTopic;
+            this.topic = this.initialTopic;
+        },
+
+        /**
+         * Vue can't track data that is changed from a completely disconnected Vue component
+         * So #article-list-mixin dipatches the event so the link can change
+         *
+         */
+        initTabChangeListener () {
+            document.addEventListener('article-list-mixin__onTabChange', (event) => {
+                this.queryStringTopic = event.detail.queryStringTopic;
+                this.topic = event.detail.tab;
+            }); 
+        }
 
     }
 
