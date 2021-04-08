@@ -119,7 +119,7 @@ class CourseManagedFields
         /* You're editing an implementation that doesn't have the course managed restriction applied
          * You can freely mutate its special fields as you wish
          */
-        if ($context->isImplementationContext() && !$this->assessment->getCourseManaged()) {
+        if ($context->isImplementationContext() && $this->assessment->getSpecificationAssessment() && !$this->assessment->getCourseManaged()) {
             return true;
         }
 
@@ -159,7 +159,7 @@ class CourseManagedFields
          * locked in the course specification, so you can't change stuff...unless you're
          * a superuser, then you can change stuff
          */
-        if ($context->isImplementationContext() && $this->assessment->getCourseManaged()) {
+        if ($context->isImplementationContext() && $this->assessment->getSpecificationAssessment() && $this->assessment->getCourseManaged()) {
             return !$this->viewer->isSuperuser();
         }
 
