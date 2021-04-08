@@ -155,8 +155,8 @@ module.exports = {
         resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/calendar.main.js',
         resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js',
         eventDetails: './library/Schoolbox/Calendar/Event/templates/vue/index.js',
-        calendarComponent: './library/Schoolbox/Calendar/vue/component.main.js',
-
+		calendarComponent: './library/Schoolbox/Calendar/vue/component.main.js',
+		
         //News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/initArticleList.js',
