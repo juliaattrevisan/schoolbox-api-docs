@@ -28,3 +28,4 @@ UPDATE config SET value='vagrant' WHERE name='site_type';
 UPDATE config SET value='1' WHERE name='debug_show_stack_trace';
 UPDATE config SET value='1' WHERE name = 'strict_templates';
 UPDATE config SET value='1' WHERE name = 'debug_templates';
+UPDATE config SET value='http://localhost:3000' WHERE name = 'gotenberg_host';
