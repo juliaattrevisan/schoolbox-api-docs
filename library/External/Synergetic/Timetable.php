@@ -645,7 +645,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $quotedFileTypes    = empty($allowedFileTypes)
             ? ''
-            : implode("','", array_map([$this->database, 'legacyQuote',], $allowedFileTypes));
+            : implode(',', array_map([$this->database, 'legacyQuote',], $allowedFileTypes));
         $allowedFileTypeSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
 
         if ($this->groupHandler->isStudent($userId)) {
@@ -724,7 +724,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $allowedFileTypes    = $this->getAllowedFileTypes();
         $quotedFileTypes     = empty($allowedFileTypes)
             ? ''
-            : implode("','", array_map([$this->getDatabase(), 'legacyQuote',], $allowedFileTypes));
+            : implode(',', array_map([$this->getDatabase(), 'legacyQuote',], $allowedFileTypes));
         $allowedFileTypesSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
 
         if ($this->groupHandler->isStudent($userId)) {
