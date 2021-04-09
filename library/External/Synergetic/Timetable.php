@@ -286,7 +286,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 return $dateFileSemesterYear['fileSemester'];
             }
         }
-        return $this->externalUser->getCurrentYear($externalId);
+        return $this->externalUser->getCurrentSemester($externalId);
     }
 
 
