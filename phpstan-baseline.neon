@@ -1441,11 +1441,6 @@ parameters:
 			path: library/Custom/Stk/OleReport/Controller.php
 
 		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Custom/Stk/OleReport/Module.php
-
-		-
 			message: "#^Method Custom\\\\Stk\\\\OleReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Custom/Stk/OleReport/Module.php

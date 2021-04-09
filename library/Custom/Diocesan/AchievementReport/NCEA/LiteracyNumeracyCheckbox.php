@@ -71,27 +71,17 @@ class LiteracyNumeracyCheckbox extends Base
 
         $result = $this->db->executeQuery($query, $params)->fetch();
 
-        if (is_array($result)) {
-
-            /* Cast everything as an int - mssql can return empty
-             * count value, which is a shame
-             */
-            foreach ($result as $key => &$value) {
-                $value += 0;
-            }
-
-            /* That stupid php bug
-             */
-            unset($value);
-
-            return $result;
+        /* Cast everything as an int - mssql can return empty
+         * count value, which is a shame
+         */
+        foreach ($result as $key => &$value) {
+            $value += 0;
         }
 
-        return [
-            'UE Literacy' => 0,
-            'UE Numeracy' => 0,
-            'Level 1 Literacy' => 0,
-            'Level 1 Numeracy' => 0
-        ];
+        /* That stupid php bug
+         */
+        unset($value);
+
+        return $result;
     }
 }
