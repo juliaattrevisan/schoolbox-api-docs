@@ -147,7 +147,7 @@ module.exports = {
         strtotime: './www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js',
 
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
-        
+
         //Calendars
         fullCalendar: './library/Schoolbox/Calendar/vue/fullCalendar.main.js',
         assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/calendar.main.js',
@@ -156,26 +156,27 @@ module.exports = {
         resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js',
         eventDetails: './library/Schoolbox/Calendar/Event/templates/vue/index.js',
         calendarComponent: './library/Schoolbox/Calendar/vue/component.main.js',
-        
+
         //News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
-        articleList: './library/Schoolbox/Comms/News/templates/vue/article-list.js',
-        articleThreads: './library/Schoolbox/Comms/News/templates/vue/init-article-threads.js',
-        authored: './library/Schoolbox/Comms/News/vue/authored.main.js',
+        articleList: './library/Schoolbox/Comms/News/templates/vue/initArticleList.js',
+        articleThreads: './library/Schoolbox/Comms/News/templates/vue/initArticleThreads.js',
+        newsAuthored: './library/Schoolbox/Comms/News/vue/initNewsAuthored.js',
         newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/initNewsItemAudienceSelect.js',
         newsItemFormActions: './library/Schoolbox/Comms/News/vue/initNewsItemFormActions.js',
+        newsRssLink: './library/Schoolbox/Comms/News/vue/initNewsRssLink.js',
 
         //Learning
         learningMomentsEvidenceDetail: './library/Schoolbox/Learning/Moment/Evidence/vue/evidence-detail.js',
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/feeds.main.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
-        
+
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
         staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/initStaleUsersReport.js',
-        
+
         usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/total.main.js',
         usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/role.main.js',
         usageGlobalSystem: './library/Schoolbox/Admin/Usage/vue/global/system.main.js',
@@ -211,35 +212,35 @@ module.exports = {
             },
             {
                 test: require.resolve('dropzone'),
-                loader: 'expose-loader', 
+                loader: 'expose-loader',
                 options: {
                     exposes: { globalName: 'Dropzone', override: true }
                 },
             },
             {
                 test: require.resolve('moment'),
-                loader: 'expose-loader', 
+                loader: 'expose-loader',
                 options: {
                     exposes: { globalName: 'moment', override: true }
                 },
             },
             {
                 test: require.resolve('axios'),
-                loader: 'expose-loader', 
+                loader: 'expose-loader',
                 options: {
                     exposes: { globalName: 'axios', override: true }
                 },
             },
             {
                 test: require.resolve('lodash'),
-                loader: 'expose-loader', 
+                loader: 'expose-loader',
                 options: {
                     exposes: { globalName: '_', override: true }
                 },
             },
             {
                 test: require.resolve('intro.js'),
-                loader: 'expose-loader', 
+                loader: 'expose-loader',
                 options: {
                     exposes: { globalName: 'IntroJs', moduleLocalName: 'introJs', override: true }
                 },
@@ -281,7 +282,7 @@ module.exports = {
                 }
             },
             {
-                test: /\.css$/, 
+                test: /\.css$/,
                 use: ['vue-style-loader', 'css-loader'],
             },
             {

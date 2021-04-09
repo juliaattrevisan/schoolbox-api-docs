@@ -100,11 +100,6 @@
     'initialTopic': ''
 } %}
 
-<div id="news-component">
-    <article-list :data="{{ articleListData | json_encode }}"></article-list>
-</div>
-<div id='toaster' class="toast" data-toast></div>
-
 <script>
     'use strict';
 
@@ -121,4 +116,10 @@
         'content-type': 'application/x-www-form-urlencoded'
     }
 </script>
+
+<div id="news-component">
+    <article-list :data="{{ articleListData | json_encode }}"></article-list>
+</div>
 <script src="{{ CDN_PREFIX }}/javascript/components/articleList.bundle.js"></script>
+
+<div id='toaster' class="toast" data-toast></div>

@@ -22,7 +22,7 @@ export default {
          * @param {boolean} persistPage
          * @param {boolean} holdState - Whether to change the window's history or not
          */
-        onTabChange: function (tab, persistPage, holdState) {
+        onTabChange: function (tab, persistPage, holdState, dispatchEvent=false) {
             var self = this;
 
             self.tabSelected = tab;
@@ -54,6 +54,17 @@ export default {
             if (typeof rssLink !== 'undefined') {
                 rssLink.topic = tab;
             }
+
+            if (dispatchEvent) {
+                const event = new CustomEvent('article-list-mixin__onTabChange', {
+                    detail: {
+                        queryStringTopic: this.queryStringTopic,
+                        tab: tab
+                    }
+                });
+                document.dispatchEvent(event);
+            }
+
         },
 
 
