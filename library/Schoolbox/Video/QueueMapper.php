@@ -18,6 +18,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\UserMapper;
 
 /**
@@ -56,6 +57,42 @@ class QueueMapper extends Mapper
         $this->uses('createdOn', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
         $this->uses('modifiedOn', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
     }
+
+
+    /**
+     * Find out if $file had an error during transcode
+     *
+     * @param IStorage $file
+     * @return bool
+     */
+    public function hasError(IStorage $file): bool
+    {
+        /* Find the transcode status for transcodable items
+         * Namely audio files and video files
+         */
+        $error = true;
+
+        if ($file->getMimetype()->isAudio() || $file->getMimetype()->isVideo()) {
+            try {
+                $videoQueueItem = $this->findOneByColumn('hash', $file->getStorage()->getHash());
+
+                /* If it was in the queue, check its processing status
+                 * If it's complete, we can show it normally
+                 * Otherwise send the $error flag into the ui
+                 */
+                if ($videoQueueItem->isComplete()) {
+                    $error = false;
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                // noop: hash not found
+                // This file was never in the queue, so I guess we don't load it
+            }
+        }
+
+        return $error;
+    }
+
 
     /**
      * Return all pending transcodes

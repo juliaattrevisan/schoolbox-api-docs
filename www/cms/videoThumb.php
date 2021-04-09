@@ -68,7 +68,7 @@ if (isset($type, $id)) {
         // If it hasn't finished processing, display please wait image
         // (Do not cache, because the video should be done processing soon)
         if (!$videoQueue->isComplete()) {
-            $prefixGenerator->redirectTemporary("/images/core/video-processing.png");
+            $prefixGenerator->redirectTemporary("/images/core/video-processing.gif");
             exit;
         }
 

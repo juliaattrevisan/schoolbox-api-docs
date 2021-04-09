@@ -341,6 +341,7 @@ abstract class AbstractController extends BaseController
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
             'RETURN_URL'=> Redirect::RETURN_URL . '=' . Redirect::encode("/resources/$folderId"),
+            'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($file),
         ];
 
         $this->getResponse()->content->set([
