@@ -102,15 +102,9 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('category', 'f')},
                 COUNT(*) AS numUsages
-            FROM component_definition cd
-            INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
-            INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
-            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
-            INNER JOIN textBox ON cci.value = textBox.textBoxID
-            INNER JOIN folder f ON ci.identifier = f.id
-            WHERE cd.`class` = :controller
-            AND ccd.`key` = :key
-            AND textBox.categoryID = :folderId
+            FROM textBox 
+            INNER JOIN folder f ON textBox.categoryID = f.id
+            WHERE textBox.categoryID = :folderId
             AND textBox.deleted IS NULL
             AND f.deleted_at IS NULL
             GROUP BY f.id, textBox.textBoxID
@@ -119,8 +113,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $homepageUsageStatement = $this->database->prepare($homepageUsageQuery);
 
         $homepageUsageStatement->execute([
-            'controller' => self::COMPONENT_CONTROLLER,
-            'key' => self::COMPONENT_KEY,
             'folderId' => $folderId,
         ]);
 
