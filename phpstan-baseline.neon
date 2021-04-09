@@ -1466,16 +1466,6 @@ parameters:
 			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
-
-		-
-			message: "#^Array \\(array\\<string\\>\\) does not accept GuzzleHttp\\\\Psr7\\\\Uri\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/ParticipationReport/Module.php
