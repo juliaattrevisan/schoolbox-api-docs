@@ -10531,11 +10531,6 @@ parameters:
 			path: library/Session.php
 
 		-
-			message: "#^Property SitePage\\:\\:\\$di \\(Aura\\\\Di\\\\Container\\) does not accept Aura\\\\Di\\\\ContainerInterface\\.$#"
-			count: 2
-			path: library/SitePage.php
-
-		-
 			message: "#^Comparison operation \"\\<\" between \\(array\\|float\\|int\\) and int results in an error\\.$#"
 			count: 1
 			path: library/SitePage.php

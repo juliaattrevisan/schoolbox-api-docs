@@ -22,7 +22,7 @@ class SitePage extends Page
 
     /**
      * The dependency injection container, injected into SitePage!
-     * @var Aura\Di\Container
+     * @var Aura\Di\ContainerInterface
      */
     protected $di;
 
