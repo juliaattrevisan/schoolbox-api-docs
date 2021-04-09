@@ -396,7 +396,7 @@ class CliPdfGenerator extends CliTool\PdfGenerator\App
      * @param User  $student
      * @param array $externalStudent
      * @param null|string $excludedClassCodes
-     * @return Uri[]
+     * @return string[]
      * @throws \Aura\Router\Exception\RouteNotFound
      * @throws InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException

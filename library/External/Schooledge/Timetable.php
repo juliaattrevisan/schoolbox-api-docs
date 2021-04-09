@@ -492,7 +492,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             WHERE t.Name = {$quotedCampus}
             ORDER BY TimetableDate ASC
         ");
-        if (is_array($timetableDates)) {
+        if (!empty($timetableDates)) {
             $timetableDates = array_combine(
                 array_column($timetableDates, 'TimetableDate'),
                 $timetableDates
@@ -714,8 +714,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
         }
 
 
-        $result = $this->database->getAll($query);
-        return is_array($result) ? $result : [];
+        return $this->database->getAll($query);
     }
 
 

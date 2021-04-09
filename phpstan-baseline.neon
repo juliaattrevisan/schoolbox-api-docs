@@ -1441,11 +1441,6 @@ parameters:
 			path: library/Custom/Stk/OleReport/Controller.php
 
 		-
-			message: "#^Call to an undefined method Aura\\\\Di\\\\ContainerInterface\\:\\:lazy\\(\\)\\.$#"
-			count: 1
-			path: library/Custom/Stk/OleReport/Module.php
-
-		-
 			message: "#^Method Custom\\\\Stk\\\\OleReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Custom/Stk/OleReport/Module.php
@@ -1467,16 +1462,6 @@ parameters:
 
 		-
 			message: "#^Property Custom\\\\Tigs\\\\Summative\\\\CliPdfGenerator\\:\\:\\$folderMapper \\(Schoolbox\\\\Resource\\\\Folder\\\\Mapper\\) does not accept Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
-
-		-
-			message: "#^Array \\(array\\<string\\>\\) does not accept GuzzleHttp\\\\Psr7\\\\Uri\\.$#"
 			count: 1
 			path: library/Custom/Tigs/Summative/CliPdfGenerator.php
 
@@ -2954,51 +2939,6 @@ parameters:
 			message: "#^Method Leave_RequestMapper\\:\\:findNextPendingByHouseId\\(\\) should return Leave_Request but returns null\\.$#"
 			count: 1
 			path: library/Leave/RequestMapper.php
-
-		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Constructor of class MSSQL has an unused parameter \\$db\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Constructor of class MSSQL has an unused parameter \\$optionalConfig\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Property MSSQL\\:\\:\\$connector \\(Alaress\\\\Database\\\\Connector\\\\Base\\) does not accept Alaress\\\\Database\\\\Connector\\\\IConnector\\|null\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Method MSSQL\\:\\:getIterator\\(\\) should return MssqlResultIterator but returns Alaress\\\\Database\\\\Iterator\\\\IIterator\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 2
-			path: library/MSSQL.php
-
-		-
-			message: "#^Function mssql_num_rows not found\\.$#"
-			count: 2
-			path: library/MssqlResultIterator.php
-
-		-
-			message: "#^Function mssql_data_seek not found\\.$#"
-			count: 2
-			path: library/MssqlResultIterator.php
-
-		-
-			message: "#^Function mssql_fetch_assoc not found\\.$#"
-			count: 1
-			path: library/MssqlResultIterator.php
 
 		-
 			message: "#^Cannot access offset 'published' on bool\\.$#"
@@ -5124,16 +5064,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/Factory.php
-
-		-
-			message: "#^Variable \\$stmt might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/Factory.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"

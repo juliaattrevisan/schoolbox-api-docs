@@ -126,13 +126,7 @@ abstract class Base extends AchievementReportBase
                 StrippedResult DESC
         ";
 
-        $result = $this->db->executeQuery($query, $params)->fetchAll();
-
-        if (is_array($result)) {
-            return $result;
-        }
-
-        return [];
+        return $this->db->executeQuery($query, $params)->fetchAll();
     }
 
 
@@ -179,13 +173,7 @@ abstract class Base extends AchievementReportBase
                 StrippedResult DESC
         ";
 
-        $result = $this->db->executeQuery($query, $params)->fetchAll();
-
-        if (is_array($result)) {
-            return $result;
-        }
-
-        return [];
+        return $this->db->executeQuery($query, $params)->fetchAll();
     }
 
 

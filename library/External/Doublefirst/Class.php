@@ -1,6 +1,6 @@
 <?php
 
-use External\IConnector;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Database\Factory;
 
 /**
