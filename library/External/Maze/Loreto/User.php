@@ -269,12 +269,12 @@ class External_Maze_Loreto_User extends External_Maze_User {
             $splitNames = explode(' ', $name);
 
             foreach ($splitNames as $splitName) {
-                $splitName = $this->getDb()->quote($splitName);
+                $splitName = $this->getDb()->legacyQuote('%' . $splitName . '%');
                 $query .= "
                     AND (
-                        (ST.SURNAME LIKE '%{$splitName}%')
+                        (ST.SURNAME LIKE {$splitName})
                         OR
-                        (ST.FIRST_NAME LIKE '%{$splitName}%')
+                        (ST.FIRST_NAME LIKE {$splitName})
                     )
                 ";
             }
@@ -301,10 +301,10 @@ class External_Maze_Loreto_User extends External_Maze_User {
 		/* Search for a particular form
 		 */
 		if ($form) {
-			$form = $this->getDb()->quote($form);
+			$form = $this->getDb()->legacyQuote($form);
 
 			$query .= "
-				AND KGC.DESCRIPTION = '{$form}'
+				AND KGC.DESCRIPTION = {$form}
 			";
 		}
 

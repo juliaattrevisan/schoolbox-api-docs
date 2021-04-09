@@ -1,4 +1,8 @@
 <?php
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * Synergetic implementation of External_UserDetentionInterface
  *
@@ -12,12 +16,12 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     use External_Synergetic_ValidateExternalIdTrait;
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     protected $database;
 
     public function __construct() {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
     /**
@@ -40,18 +44,18 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             'ID = :externalId'
         );
         $params = array(
-            ':externalId' => "'".$this->database->quote($externalId)."'",
+            ':externalId' => $this->database->legacyQuote($externalId),
         );
 
         // Apply date checks
         if ($dateField) {
             if ($fromDate) {
-                $whereParts[]        = $dateField.' >= :fromDate';
-                $params[':fromDate'] = "'".$this->database->quote($fromDate->format('Y-m-d'))."'";
+                $whereParts[]        = $dateField . ' >= :fromDate';
+                $params[':fromDate'] = $this->database->legacyQuote($fromDate->format('Y-m-d'));
             }
             if ($toDate) {
-                $whereParts[]      = $dateField.' <= :toDate';
-                $params[':toDate'] = "'".$this->database->quote($toDate->format('Y-m-d'))."'";
+                $whereParts[]      = $dateField . ' <= :toDate';
+                $params[':toDate'] = $this->database->legacyQuote($toDate->format('Y-m-d'));
             }
         }
 
@@ -91,12 +95,12 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         $query = strtr(
             $query,
             array(
-                ':externalId' => "'".$this->database->quote($externalId)."'",
-                ':year'       => "'".$this->database->quote($year)."'",
-                ':semester'   => "'".$this->database->quote($semester)."'",
+                ':externalId' => $this->database->legacyQuote($externalId),
+                ':year'       => $this->database->legacyQuote($year),
+                ':semester'   => $this->database->legacyQuote($semester),
             )
         );
-        
+
         return $this->database->getAll($query);
     }
 
@@ -118,7 +122,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             %s
             ORDER BY DetentionDate DESC
         ";
-        list($wherePart, $params) = $this->buildWherePart(
+        [$wherePart, $params] = $this->buildWherePart(
             $externalId, 'DetentionDate', $fromDate, $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);
@@ -152,7 +156,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             -- AND AbsenceTypeCode != ''
             ORDER BY EventDateTime DESC
         ";
-        list($wherePart, $params) = $this->buildWherePart(
+        [$wherePart, $params] = $this->buildWherePart(
             $externalId, 'EventDateTime', $fromDate, $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);

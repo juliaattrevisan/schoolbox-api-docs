@@ -105,11 +105,11 @@ class External_Tass_V52_User extends External_Tass_User
         if (empty($externalUserIds)) {
             return [];
         }
-        $idList = implode(',', array_map([$this->database, 'smartQuote'], $externalUserIds));
+        $idList = implode(',', array_map([$this->database, 'legacyQuote'], $externalUserIds));
 
         $charIndexQuery = [];
         foreach ($externalUserIds as $externalId) {
-            $charIndexQuery[] = "(CHARINDEX(','+ '{$this->database->quote($externalId)}' +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
+            $charIndexQuery[] = "(CHARINDEX(','+ {$this->database->legacyQuote($externalId)} +',', ','+RTRIM(sf.stud_codes)+',') > 0)";
         }
         $charIndexQueryString = implode(' OR ', $charIndexQuery);
 

@@ -5,7 +5,10 @@
  * @link        https://schoolbox.com.au/
  *
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus as CampusModel;
+use Schoolbox\Database\Factory;
 
 /**
  * Class External_Doublefirst_Timetable
@@ -14,7 +17,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 {
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -36,7 +39,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('doublefirst');
         $this->helper = new External_Doublefirst_Helper();
     }
@@ -47,7 +50,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition(?string $externalUserId, CampusModel $campus, $day = 1, $date = null): array
     {
-        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $fileYear = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
 
         /**
          * Doublefirst has timetable definitions for each year level. This is likely to cause
@@ -107,7 +110,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         if ($type == 'student') {
             $query .= "
                 WHERE
-                p.AcademicYear = '{$fileYear}' AND
+                p.AcademicYear = {$fileYear} AND
                 p.YearGroup = '{$studentDetails['YearGroupID']}' AND
                 p.DayOfWeek = 1
             ";
@@ -121,7 +124,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             $query .=
                 "
                 WHERE
-                    p.AcademicYear = '{$fileYear}' AND
+                    p.AcademicYear = {$fileYear} AND
                     p.YearGroup IN ({$yearGroups}) AND
                     p.DayOfWeek = 1
             ";
@@ -145,7 +148,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             SELECT TOP 1 SchoolStartTime, NoOfPeriods
             FROM AttendancePeriodStructure
             WHERE {$yearGroupQuery}
-            AND AcademicYear = '{$fileYear}'
+            AND AcademicYear = {$fileYear}
             AND DayOfWeek = 1
         ";
 
@@ -427,7 +430,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             $type = 'student';
         }
 
-        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $fileYear = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
 
         $query =
             "
@@ -490,7 +493,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 JOIN SubjectMaster sm ON
                 sm.SubjectID = tcr.SubjectID
 
-                WHERE tcr.AcademicYear = '{$fileYear}'
+                WHERE tcr.AcademicYear = {$fileYear}
                 AND ps.PupilID = '{$externalUserId}'
                 AND tm.DayOfWeek + ((tm.WeekNumber - 1) * {$campus->getTimetableDay()}) = {$dayNumber}
 
@@ -550,7 +553,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 tn.TimetableName = tm.TimetableName AND
                 tn.IsWorking = 1
 
-                WHERE tcr.AcademicYear = '{$fileYear}'
+                WHERE tcr.AcademicYear = {$fileYear}
                 AND tcs.StaffID = '{$externalUserId}'
                 AND tcr.YearGroup IN ({$yearGroups})
                 AND tm.DayOfWeek + ((tm.WeekNumber - 1) * {$campus->getTimetableDay()}) = {$dayNumber}
@@ -649,7 +652,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             }
         }
 
-        $fileYear = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $fileYear = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
 
         $query =
             "
@@ -711,7 +714,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 JOIN SubjectMaster sm ON
                 sm.SubjectID = tcr.SubjectID
 
-                WHERE tcr.AcademicYear = '{$fileYear}'
+                WHERE tcr.AcademicYear = {$fileYear}
                 AND ps.PupilID = '{$externalUserId}'
 
                 ORDER BY DayNumber, PeriodNumber
@@ -770,7 +773,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 tn.TimetableName = tm.TimetableName AND
                 tn.IsWorking = 1
 
-                WHERE tcr.AcademicYear = '{$fileYear}'
+                WHERE tcr.AcademicYear = {$fileYear}
                 AND tcs.StaffID = '{$externalUserId}'
                 AND tcr.YearGroup IN ({$yearGroups})
                 ORDER BY DayNumber, PeriodNumber
@@ -860,7 +863,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private function setDatabase($database)
     {
@@ -869,7 +872,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {

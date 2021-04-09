@@ -6,7 +6,6 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Factory as DatabaseFactory;
 use InvalidArgumentException;
-use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 

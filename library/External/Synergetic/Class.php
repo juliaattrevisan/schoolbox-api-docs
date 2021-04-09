@@ -4,8 +4,10 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate;
 use Alaress\Database\Quoter\Sqlsrv\Quoter;
+use Schoolbox\Database\Factory;
 
 /**
  * This file provides access to synergetic class info
@@ -16,7 +18,7 @@ class External_Synergetic_Class implements External_ClassInterface
     use External_Synergetic_ClearInvalidValuesTrait;
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -30,7 +32,7 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->setExternalUser(new External_User('synergetic'));
     }
 
@@ -48,10 +50,10 @@ class External_Synergetic_Class implements External_ClassInterface
         foreach ($subCodeArray as $code) {
             if (strpos($code, '/') !== false) {
                 $codeArray = explode('/', $code, 2);
-                $classQuery .= "( ClassCode = '{$this->database->quote($codeArray[1])}' AND ClassCampus = '{$this->database->quote($codeArray[0])}' ) OR ";
+                $classQuery .= "( ClassCode = {$this->database->legacyQuote($codeArray[1])} AND ClassCampus = {$this->database->legacyQuote($codeArray[0])}) OR ";
             }
             // SB class code may or may not have the SIS campus code prefixed, a '/' char is not conclusive as a class code can contain this.
-            $classQuery .= "ClassCode = '{$this->database->quote($code)}' OR ";
+            $classQuery .= "ClassCode = {$this->database->legacyQuote($code)} OR ";
         }
 
         return substr($classQuery, 0, -3) . ')';
@@ -73,18 +75,18 @@ class External_Synergetic_Class implements External_ClassInterface
     public function getClass($classCode, \Schoolbox\User $user, int $fileYearOverride = null, int $fileSemesterOverride = null, string $fileType = null)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
-        $fileSemester = $this->database->quote($fileSemesterOverride ?? $this->externalUser->getCurrentSemester($user->getExternalId()));
-        $fileYear = $this->database->quote($fileYearOverride ?? $this->externalUser->getCurrentYear($user->getExternalId()));
+        $fileSemester = $this->database->legacyQuote($fileSemesterOverride ?? $this->externalUser->getCurrentSemester($user->getExternalId()));
+        $fileYear = $this->database->legacyQuote($fileYearOverride ?? $this->externalUser->getCurrentYear($user->getExternalId()));
 
         $query = "
             SELECT *
             FROM dbo.SubjectClasses
             WHERE {$classQuery}
-            AND FileYear='{$fileYear}'
-            AND FileSemester='{$fileSemester}'";
+            AND FileYear={$fileYear}
+            AND FileSemester={$fileSemester}";
 
         if (null !== $fileType) {
-            $query .= " AND FileType='{$this->database->quote($fileType)}'";
+            $query .= " AND FileType={$this->database->legacyQuote($fileType)}";
         }
 
         $query .= ' ORDER BY ClassCampus';
@@ -104,10 +106,9 @@ class External_Synergetic_Class implements External_ClassInterface
 
         // Get fileType to limit the data to
         $allowedFileTypes = $this->getAllowedFileTypes();
-        $quotedFileTypes    = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
-                $this->database,
-                'quote',
-            ], $allowedFileTypes)) . "'";
+        $quotedFileTypes    = empty($allowedFileTypes)
+            ? ''
+            : implode(",", array_map([$this->database, 'legacyQuote',], $allowedFileTypes));
         $allowedFileTypeSql = empty($quotedFileTypes) ? '' : " AND StudentClasses.FileType IN ({$quotedFileTypes}) ";
 
         $classQuery = $this->getClassCodeQuery($classCode);
@@ -116,8 +117,8 @@ class External_Synergetic_Class implements External_ClassInterface
         /** @var Schoolbox\User $sessionUser */
         $sessionUser = isset($_SESSION['user']) ? $_SESSION['user'] : null;
         $userExternalId = $sessionUser instanceof \Schoolbox\User ? $sessionUser->getExternalId() : null;
-        $fileSemester = $this->getDatabase()->quote($this->getExternalUser()->getCurrentSemester($userExternalId));
-        $fileYear = $this->getDatabase()->quote($this->getExternalUser()->getCurrentYear($userExternalId));
+        $fileSemester = $this->getDatabase()->legacyQuote($this->getExternalUser()->getCurrentSemester($userExternalId));
+        $fileYear = $this->getDatabase()->legacyQuote($this->getExternalUser()->getCurrentYear($userExternalId));
 
         $query = "
         SELECT DISTINCT vStudentsAll.StudentSurname as lastname,
@@ -141,8 +142,8 @@ class External_Synergetic_Class implements External_ClassInterface
         )
         JOIN dbo.Community cstu ON (vStudentsAll.ID = cstu.ID)
         WHERE $classQuery
-            AND (StudentClasses.FileYear='" . $fileYear . "')
-            AND (StudentClasses.FileSemester='" . $fileSemester . "')
+            AND (StudentClasses.FileYear={$fileYear})
+            AND (StudentClasses.FileSemester={$fileSemester})
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
             AND NOT (vStudentsAll.StudentStatusSynergyMeaning IN ('LEFT', 'LEAVING') AND DATEDIFF(DAY, sy.LeavingDate, GETDATE()) > 0)
@@ -238,9 +239,9 @@ class External_Synergetic_Class implements External_ClassInterface
         $database = $this->getDatabase();
 
         $params = [
-            ':type' => "'" . $database->quote($filetype) . "'",
-            ':year' => "'" . $database->quote($this->externalUser->getCurrentYear()) . "'",
-            ':semester' => "'" . $database->quote($this->externalUser->getCurrentSemester()) . "'",
+            ':type'     => $database->legacyQuote($filetype),
+            ':year'     => $database->legacyQuote($this->externalUser->getCurrentYear()),
+            ':semester' => $database->legacyQuote($this->externalUser->getCurrentSemester()),
         ];
 
         if (empty($timetableCode)) {
@@ -252,7 +253,7 @@ class External_Synergetic_Class implements External_ClassInterface
                 ',',
                 array_map(
                     function ($code) use ($database) {
-                        return "'" . $database->quote($code) . "'";
+                        return $database->legacyQuote($code);
                     },
                     $timetableCode
                 )
@@ -300,7 +301,7 @@ class External_Synergetic_Class implements External_ClassInterface
     }
 
     /**
-     * @param MSSQL $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {
@@ -308,7 +309,7 @@ class External_Synergetic_Class implements External_ClassInterface
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     protected function getDatabase()
     {

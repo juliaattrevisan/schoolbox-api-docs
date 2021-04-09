@@ -6,7 +6,9 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\CampusMapper;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage\Model;
 use Schoolbox\User;
@@ -25,7 +27,7 @@ class External_Schooledge_User implements External_UserInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -35,7 +37,7 @@ class External_Schooledge_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
 
@@ -53,9 +55,9 @@ class External_Schooledge_User implements External_UserInterface
         // Hydrate campuses, if not set.
         $campusList = $user->getCampusCollection() ?? CampusMapper::getInstance()->getAvailableCampusesForUser($user);
 
-        $quotedId    = $this->database->smartQuote($externalId);
+        $quotedId    = $this->database->legacyQuote($externalId);
         $campusCodes = array_map(
-            [$this->database, 'smartQuote'],
+            [$this->database, 'legacyQuote'],
             $campusList->getColumnValues('extTimetableCode')
         );
         if (empty($campusCodes)) {
@@ -196,7 +198,7 @@ class External_Schooledge_User implements External_UserInterface
             FROM Student s
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID AND sc.EmergencyContact = 'Y'
             LEFT JOIN Contact c ON sc.ContactID = c.ID
-            WHERE s.Code = {$this->database->smartQuote($externalUserId)}
+            WHERE s.Code = {$this->database->legacyQuote($externalUserId)}
         ";
         $result = [];
         $i = 1;
@@ -230,7 +232,7 @@ class External_Schooledge_User implements External_UserInterface
             return [];
         }
 
-        $ids = implode(',', array_map([$this->database, 'smartQuote'], $externalUserId));
+        $ids = implode(',', array_map([$this->database, 'legacyQuote'], $externalUserId));
 
         $query = "
             SELECT
@@ -293,7 +295,7 @@ class External_Schooledge_User implements External_UserInterface
             return [];
         }
 
-        $idString = implode(',', array_map([$this->database, 'smartQuote'], $externalUserIds));
+        $idString = implode(',', array_map([$this->database, 'legacyQuote'], $externalUserIds));
 
         $query = "
             SELECT
@@ -344,7 +346,7 @@ class External_Schooledge_User implements External_UserInterface
                 '' AS SpouseMobilePhone,
                 1 AS SpouseDirectoryIncludeFlag
             FROM Contact c
-            WHERE c.Code = {$this->database->smartQuote($externalUserId)}
+            WHERE c.Code = {$this->database->legacyQuote($externalUserId)}
         ";
         return $this->database->getRow($query) ?: [];
     }
@@ -383,7 +385,7 @@ class External_Schooledge_User implements External_UserInterface
                 '' AS StaffVoiceMail,
                 '' AS StaffHouseDescription
             FROM Staff t
-            WHERE t.Code = {$this->database->smartQuote($externalUserId)}
+            WHERE t.Code = {$this->database->legacyQuote($externalUserId)}
         ";
         return $this->database->getRow($query) ?: [];
     }
@@ -494,7 +496,7 @@ class External_Schooledge_User implements External_UserInterface
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
             LEFT JOIN Contact c ON sc.ContactID = c.ID
             {$this->buildStudentContactAdhocJoins()}
-            WHERE c.Code = {$this->database->smartQuote($externalUserId)}
+            WHERE c.Code = {$this->database->legacyQuote($externalUserId)}
             AND ({$this->buildStudentContactFilter()})
         ";
         return $this->database->getAll($query);

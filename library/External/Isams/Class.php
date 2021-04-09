@@ -1,4 +1,7 @@
 <?php
+
+use Alaress\Database\Connector\IConnector;
+
 /**
  * Isams Class Object
  *
@@ -24,7 +27,7 @@ class External_Isams_Class implements External_ClassInterface
     use External_MssqlConnector;
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 

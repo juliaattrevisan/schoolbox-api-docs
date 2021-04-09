@@ -1,7 +1,9 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Bindings;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use Schoolbox\Database\Factory;
 
 class External_Tass_Helper
 {
@@ -24,7 +26,7 @@ class External_Tass_Helper
 
     /**
      * An instance of MSSQL
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -34,7 +36,7 @@ class External_Tass_Helper
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
     }
 
 
@@ -50,7 +52,7 @@ class External_Tass_Helper
 
 
     /**
-     * @param MSSQL $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {
@@ -58,7 +60,7 @@ class External_Tass_Helper
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {
@@ -76,7 +78,7 @@ class External_Tass_Helper
         $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
 
         foreach ($addnum_array as $value) {
-            $addnum = $addnum . ',' . $this->getDatabase()->smartQuote(trim($value));
+            $addnum = $addnum . ',' . $this->getDatabase()->legacyQuote(trim($value));
         }
         if (strlen($addnum) > 0 ) {
             $addnum = substr($addnum,1);
@@ -103,7 +105,7 @@ class External_Tass_Helper
      */
     public function getAddNumMother()
     {
-        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_mother')));
+        $addnum = $this->getDatabase()->legacyQuote(trim(Config::get('external_tass_addnum_mother')));
         if ($addnum == "''") {
             $addnum = "'4'"; // TASS default
         }
@@ -115,7 +117,7 @@ class External_Tass_Helper
      */
     public function getAddNumFather()
     {
-        $addnum = $this->getDatabase()->smartQuote(trim(Config::get('external_tass_addnum_father')));
+        $addnum = $this->getDatabase()->legacyQuote(trim(Config::get('external_tass_addnum_father')));
         if ($addnum == "''" ) {
             $addnum = "'5'"; // TASS default
         }
@@ -132,7 +134,7 @@ class External_Tass_Helper
         $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_typecode'))));
 
         foreach ($typecode_array as $value) {
-            $typecode = $typecode . ',' . $this->getDatabase()->smartQuote(trim($value));
+            $typecode = $typecode . ',' . $this->getDatabase()->legacyQuote(trim($value));
         }
         if (strlen($typecode) > 0 ) {
             $typecode = substr($typecode,1);

@@ -60,7 +60,7 @@ abstract class Base extends \Custom\Diocesan\AchievementReport\StandardisedTest\
             ORDER BY xAxisOrderSeq, Seq
         ';
 
-        $result = $this->db->getAll($query, $params);
+        $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         /* No data? Exit early
          */

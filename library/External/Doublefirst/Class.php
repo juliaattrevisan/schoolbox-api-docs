@@ -1,5 +1,8 @@
 <?php
 
+use External\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * DoubleFirst Class Object
  *
@@ -12,7 +15,7 @@ class External_Doublefirst_Class implements External_ClassInterface
 {
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -26,7 +29,7 @@ class External_Doublefirst_Class implements External_ClassInterface
      */
     public function __construct()
     {
-        $this->database     = MSSQL::getInstance();
+        $this->database     = Factory::getInstanceExternal();
         $this->externalUser = new External_User('Doublefirst');
     }
 
@@ -95,7 +98,7 @@ class External_Doublefirst_Class implements External_ClassInterface
         $subCodeArray = array_filter(explode(",", $subCode));
 
         foreach ($subCodeArray as &$code) {
-            $code = "'" . $this->database->quote($code) . "'";
+            $code = $this->database->legacyQuote($code);
         }
 
         return "ygsd.SubjectDivisionName IN (" . implode(',', $subCodeArray) . ")";

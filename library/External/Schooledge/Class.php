@@ -6,14 +6,17 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\CampusMapper;
+use Schoolbox\Database\Factory;
 
 class External_Schooledge_Class implements External_ClassInterface
 {
 
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -23,7 +26,7 @@ class External_Schooledge_Class implements External_ClassInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
 
@@ -40,9 +43,9 @@ class External_Schooledge_Class implements External_ClassInterface
         foreach ($subCodeArray as $code) {
             if (strpos($code, '/') !== false) {
                 $codeArray = explode('/', $code, 2);
-                $classQuery .= "(tc.Name = '{$this->database->quote($codeArray[1])}' AND t.Name = '{$this->database->quote($codeArray[0])}' ) OR ";
+                $classQuery .= "(tc.Name = {$this->database->legacyQuote($codeArray[1])} AND t.Name = {$this->database->legacyQuote($codeArray[0])}) OR ";
             } else {
-                $classQuery .= "tc.Name = '{$this->database->quote($code)}' OR ";
+                $classQuery .= "tc.Name = {$this->database->legacyQuote($code)} OR ";
             }
         }
         return substr($classQuery, 0, -3) . ')';
@@ -60,7 +63,7 @@ class External_Schooledge_Class implements External_ClassInterface
         $quotedCode     = [];
         foreach ($allCampusCodes as $code) {
             if (strlen($code) > 0) {
-                $quotedCode[$code] = "'" . $this->database->quote($code) . "'";
+                $quotedCode[$code] = $this->database->legacyQuote($code);
             }
         }
 

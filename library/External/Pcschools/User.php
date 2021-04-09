@@ -8,6 +8,8 @@
  */
 declare(strict_types=1);
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
 use Schoolbox\External\Connector\Pcschools\QueryHelper;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\Freedom;
 use Schoolbox\External\Connector\Pcschools\QueryHelper\IQueryHelper;
@@ -34,7 +36,7 @@ class External_Pcschools_User implements External_UserInterface
     protected $timetableStoredProc = 'spSelTimeTable';
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -51,7 +53,7 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
 //        // Required, as using @LOGIC_NO
 //        $this->getDatabase()->query('SET ANSI_PADDING ON');
 //        $this->getDatabase()->query('SET ANSI_WARNINGS ON');
@@ -95,7 +97,7 @@ class External_Pcschools_User implements External_UserInterface
         }
 
         [ $sql, $params ] = $this->queryHelper->getGetStudentContactListQuery(
-            array_map([$this->database, 'smartQuote'], $externalUserId)
+            array_map([$this->database, 'legacyQuote'], $externalUserId)
         );
 
         // Split contacts into separate father/mother/guardian/carer records
@@ -229,7 +231,7 @@ class External_Pcschools_User implements External_UserInterface
 
         $whereParts = [];
         foreach ($externalUserIds as $id) {
-            $whereParts[] = "S.STUDKEY = {$this->getDatabase()->smartQuote($id)}";
+            $whereParts[] = "S.STUDKEY = {$this->getDatabase()->legacyQuote($id)}";
         }
         $query .= ' AND ('.implode(' OR ', $whereParts) . ')';
 
@@ -300,7 +302,7 @@ class External_Pcschools_User implements External_UserInterface
                     '' AS StaffHouseDescription
                 FROM TEACHER T
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
-                WHERE T.TEACHER_CODE = {$this->getDatabase()->smartQuote($externalUserId)}
+                WHERE T.TEACHER_CODE = {$this->getDatabase()->legacyQuote($externalUserId)}
             ")
         ) ?: [];
     }
@@ -514,7 +516,7 @@ class External_Pcschools_User implements External_UserInterface
     // Local methods
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {
@@ -522,7 +524,7 @@ class External_Pcschools_User implements External_UserInterface
     }
 
     /**
-     * @param  MSSQL $database
+     * @param  IConnector $database
      *
      * @return $this
      */

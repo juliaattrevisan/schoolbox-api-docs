@@ -144,7 +144,7 @@ class Comments extends Base
             ORDER BY SortOrder, CourseDescription, Term
         ';
 
-        $result = $this->db->getAll($query, $params) ?: [];
+        $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         return $this->formatData($result);
 
@@ -201,7 +201,7 @@ class Comments extends Base
             ORDER BY CourseDescription, Term
         ';
 
-        $result = $this->db->getAll($query, $params) ?: [];
+        $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         return $this->formatData($result);
     }

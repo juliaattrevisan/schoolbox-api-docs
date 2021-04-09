@@ -1,5 +1,8 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -11,7 +14,7 @@ class External_Synergetic_Ping implements External_PingInterface
     use External_MssqlPingTrait;
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -20,7 +23,7 @@ class External_Synergetic_Ping implements External_PingInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
     /**

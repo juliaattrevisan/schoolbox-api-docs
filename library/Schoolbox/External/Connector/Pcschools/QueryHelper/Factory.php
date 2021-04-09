@@ -9,7 +9,6 @@
 namespace Schoolbox\External\Connector\Pcschools\QueryHelper;
 
 use Alaress\Database\Connector\IConnector;
-use MSSQL;
 use TypeError;
 
 
@@ -20,16 +19,11 @@ class Factory
 
 
     /**
-     * @param IConnector|MSSQL $connector
+     * @param IConnector $connector
      * @throws TypeError
      */
-    public function __construct($connector)
+    public function __construct(IConnector $connector)
     {
-        // poor man's polymorphism
-        if (!($connector instanceof IConnector || $connector instanceof MSSQL)) {
-            throw new TypeError('Connector must be either an IConnector or MSSQL instance');
-        }
-
         $this->connector = $connector;
     }
 
@@ -39,15 +33,7 @@ class Factory
      */
     public function spawn()
     {
-        // blegh...
-        if ($this->connector instanceof MSSQL) {
-            $stmt = $this->connector->query(IQueryHelper::FREEDOM_DETECT);
-
-        } elseif ($this->connector instanceof IConnector) {
-            $stmt = $this->connector->executeQuery(IQueryHelper::FREEDOM_DETECT);
-        }
-
-        /** @noinspection PhpUndefinedVariableInspection */
+        $stmt = $this->connector->executeQuery(IQueryHelper::FREEDOM_DETECT);
         return $stmt->fetchColumn()
             ? new Freedom()
             : new NonFreedom();

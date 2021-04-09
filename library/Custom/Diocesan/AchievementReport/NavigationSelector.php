@@ -6,10 +6,10 @@
  */
 namespace Custom\Diocesan\AchievementReport;
 
+use Alaress\Database\Connector\IConnector;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\User;
-use MSSQL;
 
 /**
  * Class NavigationSelector
@@ -33,7 +33,7 @@ class NavigationSelector
     /**
      * MSSQL db handler
      *
-     * @var MSSQL
+     * @var IConnector
      */
     private $db;
 
@@ -85,14 +85,14 @@ class NavigationSelector
     /**
      * NavigationSelector constructor.
      *
-     * @param Router   $router
-     * @param User     $user
-     * @param array    $externalUser
-     * @param MSSQL    $db
-     * @param int|null $year
+     * @param Router     $router
+     * @param User       $user
+     * @param array      $externalUser
+     * @param IConnector $db
+     * @param int|null   $year
      * @throws RouteNotFound
      */
-    public function __construct(Router $router, User $user, array $externalUser, MSSQL $db, ?int $year)
+    public function __construct(Router $router, User $user, array $externalUser, IConnector $db, ?int $year)
     {
         $this->router = $router;
         $this->user = $user;

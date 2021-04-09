@@ -1,5 +1,8 @@
 <?php
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * Helper
  *
@@ -14,9 +17,9 @@ class External_Maze_Helper
     /**
      * An instance of MSSQL
      *
-     * @var MSSQL
+     * @var IConnector
      */
-    private $db = null;
+    private $db;
 
     /**
      * Current semester
@@ -44,7 +47,7 @@ class External_Maze_Helper
      */
     public function __construct()
     {
-        $this->setDb(MSSQL::getInstance());
+        $this->db = Factory::getInstanceExternal();
         $this->setCurrentYear($this->determineCurrentYear());
         $this->setCurrentSemester($this->determineCurrentSemester());
     }
@@ -168,14 +171,14 @@ class External_Maze_Helper
          */
         if (strstr($schoolboxClassCode, ',')) {
             foreach (str_getcsv($schoolboxClassCode) as $currentClassCode) {
-                list($classCode, $classNumber) = explode('-', $currentClassCode);
+                [$classCode, $classNumber] = explode('-', $currentClassCode);
 
                 $allClassCodes[] = "'{$classCode}'";
                 $allClassNumbers[] = "'{$classNumber}'";
             }
         }
         else {
-            list($classCode, $classNumber) = explode('-', $schoolboxClassCode);
+            [$classCode, $classNumber] = explode('-', $schoolboxClassCode);
 
             $allClassCodes[] = "'{$classCode}'";
             $allClassNumbers[] = "'{$classNumber}'";
@@ -202,7 +205,7 @@ class External_Maze_Helper
     /**
      * Set db
      *
-     * @param MSSQL $db
+     * @param IConnector $db
      */
     private function setDb($db)
     {
@@ -212,7 +215,7 @@ class External_Maze_Helper
     /**
      * Get db
      *
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDb()
     {

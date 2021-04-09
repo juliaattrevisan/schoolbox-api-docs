@@ -1,4 +1,8 @@
 <?php
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * PCSchools class connector
  *
@@ -9,7 +13,7 @@
 class External_Pcschools_Class implements External_ClassInterface
 {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -23,7 +27,7 @@ class External_Pcschools_Class implements External_ClassInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
     }
 
     /**
@@ -103,11 +107,11 @@ class External_Pcschools_Class implements External_ClassInterface
 
             $parts = explode('/', $code);
             if (count($parts) > 1) {
-                list($timePeriod, $code) = $parts;
+                [$timePeriod, $code] = $parts;
             }
-            $filter = "(tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->smartQuote($code)}";
+            $filter = "(tf.YEAR + tf.ABBREV + tf.CLASS) = {$this->getDatabase()->legacyQuote($code)}";
             if (isset($timePeriod)) {
-                $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->smartQuote($timePeriod)}";
+                $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->legacyQuote($timePeriod)}";
             }
 
             $query[] = '('.$filter.')';
@@ -118,7 +122,7 @@ class External_Pcschools_Class implements External_ClassInterface
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {
@@ -126,7 +130,7 @@ class External_Pcschools_Class implements External_ClassInterface
     }
 
     /**
-     * @param  MSSQL $database
+     * @param  IConnector $database
      *
      * @return $this
      */

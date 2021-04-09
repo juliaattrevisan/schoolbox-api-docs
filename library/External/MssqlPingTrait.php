@@ -1,4 +1,8 @@
 <?php
+
+use Alaress\Database\Exception as DatabaseException;
+use Schoolbox\Database\Factory;
+
 /**
  * A trait for MSSQL databases to return whether or not they are alive and accessible.
  *
@@ -17,8 +21,9 @@ trait External_MssqlPingTrait
     public function isResponsive(): bool
     {
         try {
-            return MSSQL::getInstance()->isResponsive();
-        } catch (\Alaress\Database\Exception $e) {
+            Factory::getInstanceExternal();
+            return true;
+        } catch (DatabaseException $e) {
             // Something failed in connection - I know not what
             return false;
         }

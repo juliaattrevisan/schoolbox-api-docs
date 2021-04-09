@@ -1,12 +1,15 @@
 <?php
 
+use External\IConnector;
+use Schoolbox\Database\Factory;
+
 class External_Doublefirst_Helper
 {
     /**
      * An instance of MSSQL
-     * @var MSSQL
+     * @var IConnector
      */
-    private $database = null;
+    private $database;
 
     /**
      * Cache for current year
@@ -19,7 +22,7 @@ class External_Doublefirst_Helper
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
     }
 
     /**
@@ -170,7 +173,7 @@ class External_Doublefirst_Helper
      */
 
     /**
-     * @param MSSQL $database
+     * @param IConnector $database
      */
     private function setDatabase($database)
     {
@@ -178,7 +181,7 @@ class External_Doublefirst_Helper
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {

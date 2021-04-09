@@ -4,7 +4,10 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
+use Schoolbox\Database\Factory;
 use Schoolbox\UserMapper;
 
 /**
@@ -114,7 +117,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -124,7 +127,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
     }
 
 
@@ -143,7 +146,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             SELECT COUNT(DISTINCT td.ID)
             FROM       fc.Timetable       t
             INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
-            WHERE t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            WHERE t.Name    = {$this->database->legacyQuote($campus->getExtTimetableCode())}
             AND   t.Enabled = 1
         ");
 
@@ -160,9 +163,9 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             INNER JOIN fc.TimetableDay    td ON t.ID  = td.TimetableId
             INNER JOIN fc.TimetablePeriod tp ON td.ID = tp.TimetableDayId
 
-            WHERE t.Name       = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            WHERE t.Name       = {$this->database->legacyQuote($campus->getExtTimetableCode())}
             AND   t.Enabled    = 1
-            AND   td.SortOrder = {$this->database->smartQuote($day)}
+            AND   td.SortOrder = {$this->database->legacyQuote($day)}
 
             ORDER BY DayNumber ASC, StartTime ASC, EndTime ASC
         ");
@@ -235,12 +238,12 @@ class External_Schooledge_Timetable implements External_TimetableInterface
         }
 
         // SchoolEdge doesn't really have period numbers as such - use period name.
-        $quotedTime      = $this->database->smartQuote($dateObject->getDatabaseTime());
+        $quotedTime      = $this->database->legacyQuote($dateObject->getDatabaseTime());
         $timetablePeriod = $this->database->getRow($q="
             SELECT tp.*
             FROM fc.TimetablePeriod tp
 
-            WHERE tp.TimetableDayID = {$this->database->smartQuote($timetableDate['TimetableDay']['ID'])}
+            WHERE tp.TimetableDayID = {$this->database->legacyQuote($timetableDate['TimetableDay']['ID'])}
             AND   CAST(tp.StartTime AS TIME) <= $quotedTime
             AND   CAST(tp.EndTime   AS TIME) >  $quotedTime
         ");
@@ -259,7 +262,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
     {
-        $extraWhere          = "td.SortOrder = {$this->database->smartQuote($dayNumber)}";
+        $extraWhere          = "td.SortOrder = {$this->database->legacyQuote($dayNumber)}";
         $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus, $extraWhere);
         if (empty($timetabledClassRows)) {
             return [];
@@ -296,7 +299,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $extraWhere          = "td.ID = {$this->database->smartQuote($timetableDate['TimetableDay']['ID'])}";
+        $extraWhere          = "td.ID = {$this->database->legacyQuote($timetableDate['TimetableDay']['ID'])}";
         $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus, $extraWhere);
         if (empty($timetabledClassRows)) {
             return [];
@@ -357,8 +360,8 @@ class External_Schooledge_Timetable implements External_TimetableInterface
         // Build query parts for them
         $extraWhereParts = [];
         foreach ($roomCodes as $roomCode) {
-            $extraWhereParts[] = "room_base.Code = {$this->database->smartQuote($roomCode)}";
-            $extraWhereParts[] = "room_replacement.Code = {$this->database->smartQuote($roomCode)}";
+            $extraWhereParts[] = "room_base.Code = {$this->database->legacyQuote($roomCode)}";
+            $extraWhereParts[] = "room_replacement.Code = {$this->database->legacyQuote($roomCode)}";
         }
         $extraWhere = implode(' OR ', $extraWhereParts);
 
@@ -454,7 +457,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
     protected function getTimetableDates(Campus $campus): array
     {
         // Adapted from some C# code SchoolEdge gave us
-        $quotedCampus   = $this->database->smartQuote($campus->getExtTimetableCode());
+        $quotedCampus   = $this->database->legacyQuote($campus->getExtTimetableCode());
         $timetable      = $this->database->getRow("
             SELECT
                 CAST(t.StartDate AS DATE) AS StartDate,
@@ -723,7 +726,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     protected function getStaffBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
-        $quotedId = $this->database->smartQuote($externalUserId);
+        $quotedId = $this->database->legacyQuote($externalUserId);
         return "
             SELECT
                 $this->classSelect,
@@ -756,7 +759,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
                 OR
                 staff_replacement.Code = {$quotedId}
             )
-            AND t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND t.Name    = {$this->database->legacyQuote($campus->getExtTimetableCode())}
             AND t.Enabled = 1
         ";
     }
@@ -769,7 +772,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     protected function getStaffNonBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
-        $quotedId = $this->database->smartQuote($externalUserId);
+        $quotedId = $this->database->legacyQuote($externalUserId);
         return "
             SELECT
                 $this->classSelect,
@@ -801,7 +804,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
                 OR
                 staff_replacement.Code = {$quotedId}
             )
-            AND t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND t.Name    = {$this->database->legacyQuote($campus->getExtTimetableCode())}
             AND t.Enabled = 1
         ";
     }
@@ -814,7 +817,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     protected function getStudentBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
-        $quotedId = $this->database->smartQuote($externalUserId);
+        $quotedId = $this->database->legacyQuote($externalUserId);
         return "
             SELECT
                 $this->classSelect,
@@ -841,7 +844,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             $this->timetableJoin
 
             WHERE s.Code = {$quotedId}
-            AND   t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND   t.Name    = {$this->database->legacyQuote($campus->getExtTimetableCode())}
             AND   t.Enabled = 1
         ";
     }
@@ -854,7 +857,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
      */
     protected function getStudentNonBlockedTimetableQuery($externalUserId, Campus $campus): string
     {
-        $quotedId = $this->database->smartQuote($externalUserId);
+        $quotedId = $this->database->legacyQuote($externalUserId);
         return "
             SELECT
                 $this->classSelect,
@@ -883,7 +886,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             WHERE s.Code = {$quotedId}
             AND   tci.TimetableBlockInstanceID IS NULL
             AND   tci.TimetablePeriodID IS NOT NULL
-            AND   t.Name    = {$this->database->smartQuote($campus->getExtTimetableCode())}
+            AND   t.Name    = {$this->database->legacyQuote($campus->getExtTimetableCode())}
             AND   t.Enabled = 1
         ";
     }

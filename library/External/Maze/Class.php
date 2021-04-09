@@ -1,4 +1,8 @@
 <?php
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * External_Maze_Class
  *
@@ -13,7 +17,7 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * An instance of MSSQL
      *
-     * @var MSSQL
+     * @var IConnector
      */
     protected $db;
 
@@ -26,7 +30,7 @@ class External_Maze_Class implements External_ClassInterface {
      * Constructor
      */
     public function __construct() {
-        $this->setDb(MSSQL::getInstance());
+        $this->db = Factory::getInstanceExternal();
         $this->setHelper(new External_Maze_Helper());
     }
 
@@ -224,7 +228,7 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * Set db
      *
-     * @param MSSQL $db
+     * @param IConnector $db
      */
     protected function setDb($db) {
         $this->db = $db;
@@ -233,7 +237,7 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * Get db
      *
-     * @return MSSQL
+     * @return IConnector
      */
     protected function getDb() {
         return $this->db;

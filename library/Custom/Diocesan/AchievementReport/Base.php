@@ -6,7 +6,7 @@
  */
 namespace Custom\Diocesan\AchievementReport;
 
-use MSSQL;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\User;
 
 /**
@@ -34,7 +34,7 @@ abstract class Base
     /**
      * MSSQL db handler
      *
-     * @var MSSQL
+     * @var IConnector
      */
     protected $db;
 
@@ -111,10 +111,10 @@ abstract class Base
      *
      * @param User        $user
      * @param array       $externalUser
-     * @param MSSQL       $db
+     * @param IConnector  $db
      * @param string|null $year
      */
-    public function __construct(User $user, array $externalUser, MSSQL $db, $year) {
+    public function __construct(User $user, array $externalUser, IConnector $db, $year) {
         $this->user = $user;
         $this->externalUser = $externalUser;
         $this->db = $db;
@@ -138,7 +138,7 @@ abstract class Base
             AND TABLE_TYPE = 'VIEW'
         ";
 
-        $stuff = $this->db->getAll($query);
+        $stuff = $this->db->executeQuery($query)->fetchAll();
 
         new \Alaress_Probe($stuff);
     }

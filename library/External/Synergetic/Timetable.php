@@ -4,8 +4,10 @@
  * @link      https://schoolbox.com.au/
  */
 use Alaress\Cache;
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
+use Schoolbox\Database\Factory;
 
 /**
  * Class External_Synergetic_Timetable
@@ -31,7 +33,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private $database;
 
@@ -89,7 +91,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function __construct()
     {
-        $this->setDatabase(MSSQL::getInstance());
+        $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('synergetic');
         $this->groupHandler = new Group();
 
@@ -149,19 +151,25 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
         }
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
-        $query        = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
+        $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
                     TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
                     FROM dbo.TimetableDefinition TimetableDefinition
-                    WHERE TimetableDefinition.FileYear='{$fileYear}' AND
-                        TimetableDefinition.FileSemester='{$fileSemester}' AND
-                        TimetableDefinition.TimetableGroup='{$campus->getExtTimetableCode()}' AND
-                        (TimetableDefinition.DayNumber = '$day' )
+                    WHERE TimetableDefinition.FileYear = :fileYear AND
+                        TimetableDefinition.FileSemester = :fileSemester AND
+                        TimetableDefinition.TimetableGroup = :timetableGroup AND
+                        (TimetableDefinition.DayNumber = :day)
                     ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
                     ";
         unset($statement);
-        $statement = $this->getDatabase()->query($query);
+        $statement = $this->getDatabase()->query(
+            $query,
+            [
+                'fileSemester'   => $this->externalUser->getCurrentSemester($externalUserId),
+                'fileYear'       => $this->externalUser->getCurrentYear($externalUserId),
+                'timetableGroup' => $campus->getExtTimetableCode(),
+                'day'            => $day,
+            ]
+        );
 
         $periodCount = 0;
 
@@ -278,8 +286,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     public function getDayName($dayNumber): string
     {
-        $query  = "SELECT Description FROM luDays WHERE Code = '{$this->getDatabase()->quote($dayNumber)}'";
-        $result = $this->getDatabase()->getRow($query);
+        $query  = "SELECT Description FROM luDays WHERE Code = :code";
+        $result = $this->getDatabase()->getRow($query, ['code' => $dayNumber]);
 
         if ($result['Description']) {
             return $result['Description'];
@@ -302,33 +310,29 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         // firstly, what day number is it?
         $day = $this->getDayNumber($campus, $now);
 
-        // get available day numbers
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
-
         // cannot believe the something like 'LEFT(CONVERT(VARCHAR...' is needed
         $query = "
             SELECT TOP 1 t.TimeFrom, t.TimeTo, t.PeriodNumber, t.PeriodNumberSeq
             FROM TimetableDefinition t
-            WHERE t.FileSemester = '%s'
-            AND t.FileYear = '%s'
-            AND t.TimetableGroup = '%s'
-            AND (t.DayNumber = '%d' OR t.DayNumber = '0')
-            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, " . self::FORMAT_ISO8601 . "), 10), t.TimeFrom) < '%d'
-            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, " . self::FORMAT_ISO8601 . "), 10), t.TimeTo) > '%d'
+            WHERE t.FileSemester = :fileSemester
+            AND t.FileYear = :fileYear
+            AND t.TimetableGroup = :timetableGroup
+            AND (t.DayNumber = :dayNumber OR t.DayNumber = '0')
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeFrom, " . self::FORMAT_ISO8601 . "), 10), t.TimeFrom) < :secondsAfterMidnight1
+            AND DATEDIFF(S, LEFT(CONVERT(VARCHAR(20), t.TimeTo, " . self::FORMAT_ISO8601 . "), 10), t.TimeTo) > :secondsAfterMidnight2
             ORDER BY t.DayNumber DESC
         ";
 
         return $this->getDatabase()->getRow(
-            sprintf(
-                $query,
-                $fileSemester,
-                $fileYear,
-                $campusString,
-                $day,
-                $secondsAfterMidnight,
-                $secondsAfterMidnight
-            )
+            $query,
+            [
+                'fileSemester'          => $this->externalUser->getCurrentSemester(),
+                'fileYear'              => $this->externalUser->getCurrentYear(),
+                'timetableGroup'        => $campusString,
+                'dayNumber'             => $day,
+                'secondsAfterMidnight1' => $secondsAfterMidnight,
+                'secondsAfterMidnight2' => $secondsAfterMidnight,
+            ]
         ) ?: [];
     }
 
@@ -371,8 +375,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $campusString = $campus->getExtTimetableCode();
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $fileSemester = $this->externalUser->getCurrentSemester($externalUserId);
+        $fileYear     = $this->externalUser->getCurrentYear($externalUserId);
 
         $allowedFileTypes = $this->getAllowedFileTypes();
 
@@ -602,8 +606,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $fileSemester = $this->externalUser->getCurrentSemester($externalUserId);
+        $fileYear     = $this->externalUser->getCurrentYear($externalUserId);
         $periodList = $this->getTimetablePeriods($externalUserId, (int)$userId, (int)$dayNumber, null, $fileSemester, $fileYear, $campus);
 
         $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, []);
@@ -627,7 +631,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function getTimetablePeriods(string $externalUserId, int $userId, int $dayNumber, ?array $fileTypes, string $fileSemester, string $fileYear, Campus $campus): array
     {
-        $campusString = $campus->getExtTimetableCode();
+        $externalUserId = $this->database->legacyQuote($externalUserId);
+        $fileSemester   = $this->database->legacyQuote($fileSemester);
+        $fileYear       = $this->database->legacyQuote($fileYear);
+        $dayNumber      = $this->database->legacyQuote($dayNumber);
+        $campusString   = $campus->getExtTimetableCode();
 
         // Get file types to limit the data to
         $allowedFileTypes = $this->getAllowedFileTypes();
@@ -635,10 +643,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $allowedFileTypes = array_intersect($allowedFileTypes, $fileTypes);
         }
 
-        $quotedFileTypes    = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
-                $this->database,
-                'quote',
-            ], $allowedFileTypes)) . "'";
+        $quotedFileTypes    = empty($allowedFileTypes)
+            ? ''
+            : implode("','", array_map([$this->database, 'legacyQuote',], $allowedFileTypes));
         $allowedFileTypeSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
 
         if ($this->groupHandler->isStudent($userId)) {
@@ -659,10 +666,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 StudentClasses.FileYear = SubjectClasses.FileYear AND
                 StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
                 StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                Timetable.FileSemester='" . $fileSemester . "' AND
-                Timetable.FileYear='" . $fileYear . "' AND
-                (StudentClasses.ID='$externalUserId' AND
-                Timetable.DayNumber = '$dayNumber' AND
+                Timetable.FileSemester={$fileSemester} AND
+                Timetable.FileYear={$fileYear} AND
+                (StudentClasses.ID={$externalUserId} AND
+                Timetable.DayNumber = {$dayNumber} AND
                 Timetable.TimetableGroup = '$campusString' AND
                 {$allowedFileTypeSql}
                 StudentClasses.StartDate <= getdate() AND
@@ -679,12 +686,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 Timetable.FileSemester = SubjectClasses.FileSemester AND
                 Timetable.FileType = SubjectClasses.FileType AND
                 Timetable.FileYear = SubjectClasses.FileYear AND
-                SubjectClasses.FileSemester='" . $fileSemester . "' AND
-                SubjectClasses.FileYear='" . $fileYear . "' AND
+                SubjectClasses.FileSemester={$fileSemester} AND
+                SubjectClasses.FileYear={$fileYear} AND
                 Timetable.TimetableGroup = '$campusString' AND
                 {$allowedFileTypeSql}
-                Timetable.StaffID='$externalUserId' AND
-                Timetable.DayNumber = '$dayNumber'
+                Timetable.StaffID={$externalUserId} AND
+                Timetable.DayNumber = {$dayNumber}
                 ORDER BY Timetable.PeriodNumber";
         }
 
@@ -709,20 +716,19 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $campusString = $campus->getExtTimetableCode();
-
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($externalUserId));
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
+        $campusString   = $this->database->legacyQuote($campus->getExtTimetableCode());
+        $fileSemester   = $this->database->legacyQuote($this->externalUser->getCurrentSemester($externalUserId));
+        $fileYear       = $this->database->legacyQuote($this->externalUser->getCurrentYear($externalUserId));
+        $externalUserId = $this->database->legacyQuote($externalUserId);
 
         $allowedFileTypes    = $this->getAllowedFileTypes();
-        $quotedFileTypes     = empty($allowedFileTypes) ? '' : "'" . implode("','", array_map([
-                $this->getDatabase(),
-                'quote',
-            ], $allowedFileTypes)) . "'";
+        $quotedFileTypes     = empty($allowedFileTypes)
+            ? ''
+            : implode("','", array_map([$this->getDatabase(), 'legacyQuote',], $allowedFileTypes));
         $allowedFileTypesSql = empty($quotedFileTypes) ? '' : " Timetable.FileType IN ({$quotedFileTypes}) AND ";
 
         if ($this->groupHandler->isStudent($userId)) {
-            $query = 'SELECT
+            $query = "SELECT
                         Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
                         Timetable.ClassCampus, Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
                         vStaff.StaffSurname
@@ -743,11 +749,11 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         StudentClasses.FileYear = SubjectClasses.FileYear AND
                         StudentClasses.ClassCampus = SubjectClasses.ClassCampus AND
                         StudentClasses.ClassCode = SubjectClasses.ClassCode AND
-                        ((Timetable.FileSemester=' . $fileSemester . ') AND
-                        (Timetable.FileYear=' . $fileYear . ") AND
-                        Timetable.TimetableGroup = '$campusString' AND
+                        ((Timetable.FileSemester = {$fileSemester}) AND
+                        (Timetable.FileYear = {$fileYear}) AND
+                        Timetable.TimetableGroup = {$campusString} AND
                         {$allowedFileTypesSql}
-                        (StudentClasses.ID='$externalUserId'))
+                        (StudentClasses.ID = {$externalUserId}))
                         AND StudentClasses.StartDate <= getdate() AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
                         AND DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . '
                     ORDER BY Timetable.PeriodNumber, Timetable.DayNumber';
@@ -769,10 +775,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         Timetable.FileSemester = SubjectClasses.FileSemester AND
                         Timetable.FileType = SubjectClasses.FileType AND
                         Timetable.FileYear = SubjectClasses.FileYear AND
-                        SubjectClasses.FileSemester='" . $fileSemester . "' AND
-                        SubjectClasses.FileYear='" . $fileYear . "' AND
-                        Timetable.TimetableGroup = '$campusString' AND
-                        Timetable.StaffID='$externalUserId' AND
+                        SubjectClasses.FileSemester = {$fileSemester} AND
+                        SubjectClasses.FileYear = {$fileYear} AND
+                        Timetable.TimetableGroup = {$campusString} AND
+                        Timetable.StaffID = {$externalUserId} AND
                         {$allowedFileTypesSql}
                         DayNumber > 0 AND DayNumber <= " . $timetabledef['dayCount'] . '
                     ORDER BY Timetable.PeriodNumber, Timetable.DayNumber';
@@ -909,9 +915,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $query = strtr(
             $query,
             [
-                ':semester' => "'" . $this->database->quote($this->externalUser->getCurrentSemester()) . "'",
-                ':year'     => "'" . $this->database->quote($this->externalUser->getCurrentYear()) . "'",
-                ':rooms'    => implode(',', array_map([$this->database, 'smartQuote'], $filteredRoomCodes)),
+                ':semester' => $this->database->legacyQuote($this->externalUser->getCurrentSemester()),
+                ':year'     => $this->database->legacyQuote($this->externalUser->getCurrentYear()),
+                ':rooms'    => implode(',', array_map([$this->database, 'legacyQuote'], $filteredRoomCodes)),
             ]
         );
 
@@ -997,7 +1003,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var MSSQL $database
+     * @var IConnector $database
      */
     private function setDatabase($database)
     {
@@ -1005,7 +1011,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
     /**
-     * @return MSSQL
+     * @return IConnector
      */
     private function getDatabase()
     {

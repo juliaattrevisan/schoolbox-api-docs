@@ -1,4 +1,8 @@
 <?php
+
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Database\Factory;
+
 /**
  * This file provides access to TASS class info
  *
@@ -8,7 +12,7 @@
 
 class External_Tass_Class implements External_ClassInterface {
     /**
-     * @var MSSQL
+     * @var IConnector
      */
     private $database;
 
@@ -23,7 +27,7 @@ class External_Tass_Class implements External_ClassInterface {
     private $externalUser;
 
     function __construct () {
-        $this->database = MSSQL::getInstance();
+        $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('tass');
     }
 
@@ -42,7 +46,7 @@ class External_Tass_Class implements External_ClassInterface {
         if(stristr($classCode, ',')) {
             $subCodeArray = explode(',',$classCode);
             foreach($subCodeArray as $code) {
-                list($year, $code, $class) = self::parseClassCode($code);
+                [$year, $code, $class] = self::parseClassCode($code);
                 $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
                 $classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
@@ -50,15 +54,15 @@ class External_Tass_Class implements External_ClassInterface {
             $classQuery .= '1=0';
         }
         else {
-            list($year, $code, $class) = self::parseClassCode($classCode);
+            [$year, $code, $class] = self::parseClassCode($classCode);
             $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
             $classQuery = " $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ";
         }
 
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear());
         $query = "
             SELECT DISTINCT
                 studsub.stud_code as synergy_id,
@@ -72,8 +76,8 @@ class External_Tass_Class implements External_ClassInterface {
                 '' as StudentTutorDescription
             FROM studsub
             JOIN student ON student.stud_code = studsub.stud_code AND student.cmpy_code = studsub.cmpy_code
-            WHERE semester = '{$fileSemester}'
-                AND yr_study = '{$fileYear}'
+            WHERE semester = {$fileSemester}
+                AND yr_study = {$fileYear}
                 AND next_yr_ind != 'F'
                 AND student.doe <= CAST(GETDATE() AS DATE)
                 AND (student.dol IS NULL OR student.dol >= CAST(GETDATE() AS DATE))
@@ -106,10 +110,10 @@ class External_Tass_Class implements External_ClassInterface {
         }
         $classQuery = implode(' OR ', $classQueries);
 
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->legacyQuote($this->externalUser->getCurrentSemester());
+        $fileYear     = $this->database->legacyQuote($this->externalUser->getCurrentYear());
         $query = "SELECT DISTINCT tch_code FROM tchsub
-                    WHERE semester = '{$fileSemester}' AND year_num = '{$fileYear}'
+                    WHERE semester = {$fileSemester} AND year_num = {$fileYear}
                     AND ( $classQuery )";
 
         $statement = $this->database->query($query);
