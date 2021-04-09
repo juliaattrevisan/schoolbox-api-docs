@@ -2941,51 +2941,6 @@ parameters:
 			path: library/Leave/RequestMapper.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Constructor of class MSSQL has an unused parameter \\$db\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Constructor of class MSSQL has an unused parameter \\$optionalConfig\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Property MSSQL\\:\\:\\$connector \\(Alaress\\\\Database\\\\Connector\\\\Base\\) does not accept Alaress\\\\Database\\\\Connector\\\\IConnector\\|null\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Method MSSQL\\:\\:getIterator\\(\\) should return MssqlResultIterator but returns Alaress\\\\Database\\\\Iterator\\\\IIterator\\.$#"
-			count: 1
-			path: library/MSSQL.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 2
-			path: library/MSSQL.php
-
-		-
-			message: "#^Function mssql_num_rows not found\\.$#"
-			count: 2
-			path: library/MssqlResultIterator.php
-
-		-
-			message: "#^Function mssql_data_seek not found\\.$#"
-			count: 2
-			path: library/MssqlResultIterator.php
-
-		-
-			message: "#^Function mssql_fetch_assoc not found\\.$#"
-			count: 1
-			path: library/MssqlResultIterator.php
-
-		-
 			message: "#^Cannot access offset 'published' on bool\\.$#"
 			count: 1
 			path: library/MyFile.php
@@ -5109,16 +5064,6 @@ parameters:
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Pcschools\\\\Base\\\\User\\:\\:getCampusInvolvement\\(\\) should return iterable\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Common\\\\Campus\\>&Schoolbox\\\\GenericCollection but returns Schoolbox\\\\Collection\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Pcschools/Base/User.php
-
-		-
-			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/Factory.php
-
-		-
-			message: "#^Variable \\$stmt might not be defined\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Pcschools/QueryHelper/Factory.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Schoolbox\\\\Base\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
