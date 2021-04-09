@@ -2,7 +2,7 @@
     action                string ['Create','Update']
     article               News\Article\Model
     featureImageZone      array
-    encodedSegments      null|array,
+    encodedSegments       null|array,
     isAutoSavable         bool
     availableEntityTypes  string[]         The set of entity types that can be audienced by the current user
     entityTypesData       array
@@ -213,33 +213,38 @@
 
 
         {% if isAutoSavable %}
-            // Init draft plugin
-            $createForm.draft({
-                inputs: ['#news-title', '#audience-search', '#news-topics', '#news-sticky'],
-                textareas: ['body', 'blurb'],
-                attachzones: ['#{{ featureImageZone.id }}-zone', '#{{ fileZone.id }}-zone'],
-                datepickers: ['#publishAt', '#expiresAt'],
-                staller: $submitButton,
-                onSaveSuccess: function (response) {
-                    // Update the form actions
-                    $createForm.data('action-draft', response.updateRoute);
-                    if (response.approveRoute) {
-                        $createForm.data('action-submit', response.approveRoute);
-                    } else {
-                        $createForm.data('action-submit', response.submitRoute);
-                    }
-
-                    // Update the window history
-                    window.history.pushState({}, null, response.url);
-
-                    // Update the Vue properties
-                    formActionsApp.approveRoute = response.approveRoute;
-                    formActionsApp.articleId = response.articleId;
-
-                    // Enable the submit buttons (this is just for the case where you're creating and they are disabled until an initial draft is saved)
-                    $submitButtons.prop('disabled', false);
+        // Init draft plugin
+        $createForm.draft({
+            inputs: ['#news-title', '#audience-search', '#news-topics', '#news-sticky'],
+            textareas: ['body', 'blurb'],
+            attachzones: ['#{{ featureImageZone.id }}-zone', '#{{ fileZone.id }}-zone'],
+            datepickers: ['#publishAt', '#expiresAt'],
+            staller: $submitButton,
+            onSaveSuccess: function (response) {
+                // Update the form actions
+                $createForm.data('action-draft', response.updateRoute);
+                if (response.approveRoute) {
+                    $createForm.data('action-submit', response.approveRoute);
+                } else {
+                    $createForm.data('action-submit', response.submitRoute);
                 }
-            });
+
+                // Update the window history
+                window.history.pushState({}, null, response.url);
+
+                // Update the Vue properties
+                var event = new CustomEvent('create-news-form-actions__on-news-saved', {
+                    detail: {
+                        approveRoute: response.approveRoute,
+                        articleId: response.articleId
+                    }
+                });
+                document.dispatchEvent(event);
+
+                // Enable the submit buttons (this is just for the case where you're creating and they are disabled until an initial draft is saved)
+                $submitButtons.prop('disabled', false);
+            }
+        });
         {% endif %}
 
         if (audienceIsReadOnly) {
@@ -290,51 +295,6 @@
             });
         }
 
-        {##
-         # SA-7580 introduced the below stall-submit when clicking the submit
-         # if the form was invalid, and resolved it if clicked when the form is
-         # valid.
-         #
-         # Removing it appears to have made no difference to the way that this
-         # form is handled: maybe it was required because of the now removed
-         # AJAX date conversion?
-         #}
-        {#/**#}
-        {# * Listen for a click on one of the submit buttons#}
-        {# * This bypasses the staller because the event is assigned directly to the element (rather than doing $(document).on)#}
-        {# * So this will be called first, then one of the two event below will fire once stallSubmit resolves#}
-        {# */#}
-        {#$submitButtons.click(function() {#}
-        {#    if (!$createForm.valid()) {#}
-        {#        // Scroll to error#}
-        {#        // TODO: this doesn't scroll to the audience selector. we'll need to rebase our fork of selectize before we can fix this#}
-        {#        $createForm.data('validator').errorList[0].element.focus();#}
-
-        {#        {% if isAutoSavable %}#}
-        {#            if (validationDeferred === undefined || (validationDeferred && validationDeferred.state === 'resolved')) {#}
-        {#                // Add another deferred object for validation#}
-        {#                validationDeferred = $.Deferred();#}
-        {#                $submitButton.stallSubmit(validationDeferred);#}
-        {#            }#}
-        {#        {% endif %}#}
-        {#    } else {#}
-        {#        // Make submit buttons readonly#}
-        {#        // Can't use disabled because then the click event below won't work#}
-        {#        $submitButtons.attr('readonly', 'readonly');#}
-
-        {#        // Update the text on the button clicked#}
-        {#        $(this).text('Working...');#}
-
-        {#        // Resolve validation defer#}
-        {#        if (validationDeferred !== undefined) {#}
-        {#            validationDeferred.resolve();#}
-        {#        }#}
-
-        {#        // TODO: Would be nice to clear the draft timeout at this point, so that this doesn't provide the 3 second grace period#}
-        {#        //       It will require a new public method on the draft plugin to clear it#}
-        {#    }#}
-        {#});#}
-
         /**
          * Listen for a click on the submit button
          * This is the event that will be stalled (if isAutosavable)
@@ -362,6 +322,7 @@
             // Submit the form
             $createForm.submit();
         }
+
     });
 
     /**
@@ -653,16 +614,19 @@
 
             <div class="row">
                 <div class="small-12 columns">
-                    <ul class="flex-list buttons" id="create-form-actions">
-                        {% if isAutoSavable %}
-                        <li>
-                            <button type="submit" id="news-preview" {% if not article.id %}disabled{% endif %}>Preview</button>
-                        </li>
-                        {% endif %}
-                        <li>
-                            <button type="submit" class="submit" id="news-submit" {% if not article.id %}disabled{% endif %}>${ submitText }</button>
-                        </li>
-                    </ul>
+                    <div id="create-form-actions">
+                        <news-item-form-actions 
+                            :initial-article-id="{{ article.id ?? '0' }}"
+                            initial-approve-route="{{ approveRoute ?? '' }}"
+                            :global-moderation="{{ config.global_moderation ? 'true' : 'false' }}"
+                            :global-posting="{{ config.news_staff_post_enabled ? 'true' : 'false' }}"
+                            :is-submitted="{{ article.isSubmitted  ? 'true' : 'false' }}"
+                            :is-rejected="{{ article.isRejected ? 'true' : 'false' }}"
+                            :is-auto-savable="{{ isAutoSavable ? 'true' : 'false' }}"
+                            locale-news="{{ locale.news }}"
+                        />
+                    </div>
+                    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsItemFormActions.bundle.js"></script>
                 </div>
             </div>
         </form>
@@ -670,39 +634,3 @@
 </div>
 
 <div class="toast" id="saveDraft"></div>
-
-<script src="{{ CDN_PREFIX }}/javascript/shared/schoolbox-vue.min.js"></script>
-{% autoescape 'js' %}
-<script>
-    var formActionsApp = new Vue({
-        el: '#create-form-actions',
-        delimiters: ['${', '}'],
-        data: {
-            articleId: '{{ article.id }}',
-            approveRoute: '{{ approveRoute ?? '' }}',
-            globalModeration: '{{ config.global_moderation }}',
-            globalPosting: '{{ config.news_staff_post_enabled }}',
-            isSubmitted: '{{ (article.isSubmitted) }}',
-            isRejected: '{{ (article.isRejected) }}'
-        },
-        computed: {
-            submitText: function() {
-                if (this.isSubmitted && !this.isRejected) {
-                    return 'Save';
-                } else if (this.requiresModeration && this.articleId) {
-                    return 'Submit for moderation';
-                }
-                return 'Publish {{ locale.news }}';
-            },
-
-            // Switch to 'requiring moderation' if:
-            // * Global moderation config is turned on
-            // * Global posting is turned on (no case where a user can post for moderation otherwise)
-            // * The draft save response has returned false for an approveRoute
-            requiresModeration: function() {
-                return this.globalModeration && this.globalPosting && !this.approveRoute;
-            }
-        }
-    });
-</script>
-{% endautoescape %}
