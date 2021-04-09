@@ -44,7 +44,7 @@ class External_Synergetic_Hutchins_Class extends External_Synergetic_Class
             uvStudents.ID = StudentClasses.StudentID)
         WHERE $classQuery
             AND (StudentClasses.FileYear={$fileYear})
-            AND (StudentClasses.FileSemester={$fileSemester}
+            AND (StudentClasses.FileSemester={$fileSemester})
             AND (StudentClasses.StartDate <= getdate() OR StudentClasses.StartDate IS NULL)
             AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
         ORDER BY StudentClasses.StudentSurname, StudentClasses.StudentPreferred";
