@@ -197,6 +197,7 @@ interface External_UserInterface extends External\IConnector
      * SpouseOccupEmail,
      * SpouseDefaultEmailCode,
      * SpouseMobilePhone,
+     * SpouseWorkPhone,
      * SpouseDirectoryIncludeFlag
      *
      * @importance medium - used on parent profile page.
