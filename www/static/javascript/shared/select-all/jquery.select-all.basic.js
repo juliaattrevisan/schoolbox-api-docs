@@ -37,6 +37,15 @@
                  */
                 selector: '[data-select-all-group]',
 
+                /* Special css styles to apply in particular scenarios
+                 */
+                css: {
+
+                    /* Occurs when some, but not all, checkboxes in a group are ticked
+                     */
+                    'indeterminate': 'indeterminate'
+                },
+
                 /* Callbacks
                  * Use these callbacks to augment the default behaviour with whatever
                  * specialty actions you need. Add more callbacks as required instead
@@ -104,6 +113,10 @@
                 }
 
                 config.onAfterSelectAllChange(allCheckboxes);
+
+                /* Remove indeterminate status if that was previously set
+                 */
+                $(selectAll).removeClass(config.css.indeterminate);
             });
 
             /* Checkboxes in the group affect the select-all parent
@@ -121,6 +134,17 @@
                 }
 
                 config.onAfterCheckboxChange(allCheckboxes);
+
+                /* Check indeterminate select-all state
+                 * Occurs when some, but not all, checkboxes in a group are ticked
+                 */
+                let numSelected = $(selectedCheckboxes).length;
+
+                if (numSelected && numSelected < allCheckboxes.length) {
+                    $(selectAll).addClass(config.css.indeterminate);
+                } else {
+                    $(selectAll).removeClass(config.css.indeterminate);
+                }
             });
         }
     }
