@@ -47,11 +47,6 @@ check_run_as_root(){
   fi
 }
 
-# Parse CLI arguments passed to this script
-parse_cli_args(){
-  log 'TODO parse_cli_args()'
-}
-
 # Derive global vars that will be used by multiple subsequent functions
 derive_global_vars(){
   file_path=$(readlink -f "$0");
@@ -238,7 +233,6 @@ check_system_dependencies(){
 main(){
   check_instance_id
   check_run_as_root
-  parse_cli_args "$@"
   derive_global_vars "$@"
 
   # Build update version list, derive latest version, collect current SQL version
