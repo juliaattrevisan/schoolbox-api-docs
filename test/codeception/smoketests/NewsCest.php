@@ -54,9 +54,9 @@ class NewsCest
         $i->sendGET("https://vagrant.dev.schoolbox.cloud/news/{$draftArticle->getId()}");
         $i->seeResponseCodeIs(200);
     }
-    
+
     /** Create a news article with the auto increment pointing to an old article.
-     * 
+     *
      * Test creates a new news article, moves its id up one to clash with the auto increment,
      * it then create a new article, there should be a clash of ids and the old article shouldn't
      * be replaced.
@@ -68,41 +68,41 @@ class NewsCest
         #GIVEN
         $timestamp = time();
         $title     = 'Smoke Overwrite IMPORTANT NEWS at ' . $timestamp;
-        
+
         #WHEN
         $newsPayload = new Payload\News\Create(Querystring::encode('/'));
         $newsPayload->setNewsTitle($title);
         $newsPayload->setFormParam('audience', 'role:IjMi:self');
         $i->amGoingTo('Send request to create draft news');
         $i->sendRequest($newsPayload);
-        
+
         #THEN
         $i->seeResponseCodeIs(303);
-        
+
         $draftArticle = $i->grabNewsArticleByTitle($title);
-        
+
         $i->sendGET("https://vagrant.dev.schoolbox.cloud/news/{$draftArticle->getId()}");
         $i->seeResponseCodeIs(200);
-        
+
         $newID=$draftArticle->getId()+1;
         $i->updateInDatabase('comms_news_article', ['id' => (string)$newID], ['title' => $title]);
         $new_title     = 'Smoke Overwrite OVERWRITE IT at ' . $timestamp;
         $newsPayload->setNewsTitle($new_title);
-        
+
         $i->amGoingTo('Send request to create draft news and blow up!');
         $i->sendRequest($newsPayload);
-        
+
         #THEN
         $i->seeResponseCodeIs(500);
         $i->canSeeResponseContains('PDOException: "SQLSTATE[23000]: Integrity constraint violation');
-        
+
         try
         {
             $draftArticle = $i->grabNewsArticleByTitle($title);
         } catch (\Exception $e) {
             $draftArticle = null;
         }
-        
+
         $i->assertNotNull($draftArticle);
     }
 

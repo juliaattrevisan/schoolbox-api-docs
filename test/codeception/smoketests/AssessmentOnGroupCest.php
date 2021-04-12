@@ -366,7 +366,7 @@ class AssessmentOnGroupCest
         $capabilityNameSuffixes           = ['I', 'II', 'III'];
         $indicatorNameSuffixes            = ['1', '2', '3'];
         $levelNameSuffixes                = ['A', 'B', 'C'];
-        
+
         $assessmentPayload->setFormParam('capability-markType', '1');
         $assessmentPayload->setFormParam('capability-gradingScheme', '1');
         $assessmentPayload->setFormParam('maxMark', '12');

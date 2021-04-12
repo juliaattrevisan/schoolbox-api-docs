@@ -52,7 +52,7 @@ Admin,Review pastoral severity,https://vagrant.dev.schoolbox.cloud/adminv2/lists
 Admin,Review pastoral tags,https://vagrant.dev.schoolbox.cloud/adminv2/lists/pastoral-tags
 Admin,Review year levels,https://vagrant.dev.schoolbox.cloud/adminv2/lists/year-levels
 Admin,Setup LTI provider,https://vagrant.dev.schoolbox.cloud/adminv2/lti
-Admin,View storage usage,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all
+Admin,View storage usage,https://vagrant.dev.schoolbox.cloud/adminv2/usage
 Admin,Review engagement,https://vagrant.dev.schoolbox.cloud/adminv2/engagement
 Admin,Setup UPS rules,https://vagrant.dev.schoolbox.cloud/adminv2/ups
 Admin,Setup UPS rules for students,https://vagrant.dev.schoolbox.cloud/adminv2/ups/student

@@ -43,6 +43,7 @@ class CourseLocationPickerCest
     {
         // Set the location of the 'Java Programming' course to 'Class 1: Introduction' unit
         $i->updateInDatabase('folder', ['parent' => 508], ['id' => 545]);
+
     }
 
 

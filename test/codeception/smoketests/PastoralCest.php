@@ -120,7 +120,7 @@ class PastoralCest
 
         #THEN
         $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}");
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}#panel-general");
 
         #WHEN
         $pastoralCommentPayload = new Payload\Pastoral\Comment\PastoralComment($pastoral_record);
@@ -130,7 +130,7 @@ class PastoralCest
 
         #THEN
         $i->seeResponseCodeIs(303);
-        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}");
+        $i->seeHttpHeader('location', "/pastoral/student/{$student_jreed->getId()}/record/{$pastoral_record->getId()}#panel-confidential");
 
         #WHEN
         $i->sendGET($i->grabHttpHeader('location'));
