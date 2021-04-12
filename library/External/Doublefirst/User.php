@@ -187,6 +187,21 @@ class External_Doublefirst_User implements External_UserInterface
                     )
                   )
                 ) AS MobilePhone,
+                
+                LTRIM(
+                  RTRIM(
+                    COALESCE(
+                      NULLIF(ct.Mobile, ''),
+                      NULLIF(cmPhoneWork.TelephoneNumber + '', ''),
+                      NULLIF(cmPhoneWork2.TelephoneNumber + '', ''),
+                      NULLIF(cmPhoneWork3.TelephoneNumber + '', ''),
+                      NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'),
+                      NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'),
+                      NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
+                    )
+                  )
+                ) AS WorkPhone,
+
                 0                           AS SilentPhoneFlag,
                 0                           AS SilentMobilePhoneFlag,
                 1                           AS DirectoryIncludeFlag,
@@ -212,6 +227,13 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile3   ON ctPhoneMobile3.ContactID = pc.ContactID AND ctPhoneMobile3.TelephoneType = '004'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile4   ON ctPhoneMobile4.ContactID = pc.ContactID AND ctPhoneMobile4.TelephoneType = '005'
             LEFT JOIN ContactTelephoneInformation ctPhoneMobile5   ON ctPhoneMobile5.ContactID = pc.ContactID AND ctPhoneMobile5.TelephoneType = '006'
+
+            LEFT JOIN ContactTelephoneInformation cmPhoneWork    ON cmPhoneWork.ContactID = pc.ContactID AND cmPhoneWork.TelephoneType = 'W'
+            LEFT JOIN ContactTelephoneInformation cmPhoneWork2   ON cmPhoneWork2.ContactID = pc.ContactID AND cmPhoneWork2.TelephoneType = '001'
+            LEFT JOIN ContactTelephoneInformation cmPhoneWork3   ON cmPhoneWork3.ContactID = pc.ContactID AND cmPhoneWork3.TelephoneType = '002'
+            LEFT JOIN ContactTelephoneInformation cmPhoneWork4   ON cmPhoneWork4.ContactID = pc.ContactID AND cmPhoneWork4.TelephoneType = '007'
+            LEFT JOIN ContactTelephoneInformation cmPhoneWork5   ON cmPhoneWork5.ContactID = pc.ContactID AND cmPhoneWork5.TelephoneType = '008'
+            LEFT JOIN ContactTelephoneInformation cmPhoneWork6   ON cmPhoneWork6.ContactID = pc.ContactID AND cmPhoneWork6.TelephoneType = '009'
 
             WHERE       pc.IsContactParental = 1
             AND         pc.ContactID = {$externalUserId}
