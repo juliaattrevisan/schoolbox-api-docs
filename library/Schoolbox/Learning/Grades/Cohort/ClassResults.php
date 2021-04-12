@@ -96,6 +96,9 @@ class ClassResults
      */
     private function getCohortAssessmentSet(): Collection
     {
+        if ($this->assessments->count() === 0) {
+            return new Collection();
+        }
 
         /* The input implementation ids are in a particular sort order which isn't easy to replicate
          * It's nominally by Due Date, but CAP plans throw a spanner in the works as you have to
