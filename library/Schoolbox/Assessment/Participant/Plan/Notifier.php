@@ -243,6 +243,9 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         // TODO: handle the case where a plan has been changed for a student.
 
+        // give enough time to make sure all the database persistence has completed before sending out
+        $now = time() + 5;
+
         /** @var Plan $plan */
         $plan = $bundle->getEvent()->getObject();
 
@@ -279,7 +282,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 self::TRIGGER_CLOSED,
             ]);
             // trigger to retract existing notifications
-            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_DELETED, $now);
             return;
         }
 
@@ -339,7 +342,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 self::TRIGGER_CLOSED,
             ]);
             // trigger to retract existing notifications
-            $bundle->attach(self::TRIGGER_DELETED, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_DELETED, $now);
             return;
         }
 
@@ -355,6 +358,8 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             // this date shouldn't be null
             return;
         }
+
+        $triggerOpenTime = $openDate->isPast() ? $now : $openDate->getUnixTimeStamp();
 
         // Quiz and Due Work have different logic for when notification happens
         // Quiz: 2 hours before
@@ -381,7 +386,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             /**
              * New or just switched from is isStaffOrInstructorVisibleOnly to visible status
              */
-            $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_OPEN, $triggerOpenTime);
             $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
             $bundle->attach(self::TRIGGER_CLOSED, $closeDate->getUnixTimeStamp());
@@ -395,12 +400,12 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 self::TRIGGER_UPDATED,
                 self::TRIGGER_OVERDUE,
             ]);
-            $bundle->attach(self::TRIGGER_CLOSED, self::IMMEDIATELY);
+            $bundle->attach(self::TRIGGER_CLOSED, $now);
         } elseif ($this->dateChanged($planDiff, self::DATE_CLOSE, self::PAST_TO_FUTURE)) {
             /**
              * Re-opened.
              */
-            $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
+            $bundle->attach(self::TRIGGER_OPEN, $triggerOpenTime);
             $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
             if ($dueDate->isFuture() && $this->dateChanged($planDiff, self::DATE_DUE, self::ANY)) {
                 $bundle->attach(self::TRIGGER_OVERDUE, $dueDate->getUnixTimeStamp());
@@ -414,7 +419,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             if ($this->dateChanged($planDiff, self::DATE_OPEN, self::FUTURE_TO_PAST)) {
                 $bundle->detach(self::TRIGGER_OPEN);
             } elseif ($openDate->isFuture() && $this->dateChanged($planDiff, self::DATE_OPEN, self::ANY)) {
-                $bundle->attach(self::TRIGGER_OPEN, $openDate->getUnixTimeStamp());
+                $bundle->attach(self::TRIGGER_OPEN, $triggerOpenTime);
             }
             /**
              * Due date changed.
@@ -427,7 +432,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
                 $bundle->attach(self::TRIGGER_UPCOMING, $upcomingDate->getUnixTimeStamp());
             }
             if ($openDate->isPast()) {
-                $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+                $bundle->attach(self::TRIGGER_UPDATED, $now);
             }
             /**
              * Close date changed.

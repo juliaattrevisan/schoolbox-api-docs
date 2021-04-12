@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Alaress\Html\ToText as Html2Text;
+use Schoolbox\Comms\News\Notifier;
 use Schoolbox\L10n\Mapper as L10nMapper;
 use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
@@ -120,8 +121,11 @@ class Decorator extends NotificationBundle
                     $ns = 'work';
                     break;
                 case NSMapper::NS_NEWS:
-                    $ns = 'news';
-                    break;
+                    // using news template only for posted/updated news notif
+                    if (isset($msg['meta']['title']) && !empty($msg['meta']['title'])) {
+                        $ns = 'news';
+                        break;
+                    }
                 default:
                     $ns = 'activity';
                     break;
