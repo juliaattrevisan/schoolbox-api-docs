@@ -29,7 +29,7 @@ Data:
                     <li><a @click.prevent="addPastoralRecord"
                            :class="{disabled: selectedStudentIds.length === 0, 'icon-user': true}">Add {{ locale.pastoralCare.proper }} Record</a></li>
                 {% endif %}
-                {% if mailEnabled %}
+                {% if mailEnabled and USER.hasEmail %}
                     <li><a @click.prevent="openMailDialog"
                            :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}">Compose Email</a></li>
                 {% endif %}

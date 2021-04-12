@@ -239,7 +239,7 @@ class Component_Homepage_MembersController extends Component_Homepage_Controller
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                 $this->setVar("EMAILALL", implode(AbstractMailer::implodeGlue(), array_unique($emailall)));
 
-                if ($this->getConfigLoader()->get('mail_enable')) {
+                if ($this->getConfigLoader()->get('mail_enable') && $this->getUser()->hasEmail()) {
                     $this->parse("member_email_block", "member_email");
                 } else {
                     $this->setVar('member_email_block', '');

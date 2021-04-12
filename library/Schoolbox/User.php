@@ -331,6 +331,17 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
 
 
     /**
+     * Decide if this user has an email address
+     *
+     * @return bool
+     */
+    public function hasEmail(): bool
+    {
+        return '' !== (string)$this->getEmail();
+    }
+
+
+    /**
      * @return string
      */
     public function getFullName()
