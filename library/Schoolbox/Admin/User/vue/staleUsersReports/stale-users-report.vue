@@ -6,10 +6,11 @@
  *
  */
 
-import {VueGoodTable} from 'vue-good-table';
+// import {VueGoodTable} from 'vue-good-table';
+import {ClientTable} from 'vue-tables-2';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
-import {mixinVgtSelectRows} from '@schoolbox/vueGoodTable/mixinVgtSelectRows';
+// import {mixinVgtSelectRows} from '@schoolbox/vueGoodTable/mixinVgtSelectRows';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import {ResizeObserver} from 'vue-resize';
@@ -20,15 +21,15 @@ export default {
   name: 'stale-users-report',
 
   components: {
-    VueGoodTable,
+    // VueGoodTable,
     Toast,
     RevealModal,
     ResizeObserver
   },
 
-  mixins: [
-    mixinVgtSelectRows //contains row selection functionality
-  ],
+  // mixins: [
+  //   mixinVgtSelectRows //contains row selection functionality
+  // ],
 
   props: {
     dateFormat: {
@@ -50,55 +51,78 @@ export default {
     return {
       hasRowsLoaded: false,
       hasLoadError: false,
-      columns: [
-        {
-          id: 'id',
-          field: 'id',
-          hidden: true
+      rows: [],
+      columns: ['id', 'username', 'external_id', 'firstname', 'lastname', 'role', 'year', 'updated_at'],
+      hiddenColumns: ['id'],
+      options: {
+        stickyHeader: true,
+        headings: {
+          username: 'Username',
+          external_id: 'External ID',
+          firstname: 'First Name',
+          lastname: 'Surname',
+          role: 'Role',
+          year: 'Year Level',
+          updated_at: 'Last Updated',
         },
-        {
-          label: 'Username',
-          field: 'username',
+        pagination: {
+          dropdown: true
         },
-        {
-          label: 'External ID',
-          field: 'external_id',
+        perPage: 50, 
+        perPageValues: [50, 100, 200],
+        selectable: {
+          mode: 'multiple'
         },
-        {
-          label: 'First Name',
-          field: 'firstname',
-        },
-        {
-          label: 'Surname',
-          field: 'lastname',
-        },
-        {
-          label: 'Role',
-          field: 'role',
-        },
-        {
-          label: 'Year Level',
-          field: 'year',
-        },
-        {
-          label: 'Last Updated',
-          field: 'updated_at',
-          formatFn: this.formatLastUpdated
-        },
-        {
-          label: 'pageIndex', //to assist in shift-selection
-          field: 'pageIndex',
-          hidden: true
-        }
-      ],
+        
+      },
+      //   {
+      //     id: 'id',
+      //     field: 'id',
+      //     hidden: true
+      //   },
+      //   {
+      //     label: 'Username',
+      //     field: 'username',
+      //   },
+      //   {
+      //     label: 'External ID',
+      //     field: 'external_id',
+      //   },
+      //   {
+      //     label: 'First Name',
+      //     field: 'firstname',
+      //   },
+      //   {
+      //     label: 'Surname',
+      //     field: 'lastname',
+      //   },
+      //   {
+      //     label: 'Role',
+      //     field: 'role',
+      //   },
+      //   {
+      //     label: 'Year Level',
+      //     field: 'year',
+      //   },
+      //   {
+      //     label: 'Last Updated',
+      //     field: 'updated_at',
+      //     formatFn: this.formatLastUpdated
+      //   },
+      //   {
+      //     label: 'pageIndex', //to assist in shift-selection
+      //     field: 'pageIndex',
+      //     hidden: true
+      //   }
+      // ],
       singleRowName: 'user',
       pluralRowName: 'users',
-      selectContainer: null
+      selectContainer: null,
     };
   },
 
   mounted() {
-    this.selectContainer = document.querySelector('[data-select-container]');
+    // this.selectContainer = document.querySelector('[data-select-container]');
     this.loadRows();
   },
 
@@ -111,7 +135,7 @@ export default {
      * @returns { width, height }
      */
     onContainerResize(dimensions) {
-      this.selectContainer.style.width = (dimensions.width) + 'px';
+      // this.selectContainer.style.width = (dimensions.width) + 'px';
     },
 
     /**
@@ -123,7 +147,7 @@ export default {
         .then((response) => {
           this.rows = response.data;
           this.hasRowsLoaded = true;
-          this.customVueGoodTableSetup();
+          // this.customVueGoodTableSetup();
         }).catch((error) => {
           this.hasLoadError = true; //display error note in the DOM
        });
@@ -133,12 +157,12 @@ export default {
      * custom fixes to get VGT to do exactly what we want it to
      *
      */
-    customVueGoodTableSetup() {
-      this.$nextTick()
-          .then(() => { //to ensure it exists in the DOM
-            this.$refs.vueGoodTable.selectAllByPage = false; //defaults to true, not currently provided as a prop, but works as expected
-          });
-    },
+    // customVueGoodTableSetup() {
+    //   this.$nextTick()
+    //       .then(() => { //to ensure it exists in the DOM
+    //         this.$refs.vueGoodTable.selectAllByPage = false; //defaults to true, not currently provided as a prop, but works as expected
+    //       });
+    // },
 
     /**
      * display the date in the Numerical Date Format within settings
@@ -152,69 +176,69 @@ export default {
      * To confirm/cancel selected users deletion
      *
      */
-    onDeleteUsersSelected() {
-      this.$refs.deleteModal.open();
-    },
+    // onDeleteUsersSelected() {
+    //   this.$refs.deleteModal.open();
+    // },
 
     /**
      * Delete the selected users
      *
      */
-    onConfirmDeleteUsersSelected() {
+    // onConfirmDeleteUsersSelected() {
 
-      this.$refs.toast.activate('Deleting...');
+    //   this.$refs.toast.activate('Deleting...');
 
-      const usersToDeleteIDList = this.$_vgtSelectRows_getSelectedRows().map(row => row.id);
+    //   const usersToDeleteIDList = this.$_vgtSelectRows_getSelectedRows().map(row => row.id);
 
-      let formdata = new FormData();
-      usersToDeleteIDList.forEach((item) => {
-        formdata.append('users[]', item);
-      })
+    //   let formdata = new FormData();
+    //   usersToDeleteIDList.forEach((item) => {
+    //     formdata.append('users[]', item);
+    //   })
 
-      axios.post(this.action, formdata)
-        .then((response) => {
-          this.$refs.toast.timeout('Deleted', true, 2000);
-          this.$refs.deleteModal.close();
-          this.rows = this.getUpdatedRowsAfterUserDeletion();
-          this.$_vgtSelectRows_clearRows();
+    //   axios.post(this.action, formdata)
+    //     .then((response) => {
+    //       this.$refs.toast.timeout('Deleted', true, 2000);
+    //       this.$refs.deleteModal.close();
+    //       this.rows = this.getUpdatedRowsAfterUserDeletion();
+    //       this.$_vgtSelectRows_clearRows();
 
-        }).catch((error) => {
-          this.$refs.toast.timeout('Unable to delete', false, 2000);
+    //     }).catch((error) => {
+    //       this.$refs.toast.timeout('Unable to delete', false, 2000);
 
-        });
+    //     });
 
-    },
+    // },
 
     /**
      * To update the row display
      *
      * @returns {Array}
      */
-    getUpdatedRowsAfterUserDeletion() {
-      return this.rows.filter((row) => {
-        if (this.$_vgtSelectRows_getSelectedRows().some(rowToDelete => rowToDelete.id === row.id)) {
-          return false;
-        }
-        return true;
-      });
-    },
+    // getUpdatedRowsAfterUserDeletion() {
+    //   return this.rows.filter((row) => {
+    //     if (this.$_vgtSelectRows_getSelectedRows().some(rowToDelete => rowToDelete.id === row.id)) {
+    //       return false;
+    //     }
+    //     return true;
+    //   });
+    // },
 
     /**
      * Cancel the the selected users deletion
      *
      */
-    onCancelDeleteUsersSelected() {
-      this.$refs.deleteModal.close();
-    },
+    // onCancelDeleteUsersSelected() {
+    //   this.$refs.deleteModal.close();
+    // },
 
     /**
      * To confirm/cancel selected users deletion
      *
      */
-    onClearUsersToSelected() {
-      this.$_vgtSelectRows_clearRows();
-      this.$refs.vueGoodTable.unselectAllInternal(true);
-    },
+    // onClearUsersToSelected() {
+    //   this.$_vgtSelectRows_clearRows();
+    //   this.$refs.vueGoodTable.unselectAllInternal(true);
+    // },
 
   }
 
@@ -232,45 +256,13 @@ export default {
 
     <resize-observer @notify="onContainerResize"/>
 
-    <vue-good-table
-        v-if="hasRowsLoaded"
-        ref="vueGoodTable"
-        styleClass="vgt-table"
-        :columns="columns"
-        :rows="rows"
-        :search-options="{
-				enabled: true,
-				placeholder: 'Search for users...',
-			}"
-        :sort-options="{
-				enabled: true,
-				initialSortBy: {
-					field: 'updated_at',
-					type: 'asc'
-				}
-			}"
-        :pagination-options="{
-				enabled: true,
-				perPage: 50,
-				perPageDropdown: [50, 100, 200],
-				rowsPerPageLabel: 'Users per page',
-				infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
-			}"
-        :select-options="{
-				enabled: true,
-				disableSelectInfo: true,
-			}"
-        @on-sort-change="$_vgtSelectRows_onSortChange"
-        @on-page-change="$_vgtSelectRows_onPageChange"
-        @on-row-click="$_vgtSelectRows_onRowClick"
-        @on-select-all="$_vgtSelectRows_onSelectAllRows"
-    >
-      <div slot="emptystate">
-        <p>There are currently no users to delete.</p>
-      </div>
-    </vue-good-table>
+    <v-client-table 
+      :data="rows" 
+      :columns="columns" 
+      :options="options" 
+    />
 
-    <toast ref="toast"></toast>
+    <!-- <toast ref="toast"></toast>
 
     <reveal-modal ref="deleteModal">
       <h2>Please Confirm Multiple User Deletion</h2>
@@ -296,14 +288,14 @@ export default {
           <button @click.prevent="onDeleteUsersSelected" class="button submit">Delete Users</button>
         </section>
       </div>
-    </transition>
+    </transition> -->
 
   </div>
 </template>
 
 <style lang="scss">
 
-@import '@schoolbox/vueGoodTable/vueGoodTable';
-@import 'staleUsersReport';
+// @import '@schoolbox/vueGoodTable/vueGoodTable';
+// @import 'staleUsersReport';
 
 </style>
