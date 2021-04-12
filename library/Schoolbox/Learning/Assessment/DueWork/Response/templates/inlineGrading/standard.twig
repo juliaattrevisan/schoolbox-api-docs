@@ -238,15 +238,17 @@ Usage:
                                                         {% if selfAssessmentFeedback.comment|length %}
                                                         <article>{{ selfAssessmentFeedback.comment|nl2br }}</article>
                                                         {% else %}
-                                                        <article><em>Nothing submitted</em></article>
+                                                        <article><span class="meta">{{ locale.selfReflection.proper }} comment not provided</span></article>
                                                         {% endif %}
                                                     </li>
                                                 </ul>
                                             </li>
                                         </ul>
+                                        {% if selfAssessmentFeedback.humanReadableMark|length %}
                                         <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg">
                                             <span>{{ selfAssessmentFeedback.humanReadableMark }}</span>
                                         </div>
+                                        {% endif %}
                                     </div>
                                 </fieldset>
                             </div>
