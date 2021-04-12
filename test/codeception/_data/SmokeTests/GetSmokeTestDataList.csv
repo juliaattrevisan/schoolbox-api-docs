@@ -214,10 +214,10 @@ Admin,"Setup LTI provider",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2
 Admin,"Setup LTI provider",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/lti,401
 Admin,"Setup LTI provider",Student,https://vagrant.dev.schoolbox.cloud/adminv2/lti,401
 Admin,"Setup LTI provider",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/lti,401
-Admin,"View storage usage",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,200
-Admin,"View storage usage",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,401
-Admin,"View storage usage",Student,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,401
-Admin,"View storage usage",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/usage/all,401
+Admin,"View storage usage",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/usage,200
+Admin,"View storage usage",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
+Admin,"View storage usage",Student,https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
+Admin,"View storage usage",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/usage,401
 Admin,"Review engagement",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/engagement,200
 Admin,"Review engagement",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/engagement,401
 Admin,"Review engagement",Student,https://vagrant.dev.schoolbox.cloud/adminv2/engagement,401
