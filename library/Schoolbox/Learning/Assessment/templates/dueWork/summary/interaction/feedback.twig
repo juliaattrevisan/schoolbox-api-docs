@@ -142,6 +142,10 @@ feedback: currentFeedback,
                     {% endif %}>
                 {{ currentFeedback.comment|linkify|nl2br }}
             </blockquote>
+        {% else %}
+            <article>
+                <span class="meta">{{ locale.selfReflection.proper }} comment not provided</span>
+            </article>
         {% endif %}
 
         {% if currentFeedback.allFiles | length %}
