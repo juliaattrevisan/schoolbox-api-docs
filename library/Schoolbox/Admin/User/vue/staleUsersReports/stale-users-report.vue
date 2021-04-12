@@ -53,9 +53,8 @@ export default {
       hasLoadError: false,
       rows: [],
       columns: ['id', 'username', 'external_id', 'firstname', 'lastname', 'role', 'year', 'updated_at'],
-      hiddenColumns: ['id'],
+      // hiddenColumns: ['id'],
       options: {
-        stickyHeader: true,
         headings: {
           username: 'Username',
           external_id: 'External ID',
@@ -146,6 +145,7 @@ export default {
       axios.get(this.src)
         .then((response) => {
           this.rows = response.data;
+          // debugger;
           this.hasRowsLoaded = true;
           // this.customVueGoodTableSetup();
         }).catch((error) => {
@@ -171,6 +171,10 @@ export default {
     formatLastUpdated(value) {
       return dayjs(value).format(this.dateFormat);
     },
+
+    onSelect (event) {
+			console.log(event)
+		}
 
     /**
      * To confirm/cancel selected users deletion
@@ -257,9 +261,11 @@ export default {
     <resize-observer @notify="onContainerResize"/>
 
     <v-client-table 
+      v-if="hasRowsLoaded"
       :data="rows" 
       :columns="columns" 
       :options="options" 
+      @select="onSelect"
     />
 
     <!-- <toast ref="toast"></toast>
@@ -297,5 +303,13 @@ export default {
 
 // @import '@schoolbox/vueGoodTable/vueGoodTable';
 // @import 'staleUsersReport';
+
+.VueTables input[type=checkbox] {
+  position: static;
+  width: auto;
+  height: auto;
+  min-height: auto;
+  opacity: 1;
+}
 
 </style>
