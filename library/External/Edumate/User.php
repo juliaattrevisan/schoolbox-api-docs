@@ -25,6 +25,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
 
         $caseSensitiveFields = ['ID', 'Email', 'MobilePhone'];
 
+        /* There isn't a WorkPhone equivalent in this table
+         */
         $stmt = $this->getConnection()->prepareQuery('
             SELECT CARER_NUMBER AS ID, FULL_NAME, EMAIL, MOBILE AS MOBILEPHONE
             FROM SCHOOLBOX_PARENTS
