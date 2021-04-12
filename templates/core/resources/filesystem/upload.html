@@ -216,12 +216,24 @@ $(function () {
             }
         });
 
+        //when returning from the modal, display those failed files that have either timed out or are beyond the max file size
+        //these are the only errors I can see that return an errorMessage
+        //other issues like 'max files reached' or 'incorrect file type' are already displayed in the modal,
+        //so no need to return them from the modal when it's alredy clear they won't be added
         errorFiles.forEach(function (errorFile) {
-            data.push({
-                status: errorFile.status,
-                name: errorFile.name,
-                errorMessage: errorFile.errorMessage
-            });
+            if (errorFile.errorMessage) {
+                let errorMessage;
+                if (typeof errorFile.errorMessage === 'string') { //timed out message
+                    errorMessage = errorFile.errorMessage;
+                } else { //assumed it's an object, with a max file size note
+                    errorMessage = errorFile.errorMessage.hash.replace('exception:', ''); //already has file.jpg failed: (so no need to say exception:)
+                }
+                data.push({
+                    status: errorFile.status,
+                    name: errorFile.name,
+                    errorMessage: errorMessage
+                });
+            }
         });
 
         /* Send a list of file data to message receiver in modal.js
