@@ -104,6 +104,10 @@
                 }
 
                 config.onAfterSelectAllChange(allCheckboxes);
+
+                /* Remove indeterminate status if that was previously set
+                 */
+                $(selectAll).removeClass('indeterminate');
             });
 
             /* Checkboxes in the group affect the select-all parent
@@ -121,6 +125,17 @@
                 }
 
                 config.onAfterCheckboxChange(allCheckboxes);
+
+                /* Check indeterminate select-all state
+                 * Occurs when some, but not all, checkboxes in a group are ticked
+                 */
+                let numSelected = $(selectedCheckboxes).length;
+
+                if (numSelected && numSelected < allCheckboxes.length) {
+                    $(selectAll).addClass('indeterminate');
+                } else {
+                    $(selectAll).removeClass('indeterminate');
+                }
             });
         }
     }

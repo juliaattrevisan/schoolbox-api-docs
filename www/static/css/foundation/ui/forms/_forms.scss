@@ -371,6 +371,19 @@ td {
     }
   }
 
+  &.indeterminate {
+    + #{$label-selector} {
+      &:before,
+      &:after {
+        color: $content-ui-foreground !important;
+        background-color: $content-ui-background;
+      }
+      &:after {
+        content: "\e60f";
+      }
+    }
+  }
+
   &:not(:disabled) {
     + #{$label-selector} {
       &:hover {

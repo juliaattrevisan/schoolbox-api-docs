@@ -175,7 +175,7 @@
                         </fieldset>
                     </div>
 
-                    <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/select-all/jquery.select-all.js"></script>
+                    <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/select-all/jquery.select-all.basic.js"></script>
 
                     <div id="ordinaryCheckboxes" class="small-12 medium-6 columns">
                         <fieldset class="checklist">
@@ -195,13 +195,13 @@
                             </label>
                         </fieldset>
                         <script>
-                            $("#ordinaryCheckboxes").selectAll({
-                                selector: "#selectAllOrdinary",
-                                checkboxes: "[data-ordinary-checkbox]"
+                            $("#selectAllOrdinary").selectAllBasic({
+                                selector: "[data-ordinary-checkbox]"
                             });
                         </script>
                     </div>
 
+                    <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/select-all/jquery.select-all.js"></script>
                     <div id="nestedCheckboxes" class="small-12 medium-6 columns">
                         <fieldset class="checklist">
                             <legend>Select All - nested checkboxes</legend>
