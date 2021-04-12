@@ -333,6 +333,7 @@ class External_Schooledge_User implements External_UserInterface
                 c.Email AS Email,
                 c.WorkEmail as OccupEmail,
                 c.PhoneFamily AS HomePhone,
+                '' AS WorkPhone,
                 '' AS SilentPhoneFlag,
                 c.PhoneMobile AS MobilePhone,
                 1 AS DirectoryIncludeFlag,
