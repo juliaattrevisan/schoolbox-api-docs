@@ -142,7 +142,6 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
         $this->hasSoftDeleteDateField('deleted_at');
     }
 
-
     /**
      * Custom findById
      *
@@ -496,5 +495,21 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
     public function homepageClean($cid): void
     {
         $this->deleteByColumn('homepage_id', $cid);
+    }
+
+    /**
+     * @param object      $objectA
+     * @param null        $objectB
+     * @param array|int[] $keys
+     * @return array
+     * @throws Schoolbox\Mapper\Exception
+     */
+    public function diff($objectA, $objectB = null, $keys = [0, 1])
+    {
+        // set this model to actual model
+        if ($objectA instanceof $this->model) {
+            $this->model = trim(get_class($objectA), '\\');
+        }
+        return parent::diff($objectA, $objectB, $keys);
     }
 }
