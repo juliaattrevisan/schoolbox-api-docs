@@ -187,6 +187,7 @@ interface External_UserInterface extends External\IConnector
      * HomePhone,
      * SilentPhoneFlag,
      * MobilePhone,
+     * WorkPhone,
      * DirectoryIncludeFlag,
      * SpouseID,
      * SpouseTitle,
