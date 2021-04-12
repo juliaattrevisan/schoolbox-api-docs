@@ -6,7 +6,7 @@
                 <div class="card small-12">
                     <a href="/search/user/{STUDENT_ID}">
                         <img src="/portrait.php?userId={STUDENT_EXTERNAL_ID}&size=square64" title="View Profile" />
-                        <h3>{STUDENT_NAME}, Year {STUDENT_YEAR}</h3>
+                        <h3>{STUDENT_NAME}, {STUDENT_YEAR}</h3>
                     </a>
                 </div>
 
@@ -49,7 +49,7 @@
                     <li><a class="icon-{BUTTON_ICON} {BUTTON_CSS}" href="{BUTTON_HREF}" target="{BUTTON_TARGET}" title="{BUTTON_TITLE}">{BUTTON_TEXT}</a></li>
                     <!-- END custom_buttons -->
 
-                    <li><a href="/modules/report/bialik/parents?searchYear={STUDENT_YEAR}" class="icon-class-list">Class Lists</a></li>
+                    <li><a href="/modules/report/bialik/parents?searchYear={STUDENT_YEAR_LEVEL}" class="icon-class-list">Class Lists</a></li>
                 </ul>
 
                 <ul class="action-list">

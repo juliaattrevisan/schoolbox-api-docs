@@ -81,6 +81,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar("STUDENT_EXTERNAL_ID", $userChild->getExternalId());
             $this->setVar("STUDENT_NAME", Scrub::text($child['name']));
             $this->setVar("STUDENT_YEAR", $userChild->getYear() ? Scrub::text($userChild->getYear()->getLongName()) : '');
+            $this->setVar("STUDENT_YEAR_LEVEL", $userChild->getYear() ? Scrub::text($userChild->getYear()->getName()) : '');
 
             // Render the Verso school's Travel Log data
             $this->setVar('TRAVEL_LOG', $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true));
