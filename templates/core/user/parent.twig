@@ -73,6 +73,16 @@
                                     </dd>
                                 {% endif %}
                             {% endif %}
+
+                            {% if showDetails and not (externalUser.SilentPhoneFlag ?? false) %}
+                                {% if externalUser and externalUser.WorkPhone %}
+                                    <dt class="small-12 medium-3">Work Phone:</dt>
+                                    <dd class="small-12 medium-9">
+                                        <a href="tel:{{ externalUser.WorkPhone }}">{{ externalUser.WorkPhone }}</a>
+                                    </dd>
+                                {% endif %}
+                            {% endif %}
+
                             {% if showDetails %}
                                 <dt class="small-12 medium-3">Role:</dt>
                                 <dd class="small-12 medium-9">{{ user.role.name }}</dd>
