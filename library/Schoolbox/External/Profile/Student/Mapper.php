@@ -72,7 +72,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('individual_learning_plans', self::TYPE_BOOLEAN);
         $this->uses('esl', self::TYPE_BOOLEAN);
         $this->uses('special_needs', self::TYPE_BOOLEAN);
-        $this->uses('boarding_status', self::TYPE_STRING);
+        $this->uses('boarding_status', self::TYPE_BOOLEAN);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
     }
