@@ -146,8 +146,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             }
 
             // Get admin
-            $userAccessMapper = new UserAccessMapper();
-            $admins           = $userAccessMapper->findAdminsInCategory($this->getContext());
+            $admins = (new UserAccessMapper())->findAdminsInCategory($this->getContext());
 
             $staffPhotoVisibility = $this->getConfigLoader()->get('protect_teacher_photo');
             $studentPhotoHidden   = $this->getConfigLoader()->get('protect_student_photo');
@@ -157,6 +156,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $emailAll = [];
 
             foreach ($managerList as $manager) {
+
                 /* Manager bulk email
                  */
                 if ($manager->getEmail()) {
@@ -166,32 +166,33 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 /* Manager cards
                  */
                 if ($i < self::MAX_MANAGERS) {
+
                     $name = $manager->getFullName();
 
-                    if (count($admins)) {
-                        foreach ($admins as $admin) {
-                            if ($manager->getId() === $admin->getId()) {
-                                $name .= " (Group Admin)";
-                            }
-                        }
+                    /* Check if this manager is also an admin
+                     * If so, give them a suffix
+                     */
+                    if (null !== $admins->getOffset($manager->getId())) {
+                        $name .= " (Group Admin)";
                     }
 
-
-                    $this->setVar(
-                        [
-                            'PERSON_UID'         => $manager->getId(),
-                            'PERSON_NAME'        => \Scrub::text($name),
-                            'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
-                            'PERSON_GROUP'       => \Scrub::text($manager->getPreferredTitle()),
-                        ]
-                    );
+                    $this->setVar([
+                        'PERSON_UID'         => $manager->getId(),
+                        'PERSON_NAME'        => \Scrub::text($name),
+                        'PERSON_EXTERNAL_ID' => \Scrub::text($manager->getExternalId()),
+                        'PERSON_GROUP'       => \Scrub::text($manager->getPreferredTitle()),
+                    ]);
 
                     /* Don't display images in list view
                      */
                     if ($this->getConfig('displayPortraits') == 'grid') {
-                        $this->setVar('GRID_VIEW_CLASSES', 'medium-block-grid-2');
+                        $this->setVar([
+                            'GRID_VIEW_CLASSES' => 'medium-block-grid-2'
+                        ]);
                     } else {
-                        $this->setVar('GRID_VIEW_CLASSES', '');
+                        $this->setVar([
+                            'GRID_VIEW_CLASSES' => '',
+                        ]);
                     }
 
                     if ($manager->getRole()->isStudent()) {
@@ -221,7 +222,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                 $i++;
             }
-
+            
             /* Decide whether to show the Email All button
              */
             if (\count($emailAll)
@@ -232,6 +233,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                     "REPLYTO" => $this->getUser()->getEmail(),
                     "EMAILALL" => implode(AbstractMailer::implodeGlue(), array_unique($emailAll)),
                 ]);
+
                 $this->parse("member_email_block", "member_email");
             } else {
                 $this->setVar('member_email_block', '');
