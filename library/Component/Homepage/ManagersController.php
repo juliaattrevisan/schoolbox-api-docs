@@ -226,6 +226,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             /* Decide whether to show the Email All button
              */
             if (\count($emailAll)
+                && $this->getUser()->hasEmail()
                 && $this->getConfigLoader()->get('mail_enable')
                 && $this->getUser()->getRole()->isStaff()
             ) {
