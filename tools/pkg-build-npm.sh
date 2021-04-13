@@ -5,7 +5,7 @@ instdir=`readlink -f $fullpath/../`;
 PATH="$PATH:$instdir/node_modules/.bin";
 
 echo "Installing NPM dependencies";
-npm install;
+npm ci;
 check=$?;
 if [ $? -ne 0 ];
 then

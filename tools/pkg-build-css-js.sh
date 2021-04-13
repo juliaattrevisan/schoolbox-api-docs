@@ -12,21 +12,25 @@
 # @link        https://schoolbox.com.au/
 #
 #
+production=0
 
-sass=0
-if [ "$1" == "--sass" ]; then
-	sass=1
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -p|--production) production=1 ;;
+        *) echo "Unknown parameter passed: $1"; exit 1 ;;
+    esac
+    shift
+done
+
+echo "Minifying and compiling JS and CSS";
+if [ $production -eq 1 ];
+then
+  npm run publish
+else
+  npm run build
 fi
-
-filepath=`readlink -f $0`;
-fullpath=${filepath%/*}
-instdir=`readlink -f $fullpath/../`;
-PATH="$PATH:$instdir/node_modules/.bin";
-
-echo "NPM";
-tools/pkg-build-npm.sh;
 if [ $? -ne 0 ];
 then
-	echo "An error occurred";
-	exit 1;
+	echo "Failed to build JS and CSS";
+	exit -1;
 fi
