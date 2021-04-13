@@ -354,7 +354,7 @@ fi
 cd /vagrant;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building JS/CSS files";
-npm run build;
+/vagrant/tools/pkg-build-css-js.sh
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Loading all demo data complete";
 

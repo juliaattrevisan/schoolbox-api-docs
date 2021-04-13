@@ -19,7 +19,6 @@ echo "Branch: $branch";
 
 PATH="$PATH:$instdir/node_modules/.bin";
 
-echo "Building NPM dependencies";
 tools/pkg-build-npm.sh;
 if [ $? -ne 0 ];
 then
