@@ -53,14 +53,14 @@ then
         exit 1;
 fi
 
-if [ ! -f ../vendor-php-artifact/"$branch"-assets.tar.gz ];
+if [ ! -f ../assets-artifact/"$branch"-assets.tar.gz ];
 then
-	echo "Unable to locate javascript/css artifact: ../vendor-php-artifact/"$branch"-assets.tar.gz";
+	echo "Unable to locate javascript/css artifact: ../assets-artifact/"$branch"-assets.tar.gz";
 	exit 1;
 fi
 
 echo "Unpacking javascript/css build files";
-tar xzf ../vendor-php-artifact/"$branch"-assets.tar.gz;
+tar xzf ../assets-artifact/"$branch"-assets.tar.gz;
 
 echo "Removing undeployable files";
 if [ -f tools/ci/undeployable.list ];
