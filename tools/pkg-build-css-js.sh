@@ -22,11 +22,12 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-echo "Minifying and compiling JS and CSS";
 if [ $production -eq 1 ];
 then
+  echo "Minifying and compiling JS and CSS for production";
   npm run publish
 else
+  echo "Minifying and compiling JS and CSS for development";
   npm run build
 fi
 if [ $? -ne 0 ];
