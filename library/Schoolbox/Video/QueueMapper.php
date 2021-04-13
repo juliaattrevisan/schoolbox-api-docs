@@ -74,7 +74,7 @@ class QueueMapper extends Mapper
 
         if ($file->getMimetype()->isAudio() || $file->getMimetype()->isVideo()) {
             try {
-                $videoQueueItem = $this->findOneByColumn('hash', $file->getStorage()->getHash());
+                $videoQueueItem = $this->findOneByColumn('hash', $file->getHash());
 
                 /* If it was in the queue, check its processing status
                  * If it's complete, we can show it normally
