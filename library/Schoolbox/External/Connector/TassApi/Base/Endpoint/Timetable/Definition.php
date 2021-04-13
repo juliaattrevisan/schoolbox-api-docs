@@ -326,20 +326,22 @@ class Definition implements IStrategy
                 return $a > $b;
             });
 
-            $record = array_pop($stack[$ttid])[0];
+            if (\count($stack[$ttid])) {
+                $record = array_pop($stack[$ttid])[0];
 
-            /* Mine it for all its worth
-             */
-            $payload[$ttid] = [
-
-                /* Cycle start date
+                /* Mine it for all its worth
                  */
-                'cycleStart' => $record['VALUE'],
+                $payload[$ttid] = [
 
-                /* Starting Day number
-                 */
-                'dayStart' => $record['DAY_CODE']
-            ];
+                    /* Cycle start date
+                     */
+                    'cycleStart' => $record['VALUE'],
+
+                    /* Starting Day number
+                     */
+                    'dayStart' => $record['DAY_CODE']
+                ];
+            }
         }
 
         /* Return (ttid, startDate, dayNumber) tuples for later
