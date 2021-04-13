@@ -411,7 +411,7 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @return User
+     * @return User|null
      */
     public function getStudent()
     {

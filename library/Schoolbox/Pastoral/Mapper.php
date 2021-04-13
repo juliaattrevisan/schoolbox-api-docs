@@ -1054,10 +1054,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @param object $object
-     * @param string $verb
-     * @param null   $previous
-     * @return bool
+     * @inheritDoc
      */
     public function raiseNotification($object, $verb, $previous = null)
     {
