@@ -51,19 +51,7 @@ function main() {
   cp -f vagrant.dev.schoolbox.cloud/fullchain.pem /etc/nginx/certs/schoolbox-fullchain.crt;
   cp -f vagrant.dev.schoolbox.cloud/privkey.pem /etc/nginx/certs/schoolbox-private.key;
 
-  set_up_ip_based_web_request_routing
-
   service php7.4-fpm restart
-}
-
-
-# Vagrant also needs to support IP-based web addresses, eg https://192.168.36.10/
-function set_up_ip_based_web_request_routing(){
-  extra_hostnames=''
-  for ip_address in $(ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk '{print $2}' | cut -d/ -f1); do
-    extra_hostnames="$extra_hostnames\nhostnames[] = '$ip_address'"
-  done
-  sed -i "s/\[vagrantx\]/[vagrantx]$extra_hostnames/g" /etc/schoolbox/instances.ini;
 }
 
 ##################################################################################
