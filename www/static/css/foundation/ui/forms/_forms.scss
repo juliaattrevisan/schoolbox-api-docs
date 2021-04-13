@@ -212,6 +212,7 @@ td {
 .input-group {
   @include flex;
   align-items: flex-start;
+  line-height: 1.5;
 
   input,
   select,

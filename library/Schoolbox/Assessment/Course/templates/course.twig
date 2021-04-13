@@ -366,16 +366,12 @@ Usage:
                             {% if not courseSpec or folderAccess[courseSpec.folder.id] > 1 %}
                                 <li class="actions-small-1" data-new-unit>
                                     <div class="list-item content">
-                                        <div class="small-1 column">
-                                            <span class="icon-add course-new-unit-icon"></span>
-                                        </div>
-                                        <div class="small-11 column">
-                                            <div class="input-group">
-                                                <input type="text" value="" placeholder="New Unit" id="noonit-name" name="newUnitName" maxlength="255"/>
-                                                <input name="spawn-unit" type="submit" value="Create {{ locale.unit.proper }}"
-                                                       data-mage-next="spawn-unit" data-mage-working="Working..."
-                                                       formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>
-                                            </div>
+                                        <label for="newUnitName">Unit name</label>
+                                        <div class="input-group">
+                                            <input type="text" value="" placeholder="New unit name" id="noonit-name" name="newUnitName" maxlength="255"/>
+                                            <input name="spawn-unit" type="submit" class="button icon-add" value="Create new {{ locale.unit.proper }}"
+                                                   data-mage-next="spawn-unit" data-mage-working="Working..."
+                                                   formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>
                                         </div>
                                     </div>
                                     <div>
