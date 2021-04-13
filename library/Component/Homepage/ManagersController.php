@@ -154,23 +154,13 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $viewer               = $this->getUser();
 
             $i = 0;
+            $emailAll = [];
+
             foreach ($managerList as $manager) {
                 /* Manager bulk email
                  */
                 if ($manager->getEmail()) {
-                    $emailall[] = Scrub::text($manager->getFormattedEmailDisplay());
-                }
-
-                if ($this->getUser()->getRole()->isStaff() && isset($emailall) && $this->getConfigLoader()->get('mail_enable')) {
-                    $this->setVar(
-                        [
-                            "REPLYTO"  => $this->getUser()->getEmail(),
-                            "EMAILALL" => implode(AbstractMailer::implodeGlue(), array_unique($emailall)),
-                        ]
-                    );
-                    $this->parse("member_email_block", "member_email");
-                } else {
-                    $this->setVar('member_email_block', '');
+                    $emailAll[] = Scrub::text($manager->getFormattedEmailDisplay());
                 }
 
                 /* Manager cards
@@ -230,6 +220,21 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 }
 
                 $i++;
+            }
+
+            /* Decide whether to show the Email All button
+             */
+            if (\count($emailAll)
+                && $this->getConfigLoader()->get('mail_enable')
+                && $this->getUser()->getRole()->isStaff()
+            ) {
+                $this->setVar([
+                    "REPLYTO" => $this->getUser()->getEmail(),
+                    "EMAILALL" => implode(AbstractMailer::implodeGlue(), array_unique($emailAll)),
+                ]);
+                $this->parse("member_email_block", "member_email");
+            } else {
+                $this->setVar('member_email_block', '');
             }
 
             $this->parse('has_members_block', 'has_members');
