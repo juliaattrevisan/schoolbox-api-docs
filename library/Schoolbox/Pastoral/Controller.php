@@ -476,15 +476,17 @@ class Controller extends Base
     /**
      * Insert pastoral care record
      *
-     * @param User $student
+     * @param User|null $student // can be null, if requested from classlist
      * @throws MapperException
      */
-    public function getStudentRecordInsertForm(User $student): void
+    public function getStudentRecordInsertForm(?User $student): void
     {
         // Throw in a blank pastoral record with the student populated
 
         $record = $this->pastoralDataSource->createModel();
-        $record->setStudent($student);
+        if ($student) {
+            $record->setStudent($student);
+        }
 
         $this->getStudentRecordUpdateForm($record);
     }
@@ -529,9 +531,11 @@ class Controller extends Base
             if ($allowParents && $roleCurrent->isParent()) {
                 $roles->add($roleCurrent);
                 $roleUsers[$roleCurrent->getId()] = 0;
-                foreach ($record->getStudent()->getParents() as $parent) {
-                    if ($parent->getRole()->getId() == $roleCurrent->getId()) {
-                        $roleUsers[$roleCurrent->getId()]++;
+                if ($record->getStudent()) {
+                    foreach ($record->getStudent()->getParents() as $parent) {
+                        if ($parent->getRole()->getId() == $roleCurrent->getId()) {
+                            $roleUsers[$roleCurrent->getId()]++;
+                        }
                     }
                 }
             }
@@ -614,13 +618,11 @@ class Controller extends Base
         $hash = '';
 
         try {
-            /** @var Model $record */
             $record = $this->pastoralDataSource->findById($this->getUser(), $post['pastoral_id']);
 
             if (!empty(trim($post["comment_body"]))) {
                 // Insert the comment to the internal database
 
-                /** @var PastoralComment $comment */
                 $comment = $this->pastoralCommentMapper->createModel();
 
                 $comment->setPastoral($record);
@@ -868,13 +870,13 @@ class Controller extends Base
      * @param int           $primaryStudentId    The primary records student ID
      * @param RequestValues $post                POST parameters passed by the create/update form
      * @param array         $duplicateStudentIds List of students the primary record should be duplicated on
-     * @param PastoralModel|null $parent              Parent record (if we are updating an existing record)
+     * @param PastoralModel|null $parent         Parent record (if we are updating an existing record)
      *
-     * @return Collection|PastoralModel[]
+     * @return void
      * @throws MapperException
      * @throws Exception
      */
-    private function processPastoralRecords(int $primaryStudentId, RequestValues $post, array $duplicateStudentIds = [], PastoralModel $parent = null): Collection
+    private function processPastoralRecords(int $primaryStudentId, RequestValues $post, array $duplicateStudentIds = [], PastoralModel $parent = null): void
     {
         $heading = trim($post->get('heading'));
         if (empty($heading)) {
@@ -938,13 +940,9 @@ class Controller extends Base
 
         // Prepare attachments. No database change yet.
         $newAttachments = $this->prepareAttachments($post);
-        $diffMethod     = function (PastoralAttachmentModel $a, PastoralAttachmentModel $b) {
-            return $a->getStorage()->getHash() === $b->getStorage()->getHash();
-        };
 
         // Now ready to make changes
         $db = $this->pastoralTypeMapper->getDatabase();
-        $db->beginTransaction();
 
         // Prepare tags. Save newly created tags.
         $tags = $this->prepareTags($post->get('tags'));
@@ -952,9 +950,14 @@ class Controller extends Base
         // Go through every kid
 
         foreach ($duplicateStudentIds as $studentIdCurrent) {
+            // save pastoral records one by one
+            $db->beginTransaction();
+
+            $previousRecord = null;
             if ($parent instanceof PastoralModel && $studentIdCurrent == $primaryStudentId) {
                 // Updating existing pastoral record
                 $record = $parent;
+                $previousRecord = clone $parent;
             } else {
                 // Creating a new record
                 $record = $this->pastoralDataSource->createModel();
@@ -1006,8 +1009,6 @@ class Controller extends Base
             }
             $this->pastoralDataSource->save($record);
 
-            $records->add($record);
-
             // Store the first records ID for use as parent for subsequent copies
 
             if (!isset($parent)) {
@@ -1019,13 +1020,16 @@ class Controller extends Base
             foreach ($tags as $tag) {
                 $this->pastoralTagMapper->assignToRecord($record, $tag);
             }
+            $record->setTags($tags);
 
             // Save permissions/visibility
             $this->pastoralAccessMapper->deleteByColumn('pastoral_id', $record->getId());
+            $record->setAccess($this->pastoralAccessMapper->createCollection());
             foreach ($accesses as $access) {
                 $recordAccess = clone $access;
                 $recordAccess->setPastoral($record);
                 $this->pastoralAccessMapper->save($recordAccess);
+                $record->getAccess()->add($recordAccess);
             }
 
             // preparation
@@ -1037,17 +1041,22 @@ class Controller extends Base
                 $newRecordAttachments->add($newRecordAttachment);
             }
 
+            [$createdAttachments, $deletedAttachments] = $this->pastoralAttachmentMapper->diffAttachments($newRecordAttachments, $oldAttachments);
             // Save new attachments that aren't in old
-            $this->pastoralAttachmentMapper->save($newRecordAttachments->diff($oldAttachments, $diffMethod));
+            $this->pastoralAttachmentMapper->save($createdAttachments);
             // Delete old attachments that aren't in new
-            $this->pastoralAttachmentMapper->delete($oldAttachments->diff($newRecordAttachments, $diffMethod));
+            $this->pastoralAttachmentMapper->delete($deletedAttachments);
+            $record->setAttachments($newRecordAttachments);
+
+            $db->commit();
+
+            // raise notification
+            $action = $previousRecord ? \Schoolbox\Mapper::METHOD_UPDATE : \Schoolbox\Mapper::METHOD_CREATE;
+            $this->pastoralDataSource->raiseNotification($record, $action, $previousRecord);
 
             // Save record in external database, and set pastoral external_id in Schoolbox database
             $pastoralExternal->syncPastoral($record);
         }
-
-        $db->commit();
-        return $records;
     }
 
     /**
