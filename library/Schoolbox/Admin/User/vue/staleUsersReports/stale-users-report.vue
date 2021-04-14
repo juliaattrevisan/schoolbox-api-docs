@@ -52,8 +52,8 @@ export default {
       hasRowsLoaded: false,
       hasLoadError: false,
       rows: [],
-      columns: ['id', 'username', 'external_id', 'firstname', 'lastname', 'role', 'year', 'updated_at'],
-      // hiddenColumns: ['id'],
+      columns: ['username', 'external_id', 'firstname', 'lastname', 'role', 'year', 'updated_at'],
+      hiddenColumns: ['id'],
       options: {
         headings: {
           username: 'Username',
@@ -74,46 +74,6 @@ export default {
         },
         
       },
-      //   {
-      //     id: 'id',
-      //     field: 'id',
-      //     hidden: true
-      //   },
-      //   {
-      //     label: 'Username',
-      //     field: 'username',
-      //   },
-      //   {
-      //     label: 'External ID',
-      //     field: 'external_id',
-      //   },
-      //   {
-      //     label: 'First Name',
-      //     field: 'firstname',
-      //   },
-      //   {
-      //     label: 'Surname',
-      //     field: 'lastname',
-      //   },
-      //   {
-      //     label: 'Role',
-      //     field: 'role',
-      //   },
-      //   {
-      //     label: 'Year Level',
-      //     field: 'year',
-      //   },
-      //   {
-      //     label: 'Last Updated',
-      //     field: 'updated_at',
-      //     formatFn: this.formatLastUpdated
-      //   },
-      //   {
-      //     label: 'pageIndex', //to assist in shift-selection
-      //     field: 'pageIndex',
-      //     hidden: true
-      //   }
-      // ],
       singleRowName: 'user',
       pluralRowName: 'users',
       selectContainer: null,

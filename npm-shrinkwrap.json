@@ -4944,8 +4944,8 @@
       }
     },
     "node_modules/vue-tables-2": {
-      "version": "2.2.2",
-      "resolved": "git+https://gwN_lOKvQ6W8X2hlJU6ejnY-cmk@git.xscode.com/matfish2/vue-tables-2.git#cd7d0c86d12208e1428fc4be66dd922329a5714e",
+      "version": "2.2.3",
+      "resolved": "git+https://gwN_lOKvQ6W8X2hlJU6ejnY-cmk@git.xscode.com/matfish2/vue-tables-2.git#1f500e9f787596b3c2c1e95f8873eea0dda8abf4",
       "license": "MIT",
       "dependencies": {
         "array-intersect": "^0.0.1",
@@ -9523,7 +9523,7 @@
       }
     },
     "vue-tables-2": {
-      "version": "git+https://gwN_lOKvQ6W8X2hlJU6ejnY-cmk@git.xscode.com/matfish2/vue-tables-2.git#cd7d0c86d12208e1428fc4be66dd922329a5714e",
+      "version": "git+https://gwN_lOKvQ6W8X2hlJU6ejnY-cmk@git.xscode.com/matfish2/vue-tables-2.git#1f500e9f787596b3c2c1e95f8873eea0dda8abf4",
       "from": "vue-tables-2@git+https://gwN_lOKvQ6W8X2hlJU6ejnY-cmk@git.xscode.com/matfish2/vue-tables-2.git",
       "requires": {
         "array-intersect": "^0.0.1",
