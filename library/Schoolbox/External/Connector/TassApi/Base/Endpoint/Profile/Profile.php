@@ -190,10 +190,10 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
-        $this->log->info('Downloading student and parent data (this might take a while)');
-
-        $this->importStudents();
+//        $this->log->info('Processing students and their parents.');
+//        $this->log->info('Downloading student and parent data (this might take a while)');
+//
+//        $this->importStudents();
 
         /* Import staff profile data
          */
