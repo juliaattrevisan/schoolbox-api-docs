@@ -313,10 +313,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 u.firstname,
                 u.lastname
             FROM        sis_class c
-            INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId2
+            INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId
             INNER JOIN  sis_class_period cp ON cp.class_id = c.id
             LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
-            WHERE sups.sis_user_profile_id IS NOT NULL
         ';
 
         $statement = $this->internalDatabase->prepareQuery($query);
