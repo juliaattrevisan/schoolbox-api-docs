@@ -248,9 +248,17 @@ class AdditionalSubjects implements IStrategy
 
         foreach ($users as $externalId => $userData) {
 
-            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
-                'code' => (string)$externalId
-            ]);
+            /* Allow continuation even if this dies irrecoverably
+             */
+            try {
+                $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
+                    'code' => (string)$externalId
+                ]);
+            } catch (\RuntimeException $e) {
+                $this->log->critical($e->getMessage());
+
+                continue;
+            }
 
             /* No additional subjects
              */
