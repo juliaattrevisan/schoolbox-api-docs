@@ -148,8 +148,8 @@ class Classes implements IStrategy
          */
         $periods = $this->lookup->getPeriods();
 
-        $this->importTimetable($this->lookup->getStudents(), self::TYPE_STAFF, $periods);
-        $this->importTimetable($this->lookup->getStaff(), self::TYPE_STUDENT, $periods);
+        $this->importTimetable($this->lookup->getStaff(), self::TYPE_STAFF, $periods);
+        $this->importTimetable($this->lookup->getStudents(), self::TYPE_STUDENT, $periods);
     }
 
 
@@ -424,25 +424,30 @@ class Classes implements IStrategy
             ));
         }
 
-        /* Throw warning, but assign them anyway
+        /* If this class had teachers, process them
          */
-        if (!isset($users[$class['teachers']['externalId']])) {
-            $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
-                $class['teachers']['externalId'],
-                $timetableClass->getName(),
-                $timetableClass->getCode()
+        if (\count($class['teachers'])) {
+
+            /* Throw warning, but assign them anyway
+             */
+            if (!isset($users[$class['teachers']['externalId']])) {
+                $this->log->warning(sprintf(
+                    'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
+                    $class['teachers']['externalId'],
+                    $timetableClass->getName(),
+                    $timetableClass->getCode()
+                ));
+            }
+
+            $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
+
+            $this->log->info(sprintf(
+                'Creating class period relation for teacher %s %s in room %s',
+                $class['teachers']['firstname'],
+                $class['teachers']['surname'],
+                $class['room']['name']
             ));
         }
-
-        $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
-
-        $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s',
-            $class['teachers']['firstname'],
-            $class['teachers']['surname'],
-            $class['room']['name']
-        ));
 
         $this->log->info(sprintf(
             'This occurs on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',
