@@ -188,6 +188,9 @@ module.exports = {
         usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/filetype.main.js',
         usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/file.main.js',
 
+        //Record Media
+        recordMedia: './templates/core/resources/filesystem/vue/initRecordMedia.js', 
+
         //Sass
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
         editor: './www/static/css/foundation/editor.scss'
@@ -283,7 +286,7 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                use: ['vue-style-loader', 'css-loader'],
+                use: ['vue-style-loader', 'style-loader', 'css-loader'],
             },
             {
                 test: /\.scss$/,
