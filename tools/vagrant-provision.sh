@@ -28,9 +28,6 @@ function error(){
   $LOG $L_ERROR "$1"
 }
 
-mkdir -p $cachedir;
-cd $cachedir || exit;
-
 # Get options
 if [ ! -z $1 ]; then data_source=$1; else echo "Please provide data_source"; exit 1; fi;
 if [ ! -z $2 ]; then
@@ -91,10 +88,6 @@ if ! schoolbox-download-s3-file.sh --data-source "$data_source"  --s3-referer "$
 fi
 if ! schoolbox-download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
   echo "Error: Unable to download s3 file: 'vagrant-cleanup-secrets.sql'";
-  exit 1;
-fi
-if ! schoolbox-download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cachedir"; then
-  echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'";
   exit 1;
 fi
 
@@ -251,19 +244,7 @@ cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf sc
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;
-sed -i 's/php_flag\[display_startup_errors\]\ \=\ off/php_flag\[display_startup_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
-sed -i 's/php_flag\[display_errors\]\ \=\ off/php_flag\[display_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
-sed -i 's/php_flag\[html_errors\]\ \=\ off/php_flag\[html_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
-cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
-cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket-ssl.conf /etc/nginx/conf.d/;
-sed -i 's/www-data/vagrant/g' /etc/php/*/fpm/pool.d/schoolbox*;
-# disable nginx open file cache since not a production server
-sed -i '/open_file_cache/d' /etc/nginx/nginx.conf;
 cd $cachedir;
-rm -fR vagrant.dev.schoolbox.cloud;
-tar xzf tls-vagrant.dev.schoolbox.cloud.tar.gz;
-cp -f vagrant.dev.schoolbox.cloud/fullchain.pem /etc/nginx/certs/schoolbox-fullchain.crt;
-cp -f vagrant.dev.schoolbox.cloud/privkey.pem /etc/nginx/certs/schoolbox-private.key;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing npx if not already installed";
 /vagrant/tools/npx.sh
