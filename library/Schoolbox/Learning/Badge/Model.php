@@ -233,7 +233,7 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param GenericCollection|\Schoolbox\YearLevel\Model[]|null $yearLevels
+     * @param GenericCollection $yearLevels
      * @return $this
      */
     public function setYearLevels(GenericCollection $yearLevels): self
