@@ -3,6 +3,12 @@
 # It is used to ensure that when puppet runs, the VM is in a similar state as
 # when puppet is invoked during a real live schoolbox[dev] installation.
 
+# Global constants
+readonly cache_dir='/vagrant/vagrantcache';
+
+mkdir -p $cache_dir;
+cd $cache_dir || exit 1;  # TODO do we need to?
+
 # Ensure running an appropriate era vagrant box
 if [ "$(cat /home/vagrant/.vagrant.buildtimestamp)" -gt 1612117411 ]; then
   echo "[SB][$(date +%Y-%m-%d\ %X)] Vagrant box meets minimum requirements: 1612117411 Current: $(cat /home/vagrant/.vagrant.buildtimestamp)";
@@ -26,6 +32,14 @@ if [ ! -f /vagrant/.env ]; then
     echo "Error: '.env' environment file missing. See LastPass for details" >&2;
     exit 1;
 fi
+
+# Function to fetch value from .env file by key
+# Usage: value=$(read_var $key)
+read_var() {
+    VAR=$(grep -E "^\s*$1" /vagrant/.env | xargs)
+    IFS="=" read -ra VAR <<< "$VAR"
+    echo "${VAR[1]}"
+}
 
 
 # Is mysql installed ? (it won't if packer image build)
@@ -76,3 +90,17 @@ for service in socketd digestd routed scheduled; do
   fi
   find /etc/systemd/system/multi-user.target.wants/ -iname "schoolbox-$service.service" -delete
 done
+
+
+# vagrant does not use LE to deploy SSL certs, we need to deploy certs prior to running puppet so puppet can configure nginx vhosts
+if [[ -n "$3" ]]; then data_source=$3; else echo "Please provide data_source"; exit 1; fi;
+s3Referer=$(read_var AWS_S3_REFERER);
+if ! /vagrant/tools/download-s3-file.sh --data-source "$data_source" --s3-referer "$s3Referer" --file-name "tls-vagrant.dev.schoolbox.cloud.tar.gz" --cache-dir "$cache_dir"; then
+  echo "Error: Unable to download s3 file: 'tls-vagrant.dev.schoolbox.cloud.tar.gz'";
+  exit 1;
+fi
+tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-vagrantx-fullchain.crt
+tar xzfO $cache_dir/tls-vagrant.dev.schoolbox.cloud.tar.gz vagrant.dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-vagrantx-private.key
+
+# Remove old style named cert/key
+rm -f /etc/nginx/certs/schoolbox-fullchain.crt /etc/nginx/certs/schoolbox-private.key

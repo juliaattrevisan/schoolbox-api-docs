@@ -40,16 +40,9 @@ function main() {
   sed -i 's/php_flag\[display_startup_errors\]\ \=\ off/php_flag\[display_startup_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
   sed -i 's/php_flag\[display_errors\]\ \=\ off/php_flag\[display_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
   sed -i 's/php_flag\[html_errors\]\ \=\ off/php_flag\[html_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
-  cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;
-  cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket-ssl.conf /etc/nginx/conf.d/;
   sed -i 's/www-data/vagrant/g' /etc/php/*/fpm/pool.d/schoolbox*;
   # disable nginx open file cache since not a production server
   sed -i '/open_file_cache/d' /etc/nginx/nginx.conf;
-  cd '/vagrant/vagrantcache' || exit 1;
-  rm -fR vagrant.dev.schoolbox.cloud;
-  tar xzf tls-vagrant.dev.schoolbox.cloud.tar.gz;
-  cp -f vagrant.dev.schoolbox.cloud/fullchain.pem /etc/nginx/certs/schoolbox-fullchain.crt;
-  cp -f vagrant.dev.schoolbox.cloud/privkey.pem /etc/nginx/certs/schoolbox-private.key;
 
   service php7.4-fpm restart
 }

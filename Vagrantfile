@@ -118,7 +118,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "tools/vagrant-provision-pre-puppet.sh"
-    s.args = "'#{instance_registry_url_override}' '#{instance_registry_api_key}'"
+    s.args = "'#{instance_registry_url_override}' '#{instance_registry_api_key}' '#{data_source}'"
   end
 
   # Mount the puppet directory and execute the puppet hook.
