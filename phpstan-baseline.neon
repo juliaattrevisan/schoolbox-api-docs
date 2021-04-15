@@ -2271,31 +2271,6 @@ parameters:
 			path: library/Evaluation/Question/Category.php
 
 		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\)\\: Unexpected token \"\\\\n     \", expected type at offset 104$#"
-			count: 1
-			path: library/Event/Attendance/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 107$#"
-			count: 1
-			path: library/Event/Attendance/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 63$#"
-			count: 1
-			path: library/Event/Attendance/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$eventId\\)\\: Unexpected token \"\\$eventId\", expected type at offset 61$#"
-			count: 2
-			path: library/Event/Attendance/Controller.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$data\\)\\: Unexpected token \"\\$data\", expected type at offset 82$#"
-			count: 1
-			path: library/Event/Attendance/Controller.php
-
-		-
 			message: "#^Return type \\(iterable\\<array\\>&Iterator\\) of method External_AscTimetables_Translator_Enrolment\\:\\:translateXmlToArray\\(\\) should be compatible with return type \\(array\\<array\\>\\) of method External_AscTimetables_Translator_Base\\:\\:translateXmlToArray\\(\\)$#"
 			count: 1
 			path: library/External/AscTimetables/Translator/Enrolment.php
