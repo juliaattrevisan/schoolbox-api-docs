@@ -8,8 +8,9 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Grades\Cohort;
+namespace Schoolbox\Learning\Grades\Cohort\Test;
 
+use Schoolbox\Learning\Grades\Cohort;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
@@ -35,7 +36,7 @@ class ValidUseCohortMarksTest extends TestCase
      */
     public function testValidLMSCohortComparison(bool $configOption, Folder\Model $folder, bool $expected): void
     {
-        $actual = (new ValidUseCohortMarks())->isSatisfiedBy($configOption, $folder);
+        $actual = (new Cohort\ValidUseCohortMarks())->isSatisfiedBy($configOption, $folder);
 
         $this->assertEquals($expected, $actual);
     }

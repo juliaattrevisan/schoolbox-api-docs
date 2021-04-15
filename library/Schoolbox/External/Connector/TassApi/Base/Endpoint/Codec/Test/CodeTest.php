@@ -8,7 +8,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Test;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Code as CodeCodec;
