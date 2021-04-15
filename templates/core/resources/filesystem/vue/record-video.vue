@@ -41,12 +41,12 @@ export default {
 						},
 						maxLength: 20,
 						debug: true,
-						// convertEngine: 'ffmpeg.wasm', // enable ffmpeg.wasm plugin
-						// convertWorkerURL: '../../node_modules/@ffmpeg/core/dist/ffmpeg-core.js',
-						// convertOptions: ['-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', '-f', 'mp4'], // convert recorded data to MP4 (and copy over audio data without encoding)
-						// pluginLibraryOptions: {
-						// 	outputType: 'video/mp4' // specify output mime-type
-						// }
+						convertEngine: 'ffmpeg.wasm', // enable ffmpeg.wasm plugin
+						convertWorkerURL: '../../node_modules/@ffmpeg/core/dist/ffmpeg-core.js',
+						convertOptions: ['-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', '-f', 'mp4'], // convert recorded data to MP4 (and copy over audio data without encoding)
+						pluginLibraryOptions: {
+							outputType: 'video/mp4' // specify output mime-type
+						}
 					}
 				},
 			}
@@ -54,7 +54,6 @@ export default {
 	},
 
 	mounted () {
-		debugger;
 		this.initVideojs();
 		this.initVideoRecordListeners();
 		this.initVideoConvertListeners();
