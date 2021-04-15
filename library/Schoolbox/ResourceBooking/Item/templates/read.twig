@@ -66,7 +66,7 @@
                 {% endif %}
 
                 <div class="small-12 medium-8 large-7 columns">
-                    {{ item.description|purify }}
+                    <article>{{ item.description|purify }}</article>
 
                     <h3>Rules</h3>
                     {% include '@resourceItem/sub/rules.twig' with {item: item} %}
