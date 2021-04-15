@@ -145,18 +145,13 @@ $app = new class extends CliTool\App {
             'curriculum_badge'              => 'SELECT count(*) FROM curriculum_node JOIN curriculum_badge cb on curriculum_node.id = cb.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_evidence ce on curriculum_node.id = ce.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
 
-
-
-
-
-
             //Mobile Users
             'mobile_registrations' => 'SELECT count(*) FROM `mobile_app_registry`',
 
             //Calendar
-            'event_school'      => 'SELECT COUNT(*) FROM event WHERE type = 3 AND deleted_at IS NULL',
-            'event_group'       => 'SELECT COUNT(*) FROM event WHERE type = 2 AND deleted_at IS NULL',
-            'event_personal'    => 'SELECT COUNT(*) FROM event WHERE type = 1 AND deleted_at IS NULL',
+            'event_school'      => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_CAMPUS . ' AND deleted_at IS NULL',
+            'event_group'       => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_GROUP . ' AND deleted_at IS NULL',
+            'event_personal'    => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_PERSONAL . ' AND deleted_at IS NULL',
 
             //CMS
             'storage'           => 'SELECT count(*) FROM `storage`',
@@ -173,7 +168,6 @@ $app = new class extends CliTool\App {
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
             'badge_goals'       => 'SELECT count(*) FROM badge_user WHERE status = "goal" AND deleted_at IS NULL',
             'badge_achieved'       => 'SELECT count(*) FROM badge_user WHERE status = "achievement" AND deleted_at IS NULL',
-
         ];
 
         $result['instance_id'] = INSTANCE_ID;
