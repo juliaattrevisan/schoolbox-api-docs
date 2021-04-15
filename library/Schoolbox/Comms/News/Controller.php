@@ -231,7 +231,8 @@ class Controller extends Base
             ->setMulti(false)
             ->setAttachPrompt('Attach a feature image')
             ->setAttachmentsLabel('')
-            ->setMimeFilter('image/*');
+            ->setMimeFilter('image/*')
+            ->setFilesystemContext('images');
 
         /* Misc attached files
          */

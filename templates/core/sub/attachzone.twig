@@ -18,7 +18,8 @@ $data = {
         name: (string),
         hash: (string),
         prev: (url)
-    }, ...]
+    }, ...],
+    fs: (?string),
 }
 
 #}
@@ -87,6 +88,7 @@ $data = {
                     useModal: {{ attachzone.useModal ? 'true' : 'false' }},
                     capture: {{ attachzone.capture ? 'true' : 'false' }},
                     {% if attachzone.iconClass is defined and attachzone.iconClass is not null %}iconClass: '{{ attachzone.iconClass }}',{% endif %}
+                    {% if attachzone.fs is defined and attachzone.fs %}fs: '{{ attachzone.fs }}',{% endif %}
                 });
             });
         </script>
