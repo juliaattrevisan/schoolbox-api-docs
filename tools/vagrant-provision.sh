@@ -244,12 +244,6 @@ cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf sc
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Enabling Schoolbox nginx vhost";
 chown -fR vagrant:vagrant /mnt/data/php_tmp;
-sed -i 's/php_flag\[display_startup_errors\]\ \=\ off/php_flag\[display_startup_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
-sed -i 's/php_flag\[display_errors\]\ \=\ off/php_flag\[display_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
-sed -i 's/php_flag\[html_errors\]\ \=\ off/php_flag\[html_errors\]\ \=\ on/g' /etc/php/*/fpm/pool.d/schoolbox*.conf;
-sed -i 's/www-data/vagrant/g' /etc/php/*/fpm/pool.d/schoolbox*;
-# disable nginx open file cache since not a production server
-sed -i '/open_file_cache/d' /etc/nginx/nginx.conf;
 cd $cachedir;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing npx if not already installed";
