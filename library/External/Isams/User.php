@@ -68,11 +68,11 @@ class External_Isams_User implements External_UserInterface
                         ''                            AS SpouseMobilePhone,
                         1                             AS SpouseDirectoryIncludeFlag
             FROM        V_Student
-            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = :external_user_id
-            WHERE       V_Student.StudentID = :external_user_id
+            LEFT JOIN   V_Parent AS V_Parent ON V_Parent.StudentID = :external_user_id1
+            WHERE       V_Student.StudentID = :external_user_id2
         ";
 
-        return $this->getConnector()->executeQuery($query, ['external_user_id' => $externalUserId])->fetch() ?: [];
+        return $this->getConnector()->executeQuery($query, ['external_user_id1' => $externalUserId, 'external_user_id2' => $externalUserId])->fetch() ?: [];
     }
 
     /**
