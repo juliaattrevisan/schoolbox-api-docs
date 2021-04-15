@@ -95,6 +95,9 @@ $app = new class extends CliTool\App {
             'blog'              => 'SELECT count(*) FROM blog WHERE deleted_at IS NULL',
             'etherpad'          => 'SELECT count(*) FROM etherpad_pad WHERE deleted_at IS NULL',
             'groups'            => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE f.deleted_at is null',
+            'groups_open'       => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::FREE_GROUP . ' AND f.deleted_at is null',
+            'groups_moderated'  => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::MODERATED_GROUP . ' AND f.deleted_at is null',
+            'groups_private'    => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::PRIVATE_GROUP . ' AND f.deleted_at is null',
             'views_total'       => 'SELECT SUM(hitcount) FROM homepage_log',
             'views_groups'      => 'SELECT SUM(hitcount) FROM homepage_log JOIN userGroups u on homepage_log.folder_id = u.cid',
             'views_classes'     => 'SELECT SUM(hitcount) FROM homepage_log JOIN folder_code fc ON homepage_log.folder_id = fc.folder_id',
@@ -127,6 +130,26 @@ $app = new class extends CliTool\App {
             'pastoral_records'  => 'SELECT count(*) FROM `pastoral` WHERE deleted_at IS NULL',
             'pastoral_groups'   => 'SELECT count(*) FROM `pastoral_group` WHERE deleted_at IS NULL',
 
+            //EOTC
+            'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
+
+            //Boarder Leave
+            'leave_requests'    => 'SELECT count(*) FROM leave_request',
+
+            //Curriculum
+            'curriculum'                    => 'SELECT count(*) FROM curriculum_node WHERE deleted_at IS NULL',
+            'curriculum_assessment'         => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_assessment cnfa on curriculum_node.id = cnfa.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_rubric_indicator'   => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_indicator cnfri on curriculum_node.id = cnfri.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_badge'              => 'SELECT count(*) FROM curriculum_node JOIN curriculum_badge cb on curriculum_node.id = cb.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_evidence ce on curriculum_node.id = ce.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+
+
+
+
+
+
             //Mobile Users
             'mobile_registrations' => 'SELECT count(*) FROM `mobile_app_registry`',
 
@@ -156,6 +179,9 @@ $app = new class extends CliTool\App {
         $result['instance_id'] = INSTANCE_ID;
         $result['school_code'] = $config->get('site_school_code');
         $result['type'] = $config->get('site_type');
+        $result['version'] = $config->get('site_version');
+        $result['plan'] = $config->get('site_plan');
+
 
         foreach($queryList as $name => $query) {
 
