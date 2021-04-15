@@ -115,8 +115,17 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
                 'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
                 'AttendedFlag' => in_array($_POST['studentID'][$i], $attending) ? 0 : 1,
-            ];
 
+                /* dbo.wkAttendances lets the EarlyDepartureTime and LateArrivalTime be null
+                 * so this basically means you're clearing these fields in our ui; but when you
+                 * do that they're not being passed here which means they're never going to
+                 * get to the db. We have to explicitly state them as default values
+                 */
+                'EarlyDepartureFlag' => 0,
+                'EarlyDepartureTime' => null,
+                'LateArrivalFlag' => 0,
+                'LateArrivalTime' => null
+            ];
 
             // Arrival/Departure for multi-period classes
             if ($_POST['LateArrivalTime'][$i]) {
