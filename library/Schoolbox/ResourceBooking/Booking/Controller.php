@@ -140,6 +140,12 @@ class Controller extends Base
             [
                 'template' => '@resourceBooking/book.twig',
                 'data'     => [
+
+                    /* Confusingly, 'item' refers to a Booking/Model, and a 'resource'
+                     * is the Item/Model itself. Trying to rename it snaps a bunch of
+                     * other unrelated stuff
+                     */
+                    'resource'          => $item,
                     'item'              => $booking,
                     'select'            => 'radio',
                     'campusList'        => $this->getCampusList(),
@@ -698,6 +704,7 @@ class Controller extends Base
                 'template' => '@resourceBooking/book.twig',
                 'data'     => [
                     'item'              => $item,
+                    'resource'          => $item->getResource(),
                     'campusList'        => $this->getCampusList(),
                     'returnUrl'         => $this->getRequest()->query['returnUrl'],
                     'cancelReturnUrl'   => $this->session->getHistory(),

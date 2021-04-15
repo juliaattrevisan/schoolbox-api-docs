@@ -367,6 +367,20 @@ $(function() {
             {# Input for determining which action to run #}
             <input type="hidden" name="action" />
 
+            <section class="content">
+                <div class="row">
+                    {% if resource.image.hash %}
+                        <div class="small-12 medium-4 large-5 columns">
+                            <img src="/storage/image.php?size=maxsize&hash={{ resource.image.hash|e('url') }}" />
+                        </div>
+                    {% endif %}
+
+                    <div class="small-12 medium-8 large-7 columns">
+                        {{ resource.description|purify }}
+                    </div>
+                </div>
+            </section>
+
             <section>
                 <fieldset class="content">
                     <legend>Overview</legend>
