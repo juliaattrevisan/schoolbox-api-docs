@@ -16,6 +16,7 @@ class NewsInitialCest
         $i->clickWithLeftButton(['css' => 'a.icon-add[title=Create\ news]']);
         $i->fillField("title", "Test News Title");
         $i->fillCkEditorById('body', 'wow what interesting news');
+        $i->scrollTo(['css' => 'button.button.icon-drag-drop']);
         $i->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
         $i->waitForText('Year Levels');
         $element = Locator::contains('button.button-block', 'Year Levels');
