@@ -59,6 +59,8 @@
                 <div class="small-12 medium-8 large-7 columns">
                     <article>{{ item.description|purify }}</article>
 
+                    <hr />
+
                     <h3>Rules</h3>
                     {% include '@resourceItem/sub/rules.twig' with {item: item} %}
                 </div>
