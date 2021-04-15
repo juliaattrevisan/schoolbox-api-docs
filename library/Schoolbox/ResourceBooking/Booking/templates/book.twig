@@ -354,9 +354,6 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <div class="alert-box">
-            {% include '@resourceItem/sub/rules.twig' with {item: item.resource, currentTerm: currentTerm} %}
-        </div>
         <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
             <input type="hidden" name="id" value="{{ item.id }}"/>
             <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
@@ -377,6 +374,9 @@ $(function() {
 
                     <div class="small-12 medium-8 large-7 columns">
                         <article>{{ resource.description|purify }}</article>
+
+                        <h3>Rules</h3>
+                        {% include '@resourceItem/sub/rules.twig' with {item: item.resource, currentTerm: currentTerm} %}
                     </div>
                 </div>
             </section>
