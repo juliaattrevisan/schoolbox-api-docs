@@ -18,6 +18,7 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 /**
  * Class Mapper
@@ -35,6 +36,7 @@ class Mapper extends \Schoolbox\Mapper
 {
     /**
      * @inheritDoc
+     * @throws MapperException
      */
     protected function mapping(): void
     {
@@ -52,6 +54,18 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->joinsVia(
+            'badge_year_level',
+            YearLevelMapper::class,
+            YearLevelMapper::COL_ID,
+            'year_level_id',
+            'badge_id',
+            null,
+            null,
+            null,
+            'yearLevels'
+        );
 
         /* A bunch of Curriculum Nodes
          */
@@ -77,6 +91,9 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function getSelectString(): string
     {
+        /** @var YearLevelMapper $yearLevelMapper */
+        $yearLevelMapper = $this->getJoinMapper('badge_year_level');
+
         return "
             SELECT
                 {$this->getColumnString()},
@@ -86,7 +103,8 @@ class Mapper extends \Schoolbox\Mapper
                 {$this->getJoinColumnString('createdBy', 'c')},
                 {$this->getJoinColumnString('createdBy.role', 'cr')},
                 {$this->getJoinColumnString('updatedBy', 'u')},
-                {$this->getJoinColumnString('updatedBy.role', 'ur')}
+                {$this->getJoinColumnString('updatedBy.role', 'ur')},
+                {$yearLevelMapper->getColumnString('byl')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'm', true)}
@@ -95,6 +113,7 @@ class Mapper extends \Schoolbox\Mapper
             INNER JOIN {$this->getJoinSql('createdBy.role', 'c', 'cr')}
             INNER JOIN {$this->getJoinSql('updatedBy', '', 'u', true)}
             INNER JOIN {$this->getJoinSql('updatedBy.role', 'u', 'ur')}
+            LEFT JOIN {$this->getJoinSql('badge_year_level', '', 'byl')}
         ";
     }
 
@@ -149,6 +168,9 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var YearLevelMapper $yearLevelMapper */
+        $yearLevelMapper = $this->getJoinMapper('badge_year_level');
+
         $collection = $this->createCollection();
 
         foreach ($statement as $row) {
@@ -164,6 +186,15 @@ class Mapper extends \Schoolbox\Mapper
 
             if ($category instanceof Category\Model) {
                 $collection[$badgeId]->setCategory($category);
+            }
+
+            if (!$collection[$badgeId]->getYearLevels()) {
+                $collection[$badgeId]->setYearLevels($this->getJoinMapper('badge_year_level')->createCollection());
+            }
+            $yearLevelId = $row['byl.' . YearLevelMapper::COL_ID];
+
+            if ($yearLevelId) {
+                $collection[$badgeId]->getYearLevels()->setOffset($yearLevelId, $yearLevelMapper->hydrate($row, 'byl'));
             }
 
             // Set the list of curriculum codes as an empty collection:

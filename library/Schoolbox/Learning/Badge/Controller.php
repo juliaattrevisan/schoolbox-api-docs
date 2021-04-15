@@ -23,6 +23,8 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
+use Schoolbox\YearLevel\Model as YearLevel;
 
 /**
  * Controller for badge requests.
@@ -70,6 +72,12 @@ class Controller extends Base
 
 
     /**
+     * Mapper for year levels.
+     */
+    private YearLevelMapper $yearLevelMapper;
+
+
+    /**
      * Mapper for curriculum nodes.
      */
     private CurriculumNodeMapper $curriculumNodeMapper;
@@ -84,6 +92,7 @@ class Controller extends Base
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param Storage\Mapper          $storageMapper
      * @param Category\Mapper         $categoryMapper
+     * @param YearLevelMapper         $yearLevelMapper
      * @param CurriculumNodeMapper    $curriculumNodeMapper
      */
     public function __construct(
@@ -93,6 +102,7 @@ class Controller extends Base
         Filter\Selection\Mapper $filterSelectionMapper,
         Storage\Mapper $storageMapper,
         Category\Mapper $categoryMapper,
+        YearLevelMapper $yearLevelMapper,
         CurriculumNodeMapper $curriculumNodeMapper
     ) {
         $this->mapper                = $mapper;
@@ -101,6 +111,7 @@ class Controller extends Base
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->storageMapper         = $storageMapper;
         $this->categoryMapper        = $categoryMapper;
+        $this->yearLevelMapper       = $yearLevelMapper;
         $this->curriculumNodeMapper  = $curriculumNodeMapper;
     }
 
@@ -225,6 +236,13 @@ class Controller extends Base
 
         $iconRegistry = (new IconRegistry())->prepare();
 
+        $yearLevels = $this->yearLevelMapper->findAll()->map(
+            function ($yearLevel) {
+                /** @var YearLevel $yearLevel */
+                return array_combine(['id', 'name'], $yearLevel->findValueLabelPair());
+            }
+        );
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 '@learningBadge/createUpdateForm.twig',
@@ -232,6 +250,7 @@ class Controller extends Base
                     'badge' => [],
                     'attachzone' => $attachzone->getTwigContext(),
                     'categories' => $this->categoryMapper->findAll(),
+                    'yearLevels' => $yearLevels,
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
                         'registry' => $iconRegistry->getRegistry(),
@@ -326,10 +345,18 @@ class Controller extends Base
 
         $iconRegistry = (new IconRegistry())->prepare();
 
+        $yearLevels = $this->yearLevelMapper->findAll()->map(
+            function ($yearLevel) {
+                /** @var YearLevel $yearLevel */
+                return array_combine(['id', 'name'], $yearLevel->findValueLabelPair());
+            }
+        );
+
         $this->response->content->set($this->buildHtmlOutput('@learningBadge/createUpdateForm.twig', [
             'badge' => $badge,
             'attachzone' => $attachzone->getTwigContext(),
             'categories' => $this->categoryMapper->findAll(),
+            'yearLevels' => $yearLevels,
             'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'iconRegistry' => [
                 'registry' => $iconRegistry->getRegistry(),

@@ -18,6 +18,7 @@ use Schoolbox\Curriculum\Node\Mapper as CurriculumNodeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
+use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 
 /**
  * Module for badge requests.
@@ -126,15 +127,6 @@ class Module extends BaseModule
 
 
     /**
-     * @return \External_UserInterface
-     */
-    protected function getExternalUser()
-    {
-        return $this->getInjector()->get('externalUser');
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
@@ -159,6 +151,7 @@ class Module extends BaseModule
                     'filterSelectionMapper' => $this->getMapperFactory()->getLazy(Filter\Selection\Mapper::class),
                     'storageMapper'         => $this->getMapperFactory()->getLazy(StorageMapper::class),
                     'categoryMapper'        => $this->getMapperFactory()->getLazy(Category\Mapper::class),
+                    'yearLevelMapper'       => $this->getMapperFactory()->getLazy(YearLevelMapper::class),
                     'curriculumNodeMapper'  => $this->getMapperFactory()->getLazy(CurriculumNodeMapper::class),
                 ]
             )

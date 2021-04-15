@@ -257,15 +257,6 @@ class Module extends BaseModule
 
 
     /**
-     * @return \External_UserInterface
-     */
-    protected function getExternalUser()
-    {
-        return $this->getInjector()->get('externalUser');
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void

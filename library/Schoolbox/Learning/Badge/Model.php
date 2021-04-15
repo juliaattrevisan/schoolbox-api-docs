@@ -82,6 +82,12 @@ class Model implements ISoftDeletable
     /**
      * @var GenericCollection|null
      */
+    private ?GenericCollection $yearLevels = null;
+
+
+    /**
+     * @var GenericCollection|null
+     */
     private ?GenericCollection $curriculumNodes = null;
 
 
@@ -213,6 +219,27 @@ class Model implements ISoftDeletable
     public function setCategory(Category\Model $category): self
     {
         $this->category = $category;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|\Schoolbox\YearLevel\Model[]|null
+     */
+    public function getYearLevels(): ?GenericCollection
+    {
+        return $this->yearLevels;
+    }
+
+
+    /**
+     * @param GenericCollection|\Schoolbox\YearLevel\Model[]|null $yearLevels
+     * @return $this
+     */
+    public function setYearLevels(GenericCollection $yearLevels): self
+    {
+        $yearLevels->assertCollectionOf(\Schoolbox\YearLevel\Model::class);
+        $this->yearLevels = $yearLevels;
         return $this;
     }
 

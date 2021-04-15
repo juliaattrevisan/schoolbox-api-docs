@@ -17,6 +17,7 @@ use Schoolbox\Learning\Badge\Model;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\User;
+use Schoolbox\YearLevel\Model as YearLevel;
 
 /**
  * Translator for translating an array (generally from a request body) into a
@@ -75,6 +76,18 @@ class AllFields extends Base
         );
 
         // TODO set tags
+
+        // Set year levels
+        $this->setCollection(
+            $array,
+            'yearLevelIds',
+            'id',
+            $model,
+            'setYearLevels',
+            new GenericCollection(YearLevel::class),
+            new YearLevel(),
+            'setId'
+        );
 
         // Set curriculum nodes
         $this->setCollection(
