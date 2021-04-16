@@ -11,7 +11,7 @@
             {# Two different types of confirmDialog depending on circumstances
              # Use this to inform user they can't actually delete this thing
              #}
-            {% if numItems %}
+            {% if numItems ?? false %}
                 $(this).confirmDialog({
                     header: 'Cannot delete this resource category',
                     text: 'This resource category currently contains resources; you must remove all resources from the category before it can be deleted.',
