@@ -28,6 +28,24 @@ class Controller extends Base {
      */
     protected $paginator;
 
+
+    /**
+     * @var ItemMapper
+     */
+    private ItemMapper $itemMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param ItemMapper $itemMapper
+     */
+    public function __construct(ItemMapper $itemMapper)
+    {
+        $this->itemMapper = $itemMapper;
+    }
+
+
     /**
      * Browses the list of categories.
      */
@@ -141,14 +159,12 @@ class Controller extends Base {
      */
     public function edit(Model $category): void
     {
-        $items = \Schoolbox\ResourceBooking\Item\Mapper::getInstance()->findByColumn('resource_category_id', $category->getId());
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceCategory/edit.twig',
                 'data'     => array(
                     'category' => $category,
-                    'numItems' => $items->count()
+                    'numItems' => $this->itemMapper->findByColumn('resource_category_id', $category->getId())->count()
                 ),
             )
         );

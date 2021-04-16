@@ -17,7 +17,7 @@ use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Permission\Access\UserAccess;
-
+use Schoolbox\ResourceBooking;
 
 class Module extends BaseModule
 {
@@ -80,6 +80,10 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
+        $injector->params[Controller::class] = [
+            'itemMapper' => $this->getMapperFactory()->getLazy(ResourceBooking\Item\Mapper::class),
+        ];
+
         $injector->setters[Controller::class]['setMapper']
             = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->setters[Controller::class]['setPaginator']
