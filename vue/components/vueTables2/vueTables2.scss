@@ -6,6 +6,11 @@
   opacity: 1;
 }
 
+.row .row {
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .VueTables__sort-icon {
   background: grey;
   float: right;

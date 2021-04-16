@@ -263,7 +263,8 @@
     font-family: $font-family-icon;
 }
 
-.icon-dropdown:before {
+.icon-dropdown:before,
+.icon-sort-down:before {
     content: '\e621';
     font-family: $font-family-icon;
 }
@@ -699,6 +700,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-sort-up:before {
+    content: "\e91f";
+    font-family: $font-family-icon;
+}
+
 .icon-sport:before,
 .icon-ball:before {
     content: '\e665';
@@ -792,7 +798,8 @@
     font-family: $font-family-icon;
 }
 
-.icon-up-down:before {
+.icon-up-down:before,
+.icon-sortable:before {
     content: '\e800';
     font-family: $font-family-icon;
 }

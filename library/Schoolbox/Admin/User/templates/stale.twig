@@ -4,14 +4,16 @@
 <div class="admin-container row">
 {{ renderAdminNavigation(pageCurrent) }}
     <div class="admin-content">
-    <h2 class="subheader">Stale Users <span class="hint has-tip tip-top" data-tooltip title="This list contains staff, students and parents that have not been updated in the last week. This may indicate the UPS is no longer maintaining these users accounts.">?</span></h2>
-    <div id='stale-users-report'>
-        <stale-users-report
-                date-format="{{ config.date_local | momentJsFormat }}"
-                src="{{ listEndpoint }}"
-                action="{{ deleteEndpoint }}"
-        />
+        <div class="small-12 columns">
+            <h2 class="subheader">Stale Users <span class="hint has-tip tip-top" data-tooltip title="This list contains staff, students and parents that have not been updated in the last week. This may indicate the UPS is no longer maintaining these users accounts.">?</span></h2>
+            <div id='stale-users-report'>
+                <stale-users-report
+                        date-format="{{ config.date_local | momentJsFormat }}"
+                        src="{{ listEndpoint }}"
+                        action="{{ deleteEndpoint }}"
+                />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/staleUsersReport.bundle.js?v={{ config.site_version }}"></script>
+        </div>
     </div>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/staleUsersReport.bundle.js?v={{ config.site_version }}"></script>
-</div>
 </div>
