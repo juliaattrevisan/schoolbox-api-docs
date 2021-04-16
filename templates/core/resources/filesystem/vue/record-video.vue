@@ -20,7 +20,13 @@ export default {
 	
 	data () {
 		return {
-			player: '',
+			isDeviceReady: false, //to toggle the device display
+			hasDeviceError: false, //can't access the requested device
+			isRecording: false, //track recording status
+			recordedData: null, 
+			isConverting: false, //converting video to mp4
+			convertedData: null,
+			player: '', //videojs player
 			options: {
 				controls: true,
 				autoplay: false,
@@ -57,9 +63,6 @@ export default {
 
 	mounted () {
 		this.initVideojs();
-		this.initVideoRecordListeners();
-		this.initVideoConvertListeners();
-		this.initVideoErrorListeners();
 	},
 
 	beforeDestroy () { 
@@ -73,92 +76,112 @@ export default {
          * 
          */ 
         initVideojs () {
-            this.player = videojs(this.$refs.myVideo, this.options, () => {
-				// print version information at startup
-				var msg = 'Using video.js ' + videojs.VERSION +
-					' with videojs-record ' + videojs.getPluginVersion('record') +
-					' and recordrtc ' + RecordRTC.version;
-				videojs.log(msg);
-			});
-			// device is ready
+
+            this.player = videojs(this.$refs.myVideo, this.options);
+			
 			this.player.on('deviceReady', () => {
-				console.log('device is ready!');
+				this.isDeviceReady = true;
 			});
+
+			this.initVideoRecordListeners();
+			this.initVideoConvertListeners();
+			this.initVideoErrorListeners();
+
         },
 
 		/*
-         * initVideoRecordListeners
+         * the user has started/stopped recording a video
          * 
          */ 
         initVideoRecordListeners () {
-            // user clicked the record button and started recording
-			this.player.on('startRecord', () => {
-				console.log('started recording!');
+            
+			this.player.on('startRecord', () => { // user clicked the record button and started recording
+				this.isRecording = true;
 			});
 
-			// user completed recording and stream is available
-			this.player.on('finishRecord', () => {
-				// the blob object contains the recorded data that
-				// can be downloaded by the user, stored on server etc.
-				console.log('finished recording: ', this.player.recordedData);
+			this.player.on('stopRecord', () => { // and stopped recording
+				this.isRecording = false;
 			});
+
+			this.player.on('finishRecord', () => { // user completed recording and stream is available
+				this.recordedData = this.player.recordedData; // the blob object contains the recorded data that
+			});
+
         },
 
 		/*
-         * initVideoConvertListeners
+         * conert all browser videos to mp4 for consistency
          * 
          */ 
         initVideoConvertListeners () {
-            // converter started processing
-			this.player.on('startConvert', () => {
-				console.log('started converting!');
+            
+			this.player.on('startConvert', () => { // converter started processing
+				this.isConverting = true;
 			});
 
-			// converter completed and stream is available
-			this.player.on('finishConvert', () => {
-				// the convertedData object contains the recorded data that
-				// can be downloaded by the user, stored on server etc.
-				console.log('finished converting: ', this.player.convertedData);
+			this.player.on('finishConvert', () => { // converter completed and stream is available
+				this.convertedData = this.player.convertedData; // the convertedData object contains the recorded data that
+				this.uploadConvertedFile();
+			});
 
+        },
+
+		/*
+         * the mp4 is ready, so upload it up to SchoolBox
+         * 
+         */ 
+        async uploadConvertedFile () {
+
+			try {
+				
 				const formData = new FormData();
 				formData.append('upload', this.player.convertedData, this.player.convertedData.name);
 
-				axios.post('/storage/asyncUpload.php', formData)
-				.then((response) => {
-					const data = {
-						title:    this.player.convertedData.name,
-						mimeType: this.player.convertedData.type,
-						filesize: this.player.convertedData.size,
-						hash:     response.data.hash
-					};
+				const response = await axios.post('/storage/asyncUpload.php', formData);
+				this.postUploadMessage(response.data);
 
-					window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
+			} catch (error) {
+				console.log(error);
+			}
 
-				})
-				.catch((error) => {
-					console.log(error);
-				});
+		},
 
-			});
-        },
+		/*
+         * inform any listeners that a file was uploaded.
+         * put it in the dropzone, and inform the dropzone opener
+         * that a file was posted to it.
+         * 
+		 * @params {Object}
+         */ 
+        postUploadMessage (data) {
+			const data = {
+				title:    this.player.convertedData.name,
+				mimeType: this.player.convertedData.type,
+				filesize: this.player.convertedData.size,
+				hash:     response.data.hash
+			};
+			window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
+		},
 
 		/*
          * initVideoErrorListeners
          * 
          */ 
         initVideoErrorListeners () {
-			// error handling
-			this.player.on('error', (element, error) => {
+			
+			this.player.on('error', (element, error) => { // error handling, not sure what would cause this trigger yet, but it's in the videojs-record examples
 				console.warn(error);
 			});
 
-			this.player.on('deviceError', () => {
+			this.player.on('deviceError', () => { //User doesn't allow the browser to access the webcam and/or microphone. Check player.deviceErrorCode for the specific error code.
+				this.hasDeviceError = true;
 				console.error('device error:', this.player.deviceErrorCode);
 			});
+
 		},
 
 		/*
-         * destroyVideojs
+         * ensure everything reset on possible modal re-display
          * 
          */ 
         destroyVideojs () {
