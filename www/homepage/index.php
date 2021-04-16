@@ -142,6 +142,7 @@ $this->setBlock(TEMPLATE_content, 'readonly_switch_off', 'readonly_switch_off_bl
 
 $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
+$this->setBlock('page_controls', 'browse_resources', 'browse_resources_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory($this->getDi()->get('session')->get('user'), $this);
@@ -170,6 +171,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
     $this->parse('edit_page_block', 'edit_page');
     $this->parse('modify_layout_block', 'modify_layout');
     $this->parse('customise_page_block', 'customise_page');
+    $this->parse('browse_resources_block', 'browse_resources');
 
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
@@ -331,6 +333,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
         'customise_page_block' => '',
         'colour_list_block' => '',
         'course_actions_block' => '',
+        'browse_resources_block' => '',
 
         // Read access users still see their collapse button
         'HIDE_CONTROLS_ON_WRITE' => ''

@@ -127,12 +127,12 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setBlock('has_file', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'files', 'files_block');
             $this->setBlock('source_folder_exists', "submit_file", "submit_file_block");
+            $this->setBlock('source_folder_exists', "view_all_files", "view_all_files_block");
             $this->setBlock('files', 'file_url', 'file_url_block');
             $this->setBlock('files', 'file_no_url', 'file_no_url_block');
             $this->setBlock('files', 'modify_file', 'modify_file_block');
             $this->setBlock('files', 'file_modify_user', 'file_modify_user_block');
             $this->setBlock('files', 'file_deleted_user', 'file_deleted_user_block');
-
 
             $this->setVar('empty_state_block', '');
 
@@ -229,9 +229,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                 }
 
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
-                    $this->setVar("submit_file_block", "");
+                    $this->setVar([
+                        'submit_file_block' => '',
+                        'view_all_files_block' => ''
+                    ]);
                 } else {
                     $this->parse("submit_file_block", "submit_file");
+                    $this->parse('view_all_files_block', 'view_all_files');
                 }
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
             }

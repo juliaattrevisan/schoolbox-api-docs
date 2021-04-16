@@ -198,7 +198,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 }
 
                 // Show view all links button, only when total available is more than links displayed.
-                if (\count($allLinks) < $linkCount) {
+                if (\count($allLinks) < $linkCount && $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     $this->parse('view_all_links_block', 'view_all_links');
                 } else {
                     $this->setVar('view_all_links_block', '');
