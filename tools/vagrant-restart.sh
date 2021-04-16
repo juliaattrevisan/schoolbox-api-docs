@@ -29,10 +29,9 @@ service php7.4-fpm restart
 for eth in `ip addr | grep inet | grep -v inet6 | grep global | grep -v eth0 | awk {'print $2'} | cut -d/ -f1`;
 do
   echo "[SB][`date +%Y-%m-%d\ %X`] Website URL             => https://$eth/";
-  echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL              => https://$eth:8882/";
   echo "[SB][`date +%Y-%m-%d\ %X`] RabbitMQ Management URL => http://$eth:$rabbitmq_management_port/";
 done
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Website URL             => https://vagrant.dev.schoolbox.cloud";
-echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL              => https://vagrant.dev.schoolbox.cloud:8882/";
+echo "[SB][`date +%Y-%m-%d\ %X`] WebDav URL              => https://vagrant-dav.dev.schoolbox.cloud";
 echo "[SB][`date +%Y-%m-%d\ %X`] RabbitMQ Management URL => http://vagrant.dev.schoolbox.cloud:$rabbitmq_management_port/";
