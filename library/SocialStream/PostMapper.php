@@ -499,7 +499,7 @@ class PostMapper extends Schoolbox\Mapper implements FeedableMapperInterface, Sc
 
     /**
      * @param object      $objectA
-     * @param null        $objectB
+     * @param object|null $objectB
      * @param array|int[] $keys
      * @return array
      * @throws Schoolbox\Mapper\Exception
