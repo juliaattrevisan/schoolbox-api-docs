@@ -68,7 +68,7 @@ class QuestionBankPage
         $i = $this->tester;
         $numQuestionBank = $i->grabNumRecords('assess_question_bank');
         $position = 0;
-        for ($j = 1; $j <= $numQuestionBank + 1; $j++) {
+        for ($j = 1; $j <= $numQuestionBank ; $j++) {
             $q = $i->grabTextFrom('#questionBankForm > section > ul > li:nth-child(' . $j . ')');
             if (strpos($q, $question) !== false) {
                 $position = $j;

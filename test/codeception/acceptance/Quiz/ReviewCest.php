@@ -86,6 +86,7 @@ class ReviewCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
+
     public function testQuizReviewHorizontal(AcceptanceTester $i)
     {
         $className = Common::CLASS_CHEMISTRY_1_3;
@@ -139,6 +140,7 @@ class ReviewCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
+
     public function testQuizBulkReview(AcceptanceTester $i)
     {
         $className = Common::CLASS_CHEMISTRY_1_3;
@@ -177,6 +179,7 @@ class ReviewCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
+
     public function testQuizGradeVisibility(AcceptanceTester $i)
     {
         $className = Common::CLASS_CHEMISTRY_1_3;
@@ -250,6 +253,7 @@ class ReviewCest
      * @param int $visibility
      * @throws Exception
      */
+
     private function createQuiz(AcceptanceTester $i, array $students, int $classId, string $className,
                                 string $teacher, string $quizTitle, int $visibility)
     {
@@ -311,5 +315,6 @@ class ReviewCest
         $i->waitForText('Status of ' . $quizTitle);
 
     }
+
 
 }

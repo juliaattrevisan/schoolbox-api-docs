@@ -10,6 +10,7 @@ namespace Page\Survey;
 
 use AcceptanceTester;
 use Alaress_Date_Format;
+use Codeception\Util\Locator;
 
 /**
  * Survey form page object
@@ -24,7 +25,7 @@ class SurveyForm
     public const SELECTOR_TITLE = self::FORM . ' input[name="title"]';
     public const SELECTOR_OPEN_DATE = self::FORM . ' input[name="openDate"]';
     public const SELECTOR_DUE_DATE = self::FORM . ' input[name="dueDate"]';
-    public const SELECTOR_BUTTON_CREATE = self::FORM . ' [type=submit][value="Create"]';
+    public const SELECTOR_BUTTON_CREATE = self::FORM . ' input[type=submit][value="Create"]';
     public const SELECTOR_BUTTON_UPDATE = self::FORM . ' [type=submit][value="Update"]';
 
     /**
@@ -74,7 +75,10 @@ class SurveyForm
     {
         $i = $this->tester;
         $i->waitForElement(self::SELECTOR_BUTTON_CREATE);
-        $i->click(self::SELECTOR_BUTTON_CREATE);
+        $i->scrollTo(['css' => self::SELECTOR_BUTTON_CREATE]);
+        $i->waitForElementVisible(['css' => self::SELECTOR_BUTTON_CREATE],5);
+        //$i->click(['css' => 'input[type=submit][value="Create"]']);
+        $i->click(['css' => self::SELECTOR_BUTTON_CREATE]);
         $i->waitForElement('input[name="assess_id"]');
         return new SectionForm($i);
     }

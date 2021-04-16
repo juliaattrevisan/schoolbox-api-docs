@@ -78,6 +78,9 @@ class QuestionForm
      */
     public function create(): self
     {
+        $i = $this->tester;
+        $i->scrollTo(['css' => self::SELECTOR_BUTTON_CREATE]);
+        $i->waitForElementVisible(['css' => self::SELECTOR_BUTTON_CREATE],5);
         $this->tester->click(self::SELECTOR_BUTTON_CREATE);
         $this->tester->waitForText('CREATE QUESTION');
         return $this;
@@ -90,6 +93,8 @@ class QuestionForm
     public function modify()
     {
         $i = $this->tester;
+        $i->scrollTo(['css' => self::SELECTOR_BUTTON_MODIFY]);
+        $i->waitForElementVisible(['css' => self::SELECTOR_BUTTON_MODIFY],5);
         $i->click(self::SELECTOR_BUTTON_MODIFY);
         // TODO: make it more general
         $i->waitForText('Question Bank');

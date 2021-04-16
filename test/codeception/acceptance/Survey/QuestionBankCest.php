@@ -53,6 +53,7 @@ class QuestionBankCest
         // create survey
         $surveyForm = new SurveyForm($i);
         $surveyForm->openCreate($classId);
+      //  $surveyForm->setTitle($surveyTitle);
         $sectionForm = $surveyForm->setTitle($surveyTitle)
 //            ->setOpenDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
         ->create();
