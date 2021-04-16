@@ -13,6 +13,7 @@ import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import FFmpegWasmEngine from 'videojs-record/dist/plugins/videojs.record.ffmpeg-wasm.js';
+import axios from 'axios';
 
 
 export default {
@@ -23,7 +24,8 @@ export default {
 			options: {
 				controls: true,
 				autoplay: false,
-				fluid: false,
+				fluid: true,
+				ratio: '16:9',
 				loop: false,
 				width: 320,
 				height: 240,
@@ -42,8 +44,8 @@ export default {
 						maxLength: 20,
 						debug: true,
 						convertEngine: 'ffmpeg.wasm', // enable ffmpeg.wasm plugin
-						convertWorkerURL: '../../node_modules/@ffmpeg/core/dist/ffmpeg-core.js',
-						convertOptions: ['-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', '-f', 'mp4'], // convert recorded data to MP4 (and copy over audio data without encoding)
+						convertWorkerURL: '/static/javascript/vendor/ffmpeg/ffmpeg-core.js', //point to ffmpeg directory
+						convertOptions: ['-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', '-f', 'mp4'], // convert recorded data to MP4 (and copy over audio data without encoding) https://ffmpeg.org/ffmpeg.html#toc-Main-options
 						pluginLibraryOptions: {
 							outputType: 'video/mp4' // specify output mime-type
 						}
@@ -117,6 +119,26 @@ export default {
 				// the convertedData object contains the recorded data that
 				// can be downloaded by the user, stored on server etc.
 				console.log('finished converting: ', this.player.convertedData);
+
+				const formData = new FormData();
+				formData.append('upload', this.player.convertedData, this.player.convertedData.name);
+
+				axios.post('/storage/asyncUpload.php', formData)
+				.then((response) => {
+					const data = {
+						title:    this.player.convertedData.name,
+						mimeType: this.player.convertedData.type,
+						filesize: this.player.convertedData.size,
+						hash:     response.data.hash
+					};
+
+					window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
+
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+
 			});
         },
 
