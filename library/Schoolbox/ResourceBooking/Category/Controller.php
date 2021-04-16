@@ -199,7 +199,14 @@ class Controller extends Base {
      */
     public function delete(Model $category): void
     {
-        $this->getMapper()->delete($category);
+        $numItems = $this->itemMapper->findByColumn('resource_category_id', $category->getId())->count();
+
+        /* Don't delete if there are items associated
+         */
+        if (!$numItems) {
+            $this->getMapper()->delete($category);
+        }
+
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
