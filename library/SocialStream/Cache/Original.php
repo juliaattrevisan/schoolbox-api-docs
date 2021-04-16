@@ -166,7 +166,10 @@ class Original extends \Alaress_Cache_Abstract
 
             // only save it if it actually already exists
             if ($this->post->getPostId()) {
-                PostMapper::getInstance()->save($this->post);
+                $postMapper = PostMapper::getInstance();
+                $postMapper->suppressNotification();
+                $postMapper->save($this->post);
+                $postMapper->restoreNotification();
             }
 
             $this->file = $storage;
