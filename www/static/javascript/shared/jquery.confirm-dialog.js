@@ -61,7 +61,13 @@
             confirmEvent: $.confirmDialog.followHref,
             cancelEvent: $.noop,
             cancelLabel: 'Cancel',
-            format: 'text'
+            format: 'text',
+
+            /* You can optionally turn off these buttons in favour of a message
+             * to the user instead
+             */
+            hasConfirmButton: true,
+            hasCancelButton: true
         };
 
         // Allow passing of defaults in data-vars
@@ -78,34 +84,58 @@
 
         var modal        = $('<div data-reveal class="reveal-modal small" />');
         var h2 = $('<h2 />');
-        h2.text(settings.header );
+        h2.text(settings.header);
 
-        var okayButton   = $('<a href="#" class="button submit" id="confirm-dialog-confirm-button"/>').text(settings.confirmLabel),
-            cancelButton = $('<a href="#" class="button" id="confirm-dialog-cancel-button"/>').text(settings.cancelLabel),
-            buttons      = $().add(okayButton).add(cancelButton);
-        okayButton.on('click.confirmDialog', function(e) {
-            // Immediately prevent further click events
-            buttons.off('click.confirmDialog');
-            e.preventDefault();
-            settings.confirmEvent(element);
-            // Don't trigger cancelEvent if I pressed OK
-            modal.off('close.fndtn.reveal.cancel');
-            modal.foundation('reveal', 'close');
-        });
-        cancelButton.on('click.confirmDialog', function(e) {
-            // Immediately prevent further click events
-            buttons.off('click.confirmDialog');
-            e.preventDefault();
-            // Cancel button doesn't trigger cancelEvent directly;
-            // closing the modal does.
-            // This is so clicking the X, or pressing ESC, triggers the cancel.
-            modal.foundation('reveal', 'close');
-        });
-
+        /* Set up flex list container
+         */
         var ul = $('<ul class="flex-list buttons" />');
         var li = $('<li />');
-        ul.append(li.clone().append(okayButton));
-        ul.append(li.clone().append(cancelButton));
+
+        /* If you want the Confirm button available,
+         * make the element and attach listeners
+         * then shank it into the flexlist
+         */
+        var buttons = $();
+
+        if (settings.hasConfirmButton) {
+            var okayButton = $('<a href="#" class="button submit" id="confirm-dialog-confirm-button" />').text(settings.confirmLabel);
+
+            buttons.add(okayButton);
+
+            okayButton.on('click.confirmDialog', function (e) {
+                // Immediately prevent further click events
+                buttons.off('click.confirmDialog');
+                e.preventDefault();
+                settings.confirmEvent(element);
+                // Don't trigger cancelEvent if I pressed OK
+                modal.off('close.fndtn.reveal.cancel');
+                modal.foundation('reveal', 'close');
+            });
+
+            ul.append(li.clone().append(okayButton));
+        }
+
+        /* If you want the Cancel button available,
+         * make the element and attach listeners
+         * then shank it into the flexlist
+         */
+        if (settings.hasCancelButton) {
+            var cancelButton = $('<a href="#" class="button" id="confirm-dialog-cancel-button" />').text(settings.cancelLabel);
+
+            buttons.add(cancelButton);
+
+            cancelButton.on('click.confirmDialog', function (e) {
+                // Immediately prevent further click events
+                buttons.off('click.confirmDialog');
+                e.preventDefault();
+                // Cancel button doesn't trigger cancelEvent directly;
+                // closing the modal does.
+                // This is so clicking the X, or pressing ESC, triggers the cancel.
+                modal.foundation('reveal', 'close');
+            });
+
+            ul.append(li.clone().append(cancelButton));
+        }
 
         var pBody = $('<p />');
 
