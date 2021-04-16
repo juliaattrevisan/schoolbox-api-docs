@@ -141,11 +141,14 @@ class Controller extends Base {
      */
     public function edit(Model $category): void
     {
+        $items = \Schoolbox\ResourceBooking\Item\Mapper::getInstance()->findByColumn('resource_category_id', $category->getId());
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@resourceCategory/edit.twig',
                 'data'     => array(
                     'category' => $category,
+                    'numItems' => $items->count()
                 ),
             )
         );
