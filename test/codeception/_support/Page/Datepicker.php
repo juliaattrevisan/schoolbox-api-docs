@@ -78,10 +78,8 @@ class Datepicker
 
         // Check actual datetime
         $date = \Alaress_Date_Format::newNaturalDate($value);
-        $i->see($date->getUsingFormat('F'));
-        $i->see($date->getYear());
-        // Wrong, can't get the element this way
-//      $i->seeElement('span[aria-date="February 1, 2017"]', ['css' => 'selected']);
+
+        $i->seeElement("span[aria-label='{$date->getUsingFormat('F j, Y')}']");
     }
 
 

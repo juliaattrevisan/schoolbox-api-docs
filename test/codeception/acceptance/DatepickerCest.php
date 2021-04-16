@@ -39,7 +39,7 @@ class DatepickerCest
         $element = Locator::contains('a.button', 'Modify');
         $i->clickWithLeftButton($element);
         sleep(2);
-        $datepickerPage->checkCalendarDate('startDate', '01/02/2017');
+        $datepickerPage->checkCalendarDate('startDate', '19/06/2017');
     }
 
 }
