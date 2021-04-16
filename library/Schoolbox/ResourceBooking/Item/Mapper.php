@@ -327,13 +327,14 @@ class Mapper extends BaseMapper
                     /** @var Role $role */
                     $roleList[$role->getId()] = $role;
                 }
+                $model->setRoleList($rolePermissionMapper->createCollection());
                 foreach ($rolePermissionList as $rolePermission) {
                     /** @var RolePermission\Model $rolePermission */
                     if (array_key_exists($rolePermission->getRole()->getId(), $roleList)) {
                         $rolePermission->setRole($roleList[$rolePermission->getRole()->getId()]);
+                        $model->getRoleList()->add($rolePermission);
                     }
                 }
-                $model->setRoleList($rolePermissionList);
 
                 return $model;
             }
