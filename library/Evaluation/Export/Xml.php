@@ -193,7 +193,8 @@ abstract class Evaluation_Export_Xml
         header('Content-type: text/xml');
         header('Content-Disposition: attachment; filename="' . $this->generateFilename() . '"');
 
-        $this->getPage()->template->pparse('finaloutput', 'xml');
+        $this->page->injectGlobalVars();
+        $this->page->template->pparse('finaloutput', 'xml');
         die();
     }
 

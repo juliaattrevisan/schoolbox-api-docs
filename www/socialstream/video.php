@@ -18,4 +18,5 @@ $page->setVar(array(
 	'SOCIALSTREAM_STORAGE_HASH' => $_GET['hash'],
 ));
 
+$this->injectGlobalVars();
 $page->template->pparse('finaloutput', TEMPLATE_content);

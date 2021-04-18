@@ -7,4 +7,5 @@ $this->setVar([
     'ASSESS_KIND_PLURAL' => 'quizzes',
 ]);
 
+$this->injectGlobalVars();
 $this->template->pparse('finaloutput', TEMPLATE_content);

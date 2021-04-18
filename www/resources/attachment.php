@@ -90,4 +90,5 @@ foreach ($factory->getMappedControllers() as $controller) {
     $this->parse('source_panel_block', 'source_panel', true);
 }
 
+$this->injectGlobalVars();
 $this->template->pparse('finaloutput', TEMPLATE_content);

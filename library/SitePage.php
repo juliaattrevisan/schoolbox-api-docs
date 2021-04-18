@@ -264,9 +264,6 @@ class SitePage extends Page
     public function outputPage($lite = false)
     {
         if ($this->ajax) {
-            // Inject globals even when outputting "ajax" (actually just HTML
-            // with no chrome) as some outputs might need it
-            $this->injectGlobalVars();
             return true;
         }
 

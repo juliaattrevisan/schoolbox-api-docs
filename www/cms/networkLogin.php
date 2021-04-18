@@ -42,6 +42,7 @@ if (strlen($_POST['password'])) {
     if (isset($this->arg[0]) && $this->arg[0] == 'lite') {
         $this->parse('lite_block', 'lite');
         $this->setAjax();
+        $this->injectGlobalVars();
         $this->template->pparse('finaloutput', TEMPLATE_content);
     } else {
         $this->setVar('lite_block', '');

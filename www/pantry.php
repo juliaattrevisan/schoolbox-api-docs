@@ -40,5 +40,6 @@ $this->setVar([
 
 if (isset($_GET['ajax']) && $_GET['ajax']) {
     $this->setAjax();
+    $this->injectGlobalVars();
     $this->template->pparse('finaloutput', TEMPLATE_content);
 }

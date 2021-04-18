@@ -52,6 +52,7 @@ if (!empty($_POST)) {
     $this->setVar('ASSESS_KIND_PLURAL', 'surveys');
     $questionCategoryList = new Survey_Question_Category_List($this, $assessId, 0, $questionBankCategoryHandler->getPath());
     $questionCategoryList->render();
+    $this->injectGlobalVars();
     $this->template->pparse('finaloutput', TEMPLATE_content);
 
 } else {
