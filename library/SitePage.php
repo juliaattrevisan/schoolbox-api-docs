@@ -264,6 +264,9 @@ class SitePage extends Page
     public function outputPage($lite = false)
     {
         if ($this->ajax) {
+            // Inject globals even when outputting "ajax" (actually just HTML
+            // with no chrome) as some outputs might need it
+            $this->injectGlobalVars();
             return true;
         }
 
@@ -290,7 +293,7 @@ class SitePage extends Page
             $this->setVar('CUSTOM_HEADER_REGION', '');
         }
 
-        // Inject all global vars with this method
+        // Inject all global vars
         $this->injectGlobalVars();
 
 
