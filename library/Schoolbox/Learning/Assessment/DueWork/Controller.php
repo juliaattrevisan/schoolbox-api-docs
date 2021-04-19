@@ -458,16 +458,20 @@ class Controller extends Assessment\Controller
 
             $request = new Gotenberg\URLRequest($url->toString());
             $request->setWaitDelay(1);
+
+            // Authenticate using the cookie
             $request->addRemoteURLHTTPHeader(
                 'Cookie',
                 sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, session_id())
             );
 
 //            // Alternately use the token
+//            // (Can't use the token until SA-11077 is done)
 //            /** @var Jwt $tokenBuilder */
 //            $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
 //            $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($this->getUser()));
 
+            // Download and store the PDF
             $tempfile = sb_tempnam();
             $pdfGenerator->store($request, $tempfile);
 
@@ -477,7 +481,8 @@ class Controller extends Assessment\Controller
                 $firstNameSanitized,
                 $users[$participant->getUser()->getId()]->getId(),
             );
-            $zipStream->addFileFromStream($zipFilename, $file->readStream());
+            $zipStream->addFileFromPath($zipFilename, $tempfile);
+            unlink($tempfile);
         }
 
         // Stream the zip archive
