@@ -388,15 +388,18 @@ class Controller extends Assessment\Controller
         $zipStream = new ZipStream\ZipStream("{$titleSanitized}-{$dateNow}.zip", $zipOptions);
 
         // Iterate participants and get their responses
-
         /** @var Participant $participant */
         foreach ($participants as $participant) {
+            // Short-circuit if there's no interactions
+            if (!($participant->hasPublishedFeedback() || $participant->hasSubmittedResponse())) {
+                continue;
+            }
+
+            // Get the users details and generate an appropriate folder name
             if (!isset($users[$participant->getUser()->getId()])) {
                 $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
             }
             $student = $users[$participant->getUser()->getId()];
-
-            // Get the users details and generate an appropriate folder name
             $baseFolderName = sprintf(
                 "%s_%s_%d",
                 $this->sanitizeForFilename($student->getLastname()),
@@ -404,13 +407,11 @@ class Controller extends Assessment\Controller
                 $student->getId(),
             );
 
-            $responses = $participant->getAllResponses();
-
-            // Iterate all their responses
+            // Iterate all their submitted responses
             /** @var Submission $response */
-            foreach ($responses as $response) {
+            foreach ($participant->getSubmittedResponses() as $response) {
                 // If the response is a submission...
-                if ($response instanceof Submission && !$response->isDraft()) {
+                if ($response instanceof Submission) {
                     // ...iterate all files in that submission and add them to the ZIP archive
                     foreach ($response->getAllFiles() as $file) {
                         if ($file->exists()) {
@@ -427,16 +428,10 @@ class Controller extends Assessment\Controller
             }
 
 
-            // Generate a PDF of the submission history page too
-            // (need a FQDN)
-//            $submissionHistoryUrl = $this->router->generate(
-//                'learningAssessment.getSummary',
-//                [
-//                    'assessmentId' => $assessment->getId(),
-//                    'studentId'    => $participant->getUser()->getId(),
-//                ],
-//            );
-
+            // Generate a PDF of the submission history page,
+            // Since PDF generation is a remote service, need a FQDN
+            // TODO migrate the PDF building stuff into its own class?
+            //      In particular, the FQDN generation?
             $url = (new Uri())
                 ->setScheme('https')
                 ->setHost($this->request->server->get('HTTP_HOST'))
@@ -455,6 +450,9 @@ class Controller extends Assessment\Controller
             $request->setWaitDelay(1);
 
             // Authenticate using the cookie
+            // TODO ensure drafts do not show
+            // (This shows submission history in context of current user: should
+            //  show in context of student, or parent)
             $request->addRemoteURLHTTPHeader(
                 'Cookie',
                 sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, session_id())
