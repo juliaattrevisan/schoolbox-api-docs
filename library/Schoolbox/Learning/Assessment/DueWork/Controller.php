@@ -391,40 +391,35 @@ class Controller extends Assessment\Controller
 
         /** @var Participant $participant */
         foreach ($participants as $participant) {
-            // Get the users details and generate an appropriate folder name with the date/time stamp of the submission
-
             if (!isset($users[$participant->getUser()->getId()])) {
                 $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
             }
+            $student = $users[$participant->getUser()->getId()];
+
+            // Get the users details and generate an appropriate folder name
+            $baseFolderName = sprintf(
+                "%s_%s_%d",
+                $this->sanitizeForFilename($student->getLastname()),
+                $this->sanitizeForFilename($student->getFirstname()),
+                $student->getId(),
+            );
 
             $responses = $participant->getAllResponses();
 
             // Iterate all their responses
-            $lastNameSanitized  = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
-            $firstNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getFirstname());
-
             /** @var Submission $response */
             foreach ($responses as $response) {
                 // If the response is a submission...
-
                 if ($response instanceof Submission && !$response->isDraft()) {
-                    $directory = sprintf(
-                        "%s_%s_%s/%s",
-                        $lastNameSanitized,
-                        $firstNameSanitized,
-                        $users[$participant->getUser()->getId()]->getId(),
-                        $response->getSubmittedAt()->getUsingFormat('Ymd-His')
-                    );
-
                     // ...iterate all files in that submission and add them to the ZIP archive
-
-                    $files = $response->getAllFiles();
-
-                    /** @var SubmissionFile $file */
-                    foreach ($files as $file) {
+                    foreach ($response->getAllFiles() as $file) {
                         if ($file->exists()) {
-                            $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
-                            $zipFilename       = sprintf("%s/%s", $directory, $filenameSanitized);
+                            $zipFilename = sprintf(
+                                "%s/%s/%s",
+                                $baseFolderName,
+                                $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
+                                $this->sanitizeForFilename($file->getBasename())
+                            );
                             $zipStream->addFileFromStream($zipFilename, $file->readStream());
                         }
                     }
@@ -476,10 +471,8 @@ class Controller extends Assessment\Controller
             $pdfGenerator->store($request, $tempfile);
 
             $zipFilename = sprintf(
-                "%s_%s_%s/submissionHistory.pdf",
-                $lastNameSanitized,
-                $firstNameSanitized,
-                $users[$participant->getUser()->getId()]->getId(),
+                "%s/submissionHistory.pdf",
+                $baseFolderName,
             );
             $zipStream->addFileFromPath($zipFilename, $tempfile);
             unlink($tempfile);
