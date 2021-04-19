@@ -21,7 +21,7 @@ class Update extends Request
     {
         $this->courseSpecId = $courseSpec->getId();
 
-        $this->setReferer("course/modify/{$courseSpec->getId()}");
+        $this->setReferer("/course/modify/{$courseSpec->getId()}");
 
         $this->setFormParam('name', $courseSpec->getTitle());
         $this->setFormParam('parent', $courseSpec->getFolder()->getParent()->getId());
