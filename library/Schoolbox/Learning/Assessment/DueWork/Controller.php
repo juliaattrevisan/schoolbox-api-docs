@@ -19,7 +19,9 @@ use ICollection;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -60,12 +62,15 @@ use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
+use TheCodingMachine\Gotenberg;
 use UnexpectedValueException;
+use Zend\Uri\Uri;
 use ZipStream;
 
 /**
@@ -370,6 +375,9 @@ class Controller extends Assessment\Controller
         /** @var User[] $users */
         $users = [];
 
+        // PDF generator
+        $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
+
         // Create a zip stream to hold the downloaded submissions
 
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
@@ -392,17 +400,16 @@ class Controller extends Assessment\Controller
             $responses = $participant->getAllResponses();
 
             // Iterate all their responses
+            $lastNameSanitized  = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
+            $firstNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getFirstname());
 
             /** @var Submission $response */
             foreach ($responses as $response) {
                 // If the response is a submission...
 
                 if ($response instanceof Submission && !$response->isDraft()) {
-                    $lastNameSanitized  = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
-                    $firstNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getFirstname());
-
                     $directory = sprintf(
-                        "%s_%s_%s-%s",
+                        "%s_%s_%s/%s",
                         $lastNameSanitized,
                         $firstNameSanitized,
                         $users[$participant->getUser()->getId()]->getId(),
@@ -423,6 +430,54 @@ class Controller extends Assessment\Controller
                     }
                 }
             }
+
+
+            // Generate a PDF of the submission history page too
+            // (need a FQDN)
+//            $submissionHistoryUrl = $this->router->generate(
+//                'learningAssessment.getSummary',
+//                [
+//                    'assessmentId' => $assessment->getId(),
+//                    'studentId'    => $participant->getUser()->getId(),
+//                ],
+//            );
+
+            $url = (new Uri())
+                ->setScheme('https')
+                ->setHost($this->request->server->get('HTTP_HOST'))
+                ->setPort($this->request->server->get('SERVER_PORT'))
+                ->setPath(
+                    $this->router->generate(
+                        'learningAssessment.getSummary',
+                        [
+                            'assessmentId' => $assessment->getId(),
+                            'studentId'    => $participant->getUser()->getId(),
+                        ],
+                    )
+                );
+
+            $request = new Gotenberg\URLRequest($url->toString());
+            $request->setWaitDelay(1);
+            $request->addRemoteURLHTTPHeader(
+                'Cookie',
+                sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, session_id())
+            );
+
+//            // Alternately use the token
+//            /** @var Jwt $tokenBuilder */
+//            $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
+//            $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($this->getUser()));
+
+            $tempfile = sb_tempnam();
+            $pdfGenerator->store($request, $tempfile);
+
+            $zipFilename = sprintf(
+                "%s_%s_%s/submissionHistory.pdf",
+                $lastNameSanitized,
+                $firstNameSanitized,
+                $users[$participant->getUser()->getId()]->getId(),
+            );
+            $zipStream->addFileFromStream($zipFilename, $file->readStream());
         }
 
         // Stream the zip archive
