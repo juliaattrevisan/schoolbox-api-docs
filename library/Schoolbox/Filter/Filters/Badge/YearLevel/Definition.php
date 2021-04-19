@@ -123,11 +123,11 @@ class Definition extends AbstractDefinition
         foreach ($this->yearLevels as $yearLevel) {
             $abstractKey = (string)$yearLevel->getId();
             if (!$options->offsetExists($abstractKey)) {
-                $option = (new Filter\Page\Option\Model())
+                $option = $this->getFilterOptionMapper()->createModel()
                     ->setFilterPage($pageFilter)
                     ->setKey($abstractKey)
                     ->setAvailable($this->getInitialAvailability($abstractKey, $pageFilter))
-                    ->setDefaults(new GenericCollection(Filter\Page\Option\Defaults\Model::class));
+                    ->setDefaults($this->getFilterDefaultMapper()->createCollection());
                 $options->setOffset($abstractKey, $option);
             }
         }

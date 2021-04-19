@@ -52,6 +52,10 @@ class Controller extends Base
      */
     private Filter\IFactoryFactory $filterFactoryFactory;
 
+    /**
+     * The filter mapper
+     */
+    private Filter\Mapper $filterMapper;
 
     /**
      * Mapper for users.
@@ -65,17 +69,20 @@ class Controller extends Base
      * @param Mapper                 $mapper
      * @param BadgeMapper            $badgeMapper
      * @param Filter\IFactoryFactory $filterFactoryFactory
+     * @param Filter\Mapper          $filterMapper
      * @param UserMapper             $userMapper
      */
     public function __construct(
         Mapper $mapper,
         BadgeMapper $badgeMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
+        Filter\Mapper $filterMapper,
         UserMapper $userMapper
     ) {
         $this->badgeMapper          = $badgeMapper;
         $this->mapper               = $mapper;
         $this->filterFactoryFactory = $filterFactoryFactory;
+        $this->filterMapper         = $filterMapper;
         $this->userMapper           = $userMapper;
     }
 
@@ -180,30 +187,49 @@ class Controller extends Base
      * Show a form for awarding a badge as an achievement or goal to a set of
      * users.
      *
-     * @param GenericCollection|User[] $users
+     * @param GenericCollection|User[] $students
      * @param string                   $template The template to display
      * @param string                   $title    The title of this page
      */
-    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title): void
+    private function getAwardBadgeForm(GenericCollection $students, string $template, string $title): void
     {
+        $queryArgs = $this->request->query->getArrayCopy();
+
+        // In the year level filter, select selected students' year levels and None by default
+        $yearLevelFilterDefinition = Filter\Filters\Badge\YearLevel\Definition::class;
+        $filters                   = $this->filterMapper->findForEntity(BadgeMapper::class);
+        foreach ($filters as $filter) {
+            if ($yearLevelFilterDefinition !== $filter->getClass()) {
+                continue;
+            }
+            foreach ($students as $student) {
+                if (!$student->getYear() || isset($queryArgs[$filter->getId()][$student->getYear()->getId()])) {
+                    continue;
+                }
+                $queryArgs[$filter->getId()][$student->getYear()->getId()] = 1;
+            }
+            // select None
+            $queryArgs[$filter->getId()][Filter\Filters\Badge\YearLevel\Definition::KEY_NONE] = 1;
+        }
+
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             Filter\Page\Model::PAGE_BADGE_LIST,
             null,
             $this->getUser(),
             [],
-            $this->request->query->getArrayCopy(),
+            $queryArgs,
         );
 
         // Segment users into users which are and are not this user
-        $otherUsers     = $users->emptyClone();
+        $otherUsers     = $students->emptyClone();
         $thisUserId     = $this->getUser()->getId();
         $settingForSelf = false;
-        foreach ($users as $user) {
-            if ($user->getId() === $thisUserId) {
+        foreach ($students as $student) {
+            if ($student->getId() === $thisUserId) {
                 $settingForSelf = true;
             } else {
-                $otherUsers->add($user);
+                $otherUsers->add($student);
             }
         }
 
@@ -213,7 +239,7 @@ class Controller extends Base
                 $template,
                 [
                     'settingForSelf' => $settingForSelf,
-                    'users'          => $users->map($translator),
+                    'users'          => $students->map($translator),
                     'otherUsers'     => $otherUsers->map($translator),
                     'filterPanel'    => $filterPanel,
                 ],
