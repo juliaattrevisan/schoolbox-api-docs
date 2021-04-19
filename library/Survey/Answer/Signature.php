@@ -56,29 +56,9 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     public function resultsForQuestion($attempt_id, $question_id) {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
-        // Inject signature SVG template directly,
-        // instead of using a SitePage to render it
-        $template = <<<TEMPLATE
-            <script type="text/javascript">
-                $(function() {
-                    // {RESPONSE} can be empty - function wrapper caters for that possibility.
-                    (function (response) {
-                        $('[data-signature="{ID}"]').alaressSignaturePad({
-                            displayOnly: true,
-                            rescale: true,
-                            init: response
-                        });
-                    })({RESPONSE});
-                });
-            </script>
-            <div class="answer-given-container">
-                <div class="sigPad readonly" data-signature="{ID}">
-                    <div class="sigPadWrapper">
-                        <canvas class="pad" data-role="signatureCanvas" height="142"></canvas>
-                    </div>
-                </div>
-            </div>
-            TEMPLATE;
+        // Instead of using a SitePage instance to render the signature:
+        // just load the template's contents
+        $template = file_get_contents(SITE_root . '/templates/core/survey/answer/signature/rendered.html');
 
         $data['responses'] = strtr(
             $template,
