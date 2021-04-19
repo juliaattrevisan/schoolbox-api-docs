@@ -11,6 +11,7 @@ import videojs from 'video.js';
 import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
+import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import axios from 'axios';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
@@ -22,10 +23,28 @@ export default {
 			isDeviceReady: false, //to toggle the device display
 			hasDeviceError: false, //can't access the requested device
 			isRecording: false, //track recording status to toggle record/stop buttons
+			recordedCount: 0, //to show 'Record' or 'Re-record' on the button
 			canConvert: false, //when there's a video available to convert, provide convert button
 			isConverting: false, //converting video to mp4, to notify user
 			conversionProgress: 0 //to indicate to the user conversion progress
 		}
+	},
+
+	computed: {
+
+		/*
+         * To know that you'll be re-recording a video, overwriting the previously recorded
+         * 
+		 * @params { String }
+         */ 
+		recordButtonText () {
+			if (this.recordedCount == 0) {
+				return 'Record';
+			} else {
+				return 'Re-Record';
+			}
+		}
+
 	},
 
 	created () {
@@ -36,8 +55,15 @@ export default {
 
 		this.ffmpeg = createFFmpeg({
 			log: true,
-			progress: p => updateConversionProgress(p)
+			// progress: p => console.log(p)
 		});
+
+		// this.ffmpeg.setProgress(({ ratio }) => {
+		// 	console.log(ratio);
+		// 	/*
+		// 	* ratio is a float number between 0 to 1.
+		// 	*/
+		// });
 
     },
 
@@ -80,9 +106,9 @@ export default {
 				fluid: true,
 				aspectRatio: '4:3',
 				loop: false,
-				bigPlayButton: true,
+				bigPlayButton: false,
 				controlBar: {
-					volumePanel: true
+					volumePanel: true,
 				},
 				plugins: {
 					record: {
@@ -92,6 +118,7 @@ export default {
 							height: { min: 480, ideal: 480, max: 920 }
 						},
 						maxLength: 20,
+						convertEngine: 'ts-ebml', //to be able to have seekable webm files
 						debug: true,
 					}
 				}
@@ -110,6 +137,7 @@ export default {
 			});
 
 			this.player.on('stopRecord', () => { // and stopped recording
+				this.recordedCount++;
 				this.isRecording = false;
 			});
 
@@ -274,18 +302,21 @@ export default {
 			<section>
 				<a v-if="canConvert" @click.prevent="onConvertSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video">Convert &amp; Upload</a>
 				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video">Enable Video</a>
-				<a v-else-if="isDeviceReady && !isRecording" @click.prevent="onStartRecordSelected" role="button" class="button" data-interaction="audio-record-play" title="Record Video" href="#record-video">Record</a>
+				<a v-else-if="isDeviceReady && !isRecording" @click.prevent="onStartRecordSelected" role="button" class="button" data-interaction="audio-record-play" title="Record Video" href="#record-video">{{ recordButtonText }}</a>
 				<a v-else-if="isDeviceReady && isRecording" @click.prevent="onStopRecordSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video">Stop</a>
-				<a role="button" class="button cancel" href="#close-modal">Cancel</a>
 			</section>
 		</div>
 	</div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 
-#myVideo {
-  background-color: #1a535c;
+// #myVideo {
+//   background-color: #1a535c;
+// }
+
+.vjs-icon-record-start, .vjs-icon-record-stop {
+	min-height: 0;
 }
 
 </style>
