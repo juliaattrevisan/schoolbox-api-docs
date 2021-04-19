@@ -19,7 +19,7 @@ use ICollection;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
-use Schoolbox\API\Token\Jwt;
+//use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -399,12 +399,12 @@ class Controller extends Assessment\Controller
             if (!isset($users[$participant->getUser()->getId()])) {
                 $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
             }
-            $student = $users[$participant->getUser()->getId()];
+            $participantUser = $users[$participant->getUser()->getId()];
             $baseFolderName = sprintf(
                 "%s_%s_%d",
-                $this->sanitizeForFilename($student->getLastname()),
-                $this->sanitizeForFilename($student->getFirstname()),
-                $student->getId(),
+                $this->sanitizeForFilename($participantUser->getLastname()),
+                $this->sanitizeForFilename($participantUser->getFirstname()),
+                $participantUser->getId(),
             );
 
             // Iterate all their submitted responses
@@ -462,7 +462,7 @@ class Controller extends Assessment\Controller
 //            // (Can't use the token until SA-11077 is done)
 //            /** @var Jwt $tokenBuilder */
 //            $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
-//            $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($this->getUser()));
+//            $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($participantUser));
 
             // Download and store the PDF
             $tempfile = sb_tempnam();
