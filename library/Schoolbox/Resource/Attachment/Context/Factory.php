@@ -78,6 +78,18 @@ class Factory
             'office'    => Filesystem\Office365Controller::class,
         ],
 
+        /* Removes the Recording option for contexts where you only wanted images
+         * or other non-video/non-audio sources
+         */
+        'images' => [
+            'upload'    => Filesystem\UploadController::class,
+            'browse'    => Filesystem\BrowseController::class,
+            'myfile'    => Filesystem\MyfileController::class,
+            'webdav'    => Filesystem\WebdavController::class,
+            'google'    => Filesystem\GoogleController::class,
+            'office'    => Filesystem\Office365Controller::class,
+        ],
+
         /* Learning/Tasks
          * Tasks have a separate attachzone for uploading files, though they should retain
          * other non-upload filesystems for adding Links to a Task.

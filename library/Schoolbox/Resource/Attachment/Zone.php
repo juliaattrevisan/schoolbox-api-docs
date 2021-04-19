@@ -79,6 +79,13 @@ class Zone
 
 
     /**
+     * One of keys from Attachment/Context/Factory.php options array
+     *
+     * @var string|null
+     */
+    private ?string $filesystemContext = null;
+
+    /**
      * @param string $zoneId
      * @param Mapper $mapper
      * @throws UnexpectedValueException
@@ -305,6 +312,7 @@ class Zone
             'useModal'  => $this->useModal,
             'capture'   => $this->capture,
             'iconClass' => $this->iconClass,
+            'fs'        => $this->filesystemContext,
         ];
 
         foreach ($this->attachments as $storage) {
@@ -382,6 +390,27 @@ class Zone
     public function setButtonMode($bool)
     {
         $this->buttonMode = $bool;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getFilesystemContext(): ?string
+    {
+        return $this->filesystemContext;
+    }
+
+
+    /**
+     * @param string|null $filesystemContext
+     * @return $this
+     */
+    public function setFilesystemContext(?string $filesystemContext): self
+    {
+        $this->filesystemContext = $filesystemContext;
+
         return $this;
     }
 }

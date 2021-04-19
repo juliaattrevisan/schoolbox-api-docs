@@ -47,6 +47,12 @@
             multi: false,
             useFolder: true,
 
+            /* Optional Filesystem context
+             * This is used by /resources/attachment.php to provide Filesystem options
+             * denoted by this context as defined in Attachment/Context/Factory.php
+             */
+            fs: null,
+
             // callbacks
             onSelect: noop,
             onDetach: noop,
@@ -331,6 +337,10 @@
 
         if (this.options.useFolder) {
             qString += '&f=1';
+        }
+
+        if (this.options.fs) {
+            qString += '&fs=' + this.options.fs;
         }
 
         return qString;
