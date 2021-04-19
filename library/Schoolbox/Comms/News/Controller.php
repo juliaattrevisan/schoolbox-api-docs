@@ -363,7 +363,8 @@ class Controller extends Base
             ->setMulti(false)
             ->setAttachPrompt('Attach a feature image')
             ->setAttachmentsLabel('')
-            ->setMimeFilter('image/*');
+            ->setMimeFilter('image/*')
+            ->setFilesystemContext('images');
 
         if ($article->getFeatureImage()) {
             $zone->attachFiles([$article->getFeatureImage()]);
