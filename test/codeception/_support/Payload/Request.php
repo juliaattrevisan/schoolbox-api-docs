@@ -55,13 +55,17 @@ abstract class Request
     }
 
     /**
-     * Sets the referer header to the specified path
+     * Sets the referer header to the specified path.
      *
-     * @param string $path
+     * @param string $path A path URL fragment: if it does not start with a /,
+     *                     it will be added if this value is not empty.
      * @return $this
      */
     public function setReferer(string $path): self
     {
+        if ($path !== '' && substr($path, 0, 1) !== '/') {
+            $path = '/' . $path;
+        }
         $this->setHeader('Referer', 'https://' . self::VAGRANT_DOMAIN . $path);
         return $this;
     }
