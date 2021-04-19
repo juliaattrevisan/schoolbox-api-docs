@@ -17,7 +17,7 @@ use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Permission\Access\UserAccess;
-
+use Schoolbox\ResourceBooking;
 
 class Module extends BaseModule
 {
@@ -93,7 +93,9 @@ class Module extends BaseModule
         );
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(Controller::class, [
+                'itemMapper' => $this->getMapperFactory()->getLazy(ResourceBooking\Item\Mapper::class),
+            ])
         );
     }
 

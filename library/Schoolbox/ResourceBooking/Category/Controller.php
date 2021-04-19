@@ -28,6 +28,24 @@ class Controller extends Base {
      */
     protected $paginator;
 
+
+    /**
+     * @var ItemMapper
+     */
+    private ItemMapper $itemMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param ItemMapper $itemMapper
+     */
+    public function __construct(ItemMapper $itemMapper)
+    {
+        $this->itemMapper = $itemMapper;
+    }
+
+
     /**
      * Browses the list of categories.
      */
@@ -146,6 +164,7 @@ class Controller extends Base {
                 'template' => '@resourceCategory/edit.twig',
                 'data'     => array(
                     'category' => $category,
+                    'numItems' => $this->itemMapper->findByColumn('resource_category_id', $category->getId())->count()
                 ),
             )
         );
@@ -180,7 +199,14 @@ class Controller extends Base {
      */
     public function delete(Model $category): void
     {
-        $this->getMapper()->delete($category);
+        $numItems = $this->itemMapper->findByColumn('resource_category_id', $category->getId())->count();
+
+        /* Don't delete if there are items associated
+         */
+        if (!$numItems) {
+            $this->getMapper()->delete($category);
+        }
+
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate('resourceCategory.browse', array())
         );
