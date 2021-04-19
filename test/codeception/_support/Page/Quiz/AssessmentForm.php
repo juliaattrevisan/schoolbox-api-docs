@@ -10,6 +10,7 @@ namespace Page\Quiz;
 
 use AcceptanceTester;
 use Alaress_Date_Format;
+use Codeception\Util\Locator;
 
 /**
  * Quiz form page object
@@ -76,6 +77,7 @@ class AssessmentForm
     public function create(): self
     {
         $i = $this->tester;
+        $i->scrollTo(['css' => self::SELECTOR_BUTTON_CREATE]);
         $i->waitForElement(self::SELECTOR_BUTTON_CREATE);
         $i->click(self::SELECTOR_BUTTON_CREATE);
         $i->waitForElement('input[name="assess_id"]');
@@ -85,10 +87,16 @@ class AssessmentForm
     /**
      * Submits this form to update a quiz
      * @return AssessmentForm
+     * @throws \Exception
      */
     public function update(): self
     {
-        $this->tester->click(self::SELECTOR_BUTTON_UPDATE);
+        $i = $this->tester;
+        $element = (Locator::lastElement(self::SELECTOR_BUTTON_UPDATE));
+        $i->scrollTo('input#curriculum-code-select-selectized');
+        $i->scrollTo($element);
+        $i->waitForElementVisible($element,5);
+        $i->click($element);
         return $this;
     }
 
