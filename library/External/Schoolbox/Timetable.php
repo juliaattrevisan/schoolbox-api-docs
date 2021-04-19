@@ -370,7 +370,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 u.firstname,
                 u.lastname
             FROM        sis_class c
-            INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :userId
+            INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :externalId
             LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id)
             
             UNION 
@@ -386,7 +386,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                 NULL AS firstname,
                 NULL AS lastname
             FROM        sis_class c
-            INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId
+            INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :externalId
             INNER JOIN  sis_class_period cp ON cp.class_id = c.id
             WHERE LENGTH(COALESCE(cp.teacher_external_id, '')) = 0)
         ";
@@ -394,7 +394,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         $statement = $this->internalDatabase->prepareQuery($query);
 
         $statement->execute([
-            'userId'  => $externalId,
+            'externalId'  => $externalId,
         ]);
 
         $stack = [];
