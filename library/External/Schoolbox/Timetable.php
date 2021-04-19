@@ -8,7 +8,9 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus;
 use Schoolbox\Database\Factory as DatabaseFactory;
+use Schoolbox\External\Profile;
 use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\Mapper;
 use Schoolbox\User;
 
 /**
@@ -258,59 +260,141 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      * @param string $externalId
      *
      * @return array
+     * @throws Mapper\DefinitionException
+     * @throws Mapper\Exception
+     * @throws PDOException
      * @throws \Alaress\Database\Exception
      */
     protected function getClassUsers(string $externalId): array
     {
+        /* Find out if $externalId is a staff or a student
+          * Parents never have a timetable
+          *
+          * There are more students than staff, so check if $externalId is a student first
+          */
+        try {
+            Profile\Student\Mapper::getInstance()->findByExternalId($externalId);
 
-        // Get classes for which this user is involved, or is a teacher.
+            return $this->getClassUsersForStudent($externalId);
+        } catch (Mapper\Exception\NotFound $e) {
+            try {
+                Profile\Staff\Mapper::getInstance()->findByExternalId($externalId);
 
-        /* A left join includes all the classes even if you're not in it
-         * That returns a huge data set
-         *
-         * Therefore surgically extract teachers via teacehr_external_id usage separately
-         * from the regular participants in sis_class_user
-         *
-         * Note that we still need to always join onto user to get the actual class teacher, even if
-         * $externalId isn't that class teacher; otherwise they won't display on the fulltimetable grid
-         */
+                return $this->getClassUsersForStaff($externalId);
+            } catch (Mapper\Exception\NotFound $e) {
+
+                /* Neither student nor staff record found
+                 */
+                return [];
+            }
+        }
+    }
+
+
+    /**
+     * Student users' timetable data
+     *
+     * Students are always involved, and are never teaching a class of their own
+     *
+     * @param string $externalId
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    private function getClassUsersForStudent(string $externalId): array
+    {
         $query = '
-            (
-                -- Where externalId is a class teacher
-                SELECT
-                    c.*,
-                    cp.period_id AS periodId,
-                    cp.room,
-                    u.synergy_id,
-                    u.title,
-                    u.firstname,
-                    u.lastname
-                FROM        sis_class c
-                INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :userId
-                LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
-            )
-            UNION
-            (
-                -- Regular class involvements
-                SELECT
-                    c.*,
-                    cp.period_id AS periodId,
-                    cp.room,
-                    u.synergy_id,
-                    u.title,
-                    u.firstname,
-                    u.lastname
-                FROM        sis_class c
-                INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId2
-                INNER JOIN  sis_class_period cp ON cp.class_id = c.id
-                LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
-            )
+            -- Regular class involvements
+            SELECT
+                c.*,
+                cp.period_id AS periodId,
+                cp.room,
+                u.synergy_id,
+                u.title,
+                u.firstname,
+                u.lastname
+            FROM        sis_class c
+            INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :userId
+            INNER JOIN  sis_class_period cp ON cp.class_id = c.id
+            LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id
         ';
 
         $statement = $this->internalDatabase->prepareQuery($query);
+
         $statement->execute([
             'userId'  => $externalId,
-            'userId2' => $externalId
+        ]);
+
+        $stack = [];
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $index = $row['periodId'];
+
+            if (!isset($stack[$index])) {
+                $stack[$index] = [];
+            }
+
+            $stack[$index][] = $row;
+        }
+
+        return $stack;
+    }
+
+
+    /**
+     * Staff users' timetable data
+     *
+     * When we import data we pile everyone involved in a class into sis_class_user
+     * Due to unique class constraints sometimes teachers end up involved in other teachers'
+     * classes when what actually happens is they share the teaching responsibilities on
+     * different (days, periods).
+     *
+     * In TASS we can't distinguish those circumstances trivially due to Additional Subjects
+     * prepopulating class involvements in sis_class_user before an official teacher in a
+     * (day, period) is assigned. This is because imports match involvements based on a class_id
+     * since Additional Subjects doesn't tell you a specific period in which a person is involved
+     *
+     * @param string $externalId
+     * @return array
+     * @throws \Alaress\Database\Exception
+     */
+    private function getClassUsersForStaff(string $externalId): array
+    {
+        $query = "
+            -- Where you are a class teacher
+            (SELECT
+                c.*,
+                cp.period_id AS periodId,
+                cp.room,
+                u.synergy_id,
+                u.title,
+                u.firstname,
+                u.lastname
+            FROM        sis_class c
+            INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :externalId
+            LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id)
+            
+            UNION 
+            
+            -- Regular class involvements where the teacher_external_id is a meaningless value
+            -- (null or empty string) but you are still involved in it
+            (SELECT
+                c.*,
+                cp.period_id AS periodId,
+                cp.room,
+                NULL AS synergy_id,
+                NULL AS title,
+                NULL AS firstname,
+                NULL AS lastname
+            FROM        sis_class c
+            INNER JOIN  sis_class_user cu ON c.id = cu.class_id AND cu.external_id = :externalId
+            INNER JOIN  sis_class_period cp ON cp.class_id = c.id
+            WHERE LENGTH(COALESCE(cp.teacher_external_id, '')) = 0)
+        ";
+
+        $statement = $this->internalDatabase->prepareQuery($query);
+
+        $statement->execute([
+            'externalId'  => $externalId,
         ]);
 
         $stack = [];

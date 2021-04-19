@@ -78,13 +78,13 @@ class Lookup
         [':category' => Profile::TEACHER]
         );
 
-        $students = [];
+        $staff = [];
 
         foreach ($userStatement as $row) {
-            $students[$row['external_id']] = $row;
+            $staff[$row['external_id']] = $row;
         }
 
-        return $students;
+        return $staff;
     }
 
 

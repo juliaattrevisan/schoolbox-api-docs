@@ -34,6 +34,14 @@ class Classes implements IStrategy
 {
 
     /**
+     * These consts help identify which User Lookup you used,
+     * to prevent double-up of involvement records
+     */
+    private const TYPE_STAFF = 'staff';
+    private const TYPE_STUDENT = 'student';
+
+
+    /**
      * @var LoggerInterface
      */
     private $log;
@@ -140,21 +148,22 @@ class Classes implements IStrategy
          */
         $periods = $this->lookup->getPeriods();
 
-        $this->importTimetable($this->lookup->getStudents(), $periods);
-        $this->importTimetable($this->lookup->getStaff(), $periods);
+        $this->importTimetable($this->lookup->getStaff(), self::TYPE_STAFF, $periods);
+        $this->importTimetable($this->lookup->getStudents(), self::TYPE_STUDENT, $periods);
     }
 
 
     /**
      * Import timetables that belong to $users array
      *
-     * @param array $users
-     * @param array $periods
+     * @param array  $users
+     * @param string $type
+     * @param array  $periods
      * @throws Exception
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function importTimetable(array $users, array $periods): void
+    private function importTimetable(array $users, string $type, array $periods): void
     {
 
         /* Get a list of all the timetables to process
@@ -231,27 +240,41 @@ class Classes implements IStrategy
                          * Can there be more than one teacher, maybe comma-separated?
                          */
                         'teachers' => [
-                            'externalId' => $subject['TCH_CODE'],
-                            'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                            'surname' => $users[$externalId]['lastname'] ?? 'Unknown',
                         ],
 
                         'students' => [
-                            [
-                                'externalId' => (string)$externalId,
-                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
-                                'surname' => $users[$externalId]['lastname'] ?? 'Unknown',
-                            ]
                         ],
                     ];
 
-                    $this->log->debug(sprintf(
-                        '%s %s (user %s) is the teacher of subject %s',
-                        $class['teachers']['firstname'],
-                        $class['teachers']['surname'],
-                        $class['teachers']['externalId'],
-                        $class['class']['code']
-                    ));
+                    /* If this $externalId existed in the Staff lookup, put them in the teachers set
+                     * Or, if this $externalId existed in the Student lookup, put them in the students set
+                     */
+                    if (isset($users[$externalId])) {
+                        if (self::TYPE_STAFF === $type) {
+                            $class['teachers'] = [
+                                'externalId' => $subject['TCH_CODE'],
+                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                                'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
+                            ];
+
+                            $this->log->debug(sprintf(
+                                '%s %s (user %s) is the teacher of subject %s',
+                                $class['teachers']['firstname'],
+                                $class['teachers']['surname'],
+                                $class['teachers']['externalId'],
+                                $class['class']['code']
+                            ));
+                        } elseif (self::TYPE_STUDENT === $type) {
+                            $class['students'][] = [
+                                'externalId' => (string)$externalId,
+                                'firstname' => $users[$externalId]['firstname'] ?? 'Unknown',
+                                'surname' => $users[$externalId]['lastname'] ?? "Unknown ({$externalId})",
+                            ];
+                        }
+
+                        /* noop for Parents (they don't have timetables)
+                         */
+                    }
 
                     /* Look up the period instance by (name, day)
                      *
@@ -401,25 +424,30 @@ class Classes implements IStrategy
             ));
         }
 
-        /* Throw warning, but assign them anyway
+        /* If this class had teachers, process them
          */
-        if (!isset($users[$class['teachers']['externalId']])) {
-            $this->log->warning(sprintf(
-                'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
-                $class['teachers']['externalId'],
-                $timetableClass->getName(),
-                $timetableClass->getCode()
+        if (\count($class['teachers'])) {
+
+            /* Throw warning, but assign them anyway
+             */
+            if (!isset($users[$class['teachers']['externalId']])) {
+                $this->log->warning(sprintf(
+                    'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
+                    $class['teachers']['externalId'],
+                    $timetableClass->getName(),
+                    $timetableClass->getCode()
+                ));
+            }
+
+            $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
+
+            $this->log->info(sprintf(
+                'Creating class period relation for teacher %s %s in room %s',
+                $class['teachers']['firstname'],
+                $class['teachers']['surname'],
+                $class['room']['name']
             ));
         }
-
-        $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
-
-        $this->log->info(sprintf(
-            'Creating class period relation for teacher %s %s in room %s',
-            $class['teachers']['firstname'],
-            $class['teachers']['surname'],
-            $class['room']['name']
-        ));
 
         $this->log->info(sprintf(
             'This occurs on Day %s (sequence %s) %s-%s in campus with ext_timetable_code %s',
