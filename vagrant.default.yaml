@@ -26,3 +26,5 @@ instance_registry_url_override: ""
 instance_registry_api_key: ""
 # By default the INSTANCE_ID env variable is set as vagrantx
 instance_id_env_var: "vagrantx"
+# By default we use git pull to get the latest puppet must be either pull, gitsync, or none
+puppet_sync_type: "pull"
