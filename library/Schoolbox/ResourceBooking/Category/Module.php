@@ -80,10 +80,6 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
-        $injector->params[Controller::class] = [
-            'itemMapper' => $this->getMapperFactory()->getLazy(ResourceBooking\Item\Mapper::class),
-        ];
-
         $injector->setters[Controller::class]['setMapper']
             = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->setters[Controller::class]['setPaginator']
@@ -97,7 +93,9 @@ class Module extends BaseModule
         );
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
+            $injector->lazyNew(Controller::class, [
+                'itemMapper' => $this->getMapperFactory()->getLazy(ResourceBooking\Item\Mapper::class),
+            ])
         );
     }
 
