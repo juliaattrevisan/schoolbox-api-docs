@@ -12,7 +12,7 @@ export default {
     props: {
         closedCallBack: { //what to do when the modal is closed
      		type: Function,
-      		required: true,
+      		required: false,
     	},
     },
 
@@ -27,8 +27,7 @@ export default {
          * 
          */ 
         animateOn () {
-            gsap.from(this.$refs.modalContainer, 0.3, { alpha: 0 } );
-            gsap.from(this.$refs.modal, 0.3, { alpha: 0, marginTop: 40, delay: 0.15 } );
+            gsap.from(this.$refs.modal, 0.3, { alpha: 0, marginTop: 40, delay: 0 } );
         },
 
         /*
@@ -36,8 +35,7 @@ export default {
          * 
          */ 
         animateOff () {
-            gsap.to(this.$refs.modal, 0.2, { alpha: 0, marginTop: 40, ease: 'power2.in' } );
-            gsap.to(this.$refs.modalContainer, 0.2, { alpha: 0, ease: 'power2.in', delay: 0.1, onComplete: this.closedCallBack } );
+            gsap.to(this.$refs.modal, 0.2, { alpha: 0, marginTop: 40, ease: 'power2.in', onComplete: this.closedCallBack } );
         }
 
     }
@@ -69,8 +67,9 @@ export default {
 }
 
 .modal {
-	max-width: 60%;
-	padding: 30px;
+    box-sizing: border-box;
+    max-width: 80%;
+	padding: 20px;
 	background: white;
 	button {
 		width: 100%;

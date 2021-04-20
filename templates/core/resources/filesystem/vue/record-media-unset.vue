@@ -38,16 +38,16 @@ export default {
             const allMenuItems = Array.from(this.$refs.pseudoVideo.children);
             allMenuItems.forEach((element, index) => {
                 gsap.from(element, 0.6, { 
-                    scale: 0.8, 
+                    scale: 0.6, 
                     alpha: 0.7, 
-                    ease: 'power2.inOut', 
+                    ease: 'power2.out', 
                     delay: index * 0.1 
                 } );
                 let titleContainer = element.querySelector('div');
                 gsap.from(titleContainer, 0.4, { 
-                    marginTop: 40, 
+                    marginTop: 50, 
                     alpha: 0, 
-                    ease: 'power2.inOut', 
+                    ease: 'power2.out', 
                     delay: (index * 0.1) + 0.2, 
                     onComplete: this.onTitleRevealed 
                 } );
@@ -84,18 +84,19 @@ export default {
         animateOutMenu () {
             const allMenuItems = Array.from(this.$refs.pseudoVideo.children);
             allMenuItems.forEach((element, index) => {
+                element.style.border = 'none';
                 element.disabled = true; //prevent multiple clicks
                 let titleContainer = element.querySelector('div');
-                gsap.to(titleContainer, 0.3, { 
+                gsap.to(titleContainer, 0.2, { 
                     alpha: 0, 
-                    marginBottom: 40,
-                    ease: 'power2.inOut', 
+                    marginBottom: 50,
+                    ease: 'power2.in', 
                     delay: index * 0.1 
                 } );
-                gsap.to(element, 0.4, { 
+                gsap.to(element, 0.3, { 
                     scale: 0.9, 
                     alpha: 0, 
-                    ease: 'power2.inOut', 
+                    ease: 'power2.in', 
                     delay: (index * 0.1) + 0.3, 
                     onComplete: this.onMenuHidden
                 } );
@@ -163,20 +164,23 @@ $text-colour: #0066B0; //pull this out of settings
     width: 100%;
     height: 300px; //will be updated at mounted()
     display: flex;
-    background: white;
+    background: black;
     overflow: hidden;
 }
 
 .menu-item {
-    width: calc(33.333333%);
+    width: calc(33.4%);
     height: 100%;
-    border-left: 2px solid white;
-    border-right: 2px solid white;
-    &:first-of-type {
-        border-left: none;
+    background: #FAFAFA;
+    span {
+        display: block;
+        transition: padding-bottom 0.2s;
     }
-    &:last-of-type {
-        border-right: none;
+    &:hover {
+        background: white;
+        span {
+            padding-bottom: 20px;
+        }
     }
 }
 

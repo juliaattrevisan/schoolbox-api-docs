@@ -47,14 +47,6 @@ export default {
 
 	},
 
-	created () {
-        
-		this.player = null; //videojs player
-		this.recordedData = null;
-		this.convertedData = null;
-
-    },
-
 	mounted () {
         this.initVideojs();
 	},
@@ -101,8 +93,8 @@ export default {
 				plugins: {
 					wavesurfer: { // this plugin is only needed when recording audio-only
 						backend: 'WebAudio',
-						waveColor: '#eeefda',
-						progressColor: '#FAFCD2',
+						waveColor: '#fff',
+						progressColor: '#ccc',
 						debug: true,
 						cursorWidth: 1,
 						displayMilliseconds: true,
@@ -122,7 +114,7 @@ export default {
 					record: {
 						audio: true,
 						video: false,
-						maxLength: 20,
+						maxLength: 300, //5 minutes
 						audioEngine: 'vmsg',
     					audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
     					// audioWebAssemblyURL: 'https://unpkg.com/vmsg/vmsg.wasm', //currently issues with loading .wasm files...
@@ -288,10 +280,6 @@ export default {
 </template>
 
 <style lang="scss">
-
-#myAudio {
-    background-color: #9FD6BA;
-}
 
 .vjs-icon-record-start, .vjs-icon-record-stop {
 	min-height: 0;

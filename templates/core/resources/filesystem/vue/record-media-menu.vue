@@ -16,6 +16,11 @@ export default {
       		required: true,
       		default: ''
     	},
+        isProcessActive: { //to be able to disable buttons when something heavy is going on
+     		type: Boolean,
+      		required: true,
+      		default: false
+    	},
     },
 
     watch: {
@@ -62,7 +67,16 @@ export default {
                     delay: index * 0.1 
                 } );
             });
-        }
+        },
+
+        /**
+		 * selected, so set and animate out
+		 *
+         * @params {String}
+		 */
+		mediaTypeSelected (selectedMediaType) {
+            this.$emit('on-media-type-selected', selectedMediaType);
+		},
 
     }
 
@@ -70,11 +84,17 @@ export default {
 </script>
 
 <template>
-    <div class="menu" ref="menu">
-        <button class="menu-item" @click="mediaTypeSelected(mediaTypes.AUDIO)">Record audio</button>
-        <button class="menu-item" @click="mediaTypeSelected(mediaTypes.VIDEO)">Record a video</button>
-        <button class="menu-item" @click="mediaTypeSelected(mediaTypes.UNSET)">Record your screen</button>
-    </div>
+    <dl class="tabs menu" ref="menu">
+        <dd class="menu-item" :class="[currentMediaType === mediaTypes.AUDIO ? 'active' : '']">
+            <a @click.prevent="mediaTypeSelected(mediaTypes.AUDIO)" href="#record-audio" title="Record audio" :disabled="isProcessActive">Record audio</a>
+        </dd>
+        <dd class="menu-item" :class="[currentMediaType === mediaTypes.VIDEO ? 'active' : '']">
+            <a @click.prevent="mediaTypeSelected(mediaTypes.VIDEO)" href="#record-a-video" title="Record a video" :disabled="isProcessActive">Record a video</a>
+        </dd>
+        <dd class="menu-item">
+            <a @click.prevent="mediaTypeSelected(mediaTypes.UNSET)" href="#record-your-screen" title="Record your screen" :disabled="isProcessActive">Record your screen</a>
+        </dd>
+    </dl>
 </template>
 
 <style lang="scss" scoped>
@@ -86,8 +106,7 @@ export default {
 
 .menu-item {
     width: calc(33.333333%);
-    border-left: 2px solid white;
-    border-right: 2px solid white;
+    text-align: center;
     &:first-of-type {
         border-left: none;
     }
