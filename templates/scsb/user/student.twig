@@ -1,8 +1,0 @@
-{% extends '@core/user/student.twig' %}
-
-{% block buttons %}
-    {{ parent() }}
-    {% if isStaff %}
-        <li><a class="icon-progress" href="https://dashboard.scr.vic.edu.au/login/stafflogin/{{ user.id }}">Dashboard</a></li>
-    {% endif %}
-{% endblock buttons %}
