@@ -176,7 +176,7 @@ class Controller extends Base
     public function getSetAsGoalForSelfForm(): void
     {
         $this->getAwardBadgeForm(
-            new GenericCollection(User::class),
+            $this->userMapper->createCollection()->add($this->getUser()),
             '@learningBadgeAward/setAsGoalForSelfForm.twig',
             'Set Goals'
         );
@@ -187,11 +187,11 @@ class Controller extends Base
      * Show a form for awarding a badge as an achievement or goal to a set of
      * users.
      *
-     * @param GenericCollection|User[] $students
+     * @param GenericCollection|User[] $targetUsers
      * @param string                   $template The template to display
      * @param string                   $title    The title of this page
      */
-    private function getAwardBadgeForm(GenericCollection $students, string $template, string $title): void
+    private function getAwardBadgeForm(GenericCollection $targetUsers, string $template, string $title): void
     {
         $queryArgs = $this->request->query->getArrayCopy();
 
@@ -202,11 +202,11 @@ class Controller extends Base
             if ($yearLevelFilterDefinition !== $filter->getClass()) {
                 continue;
             }
-            foreach ($students as $student) {
-                if (!$student->getYear() || isset($queryArgs[$filter->getId()][$student->getYear()->getId()])) {
+            foreach ($targetUsers as $targetUser) {
+                if (!$targetUser->getYear() || isset($queryArgs[$filter->getId()][$targetUser->getYear()->getId()])) {
                     continue;
                 }
-                $queryArgs[$filter->getId()][$student->getYear()->getId()] = 1;
+                $queryArgs[$filter->getId()][$targetUser->getYear()->getId()] = 1;
             }
             // select None
             $queryArgs[$filter->getId()][Filter\Filters\Badge\YearLevel\Definition::KEY_NONE] = 1;
@@ -222,14 +222,14 @@ class Controller extends Base
         );
 
         // Segment users into users which are and are not this user
-        $otherUsers     = $students->emptyClone();
+        $otherUsers     = $targetUsers->emptyClone();
         $thisUserId     = $this->getUser()->getId();
         $settingForSelf = false;
-        foreach ($students as $student) {
-            if ($student->getId() === $thisUserId) {
+        foreach ($targetUsers as $targetUser) {
+            if ($targetUser->getId() === $thisUserId) {
                 $settingForSelf = true;
             } else {
-                $otherUsers->add($student);
+                $otherUsers->add($targetUser);
             }
         }
 
@@ -239,7 +239,7 @@ class Controller extends Base
                 $template,
                 [
                     'settingForSelf' => $settingForSelf,
-                    'users'          => $students->map($translator),
+                    'users'          => $targetUsers->map($translator),
                     'otherUsers'     => $otherUsers->map($translator),
                     'filterPanel'    => $filterPanel,
                 ],
