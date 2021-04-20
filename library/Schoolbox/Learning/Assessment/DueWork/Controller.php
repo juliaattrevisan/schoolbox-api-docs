@@ -65,12 +65,12 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
 use TheCodingMachine\Gotenberg;
 use UnexpectedValueException;
-use Zend\Uri\Uri;
 use ZipStream;
 
 /**
@@ -429,12 +429,12 @@ class Controller extends Assessment\Controller
 
 
             // Generate a PDF of the submission history page,
-            // Since PDF generation is a remote service, need a FQDN
-            // TODO migrate the PDF building stuff into its own class?
-            //      In particular, the FQDN generation?
-            $url = (new Uri())
+            // Since PDF generation is a remote service, need a fully-qualified
+            // domain name in the URL.
+            $urlFactory = new Factory($this->getConfigLoader());
+            $url        = $urlFactory
+                ->buildFullyQualified()
                 ->setScheme('https')
-                ->setHost($this->request->server->get('HTTP_HOST'))
                 ->setPort($this->request->server->get('SERVER_PORT'))
                 ->setPath(
                     $this->router->generate(

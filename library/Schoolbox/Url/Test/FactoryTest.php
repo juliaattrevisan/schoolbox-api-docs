@@ -7,21 +7,21 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Uri\Test;
+namespace Schoolbox\Url\Test;
 
 use Schoolbox\Config\TestLoader;
-use Schoolbox\Uri\Factory;
+use Schoolbox\Url\Factory;
 use PHPUnit\Framework\TestCase;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 
 /**
- * @covers \Schoolbox\Uri\Factory
+ * @covers \Schoolbox\Url\Factory
  */
 class FactoryTest extends TestCase
 {
     /**
-     * @covers \Schoolbox\Uri\Factory::buildFullyQualified
+     * @covers \Schoolbox\Url\Factory::buildFullyQualified
      * @dataProvider getTestBuildFullyQualifiedData
      *
      * @param UriInterface $expected

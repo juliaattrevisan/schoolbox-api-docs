@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Uri;
+namespace Schoolbox\Url;
 
 use Schoolbox\IConfigLoader;
 use Zend\Uri\Uri;
 use Zend\Uri\UriInterface;
 
 /**
- * Factory for building URIs based upon Schoolbox configuration.
+ * Factory for building URLs based upon Schoolbox configuration.
  */
 class Factory
 {
@@ -36,6 +36,11 @@ class Factory
     /**
      * Build a URI object with this Schoolbox instance's fully-qualified domain
      * name.
+     *
+     * Note that the URI returned will always be a URL: the addition of a
+     * fully-qualified domain name sets the URI's host and thus defines a
+     * location on a network: this is enough to make this URI a URL.
+     * (@see https://www.guru99.com/url-vs-uri-difference.html)
      *
      * @return UriInterface
      */
