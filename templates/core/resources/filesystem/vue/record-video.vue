@@ -15,10 +15,15 @@ import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js'
 import axios from 'axios';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 import { gsap } from 'gsap/all';
+import RecordMediaModal from './record-media-modal';
 
 
 export default {
 	
+	components: {
+		RecordMediaModal
+	},
+
 	data () {
 		return {
 			isDeviceReady: false, //to toggle the device display
@@ -69,9 +74,10 @@ export default {
     },
 
 	mounted () {
+		this.updateContainerHeight();
 		this.initVideojs();
-		// gsap.set(this.$refs.pane, { opacity: 0 } );
-		// gsap.to(this.$refs.pane, 0.3, { opacity: 1, delay: 0.5 } );
+		gsap.set(this.$refs.recordingVideoContainer, { alpha: 0 } );
+		gsap.set(this.$refs.actions, { alpha: 0 } );
 	},
 
 	beforeDestroy () { 
@@ -81,13 +87,25 @@ export default {
 	methods: {
 
 		/*
+         * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
+         * 
+         */ 
+        updateContainerHeight () {
+            const targetHeight = this.$refs.mediaContainer.getBoundingClientRect().width * 0.5625; //so there's no height jumps on switching videos
+            this.$refs.mediaContainer.style.height = targetHeight + 'px';
+        },
+
+		/*
          * Start it up
          * 
          */ 
         initVideojs () {
 
-            this.player = videojs(this.$refs.myVideo, this.getVideoJsOptions());
+            this.player = videojs(this.$refs.recordingVideo, this.getVideoJsOptions());
 			
+			gsap.to(this.$refs.recordingVideoContainer, 1, { alpha: 1 } );
+			gsap.to(this.$refs.actions, 0.6, { alpha: 1, delay: 0.3 } );
+
 			this.player.on('deviceReady', () => {
 				this.isDeviceReady = true;
 			});
@@ -236,7 +254,6 @@ export default {
 
 			this.player.on('deviceError', () => { //User doesn't allow the browser to access the webcam and/or microphone. Check player.deviceErrorCode for the specific error code.
 				this.hasDeviceError = true;
-				console.error('device error:', this.player.deviceErrorCode);
 			});
 
 		},
@@ -287,6 +304,22 @@ export default {
          */ 
         onConvertSelected () {
 			this.convertVideo();
+		},
+
+		/*
+         * close the error modal
+         * 
+         */ 
+        onCloseErrorModalSelected () {
+			this.$refs.errorModal.animateOff();
+		},
+
+		/*
+         * it's closed now, so disable the error to allow trying again
+         * 
+         */ 
+        onErrorModalClosed () {
+			this.hasDeviceError = false;
 		}
 
 	}
@@ -296,15 +329,23 @@ export default {
 
 <template>
 	<div>
-		<div class="ab-pane" ref="pane">
+		<div class="ab-pane">
             <div>
-                <video id="myVideo" ref="myVideo" playsinline class="video-js vjs-default-skin"></video>
+                <div class='media-container' ref="mediaContainer">
+					<div ref='recordingVideoContainer'>
+						<video ref="recordingVideo" playsinline class="video-js vjs-default-skin"></video>
+					</div>
+					<record-media-modal v-if="hasDeviceError" ref="errorModal" :closed-call-back="onErrorModalClosed">
+						<h3>The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</h3>
+						<button @click.prevent="onCloseErrorModalSelected">Close</button>
+					</record-media-modal>
+				</div>
             </div>
         </div>
-		<div class="component-action">
+		<div class="component-action" ref="actions">
 			<section>
 				<a v-if="canConvert" @click.prevent="onConvertSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video">Convert &amp; Upload</a>
-				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video">Enable Audio &amp; Video</a>
+				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video">Enable Camera</a>
 				<a v-else-if="isDeviceReady && !isRecording" @click.prevent="onStartRecordSelected" role="button" class="button" data-interaction="audio-record-play" title="Record Video" href="#record-video">{{ recordButtonText }}</a>
 				<a v-else-if="isDeviceReady && isRecording" @click.prevent="onStopRecordSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video">Stop</a>
 			</section>
@@ -314,9 +355,13 @@ export default {
 
 <style lang="scss">
 
-// #myVideo {
-//   background-color: #1a535c;
-// }
+.media-container {
+	position: relative;
+    width: 100%;
+	height: 100%;
+    background: black;
+    overflow: hidden;
+}
 
 .vjs-icon-record-start, .vjs-icon-record-stop {
 	min-height: 0;

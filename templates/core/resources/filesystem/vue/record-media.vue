@@ -23,8 +23,8 @@ export default {
 
     data () {
 		return {
-            currentMediaType: mediaTypes.UNSET //the currently selected media recording
-            // currentMediaType: mediaTypes.AUDIO //the currently selected media recording
+            // currentMediaType: mediaTypes.UNSET //the currently selected media recording
+            currentMediaType: mediaTypes.VIDEO //the currently selected media recording
         }
     },
 
