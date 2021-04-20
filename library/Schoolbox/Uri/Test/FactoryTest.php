@@ -21,30 +21,36 @@ use Zend\Uri\UriInterface;
 class FactoryTest extends TestCase
 {
     /**
-     * @dataProvider getTestBuildFullyQualifiedFromConfigData
+     * @covers \Schoolbox\Uri\Factory::buildFullyQualified
+     * @dataProvider getTestBuildFullyQualifiedData
      *
      * @param UriInterface $expected
      * @param array        $config
      */
-    public function testBuildFullyQualifiedFromConfig(UriInterface $expected, array $config): void
+    public function testBuildFullyQualified(UriInterface $expected, array $config): void
     {
-        $factory      = new Factory();
         $configLoader = new TestLoader($config);
+        $factory      = new Factory($configLoader);
         $this->assertSame(
             $expected->getHost(),
-            $factory->buildFullyQualifiedFromConfig($configLoader)->getHost(),
+            $factory->buildFullyQualified()->getHost(),
         );
     }
 
-    public function getTestBuildFullyQualifiedFromConfigData(): iterable
+    /**
+     * Data provider for `testBuildFullyQualified`
+     *
+     * @return iterable
+     */
+    public function getTestBuildFullyQualifiedData(): iterable
     {
         return [
             'no site_hostname, no site_domain' => [
-                new Uri(''),
+                (new Uri())->setHost(''),
                 [],
             ],
             'empty site_hostname, empty site_domain' => [
-                new Uri(''),
+                (new Uri())->setHost(''),
                 ['site_hostname' => '', 'site_domain' => '',],
             ],
             'empty site_hostname, non-empty site_domain' => [
