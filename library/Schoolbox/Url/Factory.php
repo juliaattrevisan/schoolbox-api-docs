@@ -15,6 +15,11 @@ use Zend\Uri\UriInterface;
 
 /**
  * Factory for building URLs based upon Schoolbox configuration.
+ *
+ * Currently it creates `\Zend\Uri\UriInterface` instances: this seems to be the
+ * most modern URI/URL object in use in Schoolbox, even though it has been
+ * replaced by `laminas/laminas-uri`. Changing that is out of scope for now
+ * though.
  */
 class Factory
 {
