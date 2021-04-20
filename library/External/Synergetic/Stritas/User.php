@@ -72,7 +72,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 '' AS StudentEnrolmentDate,
                 '' AS StudentLeavingDate,
                 vStudents.StudentIBFlag,
-                vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
+                vStudents.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
                 uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
                 uStudentProgressiveAbsenceCount.LateStartDaysForYear,
                 uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear,
