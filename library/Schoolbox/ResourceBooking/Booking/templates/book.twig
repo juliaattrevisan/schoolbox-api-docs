@@ -366,13 +366,13 @@ $(function() {
 
             <section class="content">
                 <div class="resource-booking-item card small-12 columns">
-                    {% if item.image.hash %}
-                        <img src="/storage/image.php?size=constrain200&hash={{ item.image.hash|e('url') }}" />
+                    {% if resource.image.hash %}
+                        <img src="/storage/image.php?size=constrain200&hash={{ resource.image.hash|e('url') }}" />
                     {% endif %}
-                    <article class="resource-content">{{ item.description|purify }}</article>
+                    <article class="resource-content">{{ resource.description|purify }}</article>
                     <div class="resource-content">
                         <h3>Rules</h3>
-                        {% include '@resourceItem/sub/rules.twig' with {item: item} %}
+                        {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
                     </div>
                 </div>
             </section>
