@@ -1465,19 +1465,20 @@ class Controller extends Assessment\Controller
 //        $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
 //        $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($participant->getUser()));
 
-        // Download and store the PDF
+        // Generate, download and store the PDF
         $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
 
         $tempfile = sb_tempnam();
-        $pdfGenerator->store($request, $tempfile);
-
-        $zipFilename = sprintf(
-            "%s/submissionHistory.pdf",
-            $baseFolderName,
-        );
-        $zipStream->addFileFromPath($zipFilename, $tempfile);
-
-        // Clean up once done
-        unlink($tempfile);
+        try {
+            $pdfGenerator->store($request, $tempfile);
+            $zipFilename = sprintf(
+                "%s/submissionHistory.pdf",
+                $baseFolderName,
+            );
+            $zipStream->addFileFromPath($zipFilename, $tempfile);
+        } finally {
+            // Clean up once finished
+            unlink($tempfile);
+        }
     }
 }
