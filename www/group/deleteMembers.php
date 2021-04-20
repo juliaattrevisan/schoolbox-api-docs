@@ -11,7 +11,9 @@ $kernel = new Kernel();
 $categoryId = $_REQUEST['categoryID'];
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $groupMapper = GroupMapper::getInstance();
 $uaMapper = UserAccessMapper::getInstance();
 

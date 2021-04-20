@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,7 +9,9 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
-$sitePage = new SitePage;
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 if (is_readable($_FILES['file']['tmp_name'])) {
 	try {

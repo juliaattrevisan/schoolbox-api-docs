@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * A really old controller class, which wraps around a SitePage.
+ *
+ * Old event attendance is built on this, as is the boarder leave module.
+ */
 class Controller
 {
     /**
@@ -12,12 +17,9 @@ class Controller
      *
      * @param SitePage $page
      */
-    public function __construct ($page = null) {
-        if ( !is_a($page, 'SitePage') ) {
-            $page = new SitePage();
-        }
-
-        $this->setPage($page);
+    public function __construct(SitePage $page)
+    {
+        $this->page = $page;
     }
 
     /**

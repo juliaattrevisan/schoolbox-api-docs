@@ -6,7 +6,9 @@ use Schoolbox\Permission\Access\UserAccess;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $pollHandler = new Poll();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 

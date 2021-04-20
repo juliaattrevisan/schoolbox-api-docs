@@ -6,7 +6,9 @@ use Schoolbox\Permission\Access\UserAccess;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Kernel();
 
-$page         = $kernel->getDependencyInjector()->get('layoutEngine');
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $wikiHandler  = new Wiki;
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 

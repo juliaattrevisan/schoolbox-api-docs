@@ -15,7 +15,10 @@ if (!isset($_POST['filters'])) {
 // this is just to properly initialise the sessions so changes will take hold
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 $calHandler = new Calendar();
 
 //$response = $calHandler->updateFilters($_POST['fList'], $_POST['view']);

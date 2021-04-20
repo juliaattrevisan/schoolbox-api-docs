@@ -47,7 +47,9 @@ if (isset($_GET['hash'])) {
 }
 
 if (isset($type, $id)) {
-    $page          = new SitePage();
+    /** @var SitePage $page */
+    $page = $kernel->get('sitePage');
+    $page->initSession();
     $storageMapper = StorageMapper::getInstance();
     $videoQueue    = null;
     try {

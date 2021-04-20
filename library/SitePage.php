@@ -22,7 +22,7 @@ class SitePage extends Page
 
     /**
      * The dependency injection container, injected into SitePage!
-     * @var Aura\Di\Container
+     * @var Aura\Di\ContainerInterface
      */
     protected $di;
 
@@ -50,52 +50,27 @@ class SitePage extends Page
     /**
      * Constructor
      *
-     * @param bool                             $login
-     * @param \Aura\Di\ContainerInterface|null $di
+     * @param Aura\Di\ContainerInterface $di
      */
-    public function __construct($login = true, ?Aura\Di\ContainerInterface $di = null)
+    public function __construct(Aura\Di\ContainerInterface $di)
     {
         parent::__construct();
 
-        // TODO SA-8354: ALWAYS ensure DI exists: that is, use the SitePage from DI or not at all
-        if ($di) {
-            $this->di = $di;
-            $this->config = $di->get('config');
-        } else {
-            $this->config = ConfigLoader::getInstance();
-        }
+        $this->di     = $di;
+        $this->config = $di->get('config');
 
-
-        if(isset($_SESSION['user'])) {
+        if (isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
-        }
-
-        if ($login) {
-            $this->initSession();
         }
 
         $this->setSite();
     }
 
     /**
-     * @param  Aura\Di\ContainerInterface $di
-     * @return $this
-     */
-    public function setDi($di)
-    {
-        $this->di = $di;
-        return $this;
-    }
-
-    /**
      * @return Aura\Di\ContainerInterface
-     * @throws RuntimeException if this SitePage has no DI container.
      */
     public function getDi()
     {
-        if (!($this->di instanceof Aura\Di\ContainerInterface)) {
-            throw new RuntimeException('This SitePage does not have a dependency injector');
-        }
         return $this->di;
     }
 
@@ -268,7 +243,7 @@ class SitePage extends Page
         }
 
         if (!$lite && !$this->lite) {
-            $this->saveHistory();
+            self::saveHistory();
             /** @var Output\ThemedHtml $renderer */
             $renderer = $this->getDi()->get('webOutput:html');
             $renderer
@@ -319,7 +294,10 @@ class SitePage extends Page
     }
 
     /**
+     * Initialises a session, redirecting to the login page if there is no
+     * active session.
      *
+     * @deprecated this is definitely not a responsibility of SitePage
      */
     public function initSession()
     {
@@ -394,7 +372,7 @@ class SitePage extends Page
     /**
      * @param string $override
      */
-    public function saveHistory($override = '')
+    public static function saveHistory($override = '')
     {
         /* Function saves user page history in session so we can go back to where they came from */
         if (!is_array($_SESSION['history'])) {

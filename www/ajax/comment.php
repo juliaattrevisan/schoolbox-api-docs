@@ -23,7 +23,9 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 // do sessiony things
-new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 /* Create a new comment
  */

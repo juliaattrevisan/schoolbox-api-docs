@@ -108,8 +108,8 @@ $app = new class extends CliTool\App
 
 
         // Pre-load the component list for each page
-        $sitepage = new SitePage(false);
-        $sitepage->setDi($this->getDi());
+        /** @var SitePage $sitepage */
+        $sitepage       = $this->getDi()->get('sitePage');
         $factory        = new Component_Eportfolio_Factory($user, $sitepage);
         $eportfolioList = [];
         foreach (Eportfolio\PageMapper::getInstance()->findPagesWithPermissions($userId) as $page) {

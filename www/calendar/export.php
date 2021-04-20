@@ -238,11 +238,8 @@ try {
             break;
 
         case 'duework':
-            $page = new SitePage(false);
-            $page->setDi($kernel->getDependencyInjector());
-
             /** @var MapperProxy $assessmentDataSource */
-            $assessmentDataSource = $page->getDi()->get('assessmentDataSource');
+            $assessmentDataSource = $kernel->get('assessmentDataSource');
             $visibility           = new Visibility(Access::getInstance());
 
             $api = buildApiClass(

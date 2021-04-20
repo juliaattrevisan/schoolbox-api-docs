@@ -11,6 +11,10 @@
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -27,5 +31,4 @@ $categoryHandler->create($newCategory);
 
 /* Back to the future -_-
  */
-$page = new SitePage();
-$page->backToTheFuture(1);
+SitePage::backToTheFuture(1);

@@ -17,7 +17,10 @@ use Schoolbox\Resource\Storage\Zip\Folder;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 try {
     $folder = FolderMapper::getInstance()->findById($_GET['folder']);
 } catch (Schoolbox\Mapper\Exception $e) {

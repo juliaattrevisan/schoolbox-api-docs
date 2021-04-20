@@ -17,7 +17,10 @@ if (isset($this)) {
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-new SitePage();
+
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 header('Content-Type: application/json');
 
@@ -86,8 +89,7 @@ function rollover($categoryId)
 {
 
     // send the user back to the rollover page, and then process the rollover request
-    $page = new SitePage();
-    $page->localRedir('/adminv2/rollover', true);
+    SitePage::localRedir('/adminv2/rollover', true);
 
     // post-client processing
     $cats = traverse($categoryId);

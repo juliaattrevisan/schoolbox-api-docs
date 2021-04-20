@@ -10,7 +10,6 @@
 use Schoolbox\Error\Mapper as ErrorMapper;
 require 'saml-setup.php';
 
-$page = new SitePage(false);
 $auth = new OneLogin\Saml2\Auth($settingsInfo);
 
 

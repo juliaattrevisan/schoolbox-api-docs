@@ -13,7 +13,6 @@ use Schoolbox\Role;
 
 class AjaxChat {
 
-    private $page;
     private $groupHandler;
     private $chatHandler;
     private $homepageHandler;
@@ -48,8 +47,6 @@ class AjaxChat {
         $this->componentID = $post_vars['component_id'];
         $this->userID      = $user_id;
 
-
-        $this->page = new SitePage;
         $this->groupHandler = new Group();
         $this->chatHandler = new Chat();
         $this->homepageHandler = new Homepage($this->catID);

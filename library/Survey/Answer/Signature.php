@@ -56,23 +56,18 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
     public function resultsForQuestion($attempt_id, $question_id) {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
-        /* This is called to manufacture $sectionValues, but that's really
-         * high up to keep passing around a sitepage just for one question
-         */
-        $page = new SitePage(false);
-        $page->setLite(true);
-        $page->setFile('signaturePad', 'survey/answer/signature/rendered.html');
+        // Instead of using a SitePage instance to render the signature:
+        // just load the template's contents
+        $template = file_get_contents(SITE_root . '/templates/core/survey/answer/signature/rendered.html');
 
-        $page->setVar(array(
-            'ID'       => $attempt_id,
-            'RESPONSE' => $this->makeResponseValid($response['response']),
-        ));
+        $data['responses'] = strtr(
+            $template,
+            [
+                 '{ID}'       => $attempt_id,
+                 '{RESPONSE}' => $this->makeResponseValid($response['response'])
+            ]
+        );
 
-        $page->parse('renderedSignature', 'signaturePad');
-
-        /* SVG data
-         */
-        $data['responses'] = $page->getVar('renderedSignature');
         // Signatures are never duplicated
         $data['responsesData'] = $attempt_id;
 

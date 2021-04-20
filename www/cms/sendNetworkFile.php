@@ -14,9 +14,11 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 
 if (is_numeric($_GET['id']) && Config::get('webdav_enable')) {
-    $page = new SitePage;
+    /** @var SitePage $page */
+    $page = $kernel->get('sitePage');
+    $page->initSession();
     $groupHandler = new Group;
-    $fileHandler = PortfolioWebDAV::factory();
+    $fileHandler  = PortfolioWebDAV::factory();
     try {
         $filename = $fileHandler->getFile($_GET['id']);
     }

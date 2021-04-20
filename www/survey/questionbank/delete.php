@@ -17,6 +17,10 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
+
 $groupHandler = new Group();
 
 if (!$groupHandler->isStaff()) {
@@ -31,5 +35,4 @@ if (is_numeric($this->arg[0])) {
 
 /* Back to the future -_-
  */
-$page = new SitePage();
-$page->backToTheFuture(1);
+SitePage::backToTheFuture(1);

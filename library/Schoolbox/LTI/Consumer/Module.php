@@ -90,8 +90,8 @@ class Module extends BaseModule
 
                 if (array_key_exists('componentId', $params)) {
 
-                    $page = new SitePage();
-                    $page->setDi($this->getInjector());
+                    /** @var SitePage $page */
+                    $page = $this->getInjector()->get('sitePage');
 
                     $factory   = new Component_Homepage_Factory(new User(), $page);
                     $component = $componentInstanceMapper->findByInstanceId($params['componentId']);

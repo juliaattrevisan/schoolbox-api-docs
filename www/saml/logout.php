@@ -9,7 +9,9 @@ require 'saml-setup.php';
 
 use Schoolbox\Error\Mapper as ErrorMapper;
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 $auth = new OneLogin\Saml2\Auth($settingsInfo);
 

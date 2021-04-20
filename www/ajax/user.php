@@ -20,7 +20,10 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $userHandler = new User();
 $groupHandler = new Group();
-$pageHandler = new SitePage();
+/** @var SitePage $page */
+$pageHandler = $kernel->get('sitePage');
+$pageHandler->initSession();
+
 $emailObj = new Email();
 $userMapper = UserMapper::getInstance();
 

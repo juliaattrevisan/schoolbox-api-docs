@@ -146,9 +146,9 @@ class Leave_Controller extends Controller
     /**
      * Constructor
      *
-     * @param Page $page
+     * @param SitePage $page
      */
-    public function __construct($page = null)
+    public function __construct(SitePage $page)
     {
         parent::__construct($page);
 

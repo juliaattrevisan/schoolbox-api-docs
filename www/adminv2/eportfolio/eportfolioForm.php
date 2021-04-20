@@ -13,7 +13,10 @@ if(isset($this)) {
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
-$sitePage = new SitePage();
+
+/** @var SitePage $sitePage */
+$sitePage = $kernel->get('sitePage');
+$sitePage->initSession();
 
 // this is an admin function, so check user is super-awesome
 if(!isset($_SESSION['su']) || (!$_SESSION['su'])) {

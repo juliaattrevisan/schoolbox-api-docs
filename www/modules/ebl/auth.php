@@ -18,7 +18,9 @@
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 define('EBL_LIBRARY_ID', 'shore');
 define('EBL_SHARED_SECRET', 'bG45902501c3');

@@ -20,7 +20,10 @@ $kernel = new Kernel();
 
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
-        $page = new SitePage;
+
+        /** @var SitePage $page */
+        $page = $kernel->get('sitePage');
+        $page->initSession();
 
         $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
         $attachmentType = (!$resource->getMimetype()->getInline() || $_GET['save']) ? 'attachment;' : '';

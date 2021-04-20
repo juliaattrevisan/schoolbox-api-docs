@@ -15,7 +15,9 @@ if (!isset($this)) {
 }
 /** @var SitePage $this */
 
-$page = new SitePage();
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 
 new \EOTC\Authenticator($this);
 

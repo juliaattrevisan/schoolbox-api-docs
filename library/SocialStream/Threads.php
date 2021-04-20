@@ -219,11 +219,12 @@ class Threads
 
     /**
      * Generate ajax html
+     *
+     * @var \SitePage $page
+     * @return $this
      */
-    public function generate()
+    public function generate(\SitePage $page)
     {
-        $page = new \SitePage();
-
         /* Determine whether you have access to the input form
          */
         $newPost       = new \SocialStream_Post_String();

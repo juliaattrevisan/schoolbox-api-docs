@@ -7,7 +7,10 @@ require_once '../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
 $dropbox = Schoolbox\Dropbox\Mapper::getInstance();
-$page    = new SitePage();
+
+/** @var SitePage $page */
+$page = $kernel->get('sitePage');
+$page->initSession();
 $page->setAjax(true);
 
 if (is_numeric($_GET['delete'])) {
