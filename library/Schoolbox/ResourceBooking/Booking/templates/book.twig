@@ -373,11 +373,12 @@ $(function() {
                     {% endif %}
 
                     <div class="small-12 medium-8 large-7 columns">
-                        <article>{{ resource.description|purify }}</article>
+                        <article>
+                            {{ resource.description|purify }}
+                            <hr />
+                        </article>
 
-                        <hr />
-
-                        <h3>Rules</h3>
+                        <h3>Rulesssssssssssss</h3>
                         {% include '@resourceItem/sub/rules.twig' with {item: item.resource, currentTerm: currentTerm} %}
                     </div>
                 </div>
