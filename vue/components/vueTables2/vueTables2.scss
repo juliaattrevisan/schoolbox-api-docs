@@ -1,3 +1,5 @@
+$cdn-prefix: '/static';
+
 .VueTables input[type="checkbox"] {
   position: static;
   width: 1rem;
@@ -12,46 +14,25 @@
 }
 
 .VueTables__sort-icon {
-  background: grey;
   float: right;
 }
 
 .glyphicon {
   position: relative;
   top: 1px;
-  display: inline-block;
-  font-family: "Glyphicons Halflings";
-  font-style: normal;
-  font-weight: 400;
-  line-height: 1;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+  &:before {
+    display: block;
+    width: 16px;
+  }
 }
 
 .glyphicon-sort:before {
-  content: "\e150";
-}
-.glyphicon-sort-by-alphabet:before {
-  content: "\e151";
-}
-.glyphicon-sort-by-alphabet-alt:before {
-  content: "\e152";
-}
-.glyphicon-sort-by-order:before {
-  content: "\e153";
-}
-.glyphicon-sort-by-order-alt:before {
-  content: "\e154";
-}
-.glyphicon-sort-by-attributes:before {
-  content: "\e155";
-}
-.glyphicon-sort-by-attributes-alt:before {
-  content: "\e156";
+  content: url("#{$cdn-prefix}/images/svg/sortable.svg");
 }
 .glyphicon-chevron-up:before {
-  content: "\e113";
+  content: url("#{$cdn-prefix}/images/svg/sort-up.svg");
 }
 .glyphicon-chevron-down:before {
-  content: "\e114";
+  content: url("#{$cdn-prefix}/images/svg/sort-down.svg");
 }
