@@ -51,11 +51,9 @@ class IdFinder extends AbstractIdFinder
     {
         $categoryIds = $completeFilters[Category\Definition::class] ?? null;
         $pb          = $this->getMapper()->getPredicateBuilder();
-        $hasWhere    = false;
 
         // Query for categories
         if (isset($categoryIds) && count($categoryIds) > 0) {
-            $hasWhere = true;
             $pb = $pb->in('b.category_id', $categoryIds);
         }
 
@@ -66,10 +64,9 @@ class IdFinder extends AbstractIdFinder
             // If so, filter on those.
             unset($curriculumNodes[CurriculumNode\Definition::KEY_ALL]);
             if (count($curriculumNodes) > 0) {
-                $hasWhere = true;
-                $pb       = $pb->any(
+                $pb = $pb->any(
                     $this->getMapper()->getPredicateBuilder()
-                                      ->in('cb.curriculum_node_id', $curriculumNodes)
+                         ->in('cb.curriculum_node_id', $curriculumNodes)
                 );
             }
         }
@@ -82,7 +79,6 @@ class IdFinder extends AbstractIdFinder
                 $names = array_map('trim', preg_split('/\\s+/', (string)$nameSearchString));
                 foreach ($names as $name) {
                     if (strlen($name) > 0 && $name !== Name\Definition::KEY_ALL) {
-                        $hasWhere = true;
                         $pb = $pb->like(
                             'b.name',
                             '%' . $this->getMapper()->getDatabase()->getQuoter()->escapeForLike($name) . '%'
@@ -95,8 +91,7 @@ class IdFinder extends AbstractIdFinder
         $allowSetAsGoal = $completeFilters[AllowAsGoal\Definition::class] ?? null;
         if (isset($allowSetAsGoal) && count($allowSetAsGoal) === 1) {
             foreach ($allowSetAsGoal as $isAllowed => $_) {
-                $hasWhere = true;
-                $pb       = $pb->equals(
+                $pb = $pb->equals(
                     'b.allow_as_goal',
                     (int)$isAllowed
                 );
@@ -106,19 +101,31 @@ class IdFinder extends AbstractIdFinder
 
         // Filter out deleted badges
         if (!$deleted) {
-            $hasWhere = true;
             $pb->isNull('b.deleted_at');
         }
 
+        $wheres = $pb->getWhere();
+        $params = $pb->getParams();
+
+        // Query for year level
+        $badgeYearLevels = $completeFilters[YearLevel\Definition::class];
+        [$yearLevelJoin, $yearLevelWhere, $yearLevelParams] = $this->getClauseFolderYearLevels($badgeYearLevels);
+
         // Build query
-        $query = 'SELECT DISTINCT
+        $query = "SELECT DISTINCT
             b.id FROM badge b
             LEFT JOIN curriculum_badge cb on b.id = cb.badge_id
-        ';
-        if ($hasWhere) {
-            $query .= ' WHERE ' . $pb->getWhereIntersect();
+        ";
+
+        if ($yearLevelJoin) {
+            $query    .= " $yearLevelJoin JOIN badge_year_level fyl on b.id = fyl.badge_id";
+            $wheres[] = $yearLevelWhere;
+            $params   = array_merge($yearLevelParams, $params);
         }
-        $params = $pb->getParams();
+
+        if (count($wheres) > 0) {
+            $query .= ' WHERE (' . implode(') AND (', $wheres) . ')';
+        }
         return [$query, $params];
     }
 }

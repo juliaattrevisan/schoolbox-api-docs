@@ -440,4 +440,14 @@ abstract class AbstractFactoryFactory implements IFactoryFactory
     {
         return $this->mapperFactory->get(Selection\Mapper::class);
     }
+
+
+    /**
+     * @return \Schoolbox\YearLevel\Mapper|\Schoolbox\Mapper
+     * @throws \InvalidArgumentException
+     */
+    protected function getYearLevelMapper()
+    {
+        return $this->mapperFactory->get(\Schoolbox\YearLevel\Mapper::class);
+    }
 }

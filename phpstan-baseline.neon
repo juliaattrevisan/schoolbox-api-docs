@@ -5711,16 +5711,6 @@ parameters:
 			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
 
 		-
-			message: "#^PHPDoc tag @return with type Schoolbox\\\\Mapper is not subtype of native type Schoolbox\\\\YearLevel\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
-			message: "#^Method Schoolbox\\\\Filter\\\\Filters\\\\Assessment\\\\FactoryFactory\\:\\:getYearLevelMapper\\(\\) should return Schoolbox\\\\YearLevel\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
-			count: 1
-			path: library/Schoolbox/Filter/Filters/Assessment/FactoryFactory.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$folders with type iterable\\<Schoolbox\\\\Resource\\\\Folder\\\\Model\\>&Schoolbox\\\\Collection is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Filter/Filters/Assessment/Folder/Component.php

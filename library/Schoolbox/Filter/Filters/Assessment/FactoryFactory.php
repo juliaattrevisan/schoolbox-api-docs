@@ -335,13 +335,4 @@ class FactoryFactory extends Filter\AbstractFactoryFactory
     {
         return $this->getMapperFactory()->get(Project\Mapper::class);
     }
-
-    /**
-     * @return YearLevel\Mapper|Mapper
-     * @throws InvalidArgumentException
-     */
-    private function getYearLevelMapper(): YearLevel\Mapper
-    {
-        return $this->getMapperFactory()->get(YearLevel\Mapper::class);
-    }
 }

@@ -32,6 +32,7 @@ class MutableFieldsOnly extends AllFields
         'allow-as-goal'   => true,
         'category'        => true,
         'tags'            => true,
+        'yearLevelIds'    => true,
         'curriculumNodes' => true,
     ];
 

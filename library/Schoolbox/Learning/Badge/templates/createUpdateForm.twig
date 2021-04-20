@@ -119,7 +119,14 @@
                                         $('#{{ attachzone.id }}-zone').on('success.attachzone', function(event, file) {
                                             $('#badge-icon-file-error').remove();
                                         });
-
+                                        $('#yearLevels').selectizeSelector({
+                                            multiple: true,
+                                            value: {{ badge.yearLevels is defined ? (badge.yearLevels.propertyValues('id')|json_encode|raw) : 'null' }},
+                                            selectize: {
+                                                options: {{ yearLevels|json_encode|raw }},
+                                                hideSelected: true
+                                            }
+                                        });
                                     });
                                 </script>
                             </div>
@@ -170,8 +177,18 @@
                                 <option value="{{ category.id }}" label="{{ category.name }}" {{ selected }}>{{ category.name }}</option>
                             {% endfor %}
                         </select>
-
-                        {% if curriculumTaggingEnabled %}
+                    </div>
+                    <div class="small-12 columns">
+                        {% set toolTipTitle = 'Select the year levels to associate with this badge' %}
+                        <label>
+                            Year Levels
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="{{ toolTipTitle }}">?</span>
+                        </label>
+                        <input title="Year Levels" id="yearLevels" name="yearLevelIds" placeholder="Select year Levels"
+                               tabindex="-1" class="selectized" type="text">
+                    </div>
+                    {% if curriculumTaggingEnabled %}
+                        <div class="small-12 columns">
                             <label for="curriculum-code-select">Curriculum Codes</label>
                             <div class="input-group">
                                 {% include 'sub/curriculumCodeSelector.twig' with {
@@ -179,8 +196,8 @@
                                     renderButton: true
                                 } %}
                             </div>
-                        {% endif %}
-                    </div>
+                        </div>
+                    {% endif %}
                 </fieldset>
             </section>
 
@@ -303,6 +320,12 @@
                         id: categoryId
                     }
                 }
+                let yearLevels = form.querySelector('#yearLevels').selectize.items;
+                payload.yearLevelIds = yearLevels.map(
+                        (v) => {
+                            return {id: Number(v)}
+                        }
+                );
 
                 // Only save curriculum nodes if they are enabled
                 if (curriculumTaggingEnabled) {

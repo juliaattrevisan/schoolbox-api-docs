@@ -14,6 +14,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
+use Schoolbox\Filter\Mapper as FilterMapper;
 use Schoolbox\Learning\Badge\Mapper as BadgeMapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
@@ -257,15 +258,6 @@ class Module extends BaseModule
 
 
     /**
-     * @return \External_UserInterface
-     */
-    protected function getExternalUser()
-    {
-        return $this->getInjector()->get('externalUser');
-    }
-
-
-    /**
      * @inheritdoc
      */
     public function initTemplatePaths(IChainLoader $templateLoader): void
@@ -287,6 +279,7 @@ class Module extends BaseModule
                     'mapper'               => $this->getMapperFactory()->getLazy(Mapper::class),
                     'badgeMapper'          => $this->getMapperFactory()->getLazy(BadgeMapper::class),
                     'filterFactoryFactory' => $injector->lazyGet('filters.factoryFactory'),
+                    'filterMapper'         => $this->getMapperFactory()->getLazy(FilterMapper::class),
                     'userMapper'           => $this->getMapperFactory()->getLazy(UserMapper::class),
                 ]
             )

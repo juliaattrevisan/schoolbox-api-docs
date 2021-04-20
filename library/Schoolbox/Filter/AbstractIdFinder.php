@@ -7,10 +7,12 @@
 
 namespace Schoolbox\Filter;
 
+use Alaress\Database\Predicate\InvalidColumnException;
 use function array_map;
-use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\IMapper;
+use UnderflowException;
+use UnexpectedValueException;
 
 /**
  * Logic common to all IdFinders
@@ -84,7 +86,7 @@ abstract class AbstractIdFinder implements IdFinder
         // Can we simplify filters using set theory?
         $completeFilters = $this->simplifyFilters($completeFilters);
 
-        list($query, $params) = $this->buildQuery($completeFilters, $deleted);
+        [$query, $params] = $this->buildQuery($completeFilters, $deleted);
         $idStatement = $this->getMapper()->getDatabase()->query($query, $params);
         $ids         = array_column($idStatement->fetchAll(), $this->getMapper()->getIdentifierColumn());
 
@@ -220,5 +222,60 @@ abstract class AbstractIdFinder implements IdFinder
     {
         $this->registry = $registry;
         return $this;
+    }
+
+    /**
+     * Return structure indicates:
+     * * Whether we need to join to the `folder_year_level` table, and the type of join (INNER | LEFT)
+     * * The WHERE clause with placeholders
+     * * Any params to use in the WHERE clause
+     *
+     * @param Collection|null $folderYearLevels
+     * @return array
+     * @internal null|string return[0] join type to folder_year_level table
+     * @internal string      return[1] Where clause with placeholders
+     * @internal array       return[2] Where clause params
+     * @throws InvalidColumnException
+     * @throws UnderflowException
+     * @throws UnexpectedValueException
+     */
+    protected function getClauseFolderYearLevels(?Collection $folderYearLevels): array
+    {
+        // Case #1 - null, don't apply the filter at all
+        if ($folderYearLevels === null) {
+            return [null, 'TRUE', []];
+        }
+
+        // Case #2 - empty collection, should already be handled by pre-query-build optimiser
+        if (!$folderYearLevels->count()) {
+            throw new UnexpectedValueException('Folder YearLevels filter is empty');
+        }
+
+        # Case #3 - options present.
+
+        // What does the filter options semantically contain?
+        $concreteYearLevelIds = [];
+        $matchNone            = false;
+        foreach ($folderYearLevels as $yearLevelId) {
+            if ($yearLevelId === null) {
+                $matchNone = true;
+                continue;
+            }
+            $concreteYearLevelIds[] = $yearLevelId;
+        }
+
+        $pb = $this->getMapper()->getPredicateBuilder();
+        if ($matchNone) {
+            $pb->isNull('fyl.year_level_id');
+        }
+        if (count($concreteYearLevelIds)) {
+            $pb->in('fyl.year_level_id', $concreteYearLevelIds);
+        }
+
+        if ($matchNone && count($concreteYearLevelIds)) {
+            $pb = $this->getMapper()->getPredicateBuilder()->any($pb);
+        }
+
+        return [$matchNone ? 'LEFT' : 'INNER', $pb->getWhere()[0], $pb->getParams()];
     }
 }

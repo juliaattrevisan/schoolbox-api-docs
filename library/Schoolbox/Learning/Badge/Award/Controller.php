@@ -52,6 +52,10 @@ class Controller extends Base
      */
     private Filter\IFactoryFactory $filterFactoryFactory;
 
+    /**
+     * The filter mapper
+     */
+    private Filter\Mapper $filterMapper;
 
     /**
      * Mapper for users.
@@ -65,17 +69,20 @@ class Controller extends Base
      * @param Mapper                 $mapper
      * @param BadgeMapper            $badgeMapper
      * @param Filter\IFactoryFactory $filterFactoryFactory
+     * @param Filter\Mapper          $filterMapper
      * @param UserMapper             $userMapper
      */
     public function __construct(
         Mapper $mapper,
         BadgeMapper $badgeMapper,
         Filter\IFactoryFactory $filterFactoryFactory,
+        Filter\Mapper $filterMapper,
         UserMapper $userMapper
     ) {
         $this->badgeMapper          = $badgeMapper;
         $this->mapper               = $mapper;
         $this->filterFactoryFactory = $filterFactoryFactory;
+        $this->filterMapper         = $filterMapper;
         $this->userMapper           = $userMapper;
     }
 
@@ -169,7 +176,7 @@ class Controller extends Base
     public function getSetAsGoalForSelfForm(): void
     {
         $this->getAwardBadgeForm(
-            new GenericCollection(User::class),
+            $this->userMapper->createCollection()->add($this->getUser()),
             '@learningBadgeAward/setAsGoalForSelfForm.twig',
             'Set Goals'
         );
@@ -180,30 +187,49 @@ class Controller extends Base
      * Show a form for awarding a badge as an achievement or goal to a set of
      * users.
      *
-     * @param GenericCollection|User[] $users
+     * @param GenericCollection|User[] $targetUsers
      * @param string                   $template The template to display
      * @param string                   $title    The title of this page
      */
-    private function getAwardBadgeForm(GenericCollection $users, string $template, string $title): void
+    private function getAwardBadgeForm(GenericCollection $targetUsers, string $template, string $title): void
     {
+        $queryArgs = $this->request->query->getArrayCopy();
+
+        // In the year level filter, select selected students' year levels and None by default
+        $yearLevelFilterDefinition = Filter\Filters\Badge\YearLevel\Definition::class;
+        $filters                   = $this->filterMapper->findForEntity(BadgeMapper::class);
+        foreach ($filters as $filter) {
+            if ($yearLevelFilterDefinition !== $filter->getClass()) {
+                continue;
+            }
+            foreach ($targetUsers as $targetUser) {
+                if (!$targetUser->getYear() || isset($queryArgs[$filter->getId()][$targetUser->getYear()->getId()])) {
+                    continue;
+                }
+                $queryArgs[$filter->getId()][$targetUser->getYear()->getId()] = 1;
+            }
+            // select None
+            $queryArgs[$filter->getId()][Filter\Filters\Badge\YearLevel\Definition::KEY_NONE] = 1;
+        }
+
         $filterPanel = $this->filterFactoryFactory->buildPanel(
             $this->getUser(),
             Filter\Page\Model::PAGE_BADGE_LIST,
             null,
             $this->getUser(),
             [],
-            $this->request->query->getArrayCopy(),
+            $queryArgs,
         );
 
         // Segment users into users which are and are not this user
-        $otherUsers     = $users->emptyClone();
+        $otherUsers     = $targetUsers->emptyClone();
         $thisUserId     = $this->getUser()->getId();
         $settingForSelf = false;
-        foreach ($users as $user) {
-            if ($user->getId() === $thisUserId) {
+        foreach ($targetUsers as $targetUser) {
+            if ($targetUser->getId() === $thisUserId) {
                 $settingForSelf = true;
             } else {
-                $otherUsers->add($user);
+                $otherUsers->add($targetUser);
             }
         }
 
@@ -213,7 +239,7 @@ class Controller extends Base
                 $template,
                 [
                     'settingForSelf' => $settingForSelf,
-                    'users'          => $users->map($translator),
+                    'users'          => $targetUsers->map($translator),
                     'otherUsers'     => $otherUsers->map($translator),
                     'filterPanel'    => $filterPanel,
                 ],
