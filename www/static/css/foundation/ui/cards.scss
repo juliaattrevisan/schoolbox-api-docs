@@ -356,8 +356,7 @@
     }
   }
 
-  p,
-  ul {
+  p {
     margin: 0;
     &.spaced {
       padding-bottom: (0.2 * rem-calc($base-font-size));
@@ -580,6 +579,51 @@
 .column-right .v-card {
   flex: 1 0 50%;
   padding: 0;
+}
+
+// Resource Booking Item - sits above calendar
+.resource-booking-item.card {
+  display: flex;
+  padding: 0;
+
+  .resource-content {
+    flex-grow: 1;
+    flex-basis: 0;
+    margin-right: 2rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
+    &:empty {
+      display: none;
+    }
+  }
+
+  > img {
+    align-self: center;
+    margin: 0 1rem 0 0;
+    width: 12.5rem;
+  }
+
+  @media #{$small-only} {
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .resource-content {
+      flex-basis: 100%;
+      margin-bottom: 2rem;
+      margin-right: 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    > img {
+      margin: 0 0 1rem 0;
+      width: 12.5rem;
+    }
+  }
 }
 
 .link-row {

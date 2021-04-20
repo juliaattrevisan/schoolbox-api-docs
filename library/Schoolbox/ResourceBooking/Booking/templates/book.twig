@@ -354,9 +354,6 @@ $(function() {
 
 <div class="row">
     <div class="small-12 island">
-        <div class="alert-box">
-            {% include '@resourceItem/sub/rules.twig' with {item: item.resource, currentTerm: currentTerm} %}
-        </div>
         <form id="resource-booking-form" action="{{ saveAction }}" method="post" name="form">
             <input type="hidden" name="id" value="{{ item.id }}"/>
             <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
@@ -366,6 +363,19 @@ $(function() {
 
             {# Input for determining which action to run #}
             <input type="hidden" name="action" />
+
+            <section class="content">
+                <div class="resource-booking-item card small-12 columns">
+                    {% if resource.image.hash %}
+                        <img src="/storage/image.php?size=constrain200&hash={{ resource.image.hash|e('url') }}" />
+                    {% endif %}
+                    <article class="resource-content">{{ resource.description|purify }}</article>
+                    <div class="resource-content">
+                        <h3>Rules</h3>
+                        {% include '@resourceItem/sub/rules.twig' with {item: item.resource} %}
+                    </div>
+                </div>
+            </section>
 
             <section>
                 <fieldset class="content">
