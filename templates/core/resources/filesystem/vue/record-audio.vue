@@ -92,7 +92,7 @@ export default {
 				controls: true,
 				autoplay: false,
 				fluid: true,
-				aspectRatio: '4:3',
+				aspectRatio: '16:9',
 				loop: false,
 				bigPlayButton: false,
 				controlBar: {
@@ -273,10 +273,10 @@ export default {
 	<div>
 		<div class="ab-pane">
             <div>
-                <audio id="myAudio" ref="myAudio" class="video-js vjs-default-skin"></audio>
-            </div>
-        </div>
-		<div class="component-action recorderButtons">
+        		<audio id="myAudio" ref="myAudio" class="video-js vjs-default-skin"></audio>
+			</div>
+        </div>		
+		<div class="component-action">
 			<section>
 				<a v-if="recordedCount > 0" @click.prevent="onUploadSelected" role="button" class="button" data-interaction="audio-record-stop" title="Upload Video" href="#stop-recording-video">Upload</a>
 				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video">Enable Audio</a>

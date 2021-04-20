@@ -5,48 +5,43 @@
  *
  */
 
+import RecordMediaMenu from './record-media-menu';
+import RecordMediaUnset from './record-media-unset';
 import RecordVideo from './record-video';
 import RecordAudio from './record-audio';
 import mediaTypes from '../js/mediaTypes';
 
+
 export default {
     
     components: {
+        RecordMediaMenu,
+        RecordMediaUnset,
         RecordVideo,
         RecordAudio
     },
 
     data () {
 		return {
-            // currentMediaType: '' //the currently selected media recording
-            currentMediaType: mediaTypes.AUDIO //the currently selected media recording
+            currentMediaType: mediaTypes.UNSET //the currently selected media recording
+            // currentMediaType: mediaTypes.AUDIO //the currently selected media recording
         }
     },
 
     created () {
-        this.initConsts();
+        this.mediaTypes = mediaTypes; //to be able to move between media types
     },
 
     methods: {
 
-        /*
-         * For consts to be available within the template
-         * 
-         */ 
-        initConsts () {
-            this.MEDIA_TYPE_AUDIO = mediaTypes.AUDIO;
-            this.MEDIA_TYPE_VIDEO = mediaTypes.VIDEO;
-        },
-
-        /*
-         * To toggle between the different media types
-         * 
+        /**
+		 * To toggle between the different media types
+		 *
          * @params {String}
-         * @returns
-         */ 
-        onMediaSelected (mediaType) {
+		 */
+		onMediaTypeSelected (mediaType) {
             this.currentMediaType = mediaType;
-        }
+		}
 
     }
 
@@ -55,50 +50,15 @@ export default {
 
 <template>
     <div>
-        <div class="menu">
-            <button class="menu-item" @click="onMediaSelected(MEDIA_TYPE_AUDIO)">Audio only</button>
-            <button class="menu-item" @click="onMediaSelected(MEDIA_TYPE_VIDEO)">Audio &amp; Video</button>
-            <button class="menu-item" @click="onMediaSelected(MEDIA_TYPE_VIDEO)">Screen Capture and Audio</button>
-        </div>
-        <div class="current-media-container">
-            <!-- <transition name="fade"> -->
-                <record-audio v-if="currentMediaType === MEDIA_TYPE_AUDIO" />
-                <record-video v-else-if="currentMediaType === MEDIA_TYPE_VIDEO" />
-            <!-- </transition> -->
+        <record-media-menu @on-media-type-selected="onMediaTypeSelected" :current-media-type="currentMediaType" />
+        <div>
+            <record-media-unset v-if="currentMediaType === mediaTypes.UNSET" @on-media-type-selected="onMediaTypeSelected" />
+            <record-audio v-else-if="currentMediaType === mediaTypes.AUDIO" />
+            <record-video v-else-if="currentMediaType === mediaTypes.VIDEO" />
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
-.menu {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    display: flex;
-    margin-bottom: 5px;
-    // height: 400px;
-}
-
-.menu-item {
-    width: calc(33.333333% - 2px);
-    height: 100%;
-    margin-right: 2px;
-    &:last-of-type {
-        margin-right: 0px;
-    }
-}
-
-.current-media-container {
-    width: calc(100% - 2px); //to allow for margin of buttons
-}
-
-.fade-enter-active, .fade-leave-active {
-    transition: opacity .5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
-}
 
 </style>

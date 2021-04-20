@@ -14,6 +14,7 @@ import Record from 'videojs-record/dist/videojs.record.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import axios from 'axios';
 import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
+import { gsap } from 'gsap/all';
 
 
 export default {
@@ -69,6 +70,8 @@ export default {
 
 	mounted () {
 		this.initVideojs();
+		// gsap.set(this.$refs.pane, { opacity: 0 } );
+		// gsap.to(this.$refs.pane, 0.3, { opacity: 1, delay: 0.5 } );
 	},
 
 	beforeDestroy () { 
@@ -104,7 +107,7 @@ export default {
 				controls: true,
 				autoplay: false,
 				fluid: true,
-				aspectRatio: '4:3',
+				aspectRatio: '16:9',
 				loop: false,
 				bigPlayButton: false,
 				controlBar: {
@@ -115,7 +118,7 @@ export default {
 						audio: true,
 						video: {
 							width: { min: 640, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-							height: { min: 480, ideal: 480, max: 920 }
+							height: { min: 360, ideal: 360, max: 720 }
 						},
 						maxLength: 20,
 						convertEngine: 'ts-ebml', //to be able to have seekable webm files
@@ -293,15 +296,15 @@ export default {
 
 <template>
 	<div>
-		<div class="ab-pane">
+		<div class="ab-pane" ref="pane">
             <div>
                 <video id="myVideo" ref="myVideo" playsinline class="video-js vjs-default-skin"></video>
             </div>
         </div>
-		<div class="component-action recorderButtons">
+		<div class="component-action">
 			<section>
 				<a v-if="canConvert" @click.prevent="onConvertSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video">Convert &amp; Upload</a>
-				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video">Enable Video</a>
+				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video">Enable Audio &amp; Video</a>
 				<a v-else-if="isDeviceReady && !isRecording" @click.prevent="onStartRecordSelected" role="button" class="button" data-interaction="audio-record-play" title="Record Video" href="#record-video">{{ recordButtonText }}</a>
 				<a v-else-if="isDeviceReady && isRecording" @click.prevent="onStopRecordSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video">Stop</a>
 			</section>
