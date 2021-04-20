@@ -68,6 +68,7 @@ $filename = preg_replace('/[^a-zA-Z0-9\-\_]/', '_', 'assess_question') . '-' . $
 header('Content-type: text/xml');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 
+$this->injectGlobalVars();
 $this->template->pparse('finaloutput', 'xml');
 
 /* Prevent other template crap from rendering ;)

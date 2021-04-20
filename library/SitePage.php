@@ -290,19 +290,7 @@ class SitePage extends Page
             $this->setVar('CUSTOM_HEADER_REGION', '');
         }
 
-
-        // Put the PHPLib vars back together
-        // Some of these may be needed, some of them nay not
-        if (!$this->user instanceof User) {
-            $this->user = new User();
-        }
-        $templateVar = [
-            'USER_ID'      => $this->user->getId(),
-            'USER_ROLE'    => $this->user->getRole()->getName(),
-            'SITE_NAME'    => $this->config->get('school_name'),
-            'SITE_VERSION' => $this->config->get('site_version'),
-        ];
-        $this->setVar($templateVar);
+        // Inject all global vars
         $this->injectGlobalVars();
 
 
@@ -842,12 +830,24 @@ class SitePage extends Page
      * Inject global vars required for Sitepage to do its thing.
      *
      * That currently includes:
+     * * the user's ID and role into `USER_ID` and `USER_ROLE`
+     * * the school name into `SITE_NAME`
+     * * the Schoolbox version into `SITE_VERSION`
      * * the CDN prefix (so that stylesheets and images can be referenced)
      *   into `CDN_PREFIX`
      * * localisations
      */
     public function injectGlobalVars(): void
     {
+        $user        = $this->user ?? new User();
+        $templateVar = [
+            'USER_ID'      => $user->getId(),
+            'USER_ROLE'    => $user->getRole()->getName(),
+            'SITE_NAME'    => $this->config->get('school_name'),
+            'SITE_VERSION' => $this->config->get('site_version'),
+        ];
+        $this->setVar($templateVar);
+
         /** @var PrefixGenerator $cdnPrefixGenerator */
         $cdnPrefixGenerator = $this->getDi()->get('cdnPrefixGenerator');
         $this->setVar('CDN_PREFIX', $cdnPrefixGenerator->generate());

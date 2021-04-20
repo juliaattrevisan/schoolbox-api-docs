@@ -51,4 +51,5 @@ $this->setVar(array(
     'ACCEPTED_FILES' => $allowedFiles
 ));
 
+$this->injectGlobalVars();
 $this->template->pparse('finaloutput', TEMPLATE_content);

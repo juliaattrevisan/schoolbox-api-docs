@@ -42,10 +42,9 @@
 
             <div data-reveal id="sequential-1" class="reveal-modal">
                 <h2>Sequential Reveal 1</h2>
-                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                <div class="reveal-action">
+
+                <div class="component-action">
                     <section>
-                        <a class="button close-reveal-modal">Cancel</a>
                         <a class="button submit" data-reveal-id="sequential-2">Next</a>
                     </section>
                 </div>
@@ -67,9 +66,8 @@
                 <h2>Stacked Reveal 1</h2>
                 <p>The initial reveal</p>
                 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-                <div class="reveal-action">
+                <div class="component-action">
                     <section>
-                        <a class="button close-reveal-modal">Cancel</a>
                         <a class="button submit" data-reveal-id="stacked-2">Show me Reveal #2</a>
                     </section>
                 </div>
@@ -79,9 +77,9 @@
                 <h2>Stacked Reveal 2</h2>
                 <p>If you close this reveal, the first one will come back</p>
                 <a class="close-reveal-modal" aria-label="Close">&#65513;</a>
-                <div class="reveal-action">
+                <div class="component-action">
                     <section>
-                        <a class="button close-reveal-modal">Back</a>
+                        <a class="button" data-reveal-id="stacked-1">Back</a>
                         <a class="button submit" data-reveal-id="stacked-3">But wait, there's more!</a>
                     </section>
                 </div>
@@ -91,9 +89,9 @@
                 <h2>Stacked Reveal 3</h2>
                 <p>Closing this one will show you #2 again</p>
                 <a class="close-reveal-modal" aria-label="Close">&#65513;</a>
-                <div class="reveal-action">
+                <div class="component-action">
                     <section>
-                        <a class="button close-reveal-modal">Back</a>
+                        <a class="button" data-reveal-id="stacked-2">Back</a>
                         <a class="button submit" data-reveal-id="stacked-4">There's another reveal behind this one</a>
                     </section>
                 </div>
@@ -104,9 +102,9 @@
                 <h2>Stacked Reveal 4</h2>
                 <p>Ok, this is the last one. There's no fast escape, you have to traverse your way back through the stack now...</p>
                 <a class="close-reveal-modal" aria-label="Close">&#65513;</a>
-                <div class="reveal-action">
+                <div class="component-action">
                     <section>
-                        <a class="button close-reveal-modal">Back</a>
+                        <a class="button" data-reveal-id="stacked-3">Back</a>
                     </section>
                 </div>
             </div>
