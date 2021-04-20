@@ -41,6 +41,13 @@
                    assessment: assessment
                }) }}">Download All Submissions</a>
         </li>
+        <li>
+            <a class="icon-download"
+               href="{{ routeLookup('learningAssessment.downloadSubmissions', {
+                   assessmentId: assessment.id,
+                   assessment: assessment
+               }) }}?includeHistory=1">Download All Submissions and History</a>
+        </li>
     {% endif %}
     {% if assessment.useRubric %}
         <li>

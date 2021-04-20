@@ -375,8 +375,10 @@ class Controller extends Assessment\Controller
         /** @var User[] $users */
         $users = [];
 
-        // PDF generator
-        $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
+        // Should submission history PDFs be included?
+        // Making this an option, as generating them is a slow process.
+        $includeSubmissionHistory = $this->request->query->getBool('includeHistory', false);
+
 
         // Create a zip stream to hold the downloaded submissions
 
@@ -427,7 +429,9 @@ class Controller extends Assessment\Controller
                     }
                 }
             }
-            $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
+            if ($includeSubmissionHistory) {
+                $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
+            }
         }
 
         // Stream the zip archive
