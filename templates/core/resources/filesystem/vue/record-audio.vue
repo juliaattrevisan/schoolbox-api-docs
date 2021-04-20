@@ -11,15 +11,16 @@ import 'videojs-record/dist/css/videojs.record.css';
 import videojs from 'video.js';
 import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
-import WaveSurfer from 'wavesurfer.js';
-import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js';
-WaveSurfer.microphone = MicrophonePlugin;
-import videojs_wavesurfer_css from 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css';
-import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
+// import WaveSurfer from 'wavesurfer.js';
+// import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js';
+// WaveSurfer.microphone = MicrophonePlugin;
+// import videojs_wavesurfer_css from 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css';
+// import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
 import Record from 'videojs-record/dist/videojs.record.js';
 import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
 import { gsap } from 'gsap/all';
 import RecordMediaModal from './record-media-modal';
+import { getVideoJsAudioOptions } from '../js/mediaOptions';
 
 
 export default {
@@ -122,7 +123,7 @@ export default {
 			gsap.set(this.$refs.audioContainer, { alpha: 0 } );
 			gsap.set(this.$refs.actions, { alpha: 0 } );
 
-            this.player = videojs(this.$refs.myAudio, this.getVideoJsOptions(), () => {
+            this.player = videojs(this.$refs.myAudio, getVideoJsAudioOptions(), () => {
 				gsap.to(this.$refs.audioContainer, 0.5, { alpha: 1 } );
 				gsap.to(this.$refs.actions, 0.4, { alpha: 1, delay: 0.2 } );
 			});
@@ -141,50 +142,50 @@ export default {
 		 * refer to https://collab-project.github.io/videojs-record/#/options and https://docs.videojs.com/ for options
          * 
          */ 
-        getVideoJsOptions () {
-			return {
-				controls: true,
-				autoplay: false,
-				fluid: true,
-				aspectRatio: '16:9',
-				loop: false,
-				bigPlayButton: false,
-				controlBar: {
-					volumePanel: true,
-				},
-				plugins: {
-					wavesurfer: { // this plugin is only needed when recording audio-only
-						backend: 'WebAudio',
-						waveColor: '#fff',
-						progressColor: '#ccc',
-						debug: true,
-						cursorWidth: 1,
-						displayMilliseconds: true,
-						hideScrollbar: true,
-						plugins: [
-							WaveSurfer.microphone.create({ // enable microphone plugin
-								bufferSize: 4096,
-								numberOfInputChannels: 1,
-								numberOfOutputChannels: 1,
-								constraints: {
-									video: false,
-									audio: true
-								}
-							})
-						]
-					},
-					record: {
-						audio: true,
-						video: false,
-						maxLength: 300, //5 minutes
-						audioEngine: 'vmsg',
-    					audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
-    					// audioWebAssemblyURL: 'https://unpkg.com/vmsg/vmsg.wasm', //currently issues with loading .wasm files...
-						debug: true,
-					}
-				}
-			}
-		},
+        // getVideoJsOptions () {
+		// 	return {
+		// 		controls: true,
+		// 		autoplay: false,
+		// 		fluid: true,
+		// 		aspectRatio: '16:9',
+		// 		loop: false,
+		// 		bigPlayButton: false,
+		// 		controlBar: {
+		// 			volumePanel: true,
+		// 		},
+		// 		plugins: {
+		// 			wavesurfer: { // this plugin is only needed when recording audio-only
+		// 				backend: 'WebAudio',
+		// 				waveColor: '#fff',
+		// 				progressColor: '#ccc',
+		// 				debug: true,
+		// 				cursorWidth: 1,
+		// 				displayMilliseconds: true,
+		// 				hideScrollbar: true,
+		// 				plugins: [
+		// 					WaveSurfer.microphone.create({ // enable microphone plugin
+		// 						bufferSize: 4096,
+		// 						numberOfInputChannels: 1,
+		// 						numberOfOutputChannels: 1,
+		// 						constraints: {
+		// 							video: false,
+		// 							audio: true
+		// 						}
+		// 					})
+		// 				]
+		// 			},
+		// 			record: {
+		// 				audio: true,
+		// 				video: false,
+		// 				maxLength: 300, //5 minutes
+		// 				audioEngine: 'vmsg',
+    	// 				audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
+    	// 				// audioWebAssemblyURL: 'https://unpkg.com/vmsg/vmsg.wasm', //currently issues with loading .wasm files...
+		// 				debug: true,
+		// 			}
+		// 		}
+		// 	}
+		// },
 
 		/*
          * the user has started/stopped recording a audio

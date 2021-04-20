@@ -17,6 +17,7 @@ import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 import { gsap } from 'gsap/all';
 import RecordMediaModal from './record-media-modal';
 import VideoPlayer from '@schoolbox/videojs/video-player';
+import { getVideoJsRecordOptions, getVideoJsPlaybackOptions } from '../js/mediaOptions';
 
 
 export default {
@@ -59,7 +60,7 @@ export default {
 		},
 
 		/*
-         * To know whether to provide the convert button
+         * To know whether to show the convert button
          * 
 		 * @params { Boolean }
          */ 
@@ -72,7 +73,7 @@ export default {
 		},
 
 		/*
-         * To know whether to provide the record button
+         * To know whether to show the record button
          * 
 		 * @params { Boolean }
          */ 
@@ -85,7 +86,7 @@ export default {
 		},
 
 		/*
-         * To know whether to provide the stop button
+         * To know whether to show the stop button
          * 
 		 * @params { Boolean }
          */ 
@@ -138,7 +139,7 @@ export default {
 			gsap.set(this.$refs.recordingVideoContainer, { alpha: 0 } );
 			gsap.set(this.$refs.actions, { alpha: 0 } );
 
-            this.recordPlayer = videojs(this.$refs.recordingVideo, this.getVideoJsRecordOptions(), () => {
+            this.recordPlayer = videojs(this.$refs.recordingVideo, getVideoJsRecordOptions(), () => {
 				gsap.to(this.$refs.recordingVideoContainer, 0.5, { alpha: 1 } );
 				gsap.to(this.$refs.actions, 0.4, { alpha: 1, delay: 0.2 } );
 			});
@@ -151,61 +152,6 @@ export default {
 			this.initVideoErrorListeners();
 
         },
-
-		/*
-         * the VideoJS/VideoJS-record params to set up
-		 * refer to https://collab-project.github.io/videojs-record/#/options and https://docs.videojs.com/ for options
-         * 
-         */ 
-        getVideoJsRecordOptions () {
-			return {
-				controls: true,
-				autoplay: false,
-				fluid: true,
-				aspectRatio: '16:9',
-				loop: false,
-				bigPlayButton: false,
-				controlBar: {
-					volumePanel: false,
-				},
-				plugins: {
-					record: {
-						audio: true,
-						video: {
-							width: { min: 640, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-							height: { min: 360, ideal: 360, max: 720 }
-						},
-						maxLength: 300, //five minutes
-						convertEngine: 'ts-ebml', //to be able to have seekable webm files
-						debug: true,
-					}
-				}
-			}
-		},
-
-		/*
-         * the VideoJS/VideoJS-record params to set up
-		 * refer to https://collab-project.github.io/videojs-record/#/options and https://docs.videojs.com/ for options
-         * 
-         */ 
-        getVideoJsPlaybackOptions () {
-			return {
-				autoplay: false,
-				controls: true,
-				fluid: true,
-				aspectRatio: '16:9',
-				bigPlayButton: true,
-				controlBar: {
-					pictureInPictureToggle: false
-				},
-				sources: [
-					{
-						src: URL.createObjectURL(this.recordedData),
-						type: this.recordedData.type
-					}
-				]
-			}
-		},
 
 		/*
          * the user has started/stopped recording a video
@@ -355,7 +301,6 @@ export default {
 			this.recordPlayer.record().getDevice();
 		},
 
-
 		/*
          * start the record
          * 
@@ -363,7 +308,6 @@ export default {
         onStartRecordSelected () {
 			this.recordPlayer.record().start();
 		},
-
 
 		/*
          * stop the record
@@ -413,6 +357,15 @@ export default {
 			this.hasUploaded = false;
 		},
 
+		/*
+         * Pass through the video options to play the latest recorded video
+         * 
+		 * @returns { Object }
+         */ 
+        getVideoPlayerOptions () {
+			return getVideoJsPlaybackOptions(this.recordedData);
+		},
+
 	}
 
 }
@@ -427,7 +380,7 @@ export default {
 						<video ref="recordingVideo" playsinline class="video-js vjs-default-skin"></video>
 					</div>
 					<div v-if="isPlaybackActive" ref="playbackVideoContainer" class='video-container'>
-						<video-player :options="getVideoJsPlaybackOptions()"></video-player>
+						<video-player :options="getVideoPlayerOptions()"></video-player>
 					</div>
 					<record-media-modal v-if="hasDeviceError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<h3>The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</h3>
@@ -455,8 +408,8 @@ export default {
 					<a v-if="showConvertButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" title="Convert &amp; Upload" href="#stop-recording-video" key="convert">Convert &amp; Upload</a>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button"  :title="recordButtonText" href="#record-video" key="record">{{ recordButtonText }}</a>
-					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button"  title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
+					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" :title="recordButtonText" href="#record-video" key="record">{{ recordButtonText }}</a>
+					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
 				</transition>
 			</section>
 		</div>
