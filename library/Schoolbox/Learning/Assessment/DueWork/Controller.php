@@ -391,7 +391,8 @@ class Controller extends Assessment\Controller
         /** @var Participant $participant */
         foreach ($participants as $participant) {
             // Short-circuit if there's no interactions
-            if (!($participant->hasPublishedFeedback() || $participant->hasSubmittedResponse())) {
+            // (draft feedback does count, though)
+            if ($participant->getAllFeedbacks()->count() === 0 && !$participant->hasSubmittedResponse()) {
                 continue;
             }
 
