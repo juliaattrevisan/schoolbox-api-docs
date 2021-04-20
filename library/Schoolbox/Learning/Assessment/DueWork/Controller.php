@@ -427,54 +427,7 @@ class Controller extends Assessment\Controller
                     }
                 }
             }
-
-
-            // Generate a PDF of the submission history page,
-            // Since PDF generation is a remote service, need a fully-qualified
-            // domain name in the URL.
-            $urlFactory = new Factory($this->getConfigLoader());
-            $url        = $urlFactory
-                ->buildFullyQualified()
-                ->setScheme('https')
-                ->setPort($this->request->server->get('SERVER_PORT'))
-                ->setPath(
-                    $this->router->generate(
-                        'learningAssessment.getSummary',
-                        [
-                            'assessmentId' => $assessment->getId(),
-                            'studentId'    => $participant->getUser()->getId(),
-                        ],
-                    )
-                );
-
-            $request = new Gotenberg\URLRequest($url->toString());
-            $request->setWaitDelay(1);
-
-            // Authenticate using the cookie
-            // TODO ensure drafts do not show
-            // (This shows submission history in context of current user: should
-            //  show in context of student, or parent)
-            $request->addRemoteURLHTTPHeader(
-                'Cookie',
-                sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, session_id())
-            );
-
-//            // Alternately use the token
-//            // (Can't use the token until SA-11077 is done)
-//            /** @var Jwt $tokenBuilder */
-//            $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
-//            $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($participantUser));
-
-            // Download and store the PDF
-            $tempfile = sb_tempnam();
-            $pdfGenerator->store($request, $tempfile);
-
-            $zipFilename = sprintf(
-                "%s/submissionHistory.pdf",
-                $baseFolderName,
-            );
-            $zipStream->addFileFromPath($zipFilename, $tempfile);
-            unlink($tempfile);
+            $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
         }
 
         // Stream the zip archive
@@ -1453,5 +1406,78 @@ class Controller extends Assessment\Controller
             $kamiModels[$kamiModel->getId()] = $kamiModel;
         }
         return $kamiModels;
+    }
+
+
+    /**
+     * Add this participant's submission history (as a generated PDF) to the Zip
+     * stream for download.
+     *
+     * @param Participant         $participant    The participant record
+     * @param ZipStream\ZipStream $zipStream      The stream to download
+     * @param string              $baseFolderName The folder within `$zipStream`
+     *                                            to put the PDF
+     * @throws Gotenberg\ClientException
+     * @throws Gotenberg\FilesystemException
+     * @throws Gotenberg\RequestException
+     * @throws RouteNotFound
+     * @throws ZipStream\Exception\FileNotFoundException
+     * @throws ZipStream\Exception\FileNotReadableException
+     */
+    private function addSubmissionHistoryToZipStream(
+        Participant $participant,
+        ZipStream\ZipStream $zipStream,
+        string $baseFolderName
+    ): void {
+        // Generate a PDF of the submission history page,
+        // Since PDF generation is a remote service, need a fully-qualified
+        // domain name in the URL.
+        $urlFactory = new Factory($this->getConfigLoader());
+        $url        = $urlFactory
+            ->buildFullyQualified()
+            ->setScheme('https')
+            ->setPort($this->request->server->get('SERVER_PORT'))
+            ->setPath(
+                $this->router->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'assessmentId' => $participant->getAssessable()->getId(),
+                        'studentId'    => $participant->getUser()->getId(),
+                    ],
+                )
+            );
+
+        $request = new Gotenberg\URLRequest($url->toString());
+        $request->setWaitDelay(1);
+
+        // Authenticate using the cookie
+        // TODO ensure drafts do not show
+        // (This shows submission history in context of current user: should
+        //  show in context of student, or parent)
+        $request->addRemoteURLHTTPHeader(
+            'Cookie',
+            sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, session_id())
+        );
+
+//        // Alternately use the token
+//        // (Can't use the token until SA-11077 is done)
+//        /** @var Jwt $tokenBuilder */
+//        $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
+//        $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($participant->getUser()));
+
+        // Download and store the PDF
+        $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
+
+        $tempfile = sb_tempnam();
+        $pdfGenerator->store($request, $tempfile);
+
+        $zipFilename = sprintf(
+            "%s/submissionHistory.pdf",
+            $baseFolderName,
+        );
+        $zipStream->addFileFromPath($zipFilename, $tempfile);
+
+        // Clean up once done
+        unlink($tempfile);
     }
 }
