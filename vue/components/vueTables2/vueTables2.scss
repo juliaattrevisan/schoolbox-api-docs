@@ -19,7 +19,7 @@ $cdn-prefix: '/static';
 
 .glyphicon {
   position: relative;
-  top: 1px;
+  top: 2px;
 
   &:before {
     display: block;
@@ -35,4 +35,9 @@ $cdn-prefix: '/static';
 }
 .glyphicon-chevron-down:before {
   content: url("#{$cdn-prefix}/images/svg/sort-down.svg");
+}
+
+.VuePagination__count {
+  margin-bottom: .5rem;
+  text-align: left !important;
 }
