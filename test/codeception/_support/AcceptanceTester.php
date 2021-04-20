@@ -205,4 +205,12 @@ class AcceptanceTester extends \Codeception\Actor
     {
         return $this->executeJS("return location.href");
     }
+
+    public function scrollAndClick($selector)
+    {
+
+        $this->scrollTo($selector);
+        $this->waitForElementVisible($selector,5);
+        $this->click($selector);
+    }
 }
