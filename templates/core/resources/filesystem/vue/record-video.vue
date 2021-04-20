@@ -331,6 +331,7 @@ export default {
 
 			this.recordPlayer.on('deviceError', () => { //User doesn't allow the browser to access the webcam and/or microphone. Check player.deviceErrorCode for the specific error code.
 				this.hasDeviceError = true;
+				console.error('device error:', this.recordPlayer.deviceErrorCode);
 			});
 
 		},
@@ -449,13 +450,13 @@ export default {
 		<div class="component-action" ref="actions">
 			<section>
 				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
-				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video" key="camera">Turn on Camera</a>
+				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#turn-on-video" key="camera">Turn on Camera</a>
 				<transition name="fade">
-					<a v-if="showConvertButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" data-interaction="audio-record-stop" title="Convert &amp; Upload" href="#stop-recording-video" key="convert">Convert &amp; Upload</a>
+					<a v-if="showConvertButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" title="Convert &amp; Upload" href="#stop-recording-video" key="convert">Convert &amp; Upload</a>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" data-interaction="audio-record-play" :title="recordButtonText" href="#record-video" key="record">{{ recordButtonText }}</a>
-					<a v-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
+					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button"  :title="recordButtonText" href="#record-video" key="record">{{ recordButtonText }}</a>
+					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button"  title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
 				</transition>
 			</section>
 		</div>
@@ -492,8 +493,5 @@ export default {
   opacity: 0;
 }
 
-.button-convert {
-	margin-right: auto;
-}
 
 </style>

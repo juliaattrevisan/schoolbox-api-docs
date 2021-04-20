@@ -18,15 +18,25 @@ import videojs_wavesurfer_css from 'videojs-wavesurfer/dist/css/videojs.wavesurf
 import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
 import Record from 'videojs-record/dist/videojs.record.js';
 import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
+import { gsap } from 'gsap/all';
+import RecordMediaModal from './record-media-modal';
+
 
 export default {
 	
+	components: {
+		RecordMediaModal
+	},
+
 	data () {
 		return {
 			isDeviceReady: false, //to toggle the device display
 			hasDeviceError: false, //can't access the requested device
 			isRecording: false, //track recording status to toggle record/stop buttons
 			recordedCount: 0, //to show 'Record' or 'Re-record' on the button
+			isUploading: false, //to notify of update
+			hasUploadError: false, //to notify of upload error, try again?
+			hasUploaded: false, //notify UI of upload complete
 		}
 	},
 
@@ -43,19 +53,65 @@ export default {
 			} else {
 				return 'Re-Record';
 			}
-		}
+		},
+
+		/*
+         * To know whether to provide the record button
+         * 
+		 * @params { Boolean }
+         */ 
+		showRecordButton () {
+			if (this.isDeviceReady && !this.isRecording && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+		/*
+         * To know whether to provide the stop button
+         * 
+		 * @params { Boolean }
+         */ 
+		showStopButton () {
+			if (this.isDeviceReady && this.isRecording && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+		/*
+         * convert the filename to use .mp4 instead of whatever it was
+         * 
+		 * @params { String }
+         */ 
+		currentRecordedFilenameToMp3 () {
+			const filenameWithoutExtension = this.recordedData.name.replace(/\.[^/.]+$/, "");
+			return filenameWithoutExtension + '.mp4';
+		},
 
 	},
 
 	mounted () {
-        this.initVideojs();
+        this.updateContainerHeight();
+		this.initVideojs();
 	},
 
-	beforeDestroy () { 
+	unmounted () { 
 		this.destroyVideojs();
 	},
 
     methods: {
+
+		/*
+         * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
+         * 
+         */ 
+        updateContainerHeight () {
+            const targetHeight = this.$refs.mediaContainer.getBoundingClientRect().width * 0.5625; //so there's no height jumps on switching videos
+            this.$refs.mediaContainer.style.height = targetHeight + 'px';
+        },
 
 		/*
          * Start it up
@@ -63,7 +119,13 @@ export default {
          */ 
         initVideojs () {
 
-            this.player = videojs(this.$refs.myAudio, this.getVideoJsOptions());
+			gsap.set(this.$refs.audioContainer, { alpha: 0 } );
+			gsap.set(this.$refs.actions, { alpha: 0 } );
+
+            this.player = videojs(this.$refs.myAudio, this.getVideoJsOptions(), () => {
+				gsap.to(this.$refs.audioContainer, 0.5, { alpha: 1 } );
+				gsap.to(this.$refs.actions, 0.4, { alpha: 1, delay: 0.2 } );
+			});
 			
 			this.player.on('deviceReady', () => {
 				this.isDeviceReady = true;
@@ -151,16 +213,16 @@ export default {
          * 
          */ 
         async uploadAudio () {
-
 			try {
+				this.$emit('on-process-started');
+				this.isUploading = true;
 				const response = await axios.post('/storage/asyncUpload.php', this.getFormData());
 				this.postUploadedMessage(response.data);
-
 			} catch (error) {
+				this.isUploading = false;
+				this.hasUploadError = true;
 				console.log(error);
-
 			}
-
 		},
 
 		/*
@@ -170,7 +232,7 @@ export default {
          */ 
         getFormData () {
 			const formData = new FormData();
-			formData.append('upload', this.recordedData, 'test.mp3');
+			formData.append('upload', this.recordedData, this.currentRecordedFilenameToMp3);
 			return formData;
 		},
 
@@ -183,12 +245,17 @@ export default {
          */ 
         postUploadedMessage (responseData) {
 			const data = {
-				title:    'test.mp3',
+				title:    this.currentRecordedFilenameToMp3,
 				mimeType: this.recordedData.type,
 				filesize: this.recordedData.size,
 				hash:     responseData.hash
 			};
-			window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
+			this.isUploading = false;
+			this.hasUploaded = true;
+			setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
+				window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
+				this.$emit('on-process-ended');
+			}, 2000);
 		},
 
 		/*
@@ -254,7 +321,23 @@ export default {
          */ 
         onUploadSelected () {
 			this.uploadAudio();
-		}
+		},
+
+		/*
+         * close the error modal
+         * 
+         */ 
+        onCloseErrorModalSelected () {
+			this.$refs.errorModal.animateOff();
+		},
+
+		/*
+         * it's closed now, so disable the error to allow trying again
+         * 
+         */ 
+        onErrorModalClosed () {
+			this.hasDeviceError = false;
+		},
 
     }
 
@@ -265,15 +348,35 @@ export default {
 	<div>
 		<div class="ab-pane">
             <div>
-        		<audio id="myAudio" ref="myAudio" class="video-js vjs-default-skin"></audio>
+				<div class='media-container' ref="mediaContainer">
+					<div ref='audioContainer' class='audio-container'>
+						<audio id="myAudio" ref="myAudio" class="video-js vjs-default-skin"></audio>
+					</div>
+					<record-media-modal v-if="hasDeviceError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
+						<h3>The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</h3>
+						<button @click.prevent="onCloseErrorModalSelected">Close</button>
+					</record-media-modal>
+					<record-media-modal v-else-if="isUploading" ref="uploadingModal" key="uploadingModal">
+						<div class="loader"></div>						
+						<em>Uploading audio, please wait...</em>
+					</record-media-modal>
+					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
+						<em>Audio succesfully uploaded.</em>
+					</record-media-modal>
+				</div>
 			</div>
         </div>		
-		<div class="component-action">
+		<div class="component-action" ref="actions">
 			<section>
-				<a v-if="recordedCount > 0" @click.prevent="onUploadSelected" role="button" class="button" data-interaction="audio-record-stop" title="Upload Video" href="#stop-recording-video">Upload</a>
-				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#enable-video">Enable Audio</a>
-				<a v-else-if="isDeviceReady && !isRecording" @click.prevent="onStartRecordSelected" role="button" class="button" data-interaction="audio-record-play" title="Record Video" href="#record-video">{{ recordButtonText }}</a>
-				<a v-else-if="isDeviceReady && isRecording" @click.prevent="onStopRecordSelected" role="button" class="button" data-interaction="audio-record-stop" title="Stop Video" href="#stop-recording-video">Stop</a>
+				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
+				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#turn-on-video">Turn on Audio</a>
+				<transition name="fade">
+					<a v-if="recordedCount > 0" @click.prevent="onUploadSelected" role="button" class="button"  title="Upload Audio" href="#upload-audio">Upload Audio</a>
+				</transition>
+				<transition name="fade" mode="out-in">
+					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" title="Record Video" href="#record-audio">{{ recordButtonText }}</a>
+					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-audio">Stop</a>
+				</transition>
 			</section>
 		</div>
 	</div>
@@ -281,8 +384,32 @@ export default {
 
 <style lang="scss">
 
+.media-container {
+	position: relative;
+    width: 100%;
+	height: 100%;
+    background: black;
+    overflow: hidden;
+}
+
+.audio-container {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+}
+
 .vjs-icon-record-start, .vjs-icon-record-stop {
 	min-height: 0;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
 }
 
 </style>
