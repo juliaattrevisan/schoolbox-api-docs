@@ -63,7 +63,7 @@ export default {
          */
         getAddCommentButtonText () {
             if (this.isCKEditorLoading) return 'Loading';
-            else return 'Add a Comment'
+            else return 'Add a comment'
         },
 
         /**
@@ -395,7 +395,7 @@ export default {
                                 <textarea id="comment" name="comment" rows="5"></textarea>
                                 <a class="button submit"
                                     @click="postComment"
-                                    :disabled="isPostCommentDisabled">Post Comment</a>
+                                    :disabled="isPostCommentDisabled">Post comment</a>
                             </div>
                         </template>
                         <template v-else>
