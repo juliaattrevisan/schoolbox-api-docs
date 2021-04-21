@@ -146,6 +146,7 @@ class Scrub
             $config->set('HTML.SafeIframe', true);
             $safeIframeSources = array(
                 'www.youtube.com/',
+                'www.youtube-nocookie.com/embed/',
                 'player.vimeo.com/video/',
                 'www.slideshare.net/slideshow/embed_code/',
                 '(?:www|edu).glogster.com/glog(?:/|.php)',
@@ -166,7 +167,6 @@ class Scrub
                 'prezi.com/embed/',
                 '(?:www\\.)?spiderscribe.net/app/',
                 '(?:www\\.)?etv.org.nz',
-                'vhss-d.oddcast.com/vhss_editors/voki_player.swf',
                 'e.issuu.com/embed.html',
                 'webplayer.clickview.com.au/home/ev/',
                 'online.clickview.com.au/MyLibrary/PlayEmbed',
