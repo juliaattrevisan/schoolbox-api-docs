@@ -81,8 +81,8 @@
                 {% if blogComments[blog.getId] | length > 0 %}
                     <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="article-read-more" data-numcomments="{{ blogComments[blog.getId] | length }}">
                         Show Comments ({{ blogComments[blog.getId] | length }})
-                        <span> | </span>
                     </a>
+                    <span class="pipe meta"></span>
                 {% endif %}
 
                 <a data-toggle="commentform-{{ blog.getId }}" class='article-read-more'>Add comment</a>
