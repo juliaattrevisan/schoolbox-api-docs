@@ -142,6 +142,7 @@ class External_Synergetic_User implements External_UserInterface
                         Addresses.SilentPhoneFlag,
                         Contact.SilentMobilePhoneFlag,
                         Contact.MobilePhone,
+                        Contact.OccupPhone AS WorkPhone,
                         Contact.DirectoryIncludeFlag,
                         Contact.SpouseID,
                         Spouse.Title SpouseTitle,
@@ -154,6 +155,7 @@ class External_Synergetic_User implements External_UserInterface
                         Spouse.OccupEmail SpouseOccupEmail,
                         Spouse.DefaultEmailCode SpouseDefaultEmailCode,
                         Spouse.MobilePhone SpouseMobilePhone,
+                        Spouse.OccupPhone AS SpouseWorkPhone,
                         Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag
             FROM        dbo.Community Contact
             LEFT JOIN   dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID

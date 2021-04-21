@@ -68,6 +68,7 @@ class External_Maze_User implements External_UserInterface
                 MSURNAME AS Surname,
                 M_EMAIL AS Email,
                 '' AS HomePhone,
+                '' AS WorkPhone,
                 MMOBILE AS MobilePhone,
                 '' AS SilentPhoneFlag,
                 1 AS DirectoryIncludeFlag,

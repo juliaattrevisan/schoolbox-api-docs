@@ -115,6 +115,12 @@ class External_Denbigh_User implements External_UserInterface
             'MobilePhone'                => '',
             'HomePhone'                  => '',
             'SilentPhoneFlag'            => '',
+
+            /* Denbigh doesn't surface this value anywhere that I can see in their db
+             * we don't have an ER diagram or anything so I guess this is empty for now
+             */
+            'WorkPhone'                  => '',
+
             'DirectoryIncludeFlag'       => '1',
             'SpouseID'                   => '',
             'SpouseTitle'                => '',

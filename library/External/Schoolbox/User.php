@@ -365,6 +365,7 @@ class External_Schoolbox_User implements External_UserInterface
                          phone_home AS HomePhone,
                          '' AS SilentPhoneFlag,
                          mobile AS MobilePhone,
+                         phone_work AS WorkPhone,
                          1 AS DirectoryIncludeFlag,
                          '' AS SpouseID,
                          '' AS SpouseTitle,
