@@ -210,15 +210,18 @@ class ReviewCest
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
         // shouldn't see any grades
-        $i->cantSee('2018', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $i->cantSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
 
         // Az Zane, change visibility
         $i->impersonate($teacher);
         $i->amOnPage('/homepage/' . $classId);
+//        $element = Locator::combine('div.card.small-12 a h3', $quizTitle);
+    //    $element = Locator::contains(Locator::combine('h3', 'div.card.small-12'), $quizTitle);
+//        $element = Locator::humanReadableString($quizTitle);
         $element = Locator::contains('div.card.small-12 a h3', $quizTitle);
+
         $i->scrollTo($element);
-        $element = Locator::contains('div.card.small-12 a h3', $quizTitle);
         $i->click($element,'#content');
         $i->waitForText('Begin Quiz');
 
@@ -239,7 +242,7 @@ class ReviewCest
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
         // shouldn't see any grades
-        $i->canSee('2018', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
 
     }

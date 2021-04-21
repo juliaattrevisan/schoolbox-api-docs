@@ -11,6 +11,7 @@ namespace Page\Quiz;
 use AcceptanceTester;
 use Alaress_Date_Format;
 use Codeception\Util\Locator;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Quiz form page object
@@ -92,11 +93,15 @@ class AssessmentForm
     public function update(): self
     {
         $i = $this->tester;
-        $element = (Locator::lastElement(self::SELECTOR_BUTTON_UPDATE));
-        $i->scrollTo('input#curriculum-code-select-selectized');
-        $i->scrollTo($element);
-        $i->waitForElementVisible($element,5);
-        $i->click($element);
+       // $element = Locator::contains(self::SELECTOR_BUTTON_UPDATE, 'Update');
+        //$element = (Locator::lastElement(self::SELECTOR_BUTTON_UPDATE));
+       // $i->scrollTo('input#curriculum-code-select-selectized');
+       // $i->executeJS('window.scrollTo(0,35000);');
+       // $i->scrollTo(Locator::contains(self::SELECTOR_BUTTON_UPDATE, 'Update'),500,20);
+       // $element = Locator::contains('a.icon.modify','My Links');
+        $i->pressKey(self::SELECTOR_BUTTON_UPDATE,WebDriverKeys::PAGE_DOWN);
+        $i->waitForElementVisible(self::SELECTOR_BUTTON_UPDATE,5);
+        $i->click(self::SELECTOR_BUTTON_UPDATE);
         return $this;
     }
 
