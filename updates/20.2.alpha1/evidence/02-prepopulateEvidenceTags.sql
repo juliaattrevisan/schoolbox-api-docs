@@ -15,7 +15,7 @@ INSERT INTO lu_evidence_tag (
     NOW(),
     NULL
 ), (
-    'Co-Curricular',
+    'Extra-Curricular',
     2,
     @adminId,
     NOW(),
