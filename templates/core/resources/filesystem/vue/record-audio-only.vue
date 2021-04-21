@@ -28,10 +28,12 @@ export default {
 
 	data () {
 		return {
+			player: null, //the videojs-record player
 			isDeviceReady: false, //to toggle the device display
 			hasDeviceError: false, //can't access the requested device
 			isRecording: false, //track recording status to toggle record/stop buttons
 			recordedCount: 0, //to show 'Record' or 'Re-record' on the button
+			isPlaying: false, //to toggle play/pause controls
 			isUploading: false, //to notify of update
 			hasUploadError: false, //to notify of upload error, try again?
 			hasUploaded: false, //notify UI of upload complete
@@ -148,6 +150,7 @@ export default {
 				this.isDeviceReady = true;
 			});
 			this.animateOn();
+			this.initVideoPlayListeners();
 			this.initVideoRecordListeners();
 			this.initVideoErrorListeners();
 		},
@@ -159,6 +162,22 @@ export default {
 		animateOn () {
 			gsap.to(this.$refs.audioContainer, 0.5, { alpha: 1 } );
 			gsap.to(this.$refs.actions, 0.4, { alpha: 1, delay: 0.2 } );
+		},
+
+		/*
+		 * to know the play status of the recoreded audio to toggle UI controls
+		 * 
+		 */ 
+		initVideoPlayListeners () {
+			this.player.on('play', () => { 
+				this.isPlaying = true;
+			});
+			this.player.on('pause', () => { 
+				this.isPlaying = false;
+			});
+			this.player.on('ended', () => { 
+				this.isPlaying = false;
+			});
 		},
 
 		/*
@@ -226,7 +245,7 @@ export default {
 			setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
 				window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-			}, 2000);
+			}, 1000);
 		},
 
 		/*
@@ -312,6 +331,14 @@ export default {
 			this.hasDeviceError = false;
 		},
 
+		/*
+		 * 
+		 * 
+		 */ 
+		playAudio () {
+			// this.player.play(); //can't play/pause this audio only yet, something to do with promises maybe...
+		},
+
 	}
 
 }
@@ -323,7 +350,7 @@ export default {
 			<div>
 				<div class='media-container' ref="mediaContainer">
 					<div ref='audioContainer' class='audio-container'>
-						<audio id="myAudio" ref="myAudio" class="video-js vjs-default-skin"></audio>
+						<audio id="myAudio" ref="myAudio" class="video-js"></audio>
 					</div>
 					<record-media-modal v-if="hasDeviceError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<h3>The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</h3>
@@ -350,6 +377,10 @@ export default {
 					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" title="Record Video" href="#record-audio">{{ recordButtonText }}</a>
 					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-audio">Stop</a>
 				</transition>
+				<!-- <transition name="fade" mode="out-in">
+					<a v-if="showUploadButton && !isPlaying" @click.prevent="playAudio" role="button" class="button" title="Play Video" href="#play-video" key="play">Play</a>
+					<a v-else-if="showUploadButton && isPlaying" @click.prevent="player.pause" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause</a>
+				</transition> -->
 			</section>
 		</div>
 	</div>

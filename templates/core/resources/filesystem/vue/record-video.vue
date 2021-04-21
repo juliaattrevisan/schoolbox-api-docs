@@ -47,7 +47,11 @@ export default {
 			hasPermissionDeniedError: false, //didn't allow permission
 			isRecording: false, //track recording status to toggle record/stop buttons
 			isPlaybackActive: false, //need a different videojs player for playback to enable the progress controls
+			isPlaybackVideoActive: false, //the playback video is available for control
 			recordedCount: 0, //to show 'Record' or 'Re-record' on the button
+			isFilenameChangeActive: false, //prompt the filename change modal
+			newFilename: '',
+			hasFilenameSet: false, //allow the user to set a filename prior to converting
 			canConvert: false, //when there's a video available to convert, provide convert button
 			isConverting: false, //converting video to mp4, to notify user
 			conversionProgress: 0, //to indicate to the user conversion progress
@@ -131,7 +135,7 @@ export default {
 		 * @params { String }
 		 */ 
 		currentRecordedFilenameToMp4 () {
-			return convertFilenameExtension(this.recordedData.name, '.mp4');
+			return convertFilenameExtension(this.newFilename, '.mp4');
 		},
 
 	},
@@ -143,7 +147,6 @@ export default {
 	},
 
 	unmounted () { 
-		console.warn('unmounted?')
 		this.destroyVideojs();
 	},
 
@@ -224,6 +227,7 @@ export default {
 				this.isRecording = true;
 				this.canConvert = false; //disable the convert button
 				this.isPlaybackActive = false;
+				this.isPlaybackVideoActive = false;
 			});
 			this.recordPlayer.on('stopRecord', () => { // and stopped recording
 				this.isRecording = false;
@@ -340,7 +344,7 @@ export default {
 			setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
 				window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-			}, 2000);
+			}, 1000);
 		},
 
 		/*
@@ -385,6 +389,16 @@ export default {
 		 * 
 		 */ 
 		onConvertSelected () {
+			this.isFilenameChangeActive = true;
+		},
+
+
+		/*
+		 * convert the video to mp4 format for consistent video format across browsers
+		 * 
+		 */ 
+		onSaveFilenameSelected () {
+			this.isFilenameChangeActive = false;
 			this.convertVideo();
 		},
 
@@ -404,6 +418,22 @@ export default {
 			this.hasDeviceAlreadyInUseError = false;
 			this.hasPermissionDeniedError = false;
 			this.hasConversionError = false;
+		},
+
+		/*
+		 * close the filename modal
+		 * 
+		 */ 
+		onCloseFilenameModalSelected () {
+			this.$refs.filenameModal.animateOff();
+		},
+
+		/*
+		 * close the filename modal
+		 * 
+		 */ 
+		onFilenameModalClosed () {
+			this.isFilenameChangeActive = false;
 		},
 
 		/*
@@ -431,6 +461,14 @@ export default {
 			return getPlaybackOptions(this.recordedData);
 		},
 
+		/*
+		 * to ensure the video-player.vue video is initiated before calling methods on it
+		 * 
+		 */ 
+		onPlaybackVideoReady () {
+			this.isPlaybackVideoActive = true;
+		}
+
 	}
 
 }
@@ -441,11 +479,17 @@ export default {
 		<div class="ab-pane">
 			<div>
 				<div class='media-container' ref="mediaContainer">
-					<div ref='recordingVideoContainer' class='video-container'>
-						<video ref="recordingVideo" playsinline class="video-js vjs-default-skin"></video>
-					</div>
-					<div v-if="isPlaybackActive" ref="playbackVideoContainer" class='video-container' key="playbackVideoContainer">
-						<video-player :options="getVideoPlayerOptions()"></video-player>
+					<div ref='recordingVideoContainer'>
+						<div class='video-container'>
+							<video ref="recordingVideo" playsinline class="video-js"></video>
+						</div>
+						<div v-if="isPlaybackActive" class='video-container' key="playbackVideoContainer">
+							<video-player 
+								ref="playbackVideo"
+								:options="getVideoPlayerOptions()" 
+								@on-video-ready="onPlaybackVideoReady"
+							/>
+						</div>
 					</div>
 					<record-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError || hasConversionError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<template v-if="hasDeviceAlreadyInUseError">
@@ -460,6 +504,12 @@ export default {
 							<h3>There was an error while converting.</h3>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>	
 						</template>
+					</record-media-modal>
+					<record-media-modal v-else-if="isFilenameChangeActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
+						<label for="filename">Filename</label>
+						<input type="text" id="filename" name="filename" v-model="newFilename">
+						<button @click.prevent="onSaveFilenameSelected">Save &amp; Convert</button>
+						<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
 					</record-media-modal>
 					<record-media-modal v-else-if="isConverting" ref="convertingModal" key="convertingModal">
 						<div class="loader"></div>
@@ -485,6 +535,10 @@ export default {
 				<transition name="fade" mode="out-in">
 					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" :title="recordButtonText" href="#record-video" key="record">{{ recordButtonText }}</a>
 					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
+				</transition>
+				<transition name="fade" mode="out-in">
+					<a v-if="isPlaybackVideoActive && !$refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Video" href="#play-video" key="play">Play</a>
+					<a v-else-if="isPlaybackVideoActive && $refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause</a>
 				</transition>
 			</section>
 		</div>

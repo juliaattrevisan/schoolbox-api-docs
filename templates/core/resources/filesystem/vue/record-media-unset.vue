@@ -130,18 +130,21 @@ export default {
 						<div>
 							<span class='icon-audio'></span>
 							<span>Record audio</span>
+							<aside>Say something with an audio only recording.</aside>
 						</div>
 					</button>
 					<button class="menu-item" @click="mediaTypeSelected(mediaTypes.CAMERA)">
 						<div>
 							<div class='icon-video'></div>
 							<span>Record a video</span>
+							<aside>Use a computer camera to create a video recording.</aside>
 						</div>
 					</button>
 					<button class="menu-item" @click="mediaTypeSelected(mediaTypes.SCREEN)">
 						<div>
 							<div class='icon-screen'></div>
 							<span>Record your screen</span>
+							<aside>Choose a computer screen to create a screen recording.</aside>
 						</div>
 					</button>
 				</div>
@@ -176,10 +179,20 @@ $text-colour: #0066B0; //pull this out of settings
 		display: block;
 		transition: padding-bottom 0.2s;
 	}
+	aside {
+		padding: 10px 30px;
+		font-size: 0.8rem;
+		font-style:  italic;
+		opacity: 0;
+		transition: opacity 0.2s;
+	}
 	&:hover {
 		background: white;
 		span {
 			padding-bottom: 20px;
+		}
+		aside {
+			opacity: 1;
 		}
 	}
 }

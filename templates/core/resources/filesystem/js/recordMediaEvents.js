@@ -4,6 +4,7 @@
  */
 
 export default Object.freeze({
-  PROCCESS_STARTED: 'PROCCESS_STARTED', //usually to block/notify UI until it's stopped
-  PROCCESS_STOPPED: 'PROCCESS_STOPPED'
+  PROCCESS_STARTED: 'on-process-started', //usually to block/notify UI until it's stopped
+  PROCCESS_STOPPED: 'on-process-stopped',
+  VIDEO_READY: 'on-video-ready' //to safely access an initiated videojs instance
 })

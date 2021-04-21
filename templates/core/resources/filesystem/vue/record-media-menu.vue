@@ -107,12 +107,6 @@ export default {
 .menu-item {
 	width: calc(33.333333%);
 	text-align: center;
-	&:first-of-type {
-		border-left: none;
-	}
-	&:last-of-type {
-		border-right: none;
-	}
 }
 
 </style>
