@@ -375,11 +375,6 @@ class Controller extends Assessment\Controller
         /** @var User[] $users */
         $users = [];
 
-        // Should submission history PDFs be included?
-        // Making this an option, as generating them is a slow process.
-        $includeSubmissionHistory = $this->request->query->getBool('includeHistory', false);
-
-
         // Create a zip stream to hold the downloaded submissions
 
         $titleSanitized = $this->sanitizeForFilename($assessment->getTitle());
@@ -429,9 +424,7 @@ class Controller extends Assessment\Controller
                     }
                 }
             }
-            if ($includeSubmissionHistory) {
-                $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
-            }
+            $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
         }
 
         // Stream the zip archive

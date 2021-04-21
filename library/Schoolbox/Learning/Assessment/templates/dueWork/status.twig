@@ -36,17 +36,11 @@
     {% if download %}
         <li>
             <a class="icon-download"
+               id="download-submissions"
                href="{{ routeLookup('learningAssessment.downloadSubmissions', {
                    assessmentId: assessment.id,
                    assessment: assessment
                }) }}">Download All Submissions</a>
-        </li>
-        <li>
-            <a class="icon-download"
-               href="{{ routeLookup('learningAssessment.downloadSubmissions', {
-                   assessmentId: assessment.id,
-                   assessment: assessment
-               }) }}?includeHistory=1">Download All Submissions and History</a>
         </li>
     {% endif %}
     {% if assessment.useRubric %}
@@ -287,6 +281,20 @@
  # Massive javascript hulk
  #}
 {% block scripts %}
+    {% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            $('#download-submissions').click(function (event) {
+                event.preventDefault();
+                $(this).confirmDialog({
+                    header: 'Download all submissions?',
+                    text: 'This may take a while.',
+                });
+            })
+        });
+    </script>
+    {% endautoescape %}
+
     {% if not readonly %}
         <script type="application/javascript" src="{{ CDN_PREFIX }}/javascript/shared/submissions/jquery.bulky.js"></script>
         <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
