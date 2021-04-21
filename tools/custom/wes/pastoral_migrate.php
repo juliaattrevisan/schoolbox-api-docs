@@ -9,6 +9,7 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Alaress\Database\Connector\IConnector;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -177,7 +178,7 @@ $app = new class extends CliTool\App {
 
     /**
      * Generates pastoral group name from campus and house
-     * @param $pastoralAccess
+     * @param array $pastoralAccess
      * @return string
      */
     private function buildHousePastoralGroupName($pastoralAccess): string
@@ -213,10 +214,10 @@ $app = new class extends CliTool\App {
 
     /**
      * Gets pastoral access with the group, year and campus
-     * @param $db
-     * @param $row
-     * @param $headers
-     * @param $oldGroupId
+     * @param IConnector $db
+     * @param array      $row
+     * @param array      $headers
+     * @param int        $oldGroupId
      * @return array
      */
     private function getPastoralAccessRecords($db, $row, $headers, $oldGroupId): array
