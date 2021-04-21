@@ -7,28 +7,27 @@ use Schoolbox\Database\Factory as DatabaseFactory;
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
-
-
 class Report_Bialik_Parent extends \Report_Parent
 {
     /**
      * Constructor
      *
      * @param SitePage $page
-     * @param string $yearLevel
-     * @param string $searchName
-     * @param string $searchBoardingStatus
-     * @param string $searchForm
+     * @param string   $yearLevel
+     * @param string   $searchName
+     * @param string   $searchBoardingStatus
+     * @param string   $searchForm
      */
-    public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm) {
+    public function __construct($page, $yearLevel, $searchName, $searchBoardingStatus, $searchForm)
+    {
         $this->setGroupHandler(new Group());
 
         $this->setExternalUserHandler(new External_User());
 
-        $yearLevel = trim($yearLevel);
-        $this->sisAllYearLevels = $this->getExternalUserHandler()->getAllYearLevels();
+        $yearLevel                    = trim($yearLevel);
+        $this->sisAllYearLevels       = $this->getExternalUserHandler()->getAllYearLevels();
         $this->allowedSearchableYears = $this->filterToStudentYearLevels($this->getChildrensYears(), $this->sisAllYearLevels);
-        $yearColumn = array_column($this->allowedSearchableYears, 'Code');
+        $yearColumn                   = array_column($this->allowedSearchableYears, 'Code');
 
         // Parents may only search in their student's year level
         if ($this->isYearsRestricted() && !(in_array($yearLevel, $yearColumn) || $yearLevel == '')) {
@@ -42,8 +41,7 @@ class Report_Bialik_Parent extends \Report_Parent
 
         if (strlen($page->arg[0]) && !$this->checkPermissions()) {
             error(155);
-        }
-        else {
+        } else {
             $this->setPage($page);
 
             $this->setExternalUserHandler(new External_User());
@@ -53,7 +51,7 @@ class Report_Bialik_Parent extends \Report_Parent
             /* If all four options are empty, just show search form - don't show
              * all results (default is empty array)
              */
-            if (strlen($this->getYearLevel().$this->getSearchName().$this->getSearchForm().$this->getSearchBoardingStatus())) {
+            if (strlen($this->getYearLevel() . $this->getSearchName() . $this->getSearchForm() . $this->getSearchBoardingStatus())) {
                 $this->setAllRecords(
                     $this->getStudentContactList(
                         $this->getYearLevel(),
@@ -67,21 +65,20 @@ class Report_Bialik_Parent extends \Report_Parent
             }
 
             // check that something came back, otherwise inform the user that it was an invalid request
-            if($this->getAllRecords() === false) {
+            if ($this->getAllRecords() === false) {
                 error(155);
             }
-
         }
     }
 
     /**
      * Custom query function for fetching student contact results from Synergetic for Bialik
      */
-    protected function getStudentContactList($yearlevel, $name, $boardingStatus, $form, $fileYear, $fileSemester) {
-
+    protected function getStudentContactList($yearlevel, $name, $boardingStatus, $form, $fileYear, $fileSemester)
+    {
         $db = DatabaseFactory::getInstanceExternal();
 
-        $query = "
+        $query  = "
             SELECT
                 StudentID,
                 StudentPreferred,
@@ -159,7 +156,7 @@ class Report_Bialik_Parent extends \Report_Parent
             AND FileYear = :fileYear";
         $params = [
             'fileSemester' => $fileSemester,
-            'fileYear'     => $fileYear
+            'fileYear'     => $fileYear,
         ];
 
         /* Search for a particular year level
@@ -180,7 +177,7 @@ class Report_Bialik_Parent extends \Report_Parent
         /* Search for a student name
          */
         if (strlen($name)) {
-            $query .= "
+            $query             .= "
                 AND (
                     (StudentSurname LIKE :surname)
                     OR
@@ -211,18 +208,18 @@ class Report_Bialik_Parent extends \Report_Parent
         /* Search for a particular form
          */
         if ($form) {
-            $query .= "
+            $query                 .= "
                 AND StudentForm = :studentForm
             ";
             $params['studentForm'] = $form;
         }
-        $query .= "
+        $query       .= "
             ORDER BY StudentSurname, StudentID, StudentContactType
         ";
-        $contactList = $db->executeQuery($query)->getIterator();
+        $contactList = $db->executeQuery($query, $params)->fetchAll();
 
-        foreach ($contactList as &$row) {
-           if ($row['ValidAddressFlag'] == 0 || ($row['AddressUserFlag1'] == 1 && $row['AddressUserFlag3'] != 1)) {
+        foreach ($contactList as $row) {
+            if ($row['ValidAddressFlag'] == 0 || ($row['AddressUserFlag1'] == 1 && $row['AddressUserFlag3'] != 1)) {
                 $row['StudentContactAddress1']        = '';
                 $row['StudentContactAddress2']        = '';
                 $row['StudentContactAddress3']        = '';
@@ -243,30 +240,35 @@ class Report_Bialik_Parent extends \Report_Parent
             $row['StudentContactCountryCode']
                 = $row['StudentContactCountryCode'] == 'Not Selected' ? '' : $row['StudentContactCountryCode'];
 
-            if($row['AddressUserFlag2'] == 1)
+            if ($row['AddressUserFlag2'] == 1) {
                 $row['StudentContactPhoneActual'] = '';
-
-            if($row['AddressUserFlag3'] == 1) {
-                $row['StudentContactHomeAddress1']  = $row['StudentContactAddress1'];
-                $row['StudentContactHomeAddress2']  = $row['StudentContactAddress2'];
-                $row['StudentContactHomeAddress3']  = $row['StudentContactAddress3'];
-                $row['StudentContactHomeSuburb']    = $row['StudentContactSuburb'];
-                $row['StudentContactHomePostCode']  = $row['StudentContactPostCode'];
-                $row['StudentContactHomeState']     = $row['StudentContactState'];
-                $row['StudentContactHomeCountryCode']     = $row['StudentContactCountryCode'];
             }
 
-            if($row['ContactUserFlag1'] == 1)
+            if ($row['AddressUserFlag3'] == 1) {
+                $row['StudentContactHomeAddress1']    = $row['StudentContactAddress1'];
+                $row['StudentContactHomeAddress2']    = $row['StudentContactAddress2'];
+                $row['StudentContactHomeAddress3']    = $row['StudentContactAddress3'];
+                $row['StudentContactHomeSuburb']      = $row['StudentContactSuburb'];
+                $row['StudentContactHomePostCode']    = $row['StudentContactPostCode'];
+                $row['StudentContactHomeState']       = $row['StudentContactState'];
+                $row['StudentContactHomeCountryCode'] = $row['StudentContactCountryCode'];
+            }
+
+            if ($row['ContactUserFlag1'] == 1) {
                 $row['StudentContactDefaultEmail'] = '';
+            }
 
-            if($row['ContactUserFlag2'] == 1)
+            if ($row['ContactUserFlag2'] == 1) {
                 $row['StudentContactMobilePhone'] = '';
+            }
 
-            if($row['SpouseUserFlag1'] == 1)
+            if ($row['SpouseUserFlag1'] == 1) {
                 $row['StudentContactSpouseDefaultEmail'] = '';
+            }
 
-            if($row['SpouseUserFlag2'] == 1)
+            if ($row['SpouseUserFlag2'] == 1) {
                 $row['StudentContactSpouseMobilePhone'] = '';
+            }
 
             $row['StudentContactHomeCountryDesc'] = '';
             $row['StudentContactCountryDesc']     = '';
