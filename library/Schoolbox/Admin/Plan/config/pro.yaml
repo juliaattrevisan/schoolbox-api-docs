@@ -47,7 +47,7 @@ config:
   custom_assessment_participation: {hide: false}
   self_assessment_enabled: {hide: false}
   course_markbook_enable: {hide: false}
-  assessment_calendar_enabled: {value: false, hide: true}
+  assessment_calendar_enabled: {hide: false}
   class_markbook_enable: {hide: false}
   rubric_markbook_enable: {hide: false}
   upcoming_assessments_enabled : {hide: false}
