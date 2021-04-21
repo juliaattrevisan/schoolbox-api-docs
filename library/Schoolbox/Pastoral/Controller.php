@@ -883,13 +883,6 @@ class Controller extends Base
             throw new InvalidArgumentException('Title cannot be empty');
         }
 
-        // External interface
-        $pastoralExternal = new External_Pastoral();
-
-        // Store the records we create
-        /** @var Collection|PastoralModel[] $records */
-        $records = new Collection();
-
         // Make sure the primary records student ID is at the start of the array so we create it first
         array_unshift($duplicateStudentIds, $primaryStudentId);
 
@@ -943,20 +936,17 @@ class Controller extends Base
 
         // Now ready to make changes
         $db = $this->pastoralTypeMapper->getDatabase();
+        $db->beginTransaction();
 
         // Prepare tags. Save newly created tags.
         $tags = $this->prepareTags($post->get('tags'));
 
         // Go through every kid
-
         foreach ($duplicateStudentIds as $studentIdCurrent) {
-            // save pastoral records one by one
-            $db->beginTransaction();
-
             $previousRecord = null;
-            if ($parent instanceof PastoralModel && $studentIdCurrent == $primaryStudentId) {
+            if ($parent instanceof PastoralModel && $studentIdCurrent === $primaryStudentId) {
                 // Updating existing pastoral record
-                $record = $parent;
+                $record         = $parent;
                 $previousRecord = clone $parent;
             } else {
                 // Creating a new record
@@ -1010,7 +1000,6 @@ class Controller extends Base
             $this->pastoralDataSource->save($record);
 
             // Store the first records ID for use as parent for subsequent copies
-
             if (!isset($parent)) {
                 $parent = $record;
             }
@@ -1048,15 +1037,21 @@ class Controller extends Base
             $this->pastoralAttachmentMapper->delete($deletedAttachments);
             $record->setAttachments($newRecordAttachments);
 
-            $db->commit();
+            $db->onPersist(
+                static function () use ($previousRecord, $record) {
+                    // raise notification
+                    $action = $previousRecord ? \Schoolbox\Mapper::METHOD_UPDATE : \Schoolbox\Mapper::METHOD_CREATE;
+                    $pastoralMapper = Mapper::getInstance();
+                    $pastoralMapper->setEventPropagator(); // need to clear propagator
+                    $pastoralMapper->raiseNotification($record, $action, $previousRecord);
+                    $pastoralExternal = new External_Pastoral();
 
-            // raise notification
-            $action = $previousRecord ? \Schoolbox\Mapper::METHOD_UPDATE : \Schoolbox\Mapper::METHOD_CREATE;
-            $this->pastoralDataSource->raiseNotification($record, $action, $previousRecord);
-
-            // Save record in external database, and set pastoral external_id in Schoolbox database
-            $pastoralExternal->syncPastoral($record);
+                    // Save record in external database, and set pastoral external_id in Schoolbox database
+                    $pastoralExternal->syncPastoral($record);
+                }
+            );
         }
+        $db->commit();
     }
 
     /**

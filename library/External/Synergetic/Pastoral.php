@@ -631,7 +631,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         try {
             $params = $this->getQueryParameters($pastoral);
-            $this->connector->beginTransaction();
+            $inActiveTransaction = $this->connector->inTransaction();
+            if (!$inActiveTransaction) {
+                $this->connector->beginTransaction();
+            }
             if ($this->connector->executeQuery($query, $params)) {
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
@@ -680,7 +683,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $this->updatePastoralCareContacts($pastoral);
 
-                $this->connector->commit();
+                if (!$inActiveTransaction) {
+                    $this->connector->commit();
+                }
                 return true;
             }
         } catch (ExternalException $e) {

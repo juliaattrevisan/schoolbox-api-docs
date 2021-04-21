@@ -1054,10 +1054,41 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * @inheritDoc
+     * Match signature of Schoolbox\Mapper and emulate an Event notification
+     *
+     * @param Model      $object
+     * @param string     $verb
+     * @param Model|null $previous
+     * @return bool
      */
-    public function raiseNotification($object, $verb, $previous = null)
+    public function raiseNotification($object, $verb, $previous = null): bool
     {
+        $sessionData = $this->getSessionData();
+        if (empty($sessionData['user'])) {
+            return false;
+        }
+
+        try {
+            $diff = $previous && ($verb != \Schoolbox\Mapper::METHOD_DELETE) ? $this->diff($object, $previous) : null;
+        } catch (MapperException $e) {
+            return false;
+        }
+
+        if ($previous) {
+            /** @var \Schoolbox\Pastoral\Attachment\Mapper $pastoralAttachmentMapper */
+            $pastoralAttachmentMapper = $this->getJoinMapper('attachments');
+            [$created, $deleted] = $pastoralAttachmentMapper->diffAttachments($object->getAttachments(), $previous->getAttachments());
+            /** @var \Schoolbox\Pastoral\Attachment\Model $attachment */
+            foreach ($created->merge($deleted) as $attachment) {
+                if ($attachment->isPublic() && !isset($diff['attachmentsPublic'])) {
+                    $diff['attachmentsPublic'] = [1, 0]; // value does not matter for now
+                } elseif (!$attachment->isPublic() && !isset($diff['attachmentsPrivate'])) {
+                    $diff['attachmentsPrivate'] = [1, 0]; // value does not matter for now
+                }
+            }
+        }
+
+        $this->getEventPropagator()->propagate($sessionData['user'], $verb, $object, $this, $diff);
         return true;
     }
 }

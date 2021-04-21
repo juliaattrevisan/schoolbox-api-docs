@@ -148,7 +148,11 @@ class Notifier extends AbstractModuleNotifier
         // Users to send notifications to. Starting with author of the record.
         $targetUsers = [];
 
-        $privateChangeOnly = $diff && empty(array_diff(array_intersect(array_keys($diff), self::COLS), ['bodyPrivate', 'attachmentsPrivate',]));
+        $privateChangeOnly = false;
+        if ($diff) {
+            $relevantDiff = array_intersect(array_keys($diff), self::COLS);
+            $privateChangeOnly = empty(array_diff($relevantDiff, ['bodyPrivate', 'attachmentsPrivate']));
+        }
 
         /** @var PastoralAccess $pastoralAccess */
         foreach ($accessRecords as $pastoralAccess) {
@@ -159,7 +163,7 @@ class Notifier extends AbstractModuleNotifier
             }
 
             // if the access is public only and the changes are private only, fail
-            if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_PUBLIC && $privateChangeOnly) {
+            if (($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_PUBLIC) && $privateChangeOnly) {
                 // do not send any notification
                 continue;
             }
