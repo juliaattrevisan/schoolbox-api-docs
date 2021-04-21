@@ -8,15 +8,15 @@
 import WaveSurfer from 'wavesurfer.js';
 import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js';
 WaveSurfer.microphone = MicrophonePlugin;
-import 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css';
+import videojs_wavesurfer_css from 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css';
 import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
 
 /*
-* the VideoJS/VideoJS-record params to set up
+* set up a camera recording
 * 
 * @returns { Object }
 */ 
-export const getVideoJsRecordOptions = () => {
+export const getRecordCameraOptions = () => {
     return {
         controls: true,
         autoplay: false,
@@ -34,6 +34,35 @@ export const getVideoJsRecordOptions = () => {
                     width: { min: 640, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
                     height: { min: 360, ideal: 360, max: 720 }
                 },
+                screen: true,
+                maxLength: 300, //five minutes
+                convertEngine: 'ts-ebml', //to be able to have seekable webm files
+                debug: true,
+            }
+        }
+    }
+}
+
+/*
+* set up a screen recording
+* 
+* @returns { Object }
+*/ 
+export const getRecordScreenOptions = () => {
+    return {
+        controls: true,
+        autoplay: false,
+        fluid: true,
+        aspectRatio: '16:9',
+        loop: false,
+        bigPlayButton: false,
+        controlBar: {
+            volumePanel: false,
+        },
+        plugins: {
+            record: {
+                audio: true,
+                screen: true,
                 maxLength: 300, //five minutes
                 convertEngine: 'ts-ebml', //to be able to have seekable webm files
                 debug: true,
@@ -47,7 +76,7 @@ export const getVideoJsRecordOptions = () => {
 * 
 * @returns { Object }
 */ 
-export const getVideoJsPlaybackOptions = (recordedData) => {
+export const getPlaybackOptions = (recordedData) => {
     return {
         controls: true,
         autoplay: false,
@@ -72,7 +101,7 @@ export const getVideoJsPlaybackOptions = (recordedData) => {
 * 
 * @returns { Object }
 */ 
-export const getVideoJsAudioOptions = () => {
+export const getAudioOnlyOptions = () => {
     return {
         controls: true,
         autoplay: false,

@@ -5,7 +5,7 @@
 
 export default Object.freeze({
   UNSET: 'UNSET',
-  VIDEO: 'VIDEO',
-  AUDIO: 'AUDIO',
+  AUDIO_ONLY: 'AUDIO_ONLY',
+  CAMERA: 'CAMERA',
   SCREEN: 'SCREEN',
 })
