@@ -202,12 +202,22 @@ class Controller extends Base
             if ($yearLevelFilterDefinition !== $filter->getClass()) {
                 continue;
             }
+
+            /* For some reason this is initialising as an empty string, not an array
+             * You can't use it in an array context unless you init it first
+             */
+            if ('' === $queryArgs[$filter->getId()]) {
+                $queryArgs[$filter->getId()] = [];
+            }
+
             foreach ($targetUsers as $targetUser) {
                 if (!$targetUser->getYear() || isset($queryArgs[$filter->getId()][$targetUser->getYear()->getId()])) {
                     continue;
                 }
+
                 $queryArgs[$filter->getId()][$targetUser->getYear()->getId()] = 1;
             }
+
             // select None
             $queryArgs[$filter->getId()][Filter\Filters\Badge\YearLevel\Definition::KEY_NONE] = 1;
         }
