@@ -183,7 +183,26 @@
      * @param selector
      */
     $.fn.schoolboxResource_InitialiseMediaElementPlayer = function (selector) {
-        $(selector).find('[data-schoolboxmedia-replacement]').mediaelementplayer();
-    };
+        $(selector).find('[data-schoolboxmedia-replacement]').each(function(index, element) {
 
+            /* Use the natural rendering mechanism when full-width class is present
+             */
+            if ($(element).hasClass('full-width')) {
+                $(element).mediaelementplayer();
+            } else {
+
+                /* Video dimensions exceed the container's maxwidth setting for some reason
+                 * https://github.com/mediaelement/mediaelement/issues/42
+                 *
+                 * This was also encountered in storage.vue:46 in mounted()
+                 *
+                 * So I guess we can set it manually and explicitly here
+                 */
+                $(element).mediaelementplayer({
+                    videoWidth: $(element).attr('width'),
+                    videoHeight: $(element).attr('height')
+                });
+            }
+        })
+    };
 }(jQuery));
