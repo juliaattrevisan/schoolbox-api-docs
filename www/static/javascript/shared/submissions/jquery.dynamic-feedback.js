@@ -235,8 +235,6 @@
 
             config.onPrePublishCallback(participantId, formData);
 
-            debugger;
-
             $.ajax($form.attr('action'), {
                 dataType: 'json',
                 data:     formData,
