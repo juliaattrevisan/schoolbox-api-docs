@@ -430,10 +430,8 @@ export default {
                                 <div class="card compact small-12">
                                     <a :href="'/search/user/' + comment.author.id" title="View Profile">
                                         <img :src="'/portrait.php?id=' + comment.author.id + '&size=square64'">
-                                        <p class="meta">
-                                            {{ comment.author.fullName }}
-                                            <span class="pipe meta" :title="comment.createdAt | fullString ">Posted {{ comment.createdAt | fromNow }}</span>
-                                        </p>
+                                        {{ comment.author.fullName }}
+                                        <span class="pipe meta" :title="comment.createdAt | fullString ">Posted {{ comment.createdAt | fromNow }}</span>
                                     </a>
                                 </div>
                             </div>
