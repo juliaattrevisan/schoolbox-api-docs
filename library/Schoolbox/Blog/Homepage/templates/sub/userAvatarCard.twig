@@ -4,7 +4,7 @@
         <p>
             {{ user.formatName() }}
             {% if comment is defined %}
-            <span class="pipe meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
+            <span class="pipe meta" title="{{ comment.getCreatedAt.getShort }}">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
             {% endif %}
         </p>
     </a>
@@ -13,7 +13,7 @@
     <p>
         {{ user.formatName() }}
         {% if comment is defined %}
-        <span class="pipe meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
+        <span class="pipe meta" title="{{ comment.getCreatedAt.getShort }}">Commented {{ comment.getCreatedAt.getRelativeTime }}</span>
         {% endif %}
     </p>
 {% endif %}
