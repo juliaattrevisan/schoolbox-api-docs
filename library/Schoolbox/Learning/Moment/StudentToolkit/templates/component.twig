@@ -19,7 +19,7 @@
             {% endif %}
             {% if config.badges_enabled %}
                 <a class="button icon-goal"
-                   href="{{ routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm') }}?{{ RETURN_URL.name }}={{ returnUrl ?? RETURN_URL.current }}">Set my goals</a>
+                   href="{{ routeLookupIfAuthorized('learningBadgeAward.getSetAsGoalForSelfForm') }}?{{ RETURN_URL.name }}={{ returnUrl ?? RETURN_URL.current }}">Set My Goals</a>
             {% endif %}
             <a class="button icon-advanced-list" href="/search/user/{{ user.id }}#activity">My Activity</a>
             {% if config.badges_enabled %}
