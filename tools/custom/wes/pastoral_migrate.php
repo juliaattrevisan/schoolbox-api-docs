@@ -1,107 +1,125 @@
 #!/usr/bin/php
 <?php
 
-use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
-use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
-use Schoolbox\Application\CliTool;
+/**
+ * Script to roll over pastoral care records as specified in a csv file with columns:
+ * Old Group Name, Campus Name, Student Year Levels, New Group Name, Add to House Group, Delete Old Group Access
+ *
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
 
-require_once __DIR__ . '/../../conf/core/require.php';
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Application\CliTool;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+
+require_once __DIR__ . '/../../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
 
     private const OPT_LONG_FILE = 'file:';
-    private const OPT_LONG_RUN = 'run';
 
-    private const ACCESS_LEVEL_PRIVATE = 2;
+    private array $groupNameIdMap = [];
 
+    private array $yearNameIdMap = [];
 
     /** @inheritdoc */
     public function getLongOpts(): array
     {
         return [
             self::OPT_LONG_FILE,
-            self::OPT_LONG_RUN,
         ];
     }
 
     /** @inheritDoc */
     public function run(): void
     {
-        $performUpdate = $this->getOpt(self::OPT_LONG_RUN);
-
         $db = $this->getDatabaseInternal();
 
-        $inputCsv = $this->getOpt(self::OPT_LONG_FILE);
+        $inputCsv      = $this->getOpt(self::OPT_LONG_FILE);
         $scriptRunTime = Alaress_Date_Format::now();
 
-        if (($handle = fopen($inputCsv, "r")) !== FALSE) {
-        } else {
-            $this->getLogger()->info("no input file");
-            exit;
+        if (!file_exists($inputCsv)) {
+            $this->getLogger()->warning('Please provide a valid filename with --file option.');
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
         }
+
+        $handle = fopen($inputCsv, "r");
+
+        if (!$handle) {
+            $this->getLogger()->warning('Failed to open the file.');
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
+        if (!$this->perform()) {
+            $this->getLogger()->info('Running in dry-run mode: run with the `-p` flag to perform the migration.');
+        }
+
+        // populate group name - id map
+        $this->setGroupNameIdMap();
+
+        // populate year name - id map
+        $this->setYearNameIdMap();
 
         $headers = fgetcsv($handle, 1000, ",");
         $headers = array_flip($headers);
 
         /* Iterate over each csv row */
-        while(($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-
+        while (($row = fgetcsv($handle, 1000, ",")) !== false) {
             /* GET OLD_GROUP */
 
             $oldGroupName = $row[$headers['Old Group Name']];
 
-            $oldGroup = $this->getGroupFromName($oldGroupName, $db);
-
-            if(empty($oldGroup)) {
+            if (!key_exists($oldGroupName, $this->groupNameIdMap)) {
+                $this->getLogger()->warning("Old group $oldGroupName does not exist");
                 continue;
             }
 
-            $this->getLogger()->info("Migrating records from group ".$oldGroup['name']);
+            $this->getLogger()->info("Migrating records from group $oldGroupName");
 
             /* GET NEW GROUP */
 
             $newGroupName = $row[$headers['New Group Name']];
+            $this->getLogger()->info("Attempting to add to " . $newGroupName);
+            $addToHouse = (bool)$row[$headers['Add to House Group']];
 
-            $this->getLogger()->info("Attempting to add to ".$newGroupName);
-
-            $newGroup =  $this->getGroupFromName($newGroupName, $db);
-
-            $addToHouse = $row[$headers['Add to House Group']];
-
-            if(empty($newGroupName) && empty($addToHouse)){
+            if ($addToHouse && !key_exists($newGroupName, $this->groupNameIdMap)) {
+                $this->getLogger()->warning("New group $newGroupName does not exist");
                 continue;
             }
 
-            /*Get records matching the filters supplied in the row */
+            /* Get records matching the filters supplied in the row */
 
-            $pastoralAccessRecords = $this->getPastoralAccessRecords($db, $row, $headers, $oldGroup);
+            $pastoralAccessRecords = $this->getPastoralAccessRecords($db, $row, $headers, $this->groupNameIdMap[$oldGroupName]);
 
-            $this->getLogger()->info(count($pastoralAccessRecords)." to be migrated");
+            $this->getLogger()->info(count($pastoralAccessRecords) . " to be migrated");
+            $newGroupId = $this->groupNameIdMap[$newGroupName];
 
-            if(count($pastoralAccessRecords)) {
-                foreach($pastoralAccessRecords as $pastoralAccess){
-                    $groupsToAdd = [];
-                    $groupsToAdd[] = $newGroup;
-                    if($addToHouse == 1){
+            if (count($pastoralAccessRecords)) {
+                foreach ($pastoralAccessRecords as $pastoralAccess) {
+                    $groupsToAdd   = [];
+                    $groupsToAdd[] = $newGroupId;
+                    if ($addToHouse == 1) {
                         $housePastoralGroupName = $this->buildHousePastoralGroupName($pastoralAccess);
-                        $houseGroup = $this->getGroupFromName($housePastoralGroupName, $db);
+                        $houseGroup             = $this->groupNameIdMap[$housePastoralGroupName];
 
-                        if(!empty($houseGroup)) {
+                        if (!empty($houseGroup)) {
                             $groupsToAdd[] = $houseGroup;
                         }
                     }
 
                     /* INSERT ACCESS FOR NEW GROUPS */
-                    foreach($groupsToAdd as $group){
-
-                        $this->getLogger()->info("Creating new pastoral access records for pastoral record (".
-                            $pastoralAccess['pastoral_id']."):");
+                    foreach ($groupsToAdd as $groupId) {
+                        $this->getLogger()->info(
+                            "Creating new pastoral access records for "
+                            . "pastoral record ({$pastoralAccess['pastoral_id']}) student id ({$pastoralAccess['student_id']}):"
+                        );
 
                         /* Check for existing record so no dupe */
                         $params = [
-                            'pastoralId'    => $pastoralAccess['pastoral_id'],
-                            'groupId'         => $group['id'],
+                            'pastoralId' => $pastoralAccess['pastoral_id'],
+                            'groupId'    => $groupId,
                         ];
 
                         $query = '  SELECT * FROM pastoral_access
@@ -109,16 +127,15 @@ $app = new class extends CliTool\App {
                                 AND group_id = :groupId
                                 AND deleted_at IS NULL';
 
-                        if($db->executeQuery($query, $params)->rowCount() == 0) {
-
+                        if ($db->executeQuery($query, $params)->rowCount() == 0) {
                             $params = [
                                 'pastoralId'    => $pastoralAccess['pastoral_id'],
-                                'groupId'       => $group['id'],
+                                'groupId'       => $groupId,
                                 'scriptRunTime' => $scriptRunTime->getDatabase(),
-                                'accessLevel'   => $pastoralAccess['access']
+                                'accessLevel'   => $pastoralAccess['access'],
                             ];
 
-                            if($performUpdate) {
+                            if ($this->perform()) {
                                 $query = '  INSERT INTO pastoral_access
                                     VALUES (NULL, :pastoralId, :groupId, NULL, NULL, :scriptRunTime, NULL, :accessLevel)';
                                 $db->executeQuery($query, $params);
@@ -126,35 +143,32 @@ $app = new class extends CliTool\App {
                             }
 
                             $log = "Insert new pastoral access record for pastoral record ";
-                            $log .=  $pastoralAccess['pastoral_id']." (".$pastoralAccess['heading'].")"."\n";
-                            $log .=  "Was in pastoral group ";
-                            $log .=   $row[$headers['Old Group Name']]."\n";
+                            $log .= $pastoralAccess['pastoral_id'] . " (" . $pastoralAccess['heading'] . ")" . "\n";
+                            $log .= "Was in pastoral group $oldGroupName \n";
                             $log .= "Now in group ";
-                            $log .=   $group['name']." (".$group['id'].")\n";
+                            $log .= array_search($groupId, $this->groupNameIdMap) . " ($groupId)\n";
 
                             $this->getLogger()->info($log);
-
                         } else {
-                            $this->getLogger()->info("duplicate");
+                            $this->getLogger()->info("Already exists");
                         }
                     }
 
-                    if($row[$headers['Delete Old Group Access']] == 1 || $row[$headers['Delete Old Group Access']] == "Y") {
+                    if ($row[$headers['Delete Old Group Access']] == 1 || $row[$headers['Delete Old Group Access']] == "Y") {
+                        $this->getLogger()->info("Removing access for group: $oldGroupName");
 
-                        $log =  "Removing access for group ";
-                        $log .=  $oldGroup['name'];
-                        $this->getLogger()->info($log);
-
-                        if($performUpdate) {
+                        if ($this->perform()) {
                             $query = 'UPDATE pastoral_access
                               SET deleted_at = :scriptRunTime
                               WHERE id = :pastoralAccessId';
 
-                            $db->executeQuery($query,[
-                                'scriptRunTime'        => $scriptRunTime->getDatabase(),
-                                'pastoralAccessId'     => $pastoralAccess['pastoral_access_id']
-                            ]);
-
+                            $db->executeQuery(
+                                $query,
+                                [
+                                    'scriptRunTime'    => $scriptRunTime->getDatabase(),
+                                    'pastoralAccessId' => $pastoralAccess['pastoral_access_id'],
+                                ]
+                            );
                         }
                     }
                 }
@@ -162,37 +176,55 @@ $app = new class extends CliTool\App {
         }
     }
 
-    function buildHousePastoralGroupName($pastoralAccess)
+    /**
+     * Generates pastoral group name from campus and house
+     * @param array $pastoralAccess
+     * @return string
+     */
+    private function buildHousePastoralGroupName($pastoralAccess): string
     {
         $campusPrefix = strtok($pastoralAccess['campus_name'], "_");
-        $house = strtok($pastoralAccess['house_name'], " ");
-        return $campusPrefix." ".$house. " Heads of House";
+        $house        = strtok($pastoralAccess['house_name'], " ");
+        return $campusPrefix . " " . $house . " Heads of House";
     }
 
-    function getGroupFromName($name, $db)
+    /**
+     * Stores existing pastoral group name - id map
+     */
+    private function setGroupNameIdMap(): void
     {
-        $query = 'SELECT id, name FROM pastoral_group pg
-            WHERE pg.name = :name AND  pg.deleted_at IS NULL';
-
-        $groupCount = $db->executeQuery($query, ['name' => $name])->rowCount();
-
-        if($groupCount != 1) {
-            if($groupCount > 1) {
-                $this->getLogger()->info("More than 1 group with name ".$name);
-            } else {
-                $this->getLogger()->info("No group with name ".$name);
-            }
-            $this->getLogger()->info("Skipping row");
+        $query  = 'SELECT id, name FROM pastoral_group pg WHERE pg.deleted_at IS NULL';
+        $groups = $this->getDatabaseInternal()->executeQuery($query, [])->fetchAll();
+        foreach ($groups as $group) {
+            $this->groupNameIdMap[$group['name']] = $group['id'];
         }
-
-        return $db->executeQuery($query, ['name' => $name])->fetch();
     }
 
-    function getPastoralAccessRecords($db, $row, $headers, $oldGroup)
+    /**
+     * Stores existing year level name - id map
+     */
+    private function setYearNameIdMap(): void
+    {
+        $query      = 'SELECT id, name FROM lu_year_level yl WHERE yl.deleted_at IS NULL';
+        $yearLevels = $this->getDatabaseInternal()->executeQuery($query, [])->fetchAll();
+        foreach ($yearLevels as $yearLevel) {
+            $this->yearNameIdMap[$yearLevel['name']] = $yearLevel['id'];
+        }
+    }
+
+    /**
+     * Gets pastoral access with the group, year and campus
+     * @param IConnector $db
+     * @param array      $row
+     * @param array      $headers
+     * @param int        $oldGroupId
+     * @return array
+     */
+    private function getPastoralAccessRecords($db, $row, $headers, $oldGroupId): array
     {
         /* GET PASTORAL_ACCESS WITH THAT GROUP, AND STUDENT YEAR AND CAMPUS ASSIGNED*/
         $query = '  SELECT pa.id as pastoral_access_id, pa.pastoral_id, pa.access, c.name as campus_name,
-                        h.house as house_name, heading
+                        h.house as house_name, heading, p.student_id
                         FROM pastoral_access pa
                         JOIN  pastoral p on p.id = pa.pastoral_id
                         JOIN user s on s.id = p.student_id
@@ -204,24 +236,28 @@ $app = new class extends CliTool\App {
                         AND pa.deleted_at IS NULL';
 
         $params = [
-            'accessLevelPrivate'    => self::ACCESS_LEVEL_PRIVATE,
-            'oldGroupId'            => $oldGroup['id']
+            'accessLevelPrivate' => PastoralAccessMapper::ACCESS_PRIVATE,
+            'oldGroupId'         => $oldGroupId,
         ];
 
-        if(!empty($row[$headers['Campus Name']])) {
-            $query .= ' AND c.name IN (:campusName)';
+        if (!empty($row[$headers['Campus Name']])) {
+            $query                .= ' AND c.name IN (:campusName)';
             $params['campusName'] = $row[$headers['Campus Name']];
         }
 
-        if(!empty($row[$headers['Student Year Levels']])) {
-            $query .= ' AND s.year IN (:studentYears)';
-            $params['studentYears'] = $row[$headers['Student Year Levels']];
+        if (!empty($row[$headers['Student Year Levels']])) {
+            $yearLevelName = $row[$headers['Student Year Levels']];
+            if (!key_exists($yearLevelName, $this->yearNameIdMap)) {
+                $this->getLogger()->warning("Unable to find year level: $yearLevelName");
+                return [];
+            }
+            $query                  .= ' AND s.year_id IN (:studentYears)';
+            $params['studentYears'] = $this->yearNameIdMap[$yearLevelName];
         }
 
 
-        return $db->executeQuery($query,$params)->fetchAll();
+        return $db->executeQuery($query, $params)->fetchAll();
     }
-
 };
 
 $kernel = new CliTool\Kernel($app);
