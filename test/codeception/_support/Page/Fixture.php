@@ -167,15 +167,12 @@ class Fixture
     public function assertNotifExists($notif)
     {
         $i = $this->tester;
-
-        $i->click('Alaress Admin');
-        $i->click('Rachel Rhodes');
-
+        $i->amOnPage('/messages');
+        $i->dontSee($notif);
+        $i->impersonate('Rachel Rhodes');
         $i->amOnPage('/messages');
         $i->see($notif);
-
-        $i->click('Rachel Rhodes');
-        $i->click('Alaress Admin');
+        $i->impersonateAnyUser('Schoolbox Admin');
     }
 
     /**
@@ -185,14 +182,11 @@ class Fixture
     public function assertNotifNotExists($notif)
     {
         $i = $this->tester;
-
-        $i->click('Alaress Admin');
-        $i->click('Rachel Rhodes');
-
         $i->amOnPage('/messages');
         $i->dontSee($notif);
-
-        $i->click('Rachel Rhodes');
-        $i->click('Alaress Admin');
+        $i->impersonate('Rachel Rhodes');
+        $i->amOnPage('/messages');
+        $i->dontSee($notif);
+        $i->impersonateAnyUser('Schoolbox Admin');
     }
 }

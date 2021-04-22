@@ -106,6 +106,21 @@ class AcceptanceTester extends \Codeception\Actor
     }
 
     /**
+     * Impersonate
+     * @param $fullname
+     */
+    public function impersonateAnyUser($fullname)
+    {
+        $i = $this;
+       // $i->amOnPage('/user/recoverSession');
+        $i->click('#profile-drop');
+        $i->executeJS("var scrollableDiv = document.getElementById('account-content');
+        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+        $i->waitForText($fullname, 5);
+        $i->click($fullname, '#switch-user');
+    }
+
+    /**
      * Fill in CKEditor
      * @param $element_id
      * @param $content
