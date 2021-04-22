@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Badge\Award;
 
 use Alaress\Async\Notification\Parameter\Param;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Learning\Badge\Award\Model as Award;
 use Alaress\Async\Notification\Instance\Builder;
 use Aura\Di\ContainerInterface;
@@ -399,7 +400,8 @@ class Notifier extends AbstractModuleNotifier
     {
         $badge = $award->getBadge();
         if ($badge->getIcon()) {
-            return $badge->getIcon();
+            $prefixGenerator = new PrefixGenerator($this->conf);
+            return $prefixGenerator->generate() . $badge->getIcon();
         }
         if ($badge->getImage() && $badge->getImage()->getMimetype()->isImage()) {
             return "/storage/image.php?hash={$badge->getImage()->getHash()}";
