@@ -222,7 +222,7 @@ class Profile implements IStrategy
         /* Also alert any broken tass api payloads that we detected in lookups
          */
         foreach ($families['unknown'] as $unknown) {
-            $this->log->critical(sprintf(
+            $this->log->warning(sprintf(
                 'Cannot identify father/mother records for family record %s',
                 $unknown
             ));
