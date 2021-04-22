@@ -1,13 +1,15 @@
 <?php
+
 /**
  * CIS conference SSO
  *
+ * Retained for CISPL, as it allegedly works even though PTO no longer
+ * officially supports SSO.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 
 $remoteUrl = 'https://bookings.parentteacheronline.com.au';
 
