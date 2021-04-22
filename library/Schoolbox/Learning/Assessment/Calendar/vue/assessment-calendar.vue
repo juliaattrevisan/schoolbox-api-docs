@@ -13,6 +13,8 @@ import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalend
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
+import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
+
 
 // Various URLs this calendar can make use of
 const URL_ASSESSMENT_EVENT_SOURCE = '/learning/assessment/calendar/events';
@@ -57,6 +59,7 @@ export default {
         ViewEventModal,
         FullCalendar,
         RevealModal,
+		CustomisedCalendarEvent
     },
 
     mixins: [
@@ -952,7 +955,11 @@ export default {
         <full-calendar
             ref="fullCalendar"
             :options="calendarOptions"
-        />
+        >
+			<template v-slot:eventContent="arg">
+				<customised-calendar-event :content="arg" />
+            </template>
+		</full-calendar>
     </div>
 </template>
 

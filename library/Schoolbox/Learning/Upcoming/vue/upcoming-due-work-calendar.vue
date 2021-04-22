@@ -1,18 +1,20 @@
 <script>
 
-import FullCalendar       from '@fullcalendar/vue'
-import interactionPlugin  from '@fullcalendar/interaction'
-import dayGridPlugin      from '@fullcalendar/daygrid'
-import timeGridPlugin     from '@fullcalendar/timegrid'
-import listPlugin         from '@fullcalendar/list'
-import momentPlugin       from '@fullcalendar/moment'
-import adaptivePlugin     from '@fullcalendar/adaptive'
-import RevealModal        from '@schoolbox/reveal-modal'
-import ViewEventModal     from '@schoolbox/fullcalendar/view-event-modal';
-import FlatPickr          from '@schoolbox/fullcalendar/flat-pickr';
-import axios              from 'axios'
-import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
-import {stringify}        from 'qs';
+import FullCalendar       			from '@fullcalendar/vue'
+import interactionPlugin  			from '@fullcalendar/interaction'
+import dayGridPlugin      			from '@fullcalendar/daygrid'
+import timeGridPlugin     			from '@fullcalendar/timegrid'
+import listPlugin         			from '@fullcalendar/list'
+import momentPlugin       			from '@fullcalendar/moment'
+import adaptivePlugin     			from '@fullcalendar/adaptive'
+import RevealModal        			from '@schoolbox/reveal-modal'
+import ViewEventModal     			from '@schoolbox/fullcalendar/view-event-modal';
+import FlatPickr          			from '@schoolbox/fullcalendar/flat-pickr';
+import axios              			from 'axios'
+import { mixinFullCalendarHelper } 	from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
+import {stringify}        			from 'qs';
+import CustomisedCalendarEvent	  	from '@schoolbox/fullcalendar/customised-calendar-event';
+
 
 // Various URLs that FullCalendar may make use of.
 const URL_EVENT_SOURCE = '/learning/due/events';
@@ -36,6 +38,7 @@ export default {
         FullCalendar,
         RevealModal,
         FlatPickr,
+		CustomisedCalendarEvent
     },
 
     mixins: [
@@ -239,7 +242,11 @@ export default {
         <full-calendar
             ref="fullCalendar"
             :options="calendarOptions"
-        />
+        >
+			<template v-slot:eventContent="arg">
+				<customised-calendar-event :content="arg" />
+            </template>
+		</full-calendar>
         <flat-pickr
             ref="flatPickr"
             :config="{
