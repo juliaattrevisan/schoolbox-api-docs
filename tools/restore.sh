@@ -326,6 +326,11 @@ do
 done
 
 # Detect other remote installs
+# if no remote hosts are found check the following:
+# 1. Can you SSH to the host found in /root/.ssh/config
+# 2. Can you SCP to the host
+# 3. run 'schoolbox_check' to ensure connectivity is as intended.
+
 sshlist=`grep 'Host ' /root/.ssh/config 2>/dev/null | sed 's/Host\ //g'`;
 echo -e "\nRemote installs \c";
 for host in $sshlist;
