@@ -513,14 +513,14 @@ export default {
 					</record-media-modal>
 					<record-media-modal v-else-if="isConverting" ref="convertingModal" key="convertingModal">
 						<div class="loader"></div>
-						<em>Converting the video to mp4, please wait...</em>
+            <p><em>Converting the video to mp4, please wait...</em></p>
 					</record-media-modal>
 					<record-media-modal v-else-if="isUploading" ref="uploadingModal" key="uploadingModal">
 						<div class="loader"></div>
-						<em>Uploading video, please wait...</em>
+						<p><em>Uploading video, please wait...</em></p>
 					</record-media-modal>
 					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
-						<em>Video successfully converted &amp; uploaded.</em>
+            <p><em>Video successfully converted &amp; uploaded.</em></p>
 					</record-media-modal>
 				</div>
 			</div>

@@ -175,6 +175,8 @@ $text-colour: #0066B0; //pull this out of settings
 	width: calc(33.4%);
 	height: 100%;
 	background: #FAFAFA;
+  transform: none !important;
+
 	span {
 		display: block;
 		transition: padding-bottom 0.2s;
@@ -229,7 +231,6 @@ $text-colour: #0066B0; //pull this out of settings
 }
 
 @media screen and (max-width: 640px) {
-  flex-wrap: wrap;
 }
 
 </style>
