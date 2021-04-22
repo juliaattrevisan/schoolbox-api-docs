@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Page\Quiz;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 
 /**
  * Quiz status page
@@ -71,7 +72,6 @@ class StatusPage
         $i = $this->tester;
         $i->click('Review Attempt', StatusPage::getStatusSelector($studentId, ''));
         $i->waitForText('Marking ' . $quizTitle . ' quiz results for ' . $student);
-
         $reviewForm = new ReviewForm($i);
         $reviewForm->quizTitle = $quizTitle;
         return $reviewForm;
@@ -89,14 +89,11 @@ class StatusPage
         $i->click(self::LINK_JELLY_TOT);
         $i->click(self::LINK_REVIEW_HORIZONTAL);
         $i->waitForText('Horizontal Marking for ' . $quizTitle);
-
         $i->click('Q1)');
         $i->waitForText('Horizontal Marking for ' . $quizTitle);
-
         $reviewHorizontalForm = new ReviewHorizontalForm($i);
         $reviewHorizontalForm->quizTitle = $quizTitle;
         return $reviewHorizontalForm;
-
     }
 
     /**
@@ -110,10 +107,8 @@ class StatusPage
         $i->click(self::LINK_JELLY_TOT);
         $i->click(self::LINK_BULK_REVIEW);
         $i->waitForText('Mark Attempts as Reviewed');
-
         $i->click('Mark All as Reviewed');
         $i->waitForText('Status of ' . $quizTitle);
-
     }
 
 }

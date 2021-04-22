@@ -10,6 +10,8 @@ namespace Page\Quiz;
 
 use AcceptanceTester;
 use Alaress_Date_Format;
+use Codeception\Util\Locator;
+use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Quiz form page object
@@ -85,10 +87,13 @@ class AssessmentForm
     /**
      * Submits this form to update a quiz
      * @return AssessmentForm
+     * @throws \Exception
      */
     public function update(): self
     {
-        $this->tester->click(self::SELECTOR_BUTTON_UPDATE);
+        $i = $this->tester;
+        $i->waitForElementVisible(self::SELECTOR_BUTTON_UPDATE,5);
+        $i->click(self::SELECTOR_BUTTON_UPDATE);
         return $this;
     }
 

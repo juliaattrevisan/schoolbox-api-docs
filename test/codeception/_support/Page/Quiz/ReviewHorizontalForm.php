@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Page\Quiz;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 
 class ReviewHorizontalForm
 {
@@ -48,7 +49,8 @@ class ReviewHorizontalForm
     public function finalise()
     {
         $i = $this->tester;
-        $i->click('Finalise review'); // this Finalise review has lower case "r"
+        $i->waitForElementVisible('a.button.submit',2);
+        $i->click('a.button.submit');
         $i->waitForText('Status of ' . $this->quizTitle);
     }
 

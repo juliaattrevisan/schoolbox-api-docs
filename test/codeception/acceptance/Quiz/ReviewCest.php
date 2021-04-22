@@ -86,8 +86,7 @@ class ReviewCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
-
-    public function testQuizReviewHorizontal(AcceptanceTester $i)
+     public function testQuizReviewHorizontal(AcceptanceTester $i)
     {
         $className = Common::CLASS_CHEMISTRY_1_3;
         $classId = Common::CLASS_ID_CHEMISTRY_1_3;
@@ -128,9 +127,9 @@ class ReviewCest
         // #attempts > tbody > tr:nth-child(1) > td:nth-child(4)
         // TODO: check only latest one is reviewed
         // TODO: USE ACTUAL REVIEW TIME!!!
-        $i->canSee('2018', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
-        $i->cantSee('2018', '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
+        $i->cantSee('2021', '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(2) > td:nth-child(5)');
 
     }
@@ -140,7 +139,6 @@ class ReviewCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
-
     public function testQuizBulkReview(AcceptanceTester $i)
     {
         $className = Common::CLASS_CHEMISTRY_1_3;
@@ -179,7 +177,6 @@ class ReviewCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
-
     public function testQuizGradeVisibility(AcceptanceTester $i)
     {
         $className = Common::CLASS_CHEMISTRY_1_3;
@@ -213,13 +210,13 @@ class ReviewCest
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
         // shouldn't see any grades
-        $i->cantSee('2018', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $i->cantSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
 
         // Az Zane, change visibility
         $i->impersonate($teacher);
         $i->amOnPage('/homepage/' . $classId);
-        $i->click($quizTitle);
+        $i->click($quizTitle,'#content');
         $i->waitForText('Begin Quiz');
 
         $quizPage = new AssessmentPage($i);
@@ -231,13 +228,15 @@ class ReviewCest
 
         // As Rachel, check notification
         $i->impersonate($student1);
+        sleep(5);
+        $i->amOnPage('/messages');
         $i->assertNotifExists($teacher . ' has marked your attempt of ' . $quizTitle . ' in ' . $className);
 
         // As Rachel, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
         // shouldn't see any grades
-        $i->canSee('2018', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
+        $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
 
     }
@@ -253,7 +252,6 @@ class ReviewCest
      * @param int $visibility
      * @throws Exception
      */
-
     private function createQuiz(AcceptanceTester $i, array $students, int $classId, string $className,
                                 string $teacher, string $quizTitle, int $visibility)
     {
@@ -315,6 +313,5 @@ class ReviewCest
         $i->waitForText('Status of ' . $quizTitle);
 
     }
-
 
 }
