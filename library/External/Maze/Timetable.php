@@ -370,6 +370,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 'periodEnd'      => $definition['end'][$index - 1],
                 'periodNumber'   => $index,
                 'periodSequence' => 1,
+                'class'          => [],
             );
         }
 
@@ -472,6 +473,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                 'periodEnd'      => $definition['end'][$index - 1],
                 'periodNumber'   => $index,
                 'periodSequence' => 1,
+                'class'          => [],
             );
         }
 
