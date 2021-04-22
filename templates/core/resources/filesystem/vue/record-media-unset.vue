@@ -23,8 +23,8 @@ export default {
 
 		/*
 		 * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
-		 * 
-		 */ 
+		 *
+		 */
 		updateContainerHeight () {
 			const targetHeight = this.$refs.pseudoVideo.getBoundingClientRect().width * 0.5625; //so there's no height jumps on moving to selected record method
 			this.$refs.pseudoVideo.style.height = targetHeight + 'px';
@@ -32,24 +32,24 @@ export default {
 
 		/*
 		 * to show selection options
-		 * 
-		 */ 
+		 *
+		 */
 		animateOn () {
 			const allMenuItems = Array.from(this.$refs.pseudoVideo.children);
 			allMenuItems.forEach((element, index) => {
-				gsap.from(element, 0.6, { 
-					scale: 0.6, 
-					alpha: 0.0, 
-					ease: 'power2.out', 
-					delay: index * 0.1 
+				gsap.from(element, 0.6, {
+					scale: 0.6,
+					alpha: 0.0,
+					ease: 'power2.out',
+					delay: index * 0.1
 				} );
 				let titleContainer = element.querySelector('div');
-				gsap.from(titleContainer, 0.4, { 
-					marginTop: 50, 
-					alpha: 0, 
-					ease: 'power2.out', 
-					delay: (index * 0.1) + 0.2, 
-					onComplete: this.onTitleRevealed 
+				gsap.from(titleContainer, 0.4, {
+					marginTop: 50,
+					alpha: 0,
+					ease: 'power2.out',
+					delay: (index * 0.1) + 0.2,
+					onComplete: this.onTitleRevealed
 				} );
 			});
 			this.animatedOutCount = 0;
@@ -79,25 +79,25 @@ export default {
 
 		/*
 		 * fade out revealing psuedo video element in the background
-		 * 
-		 */ 
+		 *
+		 */
 		animateOutMenu () {
 			const allMenuItems = Array.from(this.$refs.pseudoVideo.children);
 			allMenuItems.forEach((element, index) => {
 				element.style.border = 'none';
 				element.disabled = true; //prevent multiple clicks
 				let titleContainer = element.querySelector('div');
-				gsap.to(titleContainer, 0.2, { 
-					alpha: 0, 
+				gsap.to(titleContainer, 0.2, {
+					alpha: 0,
 					marginBottom: 50,
-					ease: 'power2.in', 
-					delay: index * 0.1 
+					ease: 'power2.in',
+					delay: index * 0.1
 				} );
-				gsap.to(element, 0.3, { 
-					scale: 0.9, 
-					alpha: 0, 
-					ease: 'power2.in', 
-					delay: (index * 0.1) + 0.3, 
+				gsap.to(element, 0.3, {
+					scale: 0.9,
+					alpha: 0,
+					ease: 'power2.in',
+					delay: (index * 0.1) + 0.3,
 					onComplete: this.onMenuHidden
 				} );
 			});
@@ -106,8 +106,8 @@ export default {
 
 		/*
 		 * animation complete, so dispatch
-		 * 
-		 */ 
+		 *
+		 */
 		onMenuHidden () {
 			this.animatedOutCount++;
 			if (this.animatedOutCount === 3) {
@@ -128,7 +128,7 @@ export default {
 				<div class="pseudo-video" ref="pseudoVideo">
 					<button class="menu-item" @click="mediaTypeSelected(mediaTypes.AUDIO_ONLY)">
 						<div>
-							<span class='icon-audio'></span>
+							<span class='icon-mic'></span>
 							<span>Record audio</span>
 							<aside>Say something with an audio only recording.</aside>
 						</div>
@@ -161,7 +161,7 @@ export default {
 <style lang="scss" scoped>
 
 $font-family-icon: 'schoolbox';
-$text-colour: #0066B0; //pull this out of settings 
+$text-colour: #0066B0; //pull this out of settings
 
 .pseudo-video {
 	width: 100%;
@@ -210,7 +210,7 @@ $text-colour: #0066B0; //pull this out of settings
 	}
 }
 
-	.icon-audio {
+	.icon-mic {
 		@extend .icon;
 		&:before {
 			content: '\e606';

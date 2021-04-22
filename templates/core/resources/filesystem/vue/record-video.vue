@@ -24,7 +24,7 @@ import recordMediaEvents from '../js/recordMediaEvents';
 
 
 export default {
-	
+
 	components: {
 		RecordMediaModal,
 		VideoPlayer
@@ -66,9 +66,9 @@ export default {
 
 		/*
 		 * To know that you'll be re-recording a video, overwriting the previously recorded
-		 * 
+		 *
 		 * @params { String }
-		 */ 
+		 */
 		turnOnText () {
 			if (this.mediaType === mediaTypes.CAMERA) {
 				return 'Turn on Camera';
@@ -79,9 +79,9 @@ export default {
 
 		/*
 		 * To know that you'll be re-recording a video, overwriting the previously recorded
-		 * 
+		 *
 		 * @params { String }
-		 */ 
+		 */
 		recordButtonText () {
 			if (this.recordedCount == 0) {
 				return 'Record';
@@ -92,9 +92,9 @@ export default {
 
 		/*
 		 * To know whether to show the convert button
-		 * 
+		 *
 		 * @params { Boolean }
-		 */ 
+		 */
 		showConvertAndUploadButton () {
 			if (this.canConvert && !this.isRecording && !this.isConverting && !this.isUploading) {
 				return true;
@@ -105,9 +105,9 @@ export default {
 
 		/*
 		 * To know whether to show the record button
-		 * 
+		 *
 		 * @params { Boolean }
-		 */ 
+		 */
 		showRecordButton () {
 			if (this.isDeviceReady && !this.isRecording && !this.isConverting && !this.isUploading) {
 				return true;
@@ -118,9 +118,9 @@ export default {
 
 		/*
 		 * To know whether to show the stop button
-		 * 
+		 *
 		 * @params { Boolean }
-		 */ 
+		 */
 		showStopButton () {
 			if (this.isDeviceReady && this.isRecording && !this.isConverting && !this.isUploading) {
 				return true;
@@ -131,9 +131,9 @@ export default {
 
 		/*
 		 * convert the filename to use .mp4 instead of whatever it was
-		 * 
+		 *
 		 * @params { String }
-		 */ 
+		 */
 		currentRecordedFilenameToMp4 () {
 			return convertFilenameExtension(this.newFilename, '.mp4');
 		},
@@ -146,7 +146,7 @@ export default {
 		this.initVideojs();
 	},
 
-	unmounted () { 
+	unmounted () {
 		this.destroyVideojs();
 	},
 
@@ -154,8 +154,8 @@ export default {
 
 		/*
 		 * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
-		 * 
-		 */ 
+		 *
+		 */
 		updateContainerHeight () {
 			const targetHeight = this.$refs.mediaContainer.getBoundingClientRect().width * 0.5625; //so there's no height jumps on switching videos
 			this.$refs.mediaContainer.style.height = targetHeight + 'px';
@@ -163,8 +163,8 @@ export default {
 
 		/*
 		 * to animate on when videojs ready
-		 * 
-		 */ 
+		 *
+		 */
 		hideForAnimateOn () {
 			gsap.set(this.$refs.recordingVideoContainer, { alpha: 0 } );
 			gsap.set(this.$refs.actions, { alpha: 0 } );
@@ -172,17 +172,17 @@ export default {
 
 		/*
 		 * Start it up
-		 * 
-		 */ 
+		 *
+		 */
 		initVideojs () {
 			this.recordPlayer = videojs(this.$refs.recordingVideo, this.getVideojsOptions(), this.onVideoJsReady);
-		},	
-		
+		},
+
 		/*
 		 * to return different options for CAMERA or SCREEN
-		 * 
+		 *
 		 * @returns {Object}
-		 */ 
+		 */
 		getVideojsOptions () {
 			if (this.mediaType === mediaTypes.CAMERA) {
 				return getRecordCameraOptions();
@@ -193,8 +193,8 @@ export default {
 
 		/*
 		 * videojs is ready, so set up listeners and animate on
-		 * 
-		 */ 
+		 *
+		 */
 		onVideoJsReady () {
 			try {
 				this.recordPlayer.record().getDevice();
@@ -211,8 +211,8 @@ export default {
 
 		/*
 		 * show the video and controls
-		 * 
-		 */ 
+		 *
+		 */
 		animateOn () {
 			gsap.to(this.$refs.recordingVideoContainer, 0.5, { alpha: 1 } );
 			gsap.to(this.$refs.actions, 0.4, { alpha: 1, delay: 0.2 } );
@@ -220,8 +220,8 @@ export default {
 
 		/*
 		 * the user has started/stopped recording a video
-		 * 
-		 */ 
+		 *
+		 */
 		initVideoRecordListeners () {
 			this.recordPlayer.on('startRecord', () => { // user clicked the record button and started recording
 				this.isRecording = true;
@@ -242,8 +242,8 @@ export default {
 
 		/*
 		 * initVideoErrorListeners
-		 * 
-		 */ 
+		 *
+		 */
 		initVideoErrorListeners () {
 			this.recordPlayer.on('error', (element, error) => { // error handling, not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
 				console.warn(error);
@@ -263,7 +263,7 @@ export default {
 		/*
 		 * convert all browser videos to mp4 for consistency
 		 * refer to https://github.com/ffmpegwasm/ffmpeg.wasm/blob/master/docs/api.md for further details
-		 */ 
+		 */
 		async convertVideo () {
 			try {
 				this.$emit(recordMediaEvents.PROCCESS_STARTED);
@@ -288,7 +288,7 @@ export default {
 
 		/*
 		 * to inform the user of progress to track estimated time of completion
-		 * 
+		 *
 		 * @params { ratio }
 		 */
 		updateConversionProgress (progress) {
@@ -300,8 +300,8 @@ export default {
 
 		/*
 		 * the mp4 is ready, so upload it up to SchoolBox
-		 * 
-		 */ 
+		 *
+		 */
 		async uploadConvertedVideo () {
 			try {
 				this.isUploading = true;
@@ -316,9 +316,9 @@ export default {
 
 		/*
 		 * Prep the data to FormData so Schoolbox accepts
-		 * 
+		 *
 		 * @returns { FormData }
-		 */ 
+		 */
 		getFormData () {
 			const formData = new FormData();
 			formData.append('upload', this.convertedData, this.currentRecordedFilenameToMp4);
@@ -329,9 +329,9 @@ export default {
 		 * inform any listeners that a file was uploaded.
 		 * put it in the dropzone, and inform the dropzone opener
 		 * that a file was posted to it.
-		 * 
+		 *
 		 * @params {Object}
-		 */ 
+		 */
 		postUploadedMessage (responseData) {
 			const data = {
 				title:    this.currentRecordedFilenameToMp4,
@@ -349,8 +349,8 @@ export default {
 
 		/*
 		 * ensure everything reset on possible modal re-display
-		 * 
-		 */ 
+		 *
+		 */
 		destroyVideojs () {
 			if (this.recordPlayer) {
 				this.recordPlayer.dispose();
@@ -358,18 +358,18 @@ export default {
 		},
 
 		/*
-		 * enable the device, initially it's a blank screen until enabled 
+		 * enable the device, initially it's a blank screen until enabled
 		 * may request permission on first use
-		 * 
-		 */ 
+		 *
+		 */
 		onEnableSelected () {
 			this.recordPlayer.record().getDevice();
 		},
 
 		/*
 		 * start the record
-		 * 
-		 */ 
+		 *
+		 */
 		onStartRecordSelected () {
 			this.recordPlayer.record().start();
 			this.$emit(recordMediaEvents.PROCCESS_STARTED);
@@ -377,8 +377,8 @@ export default {
 
 		/*
 		 * stop the record
-		 * 
-		 */ 
+		 *
+		 */
 		onStopRecordSelected () {
 			this.recordPlayer.record().stop();
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
@@ -386,8 +386,8 @@ export default {
 
 		/*
 		 * convert the video to mp4 format for consistent video format across browsers
-		 * 
-		 */ 
+		 *
+		 */
 		onConvertSelected () {
 			this.isFilenameChangeActive = true;
 		},
@@ -395,8 +395,8 @@ export default {
 
 		/*
 		 * convert the video to mp4 format for consistent video format across browsers
-		 * 
-		 */ 
+		 *
+		 */
 		onSaveFilenameSelected () {
 			this.isFilenameChangeActive = false;
 			this.convertVideo();
@@ -404,16 +404,16 @@ export default {
 
 		/*
 		 * close the error modal
-		 * 
-		 */ 
+		 *
+		 */
 		onCloseErrorModalSelected () {
 			this.$refs.errorModal.animateOff();
 		},
 
 		/*
 		 * it's closed now, so disable the error to allow trying again
-		 * 
-		 */ 
+		 *
+		 */
 		onErrorModalClosed () {
 			this.hasDeviceAlreadyInUseError = false;
 			this.hasPermissionDeniedError = false;
@@ -422,49 +422,49 @@ export default {
 
 		/*
 		 * close the filename modal
-		 * 
-		 */ 
+		 *
+		 */
 		onCloseFilenameModalSelected () {
 			this.$refs.filenameModal.animateOff();
 		},
 
 		/*
 		 * close the filename modal
-		 * 
-		 */ 
+		 *
+		 */
 		onFilenameModalClosed () {
 			this.isFilenameChangeActive = false;
 		},
 
 		/*
 		 * close the uploading modal
-		 * 
-		 */ 
+		 *
+		 */
 		onCloseUploadedModalSelected () {
 			this.$refs.uploadedModal.animateOff();
 		},
 
 		/*
 		 * it's closed now, so disable the error to allow trying again
-		 * 
-		 */ 
+		 *
+		 */
 		onUploadedModalClosed () {
 			this.hasUploaded = false;
 		},
 
 		/*
 		 * Pass through the video options to play the latest recorded video
-		 * 
+		 *
 		 * @returns { Object }
-		 */ 
+		 */
 		getVideoPlayerOptions () {
 			return getPlaybackOptions(this.recordedData);
 		},
 
 		/*
 		 * to ensure the video-player.vue video is initiated before calling methods on it
-		 * 
-		 */ 
+		 *
+		 */
 		onPlaybackVideoReady () {
 			this.isPlaybackVideoActive = true;
 		}
@@ -484,9 +484,9 @@ export default {
 							<video ref="recordingVideo" playsinline class="video-js"></video>
 						</div>
 						<div v-if="isPlaybackActive" class='video-container' key="playbackVideoContainer">
-							<video-player 
+							<video-player
 								ref="playbackVideo"
-								:options="getVideoPlayerOptions()" 
+								:options="getVideoPlayerOptions()"
 								@on-video-ready="onPlaybackVideoReady"
 							/>
 						</div>
@@ -494,21 +494,23 @@ export default {
 					<record-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError || hasConversionError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<template v-if="hasDeviceAlreadyInUseError">
 							<h3>The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</h3>
-							<button @click.prevent="onCloseErrorModalSelected">Close</button>	
+							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 						<template v-else-if="hasPermissionDeniedError">
 							<h3>Permission to access the device was denied. Please retry and grant access if you wish to proceed.</h3>
-							<button @click.prevent="onCloseErrorModalSelected">Close</button>	
+							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 						<template v-else-if="hasConversionError">
-							<h3>There was an error while converting.</h3>
-							<button @click.prevent="onCloseErrorModalSelected">Close</button>	
+              <div class="alert-box alert">
+							  <p>There was an error while converting.</p>
+              </div>
+							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 					</record-media-modal>
 					<record-media-modal v-else-if="isFilenameChangeActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
 						<label for="filename">Filename</label>
 						<input type="text" id="filename" name="filename" v-model="newFilename">
-						<button @click.prevent="onSaveFilenameSelected">Save &amp; Convert</button>
+						<button @click.prevent="onSaveFilenameSelected">Save &amp; convert</button>
 						<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
 					</record-media-modal>
 					<record-media-modal v-else-if="isConverting" ref="convertingModal" key="convertingModal">
@@ -516,11 +518,11 @@ export default {
 						<em>Converting the video to mp4, please wait...</em>
 					</record-media-modal>
 					<record-media-modal v-else-if="isUploading" ref="uploadingModal" key="uploadingModal">
-						<div class="loader"></div>						
+						<div class="loader"></div>
 						<em>Uploading video, please wait...</em>
 					</record-media-modal>
 					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
-						<em>Video succesfully converted &amp; uploaded.</em>
+						<em>Video successfully converted &amp; uploaded.</em>
 					</record-media-modal>
 				</div>
 			</div>
@@ -530,7 +532,7 @@ export default {
 				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
 				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#turn-on" key="camera">{{ turnOnText }}</a>
 				<transition name="fade">
-					<a v-if="showConvertAndUploadButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" title="Convert &amp; Upload" href="#stop-recording-video" key="convert">Convert &amp; Upload</a>
+					<a v-if="showConvertAndUploadButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" title="Convert &amp; Upload" href="#stop-recording-video" key="convert">Convert &amp; upload</a>
 				</transition>
 				<transition name="fade" mode="out-in">
 					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" :title="recordButtonText" href="#record-video" key="record">{{ recordButtonText }}</a>
@@ -553,6 +555,10 @@ export default {
 	height: 100%;
 	background: black;
 	overflow: hidden;
+
+  h2, h3 {
+    max-width: none;
+  }
 }
 
 .video-container {
