@@ -70,7 +70,6 @@ class StatusPage
     public function clickReviewAttempt(int $studentId, string $quizTitle, string $student): ReviewForm
     {
         $i = $this->tester;
-        //$i->scrollTo((Locator::lastElement('a.button')));
         $i->click('Review Attempt', StatusPage::getStatusSelector($studentId, ''));
         $i->waitForText('Marking ' . $quizTitle . ' quiz results for ' . $student);
         $reviewForm = new ReviewForm($i);
