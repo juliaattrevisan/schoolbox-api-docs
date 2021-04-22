@@ -74,7 +74,7 @@ export default {
                 }
             },
             headerToolbar: false,
-            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
             height: 'auto',
             initialView: 'list',
             events: this.events,

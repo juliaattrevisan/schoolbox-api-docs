@@ -82,7 +82,7 @@ export default {
                     slotMinWidth: '50'
                 }
             },
-            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
             customButtons: {
                 customExport: {
                     text: 'Export',

@@ -78,7 +78,7 @@ export default {
                     dayHeaderFormat: this.formats.displayWeekDay
                 }
             },
-            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
             customButtons: {
                 quickSwitchButton: {
                     text: ' ',

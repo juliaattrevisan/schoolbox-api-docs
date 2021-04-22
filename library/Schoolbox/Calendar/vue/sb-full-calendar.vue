@@ -131,7 +131,7 @@ export default {
                     listDayFormat: this.config.momentJsDateShort
                 }
             },
-            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
             customButtons: {
                 customExport: {
                     text: 'Export',
@@ -191,7 +191,6 @@ export default {
     },
 
     mounted() {
-
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();

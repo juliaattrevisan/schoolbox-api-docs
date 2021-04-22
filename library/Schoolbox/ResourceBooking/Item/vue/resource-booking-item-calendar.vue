@@ -88,7 +88,7 @@ export default {
                     allDaySlot: false,
                 }
             },
-            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
             customButtons: {
                 customExport: {
                     text: 'Export',

@@ -13,13 +13,14 @@ export const mixinFullCalendarHelper = {
 
     data () {
         return {
-            $_fullCalendarHelper_eventTimeFormat: {
+            fullCalendarHelper_eventTimeFormat: {
                 hour: 'numeric',
                 hour12: true,
                 minute: '2-digit',
                 meridiem: 'short',
                 omitZeroMinute: true
-            }
+            },
+            test: 'ha'
         }
     },
 

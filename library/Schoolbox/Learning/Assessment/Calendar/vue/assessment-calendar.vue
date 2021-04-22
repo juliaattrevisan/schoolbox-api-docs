@@ -167,7 +167,7 @@ export default {
             },
             initialView: 'resourceTimelineSemester',
             weekText: "''",
-            eventTimeFormat: this.$_fullCalendarHelper_eventTimeFormat,
+            eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
             headerToolbar: {
                 left: 'customToday,customPrev,customNext',
                 center: 'title',
