@@ -21,7 +21,7 @@ export default {
 		/**
 		 * Ensure the new lines are respected
 		 */
-		lineBreakedEventTitle () {
+		lineBreakedTitleText () {
 			const eventTitle = this.content.event.title;
 			return eventTitle.replace('\n', '<br>');
 		}
@@ -41,6 +41,9 @@ export default {
 			if (!this.$el.parentElement.className.includes('list')) { //don't do for list view, only within calendars
 				this.bkgColour = this.$el.parentElement.parentElement.style.backgroundColor;
 				const readableTextColor = tinycolor.mostReadable(this.bkgColour, ['black', 'white']).toRgbString();
+				if (this.content.timeText !== '') { //not always available
+					this.$refs.timeText.style.color = readableTextColor;
+				}
 				this.$refs.titleText.style.color = readableTextColor;
 			}
 		},
@@ -52,7 +55,7 @@ export default {
 
 <template>
 	<div>
-		<b v-if="content.timeText">{{ content.timeText }}</b>
-		<i ref="titleText" v-html="lineBreakedEventTitle"></i>
+		<b v-if="content.timeText" ref="timeText">{{ content.timeText }}</b>
+		<i ref="titleText" v-html="lineBreakedTitleText"></i>
 	</div>
 </template>
