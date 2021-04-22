@@ -116,7 +116,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                     // get the expensive timetable
                     $dayTimetable = $this->buildTimetableExpensively($this->getUser(), $campus, $date);
                 } else {
-                    $dayTimetable = $this->buildTimetableCheaply($this->getUser(), $campus, $dayNumber);
+                    $dayTimetable = $this->buildTimetableCheaply($this->getUser(), $campus, $dayNumber, $date);
                 }
 
                 // Load events for this campus
@@ -264,24 +264,25 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
      * The cheap implementation of buildTimetable()
      * Use when timetable precision is less necessary (eg. more than a couple of days in the future)
      *
-     * @param Schoolbox\User $user
-     * @param Campus         $campus
-     * @param int            $dayNumber
+     * @param Schoolbox\User      $user
+     * @param Campus              $campus
+     * @param int                 $dayNumber
+     * @param Alaress_Date_Format $date
      * @return array
      */
-    private function buildTimetableCheaply(Schoolbox\User $user, Campus $campus, $dayNumber): array
+    private function buildTimetableCheaply(Schoolbox\User $user, Campus $campus, int $dayNumber, Alaress_Date_Format $date): array
     {
         if (!$user->getExternalId()) {
             return [];
         }
         try {
             // we are aware of the deprecation of this method, but must use it regardless
-            /** @noinspection PhpDeprecationInspection */
             $timetable = $this->externalTimetable->getDayTimetable(
                 $user->getExternalId(),
                 $user->getId(),
                 $campus,
-                $dayNumber
+                $dayNumber,
+                $date->getDatabaseDate()
             );
         } catch (Schoolbox\External\Exception $e) {
             // Can't fetch timetable? assume it's empty

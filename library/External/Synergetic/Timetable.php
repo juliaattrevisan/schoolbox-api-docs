@@ -182,8 +182,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $periodCount = 0;
 
         while ($period = $statement->fetch()) {
-
-
             $timetableDef['desc'][]     = $period['Description'];
             $timetableDef['start'][]    = date("g:ia", strtotime($period['TimeFrom']));
             $timetableDef['end'][]      = date("g:ia", strtotime($period['TimeTo']));
@@ -280,7 +278,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function getFileSemester(?string $externalId = null, ?Alaress_Date_Format $date = null): ?string
     {
-        if ($date) {
+        // if date is provided and is not today, get fileSemester and year from the date
+        if ($date && !$date->isToday()) {
             $dateFileSemesterYear = $this->getFileSemesterFileYear($date);
             if (isset($dateFileSemesterYear['fileSemester'])) {
                 return $dateFileSemesterYear['fileSemester'];
@@ -318,8 +317,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                 $this->semesters[] = [
                     'fileYear'     => $semester['FileYear'],
                     'fileSemester' => $semester['FileSemester'],
-                    'start'        => new Alaress_Date_Format($semester['SemesterStart'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
-                    'end'          => new Alaress_Date_Format($semester['SemesterEnd'], Alaress_Date_Format::DATABASE_DATE_FORMAT),
+                    'start'        => (new Alaress_Date_Format($semester['SemesterStart'], Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay(),
+                    'end'          => (new Alaress_Date_Format($semester['SemesterEnd'], Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay(),
                 ];
             }
         }
@@ -665,7 +664,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             return [];
         }
 
-        $dateYearSemester = [];
         $dateObject = null;
         if ($date) {
             $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
