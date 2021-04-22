@@ -70,10 +70,9 @@ class StatusPage
     public function clickReviewAttempt(int $studentId, string $quizTitle, string $student): ReviewForm
     {
         $i = $this->tester;
-        $i->scrollTo((Locator::lastElement('a.button')));
+        //$i->scrollTo((Locator::lastElement('a.button')));
         $i->click('Review Attempt', StatusPage::getStatusSelector($studentId, ''));
         $i->waitForText('Marking ' . $quizTitle . ' quiz results for ' . $student);
-
         $reviewForm = new ReviewForm($i);
         $reviewForm->quizTitle = $quizTitle;
         return $reviewForm;
@@ -91,14 +90,11 @@ class StatusPage
         $i->click(self::LINK_JELLY_TOT);
         $i->click(self::LINK_REVIEW_HORIZONTAL);
         $i->waitForText('Horizontal Marking for ' . $quizTitle);
-
         $i->click('Q1)');
         $i->waitForText('Horizontal Marking for ' . $quizTitle);
-
         $reviewHorizontalForm = new ReviewHorizontalForm($i);
         $reviewHorizontalForm->quizTitle = $quizTitle;
         return $reviewHorizontalForm;
-
     }
 
     /**
@@ -112,10 +108,8 @@ class StatusPage
         $i->click(self::LINK_JELLY_TOT);
         $i->click(self::LINK_BULK_REVIEW);
         $i->waitForText('Mark Attempts as Reviewed');
-
         $i->click('Mark All as Reviewed');
         $i->waitForText('Status of ' . $quizTitle);
-
     }
 
 }

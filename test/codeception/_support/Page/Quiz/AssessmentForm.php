@@ -78,7 +78,6 @@ class AssessmentForm
     public function create(): self
     {
         $i = $this->tester;
-        $i->scrollTo(['css' => self::SELECTOR_BUTTON_CREATE]);
         $i->waitForElement(self::SELECTOR_BUTTON_CREATE);
         $i->click(self::SELECTOR_BUTTON_CREATE);
         $i->waitForElement('input[name="assess_id"]');
@@ -93,13 +92,6 @@ class AssessmentForm
     public function update(): self
     {
         $i = $this->tester;
-       // $element = Locator::contains(self::SELECTOR_BUTTON_UPDATE, 'Update');
-        //$element = (Locator::lastElement(self::SELECTOR_BUTTON_UPDATE));
-       // $i->scrollTo('input#curriculum-code-select-selectized');
-       // $i->executeJS('window.scrollTo(0,35000);');
-       // $i->scrollTo(Locator::contains(self::SELECTOR_BUTTON_UPDATE, 'Update'),500,20);
-       // $element = Locator::contains('a.icon.modify','My Links');
-        $i->pressKey(self::SELECTOR_BUTTON_UPDATE,WebDriverKeys::PAGE_DOWN);
         $i->waitForElementVisible(self::SELECTOR_BUTTON_UPDATE,5);
         $i->click(self::SELECTOR_BUTTON_UPDATE);
         return $this;

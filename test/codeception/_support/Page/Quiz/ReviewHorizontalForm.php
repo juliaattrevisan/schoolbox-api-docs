@@ -49,9 +49,6 @@ class ReviewHorizontalForm
     public function finalise()
     {
         $i = $this->tester;
-
-        //$i->scrollTo((Locator::lastElement('a.button.submit')));
-        $i->scrollTo('a.button.submit');
         $i->waitForElementVisible('a.button.submit',2);
         $i->click('a.button.submit');
         $i->waitForText('Status of ' . $this->quizTitle);

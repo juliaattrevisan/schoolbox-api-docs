@@ -216,16 +216,6 @@ class ReviewCest
         // Az Zane, change visibility
         $i->impersonate($teacher);
         $i->amOnPage('/homepage/' . $classId);
-//        $element = Locator::combine('div.card.small-12 a h3', $quizTitle);
-//        $element = Locator::contains(Locator::combine('h3', 'div.card.small-12'), $quizTitle);
-//        $element = Locator::humanReadableString($quizTitle);
-
-//        $element = Locator::contains('div.card.small-12 a h3', $quizTitle);
-
-//        $i->scrollTo($element);
-        //$i->scrollTo('div#component2989.component-container.Schoolbox_Learning_Assessment_Quiz_Component_Homepage_Controller');
-        //$i->waitForText($quizTitle);
-//        $i->click($element,'#content');
         $i->click($quizTitle,'#content');
         $i->waitForText('Begin Quiz');
 
