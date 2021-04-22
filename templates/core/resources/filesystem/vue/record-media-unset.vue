@@ -142,7 +142,7 @@ export default {
 					</button>
 					<button class="menu-item" @click="mediaTypeSelected(mediaTypes.SCREEN)">
 						<div>
-							<div class='icon-screen'></div>
+							<div class='icon-screen-capture'></div>
 							<span>Record your screen</span>
 							<aside>Choose a computer screen to create a screen recording.</aside>
 						</div>
@@ -213,7 +213,7 @@ $text-colour: #0066B0; //pull this out of settings
 	.icon-mic {
 		@extend .icon;
 		&:before {
-			content: '\e606';
+			content: '\e641';
 		}
 	}
 
@@ -224,10 +224,10 @@ $text-colour: #0066B0; //pull this out of settings
 		}
 	}
 
-	.icon-screen {
+	.icon-screen-capture {
 		@extend .icon;
 		&:before {
-			content: '\e917';
+			content: '\e920';
 		}
 	}
 
