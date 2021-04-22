@@ -236,7 +236,7 @@ class Definition implements IStrategy
 
                         $newTitle = "{$period->getTitle()} ({$existingTuples[$period->getDay()][$period->getTitle()]})";
 
-                        $this->log->critical(sprintf(
+                        $this->log->warning(sprintf(
                             'Augmented %s since it occurs multiple times in day %s and cycle %s',
                             $period->getTitle(),
                             $period->getDay(),

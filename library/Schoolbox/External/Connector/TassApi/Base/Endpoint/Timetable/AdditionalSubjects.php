@@ -255,7 +255,7 @@ class AdditionalSubjects implements IStrategy
                     'code' => (string)$externalId
                 ]);
             } catch (\RuntimeException $e) {
-                $this->log->critical($e->getMessage());
+                $this->log->warning($e->getMessage());
 
                 continue;
             }
