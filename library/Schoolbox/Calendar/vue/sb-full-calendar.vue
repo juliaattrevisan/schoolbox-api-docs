@@ -16,6 +16,8 @@ import axios                      from 'axios'
 import qs                         from "qs";
 import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
+import SbFullCalendarEvent		  from './sb-full-calendar-event.vue';
+
 
 // Various URLs that FullCalendar may make use of.
 const URL_STATE_CHANGE = '/calendar/changeState';
@@ -64,6 +66,7 @@ export default {
         ViewEventModal,
         FullCalendar,
         FlatPickr,
+        SbFullCalendarEvent,
     },
 
     mixins: [
@@ -769,7 +772,11 @@ export default {
         <full-calendar
             ref="fullCalendar"
             :options="calendarOptions"
-        />
+        >
+			<template v-slot:eventContent="arg">
+				<sb-full-calendar-event :content="arg" />
+            </template>
+        </full-calendar>
 
         <flat-pickr
             ref="flatPickr"
