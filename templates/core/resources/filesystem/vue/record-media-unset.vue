@@ -198,37 +198,38 @@ $text-colour: #0066B0; //pull this out of settings
 }
 
 .icon {
-	display: block;
-	margin: 0px auto 10px auto;
-	width: 50px;
-	height: 50px;
 	font-family: $font-family-icon;
+
 	&:before {
 		color: $text-colour;
-		font-size: 50px;
-		line-height: 1;
+    font-size: 3rem;
+		padding: 0;
 	}
 }
 
-	.icon-mic {
-		@extend .icon;
-		&:before {
-			content: '\e641';
-		}
-	}
+.icon-mic {
+  @extend .icon;
+  &:before {
+    content: '\e641';
+  }
+}
 
-	.icon-video {
-		@extend .icon;
-		&:before {
-			content: '\e674';
-		}
-	}
+.icon-video {
+  @extend .icon;
+  &:before {
+    content: '\e674';
+  }
+}
 
-	.icon-screen-capture {
-		@extend .icon;
-		&:before {
-			content: '\e920';
-		}
-	}
+.icon-screen-capture {
+  @extend .icon;
+  &:before {
+    content: '\e920';
+  }
+}
+
+@media screen and (max-width: 640px) {
+  flex-wrap: wrap;
+}
 
 </style>

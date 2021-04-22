@@ -493,24 +493,22 @@ export default {
 					</div>
 					<record-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError || hasConversionError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<template v-if="hasDeviceAlreadyInUseError">
-							<h3>The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</h3>
+              <div class="alert-box warning">The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 						<template v-else-if="hasPermissionDeniedError">
-							<h3>Permission to access the device was denied. Please retry and grant access if you wish to proceed.</h3>
+              <div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 						<template v-else-if="hasConversionError">
-              <div class="alert-box alert">
-							  <p>There was an error while converting.</p>
-              </div>
+              <div class="alert-box alert">There was an error while converting.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 					</record-media-modal>
 					<record-media-modal v-else-if="isFilenameChangeActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
 						<label for="filename">Filename</label>
 						<input type="text" id="filename" name="filename" v-model="newFilename">
-						<button @click.prevent="onSaveFilenameSelected">Save &amp; convert</button>
+						<button @click.prevent="onSaveFilenameSelected">Save and convert</button>
 						<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
 					</record-media-modal>
 					<record-media-modal v-else-if="isConverting" ref="convertingModal" key="convertingModal">
@@ -580,6 +578,5 @@ export default {
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0;
 }
-
 
 </style>
