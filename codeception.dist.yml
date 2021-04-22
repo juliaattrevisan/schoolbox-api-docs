@@ -12,7 +12,7 @@ suites:
                     window_size: false
                     capabilities:
                         chromeOptions:
-                            args: ["--headless", "--disable-gpu", "--window-size=1920x1080", "--ignore-certificate-errors"]
+                            args: ["--headless", "--disable-gpu", "--window-size=1920x9999", "--ignore-certificate-errors"]
                             binary: "/usr/lib/chromium-browser/chromium-browser"
                         acceptInsecureCerts: true
                 - \Helper\Acceptance
