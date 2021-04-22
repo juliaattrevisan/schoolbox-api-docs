@@ -82,13 +82,16 @@ export default {
                     titleFormat: this.dayTitleFormat,
                     dayHeaders: false,
                     allDaySlot: false,
+					slotMinTime: '06:00:00'
                 },
                 week: {
                     dayHeaderFormat: this.formats.displayWeekDay,
                     allDaySlot: false,
+					slotMinTime: '06:00:00'
                 }
             },
             eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
+			eventTextColor: 'black',
             customButtons: {
                 customExport: {
                     text: 'Export',

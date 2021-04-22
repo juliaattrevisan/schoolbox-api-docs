@@ -83,7 +83,8 @@ export default {
                 }
             },
             eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
-            customButtons: {
+            eventTextColor: 'black',
+			customButtons: {
                 customExport: {
                     text: 'Export',
                     click: this.onExportClick
