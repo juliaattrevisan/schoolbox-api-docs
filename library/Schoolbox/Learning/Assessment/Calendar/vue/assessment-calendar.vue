@@ -153,10 +153,10 @@ export default {
             duration: { weeks: 1 },
             slotDuration: { days: 1 },
             slotLabelFormat: [
-                'ddd DD',
+                'ddd DD'
             ],
             resourceAreaWidth: '15%',
-            filterResourcesWithEvents: true,
+            filterResourcesWithEvents: true
         },
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
@@ -210,7 +210,7 @@ export default {
             firstDay: '1',
             initialDate: this.termStartDate,
             viewDidMount: this.viewDidMount,
-            weekNumberCalculation: "'ISO'",
+            weekNumberCalculation: 'ISO',
             loading: this.$_fullCalendarHelper_onLoading,
             eventClick: this.onEventClick,
             dateClick: this.onDateClick,
