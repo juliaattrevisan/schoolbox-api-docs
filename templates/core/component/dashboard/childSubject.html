@@ -65,11 +65,11 @@
                             <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/jquery.geosnapshot.js"></script>
                             <script>
                                 $(function() {
-                                    $('[data-view-photos]').on('click', function(event) {
+                                    $('[data-view-photos={STUDENT_ID}]').on('click', function(event) {
                                         event.preventDefault();
 
                                         $(this).geosnapshot({
-                                            id: '/pantry/' + $(this).attr('data-view-photos')
+                                            url: '/geosnapshot/user/' + $(this).attr('data-view-photos')
                                         }).requestGallery();
                                     });
                                 });

@@ -9,7 +9,6 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
-use Schoolbox\Geosnapshot\Component\Dashboard\Module;
 
 class Geosnapshot extends ModuleLoader
 {
@@ -21,6 +20,7 @@ class Geosnapshot extends ModuleLoader
      */
     public function configure($kernel): void
     {
-        $this->loadModule($kernel, Module::class, "/weather/component/dashboard");
+        $this->loadModule($kernel, \Schoolbox\Geosnapshot\Component\Dashboard\Module::class, "/geosnapshot/component/dashboard");
+        $this->loadModule($kernel, \Schoolbox\Geosnapshot\Module::class, "/geosnapshot");
     }
 }
