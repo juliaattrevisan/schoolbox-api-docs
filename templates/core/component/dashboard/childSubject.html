@@ -61,7 +61,21 @@
                         <!-- END achievements -->
 
                         <!-- BEGIN geosnapshot -->
-                        <li><a class="icon-view" href="#">View Photos</a></li>
+                        <li>
+                            <script type="text/javascript">
+
+                                /* Initiate async request
+                                 */
+                                window.addEventListener('DOMContentLoaded', (event) => {
+                                    let geosnapshotUrl = '/pantry';
+
+                                    fetch(geosnapshotUrl)
+                                    .then(response => response.json())
+                                    .then(data => console.log(data));
+                                });
+                            </script>
+                            <a class="icon-view" href="#">View Photos</a>
+                        </li>
                         <!-- END geosnapshot -->
 
                         <!-- BEGIN custom_buttons -->
