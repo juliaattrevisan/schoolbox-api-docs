@@ -468,6 +468,12 @@ class Kernel extends WebKernelAbstract
 
         /** @var \SitePage $sitePage */
         $sitePage = $this->di->get('sitePage');
+
+        // If at this point, we unfortunately must init Sitepage's session.
+        // This is because all existing requests which passed through here used
+        // the SitePage variant which initialized the session: if we don't init
+        // now, it won't ever be initialized.
+        $sitePage->initSession();
         $sitePage->loadContent($pageName);
         $sitePage->outputPage();
     }
