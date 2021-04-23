@@ -189,7 +189,7 @@ module.exports = {
         usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/file.main.js',
 
         //Record Media
-        recordMedia: './templates/core/resources/filesystem/vue/initRecordMedia.js', 
+        recordMedia: './templates/core/resources/filesystem/vue/initRecordMedia.js',
 
         //Sass
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
@@ -339,6 +339,7 @@ module.exports = {
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
             '@shared': path.resolve(__dirname, 'www/static/javascript/shared'),
+            '@css': path.resolve(__dirname, 'www/static/css/foundation')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

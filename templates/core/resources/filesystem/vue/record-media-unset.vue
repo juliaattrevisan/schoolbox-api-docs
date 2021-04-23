@@ -160,22 +160,29 @@ export default {
 
 <style lang="scss" scoped>
 
+@import '@css/utils/variables';
+
 $font-family-icon: 'schoolbox';
-$text-colour: #0066B0; //pull this out of settings
 
 .pseudo-video {
 	width: 100%;
 	height: 300px; //will be updated at mounted()
 	display: flex;
-	background: black;
+	background: transparent !important;
 	overflow: hidden;
 }
 
 .menu-item {
+  background: #FAFAFA;
+  border: 1px solid #EDEDED;
 	width: calc(33.4%);
-	height: 100%;
-	background: #FAFAFA;
+  margin-right: 1rem;
+  margin-top: 1rem;
   transform: none !important;
+
+  &:last-child {
+    margin-right: 0;
+  }
 
 	span {
 		display: block;
@@ -203,7 +210,7 @@ $text-colour: #0066B0; //pull this out of settings
 	font-family: $font-family-icon;
 
 	&:before {
-		color: $text-colour;
+		color: $content-ui-foreground;
     font-size: 3rem;
 		padding: 0;
 	}

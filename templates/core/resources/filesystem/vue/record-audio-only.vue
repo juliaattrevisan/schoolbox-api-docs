@@ -21,7 +21,7 @@ import recordMediaEvents from '../js/recordMediaEvents';
 
 
 export default {
-	
+
 	components: {
 		RecordMediaModal
 	},
@@ -44,9 +44,9 @@ export default {
 
 		/*
 		 * To know that you'll be re-recording a video, overwriting the previously recorded
-		 * 
+		 *
 		 * @params { String }
-		 */ 
+		 */
 		recordButtonText () {
 			if (this.recordedCount == 0) {
 				return 'Record';
@@ -57,9 +57,9 @@ export default {
 
 		/*
 		 * To know whether to show the convert button
-		 * 
+		 *
 		 * @params { Boolean }
-		 */ 
+		 */
 		showUploadButton () {
 			if (this.recordedCount > 0 && !this.isRecording && !this.isUploading) {
 				return true;
@@ -70,9 +70,9 @@ export default {
 
 		/*
 		 * To know whether to show the record button
-		 * 
+		 *
 		 * @params { Boolean }
-		 */ 
+		 */
 		showRecordButton () {
 			if (this.isDeviceReady && !this.isRecording && !this.isUploading) {
 				return true;
@@ -83,9 +83,9 @@ export default {
 
 		/*
 		 * To know whether to show the stop button
-		 * 
+		 *
 		 * @params { Boolean }
-		 */ 
+		 */
 		showStopButton () {
 			if (this.isDeviceReady && this.isRecording && !this.isUploading) {
 				return true;
@@ -102,7 +102,7 @@ export default {
 		this.initVideojs();
 	},
 
-	unmounted () { 
+	unmounted () {
 		this.destroyVideojs();
 	},
 
@@ -110,8 +110,8 @@ export default {
 
 		/*
 		 * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
-		 * 
-		 */ 
+		 *
+		 */
 		updateContainerHeight () {
 			const targetHeight = this.$refs.mediaContainer.getBoundingClientRect().width * 0.5625; //so there's no height jumps on switching videos
 			this.$refs.mediaContainer.style.height = targetHeight + 'px';
@@ -119,8 +119,8 @@ export default {
 
 		/*
 		 * to animate on when videojs ready
-		 * 
-		 */ 
+		 *
+		 */
 		hideForAnimateOn () {
 			gsap.set(this.$refs.audioContainer, { alpha: 0 } );
 			gsap.set(this.$refs.actions, { alpha: 0 } );
@@ -128,16 +128,16 @@ export default {
 
 		/*
 		 * Start it up
-		 * 
-		 */ 
+		 *
+		 */
 		initVideojs () {
 			this.player = videojs(this.$refs.myAudio, getAudioOnlyOptions(), this.onVideoJsReady);
 		},
 
 		/*
 		 * videojs is ready, so set up listeners and animate on
-		 * 
-		 */ 
+		 *
+		 */
 		onVideoJsReady () {
 			try {
 				setTimeout(() => { //dodgy, trying to wait until 'VIDEOJS: wavesurfer.js microphone plugin enabled.' but can't see any event to track this...
@@ -157,8 +157,8 @@ export default {
 
 		/*
 		 * show the video and controls
-		 * 
-		 */ 
+		 *
+		 */
 		animateOn () {
 			gsap.to(this.$refs.audioContainer, 0.5, { alpha: 1 } );
 			gsap.to(this.$refs.actions, 0.4, { alpha: 1, delay: 0.2 } );
@@ -166,24 +166,24 @@ export default {
 
 		/*
 		 * to know the play status of the recoreded audio to toggle UI controls
-		 * 
-		 */ 
+		 *
+		 */
 		initVideoPlayListeners () {
-			this.player.on('play', () => { 
+			this.player.on('play', () => {
 				this.isPlaying = true;
 			});
-			this.player.on('pause', () => { 
+			this.player.on('pause', () => {
 				this.isPlaying = false;
 			});
-			this.player.on('ended', () => { 
+			this.player.on('ended', () => {
 				this.isPlaying = false;
 			});
 		},
 
 		/*
 		 * the user has started/stopped recording a audio
-		 * 
-		 */ 
+		 *
+		 */
 		initVideoRecordListeners () {
 			this.player.on('startRecord', () => { // user clicked the record button and started recording
 				this.isRecording = true;
@@ -200,8 +200,8 @@ export default {
 
 		/*
 		 * the mp3 is ready, so upload it up to SchoolBox
-		 * 
-		 */ 
+		 *
+		 */
 		async uploadAudio () {
 			try {
 				this.$emit(recordMediaEvents.PROCCESS_STARTED);
@@ -217,9 +217,9 @@ export default {
 
 		/*
 		 * Prep the data to FormData so Schoolbox accepts
-		 * 
+		 *
 		 * @returns { FormData }
-		 */ 
+		 */
 		getFormData () {
 			const formData = new FormData();
 			formData.append('upload', this.recordedData, this.recordedData.name);
@@ -230,9 +230,9 @@ export default {
 		 * inform any listeners that a file was uploaded.
 		 * put it in the dropzone, and inform the dropzone opener
 		 * that a file was posted to it.
-		 * 
+		 *
 		 * @params {Object}
-		 */ 
+		 */
 		postUploadedMessage (responseData) {
 			const data = {
 				title:    this.recordedData.name,
@@ -250,10 +250,10 @@ export default {
 
 		/*
 		 * initVideoErrorListeners
-		 * 
-		 */ 
+		 *
+		 */
 		initVideoErrorListeners () {
-			
+
 			this.player.on('error', (element, error) => { // error handling, not sure what would cause this trigger yet, but it's in the videojs-record examples
 				console.warn(error);
 			});
@@ -267,8 +267,8 @@ export default {
 
 		/*
 		 * ensure everything reset on possible modal re-display
-		 * 
-		 */ 
+		 *
+		 */
 		destroyVideojs () {
 			if (this.player) {
 				this.player.dispose();
@@ -276,20 +276,20 @@ export default {
 		},
 
 		/*
-		 * enable the device, initially it's a blank screen until enabled 
+		 * enable the device, initially it's a blank screen until enabled
 		 * may request permission on first use
-		 * 
-		 */ 
+		 *
+		 */
 		onEnableSelected () {
 			this.player.record().getDevice();
 		},
 
 
 		/*
-		 * enable the device, initially it's a blank screen until enabled 
+		 * enable the device, initially it's a blank screen until enabled
 		 * may request permission on first use
-		 * 
-		 */ 
+		 *
+		 */
 		onStartRecordSelected () {
 			this.player.record().start();
 			this.$emit(recordMediaEvents.PROCCESS_STARTED);
@@ -297,44 +297,44 @@ export default {
 
 
 		/*
-		 * enable the device, initially it's a blank screen until enabled 
+		 * enable the device, initially it's a blank screen until enabled
 		 * may request permission on first use
-		 * 
-		 */ 
+		 *
+		 */
 		onStopRecordSelected () {
 			this.player.record().stop();
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
 		},
 
 		/*
-		 * enable the device, initially it's a blank screen until enabled 
+		 * enable the device, initially it's a blank screen until enabled
 		 * may request permission on first use
-		 * 
-		 */ 
+		 *
+		 */
 		onUploadSelected () {
 			this.uploadAudio();
 		},
 
 		/*
 		 * close the error modal
-		 * 
-		 */ 
+		 *
+		 */
 		onCloseErrorModalSelected () {
 			this.$refs.errorModal.animateOff();
 		},
 
 		/*
 		 * it's closed now, so disable the error to allow trying again
-		 * 
-		 */ 
+		 *
+		 */
 		onErrorModalClosed () {
 			this.hasDeviceError = false;
 		},
 
 		/*
-		 * 
-		 * 
-		 */ 
+		 *
+		 *
+		 */
 		playAudio () {
 			// this.player.play(); //can't play/pause this audio only yet, something to do with promises maybe...
 		},
@@ -353,19 +353,19 @@ export default {
 						<audio id="myAudio" ref="myAudio" class="video-js"></audio>
 					</div>
 					<record-media-modal v-if="hasDeviceError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
-						<h3>The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</h3>
+            <div class="alert-box warning">The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</div>
 						<button @click.prevent="onCloseErrorModalSelected">Close</button>
 					</record-media-modal>
 					<record-media-modal v-else-if="isUploading" ref="uploadingModal" key="uploadingModal">
-						<div class="loader"></div>						
-						<em>Uploading audio, please wait...</em>
+						<div class="loader"></div>
+						<p><em>Uploading audio, please wait...</em></p>
 					</record-media-modal>
 					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
-						<em>Audio succesfully uploaded.</em>
+            <p><em>Audio succesfully uploaded.</em></p>
 					</record-media-modal>
 				</div>
 			</div>
-		</div>		
+		</div>
 		<div class="component-action" ref="actions">
 			<section>
 				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
