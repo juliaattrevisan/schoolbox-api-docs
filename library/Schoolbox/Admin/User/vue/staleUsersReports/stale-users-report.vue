@@ -88,7 +88,7 @@ export default {
 				texts: {
 					filterPlaceholder: 'Search for users...',
 					noResults: 'No matching users',
-					count: 'Showing {from} to {to} of {count} users|{count} users|One user'
+					count: 'Showing {from} to {to} of {count} users|{count} users|1 user'
 				},
 				skin: 'table-striped table-bordered table-hover',
 				sortIcon: {
@@ -97,7 +97,8 @@ export default {
 					up: 'glyphicon-chevron-up',
 					down: 'glyphicon-chevron-down'
 				},
-				debounce: 100, //faster debouce as data is stored on the client side
+				debounce: 100, //faster debouce as data is stored on the client side,
+				resizableColumns: false
 			},
 			singleRowName: 'user',
 			pluralRowName: 'users',
