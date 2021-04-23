@@ -1,7 +1,7 @@
 (function() {
 
     /**
-     * Plugin
+     * Geosnapshots
      *
      * @param options
      */
@@ -20,7 +20,7 @@
         function init(options, element) {
             let defaults = {
                 element: element,
-                url: '/pantry'
+                url: ''
             };
 
             let derived = {
@@ -40,6 +40,11 @@
                 toast.toastActivate({text: 'Retrieving photos...'});
 
                 $.get(config.url, function(responseText) {
+
+                    /* Temporarily ram this in
+                     */
+                    $('#component24').html('<iframe src="'+responseText.url+'" style="height:500px"></iframe>');
+
                     toast.toastTimeout({
                         text: 'Loaded.',
                     });
