@@ -10,7 +10,7 @@ import videojs from 'video.js';
 import recordMediaEvents from '../../../templates/core/resources/filesystem/js/recordMediaEvents'; //hmm, put this somewhere else?
 
 export default {
-	
+
 	props: {
 		options: {
 			type: Object,
@@ -42,35 +42,35 @@ export default {
 
 		/*
 		 * Start it up
-		 * 
-		 */ 
+		 *
+		 */
 		initVideojs () {
 			this.player = videojs(this.$refs.videoPlayer, this.options, () => {
 				this.$emit(recordMediaEvents.VIDEO_READY);
 			});
-			this.player.on('play', () => { 
+			this.player.on('play', () => {
 				this.isPlaying = true;
 			});
-			this.player.on('pause', () => {  
+			this.player.on('pause', () => {
 				this.isPlaying = false;
 			});
-			this.player.on('ended', () => { 
+			this.player.on('ended', () => {
 				this.isPlaying = false;
 			});
 		},
 
 		/*
 		 * for template/external control
-		 * 
-		 */ 
+		 *
+		 */
 		play () {
 			this.player.play();
 		},
 
 		/*
 		 * for template/external control
-		 * 
-		 */ 
+		 *
+		 */
 		pause () {
 			this.player.pause();
 		}
@@ -90,21 +90,52 @@ export default {
 
 //DEMO - see https://docs.videojs.com/tutorial-skins.html to update further
 
-/* Change all text and icon colors in the player. */
-.vjs-matrix.video-js {
-  color: #00ff00;
-}
-
-/* Change the border of the big play button. */
-.vjs-matrix .vjs-big-play-button {
-  border-color: #00ff00;
-}
-
-/* Change the color of various "bars". */
-.vjs-matrix .vjs-volume-level,
-.vjs-matrix .vjs-play-progress,
-.vjs-matrix .vjs-slider-bar {
-  background: #00ff00;
+.video-js {
+  .vjs-control-bar {
+    height: 4em;
+  }
+  .vjs-control {
+    width: 5em;
+  }
+  .vjs-volume-bar {
+    margin: 1.9em 0.45em;
+  }
+  .vjs-slider-horizontal .vjs-volume-level::before {
+    top: -0.4em;
+  }
+  .vjs-time-control {
+    color: white;
+    font-size: .875rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
+    width: auto;
+    min-width: 0;
+  }
+  .vjs-button > .vjs-icon-placeholder::before {
+    color: white;
+    font-size: 2.8em;
+    line-height: 1.4;
+  }
+  .vjs-big-play-button {
+    background-color: black;
+    border-color: white;
+    top: 50%;
+    left: 50%;
+    margin-left: -45px;
+    margin-top: -24px
+  }
+  .vjs-progress-holder,
+  .vjs-matrix .vjs-play-progress,
+  .vjs-matrix .vjs-slider-bar,
+  .vjs-volume-panel .vjs-volume-control,
+  .vjs-big-play-button .vjs-icon-placeholder::before {
+    color: white;
+  }
+  .vjs-matrix .vjs-volume-level,
+  .vjs-matrix .vjs-play-progress,
+  .vjs-matrix .vjs-slider-bar {
+    background: white;
+  }
 }
 
 </style>

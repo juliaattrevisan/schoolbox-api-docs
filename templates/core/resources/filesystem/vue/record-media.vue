@@ -13,7 +13,7 @@ import mediaTypes from '../js/mediaTypes';
 
 
 export default {
-	
+
 	components: {
 		RecordMediaMenu,
 		RecordMediaUnset,
@@ -66,37 +66,37 @@ export default {
 
 <template>
 	<div>
-		<record-media-menu 
-			@on-media-type-selected="onMediaTypeSelected" 
-			:current-media-type="currentMediaType" 
-			:is-process-active="isProcessActive" 
+		<record-media-menu
+			@on-media-type-selected="onMediaTypeSelected"
+			:current-media-type="currentMediaType"
+			:is-process-active="isProcessActive"
 		/>
 		<div>
-			<record-media-unset 
-				v-if="currentMediaType === mediaTypes.UNSET" 
-				@on-media-type-selected="onMediaTypeSelected" 
+			<record-media-unset
+				v-if="currentMediaType === mediaTypes.UNSET"
+				@on-media-type-selected="onMediaTypeSelected"
 			/>
 			<keep-alive><!-- to maintain recordings etc https://vuejs.org/v2/api/#keep-alive -->
-				<record-audio-only 
-					v-if="currentMediaType === mediaTypes.AUDIO_ONLY" 
+				<record-audio-only
+					v-if="currentMediaType === mediaTypes.AUDIO_ONLY"
 					@on-process-started="onProcessStarted"
-					@on-process-stopped="onProcessStopped" 
+					@on-process-stopped="onProcessStopped"
 				/>
-				<record-video 
+				<record-video
 					v-else-if="currentMediaType === mediaTypes.CAMERA"
 					:media-type="mediaTypes.CAMERA"
 					key="camera"
 					@on-process-started="onProcessStarted"
-					@on-process-stopped="onProcessStopped" 
+					@on-process-stopped="onProcessStopped"
 				/>
-				<record-video 
+				<record-video
 					v-else-if="currentMediaType === mediaTypes.SCREEN"
 					:media-type="mediaTypes.SCREEN"
 					key="screen"
 					@on-process-started="onProcessStarted"
-					@on-process-stopped="onProcessStopped" 
+					@on-process-stopped="onProcessStopped"
 				/>
-			</keep-alive>    
+			</keep-alive>
 		</div>
 	</div>
 </template>
