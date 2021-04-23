@@ -55,7 +55,7 @@ class ValidGeosnapshotAvailable
         /* $viewer is a staff member;
          * They can view content for anyone
          */
-        if ($viewer->getRole() && $viewer->getRole()->isStaff()) {
+        if ($viewer->getRole()->isStaff()) {
             return true;
         }
 
