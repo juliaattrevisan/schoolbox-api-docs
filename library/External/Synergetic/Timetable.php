@@ -261,7 +261,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
      */
     private function getFileYear(?string $externalId = null, ?Alaress_Date_Format $date = null): ?string
     {
-        if ($date) {
+        // if date is provided and is not today, get fileSemester and year from the date
+        if ($date && !$date->isToday()) {
             $dateFileSemesterYear = $this->getFileSemesterFileYear($date);
             if (isset($dateFileSemesterYear['fileYear'])) {
                 return $dateFileSemesterYear['fileYear'];
