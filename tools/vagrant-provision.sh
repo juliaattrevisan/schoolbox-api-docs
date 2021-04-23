@@ -410,6 +410,9 @@ service nginx restart;
 echo "[SB][`date +%Y-%m-%d\ %X`] Removing system maintenance mode";
 /vagrant/tools/maintenance/site_up.sh;
 
+echo "[SB][`date +%Y-%m-%d\ %X`] Stopping Gotenberg service";
+docker ps -f ancestor=thecodingmachine/gotenberg:6 -q | xargs docker stop
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
 docker run -d --rm --network host --name schoolbox_vagrant_gotenberg thecodingmachine/gotenberg:6;
 
