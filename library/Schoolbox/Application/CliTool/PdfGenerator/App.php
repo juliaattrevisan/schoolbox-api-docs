@@ -21,6 +21,7 @@ use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Realtime\Pipe\PipeManager;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use TheCodingMachine\Gotenberg;
 use Zend\Uri\Uri;
@@ -297,11 +298,10 @@ BASE;
      */
     private function generateBaseUrl(): UriInterface
     {
-        $domain  = trim("{$this->getConfig()->get('site_hostname')}.{$this->getConfig()->get('site_domain')}");
         $port    = $this->getOptAsInt(self::OPT_LONG_PORT);
-        $baseUrl = (new Uri())
-            ->setScheme('https')
-            ->setHost($domain);
+        $baseUrl = (new Factory($this->getConfig()))
+            ->buildFullyQualified()
+            ->setScheme('https');
         if (isset($port)) {
             $baseUrl = $baseUrl->setPort($port);
         }

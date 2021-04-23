@@ -19,7 +19,9 @@ use ICollection;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+//use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -60,11 +62,14 @@ use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Sentry\State\HubInterface;
+use TheCodingMachine\Gotenberg;
 use UnexpectedValueException;
 use ZipStream;
 
@@ -380,49 +385,46 @@ class Controller extends Assessment\Controller
         $zipStream = new ZipStream\ZipStream("{$titleSanitized}-{$dateNow}.zip", $zipOptions);
 
         // Iterate participants and get their responses
-
         /** @var Participant $participant */
         foreach ($participants as $participant) {
-            // Get the users details and generate an appropriate folder name with the date/time stamp of the submission
+            // Short-circuit if there's no interactions
+            // (draft feedback does count, though)
+            if ($participant->getAllFeedbacks()->count() === 0 && !$participant->hasSubmittedResponse()) {
+                continue;
+            }
 
+            // Get the users details and generate an appropriate folder name
             if (!isset($users[$participant->getUser()->getId()])) {
                 $users[$participant->getUser()->getId()] = $this->getUserMapper()->findByIdWithFallback($participant->getUser()->getId());
             }
+            $participantUser = $users[$participant->getUser()->getId()];
+            $baseFolderName = sprintf(
+                "%s_%s_%d",
+                $this->sanitizeForFilename($participantUser->getLastname()),
+                $this->sanitizeForFilename($participantUser->getFirstname()),
+                $participantUser->getId(),
+            );
 
-            $responses = $participant->getAllResponses();
-
-            // Iterate all their responses
-
+            // Iterate all their submitted responses
             /** @var Submission $response */
-            foreach ($responses as $response) {
+            foreach ($participant->getSubmittedResponses() as $response) {
                 // If the response is a submission...
-
-                if ($response instanceof Submission && !$response->isDraft()) {
-                    $lastNameSanitized  = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getLastname());
-                    $firstNameSanitized = $this->sanitizeForFilename($users[$participant->getUser()->getId()]->getFirstname());
-
-                    $directory = sprintf(
-                        "%s_%s_%s-%s",
-                        $lastNameSanitized,
-                        $firstNameSanitized,
-                        $users[$participant->getUser()->getId()]->getId(),
-                        $response->getSubmittedAt()->getUsingFormat('Ymd-His')
-                    );
-
+                if ($response instanceof Submission) {
                     // ...iterate all files in that submission and add them to the ZIP archive
-
-                    $files = $response->getAllFiles();
-
-                    /** @var SubmissionFile $file */
-                    foreach ($files as $file) {
+                    foreach ($response->getAllFiles() as $file) {
                         if ($file->exists()) {
-                            $filenameSanitized = $this->sanitizeForFilename($file->getBasename());
-                            $zipFilename       = sprintf("%s/%s", $directory, $filenameSanitized);
+                            $zipFilename = sprintf(
+                                "%s/%s/%s",
+                                $baseFolderName,
+                                $response->getSubmittedAt()->getUsingFormat('Ymd-His'),
+                                $this->sanitizeForFilename($file->getBasename())
+                            );
                             $zipStream->addFileFromStream($zipFilename, $file->readStream());
                         }
                     }
                 }
             }
+            $this->addSubmissionHistoryToZipStream($participant, $zipStream, $baseFolderName);
         }
 
         // Stream the zip archive
@@ -1401,5 +1403,81 @@ class Controller extends Assessment\Controller
             $kamiModels[$kamiModel->getId()] = $kamiModel;
         }
         return $kamiModels;
+    }
+
+
+    /**
+     * Add this participant's submission history (as a generated PDF) to the Zip
+     * stream for download.
+     *
+     * @param Participant         $participant    The participant record
+     * @param ZipStream\ZipStream $zipStream      The stream to download
+     * @param string              $baseFolderName The folder within `$zipStream`
+     *                                            to put the PDF
+     * @throws Gotenberg\ClientException
+     * @throws Gotenberg\FilesystemException
+     * @throws Gotenberg\RequestException
+     * @throws RouteNotFound
+     * @throws ZipStream\Exception\FileNotFoundException
+     * @throws ZipStream\Exception\FileNotReadableException
+     */
+    private function addSubmissionHistoryToZipStream(
+        Participant $participant,
+        ZipStream\ZipStream $zipStream,
+        string $baseFolderName
+    ): void {
+        // Generate a PDF of the submission history page,
+        // Since PDF generation is a remote service, need a fully-qualified
+        // domain name in the URL.
+        $urlFactory = new Factory($this->getConfigLoader());
+        $url        = $urlFactory
+            ->buildFullyQualified()
+            ->setScheme('https')
+            ->setPort($this->request->server->get('SERVER_PORT'))
+            ->setPath(
+                $this->router->generate(
+                    'learningAssessment.getSummary',
+                    [
+                        'assessmentId' => $participant->getAssessable()->getId(),
+                        'studentId'    => $participant->getUser()->getId(),
+                    ],
+                )
+            );
+
+        $request = new Gotenberg\URLRequest($url->toString());
+        $request->setWaitDelay(1);
+        $request->setScale(0.75);
+        $request->setLandscape(true);
+
+        // Authenticate using the cookie
+        // TODO ensure drafts do not show
+        // (This shows submission history in context of current user: should
+        //  show in context of student, or parent)
+        $request->addRemoteURLHTTPHeader(
+            'Cookie',
+            sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, session_id())
+        );
+
+//        // Alternately use the token
+//        // (Can't use the token until SA-11077 is done)
+//        /** @var Jwt $tokenBuilder */
+//        $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
+//        $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($participant->getUser()));
+
+        // Generate, download and store the PDF
+        $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
+
+        $tempfile = sb_tempnam();
+        try {
+            $pdfGenerator->store($request, $tempfile);
+            $zipFilename = sprintf(
+                "%s/submissionHistory.pdf",
+                $baseFolderName,
+            );
+            $zipStream->addFileFromPath($zipFilename, $tempfile);
+        } finally {
+            // Clean up once finished
+            unlink($tempfile);
+        }
     }
 }

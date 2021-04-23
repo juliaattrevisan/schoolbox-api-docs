@@ -130,6 +130,10 @@ table.rb {
             font-weight: normal;
             padding-left: 1rem;
         }
+        // Print font size for the rubric grid: ~10px
+        @media print {
+           font-size: rem-calc(($base-font-size * 0.625));
+        }
     }
 
     td {

@@ -36,6 +36,7 @@
     {% if download %}
         <li>
             <a class="icon-download"
+               id="download-submissions"
                href="{{ routeLookup('learningAssessment.downloadSubmissions', {
                    assessmentId: assessment.id,
                    assessment: assessment
@@ -280,6 +281,20 @@
  # Massive javascript hulk
  #}
 {% block scripts %}
+    {% autoescape 'js' %}
+    <script type="text/javascript">
+        $(function () {
+            $('#download-submissions').click(function (event) {
+                event.preventDefault();
+                $(this).confirmDialog({
+                    header: 'Download all submissions?',
+                    text: 'Please be aware that your download will take some time to begin as we compile the students feedback and submissions into a ZIP file.',
+                });
+            })
+        });
+    </script>
+    {% endautoescape %}
+
     {% if not readonly %}
         <script type="application/javascript" src="{{ CDN_PREFIX }}/javascript/shared/submissions/jquery.bulky.js"></script>
         <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
