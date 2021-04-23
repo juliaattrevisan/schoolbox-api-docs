@@ -1,3 +1,5 @@
+-- Add Geosnapshot api key input field
+-- 3rd Party Services
 INSERT INTO `config`
     (`name`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES
@@ -12,5 +14,25 @@ VALUES
         'settings',
         (SELECT MAX(sequence)+1 FROM config c WHERE type_id = (
             SELECT id FROM lu_config_type WHERE type = '3rd Party Services'
+        ))
+    );
+
+-- Module option
+-- Geosnapshot is plan-specific
+INSERT INTO `config`
+    (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
+VALUES
+       ('geosnapshot_enabled',
+        '0',
+        'Geosnapshot Integration',
+        'If ON, Geosnapshot integration is enabled.',
+        (SELECT id FROM lu_config_field WHERE field = 'boolean'),
+        (SELECT id FROM lu_config_type WHERE type = 'Modules'),
+        'true',
+        'false',
+        'false',
+        'settings',
+        (SELECT MAX(sequence)+1 FROM config c WHERE type_id = (
+            SELECT id FROM lu_config_type WHERE type = 'Modules'
         ))
     );
