@@ -61,6 +61,9 @@ class ValidStudentPhotosAvailableTest extends TestCase
             ->setFirstname('Eden')
             ->setLastname('Reed');
 
+        /* TODO Add jana without a picture, because you need a picture to succeed at this stuff
+         */
+
         $davidRhodes = (new \Schoolbox\User())
             ->setId(230)
             ->setFirstname('David')
