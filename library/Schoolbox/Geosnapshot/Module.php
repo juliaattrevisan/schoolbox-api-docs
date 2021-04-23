@@ -15,6 +15,7 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -64,7 +65,7 @@ class Module extends BaseModule
         }
 
         return [
-            'user' => $user,
+            'viewee' => $user,
         ];
     }
 
@@ -101,6 +102,7 @@ class Module extends BaseModule
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
+            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
         ];
     }
