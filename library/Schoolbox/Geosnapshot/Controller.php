@@ -45,7 +45,21 @@ class Controller extends Base
      */
     public function getTransmit(User $user): void
     {
-        echo 'made it';
-        die();
+        /* If you're allowed to make this request...
+         */
+
+        /* Set up guzzle with the authentication pieces
+         */
+
+        /* Manufacture a payload with the necessary parts and send it out there
+         */
+
+        /* Get the iframe url back, if successful, and pop out a html fragment
+         * which we can inject into a modal, I guess
+         */
+
+        /* Otherwise just don't do anything and let the toaster communicate the issue
+         */
+        return;
     }
 }
