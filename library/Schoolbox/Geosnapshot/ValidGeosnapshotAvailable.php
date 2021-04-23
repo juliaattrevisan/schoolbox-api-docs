@@ -37,10 +37,16 @@ class ValidGeosnapshotAvailable
         /* Invalid API key; exit early
          * No connectivity allowed
          */
+        if ('' === (string)$apiKey) {
+            return false;
+        }
 
         /* Feature Flag is off; exit early
          * No connectivity allowed
          */
+        if (!$featureFlag) {
+            return false;
+        }
 
         /* TODO $viewee has been redacted from photos; exit early
          *  Nothing to see here for anyone
@@ -49,10 +55,16 @@ class ValidGeosnapshotAvailable
         /* $viewer is a staff member;
          * They can view content for anyone
          */
+        if ($viewer->getRole() && $viewer->getRole()->isStaff()) {
+            return true;
+        }
 
         /* $viewer is a parent of $viewee
          * They can view content for $viewee but nobody else
          */
+        if ($viewer->isParentOf($viewee)) {
+            return true;
+        }
 
         /* Otherwise you're someone else
          * No connectivity allowed
