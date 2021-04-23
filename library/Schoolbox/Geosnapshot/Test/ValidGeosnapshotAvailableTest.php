@@ -29,10 +29,10 @@ class ValidGeosnapshotAvailableTest extends TestCase
 
     /**
      * @dataProvider provider_validGeosnapshotAvailable
-     * @param     $apiKey
-     * @param     $featureFlag
-     * @param     $viewer
-     * @param     $viewee
+     * @param null|string $apiKey
+     * @param bool $featureFlag
+     * @param \Schoolbox\User $viewer
+     * @param \Schoolbox\User  $viewee
      * @param int $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
