@@ -38,4 +38,4 @@ try {
 $permissionMapper = \EOTC\EventPermissionMapper::getInstance();
 $permissionMapper->deleteForUser($user);
 
-$page->localRedir('/modules/eotc/permission/modify/' . $user->getId());
+$this->localRedir('/modules/eotc/permission/modify/' . $user->getId());
