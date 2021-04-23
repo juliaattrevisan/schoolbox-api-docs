@@ -62,19 +62,21 @@
 
                         <!-- BEGIN geosnapshot -->
                         <li>
-                            <script type="text/javascript">
+                            <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/jquery.geosnapshot.js"></script>
+                            <script>
+                                $(function() {
+                                    $('[data-view-photos]').on('click', function(event) {
+                                        event.preventDefault();
 
-                                /* Initiate async request
-                                 */
-                                window.addEventListener('DOMContentLoaded', (event) => {
-                                    let geosnapshotUrl = '/pantry';
-
-                                    fetch(geosnapshotUrl)
-                                    .then(response => response.json())
-                                    .then(data => console.log(data));
+                                        $(this).geosnapshot({
+                                            id: '/pantry/' + $(this).attr('data-view-photos')
+                                        }).requestGallery();
+                                    });
                                 });
                             </script>
-                            <a class="icon-view" href="#">View Photos</a>
+
+                            <a class="icon-view" data-view-photos="{STUDENT_ID}">View Photos</a>
+                            <div id="toast" class="toast" data-alert></div>
                         </li>
                         <!-- END geosnapshot -->
 
