@@ -11,14 +11,14 @@ use Schoolbox\User;
 
 
 /**
- * Class ValidGeosnapshotAvailable
+ * Class StudentPhotosAvailable
  *
- * Decide whether Geosnapshot integration was correclty set up and available
- * to make requests to the third party
+ * Decide whether Geosnapshot integration was correctly set up and available
+ * to make requests to the third party, for photos of a particular guy
  *
  * @package Schoolbox\Geosnapshot
  */
-class ValidGeosnapshotAvailable
+class ValidStudentPhotosAvailable
 {
 
     /**

@@ -15,20 +15,20 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot\Test;
 
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
+use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Role;
 
 
 /**
- * Class ValidGeosnapshotAvailableTest
+ * Class ValidStudentPhotosAvailableTest
  *
  * @package Schoolbox\Example\Test
  */
-class ValidGeosnapshotAvailableTest extends TestCase
+class ValidStudentPhotosAvailableTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validGeosnapshotAvailable
+     * @dataProvider provider_validStudentPhotosAvailable
      * @param null|string $apiKey
      * @param bool $featureFlag
      * @param \Schoolbox\User $viewer
@@ -37,10 +37,10 @@ class ValidGeosnapshotAvailableTest extends TestCase
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function testValidGeosnapshotAvailable($apiKey, $featureFlag, $viewer, $viewee, $expected)
+    public function testValidStudentPhotosAvailable($apiKey, $featureFlag, $viewer, $viewee, $expected)
     {
 
-        $outcome = (new ValidGeosnapshotAvailable())
+        $outcome = (new ValidStudentPhotosAvailable())
             ->isSatisifiedBy($apiKey, $featureFlag, $viewer, $viewee);
 
         /* There are other assertions that you can try (ctrl-click to follow)
@@ -49,11 +49,11 @@ class ValidGeosnapshotAvailableTest extends TestCase
     }
 
     /**
-     * Data provider for testValidGeosnapshotAvailable
+     * Data provider for testValidStudentPhotosAvailable
      *
      * @return array
      */
-    public function provider_validGeosnapshotAvailable() : array
+    public function provider_validStudentPhotosAvailable() : array
     {
 
         $edenReed = (new \Schoolbox\User())

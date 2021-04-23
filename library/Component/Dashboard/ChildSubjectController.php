@@ -6,7 +6,7 @@
  */
 
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
+use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Permission\Access\UserAccess;
 use Custom\Diocesan\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -221,7 +221,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Decide whether the viewer can see the Geosnapshot button for the viewee
              */
-            $isGeosnapshotAvailable = (new ValidGeosnapshotAvailable())
+            $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
                 ->isSatisifiedBy(
                     $this->getConfigLoader()->get('geosnapshot_api_key'),
                     $this->getConfigLoader()->get('geosnapshot_enabled'),

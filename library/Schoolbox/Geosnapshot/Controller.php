@@ -64,7 +64,7 @@ class Controller extends Base
     {
         /* If you're allowed to make this request...
          */
-        $isGeosnapshotAvailable = (new ValidGeosnapshotAvailable())
+        $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
             ->isSatisifiedBy(
                 $this->getConfigLoader()->get('geosnapshot_api_key'),
                 $this->getConfigLoader()->get('geosnapshot_enabled'),
