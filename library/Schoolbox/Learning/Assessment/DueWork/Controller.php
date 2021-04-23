@@ -1447,6 +1447,7 @@ class Controller extends Assessment\Controller
         $request = new Gotenberg\URLRequest($url->toString());
         $request->setWaitDelay(1);
         $request->setScale(0.75);
+        $request->setLandscape(true);
 
         // Authenticate using the cookie
         // TODO ensure drafts do not show
