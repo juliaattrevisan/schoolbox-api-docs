@@ -7,8 +7,10 @@
 
 require 'saml-setup.php';
 
+use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
+/** @var Kernel $kernel */
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();

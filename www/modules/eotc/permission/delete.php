@@ -14,10 +14,7 @@ if (!isset($this)) {
     die('No direct access permitted');
 }
 /** @var SitePage $this */
-
-/** @var SitePage $page */
-$page = $kernel->get('sitePage');
-$page->initSession();
+$this->initSession();
 
 new \EOTC\Authenticator($this);
 
@@ -41,4 +38,4 @@ try {
 $permissionMapper = \EOTC\EventPermissionMapper::getInstance();
 $permissionMapper->deleteForUser($user);
 
-$page->localRedir('/modules/eotc/permission/modify/' . $user->getId());
+$this->localRedir('/modules/eotc/permission/modify/' . $user->getId());

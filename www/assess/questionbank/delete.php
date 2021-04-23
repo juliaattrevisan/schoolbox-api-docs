@@ -10,15 +10,13 @@
  * @link        https://schoolbox.com.au/
  */
 
-// Direct access not permitted, 404
+// not in SitePage context?
 if (!isset($this)) {
     http_response_code(404);
     die('No direct access permitted');
 }
-
-/** @var SitePage $page */
-$page = $kernel->get('sitePage');
-$page->initSession();
+/** @var SitePage $this */
+$this->initSession();
 
 $groupHandler = new Group();
 

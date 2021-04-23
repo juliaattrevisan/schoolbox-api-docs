@@ -16,10 +16,7 @@ if (!isset($this)) {
     die('No direct access permitted');
 }
 /** @var SitePage $this */
-
-/** @var SitePage $page */
-$page = $kernel->get('sitePage');
-$page->initSession();
+$this->initSession();
 
 $groupHandler = new Group();
 
