@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use GuzzleHttp\Client;
 use http\Exception\RuntimeException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -23,9 +24,6 @@ use Schoolbox\UserMapper;
  */
 class Controller extends Base
 {
-
-    private const GEOSNAPSHOT_ENDPOINT = 'https://geosnapshot.com/api/v1/embeds/org_photos';
-    private const GEOSNAPSHOT_TIMEOUT = 10;
 
     /**
      * @var ErrorMapper
@@ -56,10 +54,13 @@ class Controller extends Base
      * With a provided url, make a request to Geosnapshot
      *
      * @param User $viewee
-     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function getTransmit(User $viewee): void
+    public function getStudentPhotos(User $viewee): void
     {
         /* If you're allowed to make this request...
          */
@@ -74,47 +75,30 @@ class Controller extends Base
         /* No Geosnapshot? No trabajo
          */
         if (!$isGeosnapshotAvailable) {
-            throw new RuntimeException('Unable to obtain photos: Geosnapshot is not available for this user.');
+            throw new RuntimeException('Geosnapshot: Unable to obtain photos: Geosnapshot is not available for this user.');
         }
 
         /* No portrait picture? No trabajo
          * Maybe this should be part of the geosnapshot spec pattern though
          */
         if (!$viewee->getPortrait()) {
-            throw new RuntimeException('Unable to obtain photos: Viewee has not got a portrait picture');
+            throw new RuntimeException('Geosnapshot: Unable to obtain photos: Viewee has not got a portrait picture');
         }
 
         /* Manufacture a payload with the necessary parts and send it out there
          */
-        $payload = [
-            "face_image" => base64_encode($viewee->getPortrait()->read())
-        ];
+        $payload = (new StudentPhoto())->build($viewee);
 
         /* Set up guzzle with the authentication pieces
-         */
-        $headers = array_combine(
-            ['X-API-KEY'],
-            [$this->getConfigLoader()->get('geosnapshot_api_key')]
-        );
-
-        $client = new Client([
-            'headers' => $headers,
-            'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-            'timeout' => self::GEOSNAPSHOT_TIMEOUT,
-            'http_errors' => false,
-        ]);
-
-        /* Get the iframe url back, if successful, and pop out a html fragment
+         *
+         * Get the iframe url back, if successful, and pop out a html fragment
          * which we can inject into a modal, I guess
+         *
+         * Otherwise just don't do anything and let the toaster communicate the issue
          */
-        $response = $client->request('GET', self::GEOSNAPSHOT_ENDPOINT, $payload);
+        $response = (new Api($this->getConfigLoader()->get('geosnapshot_api_key')))
+            ->retrieveStudentPhotos($payload);
 
-        /* But this 404?
-         */
-        new \Alaress_Probe($response, self::GEOSNAPSHOT_ENDPOINT, $payload);
-
-        /* Otherwise just don't do anything and let the toaster communicate the issue
-         */
-        return;
+        $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
 }

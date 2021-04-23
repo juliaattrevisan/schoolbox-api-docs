@@ -43,7 +43,7 @@ class Module extends BaseModule
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
 
-        $this->register('GET', '/user/{id}', 'getTransmit', $getPerms, $preloadUser);
+        $this->register('GET', '/user/{id}', 'getStudentPhotos', $getPerms, $preloadUser);
     }
 
 
