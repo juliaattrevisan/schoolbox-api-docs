@@ -478,8 +478,12 @@ BASE;
                 /** @var Gotenberg\Document[] $files */
                 $files = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
-                    $request = $requestFactory->buildUrlRequest($url, $sessionHash);
-                    $request->setWaitDelay($jsDelay / 1000);
+                    $request = $requestFactory->buildUrlRequest(
+                        $url,
+                        RequestFactory::DEFAULT_WAIT_DELAY,
+                        RequestFactory::DEFAULT_WAIT_TIMEOUT,
+                        $sessionHash
+                    );
                     $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
 
                     // Gotenberg doesn't seem to care about the response code.
