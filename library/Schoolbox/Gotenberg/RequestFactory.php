@@ -41,9 +41,9 @@ class RequestFactory
      *                                 cookie value, thus generating the PDF for
      *                                 the user which is authenticated with this
      *                                 hash.
-     * @return URLRequest
+     * @return Gotenberg\URLRequest
      */
-    public function buildUrlRequest(string $url, ?string $sessionHash): URLRequest
+    public function buildUrlRequest(string $url, ?string $sessionHash): Gotenberg\URLRequest
     {
         $request = new Gotenberg\URLRequest($url);
         $request->addWebhookURLHTTPHeader(
