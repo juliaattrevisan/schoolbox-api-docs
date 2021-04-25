@@ -1,11 +1,15 @@
 <?php
 
 use Codeception\Util\Locator;
+use Facebook\WebDriver\WebDriverKeys;
 
 class DueWorkInitialCest
 {
     public $home_page_url;
 
+    /**
+     * @throws \Codeception\Exception\ModuleException
+     */
     public function create2Assessments(AcceptanceTester $i)
     {
         $teacher='Jack Coles';
@@ -27,10 +31,10 @@ class DueWorkInitialCest
         $i->click("Test Class Homepage");
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
-        $this->home_page_url="https://vagrant.dev.schoolbox.cloud".($i->getCurrentUrl());
+        $this->home_page_url= $i->getCurrentUrl();
 
         $i->click('a#all-actions.icon-more');
-        $i->clickWithLeftButton('#tab-control > li a.icon-group');
+        $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
         $i->waitForText("Manage Group", 5);
         $i->click('Add Members');
         $i->clickWithLeftButton('div.selectize-input.items.not-full');
@@ -52,7 +56,8 @@ class DueWorkInitialCest
         $i->canSeeElement(['css'=>'div#tabs-1']);
         $i->click(['css'=>'a[href=\#tabs-sub-3]']);
         $i->canSeeElement(['css'=>'ul#tabs-sub-3']);
-        $i->dragAndDrop("//*[@id='tabs-sub-3']/li[8]","//div[@data-position='top']");
+        //add due work component into the homepage
+        $i->dragAndDrop("//*[@id='tabs-sub-3']/li[7]","//div[@data-position='top']");
         sleep(5);
         $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]']);
         $i->impersonate($teacher);
@@ -64,6 +69,8 @@ class DueWorkInitialCest
         $i->fillCkEditorById('assessment-description', 'We need more fish.');
         $i->selectOption('acceptOnline', '1');
         $i->fillField('weight', '5');
+        $i->click('select#markType');
+        $i->selectOption('select[name=markType]','Percentage');
         $i->click('input[type=submit][value=Create]');
         $i->waitForElementVisible(['css'=>'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
         $i->canSee('Test Due Work');
@@ -116,14 +123,14 @@ class DueWorkInitialCest
         $i->waitForText('Test Due Work', 5);
         $i->click('Test Due Work');
         $i->waitForText('Test Due Work', 5);
-        $i->click('a.submit.button.expand');
+        $i->click('a.submit.button');
         $i->click('label.checkbox-label[for=editor-submittedInPerson]');
         sleep(2);
         $i->click('input[type=submit][value=Submit\ for\ assessment]');
-        $i->canSee('Submission by Ms Eden Reed');
+        $i->canSee('Submitted in person by Ms Eden Reed');
     }
 
-    public function viewSubmission(AcceptanceTester $i)
+     public function viewSubmission(AcceptanceTester $i)
     {
         $teacher='Jack Coles';
         $i->login('alaress', 'alaress');
@@ -136,7 +143,7 @@ class DueWorkInitialCest
         $i->click('#component-assessment-'.$assessmentID.' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-'.$assessmentID.' a.icon-progress');
         sleep(1);
-        $i->click('ul.information-list li div.small-12.column div.row.actions-small-1 nav a.icon-more');
+        $i->click('ul.information-list li div.small-12.column div.row.actions-small-2 nav a.icon-more');
         $i->click('a.icon-task');
         $i->canSee('Grading Test Due Work');
     }
@@ -153,14 +160,14 @@ class DueWorkInitialCest
         $i->amOnUrl($this->home_page_url);
         $i->click('#component-assessment-'.$assessmentID.' > nav:nth-child(2) > a:nth-child(1)');
         $i->click('#component-assessment-'.$assessmentID.' a.icon-progress');
-        $i->click('ul.information-list li div.small-12.column div.row.actions-small-1 nav a.icon-more');
+        $i->click('ul.information-list li div.small-12.column div.row.actions-small-2 nav a.icon-more');
         $i->click('a.icon-task');
         $i->fillField('textarea[name=comment]', 'Not bad, but you should work on your spelling.');
         $i->fillField('input[name=mark]', '65');
         sleep(1);
-        $studentWeAreMarkingUrl="https://vagrant.dev.schoolbox.cloud".$i->getCurrentUrl();
+        $this->studentWeAreMarkingUrl= $i->getCurrentUrl();
         $i->click('a.button[data-draft=publish]');
-        $i->amOnUrl($studentWeAreMarkingUrl);
+        $i->amOnUrl($this->studentWeAreMarkingUrl);
         $i->canSee('Reviewed');
     }
 
@@ -180,7 +187,7 @@ class DueWorkInitialCest
         $i->canSee('65 %');
         $i->click('Test Due Work');
         $i->canSee('Feedback by Mr Jack Coles');
-        $i->canSee('Submission by Ms Eden Reed');
+        $i->canSee('Submitted in person by Ms Eden Reed');
         $i->canSee('65 %');
     }
 
