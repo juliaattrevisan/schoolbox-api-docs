@@ -95,13 +95,14 @@ interface External_TimetableInterface extends External\IConnector
      * Array[]['class'][]['staffID']
      *
      *
-     * @param string $externalUserId
-     * @param int    $userId
-     * @param Campus $campus
-     * @param int    $dayNumber
+     * @param string      $externalUserId
+     * @param int         $userId
+     * @param Campus      $campus
+     * @param int         $dayNumber
+     * @param string|null $date
      * @return array
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array;
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array;
 
     /**
      * Return a user's timetable for a specific date

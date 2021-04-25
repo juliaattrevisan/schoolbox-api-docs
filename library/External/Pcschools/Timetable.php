@@ -208,7 +208,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
     /**
      * {@inheritdoc}
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
     {
         if (!(new External_Pcschools_ValidCampusSpec())->isSatisfiedBy($campus)) {
             return [];

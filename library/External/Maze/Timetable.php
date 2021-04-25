@@ -265,7 +265,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
     {
         if (empty($externalUserId)) {
             return [];

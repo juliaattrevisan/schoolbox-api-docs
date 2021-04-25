@@ -52,7 +52,7 @@ class External_Offline_Timetable implements External_TimetableInterface, IOfflin
     /**
      * @inheritDoc
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
     {
         return [];
     }

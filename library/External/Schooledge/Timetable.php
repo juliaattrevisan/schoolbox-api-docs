@@ -260,7 +260,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
     /**
      * @inheritdoc
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
     {
         $extraWhere          = "td.SortOrder = {$this->database->legacyQuote($dayNumber)}";
         $timetabledClassRows = $this->getAllTimetableRows($externalUserId, $userId, $campus, $extraWhere);
