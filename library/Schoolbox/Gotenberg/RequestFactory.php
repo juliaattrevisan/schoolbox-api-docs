@@ -46,14 +46,16 @@ class RequestFactory
     public function buildUrlRequest(string $url, ?string $sessionHash): URLRequest
     {
         $request = new Gotenberg\URLRequest($url);
-        $request->addRemoteURLHTTPHeader(
-            'Cookie',
-            sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash)
-        );
         $request->addWebhookURLHTTPHeader(
             'SBAuth',
             $this->config->get(ConfigMapper::NAME_GOTENBERG_API_KEY)
         );
+        if (isset($sessionHash)) {
+            $request->addRemoteURLHTTPHeader(
+                'Cookie',
+                sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash)
+            );
+        }
         return $request;
     }
 }
