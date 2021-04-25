@@ -29,6 +29,7 @@ class AssessmentForm
     public const SELECTOR_PUBLISH_DATE = self::FORM . ' input[name="publishDate"]';
     public const SELECTOR_OPEN_DATE = self::FORM . ' input[name="openDate"]';
     public const SELECTOR_DUE_DATE = self::FORM . ' input[name="dueDate"]';
+    public const SELECTOR_MARK_TYPE = self::FORM . ' select[name="markType"]';
     public const SELECTOR_BUTTON_CREATE = self::FORM . ' [type=submit][value="Create"]';
     public const SELECTOR_BUTTON_UPDATE = self::FORM . ' [type=submit][value="Update"]';
 
@@ -36,6 +37,12 @@ class AssessmentForm
     public const WORKTYPE_ASSESSMENT_TASK = 1;
     public const WORKTYPE_ASSIGNMENT = 2;
     public const WORKTYPE_HOMEWORK = 3;
+
+    // Mark type
+    public const MARK_TYPE_NONE = 0;
+    public const MARK_TYPE_PERCENTAGE = 1;
+    public const MARK_TYPE_TOTAL_MARK = 3;
+    public const MARK_TYPE_LETTER_GRADE = 2;
 
     // Visibility
     public const VISIBILITY_STAFF_ONLY = SubmissionBox::MARK_VISIBILITY_STAFF_ONLY;
@@ -117,6 +124,17 @@ class AssessmentForm
     public function setWorkType(int $workType): self
     {
         $this->tester->selectOption(self::SELECTOR_WORKTYPE, $workType);
+        return $this;
+    }
+
+    /**
+     * Sets mark type
+     * @param int $markType
+     * @return AssessmentForm
+     */
+    public function setMarkType(int $markType): self
+    {
+        $this->tester->selectOption(self::SELECTOR_MARK_TYPE, $markType);
         return $this;
     }
 

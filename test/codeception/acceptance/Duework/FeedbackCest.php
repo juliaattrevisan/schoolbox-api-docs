@@ -59,6 +59,7 @@ class FeedbackCest
             ->setTitle($dueworkTitle1)
             ->setPublishDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
             ->setOpenDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
+            ->setMarkType(AssessmentForm::MARK_TYPE_PERCENTAGE)
             ->create();
 
         // As Rachel, check notification
@@ -128,6 +129,7 @@ class FeedbackCest
             ->setTitle($dueworkTitle2)
             ->setPublishDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
             ->setOpenDate(\Alaress_Date_Format::now()->setTime(0, 0, 0))
+            ->setMarkType(AssessmentForm::MARK_TYPE_PERCENTAGE)
             ->create();
 
         // As Rachel, check notification
