@@ -197,7 +197,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         TimetableDefinition.TimetableGroup = :timetableGroup AND
                         {$allowedFileTypesSql}
                         TimetableDefinition.DayNumber IN (:day, '0')
-                    ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
+                    ORDER BY TimetableDefinition.FileType,
+                             TimetableDefinition.DayNumber DESC,
+                             TimetableDefinition.PeriodNumber,
+                             TimetableDefinition.PeriodNumberSeq
                     ";
         unset($statement);
         $statement = $this->getDatabase()->query($query, $params);
