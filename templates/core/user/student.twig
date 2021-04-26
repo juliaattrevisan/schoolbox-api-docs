@@ -423,8 +423,27 @@
                                         </form>
                                     </li>
                                 {% endif %}
-
                             {% endblock buttons_email_parents %}
+
+                            {% block buttons_geosnapshots %}
+                                {% if isGeosnapshotAvailable %}
+                                <li>
+                                    <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/jquery.geosnapshot.js"></script>
+                                    <script>
+                                        $(function() {
+                                            $('[data-view-photos={{ user.id }}]').on('click', function(event) {
+                                                event.preventDefault();
+
+                                                $(this).geosnapshot({
+                                                    url: '/geosnapshot/user/' + $(this).attr('data-view-photos')
+                                                }).requestGallery();
+                                            });
+                                        });
+                                    </script>
+                                    <a class="icon-view" data-view-photos="{{ user.id }}">View Photos</a>
+                                </li>
+                                {% endif %}
+                            {% endblock %}
 
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}

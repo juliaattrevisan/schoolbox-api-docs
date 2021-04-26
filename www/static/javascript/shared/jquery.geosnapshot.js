@@ -35,7 +35,7 @@
              * Load a gallery for a particular person
              */
             'requestGallery': function() {
-                let toast = $('#toast');
+                let toast = $('[data-toast]');
 
                 toast.toastActivate({text: 'Retrieving photos...'});
 
