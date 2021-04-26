@@ -83,7 +83,7 @@ class CalendarFactory implements IFactory
     {
         switch ($type) {
             case self::TASS_API:
-                return (new TassApiEndpoint\CalendarFactory(
+                return (new TassApiEndpoint\Calendar\Factory(
                     $this->logger,
                     $this->perform,
                     $this->host,

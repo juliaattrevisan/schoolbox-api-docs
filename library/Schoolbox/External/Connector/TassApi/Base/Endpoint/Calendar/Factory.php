@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -19,7 +19,7 @@ use Schoolbox\GenericCollection;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
  */
-class CalendarFactory
+class Factory
 {
 
     /**
