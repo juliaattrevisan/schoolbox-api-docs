@@ -12,7 +12,6 @@ namespace Schoolbox\Help\SingleSignOn;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
 
 /**
  * Module for SSO endpoints
@@ -21,13 +20,19 @@ class Module extends BaseModule
 {
     protected $basename = 'helpSso';
 
-    protected function registerRoutes()
+    /**
+     * @inheritdoc
+     */
+    protected function registerRoutes(): void
     {
         $this->register('GET', '/send', 'sendTokenToHelp', new IsLoggedIn());
         $this->register('GET', '/receive', 'receiveTokenFromInstance');
     }
 
-    public function initControllers(ContainerInterface $injector)
+    /**
+     * @inheritdoc
+     */
+    public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
             'controller:' . $this->basename,

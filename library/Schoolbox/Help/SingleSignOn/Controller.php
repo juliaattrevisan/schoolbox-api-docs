@@ -18,19 +18,36 @@ use Zend\Uri\Uri;
  */
 class Controller extends Base
 {
+    /**
+     * Token builder: used to construct and parse tokens.
+     */
     private Jwt $tokenBuilder;
 
+    /**
+     * Constructor
+     *
+     * @param Jwt $tokenBuilder
+     */
     public function __construct(Jwt $tokenBuilder)
     {
         $this->tokenBuilder = $tokenBuilder;
     }
 
-    public function sendTokenToHelp()
+    /**
+     * Generate a JWT, and send it to Schoolbox Help for single sign-on.
+     *
+     * This will redirect to `receiveTokenFromInstance` on the Help instance,
+     * with the JWT in the "jwt" query string parameter.
+     *
+     * @api GET /help/sso/send
+     * @since 21.0
+     */
+    public function sendTokenToHelp(): void
     {
-        // Need to redir to the link
-        $url = new Uri(
-            $this->getConfigLoader()->get('schoolbox_help_url') . $this->router->generate('helpSso.receiveTokenFromInstance')
-        );
+        // Generate a link to redir to
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $url = (new Uri($this->getConfigLoader()->get('schoolbox_help_url')))
+            ->setPath($this->router->generate('helpSso.receiveTokenFromInstance'));
 
         // Generate a JWT
         // Need to inject more data (i.e. expiry)
@@ -39,8 +56,23 @@ class Controller extends Base
         var_dump($url);
     }
 
-    public function receiveTokenFromInstance()
+    /**
+     * Receive a JWT (in the "jwt" query string parameter), and use it to
+     * identify and authenticate a user.
+     *
+     * @api GET /help/sso/receive
+     * @since 21.0
+     */
+    public function receiveTokenFromInstance(): void
     {
-        // Look at the JWT
+        // Decode the JWT _without_ verifying it,
+        // in order to determine the instance whence it came
+
+        // Now we know the instance:
+        // Look it up in the registry table, and get the public key stored there
+        // so that the JWT can be verified
+
+        // Now the JWT is decoded and verified:
+        // create a session for the user matching the email address in the JWT
     }
 }
