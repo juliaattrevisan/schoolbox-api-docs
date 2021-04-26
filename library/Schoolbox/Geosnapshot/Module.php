@@ -21,6 +21,12 @@ use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 
+
+/**
+ * Class Module
+ *
+ * @package Schoolbox\Geosnapshot
+ */
 class Module extends BaseModule
 {
     /**
@@ -36,17 +42,14 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Anyone can see the form
-         */
-        $getPerms = new Rule\All(
-            new Rule\IsLoggedIn()
-        );
-
         $preloadUser = function ($params) { return $this->preloadUser($params); };
         $preloadUserAndUrl = function ($params) { return $this->preloadUserAndUrl($params); };
 
-        $this->register('GET', '/user/{id}', 'getStudentPhotosUrl', $getPerms, $preloadUser);
-        $this->register('GET', '/user/{id}/{url}', 'getStudentPhotos', $getPerms, $preloadUserAndUrl);
+        $canGetStudentPhotosUrl = $this->canGetStudentPhotosUrl();
+        $canGetStudentPhotos = $this->canGetStudentPhotosUrl();
+
+        $this->register('GET', '/user/{id}', 'getStudentPhotosUrl', $canGetStudentPhotosUrl, $preloadUser);
+        $this->register('GET', '/user/{id}/{url}', 'getStudentPhotos', $canGetStudentPhotos, $preloadUserAndUrl);
     }
 
 
@@ -62,8 +65,7 @@ class Module extends BaseModule
     {
         try {
             $user = $this->getUserMapper()->findById($params['id']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound();
         }
 
@@ -86,8 +88,7 @@ class Module extends BaseModule
     {
         try {
             $user = $this->getUserMapper()->findById($params['id']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound();
         }
 
@@ -97,6 +98,91 @@ class Module extends BaseModule
     }
 
 
+    /**
+     * Preload a User instance
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function canGetStudentPhotosUrl(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
+                    try {
+                        $viewee = $this->getUserMapper()->findById($params['id']);
+                    } catch (MapperException $e) {
+                        throw new NotFound();
+                    }
+
+                    /* No Geosnapshot? No trabajo
+                     *
+                     * One or more misconfigurations or access controls could have caused this
+                     * but all result in nothing to see for the current user
+                     */
+                    $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+                        ->isSatisifiedBy(
+                            $this->getConfig()->get('geosnapshot_api_key'),
+                            $this->getConfig()->get('geosnapshot_enabled'),
+                            $sessionUser,
+                            $viewee
+                        );
+
+                    if (!$isGeosnapshotAvailable) {
+                        throw new NotFound();
+                    }
+
+                    return [
+                        'viewee' => $viewee,
+                    ];
+                })
+            );
+        });
+    }
+
+
+    /**
+     * Preload a User instance with the url from Geosnapshot
+     *
+     * @return Rule\IAuthorizationRule
+     */
+    private function canGetStudentPhotos(): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
+                    try {
+                        $viewee = $this->getUserMapper()->findById($params['id']);
+                    } catch (MapperException $e) {
+                        throw new NotFound();
+                    }
+
+                    /* No Geosnapshot? No trabajo
+                     *
+                     * One or more misconfigurations or access controls could have caused this
+                     * but all result in nothing to see for the current user
+                     */
+                    $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+                        ->isSatisifiedBy(
+                            $this->getConfig()->get('geosnapshot_api_key'),
+                            $this->getConfig()->get('geosnapshot_enabled'),
+                            $sessionUser,
+                            $viewee
+                        );
+
+                    if (!$isGeosnapshotAvailable) {
+                        throw new NotFound();
+                    }
+
+                    return [
+                        'viewee' => $viewee,
+                        'url' => Redirect::decode($params['url'])
+                    ];
+                })
+            );
+        });
+    }
     /**
      * @inheritdoc
      */

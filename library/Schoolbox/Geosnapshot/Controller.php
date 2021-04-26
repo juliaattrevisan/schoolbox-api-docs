@@ -43,6 +43,7 @@ class Controller extends Base
      * With a provided url, make a request to Geosnapshot
      *
      * @param User $viewee
+     * @throws \Aura\Router\Exception\RouteNotFound
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
@@ -51,24 +52,6 @@ class Controller extends Base
      */
     public function getStudentPhotosUrl(User $viewee): void
     {
-        /* If you're allowed to make this request...
-         */
-        $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
-            ->isSatisifiedBy(
-                $this->getConfigLoader()->get('geosnapshot_api_key'),
-                $this->getConfigLoader()->get('geosnapshot_enabled'),
-                $this->getUser(),
-                $viewee
-            );
-
-        /* No Geosnapshot? No trabajo
-         *
-         * One or more misconfigurations or access controls could have caused this
-         * but all result in nothing to see for the current user
-         */
-        if (!$isGeosnapshotAvailable) {
-            throw new \RuntimeException('Geosnapshot: Unable to obtain photos: Geosnapshot is not available for this user.');
-        }
 
         /* Set up guzzle with the authentication pieces
          *
@@ -99,29 +82,9 @@ class Controller extends Base
      *
      * @param User   $viewee
      * @param string $url
-     * @throws \RuntimeException
      */
     public function getStudentPhotos(User $viewee, string $url): void
     {
-
-        /* If you're allowed to make this request...
-         */
-        $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
-            ->isSatisifiedBy(
-                $this->getConfigLoader()->get('geosnapshot_api_key'),
-                $this->getConfigLoader()->get('geosnapshot_enabled'),
-                $this->getUser(),
-                $viewee
-            );
-
-        /* No Geosnapshot? No trabajo
-         *
-         * One or more misconfigurations or access controls could have caused this
-         * but all result in nothing to see for the current user
-         */
-        if (!$isGeosnapshotAvailable) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
-        }
 
         /* Otherwise show the gallery
          */
