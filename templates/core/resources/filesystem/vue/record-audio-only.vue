@@ -14,14 +14,16 @@ import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
 import { gsap } from 'gsap/all';
+import VideoPlayer from '@schoolbox/videojs/video-player';
 import RecordMediaModal from './record-media-modal';
-import { getAudioOnlyOptions } from '@shared/videojs/videojsOptions';
+import { getAudioOnlyRecordOptions, getVideoPlaybackOptions } from '@shared/videojs/videojsOptions';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
 
 export default {
 
 	components: {
+		VideoPlayer,
 		RecordMediaModal
 	},
 
@@ -31,6 +33,8 @@ export default {
 			isDeviceReady: false, //to toggle the device display
 			hasDeviceError: false, //can't access the requested device
 			isRecording: false, //track recording status to toggle record/stop buttons
+			isPlaybackActive: false, //need a different videojs player for playback to enable the progress controls
+			isPlaybackVideoActive: false, //the playback video is available for control
 			recordedCount: 0, //to show 'Record' or 'Re-record' on the button
 			isPlaying: false, //to toggle play/pause controls
 			isUploading: false, //to notify of update
@@ -121,7 +125,7 @@ export default {
 		 *
 		 */
 		hideForAnimateOn () {
-			gsap.set(this.$refs.audioContainer, { alpha: 0 } );
+			gsap.set(this.$refs.recordingVideoContainer, { alpha: 0 } );
 			gsap.set(this.$refs.actions, { alpha: 0 } );
 		},
 
@@ -130,7 +134,7 @@ export default {
 		 *
 		 */
 		initVideojs () {
-			this.player = videojs(this.$refs.myAudio, getAudioOnlyOptions(), this.onVideoJsReady);
+			this.player = videojs(this.$refs.recordingAudio, getAudioOnlyRecordOptions(), this.onVideoJsReady);
 		},
 
 		/*
@@ -139,14 +143,14 @@ export default {
 		 */
 		onVideoJsReady () {
 			try {
+				this.animateOn();
+				this.initVideojsRecordListeners();
 				setTimeout(() => { //dodgy, trying to wait until 'VIDEOJS: wavesurfer.js microphone plugin enabled.' but can't see any event to track this...
 					this.player.record().getDevice();
 				}, 500);
 			} catch (error) {
 				console.log(error);
 			}
-			this.animateOn();
-			this.initVideojsRecordListeners();
 		},
 
 		/*
@@ -154,7 +158,7 @@ export default {
 		 *
 		 */
 		animateOn () {
-			gsap.to(this.$refs.audioContainer, 0.5, { alpha: 1 } );
+			gsap.to(this.$refs.recordingVideoContainer, 0.5, { alpha: 1 } );
 			gsap.to(this.$refs.actions, 0.4, { alpha: 1, delay: 0.2 } );
 		},
 
@@ -164,9 +168,6 @@ export default {
 		 */
 		initVideojsRecordListeners () {
 			this.player.on('deviceReady', this.onDeviceReady);
-			this.player.on('play', this.onPlay);
-			this.player.on('pause', this.onPause);
-			this.player.on('ended', this.onEnded);
 			this.player.on('startRecord', this.onStartRecord);
 			this.player.on('finishRecord', this.onFinishRecord);
 			this.player.on('error', this.onError);
@@ -182,37 +183,15 @@ export default {
 		},
 
 		/*
-		 * onPlay
-		 *
-		 */
-		onPlay () {
-			this.isPlaying = true;
-		},
-
-		/*
-		 * onPause
-		 *
-		 */
-		onPause () {
-			this.isPlaying = false;
-		},
-
-		/*
-		 * onEnded
-		 *
-		 */
-		onEnded () {
-			this.isPlaying = false;
-		},
-
-		/*
 		 * onStartRecord
 		 *
 		 */
 		onStartRecord () {
 			this.$emit(recordMediaEvents.PROCCESS_STARTED);
 			this.isRecording = true;
-			this.canConvert = false; //disable the convert butto
+			this.canConvert = false; //disable the convert button
+			this.isPlaybackActive = false;
+			this.isPlaybackVideoActive = false;
 		},
 
 		/*
@@ -223,6 +202,7 @@ export default {
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
 			this.recordedCount++;
 			this.isRecording = false;
+			this.isPlaybackActive = true;
 			this.recordedData = this.player.recordedData; // the blob object contains the recorded data that we could convert
 		},
 
@@ -251,6 +231,7 @@ export default {
 		onEnableSelected () {
 			this.player.record().getDevice();
 		},
+		
 
 
 		/*
@@ -350,12 +331,21 @@ export default {
 		},
 
 		/*
+		 * Pass through the video options to play the latest recorded video
 		 *
+		 * @returns { Object }
+		 */
+		getVideoPlayerOptions () {
+			return getVideoPlaybackOptions(this.recordedData);
+		},
+
+		/*
+		 * to ensure the video-player.vue video is initiated before calling methods on it
 		 *
 		 */
-		playAudio () {
-			// this.player.play(); //can't play/pause this audio only yet, something to do with promises maybe...
-		},
+		onPlaybackVideoReady () {
+			this.isPlaybackVideoActive = true;
+		}
 
 	}
 
@@ -368,9 +358,20 @@ export default {
 		<div class="ab-pane">
 			<div>
 				<div class='media-container' ref="mediaContainer">
-					<div ref='audioContainer' class='audio-container'>
-						<audio id="myAudio" ref="myAudio" class="video-js"></audio>
+					
+					<div ref='recordingVideoContainer'>
+						<div class='audio-container'>
+							<audio id="recordingAudio" ref="recordingAudio" class="video-js"></audio>
+						</div><!-- no need for a audio-player, can just use video-player -->
+						<div v-if="isPlaybackActive" class='video-container' key="playbackVideoContainer">
+							<video-player
+								ref="playbackVideo"
+								:options="getVideoPlayerOptions()"
+								@on-video-ready="onPlaybackVideoReady"
+							/>
+						</div>
 					</div>
+
 					<record-media-modal v-if="hasDeviceError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<div class="alert-box warning">The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</div>
 						<button @click.prevent="onCloseErrorModalSelected">Close</button>
@@ -382,6 +383,7 @@ export default {
 					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
 						<p><em>Audio succesfully uploaded.</em></p>
 					</record-media-modal>
+
 				</div>
 			</div>
 		</div><!-- ab-pane -->
@@ -397,10 +399,10 @@ export default {
 					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" title="Record Video" href="#record-audio">{{ recordButtonText }}</a>
 					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-audio">Stop</a>
 				</transition>
-				<!-- <transition name="fade" mode="out-in">
-					<a v-if="showUploadButton && !isPlaying" @click.prevent="playAudio" role="button" class="button" title="Play Video" href="#play-video" key="play">Play</a>
-					<a v-else-if="showUploadButton && isPlaying" @click.prevent="player.pause" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause</a>
-				</transition> -->
+				<transition name="fade" mode="out-in">
+					<a v-if="isPlaybackVideoActive && !$refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Audio" href="#play-audio" key="play">Play</a>
+					<a v-else-if="isPlaybackVideoActive && $refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Audio" href="#pause-audio" key="pause">Pause</a>
+				</transition>
 			</section>
 		</div>
 		

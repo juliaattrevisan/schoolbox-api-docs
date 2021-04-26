@@ -14,9 +14,9 @@ import Record from 'videojs-record/dist/videojs.record.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import axios from 'axios';
 import { gsap } from 'gsap/all';
-import RecordMediaModal from './record-media-modal';
 import VideoPlayer from '@schoolbox/videojs/video-player';
-import { getRecordCameraOptions, getRecordScreenOptions, getPlaybackOptions } from '@shared/videojs/videojsOptions';
+import RecordMediaModal from './record-media-modal';
+import { getRecordCameraOptions, getRecordScreenOptions, getVideoPlaybackOptions } from '@shared/videojs/videojsOptions';
 import { convertFilenameExtension } from '@shared/util/fileUtils';
 import { convertToMp4 } from '@shared/video/convertVideo';
 import mediaTypes from '../js/mediaTypes';
@@ -231,7 +231,6 @@ export default {
 		initVideojsRecordListeners () {
 			this.player.on('deviceReady', this.onDeviceReady);
 			this.player.on('startRecord', this.onStartRecord);
-			this.player.on('stopRecord', this.onStopRecord);
 			this.player.on('finishConvert', this.onFinishConvert);
 			this.player.on('error', this.onError);
 			this.player.on('deviceError', this.onDeviceError);
@@ -258,21 +257,14 @@ export default {
 		},
 
 		/*
-		 * onStopRecord
-		 *
-		 */
-		onStopRecord () {
-			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-			this.isRecording = false;
-			this.recordedCount++;
-		},
-
-		/*
 		 * the seekable media file is ready
 		 *
 		 */
 		onFinishConvert () {
-			this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert
+			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
+			this.isRecording = false;
+			this.recordedCount++;
+			this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
 			this.canConvert = true; //enable the convert button
 			this.isPlaybackActive = true;
 		},
@@ -480,7 +472,7 @@ export default {
 		 * @returns { Object }
 		 */
 		getVideoPlayerOptions () {
-			return getPlaybackOptions(this.recordedData);
+			return getVideoPlaybackOptions(this.recordedData);
 		},
 
 		/*

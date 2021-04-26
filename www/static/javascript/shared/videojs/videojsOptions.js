@@ -5,11 +5,11 @@
  *
  */
 
+import videojs_wavesurfer_css from 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css';
 import WaveSurfer from 'wavesurfer.js';
+import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
 import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js';
 WaveSurfer.microphone = MicrophonePlugin;
-import videojs_wavesurfer_css from 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css';
-import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
 
 /*
 * set up a camera recording
@@ -76,7 +76,7 @@ export const getRecordScreenOptions = () => {
 * 
 * @returns { Object }
 */ 
-export const getPlaybackOptions = (recordedData) => {
+export const getVideoPlaybackOptions = (recordedData) => {
     return {
         controls: true,
         autoplay: false,
@@ -101,7 +101,7 @@ export const getPlaybackOptions = (recordedData) => {
 * 
 * @returns { Object }
 */ 
-export const getAudioOnlyOptions = () => {
+export const getAudioOnlyRecordOptions = () => {
     return {
         controls: true,
         autoplay: false,
