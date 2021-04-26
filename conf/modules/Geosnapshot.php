@@ -3,6 +3,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Config\Modules;
@@ -12,6 +13,7 @@ use Config\ModuleLoader;
 
 class Geosnapshot extends ModuleLoader
 {
+
     /**
      * Run configuration for the given module
      *
