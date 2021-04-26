@@ -78,13 +78,19 @@ class Scheduler
      *
      * @param IDatabase       $db
      * @param string          $frequency
-     * @param Factory         $factory
+     * @param IFactory        $factory
      * @param string          $type
      * @param string|null     $file
      * @param LoggerInterface $logger
      */
-    public function __construct(IDatabase $db, string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
-    {
+    public function __construct(
+        IDatabase $db,
+        string $frequency,
+        IFactory $factory,
+        string $type,
+        ?string $file,
+        LoggerInterface $logger
+    ) {
         $this->db = $db;
         $this->frequency = $frequency;
         $this->factory = $factory;
