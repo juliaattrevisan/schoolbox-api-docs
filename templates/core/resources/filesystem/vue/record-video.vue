@@ -1,7 +1,7 @@
 <script>
 
 /*
- * To record some video
+ * To record, playback, convert and upload a video into SB 
  *
  */
 
@@ -13,12 +13,12 @@ import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import axios from 'axios';
-import { createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 import { gsap } from 'gsap/all';
 import RecordMediaModal from './record-media-modal';
 import VideoPlayer from '@schoolbox/videojs/video-player';
 import { getRecordCameraOptions, getRecordScreenOptions, getPlaybackOptions } from '@shared/videojs/videojsOptions';
 import { convertFilenameExtension } from '@shared/util/fileUtils';
+import { convertToMp4 } from '@shared/video/convertVideo';
 import mediaTypes from '../js/mediaTypes';
 import recordMediaEvents from '../js/recordMediaEvents';
 
@@ -58,7 +58,7 @@ export default {
 			hasConversionError: false, //converting video to mp4, to notify user
 			isUploading: false, //to notify of update
 			hasUploadError: false, //to notify of upload error, try again?
-			hasUploaded: false, //notify UI of upload complete
+			hasUploaded: false //notify UI of upload complete
 		}
 	},
 
@@ -67,7 +67,7 @@ export default {
 		/*
 		 * To know that you'll be re-recording a video, overwriting the previously recorded
 		 *
-		 * @params { String }
+		 * @returns { String }
 		 */
 		turnOnText () {
 			if (this.mediaType === mediaTypes.CAMERA) {
@@ -80,7 +80,7 @@ export default {
 		/*
 		 * To know that you'll be re-recording a video, overwriting the previously recorded
 		 *
-		 * @params { String }
+		 * @returns { String }
 		 */
 		recordButtonText () {
 			if (this.recordedCount == 0) {
@@ -93,7 +93,7 @@ export default {
 		/*
 		 * To know whether to show the convert button
 		 *
-		 * @params { Boolean }
+		 * @returns { Boolean }
 		 */
 		showConvertAndUploadButton () {
 			if (this.canConvert && !this.isRecording && !this.isConverting && !this.isUploading) {
@@ -106,7 +106,7 @@ export default {
 		/*
 		 * To know whether to show the record button
 		 *
-		 * @params { Boolean }
+		 * @returns { Boolean }
 		 */
 		showRecordButton () {
 			if (this.isDeviceReady && !this.isRecording && !this.isConverting && !this.isUploading) {
@@ -119,7 +119,7 @@ export default {
 		/*
 		 * To know whether to show the stop button
 		 *
-		 * @params { Boolean }
+		 * @returns { Boolean }
 		 */
 		showStopButton () {
 			if (this.isDeviceReady && this.isRecording && !this.isConverting && !this.isUploading) {
@@ -132,10 +132,20 @@ export default {
 		/*
 		 * convert the filename to use .mp4 instead of whatever it was
 		 *
-		 * @params { String }
+		 * @returns { String }
 		 */
 		currentRecordedFilenameToMp4 () {
 			return convertFilenameExtension(this.newFilename, '.mp4');
+		},
+
+		/*
+		 * to set a percentage width on an element
+		 *
+		 * @returns { String }
+		 */
+		currentConvertedPercentage () {
+			const percentage = (this.conversionProgress * 100.0).toFixed(2);
+			return percentage + '%';
 		},
 
 	},
@@ -197,16 +207,15 @@ export default {
 		 */
 		onVideoJsReady () {
 			try {
+				this.recordPlayer.on('deviceReady', () => {
+					this.isDeviceReady = true;
+				});
+				this.animateOn();
+				this.initVideoJsRecordListeners();
 				this.recordPlayer.record().getDevice();
 			} catch (error) {
 				console.log(error);
 			}
-			this.recordPlayer.on('deviceReady', () => {
-				this.isDeviceReady = true;
-			});
-			this.animateOn();
-			this.initVideoRecordListeners();
-			this.initVideoErrorListeners();
 		},
 
 		/*
@@ -219,45 +228,128 @@ export default {
 		},
 
 		/*
-		 * the user has started/stopped recording a video
+		 * track the events videojs-record offers to manage display
 		 *
 		 */
-		initVideoRecordListeners () {
-			this.recordPlayer.on('startRecord', () => { // user clicked the record button and started recording
-				this.isRecording = true;
-				this.canConvert = false; //disable the convert button
-				this.isPlaybackActive = false;
-				this.isPlaybackVideoActive = false;
-			});
-			this.recordPlayer.on('stopRecord', () => { // and stopped recording
-				this.isRecording = false;
-				this.recordedCount++;
-			});
-			this.recordPlayer.on('finishRecord', () => { // user completed recording and stream is available
-				this.recordedData = this.recordPlayer.recordedData; // the blob object contains the recorded data that we could convert
-				this.canConvert = true; //enable the convert button
-				this.isPlaybackActive = true;
-			});
+		initVideoJsRecordListeners () {
+			this.recordPlayer.on('startRecord', this.onStartRecord);
+			this.recordPlayer.on('stopRecord', this.onStopRecord);
+			this.recordPlayer.on('finishConvert', this.onFinishConvert);
+			this.recordPlayer.on('error', this.onError);
+			this.recordPlayer.on('deviceError', this.onDeviceError);
+		},
+
+		/*
+		 * onStartRecord
+		 *
+		 */
+		onStartRecord () {
+			this.$emit(recordMediaEvents.PROCCESS_STARTED);
+			this.isRecording = true;
+			this.canConvert = false; //disable the convert button
+			this.isPlaybackActive = false;
+			this.isPlaybackVideoActive = false;
+		},
+
+		/*
+		 * onStopRecord
+		 *
+		 */
+		onStopRecord () {
+			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
+			this.isRecording = false;
+			this.recordedCount++;
+		},
+
+		/*
+		 * the seekable media file is ready
+		 *
+		 */
+		onFinishConvert () {
+			this.recordedData = this.recordPlayer.convertedData; // the blob object contains the recorded data that we could convert
+			this.canConvert = true; //enable the convert button
+			this.isPlaybackActive = true;
+		},
+
+		/*
+		 * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
+		 *
+		 */
+		onError () {
+			console.warn(error);
 		},
 
 		/*
 		 * initVideoErrorListeners
 		 *
 		 */
-		initVideoErrorListeners () {
-			this.recordPlayer.on('error', (element, error) => { // error handling, not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
-				console.warn(error);
-			});
-			this.recordPlayer.on('deviceError', () => { //User doesn't allow the browser to access the webcam and/or microphone. Check player.deviceErrorCode for the specific error code.
-				const errorCode = String(this.recordPlayer.deviceErrorCode);
-				console.warn('errorCode = ' + errorCode);
-				if (errorCode === 'NotReadableError: Could not start video source' || 'AbortError: Starting video failed') {
-					this.hasDeviceAlreadyInUseError = true;
-				} else if (errorCode === 'NotAllowedError: Permission denied' || 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context.') {
-					this.hasPermissionDeniedError = true;
-				}
-				console.warn(this.recordPlayer.deviceErrorCode);
-			});
+		onDeviceError () {
+			const errorCode = String(this.recordPlayer.deviceErrorCode);
+			console.warn('errorCode = ' + errorCode);
+			if (errorCode === 'NotReadableError: Could not start video source' || 'AbortError: Starting video failed') {
+				this.hasDeviceAlreadyInUseError = true;
+			} else if (errorCode === 'NotAllowedError: Permission denied' || 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context.') {
+				this.hasPermissionDeniedError = true;
+			}
+			console.warn(this.recordPlayer.deviceErrorCode);
+		},
+
+		/*
+		 * enable the device, initially it's a blank screen until enabled
+		 * may request permission on first use
+		 *
+		 */
+		onEnableSelected () {
+			this.recordPlayer.record().getDevice();
+		},
+
+		/*
+		 * start the record
+		 *
+		 */
+		onStartRecordSelected () {
+			this.recordPlayer.record().start();
+		},
+
+		/*
+		 * stop the record
+		 *
+		 */
+		onStopRecordSelected () {
+			this.recordPlayer.record().stop();
+		},
+
+		/*
+		 * present the save file name modal to name the file
+		 *
+		 */
+		onConvertSelected () {
+			this.isFilenameChangeActive = true;
+		},
+
+
+		/*
+		 * the user has set a file name and selected save
+		 *
+		 */
+		onSaveFilenameSelected () {
+			this.isFilenameChangeActive = false;
+			this.convertAndUploadVideo();
+		},
+
+		/*
+		 * convert and upload to SB
+		 * 
+		 */
+		async convertAndUploadVideo () {
+			try {
+				await this.convertVideo();
+				const responseData = await this.uploadConvertedVideo();
+				this.postUploadedMessage(responseData);
+			} catch (error) {
+				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
+				console.log(error);
+			}
 		},
 
 		/*
@@ -268,18 +360,10 @@ export default {
 			try {
 				this.$emit(recordMediaEvents.PROCCESS_STARTED);
 				this.isConverting = true;
-				this.ffmpeg = createFFmpeg({
-					log: true,
-					// progress: p => console.log(p)
-				});
-				await this.ffmpeg.load(); //load in ffmpeg for use
-				this.ffmpeg.FS('writeFile', this.recordedData.name, await fetchFile(this.recordedData)); //save first
-				await this.ffmpeg.run('-i', this.recordedData.name, this.currentRecordedFilenameToMp4); //then run conversion
-				const data = this.ffmpeg.FS('readFile', this.currentRecordedFilenameToMp4); //the raw mp4 data
-				this.convertedData = new Blob([data.buffer], { type: 'video/mp4' }); //into blob format for uplaod to Schoolbox
+				this.convertedData = await convertToMp4(this.recordedData, this.currentRecordedFilenameToMp4, this.updateConversionProgress) //into blob format for uplaod to Schoolbox
 				this.isConverting = false;
-				this.uploadConvertedVideo();
 			} catch (error) {
+				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
 				this.isConverting = false;
 				this.hasConversionError = true;
 				console.log(error);
@@ -292,9 +376,10 @@ export default {
 		 * @params { ratio }
 		 */
 		updateConversionProgress (progress) {
-			for (const [key, value] of Object.entries(progress)) {
-				console.log('PROGRESS');
-				console.log(`${key}: ${value}`);
+			if (progress < 0) {
+				this.conversionProgress = 0;
+			} else {
+				this.conversionProgress = progress;
 			}
 		},
 
@@ -305,24 +390,16 @@ export default {
 		async uploadConvertedVideo () {
 			try {
 				this.isUploading = true;
-				const response = await axios.post('/storage/asyncUpload.php', this.getFormData());
-				this.postUploadedMessage(response.data);
+				const formData = new FormData();
+				formData.append('upload', this.convertedData, this.currentRecordedFilenameToMp4);
+				const response = await axios.post('/storage/asyncUpload.php', formData);
+				return response.data;
 			} catch (error) {
+				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
 				this.isUploading = false;
 				this.hasUploadError = true;
 				console.log(error);
 			}
-		},
-
-		/*
-		 * Prep the data to FormData so Schoolbox accepts
-		 *
-		 * @returns { FormData }
-		 */
-		getFormData () {
-			const formData = new FormData();
-			formData.append('upload', this.convertedData, this.currentRecordedFilenameToMp4);
-			return formData;
 		},
 
 		/*
@@ -358,52 +435,7 @@ export default {
 		},
 
 		/*
-		 * enable the device, initially it's a blank screen until enabled
-		 * may request permission on first use
-		 *
-		 */
-		onEnableSelected () {
-			this.recordPlayer.record().getDevice();
-		},
-
-		/*
-		 * start the record
-		 *
-		 */
-		onStartRecordSelected () {
-			this.recordPlayer.record().start();
-			this.$emit(recordMediaEvents.PROCCESS_STARTED);
-		},
-
-		/*
-		 * stop the record
-		 *
-		 */
-		onStopRecordSelected () {
-			this.recordPlayer.record().stop();
-			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-		},
-
-		/*
-		 * convert the video to mp4 format for consistent video format across browsers
-		 *
-		 */
-		onConvertSelected () {
-			this.isFilenameChangeActive = true;
-		},
-
-
-		/*
-		 * convert the video to mp4 format for consistent video format across browsers
-		 *
-		 */
-		onSaveFilenameSelected () {
-			this.isFilenameChangeActive = false;
-			this.convertVideo();
-		},
-
-		/*
-		 * close the error modal
+		 * close the error modal, animating out
 		 *
 		 */
 		onCloseErrorModalSelected () {
@@ -411,7 +443,7 @@ export default {
 		},
 
 		/*
-		 * it's closed now, so disable the error to allow trying again
+		 * it's closed now, so disable the errors to allow trying again
 		 *
 		 */
 		onErrorModalClosed () {
@@ -429,27 +461,11 @@ export default {
 		},
 
 		/*
-		 * close the filename modal
+		 * close the filename modal, cancel has been selected rather than save
 		 *
 		 */
 		onFilenameModalClosed () {
 			this.isFilenameChangeActive = false;
-		},
-
-		/*
-		 * close the uploading modal
-		 *
-		 */
-		onCloseUploadedModalSelected () {
-			this.$refs.uploadedModal.animateOff();
-		},
-
-		/*
-		 * it's closed now, so disable the error to allow trying again
-		 *
-		 */
-		onUploadedModalClosed () {
-			this.hasUploaded = false;
 		},
 
 		/*
@@ -476,9 +492,11 @@ export default {
 
 <template>
 	<div>
+
 		<div class="ab-pane">
 			<div>
 				<div class='media-container' ref="mediaContainer">
+					
 					<div ref='recordingVideoContainer'>
 						<div class='video-container'>
 							<video ref="recordingVideo" playsinline class="video-js"></video>
@@ -491,40 +509,48 @@ export default {
 							/>
 						</div>
 					</div>
+
 					<record-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError || hasConversionError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<template v-if="hasDeviceAlreadyInUseError">
-              <div class="alert-box warning">The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</div>
+			 				 <div class="alert-box warning">The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 						<template v-else-if="hasPermissionDeniedError">
-              <div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
+			 	 			<div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 						<template v-else-if="hasConversionError">
-              <div class="alert-box alert">There was an error while converting.</div>
+			  				<div class="alert-box alert">There was an error while converting.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 					</record-media-modal>
+
 					<record-media-modal v-else-if="isFilenameChangeActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
 						<label for="filename">Filename</label>
 						<input type="text" id="filename" name="filename" v-model="newFilename">
 						<button @click.prevent="onSaveFilenameSelected">Save and convert</button>
 						<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
 					</record-media-modal>
+
 					<record-media-modal v-else-if="isConverting" ref="convertingModal" key="convertingModal">
-						<div class="loader"></div>
-            <p><em>Converting the video to mp4, please wait...</em></p>
+						<!-- <div class="loader"></div> -->
+						<div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ width: currentConvertedPercentage }"></span></div>
+						<p><em>Converting the video to mp4, please wait...</em></p>
 					</record-media-modal>
+
 					<record-media-modal v-else-if="isUploading" ref="uploadingModal" key="uploadingModal">
 						<div class="loader"></div>
 						<p><em>Uploading video, please wait...</em></p>
 					</record-media-modal>
+					
 					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
-            <p><em>Video successfully converted &amp; uploaded.</em></p>
+						<p><em>Video successfully converted &amp; uploaded.</em></p>
 					</record-media-modal>
+
 				</div>
 			</div>
-		</div>
+		</div><!-- .ab-pane -->
+
 		<div class="component-action" ref="actions">
 			<section>
 				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
@@ -541,11 +567,12 @@ export default {
 					<a v-else-if="isPlaybackVideoActive && $refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause</a>
 				</transition>
 			</section>
-		</div>
+		</div><!-- .component-action -->
+
 	</div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
 .media-container {
 	position: relative;
@@ -553,10 +580,9 @@ export default {
 	height: 100%;
 	background: black;
 	overflow: hidden;
-
-  h2, h3 {
-    max-width: none;
-  }
+	h2, h3 {
+		max-width: none;
+	}
 }
 
 .video-container {
@@ -567,16 +593,20 @@ export default {
 	top: 0;
 }
 
+.meter {
+	transition: width 0.1s;
+}
+
 .vjs-icon-record-start, .vjs-icon-record-stop {
 	min-height: 0;
 }
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.2s;
+	transition: opacity 0.2s;
 }
 
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+  	opacity: 0;
 }
 
 </style>

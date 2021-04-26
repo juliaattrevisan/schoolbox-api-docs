@@ -173,17 +173,14 @@ $font-family-icon: 'schoolbox';
 }
 
 .menu-item {
-  background: #FAFAFA;
-  border: 1px solid #EDEDED;
+	background: #FAFAFA;
+	border: 1px solid #EDEDED;
 	width: calc(33.4%);
-  margin-right: 1rem;
-  margin-top: 1rem;
-  transform: none !important;
-
-  &:last-child {
-    margin-right: 0;
-  }
-
+	margin-right: 1rem;
+	margin-top: 1rem;
+	&:last-child {
+		margin-right: 0;
+	}
 	span {
 		display: block;
 		transition: padding-bottom 0.2s;
@@ -211,30 +208,30 @@ $font-family-icon: 'schoolbox';
 
 	&:before {
 		color: $content-ui-foreground;
-    font-size: 3rem;
+	font-size: 3rem;
 		padding: 0;
 	}
 }
 
 .icon-mic {
-  @extend .icon;
-  &:before {
-    content: '\e641';
-  }
+	@extend .icon;
+	&:before {
+		content: '\e641';
+	}
 }
 
 .icon-video {
-  @extend .icon;
-  &:before {
-    content: '\e674';
-  }
+	@extend .icon;
+	&:before {
+		content: '\e674';
+	}
 }
 
 .icon-screen-capture {
-  @extend .icon;
-  &:before {
-    content: '\e920';
-  }
+	@extend .icon;
+	&:before {
+		content: '\e920';
+	}
 }
 
 @media screen and (max-width: 640px) {
