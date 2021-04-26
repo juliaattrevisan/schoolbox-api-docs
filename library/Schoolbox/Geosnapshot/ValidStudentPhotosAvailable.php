@@ -48,6 +48,12 @@ class ValidStudentPhotosAvailable
             return false;
         }
 
+        /* No portrait picture? No trabajo
+         */
+        if (!$viewee->getPortrait()) {
+            return false;
+        }
+
         /* TODO $viewee has been redacted from photos; exit early
          *  Nothing to see here for anyone
          */

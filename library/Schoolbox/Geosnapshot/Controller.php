@@ -78,13 +78,6 @@ class Controller extends Base
             throw new RuntimeException('Geosnapshot: Unable to obtain photos: Geosnapshot is not available for this user.');
         }
 
-        /* No portrait picture? No trabajo
-         * Maybe this should be part of the geosnapshot spec pattern though
-         */
-        if (!$viewee->getPortrait()) {
-            throw new RuntimeException('Geosnapshot: Unable to obtain photos: Viewee has not got a portrait picture');
-        }
-
         /* Manufacture a payload with the necessary parts and send it out there
          */
         $payload = (new StudentPhoto())->build($viewee);

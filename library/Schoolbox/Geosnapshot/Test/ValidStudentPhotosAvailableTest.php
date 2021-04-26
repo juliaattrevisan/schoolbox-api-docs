@@ -56,30 +56,53 @@ class ValidStudentPhotosAvailableTest extends TestCase
     public function provider_validStudentPhotosAvailable() : array
     {
 
+        /* A classically-correct user
+         */
         $edenReed = (new \Schoolbox\User())
             ->setId(6)
             ->setFirstname('Eden')
+            ->setLastname('Reed')
+            ->setPortrait((new \Schoolbox\Resource\Storage\Model())->setHash('file hash goes here'));
+
+        /* Jana doesn't have a portrait picture
+         */
+        $janaReed = (new \Schoolbox\User())
+            ->setId(25)
+            ->setFirstname('Jana')
             ->setLastname('Reed');
 
-        /* TODO Add jana without a picture, because you need a picture to succeed at this stuff
+        /* A random person outside the Reed family
          */
-
         $davidRhodes = (new \Schoolbox\User())
             ->setId(230)
             ->setFirstname('David')
-            ->setLastname('Rhodes');
+            ->setLastname('Rhodes')
+            ->setPortrait((new \Schoolbox\Resource\Storage\Model())->setHash('file hash goes here'));
 
+        /* A random person outside the Reed family
+         * and they do not have a portrait picture
+         */
+        $jamalAli = (new \Schoolbox\User())
+            ->setId(60)
+            ->setFirstname('Jamal')
+            ->setLastname('Ali');
+
+        /* A simulated parent
+         */
         $jenniReed = (new \Schoolbox\User())
             ->setId(27)
             ->setFirstname('Jenni')
             ->setLastname('Reed')
             ->setChildren(new \Schoolbox\GenericCollection(\Schoolbox\User::class));
 
-        /* Install a child
+        /* Install Reed children
          */
         $jenniReed->getChildren()
-            ->add($edenReed);
+            ->add($edenReed)
+            ->add($janaReed);
 
+        /* A simulated staff
+         */
         $jackColes = (new \Schoolbox\User())
             ->setId(22)
             ->setFirstname('Jack')
@@ -88,7 +111,9 @@ class ValidStudentPhotosAvailableTest extends TestCase
 
         return [
 
-            /* Add other cases that you expect to be valid and allow connectivity
+            /* Classical scenario
+             * Parent of a child can view their photos if they have a portrait
+             * picture and all the api setup is there
              */
             'Parent viewing their own child' => [
                 'abcd-1234-QWERTY-10000', // API Key set
@@ -98,6 +123,29 @@ class ValidStudentPhotosAvailableTest extends TestCase
                 true
             ],
 
+            /* Parent doesn't have access to geosnapshot when child
+             * doesn't have a portrait picture
+             */
+            'Parent viewing their own child but they do not have a portrait' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $jenniReed, // Jenni is parent of Jana
+                $janaReed,
+                false
+            ],
+
+            /* Parent can't view another family's child
+             */
+            'Parent viewing some other guy' => [
+                'aa112233', // API Key set
+                false, // Feature is enabled in current plan
+                $jenniReed, // Jenni is parent of Eden, not Dr Hodes
+                $davidRhodes,
+                false
+            ],
+
+            /* Staff can see anyone
+             */
             'Staff member viewing a student 1' => [
                 'abcd-1234-QWERTY-10000', // API Key set
                 true, // Feature is enabled in current plan
@@ -106,12 +154,36 @@ class ValidStudentPhotosAvailableTest extends TestCase
                 true
             ],
 
+            /* Staff can see anyone and David is his own person
+             */
             'Staff member viewing a student 2' => [
                 'abcd-1234-QWERTY-10000', // API Key set
                 true, // Feature is enabled in current plan
                 $jackColes, // Jack is a staff member
                 $davidRhodes,
                 true
+            ],
+
+            /* Student doesn't have a portrait picture
+             * and won't work, even when viewed by a staff
+             */
+            'Staff member viewing a student 3' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $jackColes, // Jack is a staff member
+                $janaReed, /// but Jana doesn't have a picture
+                false
+            ],
+
+            /* Student doesn't have a portrait picture
+             * and won't work, even when viewed by a staff
+             */
+            'Staff member viewing a student 4' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $jackColes, // Jack is a staff member
+                $jamalAli, /// but Jana doesn't have a picture
+                false
             ],
 
             /* These cases should fail and deny connectivity
@@ -129,14 +201,6 @@ class ValidStudentPhotosAvailableTest extends TestCase
                 true, // Feature is enabled in current plan
                 $jenniReed, // Jenni is parent of Eden
                 $edenReed,
-                false
-            ],
-
-            'Parent viewing some other guy' => [
-                'aa112233', // API Key set
-                false, // Feature is enabled in current plan
-                $jenniReed, // Jenni is parent of Eden, not Dr Hodes
-                $davidRhodes,
                 false
             ],
         ];
