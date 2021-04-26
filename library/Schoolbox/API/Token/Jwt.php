@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token;
 
+use Alaress_Date_Format;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT as JwtLibrary;
@@ -31,6 +32,11 @@ class Jwt
     private $config;
 
 
+    /**
+     * Constructor
+     *
+     * @param IConfigLoader $configLoader
+     */
     public function __construct(IConfigLoader $configLoader)
     {
         $this->config = $configLoader;
@@ -38,23 +44,34 @@ class Jwt
 
 
     /**
-     * Generates a JWT for this user
+     * Generates a JWT for this user.
      *
-     * @param User $user
+     * @param User     $user
+     * @param int|null $lifetime     If provided, the JWT expires after this
+     *                               many seconds.
+     * @param bool     $includeEmail If true, add the user's email address to
+     *                               the "email" claim.
      * @return string
      */
-    public function generate(User $user): string
+    public function generate(User $user, ?int $lifetime = null, bool $includeEmail = false): string
     {
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
-        // Expiry:     not used for now
+        // Expiry:     optional
         // Not before: not used for now
         // May add ability to regenerate tokens later?
+        $claims = [
+            'iss' => trim($this->config->get('site_hostname') . '.' . $this->config->get('site_domain'), ';.'),
+            'sub' => $user->getUsername(),
+        ];
+        if (isset($lifetime)) {
+            $claims['exp'] = Alaress_Date_Format::now()->addSeconds($lifetime)->getUnixTimeStamp();
+        }
+        if ($includeEmail) {
+            $claims['email'] = $user->getEmail();
+        }
         return JwtLibrary::encode(
-            [
-                'iss' => trim($this->config->get('site_hostname') . '.' . $this->config->get('site_domain'), ';.'),
-                'sub' => $user->getUsername(),
-            ],
+            $claims,
             $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
             self::SIGNING_ALGORITHM
         );
