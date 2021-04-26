@@ -21,6 +21,10 @@
     {% if user.current.superuser %}
         <li><a class="icon-locked" href="/adminv2/home">Administration</a></li>
     {% endif %}
+
+    {# Not Help? Show a link to Help #}
+    <li><a class="icon-help" href="{{ routeLookup('helpSso.sendTokenToHelp') }}">Online Help</a></li>
+
     <li><a class="icon-logout" href="/logout.php">Logout</a></li>
 </ul>
 {% if user.current.linkedUser is not empty or user.previous  %}
