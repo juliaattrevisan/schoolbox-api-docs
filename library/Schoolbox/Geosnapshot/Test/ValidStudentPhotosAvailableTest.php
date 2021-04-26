@@ -259,6 +259,24 @@ class ValidStudentPhotosAvailableTest extends TestCase
                 $edenReed,
                 false
             ],
+
+            /* The feature flag needs to be enabled
+             */
+            'Feature flag is enabled' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $jenniReed, // Jenni is parent of Eden
+                $edenReed,
+                true
+            ],
+
+            'Feature flag is disabled' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                false, // Feature is disabled in current plan
+                $jenniReed, // Jenni is parent of Eden
+                $edenReed,
+                false
+            ],
         ];
     }
 }
