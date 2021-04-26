@@ -49,7 +49,7 @@ class Controller extends Base
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function getStudentPhotos(User $viewee): void
+    public function getStudentPhotosUrl(User $viewee): void
     {
         /* If you're allowed to make this request...
          */
