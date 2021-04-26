@@ -61,6 +61,8 @@ class RequestFactory
      *                                 cookie value, thus generating the PDF for
      *                                 the user which is authenticated with this
      *                                 hash.
+     *                                 TODO consider switching to user tokens
+     *                                 (cannot do this until SA-11077 is done)
      * @return Gotenberg\URLRequest
      */
     public function buildUrlRequest(
