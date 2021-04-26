@@ -16,6 +16,7 @@ use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -42,8 +43,34 @@ class Module extends BaseModule
         );
 
         $preloadUser = function ($params) { return $this->preloadUser($params); };
+        $preloadUserAndUrl = function ($params) { return $this->preloadUserAndUrl($params); };
 
         $this->register('GET', '/user/{id}', 'getStudentPhotosUrl', $getPerms, $preloadUser);
+        $this->register('GET', '/user/{id}/{url}', 'getStudentPhotos', $getPerms, $preloadUserAndUrl);
+    }
+
+
+    /**
+     * Preload a User instance
+     *
+     * @param array $params
+     * @return array
+     * @throws InvalidArgumentException
+     * @throws NotFound
+     */
+    private function preloadUserAndUrl(array $params): array
+    {
+        try {
+            $user = $this->getUserMapper()->findById($params['id']);
+        }
+        catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'viewee' => $user,
+            'url' => Redirect::decode($params['url'])
+        ];
     }
 
 

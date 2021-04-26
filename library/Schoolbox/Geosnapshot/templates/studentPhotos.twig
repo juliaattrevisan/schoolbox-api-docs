@@ -1,0 +1,19 @@
+{##
+ # studentPhotos
+ #
+ # Display all the photos associated with a given student $viewee
+ #
+ # @param User $viewee  The person being viewed
+ # @param string $url   A url from geosnapshot
+ #}
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Photos for {{ viewee.fullname }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <iframe src="{{ url }}" style="height:80vh"></iframe>
+    </div>
+</div>

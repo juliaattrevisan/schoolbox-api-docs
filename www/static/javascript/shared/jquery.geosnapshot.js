@@ -40,14 +40,7 @@
                 toast.toastActivate({text: 'Retrieving photos...'});
 
                 $.get(config.url, function(responseText) {
-
-                    /* Temporarily ram this in
-                     */
-                    $('#component24').html('<iframe src="'+responseText.url+'" style="height:500px"></iframe>');
-
-                    toast.toastTimeout({
-                        text: 'Loaded.',
-                    });
+                    window.location.href = responseText.url;
                 }).fail(function() {
                     toast.toastTimeout({
                         text: 'Something went wrong. Please try again.',

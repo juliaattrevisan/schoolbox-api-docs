@@ -9,8 +9,8 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use Alaress\Web\Controller\Base;
-use http\Exception\RuntimeException;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\User;
 
 
@@ -62,9 +62,12 @@ class Controller extends Base
             );
 
         /* No Geosnapshot? No trabajo
+         *
+         * One or more misconfigurations or access controls could have caused this
+         * but all result in nothing to see for the current user
          */
         if (!$isGeosnapshotAvailable) {
-            throw new RuntimeException('Geosnapshot: Unable to obtain photos: Geosnapshot is not available for this user.');
+            throw new \RuntimeException('Geosnapshot: Unable to obtain photos: Geosnapshot is not available for this user.');
         }
 
         /* Set up guzzle with the authentication pieces
@@ -77,6 +80,56 @@ class Controller extends Base
         $response = (new Api($this->getConfigLoader()->get('geosnapshot_api_key')))
             ->retrieveStudentPhotos($viewee);
 
-        $this->getResponse()->content->set($this->buildJsonOutput($response));
+        /* Redirect to a special place
+         */
+        $this->getResponse()->content->set($this->buildJsonOutput([
+            'url' => $this->getRouter()->generate('geosnapshotApi.getStudentPhotos', [
+                'id' => $viewee->getId(),
+                'url' => Redirect::encode($response['url'])
+            ])
+        ]));
+    }
+
+
+    /**
+     * Display all the photos that Geosnapshots gave to us via $url
+     *
+     * Perform the access check again, in case a) you're not who you say you are
+     * and/or b) whether something about the setup/access changed in the meantime
+     *
+     * @param User   $viewee
+     * @param string $url
+     * @throws \RuntimeException
+     */
+    public function getStudentPhotos(User $viewee, string $url): void
+    {
+
+        /* If you're allowed to make this request...
+         */
+        $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+            ->isSatisifiedBy(
+                $this->getConfigLoader()->get('geosnapshot_api_key'),
+                $this->getConfigLoader()->get('geosnapshot_enabled'),
+                $this->getUser(),
+                $viewee
+            );
+
+        /* No Geosnapshot? No trabajo
+         *
+         * One or more misconfigurations or access controls could have caused this
+         * but all result in nothing to see for the current user
+         */
+        if (!$isGeosnapshotAvailable) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+        }
+
+        /* Otherwise show the gallery
+         */
+        $this->getResponse()->content->set($this->buildHtmlOutput(
+            '@geosnapshotApi/studentPhotos.twig', [
+                'viewee' => $viewee,
+                'url' => $url
+            ]
+        ));
     }
 }
