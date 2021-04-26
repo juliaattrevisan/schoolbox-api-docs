@@ -54,10 +54,10 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param string                          $host
-     * @param string                          $key
+     * @param LoggerInterface $log
+     * @param bool            $perform
+     * @param string          $host
+     * @param string          $key
      */
     public function __construct(
         LoggerInterface $log,
@@ -74,15 +74,17 @@ class Factory
 
     /**
      * @return GenericCollection
+     * @throws \DomainException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     public function produce(): GenericCollection
     {
         $this->log->info('Accessing api endpoint');
 
         $modules = [
-            Codec\DSN::MODULE_LMS_INTEGRATION,
-            Codec\DSN::MODULE_STUDENT_DETAILS,
-            Codec\DSN::MODULE_IDENTITY_MANAGEMENT
+            Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES
         ];
 
         $api = [];
