@@ -19,6 +19,11 @@ use Zend\Uri\Uri;
 class Controller extends Base
 {
     /**
+     * Expire the JWT after 5 minutes.
+     */
+    private const JWT_EXPIRY = 300;
+
+    /**
      * Token builder: used to construct and parse tokens.
      */
     private Jwt $tokenBuilder;
@@ -44,14 +49,14 @@ class Controller extends Base
      */
     public function sendTokenToHelp(): void
     {
-        // Generate a link to redir to
+        // Generate a JWT
+        // Need to inject more data (i.e. expiry, email address)
+        $jwt = $this->tokenBuilder->generate($this->getUser(), self::JWT_EXPIRY, true);
+
         /** @noinspection PhpUnhandledExceptionInspection */
         $url = (new Uri($this->getConfigLoader()->get('schoolbox_help_url')))
-            ->setPath($this->router->generate('helpSso.receiveTokenFromInstance'));
-
-        // Generate a JWT
-        // Need to inject more data (i.e. expiry)
-        $url->setQuery(['jwt' => $this->tokenBuilder->generate($this->getUser())]);
+            ->setPath($this->router->generate('helpSso.receiveTokenFromInstance'))
+            ->setQuery(['jwt' => $jwt]);
 
         var_dump($url);
     }
