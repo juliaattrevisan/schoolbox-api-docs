@@ -434,9 +434,7 @@
                                             $('[data-view-photos={{ user.id }}]').on('click', function(event) {
                                                 event.preventDefault();
 
-                                                $(this).geosnapshot({
-                                                    url: '/geosnapshot/user/' + $(this).attr('data-view-photos')
-                                                }).requestGallery();
+                                                $(this).geosnapshot().requestGallery($(this).attr('data-view-photos'));
                                             });
                                         });
                                     </script>
