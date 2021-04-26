@@ -8,6 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use GuzzleHttp\Client;
+use Schoolbox\Geosnapshot\Payload\StudentPhoto;
+use Schoolbox\User;
 
 
 /**
@@ -71,7 +73,7 @@ class Api
 
 
     /**
-     * @param array $payload
+     * @param User $viewee
      * @return array
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -79,8 +81,15 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveStudentPhotos(array $payload): array
+    public function retrieveStudentPhotos(User $viewee): array
     {
+        /* Manufacture a payload with the necessary parts and send it out there
+         */
+        $payload = (new StudentPhoto())->build($viewee);
+
+        /* Portrait contents need to be POSTed, not GETted, despite us not mutating any data
+         * in the third party system
+         */
         $response = $this->build()->request('POST', self::GEOSNAPSHOT_ENDPOINT, $payload);
 
         /* Responds with this tuple: {"url":"https://geosnapshot.com/e/schoolbox-office-re-opening-from-iso-to-posh"}

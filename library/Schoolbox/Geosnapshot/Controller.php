@@ -9,12 +9,9 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use Alaress\Web\Controller\Base;
-use GuzzleHttp\Client;
 use http\Exception\RuntimeException;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 
 /**
@@ -32,21 +29,13 @@ class Controller extends Base
 
 
     /**
-     * @var UserMapper
-     */
-    private UserMapper $userMapper;
-
-
-    /**
      * Controller constructor.
      *
      * @param ErrorMapper $errorMapper
-     * @param UserMapper  $userMapper
      */
-    public function __construct(ErrorMapper $errorMapper, UserMapper $userMapper)
+    public function __construct(ErrorMapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
-        $this->userMapper = $userMapper;
     }
 
 
@@ -78,10 +67,6 @@ class Controller extends Base
             throw new RuntimeException('Geosnapshot: Unable to obtain photos: Geosnapshot is not available for this user.');
         }
 
-        /* Manufacture a payload with the necessary parts and send it out there
-         */
-        $payload = (new StudentPhoto())->build($viewee);
-
         /* Set up guzzle with the authentication pieces
          *
          * Get the iframe url back, if successful, and pop out a html fragment
@@ -90,7 +75,7 @@ class Controller extends Base
          * Otherwise just don't do anything and let the toaster communicate the issue
          */
         $response = (new Api($this->getConfigLoader()->get('geosnapshot_api_key')))
-            ->retrieveStudentPhotos($payload);
+            ->retrieveStudentPhotos($viewee);
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
