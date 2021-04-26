@@ -3,14 +3,12 @@
  #
  # Display all the photos associated with a given student $viewee
  #
- # @param User $viewee  The person being viewed
- # @param string $url   A url from geosnapshot
+ # @param array $allBreadcrumbs  A trail of crumbularity
+ # @param User $viewee           The person being viewed
+ # @param string $url            A url from geosnapshot
  #}
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Photos for {{ viewee.fullname }}</h1>
-    </div>
-</div>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
 
 <div class="row">
     <div class="small-12 columns">

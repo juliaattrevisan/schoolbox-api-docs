@@ -127,6 +127,10 @@ class Controller extends Base
          */
         $this->getResponse()->content->set($this->buildHtmlOutput(
             '@geosnapshotApi/studentPhotos.twig', [
+                'allBreadcrumbs' => [
+                    [$viewee->getFullName(), '/search/user/' . $viewee->getId()],
+                    ['Photos', null]
+                ],
                 'viewee' => $viewee,
                 'url' => $url
             ]
