@@ -68,15 +68,23 @@
   .fc-toolbar {
     flex-direction: column;
 
-    .fc-toolbar-chunk .fc-toolbar-title {
-      margin: .75rem 0;
+    .fc-toolbar-title {
+      margin: .5rem 0 !important;
+      text-align: center;
     }
-  }
-}
 
-@media #{$small-only} {
-  .fc-custom-group div:last-child {
-    padding-right: 0;
+    .fc-custom-group.row {
+      margin-bottom: .5rem;
+
+      > .small-4:last-child {
+        padding-right: .8rem;
+      }
+    }
+
+    .fc-toolbar-chunk,
+    .fc-button-group {
+      width: 100%;
+    }
   }
 }
 

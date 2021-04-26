@@ -53,6 +53,9 @@
     margin: 0.25rem 0;
     font-size: 0.875rem;
   }
+  .fc-list-event {
+    background-color: transparent;
+  }
   .fc-list-event:hover td {
     background-color: $content-ui-hover;
   }
@@ -168,6 +171,7 @@
 
 .fc-event {
   min-height: 1em;
+  overflow: hidden;
 }
 
 .fc-event,
@@ -177,7 +181,7 @@
   margin: 1px 0 0;
 }
 .fc-event:hover {
-  text-decoration: underline;
+  cursor: pointer;
 }
 .fc-event.loading {
   opacity: 0.5;
