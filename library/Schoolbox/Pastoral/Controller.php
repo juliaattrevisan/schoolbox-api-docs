@@ -941,6 +941,8 @@ class Controller extends Base
         // Prepare tags. Save newly created tags.
         $tags = $this->prepareTags($post->get('tags'));
 
+        $pastoralExternal = new External_Pastoral();
+
         // Go through every kid
         foreach ($duplicateStudentIds as $studentIdCurrent) {
             $previousRecord = null;
@@ -1038,13 +1040,11 @@ class Controller extends Base
             $record->setAttachments($newRecordAttachments);
 
             $db->onPersist(
-                static function () use ($previousRecord, $record) {
+                function () use ($previousRecord, $record, $pastoralExternal) {
                     // raise notification
                     $action = $previousRecord ? \Schoolbox\Mapper::METHOD_UPDATE : \Schoolbox\Mapper::METHOD_CREATE;
-                    $pastoralMapper = Mapper::getInstance();
-                    $pastoralMapper->setEventPropagator(); // need to clear propagator
-                    $pastoralMapper->raiseNotification($record, $action, $previousRecord);
-                    $pastoralExternal = new External_Pastoral();
+                    $this->pastoralDataSource->resetPropagator();
+                    $this->pastoralDataSource->raiseNotification($record, $action, $previousRecord);
 
                     // Save record in external database, and set pastoral external_id in Schoolbox database
                     $pastoralExternal->syncPastoral($record);

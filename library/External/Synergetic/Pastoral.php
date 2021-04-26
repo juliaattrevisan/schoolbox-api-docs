@@ -673,7 +673,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
                     $this->pastoralMapper->suppressNotification();
-                    $this->pastoralMapper->save($pastoral);
+                    try {
+                        $this->pastoralMapper->save($pastoral);
+                    } catch (MapperException $e) {
+                        $this->connector->rollBack();
+                        return false;
+                    }
 
                     // Restore the proper propagator
                     $this->pastoralMapper->restoreNotification();
