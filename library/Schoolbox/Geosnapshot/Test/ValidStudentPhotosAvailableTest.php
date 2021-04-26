@@ -62,6 +62,7 @@ class ValidStudentPhotosAvailableTest extends TestCase
             ->setId(6)
             ->setFirstname('Eden')
             ->setLastname('Reed')
+            ->setRole((new \Schoolbox\Role())->setType(Role::STUDENT))
             ->setPortrait((new \Schoolbox\Resource\Storage\Model())->setHash('file hash goes here'));
 
         /* Jana doesn't have a portrait picture
@@ -69,7 +70,8 @@ class ValidStudentPhotosAvailableTest extends TestCase
         $janaReed = (new \Schoolbox\User())
             ->setId(25)
             ->setFirstname('Jana')
-            ->setLastname('Reed');
+            ->setLastname('Reed')
+            ->setRole((new \Schoolbox\Role())->setType(Role::STUDENT));
 
         /* A random person outside the Reed family
          */
@@ -77,6 +79,7 @@ class ValidStudentPhotosAvailableTest extends TestCase
             ->setId(230)
             ->setFirstname('David')
             ->setLastname('Rhodes')
+            ->setRole((new \Schoolbox\Role())->setType(Role::STUDENT))
             ->setPortrait((new \Schoolbox\Resource\Storage\Model())->setHash('file hash goes here'));
 
         /* A random person outside the Reed family
@@ -85,7 +88,8 @@ class ValidStudentPhotosAvailableTest extends TestCase
         $jamalAli = (new \Schoolbox\User())
             ->setId(60)
             ->setFirstname('Jamal')
-            ->setLastname('Ali');
+            ->setLastname('Ali')
+            ->setRole((new \Schoolbox\Role())->setType(Role::STUDENT));
 
         /* A simulated parent
          */
@@ -93,6 +97,7 @@ class ValidStudentPhotosAvailableTest extends TestCase
             ->setId(27)
             ->setFirstname('Jenni')
             ->setLastname('Reed')
+            ->setRole((new \Schoolbox\Role())->setType(Role::PARENT))
             ->setChildren(new \Schoolbox\GenericCollection(\Schoolbox\User::class));
 
         /* Install Reed children
@@ -171,7 +176,7 @@ class ValidStudentPhotosAvailableTest extends TestCase
                 'abcd-1234-QWERTY-10000', // API Key set
                 true, // Feature is enabled in current plan
                 $jackColes, // Jack is a staff member
-                $janaReed, /// but Jana doesn't have a picture
+                $janaReed, // but Jana doesn't have a picture
                 false
             ],
 
@@ -182,7 +187,58 @@ class ValidStudentPhotosAvailableTest extends TestCase
                 'abcd-1234-QWERTY-10000', // API Key set
                 true, // Feature is enabled in current plan
                 $jackColes, // Jack is a staff member
-                $jamalAli, /// but Jana doesn't have a picture
+                $jamalAli, // but Jana doesn't have a picture
+                false
+            ],
+
+            /* Students can see themselves, but nobody else
+             */
+            'Student views themselves 1' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $edenReed,
+                $edenReed,
+                true
+            ],
+
+            /* Students can see themselves, but nobody else
+             * but they need a profile picture
+             */
+            'Student views themselves 2' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $janaReed,
+                $janaReed,
+                false
+            ],
+
+            /* Students can see themselves, but nobody else
+             */
+            'Student views another student' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $edenReed,
+                $jamalAli,
+                false
+            ],
+
+            /* Students can see themselves, but nobody else
+             */
+            'Student views parent' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $edenReed,
+                $jenniReed,
+                false
+            ],
+
+            /* Students can see themselves, but nobody else
+             */
+            'Student views staff' => [
+                'abcd-1234-QWERTY-10000', // API Key set
+                true, // Feature is enabled in current plan
+                $edenReed,
+                $jackColes,
                 false
             ],
 

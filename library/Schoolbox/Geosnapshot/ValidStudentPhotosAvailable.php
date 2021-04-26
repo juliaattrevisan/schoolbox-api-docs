@@ -58,6 +58,12 @@ class ValidStudentPhotosAvailable
          *  Nothing to see here for anyone
          */
 
+        /* $viewer is a student, and they're viewing themselves
+         */
+        if ($viewer->getRole()->isStudent() && $viewer->getId() === $viewee->getId()) {
+            return true;
+        }
+
         /* $viewer is a staff member;
          * They can view content for anyone
          */
