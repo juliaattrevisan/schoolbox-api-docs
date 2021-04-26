@@ -49,22 +49,8 @@ export default {
 					alpha: 0,
 					ease: 'power2.out',
 					delay: (index * 0.1) + 0.2,
-					onComplete: this.onTitleRevealed
 				} );
 			});
-			this.animatedOutCount = 0;
-		},
-
-
-		/**
-		 * to make the pseudo video bakground black on animated
-		 *
-		 */
-		onTitleRevealed () {
-			this.animatedOutCount++;
-			if (this.animatedOutCount === 3) {
-				this.$refs.pseudoVideo.style.background = 'black';
-			}
 		},
 
 		/**
@@ -98,23 +84,16 @@ export default {
 					alpha: 0,
 					ease: 'power2.in',
 					delay: (index * 0.1) + 0.3,
-					onComplete: this.onMenuHidden
 				} );
 			});
-			this.animatedOutCount = 0;
+			gsap.to(this.$refs.pseudoVideo, 0.3, {
+				backgroundColor: '#000',
+				delay: 0.5,
+				ease: 'power2.in',
+				onComplete: () => this.$emit('on-media-type-selected', this.selectedMediaType)
+			} );
 		},
-
-		/*
-		 * animation complete, so dispatch
-		 *
-		 */
-		onMenuHidden () {
-			this.animatedOutCount++;
-			if (this.animatedOutCount === 3) {
-				this.$emit('on-media-type-selected', this.selectedMediaType);
-			}
-		},
-
+		
 	}
 
 }
@@ -168,7 +147,7 @@ $font-family-icon: 'schoolbox';
 	width: 100%;
 	height: 300px; //will be updated at mounted()
 	display: flex;
-	background: transparent !important;
+	background: white;
 	overflow: hidden;
 }
 

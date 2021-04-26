@@ -20,7 +20,7 @@ import { getRecordCameraOptions, getRecordScreenOptions, getPlaybackOptions } fr
 import { convertFilenameExtension } from '@shared/util/fileUtils';
 import { convertToMp4 } from '@shared/video/convertVideo';
 import mediaTypes from '../js/mediaTypes';
-import recordMediaEvents from '../js/recordMediaEvents';
+import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
 
 export default {
@@ -185,7 +185,7 @@ export default {
 		 *
 		 */
 		initVideojs () {
-			this.recordPlayer = videojs(this.$refs.recordingVideo, this.getVideojsOptions(), this.onVideoJsReady);
+			this.player = videojs(this.$refs.recordingVideo, this.getVideojsOptions(), this.onVideojsReady);
 		},
 
 		/*
@@ -205,14 +205,11 @@ export default {
 		 * videojs is ready, so set up listeners and animate on
 		 *
 		 */
-		onVideoJsReady () {
+		onVideojsReady () {
 			try {
-				this.recordPlayer.on('deviceReady', () => {
-					this.isDeviceReady = true;
-				});
 				this.animateOn();
-				this.initVideoJsRecordListeners();
-				this.recordPlayer.record().getDevice();
+				this.initVideojsRecordListeners();
+				this.player.record().getDevice();
 			} catch (error) {
 				console.log(error);
 			}
@@ -231,12 +228,21 @@ export default {
 		 * track the events videojs-record offers to manage display
 		 *
 		 */
-		initVideoJsRecordListeners () {
-			this.recordPlayer.on('startRecord', this.onStartRecord);
-			this.recordPlayer.on('stopRecord', this.onStopRecord);
-			this.recordPlayer.on('finishConvert', this.onFinishConvert);
-			this.recordPlayer.on('error', this.onError);
-			this.recordPlayer.on('deviceError', this.onDeviceError);
+		initVideojsRecordListeners () {
+			this.player.on('deviceReady', this.onDeviceReady);
+			this.player.on('startRecord', this.onStartRecord);
+			this.player.on('stopRecord', this.onStopRecord);
+			this.player.on('finishConvert', this.onFinishConvert);
+			this.player.on('error', this.onError);
+			this.player.on('deviceError', this.onDeviceError);
+		},
+
+		/*
+		 * onDeviceReady
+		 *
+		 */
+		onDeviceReady () {
+			this.isDeviceReady = true;
 		},
 
 		/*
@@ -266,7 +272,7 @@ export default {
 		 *
 		 */
 		onFinishConvert () {
-			this.recordedData = this.recordPlayer.convertedData; // the blob object contains the recorded data that we could convert
+			this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert
 			this.canConvert = true; //enable the convert button
 			this.isPlaybackActive = true;
 		},
@@ -275,23 +281,23 @@ export default {
 		 * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
 		 *
 		 */
-		onError () {
+		onError (element, error) {
 			console.warn(error);
 		},
 
 		/*
-		 * initVideoErrorListeners
+		 * onDeviceError - try and manage as many errors as possible
 		 *
 		 */
 		onDeviceError () {
-			const errorCode = String(this.recordPlayer.deviceErrorCode);
+			const errorCode = String(this.player.deviceErrorCode);
 			console.warn('errorCode = ' + errorCode);
 			if (errorCode === 'NotReadableError: Could not start video source' || 'AbortError: Starting video failed') {
 				this.hasDeviceAlreadyInUseError = true;
 			} else if (errorCode === 'NotAllowedError: Permission denied' || 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context.') {
 				this.hasPermissionDeniedError = true;
 			}
-			console.warn(this.recordPlayer.deviceErrorCode);
+			console.warn(this.player.deviceErrorCode);
 		},
 
 		/*
@@ -300,7 +306,7 @@ export default {
 		 *
 		 */
 		onEnableSelected () {
-			this.recordPlayer.record().getDevice();
+			this.player.record().getDevice();
 		},
 
 		/*
@@ -308,7 +314,7 @@ export default {
 		 *
 		 */
 		onStartRecordSelected () {
-			this.recordPlayer.record().start();
+			this.player.record().start();
 		},
 
 		/*
@@ -316,7 +322,7 @@ export default {
 		 *
 		 */
 		onStopRecordSelected () {
-			this.recordPlayer.record().stop();
+			this.player.record().stop();
 		},
 
 		/*
@@ -429,8 +435,8 @@ export default {
 		 *
 		 */
 		destroyVideojs () {
-			if (this.recordPlayer) {
-				this.recordPlayer.dispose();
+			if (this.player) {
+				this.player.dispose();
 			}
 		},
 

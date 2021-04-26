@@ -7,7 +7,7 @@
 
 import 'video.js/dist/video-js.css';
 import videojs from 'video.js';
-import recordMediaEvents from '../../../templates/core/resources/filesystem/js/recordMediaEvents'; //hmm, put this somewhere else?
+import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
 export default {
 
