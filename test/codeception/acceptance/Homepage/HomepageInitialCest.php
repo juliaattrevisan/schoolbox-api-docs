@@ -138,10 +138,13 @@ class HomepageInitialCest
         $i->fillField("heading", "Test Text Box Title");
         $i->click(['css' => 'input[type=submit][value=Create\ Text\ Box]']);
         sleep(2);
-       // $i->fillCkEditorById('textBoxBody', 'wow what interesting Text box text');
+        $i->executeJS('for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].setData(\'wow what interesting Text box text\')}');
+        sleep(2);
         $i->scrollTo(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
-        //$i->waitForElementVisible(['css' => 'input[type=submit][value=Save\ Content]'], 5);
-        //$i->click(['css' => 'input[type=submit][value=Save\ Content]']);
+        $element = Locator::contains('div.component-action section button', 'Save');
+        $i->waitForElementVisible($element, 5);
+        $i->click($element);
+
     }
 
     /**
