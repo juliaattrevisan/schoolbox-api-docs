@@ -138,4 +138,21 @@ export default {
   }
 }
 
+.vjs-record.video-js {
+  .vjs-control.vjs-record-indicator {
+    line-height: 1.4;
+    width: 1em;
+    height: 1em;
+  }
+  .vjs-control.vjs-record-indicator::before {
+    font-size: 1em;
+  }
+  .vjs-control.vjs-record-indicator::after {
+    height: calc(1em - 4px);
+    width: calc(1em - 4px);
+    top: 3px;
+    left: 3px;
+  }
+}
+
 </style>
