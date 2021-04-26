@@ -32,8 +32,16 @@ class Model
     private string $instanceId;
 
     /**
-     * The instance's domain name: will be used to craft HTTP requests to be
-     * sent to this instance.
+     * The instance's school code (as stored in `config.site_school_code`):
+     * will be used to determine the domain name to forward requests to after
+     * extracting the school code from a user's external ID.
+     */
+    private string $siteSchoolCode;
+
+    /**
+     * The instance's domain name (as generated from `config.site_hostname` and
+     * `config.site_domain`): will be used to craft HTTP requests to be sent to
+     * this instance.
      */
     private string $domainName;
 
@@ -58,6 +66,24 @@ class Model
     public function setInstanceId(string $instanceId): self
     {
         $this->instanceId = $instanceId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSiteSchoolCode(): string
+    {
+        return $this->siteSchoolCode;
+    }
+
+    /**
+     * @param string $siteSchoolCode
+     * @return static
+     */
+    public function setSiteSchoolCode(string $siteSchoolCode): self
+    {
+        $this->siteSchoolCode = $siteSchoolCode;
         return $this;
     }
 

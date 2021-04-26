@@ -21,6 +21,7 @@ class Mapper extends BaseMapper
     public const TABLE = 'instance_registry';
     public const COL_ID = 'id';
     public const COL_INSTANCE_ID = 'instance_id';
+    public const COL_SITE_SCHOOL_CODE = 'site_school_code';
     public const COL_DOMAIN_NAME = 'domain_name';
     public const COL_JWT_PUBLIC_KEY = 'jwt_public_key';
     public const COL_CREATED_AT = 'created_at';
@@ -35,6 +36,7 @@ class Mapper extends BaseMapper
         $this->hasTable(self::TABLE);
         $this->uses(self::COL_ID, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses(self::COL_INSTANCE_ID, self::TYPE_STRING);
+        $this->uses(self::COL_SITE_SCHOOL_CODE, self::TYPE_STRING);
         $this->uses(self::COL_DOMAIN_NAME, self::TYPE_STRING);
         $this->uses(self::COL_JWT_PUBLIC_KEY, self::TYPE_STRING);
         $this->uses(self::COL_CREATED_AT, self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
