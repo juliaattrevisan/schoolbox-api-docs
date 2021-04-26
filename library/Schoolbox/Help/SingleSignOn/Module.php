@@ -24,6 +24,7 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $this->register('GET', '/send', 'sendTokenToHelp', new IsLoggedIn());
+        $this->register('GET', '/receive', 'receiveTokenFromInstance');
     }
 
     public function initControllers(ContainerInterface $injector)
