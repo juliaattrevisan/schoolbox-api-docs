@@ -72,7 +72,9 @@ class Controller extends Base
     {
         // Decode the JWT _without_ verifying it,
         // in order to determine the instance whence it came
-        var_dump($this->request->query->get('jwt'));
+        var_dump(
+            $this->tokenBuilder->decodeWithoutVerification($this->request->query->get('jwt'))
+        );
 
         // Now we know the instance:
         // Look it up in the registry table, and get the public key stored there
