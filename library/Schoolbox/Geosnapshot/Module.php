@@ -15,7 +15,6 @@ use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -209,14 +208,11 @@ class Module extends BaseModule
      * init time.
      *
      * @param ContainerInterface $injector The dependency injection container.
-     * @throws InvalidArgumentException
      */
     protected function preInitControllerDependencies(ContainerInterface $injector): void
     {
         /** @var Container $injector */
         $injector->params[Controller::class] = [
-            'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
-            'userMapper' => $this->getMapperFactory()->getLazy(UserMapper::class)
         ];
     }
 

@@ -23,23 +23,6 @@ class Controller extends Base
 {
 
     /**
-     * @var ErrorMapper
-     */
-    private ErrorMapper $errorMapper;
-
-
-    /**
-     * Controller constructor.
-     *
-     * @param ErrorMapper $errorMapper
-     */
-    public function __construct(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-    }
-
-
-    /**
      * With a provided url, make a request to Geosnapshot
      *
      * @param User $viewee
