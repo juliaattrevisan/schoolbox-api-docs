@@ -8,7 +8,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 
@@ -35,9 +34,9 @@ class ParentCalendar implements IStrategy
 
 
     /**
-     * @var Api
+     * @var array
      */
-    private $api;
+    private array $api;
 
 
     /**
