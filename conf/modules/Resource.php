@@ -40,6 +40,8 @@ class Resource implements ModuleConfigInterface
         $textboxModule = new Schoolbox\Resource\Textbox\Module($di);
         $textboxModule->init('/textbox');
 
+        $googleFileModule = new Schoolbox\Resource\GoogleFile\Module($di);
+        $googleFileModule->init('/googleFile');
         // Commented out as:
         // * it's unused
         // * it collides with folder search page www/resource/folder/search.php
