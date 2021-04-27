@@ -77,7 +77,7 @@ class ParentCalendar implements IStrategy
      *
      * @var string
      */
-    private string $source;
+    private string $source = self::class;
 
 
     /**
@@ -102,6 +102,14 @@ class ParentCalendar implements IStrategy
      * @var \Alaress_Date_Format
      */
     private \Alaress_Date_Format $to;
+
+
+    /**
+     * The RoleType to assign to each event in this import
+     *
+     * @var string
+     */
+    private string $roleType = Role::PARENT;
 
 
     /**
@@ -140,11 +148,6 @@ class ParentCalendar implements IStrategy
          */
         $this->from = $from;
         $this->to = $to;
-
-        /* An identifier in the event_source table so we know events came from
-         * a particular part of the import
-         */
-        $this->source = self::class;
     }
 
 
@@ -215,7 +218,7 @@ class ParentCalendar implements IStrategy
         /* Role id collection, in case there are multiple records of the same type
          * e.g. a Student event should be associated with all the Student Roletype roles
          */
-        $roleIds = $this->findRoles(Role::PARENT);
+        $roleIds = $this->findRoles($this->roleType);
 
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
