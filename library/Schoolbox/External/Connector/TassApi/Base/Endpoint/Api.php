@@ -26,15 +26,18 @@ class Api implements IApi
 {
 
     /**
-     * Request timeout
+     * Tass API Version Number
+     *
+     * Some API products are version-specific, but we default to 3 for now
      */
-    private const DEFAULT_TIMEOUT = 300;
+    public const VERSION_3 = 3;
+    public const VERSION_2 = 2;
 
 
     /**
-     * Tass API Version Number
+     * Request timeout
      */
-    private const VERSION_NUMBER = 3;
+    private const DEFAULT_TIMEOUT = 300;
 
 
     /**
@@ -179,7 +182,7 @@ class Api implements IApi
      * @throws RuntimeException
      * @throws \JsonException
      */
-    public function retrieveDocument(string $method, array $params): ?array
+    public function retrieveDocument(string $method, array $params, int $version = self::VERSION_3): ?array
     {
 
         /* Record endpoint usage
@@ -191,7 +194,7 @@ class Api implements IApi
             'appcode' => $this->credentials['appcode'],
             'company' => $this->credentials['companycode'],
             'token'   => $this->tokenCodec->generateToken($params),
-            'v'       => self::VERSION_NUMBER,
+            'v'       => $version,
         ];
 
         /* Mine out an error message if you try to access a thing that doesn't exist
