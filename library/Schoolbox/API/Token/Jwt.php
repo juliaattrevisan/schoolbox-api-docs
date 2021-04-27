@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token;
 
 use Alaress_Date_Format;
+use DomainException;
 use Firebase\JWT\BeforeValidException;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT as JwtLibrary;
@@ -99,11 +100,18 @@ class Jwt
      * @param string|null $publicKey A public key to decode the JWT with: if not
      *                               provided, use the public key in config.
      * @return array
-     * @throws SignatureInvalidException Provided JWT was invalid because the signature verification failed
-     * @throws BeforeValidException      Provided JWT is trying to be used before it's eligible as defined by 'nbf'
-     * @throws BeforeValidException      Provided JWT is trying to be used before it's been created as defined by 'iat'
-     * @throws ExpiredException          Provided JWT has since expired, as defined by the 'exp' claim
-     * @throws UnexpectedValueException  Provided JWT was invalid for any other reason
+     * @throws UnexpectedValueException  JWT doesn't contain a header, payload
+     *                                   and signature segment
+     * @throws DomainException           JWT payload is invalid JSON
+     * @throws SignatureInvalidException JWT was invalid because the signature
+     *                                   verification failed
+     * @throws BeforeValidException      JWT is trying to be used before it's
+     *                                   eligible as defined by 'nbf'
+     * @throws BeforeValidException      JWT is trying to be used before it's
+     *                                   been created as defined by 'iat'
+     * @throws ExpiredException          JWT has since expired, as defined by
+     *                                   the 'exp' claim
+     * @throws UnexpectedValueException  JWT was invalid for any other reason
      */
     public function decode(string $jwt, ?string $publicKey = null): array
     {
@@ -123,10 +131,17 @@ class Jwt
      *
      * @param string $jwt
      * @return array
+     * @throws UnexpectedValueException JWT doesn't contain a header, payload
+     *                                  and signature segment
+     * @throws DomainException          JWT payload is invalid JSON
      */
     public function decodeWithoutVerification(string $jwt): array
     {
-        [, $payload,] = explode('.', $jwt);
+        $parts = explode('.', $jwt);
+        if (count($parts) !== 3) {
+            throw new UnexpectedValueException('JWT must contain a header, payload and signature');
+        }
+        [, $payload,] = $parts;
         return (array)JwtLibrary::jsonDecode(JwtLibrary::urlsafeB64Decode($payload));
     }
 }

@@ -11,10 +11,16 @@ namespace Schoolbox\Help\SingleSignOn;
 
 use Alaress\Web\Controller\Base;
 use Authenticator;
+use DomainException;
+use Firebase\JWT\BeforeValidException;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
+use Schoolbox\Application\Exception\NotAuthenticated;
 use Schoolbox\InstanceRegistry\Mapper as InstanceRegistryMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 use Zend\Uri\Uri;
 
 /**
@@ -116,29 +122,67 @@ class Controller extends Base
      */
     public function receiveTokenFromInstance(): void
     {
+        try {
+            $this->authenticateUserFromToken();
+
+            // For now: just redir to dashboard.
+            // Later: allow redirect to another place, based on the query string
+            $this->response->redirect->seeOther('/');
+        } catch (
+            UnexpectedValueException
+            | DomainException
+            | MapperException
+            | SignatureInvalidException
+            | BeforeValidException
+            | ExpiredException
+            | NotAuthenticated $e
+        ) {
+            // For now: just redirect to login page
+            // Later: show a more useful message
+            $this->response->redirect->seeOther($this->router->generate('login.getLogin'));
+        }
+    }
+
+
+    /**
+     * @throws UnexpectedValueException  if no "jwt" query string param exists
+     * @throws UnexpectedValueException  if JWT is incorrectly formed
+     * @throws DomainException           if JWT payload is invalid JSON
+     * @throws UnexpectedValueException  if JWT contains no instance ID claim
+     * @throws MapperException           if instance ID matches no instance
+     * @throws SignatureInvalidException if JWT signature invalid
+     * @throws BeforeValidException      if JWT is not yet valid or issued
+     * @throws ExpiredException          if JWT has since expired
+     * @throws NotAuthenticated          if user identified in JWT cannot be
+     *                                   authenticated (because they don't exist
+     *                                   or their account is inactive)
+     */
+    private function authenticateUserFromToken(): void
+    {
+        // Find the JWT
+        $jwt = $this->request->query->get('jwt');
+        if (!isset($jwt)) {
+            throw new UnexpectedValueException('"jwt" query string parameter must be provided');
+        }
+
         // Decode the JWT _without_ verifying it,
         // in order to determine the instance whence it came
-        $jwt     = $this->request->query->get('jwt');
         $payload = $this->tokenBuilder->decodeWithoutVerification($jwt);
 
         // Now we know the instance:
         // Look it up in the registry table, and get the public key stored there
         // so that the JWT can be verified
-        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId(
-            $payload[self::CLAIM_INSTANCE_ID],
-        );
+        $instanceId = $payload[self::CLAIM_INSTANCE_ID] ?? null;
+        if (!isset($instanceId)) {
+            throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_INSTANCE_ID));
+        }
+        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId($instanceId);
 
+        // Verify the payload
         $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
-        try {
-            $this->auth->createSession($verifiedPayload[self::CLAIM_EMAIL]);
-            // For now, redir to dashboard
-            $this->response->redirect->seeOther('/');
-        } catch (SchoolboxNotAuthenticatedException $e) {
-            // Something went wrong: redir to login
-            $this->response->status->setCode(403);
-        }
+        $this->auth->createSession($verifiedPayload[self::CLAIM_EMAIL]);
     }
 }
