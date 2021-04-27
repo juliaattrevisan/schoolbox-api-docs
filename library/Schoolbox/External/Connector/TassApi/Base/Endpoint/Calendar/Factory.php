@@ -137,8 +137,8 @@ class Factory
 
         /* Obtain events between these two datetimes
          */
-        $from = \Alaress_Date_Format::now()->addMonths(-1);
-        $to = \Alaress_Date_Format::now()->addMonths(12);
+        $from = \Alaress_Date_Format::now()->addMonths(-24);
+        $to = \Alaress_Date_Format::now()->addMonths(24);
 
         /* A list of the event types that can be associated with an event that is
          * indexed by the eventType column which I have presumed to be unique
