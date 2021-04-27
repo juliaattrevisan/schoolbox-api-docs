@@ -11,6 +11,8 @@ use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 
 
@@ -114,7 +116,9 @@ class ParentCalendar implements IStrategy
 
         /* This comes from an API request at TASS
          */
-        $tassEvents = [];
+        $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument('getParentCalendar', [
+            'start_date' => '27/04/2021'
+        ], Api::VERSION_2);
 
         foreach ($tassEvents as $tassEvent) {
 
