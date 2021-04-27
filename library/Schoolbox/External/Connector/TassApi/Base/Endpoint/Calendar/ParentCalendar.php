@@ -153,6 +153,10 @@ class ParentCalendar implements IStrategy
             $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['start']);
             $allDay = (int)$tassEvent['all_day'];
 
+            /* Third-party source identifier for our import
+             */
+            $guid = $tassEvent['id'];
+
             /* Assign campus relations
              *
              * Link it to all the campuses in schoolbox unless you can specifically determine
@@ -194,7 +198,7 @@ class ParentCalendar implements IStrategy
             $eventSource = $this->eventSourceMapper->createModel()
                 ->setEvent($event)
                 ->setSourceName($this->source)
-                ->setGuid($tassEvent['id']);
+                ->setGuid($guid);
 
             /* Some diagnostic loggings
              */
