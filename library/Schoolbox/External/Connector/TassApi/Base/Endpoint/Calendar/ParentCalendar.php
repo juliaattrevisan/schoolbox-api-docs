@@ -11,6 +11,7 @@ use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -114,6 +115,16 @@ class ParentCalendar implements IStrategy
     private function importEvents(): void
     {
 
+        /* Get all the campuses but we can't index them for quick lookup
+         * since they are allowed to have the same name and ext_timetable_code
+         * via our ui...
+         */
+        $campuses = CampusMapper::getInstance()->findAll();
+
+        /* TODO Elected event Owner and Author is arbitrarily this person for now...
+         */
+        $administrator = \Schoolbox\UserMapper::getInstance()->findById(1);
+
         /* This comes from an API request at TASS
          */
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument('getParentCalendar', [
@@ -135,21 +146,32 @@ class ParentCalendar implements IStrategy
             $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['start']);
             $allDay = (int)$tassEvent['all_day'];
 
-            /** @var Event $event */
-            $event = $this->eventMapper->createModel()
-                ->setTitle($title)
-                ->setLocation($location)
-                ->setDetail($detail)
-                ->setStartDateTime($startDatetime)
-                ->setEndDateTime($endDatetime)
-                ->setAllDay($allDay);
-
             /* Assign campus relations
              *
              * Link it to all the campuses in schoolbox unless you can specifically determine
              * a particular campus relation via "campus_code"
              */
-    
+            $campusIds = [];
+
+            foreach ($campuses as $campus) {
+                if ($campus->getName() === $tassEvent['campus_code'] || $campus->getExtTimetableCode() === $tassEvent['campus_code']) {
+                    $campusIds[] = $campus->getId();
+                }
+            }
+
+            /** @var Event $event */
+            $event = $this->eventMapper->createModel()
+                ->setTitle($title)
+                ->setLocation($location)
+                ->setDetail($detail)
+                ->setAuthor($administrator)
+                ->setOwner($administrator)
+                ->setAccess(Event::ACCESS_CAMPUS)
+                ->setStartDateTime($startDatetime)
+                ->setEndDateTime($endDatetime)
+                ->setAllDay($allDay)
+                ->setCampusCollection($campusIds);
+
             /* Assign role relations
              * These are role-specific and hardcoded per strat
              */
