@@ -34,6 +34,7 @@ class Mapper extends BaseMapper
     protected function mapping(): void
     {
         $this->hasTable(self::TABLE);
+        $this->hasModel(Model::class);
         $this->uses(self::COL_ID, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses(self::COL_INSTANCE_ID, self::TYPE_STRING);
         $this->uses(self::COL_SITE_SCHOOL_CODE, self::TYPE_STRING);
