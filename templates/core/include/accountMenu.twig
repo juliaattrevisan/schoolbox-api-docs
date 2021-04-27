@@ -24,7 +24,7 @@
 
     {# Not Help? Show a link to Help #}
     {% if user.current.role.staff and config.show_schoolbox_help_link %}
-        <li><a class="icon-help" href="{{ routeLookup('helpSso.sendTokenToHelp') }}">Online Help</a></li>
+        <li><a class="icon-help" href="{{ routeLookup('helpSso.sendTokenToHelp') }}" target="_blank">Online Help</a></li>
     {% endif %}
 
     <li><a class="icon-logout" href="/logout.php">Logout</a></li>
