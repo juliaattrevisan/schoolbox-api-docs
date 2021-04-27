@@ -96,9 +96,11 @@ end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.trigger.before :provision do |sync|
-    sync.name = "Syncing Puppet"
-    sync.run = {inline: "./tools/vagrant-sync-puppet-repo.sh #{puppet_sync_type} #{puppet_dir}"}
+  if puppet_sync_type != 'none'
+    config.trigger.before :provision do |sync|
+      sync.name = "Syncing Puppet"
+      sync.run = {inline: "./tools/vagrant-sync-puppet-repo.sh #{puppet_sync_type} #{puppet_dir}"}
+    end
   end
 
   config.vm.box = vagrant_box

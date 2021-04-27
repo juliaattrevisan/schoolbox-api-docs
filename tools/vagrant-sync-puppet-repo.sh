@@ -25,11 +25,8 @@ case $puppet_sync_type in
     cmd=$GITSYNC
     sync_puppet "$puppet_dir" "$cmd"
     ;;
-  none)
-    echo "Not syncing puppet"
-    ;;
   *)
-    echo "Error: puppet_sync_type must be either pull, gitsync, or none, you entered $puppet_sync_type" >&2
+    echo "Error: puppet_sync_type must be either pull, gitsync, you entered $puppet_sync_type" >&2
     exit 1;
     ;;
 esac
