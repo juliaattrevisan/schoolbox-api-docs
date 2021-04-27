@@ -145,6 +145,14 @@ class Controller extends Base
     public function receiveTokenFromInstance(): void
     {
         $page = $this->determinePageQueryStringValue();
+
+        // Hold on, are you already logged in?
+        // Just go straight to the page without authenticating.
+        if ($this->getUser()->getId()) {
+            $this->response->redirect->seeOther($page);
+            return;
+        }
+
         try {
             $this->authenticateUserFromToken();
             $this->response->redirect->seeOther($page);
