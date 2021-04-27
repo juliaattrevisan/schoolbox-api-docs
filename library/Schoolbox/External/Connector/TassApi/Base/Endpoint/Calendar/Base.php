@@ -158,7 +158,9 @@ class Base
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
          */
-        $this->source = self::class;
+        $className = explode('\\',get_class($this));
+
+        $this->source = (string)array_pop($className);
     }
 
 

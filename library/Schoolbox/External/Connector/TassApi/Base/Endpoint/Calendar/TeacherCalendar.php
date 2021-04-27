@@ -7,8 +7,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
-use Psr\Log\LoggerInterface;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\Role;
 
 
 /**
@@ -16,55 +16,21 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  *
  * @package Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar
  */
-class TeacherCalendar implements IStrategy
+class TeacherCalendar extends Base implements IStrategy
 {
 
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
+     * Endpoint specific to this event import
      *
-     * @var bool
+     * @var string
      */
-    private bool $perform;
+    protected string $endpoint = 'getTeacherCalendar';
 
 
     /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * TeacherCalendar constructor.
+     * The RoleType to assign to each event in this import
      *
-     * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param array           $api
+     * @var string
      */
-    public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        array $api
-    ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-    }
-
-
-    /**
-     *
-     */
-    public function import(): void
-    {
-        if ($this->perform) {
-            $this->log->info('TeacherCalendar');
-            // TODO: Implement import() method.
-        }
-    }
+    protected string $roleType = Role::STAFF;
 }

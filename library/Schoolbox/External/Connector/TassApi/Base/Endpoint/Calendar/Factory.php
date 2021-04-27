@@ -152,11 +152,60 @@ class Factory
                 $from,
                 $to
             ))
-            ->add(new ParentNotices($this->log, $this->perform, $api))
-            ->add(new StudentCalendar($this->log, $this->perform, $api))
-            ->add(new StudentNotices($this->log, $this->perform, $api))
-            ->add(new TeacherCalendar($this->log, $this->perform, $api))
-            ->add(new TeacherNotices($this->log, $this->perform, $api))
-            ;
+            ->add(new ParentNotices(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $this->eventMapper,
+                $this->eventSourceMapper,
+                $this->roleMapper,
+                $from,
+                $to
+            ))
+            ->add(new StudentCalendar(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $this->eventMapper,
+                $this->eventSourceMapper,
+                $this->roleMapper,
+                $from,
+                $to
+            ))
+            ->add(new StudentNotices(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $this->eventMapper,
+                $this->eventSourceMapper,
+                $this->roleMapper,
+                $from,
+                $to
+            ))
+            ->add(new TeacherCalendar(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $this->eventMapper,
+                $this->eventSourceMapper,
+                $this->roleMapper,
+                $from,
+                $to
+            ))
+            ->add(new TeacherNotices(
+                $this->log,
+                $this->perform,
+                $api,
+                $campuses,
+                $this->eventMapper,
+                $this->eventSourceMapper,
+                $this->roleMapper,
+                $from,
+                $to
+            ));
     }
 }
