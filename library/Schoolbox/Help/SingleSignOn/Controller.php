@@ -11,6 +11,7 @@ namespace Schoolbox\Help\SingleSignOn;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\InstanceRegistry\Mapper;
 use Zend\Uri\Uri;
 
 /**
@@ -23,6 +24,9 @@ class Controller extends Base
      */
     private const JWT_EXPIRY = 300;
 
+    /**
+     * Key for the instance ID custom JWT claim.
+     */
     private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
 
     /**
@@ -31,13 +35,20 @@ class Controller extends Base
     private Jwt $tokenBuilder;
 
     /**
+     * Instance registry mapper
+     */
+    private Mapper $instanceRegistryMapper;
+
+    /**
      * Constructor
      *
-     * @param Jwt $tokenBuilder
+     * @param Jwt    $tokenBuilder
+     * @param Mapper $instanceRegistryMapper
      */
-    public function __construct(Jwt $tokenBuilder)
+    public function __construct(Jwt $tokenBuilder, Mapper $instanceRegistryMapper)
     {
-        $this->tokenBuilder = $tokenBuilder;
+        $this->tokenBuilder           = $tokenBuilder;
+        $this->instanceRegistryMapper = $instanceRegistryMapper;
     }
 
     /**
@@ -80,13 +91,17 @@ class Controller extends Base
     {
         // Decode the JWT _without_ verifying it,
         // in order to determine the instance whence it came
-        var_dump(
-            $this->tokenBuilder->decodeWithoutVerification($this->request->query->get('jwt'))
-        );
+        $payload = $this->tokenBuilder->decodeWithoutVerification($this->request->query->get('jwt'));
 
         // Now we know the instance:
         // Look it up in the registry table, and get the public key stored there
         // so that the JWT can be verified
+        $instanceDetails = $this->instanceRegistryMapper->findOneByColumn(
+            Mapper::COL_INSTANCE_ID,
+            $payload[self::CLAIM_INSTANCE_ID],
+        );
+
+        var_dump($instanceDetails);
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT

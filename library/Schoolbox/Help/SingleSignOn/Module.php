@@ -12,6 +12,7 @@ namespace Schoolbox\Help\SingleSignOn;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Schoolbox\InstanceRegistry\Mapper;
 
 /**
  * Module for SSO endpoints
@@ -39,7 +40,8 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'tokenBuilder' => $injector->lazyGet('user.tokenBuilder'),
+                    'tokenBuilder'           => $injector->lazyGet('user.tokenBuilder'),
+                    'instanceRegistryMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
                 ]
             )
         );
