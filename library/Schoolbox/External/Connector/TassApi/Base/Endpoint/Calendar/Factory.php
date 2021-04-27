@@ -133,6 +133,11 @@ class Factory
          */
         $campuses = CampusMapper::getInstance()->findAll();
 
+        /* Obtain events between these two datetimes
+         */
+        $from = \Alaress_Date_Format::now()->addMonths(-1);
+        $to = \Alaress_Date_Format::now()->addMonths(12);
+
         /* Purge previously-imported events and event relationships
          */
         return (new GenericCollection(IStrategy::class))
@@ -143,7 +148,9 @@ class Factory
                 $campuses,
                 $this->eventMapper,
                 $this->eventSourceMapper,
-                $this->roleMapper
+                $this->roleMapper,
+                $from,
+                $to
             ))
             ->add(new ParentNotices($this->log, $this->perform, $api))
             ->add(new StudentCalendar($this->log, $this->perform, $api))

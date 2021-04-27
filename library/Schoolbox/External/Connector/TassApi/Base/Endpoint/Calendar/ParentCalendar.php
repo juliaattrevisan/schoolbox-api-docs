@@ -81,15 +81,41 @@ class ParentCalendar implements IStrategy
 
 
     /**
+     * Endpoint specific to this event import
+     *
+     * @var string
+     */
+    private string $endpoint = 'getParentCalendar';
+
+
+    /**
+     * Obtain events that started after this datetime
+     *
+     * @var \Alaress_Date_Format
+     */
+    private \Alaress_Date_Format $from;
+
+
+    /**
+     * Obtain events that start before this datetime
+     *
+     * @var \Alaress_Date_Format
+     */
+    private \Alaress_Date_Format $to;
+
+
+    /**
      * ParentCalendar constructor.
      *
-     * @param LoggerInterface   $log
-     * @param bool              $perform
-     * @param array             $api
-     * @param GenericCollection $campuses
-     * @param EventMapper       $eventMapper
-     * @param EventSourceMapper $eventSourceMapper
-     * @param RoleMapper        $roleMapper
+     * @param LoggerInterface      $log
+     * @param bool                 $perform
+     * @param array                $api
+     * @param GenericCollection    $campuses
+     * @param EventMapper          $eventMapper
+     * @param EventSourceMapper    $eventSourceMapper
+     * @param RoleMapper           $roleMapper
+     * @param \Alaress_Date_Format $from
+     * @param \Alaress_Date_Format $to
      */
     public function __construct(
         LoggerInterface $log,
@@ -98,7 +124,9 @@ class ParentCalendar implements IStrategy
         GenericCollection $campuses,
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
-        RoleMapper $roleMapper
+        RoleMapper $roleMapper,
+        \Alaress_Date_Format $from,
+        \Alaress_Date_Format $to
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -108,6 +136,14 @@ class ParentCalendar implements IStrategy
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
 
+        /* Obtain events between these two datetimes
+         */
+        $this->from = $from;
+        $this->to = $to;
+
+        /* An identifier in the event_source table so we know events came from
+         * a particular part of the import
+         */
         $this->source = self::class;
     }
 
@@ -184,14 +220,9 @@ class ParentCalendar implements IStrategy
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
-        $earliest = \Alaress_Date_Format::now()->addMonths(-1);
-        $latest = \Alaress_Date_Format::now()->addMonths(12);
-
-        /* Grab 'em and shank 'em
-         */
-        $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument('getParentCalendar', [
-            'start_date' => $earliest->getUsingFormat('d/m/Y'),
-            'end_date' => $latest->getUsingFormat('d/m/Y')
+        $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument($this->endpoint, [
+            'start_date' => $this->from->getUsingFormat('d/m/Y'),
+            'end_date' => $this->to->getUsingFormat('d/m/Y')
         ], Api::VERSION_2);
 
         foreach ($tassEvents['events'] as $tassEvent) {
