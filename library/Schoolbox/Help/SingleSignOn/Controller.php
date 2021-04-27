@@ -54,7 +54,7 @@ class Controller extends Base
      * The name of the page query string parameter: this contains a path to
      * redirect to on Help once it has received the JWT.
      */
-    private const QUERY_STRING_PAGE = 'page';
+    private const QUERY_STRING_PAGE = 'returnUrl';
 
     /**
      * By default: redirect to the dashboard.
@@ -160,7 +160,7 @@ class Controller extends Base
             // For now: just redirect to login page
             // Later: show a more useful message
             $loginUrl = (new Uri($this->router->generate('login.getLogin')))
-                ->setQuery([self::QUERY_STRING_PAGE => $page]);
+                ->setQuery(['page' => $page]);
             $this->response->redirect->seeOther($loginUrl->toString());
         }
     }
