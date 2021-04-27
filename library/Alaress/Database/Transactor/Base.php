@@ -29,6 +29,12 @@ class Base implements ITransactor
     /**
      * A list of callbacks to call when the entire transaction is committed.
      *
+     * Callbacks are grouped by transaction nesting level:
+     * * when the transaction is committed, the current level's callbacks are
+     *   merged into the previous level's callbacks
+     * * when the transaction is rolled back, the current level's callbacks are
+     *   discarded
+     *
      * @var callable[][]
      */
     private $onPersistHooks = [];
