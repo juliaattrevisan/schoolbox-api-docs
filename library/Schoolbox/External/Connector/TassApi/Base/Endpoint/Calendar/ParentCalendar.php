@@ -127,7 +127,7 @@ class ParentCalendar implements IStrategy
 
         /* Role id set, in case there are multiple records of the same type
          */
-        $roles = \Schoolbox\RoleMapper::getInstance()
+        $roleIds = \Schoolbox\RoleMapper::getInstance()
             ->findByColumn('group_type', \Schoolbox\Role::PARENT)
             ->indexBy('id')
             ->keys();
@@ -184,7 +184,7 @@ class ParentCalendar implements IStrategy
              * These are role-specific and hardcoded per strat, but there might be multiple
              * instances of the same role type
              */
-            $event->setRoleCollection([$roles]);
+            $event->setRoleCollection([$roleIds]);
     
             /* Assign Event Type via the payload's Category field "cat_desc"
              */
@@ -196,6 +196,22 @@ class ParentCalendar implements IStrategy
                 ->setSourceName($this->source)
                 ->setGuid($tassEvent['id']);
 
+            /* Some diagnostic loggings
+             */
+            $this->log->debug(sprintf(
+                '%s event "%s" is in campuses: %s',
+                $this->source,
+                $event->getTitle(),
+                implode(', ', $campusIds)
+            ));
+
+            $this->log->debug(sprintf(
+                '%s event "%s" is in rolees: %s',
+                $this->source,
+                $event->getTitle(),
+                implode(', ', $roleIds)
+            ));
+
             /* Save it
              */
             if ($this->perform) {
@@ -203,13 +219,15 @@ class ParentCalendar implements IStrategy
                 $this->eventSourceMapper->save($eventSource);
 
                 $this->log->info(sprintf(
-                    'Saved event "%s" with event_source.guid %s',
+                    'Saved %s event "%s" with event_source.guid %s',
+                    $this->source,
                     $event->getTitle(),
                     $eventSource->getGuid()
                 ));
             } else {
                 $this->log->info(sprintf(
-                    'Planning event "%s" with event_source.guid %s',
+                    'Planning %s event "%s" with event_source.guid %s',
+                    $this->source,
                     $event->getTitle(),
                     $eventSource->getGuid()
                 ));
