@@ -15,6 +15,7 @@ use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
+use Schoolbox\GenericCollection;
 
 
 /**
@@ -46,6 +47,12 @@ class ParentCalendar implements IStrategy
 
 
     /**
+     * @var GenericCollection
+     */
+    private GenericCollection $campuses;
+
+
+    /**
      * @var EventMapper
      */
     private EventMapper $eventMapper;
@@ -72,6 +79,7 @@ class ParentCalendar implements IStrategy
      * @param LoggerInterface   $log
      * @param bool              $perform
      * @param array             $api
+     * @param GenericCollection $campuses
      * @param EventMapper       $eventMapper
      * @param EventSourceMapper $eventSourceMapper
      */
@@ -79,12 +87,14 @@ class ParentCalendar implements IStrategy
         LoggerInterface $log,
         bool $perform,
         array $api,
+        GenericCollection $campuses,
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->api = $api;
+        $this->campuses = $campuses;
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
 
@@ -106,20 +116,36 @@ class ParentCalendar implements IStrategy
 
 
     /**
+     * Generate a list of campus ids which might be associated with $campusCode
+     *
+     * @param string $campusCode
+     * @return array
+     */
+    private function findCampuses(string $campusCode): array
+    {
+        $campusIds = [];
+
+        foreach ($this->campuses as $campus) {
+            if ($campus->getName() === $campusCode || $campus->getExtTimetableCode() === $campusCode) {
+                $campusIds[] = $campus->getId();
+            }
+        }
+
+        return $campusIds;
+    }
+
+
+    /**
      * Perform the import of these events
      *
+     * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
      * @throws \UnexpectedValueException
      */
     private function importEvents(): void
     {
-
-        /* Get all the campuses but we can't index them for quick lookup
-         * since they are allowed to have the same name and ext_timetable_code
-         * via our ui...
-         */
-        $campuses = CampusMapper::getInstance()->findAll();
 
         /* TODO Elected event Owner and Author is arbitrarily this person for now...
          */
@@ -173,13 +199,7 @@ class ParentCalendar implements IStrategy
              * Link it to all the campuses in schoolbox unless you can specifically determine
              * a particular campus relation via "campus_code"
              */
-            $campusIds = [];
-
-            foreach ($campuses as $campus) {
-                if ($campus->getName() === $tassEvent['campus_code'] || $campus->getExtTimetableCode() === $tassEvent['campus_code']) {
-                    $campusIds[] = $campus->getId();
-                }
-            }
+            $campusIds = $this->findCampuses((string)$tassEvent['campus_code']);
 
             /** @var Event $event */
             $event = $this->eventMapper->createModel()

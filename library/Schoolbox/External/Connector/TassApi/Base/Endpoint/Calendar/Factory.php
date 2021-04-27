@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -114,6 +115,14 @@ class Factory
             $api[$module] = new Api($this->host, $this->key, $module);
         }
 
+        /* A list of all the campuses from which we can chooze
+         *
+         * Get all the campuses but we can't index them for quick lookup
+         * since they are allowed to have the same name and ext_timetable_code
+         * via our ui...
+         */
+        $campuses = CampusMapper::getInstance()->findAll();
+
         /* Purge previously-imported events and event relationships
          */
         return (new GenericCollection(IStrategy::class))
@@ -121,6 +130,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $api,
+                $campuses,
                 $this->eventMapper,
                 $this->eventSourceMapper
             ))
