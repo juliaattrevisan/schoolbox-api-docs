@@ -1,6 +1,6 @@
 # Making CDN Prefix globally available
 
-* Status: proposed
+* Status: Accepted
 * Deciders: Amri Sannang
 * Date: 2021-03-23
 
