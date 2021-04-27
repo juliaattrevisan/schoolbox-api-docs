@@ -48,10 +48,9 @@ export default {
 			isRecording: false, //track recording status to toggle record/stop buttons
 			isPlaybackActive: false, //need a different videojs player for playback to enable the progress controls
 			isPlaybackVideoActive: false, //the playback video is available for control
-			recordedCount: 0, //to show 'Record' or 'Re-record' on the button
-			isFilenameChangeActive: false, //prompt the filename change modal
+			isFilenameModalActive: false, //prompt the filename change modal
 			newFilename: '',
-			hasFilenameSet: false, //allow the user to set a filename prior to converting
+			isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
 			canConvert: false, //when there's a video available to convert, provide convert button
 			isConverting: false, //converting video to mp4, to notify user
 			conversionProgress: 0, //to indicate to the user conversion progress
@@ -78,15 +77,28 @@ export default {
 		},
 
 		/*
-		 * To know that you'll be re-recording a video, overwriting the previously recorded
+		 * To know whether to show the record button
 		 *
-		 * @returns { String }
+		 * @returns { Boolean }
 		 */
-		recordButtonText () {
-			if (this.recordedCount == 0) {
-				return 'Record';
+		showRecordButton () {
+			if (this.isDeviceReady && !this.canConvert && !this.isRecording && !this.isConverting && !this.isUploading) {
+				return true;
 			} else {
-				return 'Re-Record';
+				return false;
+			}
+		},
+
+		/*
+		 * To know whether to show the stop button
+		 *
+		 * @returns { Boolean }
+		 */
+		showStopButton () {
+			if (this.isDeviceReady && !this.canConvert && this.isRecording && !this.isConverting && !this.isUploading) {
+				return true;
+			} else {
+				return false;
 			}
 		},
 
@@ -104,25 +116,12 @@ export default {
 		},
 
 		/*
-		 * To know whether to show the record button
+		 * To know whether to show the delete recording button
 		 *
 		 * @returns { Boolean }
 		 */
-		showRecordButton () {
-			if (this.isDeviceReady && !this.isRecording && !this.isConverting && !this.isUploading) {
-				return true;
-			} else {
-				return false;
-			}
-		},
-
-		/*
-		 * To know whether to show the stop button
-		 *
-		 * @returns { Boolean }
-		 */
-		showStopButton () {
-			if (this.isDeviceReady && this.isRecording && !this.isConverting && !this.isUploading) {
+		showDeleteRecordingButton () {
+			if (this.canConvert && !this.isRecording && !this.isConverting && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -147,6 +146,18 @@ export default {
 			const percentage = (this.conversionProgress * 100.0).toFixed(2);
 			return percentage + '%';
 		},
+
+	},
+
+	watch: {
+
+		/*
+		 * ensure no invalid chars are added to the filename
+		 *
+		 */
+		newFilename (newValue) {
+			this.newFilename = newValue.replace(/[\\/:"*?<>|]+/g, "");
+		}
 
 	},
 
@@ -251,9 +262,6 @@ export default {
 		onStartRecord () {
 			this.$emit(recordMediaEvents.PROCCESS_STARTED);
 			this.isRecording = true;
-			this.canConvert = false; //disable the convert button
-			this.isPlaybackActive = false;
-			this.isPlaybackVideoActive = false;
 		},
 
 		/*
@@ -263,7 +271,6 @@ export default {
 		onFinishConvert () {
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
 			this.isRecording = false;
-			this.recordedCount++;
 			this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
 			this.canConvert = true; //enable the convert button
 			this.isPlaybackActive = true;
@@ -318,20 +325,31 @@ export default {
 		},
 
 		/*
+		 * confirm deletion of the latest recording, setting up for another recording
+		 *
+		 */
+		onConfirmDeleteRecordingSelected () {
+			this.isDeleteRecordingModalActive = false;
+			this.canConvert = false;
+			this.isPlaybackActive = false;
+			this.isPlaybackVideoActive = false;
+			this.player.record().getDevice();
+		},
+
+		/*
 		 * present the save file name modal to name the file
 		 *
 		 */
 		onConvertSelected () {
-			this.isFilenameChangeActive = true;
+			this.isFilenameModalActive = true;
 		},
-
 
 		/*
 		 * the user has set a file name and selected save
 		 *
 		 */
 		onSaveFilenameSelected () {
-			this.isFilenameChangeActive = false;
+			this.isFilenameModalActive = false;
 			this.convertAndUploadVideo();
 		},
 
@@ -463,7 +481,31 @@ export default {
 		 *
 		 */
 		onFilenameModalClosed () {
-			this.isFilenameChangeActive = false;
+			this.isFilenameModalActive = false;
+		},
+
+		/*
+		 * to be able to record another video
+		 *
+		 */
+		onDeleteRecordingSelected () {
+			this.isDeleteRecordingModalActive = true;
+		},
+
+		/*
+		 * close the delete recording modal
+		 *
+		 */
+		onCancelDeleteRecordingSelected () {
+			this.$refs.deleteRecordingModal.animateOff();
+		},
+
+		/*
+		 * close the delete recording modal, cancel has been selected rather than confirm
+		 *
+		 */
+		onDeleteRecordingModalClosed () {
+			this.isDeleteRecordingModalActive = false;
 		},
 
 		/*
@@ -481,7 +523,7 @@ export default {
 		 */
 		onPlaybackVideoReady () {
 			this.isPlaybackVideoActive = true;
-		}
+		},
 
 	}
 
@@ -523,15 +565,25 @@ export default {
 						</template>
 					</record-media-modal>
 
-					<record-media-modal v-else-if="isFilenameChangeActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
-						<label for="filename">Filename</label>
+					<record-media-modal v-else-if="isDeleteRecordingModalActive" ref="deleteRecordingModal" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
+						<div class="alert-box alert">Are you sure you wish to delete the current recording?</div>
+						<div class="modal-actions">
+							<button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
+							<button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
+						</div>
+					</record-media-modal>
+
+					<record-media-modal v-else-if="isFilenameModalActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
+						<h3><em>Please add a filename prior to continuing.</em></h3>
+						<label for="filename" class="required" aria-required="true">Filename</label>
 						<input type="text" id="filename" name="filename" v-model="newFilename">
-						<button @click.prevent="onSaveFilenameSelected">Save and convert</button>
-						<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
+						<div class="modal-actions">
+							<button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Save and convert</button>
+							<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
+						</div>	
 					</record-media-modal>
 
 					<record-media-modal v-else-if="isConverting" ref="convertingModal" key="convertingModal">
-						<!-- <div class="loader"></div> -->
 						<div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ width: currentConvertedPercentage }"></span></div>
 						<p><em>Converting the video to mp4, please wait...</em></p>
 					</record-media-modal>
@@ -554,15 +606,18 @@ export default {
 				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
 				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#turn-on" key="camera">{{ turnOnText }}</a>
 				<transition name="fade">
-					<a v-if="showConvertAndUploadButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" title="Convert &amp; Upload" href="#stop-recording-video" key="convert">Convert &amp; upload</a>
+					<a v-if="showConvertAndUploadButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" title="Convert &amp; Upload" href="#convert-and-upload" key="convert">Convert &amp; upload</a>
+				</transition>
+				<transition name="fade">
+					<a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" role="button" class="button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" :title="recordButtonText" href="#record-video" key="record">{{ recordButtonText }}</a>
+					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" title="Record" href="#record-video" key="record">Record</a>
 					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<a v-if="isPlaybackVideoActive && !$refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Video" href="#play-video" key="play">Play</a>
-					<a v-else-if="isPlaybackVideoActive && $refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause</a>
+					<a v-if="isPlaybackVideoActive && !$refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Video" href="#play-video" key="play">Play Recording</a>
+					<a v-else-if="isPlaybackVideoActive && $refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause Recording</a>
 				</transition>
 			</section>
 		</div><!-- .component-action -->
@@ -589,6 +644,13 @@ export default {
 	height: 100%;
 	left: 0;
 	top: 0;
+}
+
+.modal-actions {
+	display: flex;
+	button {
+		margin: 0px 2px; 
+	}
 }
 
 .meter {

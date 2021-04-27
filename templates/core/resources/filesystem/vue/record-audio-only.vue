@@ -33,9 +33,12 @@ export default {
 			isDeviceReady: false, //to toggle the device display
 			hasDeviceError: false, //can't access the requested device
 			isRecording: false, //track recording status to toggle record/stop buttons
+			hasRecording: false, //to display certain buttons
 			isPlaybackActive: false, //need a different videojs player for playback to enable the progress controls
 			isPlaybackVideoActive: false, //the playback video is available for control
-			recordedCount: 0, //to show 'Record' or 'Re-record' on the button
+			isFilenameModalActive: false, //prompt the filename change modal
+			newFilename: '',
+			isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
 			isPlaying: false, //to toggle play/pause controls
 			isUploading: false, //to notify of update
 			hasUploadError: false, //to notify of upload error, try again?
@@ -59,25 +62,12 @@ export default {
 		},
 
 		/*
-		 * To know whether to show the convert button
-		 *
-		 * @returns { Boolean }
-		 */
-		showUploadButton () {
-			if (this.recordedCount > 0 && !this.isRecording && !this.isUploading) {
-				return true;
-			} else {
-				return false;
-			}
-		},
-
-		/*
 		 * To know whether to show the record button
 		 *
 		 * @returns { Boolean }
 		 */
 		showRecordButton () {
-			if (this.isDeviceReady && !this.isRecording && !this.isUploading) {
+			if (this.isDeviceReady && !this.hasRecording && !this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -90,12 +80,50 @@ export default {
 		 * @returns { Boolean }
 		 */
 		showStopButton () {
-			if (this.isDeviceReady && this.isRecording && !this.isUploading) {
+			if (this.isDeviceReady && !this.hasRecording && this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
 			}
 		},
+
+		/*
+		 * To know whether to show the convert button
+		 *
+		 * @returns { Boolean }
+		 */
+		showUploadButton () {
+			if (this.hasRecording && !this.isRecording && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+		/*
+		 * To know whether to show the delete recording button
+		 *
+		 * @returns { Boolean }
+		 */
+		showDeleteRecordingButton () {
+			if (this.hasRecording && !this.isRecording && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+	},
+
+	watch: {
+
+		/*
+		 * ensure no invalid chars are added to the filename
+		 *
+		 */
+		newFilename (newValue) {
+			this.newFilename = newValue.replace(/[\\/:"*?<>|]+/g, "");
+		}
 
 	},
 
@@ -200,8 +228,8 @@ export default {
 		 */
 		onFinishRecord () {
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-			this.recordedCount++;
 			this.isRecording = false;
+			this.hasRecording = true;
 			this.isPlaybackActive = true;
 			this.recordedData = this.player.recordedData; // the blob object contains the recorded data that we could convert
 		},
@@ -231,8 +259,6 @@ export default {
 		onEnableSelected () {
 			this.player.record().getDevice();
 		},
-		
-
 
 		/*
 		 * enable the device, initially it's a blank screen until enabled
@@ -254,11 +280,31 @@ export default {
 		},
 
 		/*
-		 * enable the device, initially it's a blank screen until enabled
-		 * may request permission on first use
+		 * confirm deletion of the latest recording, setting up for another recording
 		 *
 		 */
-		async onUploadSelected () {
+		onConfirmDeleteRecordingSelected () {
+			this.isDeleteRecordingModalActive = false;
+			this.hasRecording = false;
+			this.isPlaybackActive = false;
+			this.isPlaybackVideoActive = false;
+			this.player.record().getDevice();
+		},
+
+		/*
+		 * present the save file name modal to name the file
+		 *
+		 */
+		onUploadSelected () {
+			this.isFilenameModalActive = true;
+		},
+
+		/*
+		 * the user has set a file name and selected save
+		 *
+		 */
+		async onSaveFilenameSelected () {
+			this.isFilenameModalActive = false;
 			const responseData = await this.uploadAudio();
 			this.postUploadedMessage(responseData);
 		},
@@ -331,6 +377,46 @@ export default {
 		},
 
 		/*
+		 * close the filename modal
+		 *
+		 */
+		onCloseFilenameModalSelected () {
+			this.$refs.filenameModal.animateOff();
+		},
+
+		/*
+		 * close the filename modal, cancel has been selected rather than save
+		 *
+		 */
+		onFilenameModalClosed () {
+			this.isFilenameModalActive = false;
+		},
+
+		/*
+		 * to be able to record another video
+		 *
+		 */
+		onDeleteRecordingSelected () {
+			this.isDeleteRecordingModalActive = true;
+		},
+
+		/*
+		 * close the delete recording modal
+		 *
+		 */
+		onCancelDeleteRecordingSelected () {
+			this.$refs.deleteRecordingModal.animateOff();
+		},
+
+		/*
+		 * close the delete recording modal, cancel has been selected rather than confirm
+		 *
+		 */
+		onDeleteRecordingModalClosed () {
+			this.isDeleteRecordingModalActive = false;
+		},
+
+		/*
 		 * Pass through the video options to play the latest recorded video
 		 *
 		 * @returns { Object }
@@ -376,10 +462,30 @@ export default {
 						<div class="alert-box warning">The camera appears to be already in use. Please close any Applications our Browser windows that may be using the camera and try again.</div>
 						<button @click.prevent="onCloseErrorModalSelected">Close</button>
 					</record-media-modal>
+
+					<record-media-modal v-else-if="isDeleteRecordingModalActive" ref="deleteRecordingModal" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
+						<div class="alert-box alert">Are you sure you wish to delete the current recording?</div>
+						<div class="modal-actions">
+							<button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
+							<button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
+						</div>
+					</record-media-modal>
+
+					<record-media-modal v-else-if="isFilenameModalActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
+						<h3><em>Please add a filename prior to continuing.</em></h3>
+						<label for="filename" class="required" aria-required="true">Filename</label>
+						<input type="text" id="filename" name="filename" v-model="newFilename">
+						<div class="modal-actions">
+							<button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Save and convert</button>
+							<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
+						</div>	
+					</record-media-modal>
+
 					<record-media-modal v-else-if="isUploading" ref="uploadingModal" key="uploadingModal">
 						<div class="loader"></div>
 						<p><em>Uploading audio, please wait...</em></p>
 					</record-media-modal>
+
 					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
 						<p><em>Audio succesfully uploaded.</em></p>
 					</record-media-modal>
@@ -395,8 +501,11 @@ export default {
 				<transition name="fade">
 					<a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button"  title="Upload Audio" href="#upload-audio">Upload Audio</a>
 				</transition>
+				<transition name="fade">
+					<a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" role="button" class="button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
+				</transition>
 				<transition name="fade" mode="out-in">
-					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" title="Record Video" href="#record-audio">{{ recordButtonText }}</a>
+					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" title="Record Video" href="#record-audio">Record</a>
 					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-audio">Stop</a>
 				</transition>
 				<transition name="fade" mode="out-in">
@@ -425,6 +534,13 @@ export default {
 	height: 100%;
 	left: 0;
 	top: 0;
+}
+
+.modal-actions {
+	display: flex;
+	button {
+		margin: 0px 2px; 
+	}
 }
 
 .vjs-icon-record-start, .vjs-icon-record-stop {

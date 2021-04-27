@@ -2,6 +2,7 @@
 
 /*
  * To notify of various media events, like camera not available or video converting/uploading
+ * Just a slot really, the parent puts whatever it needs in it
  *
  */
 
@@ -69,6 +70,7 @@ export default {
 .modal {
     box-sizing: border-box;
     max-width: 80%;
+	min-width: 50%;
 	padding: 20px;
 	background: white;
 	button {
