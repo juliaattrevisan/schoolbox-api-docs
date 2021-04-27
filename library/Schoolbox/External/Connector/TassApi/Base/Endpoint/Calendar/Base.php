@@ -214,6 +214,10 @@ class Base
          */
         $administrator = \Schoolbox\UserMapper::getInstance()->findById(1);
 
+        /* A list of missing event types which the admin needs to configure in schoolbox
+         */
+        $missingEventTypes = [];
+
         /* Role id collection, in case there are multiple records of the same type
          * e.g. a Student event should be associated with all the Student Roletype roles
          */
@@ -304,6 +308,10 @@ class Base
                     $eventType
                 ));
 
+                /* Remember it so we can tell the user which event types were missing
+                 */
+                $missingEventTypes[$eventType] = $eventType;
+
                 continue;
             }
 
@@ -348,6 +356,17 @@ class Base
                     $this->source,
                     $event->getTitle(),
                     $eventSource->getGuid()
+                ));
+            }
+        }
+
+        /* Tell someone these need to be configured in admin
+         */
+        if (\count($missingEventTypes)) {
+            foreach ($missingEventTypes as $missingEventType) {
+                $this->log->warning(sprintf(
+                    'Add this event type in admin: %s',
+                    $missingEventType
                 ));
             }
         }
