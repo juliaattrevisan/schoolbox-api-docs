@@ -16,6 +16,7 @@ import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
 import { gsap } from 'gsap/all';
 import VideoPlayer from '@schoolbox/videojs/video-player';
 import RecordMediaModal from './record-media-modal';
+import { convertFilenameExtension } from '@shared/util/fileUtils';
 import { getAudioOnlyRecordOptions, getVideoPlaybackOptions } from '@shared/videojs/videojsOptions';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
@@ -81,6 +82,32 @@ export default {
 		 */
 		showStopButton () {
 			if (this.isDeviceReady && !this.hasRecording && this.isRecording && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+		/*
+		 * To know whether to show the play recording button
+		 *
+		 * @returns { Boolean }
+		 */
+		showPlayRecordingButton () {
+			if (this.isPlaybackVideoActive && !this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+		/*
+		 * To know whether to show the stop recording button
+		 *
+		 * @returns { Boolean }
+		 */
+		showStopRecordingButton () {
+			if (this.isPlaybackVideoActive && this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -318,7 +345,7 @@ export default {
 				this.$emit(recordMediaEvents.PROCCESS_STARTED);
 				this.isUploading = true;
 				const formData = new FormData();
-				formData.append('upload', this.recordedData, this.recordedData.name);
+				formData.append('upload', this.recordedData, convertFilenameExtension(this.newFilename, '.mp3'));
 				const response = await axios.post('/storage/asyncUpload.php', formData);
 				return response.data;
 			} catch (error) {
@@ -337,7 +364,7 @@ export default {
 		 */
 		postUploadedMessage (responseData) {
 			const data = {
-				title:    this.recordedData.name,
+				title:    convertFilenameExtension(this.newFilename, '.mp3'),
 				mimeType: this.recordedData.type,
 				filesize: this.recordedData.size,
 				hash:     responseData.hash
@@ -476,7 +503,7 @@ export default {
 						<label for="filename" class="required" aria-required="true">Filename</label>
 						<input type="text" id="filename" name="filename" v-model="newFilename">
 						<div class="modal-actions">
-							<button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Save and convert</button>
+							<button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Save and upload</button>
 							<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
 						</div>	
 					</record-media-modal>
@@ -509,8 +536,8 @@ export default {
 					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-audio">Stop</a>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<a v-if="isPlaybackVideoActive && !$refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Audio" href="#play-audio" key="play">Play</a>
-					<a v-else-if="isPlaybackVideoActive && $refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Audio" href="#pause-audio" key="pause">Pause</a>
+					<a v-if="showPlayRecordingButton" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Audio" href="#play-audio" key="play">Play</a>
+					<a v-else-if="showStopRecordingButton" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Audio" href="#pause-audio" key="pause">Pause</a>
 				</transition>
 			</section>
 		</div>

@@ -103,6 +103,32 @@ export default {
 		},
 
 		/*
+		 * To know whether to show the play recording button
+		 *
+		 * @returns { Boolean }
+		 */
+		showPlayRecordingButton () {
+			if (this.isPlaybackVideoActive && !this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isConverting && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+		/*
+		 * To know whether to show the stop recording button
+		 *
+		 * @returns { Boolean }
+		 */
+		showStopRecordingButton () {
+			if (this.isPlaybackVideoActive && this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isConverting && !this.isUploading) {
+				return true;
+			} else {
+				return false;
+			}
+		},
+
+		/*
 		 * To know whether to show the convert button
 		 *
 		 * @returns { Boolean }
@@ -616,8 +642,8 @@ export default {
 					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
 				</transition>
 				<transition name="fade" mode="out-in">
-					<a v-if="isPlaybackVideoActive && !$refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Video" href="#play-video" key="play">Play Recording</a>
-					<a v-else-if="isPlaybackVideoActive && $refs.playbackVideo.isPlaying" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause Recording</a>
+					<a v-if="showPlayRecordingButton" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Video" href="#play-video" key="play">Play Recording</a>
+					<a v-else-if="showStopRecordingButton" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause Recording</a>
 				</transition>
 			</section>
 		</div><!-- .component-action -->
