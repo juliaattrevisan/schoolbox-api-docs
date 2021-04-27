@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Help\SingleSignOn;
 
 use Alaress\Web\Controller\Base;
+use Authenticator;
 use Schoolbox\API\Token\Jwt;
+use Schoolbox\Application\Exception\NotAuthenticated as SchoolboxNotAuthenticatedException;
 use Schoolbox\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\UserMapper;
 use Zend\Uri\Uri;
@@ -47,6 +49,11 @@ class Controller extends Base
     private UserMapper $userMapper;
 
     /**
+     * Authentication class
+     */
+    private Authenticator $auth;
+
+    /**
      * Instance registry mapper
      */
     private InstanceRegistryMapper $instanceRegistryMapper;
@@ -55,15 +62,18 @@ class Controller extends Base
      * Constructor
      *
      * @param Jwt                    $tokenBuilder
+     * @param Authenticator          $auth
      * @param UserMapper             $userMapper
      * @param InstanceRegistryMapper $instanceRegistryMapper
      */
     public function __construct(
         Jwt $tokenBuilder,
+        Authenticator $auth,
         UserMapper $userMapper,
         InstanceRegistryMapper $instanceRegistryMapper
     ) {
         $this->tokenBuilder           = $tokenBuilder;
+        $this->auth                   = $auth;
         $this->userMapper             = $userMapper;
         $this->instanceRegistryMapper = $instanceRegistryMapper;
     }
@@ -122,8 +132,13 @@ class Controller extends Base
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
-        $user = $this->userMapper->findByUsername($verifiedPayload[self::CLAIM_EMAIL]);
-
-        var_dump($user);
+        try {
+            $this->auth->createSession($verifiedPayload[self::CLAIM_EMAIL]);
+            // For now, redir to dashboard
+            $this->response->redirect->seeOther('/');
+        } catch (SchoolboxNotAuthenticatedException $e) {
+            // Something went wrong: redir to login
+            $this->response->status->setCode(403);
+        }
     }
 }
