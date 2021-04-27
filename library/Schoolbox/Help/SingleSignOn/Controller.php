@@ -91,19 +91,20 @@ class Controller extends Base
     {
         // Decode the JWT _without_ verifying it,
         // in order to determine the instance whence it came
-        $payload = $this->tokenBuilder->decodeWithoutVerification($this->request->query->get('jwt'));
+        $jwt     = $this->request->query->get('jwt');
+        $payload = $this->tokenBuilder->decodeWithoutVerification($jwt);
 
         // Now we know the instance:
         // Look it up in the registry table, and get the public key stored there
         // so that the JWT can be verified
-        $instanceDetails = $this->instanceRegistryMapper->findOneByColumn(
-            Mapper::COL_INSTANCE_ID,
+        $instanceDetails = $this->instanceRegistryMapper->findByInstanceId(
             $payload[self::CLAIM_INSTANCE_ID],
         );
 
-        var_dump($instanceDetails);
+        $verifiedPayload = $this->tokenBuilder->decode($jwt, $instanceDetails->getJwtPublicKey());
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
+        var_dump($verifiedPayload);
     }
 }

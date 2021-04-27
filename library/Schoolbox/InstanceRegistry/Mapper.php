@@ -15,6 +15,9 @@ use Schoolbox\Mapper as BaseMapper;
  *
  * This table contains all information which this instance needs to know about
  * other Schoolbox instances.
+ *
+ * @method Model findById($identifierValue)
+ * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -43,5 +46,17 @@ class Mapper extends BaseMapper
         $this->uses(self::COL_CREATED_AT, self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses(self::COL_UPDATED_AT, self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses(self::COL_DELETED_AT, self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Find a registration record by its instance ID.
+     *
+     * @param string $instanceId
+     * @return Model
+     * @throws BaseMapper\Exception if this registration wasn't found
+     */
+    public function findByInstanceId(string $instanceId): Model
+    {
+        return $this->findOneByColumn(self::COL_INSTANCE_ID, $instanceId);
     }
 }
