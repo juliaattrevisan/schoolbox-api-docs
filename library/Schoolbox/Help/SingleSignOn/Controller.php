@@ -11,7 +11,8 @@ namespace Schoolbox\Help\SingleSignOn;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\API\Token\Jwt;
-use Schoolbox\InstanceRegistry\Mapper;
+use Schoolbox\InstanceRegistry\Mapper as InstanceRegistryMapper;
+use Schoolbox\UserMapper;
 use Zend\Uri\Uri;
 
 /**
@@ -25,6 +26,12 @@ class Controller extends Base
     private const JWT_EXPIRY = 300;
 
     /**
+     * Key for the email JWT claim. This is a public claim, so it doesn't need
+     * a prefix.
+     */
+    private const CLAIM_EMAIL = 'email';
+
+    /**
      * Key for the instance ID custom JWT claim.
      */
     private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
@@ -35,19 +42,29 @@ class Controller extends Base
     private Jwt $tokenBuilder;
 
     /**
+     * User mapper
+     */
+    private UserMapper $userMapper;
+
+    /**
      * Instance registry mapper
      */
-    private Mapper $instanceRegistryMapper;
+    private InstanceRegistryMapper $instanceRegistryMapper;
 
     /**
      * Constructor
      *
-     * @param Jwt    $tokenBuilder
-     * @param Mapper $instanceRegistryMapper
+     * @param Jwt                    $tokenBuilder
+     * @param UserMapper             $userMapper
+     * @param InstanceRegistryMapper $instanceRegistryMapper
      */
-    public function __construct(Jwt $tokenBuilder, Mapper $instanceRegistryMapper)
-    {
+    public function __construct(
+        Jwt $tokenBuilder,
+        UserMapper $userMapper,
+        InstanceRegistryMapper $instanceRegistryMapper
+    ) {
         $this->tokenBuilder           = $tokenBuilder;
+        $this->userMapper             = $userMapper;
         $this->instanceRegistryMapper = $instanceRegistryMapper;
     }
 
@@ -67,7 +84,7 @@ class Controller extends Base
             $this->getUser(),
             self::JWT_EXPIRY,
             [
-                'email'                 => $this->getUser()->getEmail(),
+                self::CLAIM_EMAIL       => $this->getUser()->getEmail(),
                 self::CLAIM_INSTANCE_ID => INSTANCE_ID,
             ]
         );
@@ -105,6 +122,8 @@ class Controller extends Base
 
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
-        var_dump($verifiedPayload);
+        $user = $this->userMapper->findByUsername($verifiedPayload[self::CLAIM_EMAIL]);
+
+        var_dump($user);
     }
 }
