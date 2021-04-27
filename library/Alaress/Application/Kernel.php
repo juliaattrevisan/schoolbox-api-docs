@@ -491,10 +491,10 @@ abstract class Kernel
             'setIsXhrSpec'  => $di->lazyNew(IsXhr::class)
         );
 
-        $di->set('sitePage', $di->lazy(function() use ($di) {
-            return new SitePage($di);
-        }));
-
+        $di->set(
+            'sitePage',
+            $di->lazyNew(SitePage::class, ['di' => $di])
+        );
 
         $di->set(
             'commsNewsArticleResolver',
