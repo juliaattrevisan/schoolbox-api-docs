@@ -389,6 +389,12 @@ class Base
             }
         }
 
+        /* If you didn't match any campuses, add them all
+         */
+        if (!\count($campusIds)) {
+            $campusIds = $this->campuses->getPropertyValues('id');
+        }
+
         return $campusIds;
     }
 
