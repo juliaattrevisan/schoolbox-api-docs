@@ -458,6 +458,24 @@ class TransactorTest extends TestCase
     }
 
     /**
+     * Test that `onPersist` callbacks added are cleared immediately after the
+     * commit happens, and that another commit within the callback doesn't
+     * trigger the callback again.
+     */
+    public function testOnPersistClearedAfterCommit(): void
+    {
+        $this->transactor->transact(function () {
+            $this->transactor->onPersist(function () {
+                $this->transactor->transact(static function () {
+                    // noop
+                });
+                $this->incrementCount();
+            });
+        });
+        self::assertEquals(1, $this->count);
+    }
+
+    /**
      * Increment count; used as onPersist callback.
      */
     public function incrementCount(): void
