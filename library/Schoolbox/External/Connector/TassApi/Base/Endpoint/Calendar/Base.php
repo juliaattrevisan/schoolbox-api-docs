@@ -222,10 +222,21 @@ class Base
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
          */
+        $this->log->info(sprintf(
+            'Accessing endpoint %s',
+            $this->endpoint
+        ));
+
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument($this->endpoint, [
             'start_date' => $this->from->getUsingFormat('d/m/Y'),
             'end_date' => $this->to->getUsingFormat('d/m/Y')
         ], Api::VERSION_2);
+
+        $this->log->info(sprintf(
+            'Found %s events at endpoint %s',
+            \count($tassEvents['events']),
+            $this->endpoint
+        ));
 
         foreach ($tassEvents['events'] as $tassEvent) {
 
