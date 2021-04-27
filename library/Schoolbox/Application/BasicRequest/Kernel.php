@@ -339,6 +339,11 @@ class Kernel extends WebKernelAbstract
         $di->params[TwigMethod\RequireModule::class]['di'] = $di;
         $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
 
+        // Unfortunately basic request needs a SitePage for now
+        $di->set('sitePage', $di->lazy(function() use ($di) {
+            return new SitePage($di);
+        }));
+
         return $di;
     }
 }
