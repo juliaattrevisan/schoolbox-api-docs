@@ -2,7 +2,6 @@
 # vi: set ft=ruby :
 
 require 'yaml'
-
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
@@ -27,6 +26,7 @@ puppet_debug = default["puppet_debug"]
 instance_registry_url_override = default["instance_registry_url_override"]
 instance_registry_api_key = default["instance_registry_api_key"]
 instance_id_env_var = default["instance_id_env_var"]
+puppet_sync_type = default["puppet_sync_type"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -89,9 +89,19 @@ if File.file?('vagrant.yaml')
   if !conf["instance_id_env_var"].nil?
     instance_id_env_var = conf["instance_id_env_var"]
   end
+  if !conf["puppet_sync_type"].nil?
+    puppet_sync_type = conf["puppet_sync_type"]
+  end
 end
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  if puppet_sync_type != 'none'
+    config.trigger.before :provision do |sync|
+      sync.name = "Syncing Puppet"
+      sync.run = {inline: "./tools/vagrant-sync-puppet-repo.sh #{puppet_sync_type} #{puppet_dir}"}
+    end
+  end
 
   config.vm.box = vagrant_box
   config.vm.box_url = "#{data_source}/#{vagrant_box}.box"
