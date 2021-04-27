@@ -27,7 +27,7 @@ class MockConnector extends Kami\Connector
      */
     public function __construct(ClientInterface $client)
     {
-        parent::__construct($client, 'EXAMPLE_API_KEY', 'TESTING');
+        parent::__construct($client, true, 'EXAMPLE_API_KEY', 'TESTING');
     }
 
 

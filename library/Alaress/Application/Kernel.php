@@ -1280,6 +1280,7 @@ abstract class Kernel
             'client'         => $di->lazy(static function () {
                 return new GuzzleHttp\Client(['curl' => \Proxy\Server::getInstance()->buildCurlOptions()]);
             }),
+            'enabled'        => $di->get('config')->get('kami_enabled'),
             'apiKey'         => $di->get('config')->get('kami_api_key'),
             'siteSchoolCode' => $di->get('config')->get('site_school_code'),
         ]));
