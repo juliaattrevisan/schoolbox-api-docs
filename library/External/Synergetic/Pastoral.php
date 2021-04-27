@@ -629,12 +629,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ";
         }
 
+        $inOuterTransaction = $this->connector->inTransaction();
         try {
-            $params = $this->getQueryParameters($pastoral);
-            $inActiveTransaction = $this->connector->inTransaction();
-            if (!$inActiveTransaction) {
+            // TODO: this check should not be necessary, but without this, this throws nested transaction exception
+            if (!$inOuterTransaction) {
                 $this->connector->beginTransaction();
             }
+            $params = $this->getQueryParameters($pastoral);
             if ($this->connector->executeQuery($query, $params)) {
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
@@ -664,7 +665,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     )->fetchColumn();
 
                     if (!$pastoralCareSeq) {
-                        $this->connector->rollBack();
+                        if (!$inOuterTransaction) {
+                            $this->connector->rollBack();
+                        }
                         throw new ExternalException('Failed to get pastoralCareSeq for pastoral: ' . $pastoral->getId());
                     }
 
@@ -676,7 +679,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     try {
                         $this->pastoralMapper->save($pastoral);
                     } catch (MapperException $e) {
-                        $this->connector->rollBack();
+                        if (!$inOuterTransaction) {
+                            $this->connector->rollBack();
+                        }
                         return false;
                     }
 
@@ -688,13 +693,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $this->updatePastoralCareContacts($pastoral);
 
-                if (!$inActiveTransaction) {
+                if (!$inOuterTransaction) {
                     $this->connector->commit();
                 }
                 return true;
             }
         } catch (ExternalException $e) {
-            $this->connector->rollBack();
+            if (!$inOuterTransaction) {
+                $this->connector->rollBack();
+            }
             return false;
         }
 
