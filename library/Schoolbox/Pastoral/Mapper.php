@@ -1052,4 +1052,12 @@ class Mapper extends BaseMapper
 
         self::$placeholderIndex++;
     }
+
+    /**
+     * @inheritDoc
+     */
+    function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }

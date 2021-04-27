@@ -8,6 +8,7 @@
 namespace Schoolbox\Pastoral\Attachment;
 
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
@@ -58,7 +59,7 @@ class Mapper extends BaseMapper
                         {$this->getJoinColumnString('pastoral', 'p')},
                         {$this->getJoinColumnString('storage', 's')},
                         {$storageMapper->getJoinColumnString('allowedFileExtension', 'mime')}
-            FROM        {$this->getTable()} 
+            FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('pastoral', '', 'p', true)}
             INNER JOIN  {$this->getJoinSql('storage', '', 's', true)}
             LEFT JOIN   {$storageMapper->getJoinSql('allowedFileExtension', 's', 'mime')}
@@ -133,11 +134,36 @@ class Mapper extends BaseMapper
         }
     }
 
-    /** Delete corresponding pastoral uploads
-    */
-    public function postDelete(Model $object) {
-
+    /**
+     * Delete corresponding pastoral uploads
+     * @param Model $object
+     */
+    public function postDelete(Model $object)
+    {
         $uploadMapper = PastoralUploadQueueMapper::getInstance();
-        $uploadMapper->deleteByColumnList(['pastoral_id' => $object->getPastoral()->getId(), 'hash' => $object->getHash()]);
+        $uploadMapper->deleteByColumnList(
+            [
+                'pastoral_id' => $object->getPastoral()->getId(),
+                'hash'        => $object->getHash(),
+            ]
+        );
+    }
+
+    /**
+     * @param Collection $newAttachments
+     * @param Collection $oldAttachments
+     * @return array
+     */
+    public function diffAttachments(Collection $newAttachments, Collection $oldAttachments): array
+    {
+        $diffMethod = static function (Model $a, Model $b) {
+            return $a->getStorage()->getHash() === $b->getStorage()->getHash();
+        };
+        return [
+            // created attachments
+            $newAttachments->diff($oldAttachments, $diffMethod),
+            // deleted attachments
+            $oldAttachments->diff($newAttachments, $diffMethod),
+        ];
     }
 }

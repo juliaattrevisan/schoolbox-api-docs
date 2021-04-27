@@ -624,7 +624,9 @@ class DataSource
      */
     public function save(Model $model): void
     {
+        $this->mapper->suppressNotification();
         $this->mapper->save($model);
+        $this->mapper->restoreNotification();
     }
 
 
@@ -641,5 +643,52 @@ class DataSource
     public function delete(Model $model): bool
     {
         return $this->mapper->delete($model);
+    }
+
+    /**
+     * Unsets pastoral mapper's event propagator
+     */
+    public function resetPropagator(): void
+    {
+        $this->mapper->setEventPropagator();
+    }
+
+    /**
+     * Match signature of Schoolbox\Mapper and emulate an Event notification
+     *
+     * @param Model      $object
+     * @param string     $verb
+     * @param Model|null $previous
+     * @return bool
+     */
+    public function raiseNotification($object, $verb, $previous = null): bool
+    {
+        $sessionData = $this->mapper->getSessionData();
+        if (empty($sessionData['user'])) {
+            return false;
+        }
+
+        try {
+            $diff = $previous && ($verb != \Schoolbox\Mapper::METHOD_DELETE) ? $this->mapper->diff($object, $previous) : null;
+        } catch (MapperException $e) {
+            return false;
+        }
+
+        if ($previous) {
+            /** @var \Schoolbox\Pastoral\Attachment\Mapper $pastoralAttachmentMapper */
+            $pastoralAttachmentMapper = $this->mapper->getJoinMapper('attachments');
+            [$created, $deleted] = $pastoralAttachmentMapper->diffAttachments($object->getAttachments(), $previous->getAttachments());
+            /** @var \Schoolbox\Pastoral\Attachment\Model $attachment */
+            foreach ($created->merge($deleted) as $attachment) {
+                if ($attachment->isPublic() && !isset($diff['attachmentsPublic'])) {
+                    $diff['attachmentsPublic'] = [1, 0]; // value does not matter for now
+                } elseif (!$attachment->isPublic() && !isset($diff['attachmentsPrivate'])) {
+                    $diff['attachmentsPrivate'] = [1, 0]; // value does not matter for now
+                }
+            }
+        }
+
+        $this->mapper->getEventPropagator()->propagate($sessionData['user'], $verb, $object, $this->mapper, $diff);
+        return true;
     }
 }

@@ -629,9 +629,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ";
         }
 
+        $inOuterTransaction = $this->connector->inTransaction();
         try {
+            // TODO: this check should not be necessary, but without this, this throws nested transaction exception
+            if (!$inOuterTransaction) {
+                $this->connector->beginTransaction();
+            }
             $params = $this->getQueryParameters($pastoral);
-            $this->connector->beginTransaction();
             if ($this->connector->executeQuery($query, $params)) {
                 // If this is a new record we need to store the ID of the newly created Synergetic record
 
@@ -661,7 +665,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     )->fetchColumn();
 
                     if (!$pastoralCareSeq) {
-                        $this->connector->rollBack();
+                        if (!$inOuterTransaction) {
+                            $this->connector->rollBack();
+                        }
                         throw new ExternalException('Failed to get pastoralCareSeq for pastoral: ' . $pastoral->getId());
                     }
 
@@ -670,7 +676,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     // Stop pastoral notifier firing on this update, otherwise they receive both a create/update
                     // notification every time someone creates a pastoral record
                     $this->pastoralMapper->suppressNotification();
-                    $this->pastoralMapper->save($pastoral);
+                    try {
+                        $this->pastoralMapper->save($pastoral);
+                    } catch (MapperException $e) {
+                        if (!$inOuterTransaction) {
+                            $this->connector->rollBack();
+                        }
+                        return false;
+                    }
 
                     // Restore the proper propagator
                     $this->pastoralMapper->restoreNotification();
@@ -680,11 +693,15 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                 $this->updatePastoralCareContacts($pastoral);
 
-                $this->connector->commit();
+                if (!$inOuterTransaction) {
+                    $this->connector->commit();
+                }
                 return true;
             }
         } catch (ExternalException $e) {
-            $this->connector->rollBack();
+            if (!$inOuterTransaction) {
+                $this->connector->rollBack();
+            }
             return false;
         }
 

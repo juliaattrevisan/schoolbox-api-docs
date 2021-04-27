@@ -36,6 +36,20 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
 
+    // fields to notify when the value is changed
+    private const COLS = [
+      'type',
+      'subtype',
+      'severity',
+      'heading',
+      'bodyPrivate',
+      'bodyPublic',
+      'points',
+      'attachmentsPrivate',
+      'attachmentsPublic',
+      'tags',
+    ];
+
     /** @var Mapper */
     protected $mapper;
 
@@ -84,13 +98,13 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param Model  $model
-     * @param string $method
-     *
-     * @param User   $effector
+     * @param Model      $model
+     * @param string     $method
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
-    protected function buildMessage(Model $model, string $method, User $effector): Envelope
+    protected function buildMessage(Model $model, string $method, User $effector, ?array $diff): Envelope
     {
         $envelope = new Envelope();
 
@@ -134,10 +148,22 @@ class Notifier extends AbstractModuleNotifier
         // Users to send notifications to. Starting with author of the record.
         $targetUsers = [];
 
+        $privateChangeOnly = false;
+        if ($diff) {
+            $relevantDiff = array_intersect(array_keys($diff), self::COLS);
+            $privateChangeOnly = empty(array_diff($relevantDiff, ['bodyPrivate', 'attachmentsPrivate']));
+        }
+
         /** @var PastoralAccess $pastoralAccess */
         foreach ($accessRecords as $pastoralAccess) {
-            // If the comment is private, and they don't have private, fail
+            // If the access is denied, fail
             if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY) {
+                // do not send any notification
+                continue;
+            }
+
+            // if the access is public only and the changes are private only, fail
+            if (($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_PUBLIC) && $privateChangeOnly) {
                 // do not send any notification
                 continue;
             }
@@ -166,7 +192,6 @@ class Notifier extends AbstractModuleNotifier
                     }
                 } elseif ($pastoralAccess->getGroup() instanceof PastoralGroup) {
                     // Sending to a pastoral group, make sure its hydrated
-                    /** @var PastoralGroup $pastoralGroup */
                     $pastoralGroup = $this->pastoralGroupMapper->findById($pastoralAccess->getGroup()->getId());
 
                     /** @var PastoralGroupMember $member */
@@ -218,6 +243,12 @@ class Notifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle)
     {
+        $diff = $bundle->getEvent()->getDiff();
+
+        if ($diff && count(array_intersect(array_keys($diff), self::COLS)) === 0) {
+            return;
+        }
+
         $now = time() + 5;
 
         switch ($bundle->getMethod()) {
@@ -233,13 +264,13 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @param Model $model
      * @param User  $effector
-     * @param array $diff
+     * @param array|null $diff
      *
      * @return Envelope
      */
     public function notifyCreated(Model $model, User $effector, $diff = [])
     {
-        return $this->buildMessage($model, self::TRIGGER_CREATED, $effector);
+        return $this->buildMessage($model, self::TRIGGER_CREATED, $effector, $diff);
     }
 
     /**
@@ -251,7 +282,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyUpdated(Model $model, User $effector, $diff = [])
     {
-        return $this->buildMessage($model, self::TRIGGER_UPDATED, $effector);
+        return $this->buildMessage($model, self::TRIGGER_UPDATED, $effector, $diff);
     }
 
     /**

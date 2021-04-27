@@ -264,4 +264,12 @@ class Mapper extends BaseMapper
             ]
         );
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function raiseNotification($object, $verb, $previous = null)
+    {
+        return true;
+    }
 }
