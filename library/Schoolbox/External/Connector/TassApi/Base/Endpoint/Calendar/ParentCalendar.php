@@ -152,6 +152,10 @@ class ParentCalendar implements IStrategy
              */
             $title = $tassEvent['title'];
             $location = $tassEvent['location'];
+
+            /* TODO There's another field, $tassEvent['summary'], but I can't see how it is different to
+             *  $tassEvent['description'] from the api docs, I'd need real data to know which to use
+             */
             $detail = $tassEvent['description'];
 
             /* Datetimes for the event and whether it's an all-day event
