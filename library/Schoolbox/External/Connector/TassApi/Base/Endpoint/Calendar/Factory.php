@@ -18,6 +18,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 
 
 /**
@@ -145,6 +146,10 @@ class Factory
          */
         $eventTypes = EventTypeMapper::getInstance()->findAll()->indexBy('type');
 
+        /* Elected event Owner and Author is arbitrarily this person for now...
+         */
+        $owner = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);
+
         /* Purge previously-imported events and event relationships
          */
         return (new GenericCollection(IStrategy::class))
@@ -154,6 +159,7 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
+                $owner,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -166,6 +172,7 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
+                $owner,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -178,6 +185,7 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
+                $owner,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -190,6 +198,7 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
+                $owner,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -202,6 +211,7 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
+                $owner,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -214,6 +224,7 @@ class Factory
                 $api,
                 $campuses,
                 $eventTypes,
+                $owner,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,

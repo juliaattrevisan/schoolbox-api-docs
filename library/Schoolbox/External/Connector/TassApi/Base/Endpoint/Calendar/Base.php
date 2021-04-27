@@ -15,6 +15,8 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 
 /**
@@ -63,6 +65,21 @@ class Base
      * @var GenericCollection
      */
     protected GenericCollection $eventTypes;
+
+
+    /**
+     * This person arbitrarily authored and owns the events
+     * (because we need that)
+     *
+     * But, because events are determined by Role and Campus,
+     * the fact that it is "owned" by a particular guy and
+     * would appear on that guy's calendar had the events been
+     * "Personal" ...doesn't really matter. The events will be
+     * visible to anyone in the assigned Role(s) and Campus(es)
+     *
+     * @var User
+     */
+    protected User $owner;
 
 
     /**
@@ -132,6 +149,7 @@ class Base
      * @param array                $api
      * @param GenericCollection    $campuses
      * @param GenericCollection    $eventTypes
+     * @param User                 $owner
      * @param EventMapper          $eventMapper
      * @param EventSourceMapper    $eventSourceMapper
      * @param RoleMapper           $roleMapper
@@ -144,6 +162,7 @@ class Base
         array $api,
         GenericCollection $campuses,
         GenericCollection $eventTypes,
+        User $owner,
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
         RoleMapper $roleMapper,
@@ -155,6 +174,7 @@ class Base
         $this->api = $api;
         $this->campuses = $campuses;
         $this->eventTypes = $eventTypes;
+        $this->owner = $owner;
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
@@ -210,16 +230,12 @@ class Base
     protected function importEvents(): void
     {
 
-        /* TODO Elected event Owner and Author is arbitrarily this person for now...
-         */
-        $administrator = \Schoolbox\UserMapper::getInstance()->findById(1);
-
         /* A list of missing event types which the admin needs to configure in schoolbox
          */
         $missingEventTypes = [];
 
         /* Role id collection, in case there are multiple records of the same type
-         * e.g. a Student event should be associated with all the Student Roletype roles
+         * e.g. a Student event should be associated with all the Student RoleType roles
          */
         $roleIds = $this->findRoles($this->roleType);
 
@@ -281,8 +297,8 @@ class Base
                 ->setTitle($title)
                 ->setLocation($location)
                 ->setDetail($detail)
-                ->setAuthor($administrator)
-                ->setOwner($administrator)
+                ->setAuthor($this->owner)
+                ->setOwner($this->owner)
                 ->setAccess(Event::ACCESS_CAMPUS)
                 ->setStartDateTime($startDatetime)
                 ->setEndDateTime($endDatetime)
