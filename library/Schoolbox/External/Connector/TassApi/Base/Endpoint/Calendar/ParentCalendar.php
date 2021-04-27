@@ -125,6 +125,13 @@ class ParentCalendar implements IStrategy
          */
         $administrator = \Schoolbox\UserMapper::getInstance()->findById(1);
 
+        /* Role id set, in case there are multiple records of the same type
+         */
+        $roles = \Schoolbox\RoleMapper::getInstance()
+            ->findByColumn('group_type', \Schoolbox\Role::PARENT)
+            ->indexBy('id')
+            ->keys();
+
         /* This comes from an API request at TASS
          */
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument('getParentCalendar', [
@@ -173,8 +180,11 @@ class ParentCalendar implements IStrategy
                 ->setCampusCollection($campusIds);
 
             /* Assign role relations
-             * These are role-specific and hardcoded per strat
+             *
+             * These are role-specific and hardcoded per strat, but there might be multiple
+             * instances of the same role type
              */
+            $event->setRoleCollection([$roles]);
     
             /* Assign Event Type via the payload's Category field "cat_desc"
              */
