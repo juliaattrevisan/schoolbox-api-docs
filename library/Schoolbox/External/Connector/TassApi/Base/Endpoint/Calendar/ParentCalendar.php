@@ -120,15 +120,29 @@ class ParentCalendar implements IStrategy
             'start_date' => '27/04/2021'
         ], Api::VERSION_2);
 
-        foreach ($tassEvents as $tassEvent) {
+        foreach ($tassEvents['events'] as $tassEvent) {
 
             /* Spawn a new Event instance and ensure that we tell it where it came from
+             * Set the normal Event data fields from the $tassEvent structure
              */
-            /** @var Event $event */
-            $event = $this->eventMapper->createModel();
+            $title = $tassEvent['title'];
+            $location = $tassEvent['location'];
+            $detail = $tassEvent['description'];
 
-            /* Set the normal Event data fields from the $tassEvent structure
+            /* Datetimes for the event and whether it's an all-day event
              */
+            $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['start']);
+            $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['start']);
+            $allDay = (int)$tassEvent['all_day'];
+
+            /** @var Event $event */
+            $event = $this->eventMapper->createModel()
+                ->setTitle($title)
+                ->setLocation($location)
+                ->setDetail($detail)
+                ->setStartDateTime($startDatetime)
+                ->setEndDateTime($endDatetime)
+                ->setAllDay($allDay);
 
             /* Assign campus relations
              *
