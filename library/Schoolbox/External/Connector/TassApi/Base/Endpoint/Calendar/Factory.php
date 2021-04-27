@@ -7,7 +7,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 
+use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Calendar\EventMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -52,23 +54,42 @@ class Factory
 
 
     /**
+     * @var EventMapper
+     */
+    private EventMapper $eventMapper;
+
+
+    /**
+     * @var EventSourceMapper
+     */
+    private EventSourceMapper $eventSourceMapper;
+
+
+    /**
      * Factory constructor.
      *
-     * @param LoggerInterface $log
-     * @param bool            $perform
-     * @param string          $host
-     * @param string          $key
+     * @param LoggerInterface   $log
+     * @param bool              $perform
+     * @param string            $host
+     * @param string            $key
+     * @param EventMapper       $eventMapper
+     * @param EventSourceMapper $eventSourceMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
         string $host,
-        string $key
+        string $key,
+        EventMapper $eventMapper,
+        EventSourceMapper $eventSourceMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
         $this->host = $host;
         $this->key = $key;
+
+        $this->eventMapper = $eventMapper;
+        $this->eventSourceMapper = $eventSourceMapper;
     }
 
 
@@ -96,14 +117,18 @@ class Factory
         /* Purge previously-imported events and event relationships
          */
         return (new GenericCollection(IStrategy::class))
-            ->add(new Prepare($this->log, $this->perform))
-            ->add(new TeacherNotices($this->log, $this->perform, $api))
-            ->add(new TeacherCalendar($this->log, $this->perform, $api))
-            ->add(new StudentNotices($this->log, $this->perform, $api))
-            ->add(new StudentCalendar($this->log, $this->perform, $api))
+            ->add(new ParentCalendar(
+                $this->log,
+                $this->perform,
+                $api,
+                $this->eventMapper,
+                $this->eventSourceMapper
+            ))
             ->add(new ParentNotices($this->log, $this->perform, $api))
-            ->add(new ParentCalendar($this->log, $this->perform, $api))
-            ->add(new Cleanup($this->log, $this->perform))
+            ->add(new StudentCalendar($this->log, $this->perform, $api))
+            ->add(new StudentNotices($this->log, $this->perform, $api))
+            ->add(new TeacherCalendar($this->log, $this->perform, $api))
+            ->add(new TeacherNotices($this->log, $this->perform, $api))
             ;
     }
 }

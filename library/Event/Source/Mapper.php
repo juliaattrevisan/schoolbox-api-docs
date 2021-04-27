@@ -21,8 +21,8 @@ use Schoolbox\Mapper as BaseMapper;
  *
  * @package Event\Source
  * @method Model createModel($id = null)
+ * @method Model findOneByColumnList($columnList, array $options = [])
  */
-
 class Mapper extends BaseMapper
 {
     /**

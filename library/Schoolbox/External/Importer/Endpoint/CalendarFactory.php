@@ -7,9 +7,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
 
+use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Calendar\EventMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\GenericCollection;
+
 
 /**
  * Class CalendarFactory
@@ -64,8 +67,12 @@ class CalendarFactory implements IFactory
      * @param bool            $perform
      * @param LoggerInterface $logger
      */
-    public function __construct(string $host, string $key, bool $perform, LoggerInterface $logger)
-    {
+    public function __construct(
+        string $host,
+        string $key,
+        bool $perform,
+        LoggerInterface $logger
+    ) {
         $this->host = $host;
         $this->key = $key;
         $this->perform = $perform;
@@ -78,6 +85,10 @@ class CalendarFactory implements IFactory
      * @param string      $type
      *
      * @return null|GenericCollection
+     * @throws \DomainException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     public function produce(?string $file, string $type): ?GenericCollection
     {
@@ -87,7 +98,9 @@ class CalendarFactory implements IFactory
                     $this->logger,
                     $this->perform,
                     $this->host,
-                    $this->key
+                    $this->key,
+                    EventMapper::getInstance(),
+                    EventSourceMapper::getInstance()
                 ))->produce();
 
             default:
