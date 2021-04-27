@@ -60,6 +60,12 @@ class Base
 
 
     /**
+     * @var GenericCollection
+     */
+    protected GenericCollection $eventTypes;
+
+
+    /**
      * @var EventMapper
      */
     protected EventMapper $eventMapper;
@@ -125,6 +131,7 @@ class Base
      * @param bool                 $perform
      * @param array                $api
      * @param GenericCollection    $campuses
+     * @param GenericCollection    $eventTypes
      * @param EventMapper          $eventMapper
      * @param EventSourceMapper    $eventSourceMapper
      * @param RoleMapper           $roleMapper
@@ -136,6 +143,7 @@ class Base
         bool $perform,
         array $api,
         GenericCollection $campuses,
+        GenericCollection $eventTypes,
         EventMapper $eventMapper,
         EventSourceMapper $eventSourceMapper,
         RoleMapper $roleMapper,
@@ -146,6 +154,7 @@ class Base
         $this->perform = $perform;
         $this->api = $api;
         $this->campuses = $campuses;
+        $this->eventTypes = $eventTypes;
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
         $this->roleMapper = $roleMapper;
@@ -241,6 +250,10 @@ class Base
              */
             $guid = $tassEvent['id'];
 
+            /* Event Type equivalent
+             */
+            $eventType = $tassEvent['cat_desc'];
+
             /* Assign campus relations
              *
              * Link it to all the campuses in schoolbox unless you can specifically determine
@@ -270,6 +283,18 @@ class Base
 
             /* Assign Event Type via the payload's Category field "cat_desc"
              */
+            if (isset($this->eventTypes[$eventType])) {
+                $event->setType($this->eventTypes[$eventType]);
+            } else {
+                $this->log->warning(sprintf(
+                    'Skipping: %s event "%s" has an event type "%s" which is not in admin Event Type list',
+                    $this->source,
+                    $event->getTitle(),
+                    $eventType
+                ));
+
+                continue;
+            }
 
             /* Set up the Event Source so we know where this came from
              */
@@ -288,7 +313,7 @@ class Base
             ));
 
             $this->log->debug(sprintf(
-                '%s event "%s" is in rolees: %s',
+                '%s event "%s" is in roles: %s',
                 $this->source,
                 $event->getTitle(),
                 implode(', ', $roleIds)

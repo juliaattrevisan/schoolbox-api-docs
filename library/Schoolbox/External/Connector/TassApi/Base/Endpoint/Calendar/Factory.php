@@ -10,6 +10,7 @@ namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
 use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
@@ -138,6 +139,11 @@ class Factory
         $from = \Alaress_Date_Format::now()->addMonths(-1);
         $to = \Alaress_Date_Format::now()->addMonths(12);
 
+        /* A list of the event types that can be associated with an event that is
+         * indexed by the eventType column which I have presumed to be unique
+         */
+        $eventTypes = EventTypeMapper::getInstance()->findAll()->indexBy('type');
+
         /* Purge previously-imported events and event relationships
          */
         return (new GenericCollection(IStrategy::class))
@@ -146,6 +152,7 @@ class Factory
                 $this->perform,
                 $api,
                 $campuses,
+                $eventTypes,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -157,6 +164,7 @@ class Factory
                 $this->perform,
                 $api,
                 $campuses,
+                $eventTypes,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -168,6 +176,7 @@ class Factory
                 $this->perform,
                 $api,
                 $campuses,
+                $eventTypes,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -179,6 +188,7 @@ class Factory
                 $this->perform,
                 $api,
                 $campuses,
+                $eventTypes,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -190,6 +200,7 @@ class Factory
                 $this->perform,
                 $api,
                 $campuses,
+                $eventTypes,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
@@ -201,6 +212,7 @@ class Factory
                 $this->perform,
                 $api,
                 $campuses,
+                $eventTypes,
                 $this->eventMapper,
                 $this->eventSourceMapper,
                 $this->roleMapper,
