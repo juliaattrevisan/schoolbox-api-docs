@@ -202,16 +202,17 @@ class CalendarCest
         $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);
         $createEventRequest->setFormParam('roles[1]', $targetRoles[1]);
-        $createEventRequest->setFormParam('attendance', 1);
+        $createEventRequest->setFormParam('attendance', 2);
+        $createEventRequest->setFormParam('maxAttendees', 2);
+
 
         $i->amGoingTo('Send request to create campus calendar event with attendance');
         $i->sendRequest($createEventRequest);
 
         #WHEN
         $event        = $i->grabCalendarEventByTitle($title);
-        $RSVP_Payload = new Payload\Base('POST', '/calendar/full/' . date('d-m-Y', $timestamp), '/service/attendance/setAttendance');
-        $RSVP_Payload->setFormParam('event[id]', $event->getId());
-        $RSVP_Payload->setFormParam('status', 'add');
+        $RSVP_Payload = new Payload\Base('POST', '/calendar/week/', '/calendar/event/attendance/'.$event->getId().'/accept');
+
 
         $i->amGoingTo('Send request to RSVP to campus calendar event.');
         $i->sendRequest($RSVP_Payload);
@@ -244,14 +245,13 @@ class CalendarCest
         $createEventRequest->setFormParam('campus[1]', $targetCampuses[1]);
         $createEventRequest->setFormParam('roles[0]', $targetRoles[0]);
         $createEventRequest->setFormParam('roles[1]', $targetRoles[1]);
-        $createEventRequest->setFormParam('attendance', 1);
+        $createEventRequest->setFormParam('attendance', 2);
+        $createEventRequest->setFormParam('maxAttendees', 2);
         $i->amGoingTo('Send request to create campus calendar event with attendance');
         $i->sendRequest($createEventRequest);
 
         $event        = $i->grabCalendarEventByTitle($title);
-        $RSVP_Payload = new Payload\Base('POST', '/calendar/full/' . date('d-m-Y', $timestamp), '/service/attendance/setAttendance');
-        $RSVP_Payload->setFormParam('event[id]', $event->getId());
-        $RSVP_Payload->setFormParam('status', 'add');
+        $RSVP_Payload = new Payload\Base('POST', '/calendar/week/', '/calendar/event/attendance/'.$event->getId().'/accept');
         $i->amGoingTo('Send request to RSVP to campus calendar event.');
         $i->sendRequest($RSVP_Payload);
 
