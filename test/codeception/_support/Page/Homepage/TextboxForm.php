@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Page\Homepage;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 use Page\Common;
 
 /**
@@ -55,7 +56,7 @@ class TextboxForm
      */
     public function fillHeading(string $heading): self
     {
-        $this->tester->fillField(['css' => self::FORM . ' input[name="textBoxHeading"]'], $heading);
+        $this->tester->fillField("heading", $heading);
         return $this;
     }
 
@@ -75,15 +76,7 @@ class TextboxForm
      */
     public function fillContent(string $content): self
     {
-        // Need to figure out what the id of this rich text field SHOULD be
-        // (Find ID of field)
-        $this->tester->fillRichTextField(
-            $this->tester->grabAttributeFrom(
-                self::FORM . ' textarea[name^="textBoxBody"]',
-                'id'
-            ),
-            $content
-        );
+        $this->tester->executeJS('for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].setData(\''.$content.'\')}');
         return $this;
     }
 
@@ -110,7 +103,21 @@ class TextboxForm
      */
     public function submit(): self
     {
-        $this->tester->click(self::FORM_SAVE);
+        $this->tester->click(['css' => 'input[type=submit][value=Create\ Text\ Box]']);
+        sleep(2);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     * @throws \Exception
+     */
+    public function save(): self
+    {
+        $this->tester->scrollTo(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
+        $element = Locator::contains('div.component-action section button', 'Save');
+        $this->tester->waitForElementVisible($element, 5);
+        $this->tester->click($element);
         return $this;
     }
 }
