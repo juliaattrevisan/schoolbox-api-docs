@@ -133,9 +133,16 @@ class ParentCalendar implements IStrategy
             ->keys();
 
         /* This comes from an API request at TASS
+         * We want events bracketed by 1 month in the past and 12 months in the future
+         */
+        $earliest = \Alaress_Date_Format::now()->addMonths(-1);
+        $latest = \Alaress_Date_Format::now()->addMonths(12);
+
+        /* Grab 'em and shank 'em
          */
         $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument('getParentCalendar', [
-            'start_date' => '27/04/2021'
+            'start_date' => $earliest->getUsingFormat('d/m/Y'),
+            'end_date' => $latest->getUsingFormat('d/m/Y')
         ], Api::VERSION_2);
 
         foreach ($tassEvents['events'] as $tassEvent) {
@@ -150,7 +157,7 @@ class ParentCalendar implements IStrategy
             /* Datetimes for the event and whether it's an all-day event
              */
             $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['start']);
-            $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['start']);
+            $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['end']);
             $allDay = (int)$tassEvent['all_day'];
 
             /* Third-party source identifier for our import
