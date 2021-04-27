@@ -72,13 +72,14 @@ class Connector implements IConnector
 
     /**
      * @param ClientInterface $client
+     * @param null|bool       $enabled Will be null when invoked by update scripts prior to config addition
      * @param null|string     $apiKey
      * @param null|string     $siteSchoolCode
      */
-    public function __construct(ClientInterface $client, bool $enabled, ?string $apiKey, ?string $siteSchoolCode)
+    public function __construct(ClientInterface $client, ?bool $enabled, ?string $apiKey, ?string $siteSchoolCode)
     {
         $this->client         = $client;
-        $this->enabled        = $enabled;
+        $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10
         $this->apiKey         = null === $apiKey ? '' : trim($apiKey);
         $this->siteSchoolCode = null === $siteSchoolCode ? '' : trim($siteSchoolCode);
     }
