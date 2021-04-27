@@ -13,6 +13,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\ApiCertification;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
@@ -218,6 +219,10 @@ class Factory
                 $this->roleMapper,
                 $from,
                 $to
+            ))
+            ->add(new ApiCertification(
+                $this->log,
+                $api
             ));
     }
 }
