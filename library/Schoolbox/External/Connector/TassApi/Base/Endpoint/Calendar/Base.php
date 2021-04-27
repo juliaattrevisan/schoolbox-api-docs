@@ -214,6 +214,10 @@ class Base
      */
     protected function prepare(): void
     {
+        /* TODO If this works, you can improve performance/autoincrementation
+         *  by using the regular updated_at 0000-00-00 00:00:00 trick that
+         *  we did in SIS SUDS. Just delete anything that wasn't updated
+         */
         $this->eventSourceMapper->deleteEventsFromSource($this->source);
     }
 
