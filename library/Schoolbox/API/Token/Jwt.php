@@ -15,6 +15,7 @@ use Firebase\JWT\JWT as JwtLibrary;
 use Firebase\JWT\SignatureInvalidException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use UnexpectedValueException;
 
@@ -23,13 +24,28 @@ use UnexpectedValueException;
  */
 class Jwt
 {
+    /**
+     * Signing algorithm for JWTs.
+     */
     private const SIGNING_ALGORITHM = 'RS256';
 
 
     /**
-     * @var IConfigLoader
+     * Namespace used for custom claims created by Schoolbox.
+     *
+     * Any claims added to a token which are not registered or public claims
+     * must be prefixed with this value.
+     *
+     * @see https://tools.ietf.org/html/rfc7519#section-4.1
+     * @see https://www.iana.org/assignments/jwt/jwt.xhtml
      */
-    private $config;
+    public const CUSTOM_CLAIM_NAMESPACE = 'https://schoolbox.com.au/';
+
+
+    /**
+     * Config settings are stored here.
+     */
+    private IConfigLoader $config;
 
 
     /**
@@ -47,13 +63,13 @@ class Jwt
      * Generates a JWT for this user.
      *
      * @param User     $user
-     * @param int|null $lifetime     If provided, the JWT expires after this
-     *                               many seconds.
-     * @param bool     $includeEmail If true, add the user's email address to
-     *                               the "email" claim.
+     * @param int|null $lifetime         If provided, the JWT expires after this
+     *                                   many seconds.
+     * @param array    $additionalClaims Any extra claims to make beyond the
+     *                                   standard 'iss', 'sub', 'exp'
      * @return string
      */
-    public function generate(User $user, ?int $lifetime = null, bool $includeEmail = false): string
+    public function generate(User $user, ?int $lifetime = null, array $additionalClaims = []): string
     {
         // Issuer:     this Schoolbox instance's FQDN
         // Subject:    $user
@@ -61,17 +77,14 @@ class Jwt
         // Not before: not used for now
         // May add ability to regenerate tokens later?
         $claims = [
-            'iss' => trim($this->config->get('site_hostname') . '.' . $this->config->get('site_domain'), ';.'),
+            'iss' => (new Factory($this->config))->buildFullyQualified()->getHost(),
             'sub' => $user->getUsername(),
         ];
         if (isset($lifetime)) {
             $claims['exp'] = Alaress_Date_Format::now()->addSeconds($lifetime)->getUnixTimeStamp();
         }
-        if ($includeEmail) {
-            $claims['email'] = $user->getEmail();
-        }
         return JwtLibrary::encode(
-            $claims,
+            array_merge($claims, $additionalClaims),
             $this->config->get(ConfigMapper::NAME_JWT_PRIVATE_KEY),
             self::SIGNING_ALGORITHM
         );
@@ -111,7 +124,7 @@ class Jwt
      */
     public function decodeWithoutVerification(string $jwt): array
     {
-        [, $payload, ] = explode('.', $jwt);
+        [, $payload,] = explode('.', $jwt);
         return (array)JwtLibrary::jsonDecode(JwtLibrary::urlsafeB64Decode($payload));
     }
 }

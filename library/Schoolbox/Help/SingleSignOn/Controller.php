@@ -23,6 +23,8 @@ class Controller extends Base
      */
     private const JWT_EXPIRY = 300;
 
+    private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
+
     /**
      * Token builder: used to construct and parse tokens.
      */
@@ -50,8 +52,14 @@ class Controller extends Base
     public function sendTokenToHelp(): void
     {
         // Generate a JWT
-        // Need to inject more data (i.e. expiry, email address)
-        $jwt = $this->tokenBuilder->generate($this->getUser(), self::JWT_EXPIRY, true);
+        $jwt = $this->tokenBuilder->generate(
+            $this->getUser(),
+            self::JWT_EXPIRY,
+            [
+                'email'                 => $this->getUser()->getEmail(),
+                self::CLAIM_INSTANCE_ID => INSTANCE_ID,
+            ]
+        );
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $url = (new Uri($this->getConfigLoader()->get('schoolbox_help_url')))
