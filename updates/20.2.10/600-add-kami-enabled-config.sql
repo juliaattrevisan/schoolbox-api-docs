@@ -17,7 +17,7 @@ INSERT INTO config(
     'Kami inline document editor',
     (SELECT id FROM lu_config_field WHERE field = 'boolean'),
     '',
-    (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
+    (SELECT id FROM lu_config_type WHERE type = 'Modules'),
     (IF((SELECT * FROM (SELECT COUNT(*) FROM config WHERE name = 'site_plan' AND COALESCE(value,'') IN ('','pro','elite')) t1), 'true', 'false')),
     'false',
     'true'
