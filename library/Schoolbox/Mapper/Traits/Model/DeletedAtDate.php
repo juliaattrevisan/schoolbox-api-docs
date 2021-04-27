@@ -19,12 +19,12 @@ trait DeletedAtDate
     /**
      * Deleted date
      *
-     * @var Alaress_Date_Format
+     * @var Alaress_Date_Format|null
      */
     protected $deletedAt;
 
     /**
-     * @return Alaress_Date_Format
+     * @return Alaress_Date_Format|null
      */
     public function getDeletedAt()
     {
