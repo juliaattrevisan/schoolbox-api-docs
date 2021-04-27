@@ -15,6 +15,7 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
+use Schoolbox\RoleMapper;
 
 
 /**
@@ -67,6 +68,12 @@ class Factory
 
 
     /**
+     * @var RoleMapper
+     */
+    private RoleMapper $roleMapper;
+
+
+    /**
      * Factory constructor.
      *
      * @param LoggerInterface   $log
@@ -75,6 +82,7 @@ class Factory
      * @param string            $key
      * @param EventMapper       $eventMapper
      * @param EventSourceMapper $eventSourceMapper
+     * @param RoleMapper        $roleMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -82,7 +90,8 @@ class Factory
         string $host,
         string $key,
         EventMapper $eventMapper,
-        EventSourceMapper $eventSourceMapper
+        EventSourceMapper $eventSourceMapper,
+        RoleMapper $roleMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -91,6 +100,7 @@ class Factory
 
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
+        $this->roleMapper = $roleMapper;
     }
 
 
@@ -132,7 +142,8 @@ class Factory
                 $api,
                 $campuses,
                 $this->eventMapper,
-                $this->eventSourceMapper
+                $this->eventSourceMapper,
+                $this->roleMapper
             ))
             ->add(new ParentNotices($this->log, $this->perform, $api))
             ->add(new StudentCalendar($this->log, $this->perform, $api))

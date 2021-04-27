@@ -11,11 +11,12 @@ use Event\Source\Mapper as EventSourceMapper;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
-use Schoolbox\CampusMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 
 
 /**
@@ -65,6 +66,12 @@ class ParentCalendar implements IStrategy
 
 
     /**
+     * @var RoleMapper
+     */
+    private RoleMapper $roleMapper;
+
+
+    /**
      * Event source is an arbitrary string that helps identify the thing that imported
      * them into the local event table so you can do a mass remove if needed
      *
@@ -82,6 +89,7 @@ class ParentCalendar implements IStrategy
      * @param GenericCollection $campuses
      * @param EventMapper       $eventMapper
      * @param EventSourceMapper $eventSourceMapper
+     * @param RoleMapper        $roleMapper
      */
     public function __construct(
         LoggerInterface $log,
@@ -89,7 +97,8 @@ class ParentCalendar implements IStrategy
         array $api,
         GenericCollection $campuses,
         EventMapper $eventMapper,
-        EventSourceMapper $eventSourceMapper
+        EventSourceMapper $eventSourceMapper,
+        RoleMapper $roleMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
@@ -97,6 +106,7 @@ class ParentCalendar implements IStrategy
         $this->campuses = $campuses;
         $this->eventMapper = $eventMapper;
         $this->eventSourceMapper = $eventSourceMapper;
+        $this->roleMapper = $roleMapper;
 
         $this->source = self::class;
     }
@@ -136,6 +146,21 @@ class ParentCalendar implements IStrategy
 
 
     /**
+     * Find a set of roleIds that are relevant to this import
+     *
+     * @param string $roleType
+     * @return array
+     */
+    private function findRoles(string $roleType): array
+    {
+        return $this->roleMapper
+            ->findByColumn('group_type', $roleType)
+            ->indexBy('id')
+            ->keys();
+    }
+
+
+    /**
      * Perform the import of these events
      *
      * @throws \InvalidArgumentException
@@ -151,12 +176,10 @@ class ParentCalendar implements IStrategy
          */
         $administrator = \Schoolbox\UserMapper::getInstance()->findById(1);
 
-        /* Role id set, in case there are multiple records of the same type
+        /* Role id collection, in case there are multiple records of the same type
+         * e.g. a Student event should be associated with all the Student Roletype roles
          */
-        $roleIds = \Schoolbox\RoleMapper::getInstance()
-            ->findByColumn('group_type', \Schoolbox\Role::PARENT)
-            ->indexBy('id')
-            ->keys();
+        $roleIds = $this->findRoles(Role::PARENT);
 
         /* This comes from an API request at TASS
          * We want events bracketed by 1 month in the past and 12 months in the future
@@ -219,7 +242,7 @@ class ParentCalendar implements IStrategy
              * These are role-specific and hardcoded per strat, but there might be multiple
              * instances of the same role type
              */
-            $event->setRoleCollection([$roleIds]);
+            $event->setRoleCollection($roleIds);
     
             /* Assign Event Type via the payload's Category field "cat_desc"
              */

@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\GenericCollection;
+use Schoolbox\RoleMapper;
 
 
 /**
@@ -100,7 +101,8 @@ class CalendarFactory implements IFactory
                     $this->host,
                     $this->key,
                     EventMapper::getInstance(),
-                    EventSourceMapper::getInstance()
+                    EventSourceMapper::getInstance(),
+                    RoleMapper::getInstance()
                 ))->produce();
 
             default:
