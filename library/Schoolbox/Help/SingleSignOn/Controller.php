@@ -45,6 +45,23 @@ class Controller extends Base
     private const CLAIM_INSTANCE_ID = Jwt::CUSTOM_CLAIM_NAMESPACE . 'instance_id';
 
     /**
+     * The name of the JWT query string parameter: this contains the JWT passed
+     * to the Help instance.
+     */
+    private const QUERY_STRING_JWT = 'jwt';
+
+    /**
+     * The name of the page query string parameter: this contains a path to
+     * redirect to on Help once it has received the JWT.
+     */
+    private const QUERY_STRING_PAGE = 'page';
+
+    /**
+     * By default: redirect to the dashboard.
+     */
+    private const QUERY_STRING_PAGE_DEFAULT = '/';
+
+    /**
      * Token builder: used to construct and parse tokens.
      */
     private Jwt $tokenBuilder;
@@ -108,7 +125,10 @@ class Controller extends Base
         /** @noinspection PhpUnhandledExceptionInspection */
         $url = (new Uri($this->getConfigLoader()->get('schoolbox_help_url')))
             ->setPath($this->router->generate('helpSso.receiveTokenFromInstance'))
-            ->setQuery(['jwt' => $jwt]);
+            ->setQuery([
+                self::QUERY_STRING_JWT  => $jwt,
+                self::QUERY_STRING_PAGE => $this->determinePageQueryStringValue(),
+            ]);
 
         $this->response->redirect->seeOther($url->toString());
     }
@@ -117,17 +137,17 @@ class Controller extends Base
      * Receive a JWT (in the "jwt" query string parameter), and use it to
      * identify and authenticate a user.
      *
+     * Once
+     *
      * @api GET /help/sso/receive
      * @since 21.0
      */
     public function receiveTokenFromInstance(): void
     {
+        $page = $this->determinePageQueryStringValue();
         try {
             $this->authenticateUserFromToken();
-
-            // For now: just redir to dashboard.
-            // Later: allow redirect to another place, based on the query string
-            $this->response->redirect->seeOther('/');
+            $this->response->redirect->seeOther($page);
         } catch (
             UnexpectedValueException
             | DomainException
@@ -139,7 +159,9 @@ class Controller extends Base
         ) {
             // For now: just redirect to login page
             // Later: show a more useful message
-            $this->response->redirect->seeOther($this->router->generate('login.getLogin'));
+            $loginUrl = (new Uri($this->router->generate('login.getLogin')))
+                ->setQuery([self::QUERY_STRING_PAGE => $page]);
+            $this->response->redirect->seeOther($loginUrl->toString());
         }
     }
 
@@ -160,9 +182,11 @@ class Controller extends Base
     private function authenticateUserFromToken(): void
     {
         // Find the JWT
-        $jwt = $this->request->query->get('jwt');
+        $jwt = $this->request->query->get(self::QUERY_STRING_JWT);
         if (!isset($jwt)) {
-            throw new UnexpectedValueException('"jwt" query string parameter must be provided');
+            throw new UnexpectedValueException(
+                sprintf('"%s" query string parameter must be provided', self::QUERY_STRING_JWT)
+            );
         }
 
         // Decode the JWT _without_ verifying it,
@@ -184,5 +208,25 @@ class Controller extends Base
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
         $this->auth->createSession($verifiedPayload[self::CLAIM_EMAIL]);
+    }
+
+    /**
+     * Determine what URL should be redirected to after the JWT is received.
+     *
+     * @return string
+     */
+    private function determinePageQueryStringValue(): string
+    {
+        $url = new Uri(
+            $this->request->query->get(
+                self::QUERY_STRING_PAGE,
+                self::QUERY_STRING_PAGE_DEFAULT
+            )
+        );
+
+        // Don't allow non-relative redirects
+        return $url->isValidRelative()
+            ? $url->toString()
+            : self::QUERY_STRING_PAGE_DEFAULT;
     }
 }
