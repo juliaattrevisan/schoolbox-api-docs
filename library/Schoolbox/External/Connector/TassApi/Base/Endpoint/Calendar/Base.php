@@ -273,27 +273,28 @@ class Base
             /* Spawn a new Event instance and ensure that we tell it where it came from
              * Set the normal Event data fields from the $tassEvent structure
              */
-            $title = $tassEvent['title'];
-            $location = $tassEvent['location'];
+            $title = (string)$tassEvent['title'];
+            $location = (string)$tassEvent['location'];
 
             /* TODO There's another field, $tassEvent['summary'], but I can't see how it is different to
              *  $tassEvent['description'] from the api docs, I'd need real data to know which to use
+             *  I suspect it's a shorter version of $tassEvent['description']
              */
-            $detail = $tassEvent['description'];
+            $detail = (string)$tassEvent['description'];
 
             /* Datetimes for the event and whether it's an all-day event
              */
-            $startDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['start']);
-            $endDatetime = \Alaress_Date_Format::newDatabaseDate($tassEvent['end']);
+            $startDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['start']);
+            $endDatetime = \Alaress_Date_Format::newDatabaseDate((string)$tassEvent['end']);
             $allDay = (int)$tassEvent['all_day'];
 
             /* Third-party source identifier for our import
              */
-            $guid = $tassEvent['id'];
+            $guid = (string)$tassEvent['id'];
 
             /* Event Type equivalent
              */
-            $eventType = $tassEvent['cat_desc'];
+            $eventType = (string)$tassEvent['cat_desc'];
 
             /* Assign campus relations
              *
