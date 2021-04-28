@@ -4526,7 +4526,17 @@ parameters:
 			path: library/Schoolbox/Curriculum/LearningArea/Model.php
 
 		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Curriculum/LearningArea/Model.php
+
+		-
 			message: "#^Negated boolean expression is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Curriculum/LearningLevel/Model.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/LearningLevel/Model.php
 
@@ -4546,7 +4556,17 @@ parameters:
 			path: library/Schoolbox/Curriculum/Node/Model.php
 
 		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Curriculum/Node/Model.php
+
+		-
 			message: "#^Negated boolean expression is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Curriculum/Source/Model.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Source/Model.php
 
@@ -9231,6 +9251,11 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Code/Model.php
 
 		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Folder/Code/Model.php
+
+		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$classList$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Component/Dashboard/GroupController.php
@@ -9456,6 +9481,11 @@ parameters:
 			path: library/Schoolbox/Resource/Textbox/Model.php
 
 		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Resource/Textbox/Model.php
+
+		-
 			message: "#^Call to method getBooking\\(\\) on an unknown class Calendar_Event_Type_ResourceBooking\\.$#"
 			count: 2
 			path: library/Schoolbox/ResourceBooking/Booking/Component/ResourceManagement.php
@@ -9467,6 +9497,11 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/ResourceBooking/Booking/Model.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Model.php
 
@@ -9516,6 +9551,11 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Category/Model.php
 
 		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/ResourceBooking/Category/Model.php
+
+		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Category/Module.php
@@ -9542,6 +9582,11 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/ResourceBooking/Item/Model.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Model.php
 
@@ -9751,6 +9796,11 @@ parameters:
 			path: library/Schoolbox/Tile/Layout/Model.php
 
 		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Tile/Layout/Model.php
+
+		-
 			message: "#^If condition is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Tile/Mapper.php
@@ -9762,6 +9812,11 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Tile/Model.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Tile/Model.php
 
