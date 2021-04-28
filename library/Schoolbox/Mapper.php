@@ -1646,7 +1646,7 @@ abstract class Mapper implements IMapper, Serializable
         // Get the property to update on each model, if there is one.
         $property_map = null;
         foreach ($this->map as $map) {
-            if ($map['column'] === $field) {
+            if (isset($map['column']) && $map['column'] === $field) {
                 $property_map = $map;
                 break;
             }
