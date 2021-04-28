@@ -33,12 +33,4 @@ class TeacherNotices extends Base implements IStrategy
      * @var string
      */
     protected string $roleType = Role::STAFF;
-
-
-//    /**
-//     *
-//     *
-//     * @var string
-//     */
-//    protected string $source = get_class($this);
 }
