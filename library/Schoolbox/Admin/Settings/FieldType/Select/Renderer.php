@@ -31,8 +31,8 @@ class Renderer extends AbstractRenderer
 
         $isValidValue = $this->isValueValid($data['value'], $data['options']);
 
-        if(!$isValidValue){
-            $data['value'] = null;
+        if (!$isValidValue) {
+            $data['value'] = $this->castInvalidValue($data['value'], $data['options']);
         }
 
         // We need to render an empty option if:
@@ -40,7 +40,21 @@ class Renderer extends AbstractRenderer
         // * config value is invalid
         $data['renderEmptyOption'] = !$config->getRequired() || !$isValidValue;
 
+        $data['multi'] = false;
         return $data;
+    }
+
+
+    /**
+     * Converts an invalid value to a valid one suitable for passing to front-end
+     *
+     * @param string|null $value
+     * @param string[] $options
+     * @return mixed
+     */
+    protected function castInvalidValue(?string $value, array $options)
+    {
+        return null;
     }
 
 
@@ -60,9 +74,16 @@ class Renderer extends AbstractRenderer
     }
 
 
+    /**
+     * Returns whether the current value is valid because it matches one of the available options
+     *
+     * @param string|null $value
+     * @param string[]    $options
+     * @return bool
+     */
     protected function isValueValid(?string $value, array $options): bool
     {
-        foreach ($options as $key => $option) {
+        foreach ($options as $option) {
             if ($option === $value) {
                 return true;
             }
