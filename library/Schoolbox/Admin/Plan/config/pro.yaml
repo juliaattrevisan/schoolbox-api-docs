@@ -14,6 +14,7 @@ config:
   resource_booking_enabled: {value: false, edit: false}
   external_document_report_enabled : { edit : true }
   webdav_enable: {edit: true}
+  kami_enabled: {edit: true}
 
   #Pastoral
   external_pastoral: {value: false, hide: true}

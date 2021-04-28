@@ -91,7 +91,12 @@ class Uploader extends CliTool\App
 
         $connector = $dryRun
             ? new Kami\MockConnector($client)
-            : new Kami\Connector($client, $this->getConfig()->get('kami_api_key'), $this->getConfig()->get('site_school_code'));
+            : new Kami\Connector(
+                $client,
+                $this->getConfig()->get('kami_enabled'),
+                $this->getConfig()->get('kami_api_key'),
+                $this->getConfig()->get('site_school_code')
+            );
 
         if (!$connector->isEnabled()) {
             $this->getLogger()->warning('Kami has not been enabled by puppet for this instance. Aborting');

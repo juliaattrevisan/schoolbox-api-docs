@@ -38,7 +38,7 @@ class ConnectorTest extends TestCase
     public function testInvalidSiteSchoolCode(?string $siteSchoolCode): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($this->getMockClientWithConnectException(), 'TEST_API_KEY', $siteSchoolCode);
+        $connector = new Connector($this->getMockClientWithConnectException(), true, 'TEST_API_KEY', $siteSchoolCode);
         $this->expectException(EmptySiteSchoolCode::class);
         $connector->viewSession('kamiDocId', new User());
     }
@@ -52,7 +52,7 @@ class ConnectorTest extends TestCase
     public function testDisabled(?string $apiKey): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
+        $connector = new Connector($this->getMockClientWithConnectException(), false, $apiKey, 'TESTING');
         $this->assertFalse($connector->isEnabled());
     }
 
@@ -65,7 +65,7 @@ class ConnectorTest extends TestCase
     public function testEnabled(?string $apiKey): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
+        $connector = new Connector($this->getMockClientWithConnectException(), true, $apiKey, 'TESTING');
         $this->assertTrue($connector->isEnabled());
     }
 
@@ -98,7 +98,7 @@ class ConnectorTest extends TestCase
     public function testOnlineDisabled(?string $apiKey): void
     {
         // This method must not hit Kami API
-        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
+        $connector = new Connector($this->getMockClientWithConnectException(), true, $apiKey, 'TESTING');
         $this->assertFalse($connector->isOnline());
     }
 
@@ -300,7 +300,7 @@ class ConnectorTest extends TestCase
     {
         $this->expectException(\Schoolbox\Learning\InlineGrader\Kami\Exception\EmptyApiKeyException::class);
         // This method must not hit Kami API
-        $connector = new Connector($this->getMockClientWithConnectException(), $apiKey, 'TESTING');
+        $connector = new Connector($this->getMockClientWithConnectException(), false, $apiKey, 'TESTING');
         $connector->getDocument('asdfghjkl');
     }
 

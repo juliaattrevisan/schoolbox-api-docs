@@ -66,6 +66,7 @@ DESCRIPTION
 
         $connector = new \Schoolbox\Learning\InlineGrader\Kami\Connector(
             new GuzzleHttp\Client(['curl' => Proxy\Server::getInstance()->buildCurlOptions()]),
+            $this->getConfig()->get('kami_enabled'),
             $this->getConfig()->get('kami_api_key'),
             $this->getConfig()->get('site_school_code')
         );

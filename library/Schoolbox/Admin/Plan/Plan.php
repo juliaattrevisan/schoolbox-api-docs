@@ -21,6 +21,12 @@ class Plan extends CliTool\App
         return [self::OPT_LONG_PLAN];
     }
 
+    /** @inheritDoc */
+    public function runAsRoot(): ?bool
+    {
+        return null; // Does not matter if we run this as root
+    }
+
     public function run(): void
     {
         $plan = $this->getOpt(self::OPT_LONG_PLAN);

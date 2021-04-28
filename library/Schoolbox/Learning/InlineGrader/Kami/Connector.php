@@ -51,6 +51,9 @@ class Connector implements IConnector
     /** @var Client */
     private $client;
 
+    /** @var bool */
+    private bool $enabled;
+
     /**
      * Shared by all schoolbox instances. There is an alternative api-key available for testing to keep
      * test documents out of the production kami account. See SA-4489
@@ -69,12 +72,14 @@ class Connector implements IConnector
 
     /**
      * @param ClientInterface $client
+     * @param null|bool       $enabled Will be null when invoked by update scripts prior to config addition
      * @param null|string     $apiKey
      * @param null|string     $siteSchoolCode
      */
-    public function __construct(ClientInterface $client, ?string $apiKey, ?string $siteSchoolCode)
+    public function __construct(ClientInterface $client, ?bool $enabled, ?string $apiKey, ?string $siteSchoolCode)
     {
         $this->client         = $client;
+        $this->enabled        = $enabled ?? null !== $apiKey; # TODO remove coalesce once all clients upgrade to 20.2.10
         $this->apiKey         = null === $apiKey ? '' : trim($apiKey);
         $this->siteSchoolCode = null === $siteSchoolCode ? '' : trim($siteSchoolCode);
     }
@@ -88,7 +93,7 @@ class Connector implements IConnector
     public function isEnabled(): bool
     {
         // Any non-empty value is considered 'enabled', regardless of whether it is 'valid'
-        return '' !== $this->apiKey;
+        return $this->enabled;
     }
 
 
@@ -495,7 +500,7 @@ class Connector implements IConnector
     private function assertEnabled(): void
     {
         if (!$this->isEnabled()) {
-            throw new Exception\EmptyApiKeyException('Kami is not enabled. Api key is empty.');
+            throw new Exception\EmptyApiKeyException('Kami is not enabled.');
         }
     }
 
