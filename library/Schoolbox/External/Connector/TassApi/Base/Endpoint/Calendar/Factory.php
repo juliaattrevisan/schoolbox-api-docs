@@ -146,6 +146,16 @@ class Factory
          */
         $eventTypes = EventTypeMapper::getInstance()->findAll()->indexBy('type');
 
+        /* Without event types we can't import anything - they're mandatory
+         */
+        if (!$eventTypes->count()) {
+            $this->log->critical(sprintf(
+                'There needs to be at least one Event Type to import events.'
+            ));
+
+            exit();
+        }
+
         /* Elected event Owner and Author is arbitrarily this person for now...
          */
         $owner = UserMapper::getInstance()->findByUsername(UserMapper::USERNAME_ALARESS_ADMIN);

@@ -197,6 +197,12 @@ class Base
      * Import events from this source
      *
      * Facade method for Prepare/Import/Cleanup
+     * @throws \InvalidArgumentException
+     * @throws \PDOException
+     * @throws \Schoolbox\Mapper\DefinitionException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws \UnexpectedValueException
      */
     public function import(): void
     {
@@ -322,10 +328,11 @@ class Base
                 $event->setType($this->eventTypes[$eventType]);
             } else {
                 $this->log->warning(sprintf(
-                    'Skipping: %s event "%s" has an event type "%s" which is not in admin Event Type list',
+                    '%s event "%s" has an event type "%s" which is not in admin Event Type list; giving it "%s" anyway',
                     $this->source,
                     $event->getTitle(),
-                    $eventType
+                    $eventType,
+                    $this->eventTypes->first()->getType()
                 ));
 
                 /* Remember it so we can tell the user which event types were missing
