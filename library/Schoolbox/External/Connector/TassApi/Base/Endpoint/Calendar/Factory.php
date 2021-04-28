@@ -33,6 +33,18 @@ class Factory
 {
 
     /**
+     * Collect events from this many months in the past (a negative int)
+     */
+    private const FROM = -1;
+
+
+    /**
+     * Collect events to this many months in the future
+     */
+    private const TO = 12;
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -138,8 +150,8 @@ class Factory
 
         /* Obtain events between these two datetimes
          */
-        $from = \Alaress_Date_Format::now()->addMonths(-24);
-        $to = \Alaress_Date_Format::now()->addMonths(24);
+        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
+        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
 
         /* A list of the event types that can be associated with an event that is
          * indexed by the eventType column which I have presumed to be unique
