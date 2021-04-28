@@ -60,6 +60,8 @@ This is used by UPS to create user accounts.
 
 This also imports timetable data from third party endpoint into local schema.
 
+This also imports calendar events from a third party endpoint, if it exists
+
 This always performs updates; there is no dry-run mode for the cron task.
 
 Usage: scheduler.php
@@ -85,12 +87,20 @@ HELP;
          */
         $perform = true;
 
-        /* Execute scheduler
+        /* Used to shank a database instance
          */
-        $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
-
         $randomMapper = UserMapper::getInstance();
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $factory, $type, $file, $this->getLogger()))->run(time());
+
+        /* Execute scheduler: sis stuff
+         */
+        $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
+        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $sisFactory, $type, $file, $this->getLogger()))->run(time());
+
+        /* Execute scheduler: calendar stuff
+         * Not all connectivities contain a calendar importer, just some
+         */
+        $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
+        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $calendarFactory, $type, $file, $this->getLogger()))->run(time());
     }
 };
 
