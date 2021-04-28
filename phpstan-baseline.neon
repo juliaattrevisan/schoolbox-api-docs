@@ -6621,11 +6621,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Participant.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Participant\\\\Test\\\\CoalesceGetters\\:\\:getDates\\(\\) should return array\\<Alaress_Date_NullDate\\|null\\> but returns array\\<int, Alaress_Date_Format\\|null\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Participant/Test/CoalesceGetters.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\ParticipantStatistics\\:\\:\\$cacheCountAssessments \\(int\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/ParticipantStatistics.php
