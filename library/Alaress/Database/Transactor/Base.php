@@ -29,6 +29,12 @@ class Base implements ITransactor
     /**
      * A list of callbacks to call when the entire transaction is committed.
      *
+     * Callbacks are grouped by transaction nesting level:
+     * * when the transaction is committed, the current level's callbacks are
+     *   merged into the previous level's callbacks
+     * * when the transaction is rolled back, the current level's callbacks are
+     *   discarded
+     *
      * @var callable[][]
      */
     private $onPersistHooks = [];
@@ -93,14 +99,17 @@ class Base implements ITransactor
         }
         if ($this->strategy->commit()) {
             if (!$this->inTransaction()) {
-                // Are all transactions complete?
-                // Run hooks FIFO
-                foreach ($this->onPersistHooks as $persistHooks) {
+                // Are all transactions complete? Run hooks FIFO
+                // (Clear the stack before running, because otherwise a commit
+                //  within the hook will cause each hook within the stack to be
+                //  called again)
+                $onPersistHooks       = $this->onPersistHooks;
+                $this->onPersistHooks = [];
+                foreach ($onPersistHooks as $persistHooks) {
                     foreach ($persistHooks as $persistHook) {
                         $persistHook();
                     }
                 }
-                $this->onPersistHooks = [];
             } else {
                 // Not yet complete?
                 // Shift this nesting level's hooks onto the next most recent level
