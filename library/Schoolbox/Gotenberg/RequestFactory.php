@@ -35,18 +35,18 @@ class RequestFactory
     public const DEFAULT_WAIT_TIMEOUT = 30;
 
     /**
-     * Config loader
+     * Gotenberg API key
      */
-    private IConfigLoader $config;
+    private string $apiKey;
 
     /**
      * Constructor
      *
-     * @param IConfigLoader $config
+     * @param string $apiKey
      */
-    public function __construct(IConfigLoader $config)
+    public function __construct(string $apiKey)
     {
-        $this->config = $config;
+        $this->apiKey = $apiKey;
     }
 
     /**
@@ -72,10 +72,7 @@ class RequestFactory
         ?string $sessionHash = null
     ): Gotenberg\URLRequest {
         $request = new Gotenberg\URLRequest($url);
-        $request->addWebhookURLHTTPHeader(
-            'SBAuth',
-            $this->config->get(ConfigMapper::NAME_GOTENBERG_API_KEY)
-        );
+        $request->addWebhookURLHTTPHeader('SBAuth', $this->apiKey);
         $request->setWaitDelay($waitDelay);
         $request->setWaitTimeout($waitTimeout);
         if (isset($sessionHash)) {

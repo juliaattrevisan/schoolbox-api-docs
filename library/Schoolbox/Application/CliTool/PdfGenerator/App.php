@@ -461,7 +461,7 @@ BASE;
         $attempts          = 0;
         $previousException = null;
         $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
-        $requestFactory    = new RequestFactory($this->getConfig());
+        $requestFactory    = new RequestFactory($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
         while (true) {
             if ($attempts++ >= $maxAttempts) {
                 unlink($filename);
