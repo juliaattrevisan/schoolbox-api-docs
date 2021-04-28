@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint\Test;
@@ -24,7 +26,7 @@ class ScheduleTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validHourlyScheduleFrequency
+     * @dataProvider providerValidHourlyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -43,7 +45,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validHourlyScheduleFrequency(): array
+    public function providerValidHourlyScheduleFrequency(): array
     {
         return [
             'Hourly 1' => [
@@ -68,7 +70,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validTwiceDailyScheduleFrequency
+     * @dataProvider providerValidTwiceDailyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -87,7 +89,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validTwiceDailyScheduleFrequency(): array
+    public function providerValidTwiceDailyScheduleFrequency(): array
     {
         return [
             'Twice Daily 1' => [
@@ -142,7 +144,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validDailyScheduleFrequency
+     * @dataProvider providerValidDailyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -161,7 +163,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDailyScheduleFrequency(): array
+    public function providerValidDailyScheduleFrequency(): array
     {
         return [
             'Daily 1' => [
@@ -216,7 +218,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validNoneScheduleFrequency
+     * @dataProvider providerValidNoneScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -235,7 +237,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNoneScheduleFrequency(): array
+    public function providerValidNoneScheduleFrequency(): array
     {
         return [
             'No schedule 1' => [
@@ -279,7 +281,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider provider_schoolboxManagedScheduleFrequency
+     * @dataProvider providerSchoolboxManagedScheduleFrequency
      *
      * @param string[] $customHours
      * @param int      $now
@@ -300,7 +302,7 @@ class ScheduleTest extends TestCase
      *
      * @return array[]
      */
-    public function provider_schoolboxManagedScheduleFrequency(): array
+    public function providerSchoolboxManagedScheduleFrequency(): array
     {
         return [
             'No hours'                 => [[], strtotime('2019-12-02 17:13:00'), false],
