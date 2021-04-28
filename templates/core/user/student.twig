@@ -427,19 +427,13 @@
 
                             {% block buttons_geosnapshots %}
                                 {% if isGeosnapshotAvailable %}
-                                <li>
-                                    <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/jquery.geosnapshot.js"></script>
-                                    <script>
-                                        $(function() {
-                                            $('[data-view-photos={{ user.id }}]').on('click', function(event) {
-                                                event.preventDefault();
+                                    {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id})  %}
 
-                                                $(this).geosnapshot().requestGallery($(this).attr('data-view-photos'));
-                                            });
-                                        });
-                                    </script>
-                                    <a class="icon-geosnapshot" data-view-photos="{{ user.id }}">View Photos</a>
-                                </li>
+                                    {% if route %}
+                                        <li>
+                                            <a class="icon-geosnapshot" href="/geosnapshot/user/{{ user.id }}">View Photos</a>
+                                        </li>
+                                    {% endif %}
                                 {% endif %}
                             {% endblock %}
 

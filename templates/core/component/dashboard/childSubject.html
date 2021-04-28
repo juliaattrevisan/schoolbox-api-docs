@@ -62,19 +62,7 @@
 
                         <!-- BEGIN geosnapshot -->
                         <li>
-                            <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/jquery.geosnapshot.js"></script>
-                            <script>
-                                $(function() {
-                                    $('[data-view-photos={STUDENT_ID}]').on('click', function(event) {
-                                        event.preventDefault();
-
-                                        $(this).geosnapshot().requestGallery($(this).attr('data-view-photos'));
-                                    });
-                                });
-                            </script>
-
-                            <a class="icon-geosnapshot" data-view-photos="{STUDENT_ID}">View Photos</a>
-                            <div class="toast" data-toast></div>
+                            <a class="icon-geosnapshot" href="/geosnapshot/user/{STUDENT_ID}">View Photos</a>
                         </li>
                         <!-- END geosnapshot -->
 

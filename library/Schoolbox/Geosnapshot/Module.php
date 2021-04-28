@@ -41,14 +41,11 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
         $preloadUserAndUrl = function ($params) { return $this->preloadUserAndUrl($params); };
 
-        $canGetStudentPhotosUrl = $this->canGetStudentPhotosUrl();
         $canGetStudentPhotos = $this->canGetStudentPhotosUrl();
 
-        $this->register('GET', '/user/{id}', 'getStudentPhotosUrl', $canGetStudentPhotosUrl, $preloadUser);
-        $this->register('GET', '/user/{id}/{url}', 'getStudentPhotos', $canGetStudentPhotos, $preloadUserAndUrl);
+        $this->register('GET', '/user/{id}', 'getStudentPhotos', $canGetStudentPhotos, $preloadUserAndUrl);
     }
 
 
@@ -71,28 +68,6 @@ class Module extends BaseModule
         return [
             'viewee' => $user,
             'url' => Redirect::decode($params['url'])
-        ];
-    }
-
-
-    /**
-     * Preload a User instance
-     *
-     * @param array $params
-     * @return array
-     * @throws InvalidArgumentException
-     * @throws NotFound
-     */
-    private function preloadUser(array $params): array
-    {
-        try {
-            $user = $this->getUserMapper()->findById($params['id']);
-        } catch (MapperException $e) {
-            throw new NotFound();
-        }
-
-        return [
-            'viewee' => $user,
         ];
     }
 
