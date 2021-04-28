@@ -1444,7 +1444,7 @@ class Controller extends Assessment\Controller
                 )
             );
 
-        $requestFactory = new RequestFactory($this->getConfigLoader());
+        $requestFactory = new RequestFactory($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
         $request        = $requestFactory->buildUrlRequest(
             $url->toString(),
             RequestFactory::DEFAULT_WAIT_DELAY,
