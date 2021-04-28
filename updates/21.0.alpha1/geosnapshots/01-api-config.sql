@@ -36,3 +36,7 @@ VALUES
             SELECT id FROM lu_config_type WHERE type = 'Modules'
         ))
     );
+
+-- Generic error message for now
+INSERT INTO `error` (id, message)
+VALUES (230, 'Geosnapshot is not available at this time; try again later.');

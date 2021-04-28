@@ -203,6 +203,10 @@ class Mapper extends BaseMapper implements IExceptionGenerator
 
     public const ERROR_BADGE_AWARD_TO_NON_STUDENT_USER = 229;
 
+    /* Geosnapshot
+     */
+    public const ERROR_GEOSNAPSHOT_UNAVAILABLE = 230;
+
     /**
      * Setup mapping
      */

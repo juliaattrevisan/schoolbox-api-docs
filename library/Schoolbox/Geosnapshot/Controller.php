@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
 
 
@@ -21,30 +22,47 @@ class Controller extends Base
 {
 
     /**
+     * @var ErrorMapper
+     */
+    private ErrorMapper $errorMapper;
+
+
+    /**
+     * Controller constructor.
+     *
+     * @param ErrorMapper $errorMapper
+     */
+    public function __construct(ErrorMapper $errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+    }
+
+
+    /**
      * Display all the photos that Geosnapshots gave to us via $url
      *
      * Perform the access check again, in case a) you're not who you say you are
      * and/or b) whether something about the setup/access changed in the meantime
      *
-     * @param User   $viewee
-     * @param string $url
+     * @param User $viewee
      * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \JsonException
-     * @throws \RuntimeException
+     * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function getStudentPhotos(User $viewee, string $url): void
+    public function getStudentPhotos(User $viewee): void
     {
         /* Set up guzzle with the authentication pieces
          *
-         * Get the iframe url back, if successful, and pop out a html fragment
-         * which we can inject into a modal, I guess
-         *
-         * Otherwise just don't do anything and let the toaster communicate the issue
+         * If it dies, it dies (throw out a generic error screen when that happens)
          */
-        $response = (new Api($this->getConfigLoader()->get('geosnapshot_api_key')))
-            ->retrieveStudentPhotos($viewee);
+        try {
+            $response = (new Api($this->getConfigLoader()->get('geosnapshot_api_key')))
+                ->retrieveStudentPhotos($viewee);
+        } catch (\RuntimeException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_GEOSNAPSHOT_UNAVAILABLE);
+        }
 
         /* Otherwise show the gallery
          */
