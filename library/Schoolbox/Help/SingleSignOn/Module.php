@@ -13,7 +13,7 @@ use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Authenticator;
-use Schoolbox\InstanceRegistry\Mapper as InstanceRegistryMapper;
+use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\UserMapper;
 
 /**

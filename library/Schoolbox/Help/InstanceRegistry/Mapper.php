@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\InstanceRegistry;
+namespace Schoolbox\Help\InstanceRegistry;
 
 use Schoolbox\Mapper as BaseMapper;
 

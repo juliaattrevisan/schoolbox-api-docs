@@ -17,7 +17,7 @@ use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\NotAuthenticated;
-use Schoolbox\InstanceRegistry\Mapper as InstanceRegistryMapper;
+use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
