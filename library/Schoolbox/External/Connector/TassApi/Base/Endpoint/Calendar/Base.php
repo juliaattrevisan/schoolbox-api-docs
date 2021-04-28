@@ -208,6 +208,7 @@ class Base
     {
         $this->prepare();
         $this->importEvents();
+        $this->cleanup();
     }
 
 
@@ -452,6 +453,25 @@ class Base
                     $missingEventType
                 ));
             }
+        }
+    }
+
+
+    /**
+     * Blow away all the Event and Event Sources that never got updated during the import process
+     */
+    protected function cleanup(): void
+    {
+        $deadEvents = $this->eventMapper->findByColumn('updated_at', '0000-00-00 00:00:00');
+
+        foreach ($deadEvents as $deadEvent) {
+            $this->log->debug(sprintf(
+                'Deleting %s event "%s"; it was never updated during import',
+                $this->source,
+                $deadEvent->getTitle()
+            ));
+
+            $this->eventMapper->delete($deadEvent);
         }
     }
 
