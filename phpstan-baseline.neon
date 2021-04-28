@@ -7491,6 +7491,11 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
 
 		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
+
+		-
 			message: "#^PHPDoc tag @param for parameter \\$answers with type array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
@@ -7527,6 +7532,11 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
+			count: 1
+			path: library/Schoolbox/Learning/Quiz/Model.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Model.php
 
