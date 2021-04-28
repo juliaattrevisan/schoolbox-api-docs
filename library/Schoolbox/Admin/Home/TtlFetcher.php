@@ -82,31 +82,54 @@ class TtlFetcher
      *
      * @param string $domain     The domain whose name servers we are interested in
      * @param string $nameserver The nameserver to query to fetch the domain's name servers
+     * @param int    $depth      Recursion depth
      * @return string
      * @throws UnexpectedValueException If unable to determine SOA for domain name
      */
-    private function getStartOfAuthority(string $domain, string $nameserver): string
+    private function getStartOfAuthority(string $domain, string $nameserver, int $depth = 0): string
     {
-        $command = sprintf("dig @%s %s SOA +noall +authority", escapeshellarg($nameserver), escapeshellarg($domain));
+        if ($depth > 100) {
+            throw new UnexpectedValueException("Recursion depth reached fetching TTL: '$domain'");
+        }
+
+        $command = sprintf("dig @%s %s SOA +noall +answer +authority", escapeshellarg($nameserver), escapeshellarg($domain));
         exec($command, $output);
 
-        //
         //  ; <<>> DiG 9.11.3-1ubuntu1.12-Ubuntu <<>> @8.8.8.8 vagrant.dev.schoolbox.cloud SOA +noall +authority +nostats
         //  ; (1 server found)
         //  ;; global options: +cmd
         //  dev.schoolbox.cloud.	301	IN	SOA	ns-1894.awsdns-44.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400
 
+        // ; <<>> DiG 9.11.3-1ubuntu1.14-Ubuntu <<>> andie.standrewscc.qld.edu.au SOA +noall +answer +authority
+        // ;; global options: +cmd
+        // andie.standrewscc.qld.edu.au. 51290 IN	CNAME	stacc.schoolbox.cloud.
+        // stacc.schoolbox.cloud.	68	IN	CNAME	sbox-nlb-public-aa2a5eec300b979b.elb.ap-southeast-2.amazonaws.com.
+        // elb.ap-southeast-2.amazonaws.com. 2 IN	SOA	ns-527.awsdns-01.net. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 60
+
+        // If domain is a CNAME, output will have CNAME records
+        // In this case, we want to strip the leading URL fragment and recurse
+
+        $soa = null;
         foreach ($output as $line) {
             $trimmed = trim($line);
             if ($trimmed === '' || strpos($trimmed, ';') === 0) {
                 continue;
             }
+            if (preg_match("/^{$domain}\.\s+\d+\s+IN\s+CNAME/", $trimmed, $soaMatches)) {
+                return $this->getStartOfAuthority(
+                    preg_replace("/^[^.]+\./", '', $domain),
+                    $nameserver,
+                    $depth + 1
+                );
+            }
             $matches = [];
             if (preg_match('/^[.\w-]+\s+\d+\s+IN\s+SOA\s+([.\w-]+)/', $trimmed, $matches)) {
-                return $matches[1];
+                $soa = $matches[1];
             }
         }
-
+        if ($soa !== null) {
+            return $soa;
+        }
         throw new UnexpectedValueException("Unable to determine SOA for domain: '$domain'");
     }
 }
