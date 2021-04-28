@@ -94,7 +94,7 @@ class HomepageInitialCest
         $i->canSeeElement(['css' => 'ul#tabs-sub-1']);
         $i->dragAndDrop("//*[@id='tabs-sub-1']/li[6]", "//div[@data-position='top']");
         sleep(1);
-        $i->canSeeElement(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
     }
 
     /**
@@ -131,15 +131,20 @@ class HomepageInitialCest
         $i->click("Publish news");
         sleep(5);
         $i->amOnUrl($home_page_url);
-        $i->canSeeElement(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
         sleep(2);
         $i->click("Add text and multimedia, or embed content");
         sleep(5);
-        $i->fillField("textBoxHeading", "Test Text Box Title");
-        $i->fillCkEditorById('textBoxBody', 'wow what interesting Text box text');
-        $i->scrollTo(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
-        $i->waitForElementVisible(['css' => 'input[type=submit][value=Save\ Content]'], 5);
-        $i->click(['css' => 'input[type=submit][value=Save\ Content]']);
+        $i->fillField("heading", "Test Text Box Title");
+        $i->click(['css' => 'input[type=submit][value=Create\ Text\ Box]']);
+        sleep(2);
+        $i->executeJS('for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].setData(\'wow what interesting Text box text\')}');
+        sleep(2);
+        $i->scrollTo(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
+        $element = Locator::contains('div.component-action section button', 'Save');
+        $i->waitForElementVisible($element, 5);
+        $i->click($element);
+
     }
 
     /**
@@ -167,7 +172,7 @@ class HomepageInitialCest
         $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
         sleep(2);
         $i->canSee("Test News Title");
-        $i->canSeeElement(['css' => 'div[class=component-container\ Component_Homepage_TextBoxController]']);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
         sleep(2);
         $i->canSee("Test Text Box Title");
     }
@@ -197,15 +202,19 @@ class HomepageInitialCest
         $i->canSeeElement(['css' => 'a[class=button\ submit]']);
         $i->click(['css' => 'div.component-container.Schoolbox_Blog_Homepage_Component_Controller a[class=button\ submit]']);
         sleep(1);
+        $i->cantSeeElement(['css' => 'div[class=component-container\ Schoolbox_Blog_Homepage_Component_Controller]']);
         $i->click(['css' => 'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a.icon-close[data-state=closed][title=Close]']);
         sleep(3);
         $i->canSeeElement(['css' => 'a[class=button\ submit]']);
         $i->click(['css' => 'div.component-container.Schoolbox_Comms_News_Component_Homepage_Controller a[class=button\ submit]']);
         sleep(1);
-        $i->click(['css' => 'div.component-container.Component_Homepage_TextBoxController a.icon-close[data-state=closed][title=Close]']);
+        $i->cantSeeElement(['css' => 'div[class=component-container\ Schoolbox_Comms_News_Component_Homepage_Controller]']);
+        $i->click(['css' => 'div.component-container.Schoolbox_Resource_Textbox_Component_Homepage_Controller a.icon-close[data-state=closed][title=Close]']);
         sleep(3);
         $i->canSeeElement(['css' => 'a[class=button\ submit]']);
-        $i->click(['css' => 'div.component-container.Component_Homepage_TextBoxController a[class=button\ submit]']);
+        $i->click(['css' => 'div.component-container.Schoolbox_Resource_Textbox_Component_Homepage_Controller a[class=button\ submit]']);
+        sleep(2);
+        $i->cantSeeElement(['css' => 'div[class=component-container\ Schoolbox_Resource_Textbox_Component_Homepage_Controller]']);
         echo "Not done yet";
     }
 
@@ -224,7 +233,7 @@ class HomepageInitialCest
         $i->waitForText("Delete", 5);
         $i->click("Delete");
         $i->waitForText("Please Confirm", 5);
-        $i->click("No");
+        $i->click("Cancel");
         sleep(1);
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->canSee("Test Homepage");
@@ -245,7 +254,7 @@ class HomepageInitialCest
         $i->waitForText("Delete", 5);
         $i->click("Delete");
         $i->waitForText("Please Confirm", 5);
-        $i->click("Yes");
+        $i->click("a#confirm-dialog-confirm-button.button.submit");
         sleep(1);
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
         $i->cantSee("Test Homepage");
