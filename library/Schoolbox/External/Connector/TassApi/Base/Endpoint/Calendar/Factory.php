@@ -35,13 +35,13 @@ class Factory
     /**
      * Collect events from this many months in the past (a negative int)
      */
-    private const FROM = -1;
+    private const FROM = -24;
 
 
     /**
      * Collect events to this many months in the future
      */
-    private const TO = 12;
+    private const TO = 24;
 
 
     /**

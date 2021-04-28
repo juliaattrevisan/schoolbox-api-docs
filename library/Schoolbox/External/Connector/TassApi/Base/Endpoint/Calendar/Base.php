@@ -220,11 +220,28 @@ class Base
      */
     protected function prepare(): void
     {
-        /* TODO If this works, you can improve performance/autoincrementation
-         *  by using the regular updated_at 0000-00-00 00:00:00 trick that
-         *  we did in SIS SUDS. Just delete anything that wasn't updated
+        /* Set Events and Event Sources updated_at to something obvious
+         * Anything that updates them will be safe from cleanup later
          */
-        $this->eventSourceMapper->deleteEventsFromSource($this->source);
+        $query = "
+            UPDATE
+            {$this->eventSourceMapper->getTable()}
+            INNER JOIN {$this->eventSourceMapper->getJoinSql('event')} 
+            AND {$this->eventSourceMapper->getTable()}.`deleted_at` IS NULL
+            SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
+            {$this->eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
+            WHERE {$this->eventSourceMapper->getTable()}.`source_name` = :sourceName
+        ";
+
+        $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
+        $statement->execute([
+            'sourceName' => $this->source
+        ]);
+
+        $this->log->debug(sprintf(
+            'Marking all %s events for deletion',
+            $this->source
+        ));
     }
 
 
@@ -303,8 +320,46 @@ class Base
              */
             $campusIds = $this->findCampuses((string)$tassEvent['campus_code']);
 
-            /** @var Event $event */
-            $event = $this->eventMapper->createModel()
+            /* Find an event instance that used guid
+             */
+            try {
+                $eventSource = $this->eventSourceMapper->findOneByColumnList([
+                    'source_name' => $this->source,
+                    'guid' => $guid
+                ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+
+                /* Couldn't find any event matching $guid so it's a new event
+                 * Make a new source and make a new event instance
+                 */
+                $eventSource = $this->eventSourceMapper->createModel();
+            }
+
+            try {
+                $event = $this->eventMapper->findById($eventSource->getId());
+
+                $this->log->debug(sprintf(
+                    'Found an existing %s event "%s" (%s) using guid %s',
+                    $this->source,
+                    $event->getTitle(),
+                    $event->getId(),
+                    $guid
+                ));
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $event = $this->eventMapper->createModel();
+
+                $this->log->debug(sprintf(
+                    'Creating a new %s event "%s" (%s) using guid %s',
+                    $this->source,
+                    $event->getTitle(),
+                    $event->getId(),
+                    $guid
+                ));
+            }
+
+            /* Assign the usual details
+             */
+            $event
                 ->setTitle($title)
                 ->setLocation($location)
                 ->setDetail($detail)
@@ -345,7 +400,7 @@ class Base
 
             /* Set up the Event Source so we know where this came from
              */
-            $eventSource = $this->eventSourceMapper->createModel()
+            $eventSource
                 ->setEvent($event)
                 ->setSourceName($this->source)
                 ->setGuid($guid);
