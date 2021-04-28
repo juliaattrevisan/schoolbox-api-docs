@@ -3257,7 +3257,7 @@ parameters:
 
 		-
 			message: "#^Result of && is always true\\.$#"
-			count: 2
+			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWork.php
 
 		-
@@ -3521,17 +3521,7 @@ parameters:
 			path: library/Schoolbox/Assessment/Course/Task.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Task.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Task/File/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Task/File/Model.php
 
@@ -3867,11 +3857,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/Event.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Calendar/Event.php
 
@@ -4291,11 +4276,6 @@ parameters:
 			path: library/Schoolbox/Comms/News/File/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/File/Model.php
-
-		-
 			message: "#^Property Schoolbox\\\\Comms\\\\News\\\\Lists\\\\Base\\:\\:\\$articleResolver \\(Schoolbox\\\\Comms\\\\News\\\\Audience\\\\ArticleResolver\\) does not accept Schoolbox\\\\Comms\\\\News\\\\Audience\\\\IArticleResolver\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Lists/Base.php
@@ -4352,11 +4332,6 @@ parameters:
 
 		-
 			message: "#^Method Schoolbox\\\\Comms\\\\News\\\\Model\\:\\:canBeArchived\\(\\) should return bool but returns int\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Model.php
 
@@ -4492,21 +4467,11 @@ parameters:
 
 		-
 			message: "#^Result of \\|\\| is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/Comms/News/Topic/Mapper.php
-
-		-
-			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Topic/Mapper.php
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Topic/Mapper.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Topic/Mapper.php
 
@@ -4561,17 +4526,7 @@ parameters:
 			path: library/Schoolbox/Curriculum/LearningArea/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/LearningArea/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/LearningLevel/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/LearningLevel/Model.php
 
@@ -4591,17 +4546,7 @@ parameters:
 			path: library/Schoolbox/Curriculum/Node/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Node/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Curriculum/Source/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Curriculum/Source/Model.php
 
@@ -4622,11 +4567,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Comment/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Discussion/Comment/Model.php
 
@@ -5866,11 +5806,6 @@ parameters:
 			path: library/Schoolbox/Fixtures/Match/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Match/Model.php
-
-		-
 			message: "#^Parameter \\#1 \\$dependencies \\(null\\) of method Schoolbox\\\\Fixtures\\\\Match\\\\Notifier\\:\\:loadDependencies\\(\\) should be compatible with parameter \\$dependencies \\(array\\<Schoolbox\\\\Mapper\\>\\) of method Schoolbox\\\\Realtime\\\\Schedule\\\\Module\\\\AbstractModuleNotifier\\:\\:loadDependencies\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Match/Notifier.php
@@ -5918,11 +5853,6 @@ parameters:
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 2
-			path: library/Schoolbox/Fixtures/Season/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
 			path: library/Schoolbox/Fixtures/Season/Model.php
 
 		-
@@ -6032,7 +5962,7 @@ parameters:
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
-			count: 7
+			count: 6
 			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
 
 		-
@@ -6057,11 +5987,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/AbstractAssessment.php
 
@@ -6211,11 +6136,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
-
-		-
 			message: "#^Strict comparison using \\=\\=\\= between array and null will always evaluate to false\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/NotifierProxy.php
@@ -6232,11 +6152,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/Project/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Project/Model.php
 
@@ -7046,11 +6961,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Plan.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Plan.php
-
-		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Project.php
@@ -7561,11 +7471,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
-
-		-
 			message: "#^PHPDoc tag @param for parameter \\$answers with type array\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>\\|\\(iterable\\<Schoolbox\\\\Learning\\\\Quiz\\\\Attempt\\\\Answer\\\\Model\\>&Schoolbox\\\\GenericCollection\\) is not subtype of native type Schoolbox\\\\GenericCollection\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Model.php
@@ -7606,11 +7511,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Model.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Quiz\\\\Module\\:\\:getTermMapper\\(\\) should return Schoolbox\\\\Assessment\\\\Term\\\\Mapper\\|Schoolbox\\\\Learning\\\\Quiz\\\\Mapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Module.php
@@ -7622,11 +7522,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Model.php
 
@@ -7656,11 +7551,6 @@ parameters:
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Model.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Quiz\\\\Section\\\\Question\\\\Solution\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
@@ -7672,11 +7562,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Section/Question/Solution/Model.php
 
@@ -7831,17 +7716,7 @@ parameters:
 			path: library/Eportfolio/Showcase.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Eportfolio/Showcase.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Event/Source/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Event/Source/Model.php
 
@@ -7851,17 +7726,7 @@ parameters:
 			path: library/House.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/House.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/HouseResidential.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/HouseResidential.php
 
@@ -7871,17 +7736,7 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWork/SingleFile/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/ReturnedWork/SingleFile/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SingleFile/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/SingleFile/Model.php
 
@@ -7891,17 +7746,7 @@ parameters:
 			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/Submission.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Component/SubmissionBox/Submission/Submission.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Course/Task/Completion.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Course/Task/Completion.php
 
@@ -7911,17 +7756,7 @@ parameters:
 			path: library/Schoolbox/Assessment/Participant/Plan/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Participant/Plan/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Capability/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Capability/Model.php
 
@@ -7931,17 +7766,7 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Descriptor/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Indicator/Model.php
 
@@ -7951,17 +7776,7 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/DataModel/Level/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/DataModel/Level/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/StudentReportCard/Comment.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/StudentReportCard/Comment.php
 
@@ -7971,17 +7786,7 @@ parameters:
 			path: library/Schoolbox/Blog/Eportfolio/Comment/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Comment/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Image/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Eportfolio/Image/Model.php
 
@@ -7991,17 +7796,7 @@ parameters:
 			path: library/Schoolbox/Blog/Eportfolio/Post/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Eportfolio/Post/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Comment/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Comment/Model.php
 
@@ -8011,17 +7806,7 @@ parameters:
 			path: library/Schoolbox/Blog/Homepage/Image/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Image/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Blog/Homepage/Post/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Blog/Homepage/Post/Model.php
 
@@ -8031,17 +7816,7 @@ parameters:
 			path: library/Schoolbox/Calendar/EventType.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Calendar/EventType.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Campus.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Campus.php
 
@@ -8051,17 +7826,7 @@ parameters:
 			path: library/Schoolbox/Comms/News/SaveForLater/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/SaveForLater/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Cumulative/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Statistics/Cumulative/Model.php
 
@@ -8071,17 +7836,7 @@ parameters:
 			path: library/Schoolbox/Comms/News/Statistics/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Statistics/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Comms/News/Topic/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Comms/News/Topic/Model.php
 
@@ -8091,17 +7846,7 @@ parameters:
 			path: library/Schoolbox/Discussion/Thread/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Discussion/Thread/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Coach/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Coach/Model.php
 
@@ -8111,17 +7856,7 @@ parameters:
 			path: library/Schoolbox/Fixtures/Coach/Participant/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Coach/Participant/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Division/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Division/Model.php
 
@@ -8131,17 +7866,7 @@ parameters:
 			path: library/Schoolbox/Fixtures/ItineraryItem/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/ItineraryItem/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Position/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Position/Model.php
 
@@ -8151,17 +7876,7 @@ parameters:
 			path: library/Schoolbox/Fixtures/Result/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Result/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/School/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/School/Model.php
 
@@ -8171,17 +7886,7 @@ parameters:
 			path: library/Schoolbox/Fixtures/Sport/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Sport/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Status/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Status/Model.php
 
@@ -8191,17 +7896,7 @@ parameters:
 			path: library/Schoolbox/Fixtures/Team/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Player/Participant/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Team/Player/Participant/Model.php
 
@@ -8211,17 +7906,7 @@ parameters:
 			path: library/Schoolbox/Fixtures/Team/Position/Participant/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Team/Position/Participant/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Fixtures/Venue/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Fixtures/Venue/Model.php
 
@@ -8231,17 +7916,7 @@ parameters:
 			path: library/Schoolbox/LTI/Provider/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/LTI/Provider/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/AbstractFeedback.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/AbstractFeedback.php
 
@@ -8251,17 +7926,7 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/AbstractResponse.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/AbstractResponse.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DueWork/Response/File/Plagscan/Model.php
 
@@ -8271,17 +7936,7 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Task/File.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Task/File.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/WorkType/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/WorkType/Model.php
 
@@ -8291,17 +7946,7 @@ parameters:
 			path: library/Schoolbox/Learning/Badge/Award/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Badge/Award/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Badge/Category/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Badge/Category/Model.php
 
@@ -8311,17 +7956,7 @@ parameters:
 			path: library/Schoolbox/Learning/Badge/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Badge/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Course/DataModel/AbstractCourse.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Course/DataModel/AbstractCourse.php
 
@@ -8331,17 +7966,7 @@ parameters:
 			path: library/Schoolbox/Learning/Course/DataModel/AbstractUnit.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Course/DataModel/AbstractUnit.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/DueWork/State.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/DueWork/State.php
 
@@ -8351,17 +7976,7 @@ parameters:
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Moment/Evidence/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Moment/Evidence/Model.php
 
@@ -8371,27 +7986,12 @@ parameters:
 			path: library/Schoolbox/Learning/Moment/Evidence/Tag/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Moment/Evidence/Tag/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Quiz/Attempt/Answer/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Quiz/Attempt/Answer/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Menu/Top/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Menu/Top/Model.php
 
@@ -8411,17 +8011,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/Access/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Access/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Attachment/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Attachment/Model.php
 
@@ -8431,17 +8021,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/Audience/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Audience/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Comment/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Comment/Model.php
 
@@ -8451,17 +8031,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/DocumentClassification/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/DocumentClassification/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Group/Member/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Group/Member/Model.php
 
@@ -8471,17 +8041,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/Group/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Group/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Model.php
 
@@ -8491,17 +8051,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/Report/Dashboard/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Report/Dashboard/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Report/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Report/Model.php
 
@@ -8521,17 +8071,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/Severity/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Severity/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/SubType/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/SubType/Model.php
 
@@ -8546,17 +8086,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/Tag/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Tag/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Type/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Type/Model.php
 
@@ -8566,17 +8096,7 @@ parameters:
 			path: library/Schoolbox/Pastoral/UploadQueue/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/UploadQueue/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/ProfessionalDevelopment/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ProfessionalDevelopment/Model.php
 
@@ -8586,17 +8106,7 @@ parameters:
 			path: library/Schoolbox/Resource/AbstractFile.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/AbstractFile.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Model.php
 
@@ -8621,11 +8131,6 @@ parameters:
 			path: library/Schoolbox/Resource/Link.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Link.php
-
-		-
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Link.php
@@ -8646,17 +8151,7 @@ parameters:
 			path: library/Schoolbox/Role.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Role.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Survey/Attempt/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Survey/Attempt/Model.php
 
@@ -8666,27 +8161,12 @@ parameters:
 			path: library/Schoolbox/Survey/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Survey/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/TagCloud/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/TagCloud/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Tour/Model.php
 
@@ -8706,17 +8186,7 @@ parameters:
 			path: library/Schoolbox/Tour/Step/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Step/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Step/Type/AbstractModel.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Tour/Step/Type/AbstractModel.php
 
@@ -8726,17 +8196,7 @@ parameters:
 			path: library/Schoolbox/Tour/Trigger/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tour/Trigger/Model.php
-
-		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/User.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/User.php
 
@@ -8757,11 +8217,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/WebDav/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/WebDav/Model.php
 
@@ -8787,11 +8242,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/YearLevel/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/YearLevel/Model.php
 
@@ -9781,11 +9231,6 @@ parameters:
 			path: library/Schoolbox/Resource/Folder/Code/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Folder/Code/Model.php
-
-		-
 			message: "#^PHPDoc tag @param references unknown parameter\\: \\$classList$#"
 			count: 1
 			path: library/Schoolbox/Resource/Folder/Component/Dashboard/GroupController.php
@@ -10011,11 +9456,6 @@ parameters:
 			path: library/Schoolbox/Resource/Textbox/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Textbox/Model.php
-
-		-
 			message: "#^Call to method getBooking\\(\\) on an unknown class Calendar_Event_Type_ResourceBooking\\.$#"
 			count: 2
 			path: library/Schoolbox/ResourceBooking/Booking/Component/ResourceManagement.php
@@ -10027,11 +9467,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Booking/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Model.php
 
@@ -10081,11 +9516,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Category/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Category/Model.php
-
-		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$setters\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Category/Module.php
@@ -10112,11 +9542,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Item/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Item/Model.php
 
@@ -10326,11 +9751,6 @@ parameters:
 			path: library/Schoolbox/Tile/Layout/Model.php
 
 		-
-			message: "#^Result of && is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Layout/Model.php
-
-		-
 			message: "#^If condition is always true\\.$#"
 			count: 2
 			path: library/Schoolbox/Tile/Mapper.php
@@ -10342,11 +9762,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Tile/Model.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Tile/Model.php
 
@@ -10562,11 +9977,6 @@ parameters:
 
 		-
 			message: "#^Negated boolean expression is always true\\.$#"
-			count: 1
-			path: library/SocialStream/Post/Abstract.php
-
-		-
-			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: library/SocialStream/Post/Abstract.php
 
