@@ -39,7 +39,7 @@
         let $fieldImportFrequency = $('#schooldata_import_frequency');
         let $fieldCustomHours = $('#schooldata_import_managed_hours').parent();
         $fieldImportFrequency.on('change', function () {
-            if ($(this).val() === 'sb') {
+            if ($(this).val() === 'sb' && ['','csv'].indexOf('{{ dataSource }}') === -1) {
                 $fieldCustomHours.show();
             } else {
                 $fieldCustomHours.hide();
