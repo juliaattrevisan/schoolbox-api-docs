@@ -242,7 +242,7 @@ class ConfigMapper extends Mapper
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $config = $this->hydrate($row);
             $type = $this->hydrateJoin($row, 'type', 'lct');
-            if($type instanceof Type\Model) {
+            if ($type instanceof Type\Model) {
                 $config->setType($type);
             }
             $configs->add($config);
