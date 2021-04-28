@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
@@ -26,21 +28,15 @@ class ValidScheduleExecution
      * Decide whether to execute the importer
      *
      * @param string $frequency
+     * @param string[] $customHours
      * @param int    $now
      * @return bool
      */
-    public function isSatisfiedBy(string $frequency, int $now): bool
+    public function isSatisfiedBy(string $frequency, array $customHours, int $now): bool
     {
-
-        /* If the frequency is Schoolbox Managed, just do it
-         * The importer should run whenever it's configured to run and we have a custom crontab for this usage
-         * Functionally this is identical to Hourly in that it means "whenever schoolbox told it to run"
-         *
-         * This option is here for ui feedback, basically so if questions are asked of Support they know
-         * to look at the setup in crontab
-         */
+        // If the frequency is 'Schoolbox Managed', check whether current time matches one of the configured times
         if ($frequency === Scheduler::SB) {
-            return true;
+            return in_array(date('H', $now), $customHours, true);
         }
 
         /* If the frequency is hourly, just do it

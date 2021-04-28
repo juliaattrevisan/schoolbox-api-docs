@@ -7,6 +7,7 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\Admin\Settings\FieldType\SelectMulti\Renderer;
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Importer\Endpoint;
 use Schoolbox\UserMapper;
@@ -81,6 +82,7 @@ HELP;
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
         $frequency = $this->getConfig()->get('schooldata_import_frequency') ?: Endpoint\Scheduler::HOURLY;
         $type = $this->getConfig()->get('schooldata_import_data_source') ?: Endpoint\Factory::CSV;
+        $customHours = explode(Renderer::VALUE_DELIMITER, $this->getConfig()->get('schooldata_import_managed_hours') ?? '');
         $file = null;
 
         /* This always perform updates
@@ -94,13 +96,13 @@ HELP;
         /* Execute scheduler: sis stuff
          */
         $sisFactory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $sisFactory, $type, $file, $this->getLogger()))->run(time());
+        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $sisFactory, $type, $file, $this->getLogger()))->run(time());
 
         /* Execute scheduler: calendar stuff
          * Not all connectivities contain a calendar importer, just some
          */
         $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $calendarFactory, $type, $file, $this->getLogger()))->run(time());
+        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $customHours, $calendarFactory, $type, $file, $this->getLogger()))->run(time());
     }
 };
 
