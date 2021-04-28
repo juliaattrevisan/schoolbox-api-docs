@@ -25,13 +25,13 @@ class Specification implements ISpecification
     /**
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
      * @var string
      */
-    private $dsn;
+    private string $dsn;
 
 
     /**
@@ -52,15 +52,17 @@ class Specification implements ISpecification
      *
      * @return array
      * @throws DomainException
-     * @throws \External\Tass\Api\Exception\InvalidApiKey
      * @throws InvalidArgumentException
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \JsonException
      */
     public function check(): array
     {
         $modules = [
             Codec\DSN::MODULE_LMS_INTEGRATION,
             Codec\DSN::MODULE_STUDENT_DETAILS,
-            Codec\DSN::MODULE_IDENTITY_MANAGEMENT
+            Codec\DSN::MODULE_IDENTITY_MANAGEMENT,
+            Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES
         ];
 
         foreach ($modules as $module) {
@@ -485,6 +487,63 @@ class Specification implements ISpecification
                     'user_code' => 'all',
                 ]
             ],
+
+            /* School Calendar and Notices is only on version 2, not 3
+             */
+            [
+                'api' => Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+                'method' => 'getParentCalendar',
+                'version' => 2,
+                'args' => [
+                    'start_date' => \Alaress_Date_Format::now()->addDays(-1)->getUsingFormat('d/m/Y'),
+                    'end_date' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat('d/m/Y'),
+                ]
+            ],
+            [
+                'api' => Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+                'method' => 'getParentNotices',
+                'version' => 2,
+                'args' => [
+                    'start_date' => \Alaress_Date_Format::now()->addDays(-1)->getUsingFormat('d/m/Y'),
+                    'end_date' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat('d/m/Y'),
+                ]
+            ],
+            [
+                'api' => Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+                'method' => 'getStudentCalendar',
+                'version' => 2,
+                'args' => [
+                    'start_date' => \Alaress_Date_Format::now()->addDays(-1)->getUsingFormat('d/m/Y'),
+                    'end_date' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat('d/m/Y'),
+                ]
+            ],
+            [
+                'api' => Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+                'method' => 'getStudentNotices',
+                'version' => 2,
+                'args' => [
+                    'start_date' => \Alaress_Date_Format::now()->addDays(-1)->getUsingFormat('d/m/Y'),
+                    'end_date' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat('d/m/Y'),
+                ]
+            ],
+            [
+                'api' => Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+                'method' => 'getTeacherCalendar',
+                'version' => 2,
+                'args' => [
+                    'start_date' => \Alaress_Date_Format::now()->addDays(-1)->getUsingFormat('d/m/Y'),
+                    'end_date' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat('d/m/Y'),
+                ]
+            ],
+            [
+                'api' => Codec\DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES,
+                'method' => 'getTeacherNotices',
+                'version' => 2,
+                'args' => [
+                    'start_date' => \Alaress_Date_Format::now()->addDays(-1)->getUsingFormat('d/m/Y'),
+                    'end_date' => \Alaress_Date_Format::now()->addDays(+1)->getUsingFormat('d/m/Y'),
+                ]
+            ],
         ];
 
         $endpoints = [];
@@ -494,7 +553,7 @@ class Specification implements ISpecification
             $message = "{$path['api']}: {$path['method']}";
 
             try {
-                $result = (bool)$api[$path['api']]->retrieveDocument($path['method'], $path['args']);
+                $result = (bool)$api[$path['api']]->retrieveDocument($path['method'], $path['args'], $path['version']);
             } catch (RuntimeException $e) {
                 $errorMessage = $e->getMessage();
                 $result = false;

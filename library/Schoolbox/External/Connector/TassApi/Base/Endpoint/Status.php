@@ -16,7 +16,7 @@ use Schoolbox\External\Importer\Endpoint\Status\IStatus;
 /**
  * Class Status
  *
- * @package Schoolbox\External\Connector\Isams\Base\Endpoint
+ * @package Schoolbox\External\Connector\TassApi\Base\Endpoint
  */
 class Status implements IStatus
 {
