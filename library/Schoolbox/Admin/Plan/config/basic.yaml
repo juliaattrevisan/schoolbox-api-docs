@@ -15,6 +15,7 @@ config:
   external_document_report_enabled : { value : false, edit : false }
   webdav_enable: {value: false, edit: false}
   kami_enabled: {value: false, edit: false}
+  geosnapshot_enabled: {edit: true}
 
   #Pastoral
   external_pastoral: {value: false, hide: true}

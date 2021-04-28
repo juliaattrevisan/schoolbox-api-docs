@@ -6,6 +6,7 @@
  */
 
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Permission\Access\UserAccess;
 use Custom\Diocesan\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -49,6 +50,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
         $this->setBlock('student_block', 'timetable', 'timetable_block');
         $this->setBlock('student_block', 'achievements', 'achievements_block');
         $this->setBlock('student_block', 'custom_buttons', 'custom_buttons_block');
+        $this->setBlock('student_block', 'geosnapshot', 'geosnapshot_block');
 
         $isParent = $this->getUser()->getRole()->isParent();
 
@@ -77,15 +79,14 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             $i++;
 
-            $this->setVar("STUDENT_ID", $userChild->getId());
-            $this->setVar("STUDENT_EXTERNAL_ID", $userChild->getExternalId());
-            $this->setVar("STUDENT_NAME", Scrub::text($child['name']));
-            $this->setVar("STUDENT_YEAR", $userChild->getYear() ? Scrub::text($userChild->getYear()->getLongName()) : '');
-            $this->setVar("STUDENT_YEAR_LEVEL", $userChild->getYear() ? Scrub::text($userChild->getYear()->getName()) : '');
-
-            // Render the Verso school's Travel Log data
-            $this->setVar('TRAVEL_LOG', $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true));
-
+            $this->setVar([
+                'STUDENT_ID' => $userChild->getId(),
+                'STUDENT_EXTERNAL_ID' => $userChild->getExternalId(),
+                'STUDENT_NAME' => Scrub::text($child['name']),
+                'STUDENT_YEAR' => $userChild->getYear() ? Scrub::text($userChild->getYear()->getLongName()) : '',
+                'STUDENT_YEAR_LEVEL' => $userChild->getYear() ? Scrub::text($userChild->getYear()->getName()) : '',
+                'TRAVEL_LOG' => $travelLogRenderer->render($this->getSitePage()->getTwig(), $userChild->getExternalId(), true)
+            ]);
 
             if (
                 $this->getConfigLoader()->get('pastoral_enabled') &&
@@ -218,6 +219,20 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 }
             }
 
+            /* Decide whether the viewer can see the Geosnapshot button for the viewee
+             */
+            $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+                ->isSatisifiedBy(
+                    $this->getConfigLoader()->get('geosnapshot_api_key'),
+                    $this->getConfigLoader()->get('geosnapshot_enabled'),
+                    $this->getUser(),
+                    $userChild
+                );
+
+            if ($isGeosnapshotAvailable) {
+                $this->parse('geosnapshot_block', 'geosnapshot');
+            }
+
             // Parse the parent block
             $this->parse("student_subjects", "student_block", true);
 
@@ -226,15 +241,11 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             $this->setVar([
                 'subject_item' => '',
                 'due_work_block' => '',
-                'custom_buttons_block' => ''
+                'custom_buttons_block' => '',
+                'geosnapshot_block' => ''
             ]);
         }
 
-
-        if ($i > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return $i > 0;
     }
 }

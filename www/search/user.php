@@ -4,6 +4,8 @@ use Alaress\Color\ColorFactory;
 use Schoolbox\Collection;
 use Alaress\Mail\AbstractMailer;
 use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access as Access;
@@ -537,6 +539,17 @@ function renderStudent(
      */
     $learningMomentCanComment = ($sessionUser->getRole()->isStaff() || $sessionUser->getRole()->isStudent() || ($sessionUser->getRole()->isParent() && $config->get('evidence_parent_comment')));
 
+    /* Decide whether View Photos (Geosnapshots) is available for this student
+     * If you're allowed to make this request...
+     */
+    $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+        ->isSatisifiedBy(
+            $config->get('geosnapshot_api_key'),
+            $config->get('geosnapshot_enabled'),
+            $sessionUser,
+            $user
+        );
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -569,7 +582,8 @@ function renderStudent(
                 'showDetails'              => $showDetails,
                 'showEmail'                => $showEmails,
                 'travelLogs'               => $travelLogs,
-                'learningMomentCanComment' => $learningMomentCanComment
+                'learningMomentCanComment' => $learningMomentCanComment,
+                'isGeosnapshotAvailable'   => $isGeosnapshotAvailable
             ]
         )
     );

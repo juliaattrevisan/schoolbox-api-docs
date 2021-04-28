@@ -423,8 +423,19 @@
                                         </form>
                                     </li>
                                 {% endif %}
-
                             {% endblock buttons_email_parents %}
+
+                            {% block buttons_geosnapshots %}
+                                {% if isGeosnapshotAvailable %}
+                                    {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id})  %}
+
+                                    {% if route %}
+                                        <li>
+                                            <a class="icon-geosnapshot" href="/geosnapshot/user/{{ user.id }}">View Photos</a>
+                                        </li>
+                                    {% endif %}
+                                {% endif %}
+                            {% endblock %}
 
                             {% block buttons_miscellaneous %}
                             {% endblock buttons_miscellaneous %}
