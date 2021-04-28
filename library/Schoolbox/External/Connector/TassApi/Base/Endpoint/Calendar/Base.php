@@ -224,25 +224,27 @@ class Base
         /* Set Events and Event Sources updated_at to something obvious
          * Anything that updates them will be safe from cleanup later
          */
-        $query = "
-            UPDATE
-            {$this->eventSourceMapper->getTable()}
-            INNER JOIN {$this->eventSourceMapper->getJoinSql('event')} 
-            AND {$this->eventSourceMapper->getTable()}.`deleted_at` IS NULL
-            SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
-            {$this->eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
-            WHERE {$this->eventSourceMapper->getTable()}.`source_name` = :sourceName
-        ";
+        if ($this->perform) {
+            $query = "
+                UPDATE
+                {$this->eventSourceMapper->getTable()}
+                INNER JOIN {$this->eventSourceMapper->getJoinSql('event')} 
+                AND {$this->eventSourceMapper->getTable()}.`deleted_at` IS NULL
+                SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
+                {$this->eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
+                WHERE {$this->eventSourceMapper->getTable()}.`source_name` = :sourceName
+            ";
 
-        $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
-        $statement->execute([
-            'sourceName' => $this->source
-        ]);
+            $statement = $this->eventSourceMapper->getDatabase()->prepare($query);
+            $statement->execute([
+                'sourceName' => $this->source
+            ]);
 
-        $this->log->debug(sprintf(
-            'Marking all %s events for deletion',
-            $this->source
-        ));
+            $this->log->debug(sprintf(
+                'Marking all %s events for deletion',
+                $this->source
+            ));
+        }
     }
 
 
@@ -461,16 +463,18 @@ class Base
      */
     protected function cleanup(): void
     {
-        $deadEvents = $this->eventMapper->findByColumn('updated_at', '0000-00-00 00:00:00');
+        if ($this->perform) {
+            $deadEvents = $this->eventMapper->findByColumn('updated_at', '0000-00-00 00:00:00');
 
-        foreach ($deadEvents as $deadEvent) {
-            $this->log->debug(sprintf(
-                'Deleting %s event "%s"; it was never updated during import',
-                $this->source,
-                $deadEvent->getTitle()
-            ));
+            foreach ($deadEvents as $deadEvent) {
+                $this->log->debug(sprintf(
+                    'Deleting %s event "%s"; it was never updated during import',
+                    $this->source,
+                    $deadEvent->getTitle()
+                ));
 
-            $this->eventMapper->delete($deadEvent);
+                $this->eventMapper->delete($deadEvent);
+            }
         }
     }
 
@@ -514,5 +518,4 @@ class Base
             ->indexBy('id')
             ->keys();
     }
-
 }
