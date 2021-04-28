@@ -20,6 +20,7 @@ use Schoolbox\Application\CliTool\App as BaseApp;
 use Schoolbox\Auth\Remote\RemoteLogin;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
@@ -460,6 +461,7 @@ BASE;
         $attempts          = 0;
         $previousException = null;
         $jsDelay           = $this->getOptAsInt(self::OPT_LONG_JS_DELAY) ?? self::DEFAULT_JS_DELAY;
+        $requestFactory    = new RequestFactory($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
         while (true) {
             if ($attempts++ >= $maxAttempts) {
                 unlink($filename);
@@ -476,10 +478,13 @@ BASE;
                 /** @var Gotenberg\Document[] $files */
                 $files = [];
                 foreach ($pdfSource->getUrls() as $i => $url) {
-                    $request = new Gotenberg\URLRequest($url);
-                    $request->setWaitDelay($jsDelay / 1000);
+                    $request = $requestFactory->buildUrlRequest(
+                        $url,
+                        RequestFactory::DEFAULT_WAIT_DELAY,
+                        RequestFactory::DEFAULT_WAIT_TIMEOUT,
+                        $sessionHash
+                    );
                     $request->setLandscape((bool)$this->getOpt(self::OPT_LONG_ORIENTATION_LANDSCAPE));
-                    $request->addRemoteURLHTTPHeader('Cookie', sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, $sessionHash));
 
                     // Gotenberg doesn't seem to care about the response code.
                     // Just have to hope that no requests are made with an

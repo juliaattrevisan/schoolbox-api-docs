@@ -136,6 +136,7 @@ class ConfigMapper extends Mapper
     public const NAME_SITE_STATIC_ASSET_PREFIX = 'site_static_asset_prefix';
 
     public const NAME_GOTENBERG_HOST = 'gotenberg_host';
+    public const NAME_GOTENBERG_API_KEY = 'gotenberg_api_key';
 
     /**
      * @throws \InvalidArgumentException

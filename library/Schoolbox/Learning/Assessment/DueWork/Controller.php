@@ -19,9 +19,9 @@ use ICollection;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
-//use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -1444,25 +1444,14 @@ class Controller extends Assessment\Controller
                 )
             );
 
-        $request = new Gotenberg\URLRequest($url->toString());
-        $request->setWaitDelay(1);
-        $request->setScale(0.75);
-        $request->setLandscape(true);
-
-        // Authenticate using the cookie
-        // TODO ensure drafts do not show
-        // (This shows submission history in context of current user: should
-        //  show in context of student, or parent)
-        $request->addRemoteURLHTTPHeader(
-            'Cookie',
-            sprintf('%s=%s', PipeManager::PHP_SESSION_PREFIX, session_id())
+        $requestFactory = new RequestFactory($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_API_KEY));
+        $request        = $requestFactory->buildUrlRequest(
+            $url->toString(),
+            RequestFactory::DEFAULT_WAIT_DELAY,
+            RequestFactory::DEFAULT_WAIT_TIMEOUT,
+            session_id(),
         );
-
-//        // Alternately use the token
-//        // (Can't use the token until SA-11077 is done)
-//        /** @var Jwt $tokenBuilder */
-//        $tokenBuilder = $this->getDi()->get('user.tokenBuilder');
-//        $request->addRemoteURLHTTPHeader('Authorization', 'Bearer ' . $tokenBuilder->generate($participant->getUser()));
+        $request->setScale(0.75);
 
         // Generate, download and store the PDF
         $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
