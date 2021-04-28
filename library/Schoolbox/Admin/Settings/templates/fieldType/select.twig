@@ -8,8 +8,12 @@
     renderEmptyOption: bool            Should we insert an empty option in the dropdown select?
     multi:             bool            Can we select multiple options?
 #}
+{# We need an empty option here so if no values are selected, the field is still included in payload #}
+{% if multi %}
+    <input type="hidden" name="{{ name }}" value="">
+{% endif %}
 
-<select name="{{ name }}{% if multi %}[]{% endif %}" id="{{ name }}-field" {{ required and not multi ? 'required ' }} {% if not editable %}disabled="disabled"{% endif %}{% if multi %} multiple{% endif %}>
+<select name="{{ name }}{% if multi %}[]{% endif %}" id="{{ name }}-field" {{ required ? 'required ' }} {% if not editable %}disabled="disabled"{% endif %}{% if multi %} multiple{% endif %}>
     {% if renderEmptyOption %}
         <option value="" {% if required %} style="display: none;"{% endif %}{% if value is null %} selected="selected"{% endif %}>-- select an option --</option>
     {% endif %}

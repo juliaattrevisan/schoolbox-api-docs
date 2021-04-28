@@ -18,6 +18,9 @@ class ValueSerializer implements IFieldValueSerializer
      */
     public function serializeValue($value): string
     {
+        if ($value === '') {
+            return '';
+        }
         return implode(Renderer::VALUE_DELIMITER, $value);
     }
 }

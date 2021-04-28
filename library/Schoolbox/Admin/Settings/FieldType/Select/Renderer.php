@@ -38,10 +38,15 @@ class Renderer extends AbstractRenderer
         // We need to render an empty option if:
         // * config is optional, or
         // * config value is invalid
-        $data['renderEmptyOption'] = !$config->getRequired() || !$isValidValue;
+        $data['renderEmptyOption'] = $this->renderEmptyOption($config, $isValidValue);
 
         $data['multi'] = false;
         return $data;
+    }
+
+    protected function renderEmptyOption(Config $config, bool $isValidValue): bool
+    {
+        return !$config->getRequired() || !$isValidValue;
     }
 
 

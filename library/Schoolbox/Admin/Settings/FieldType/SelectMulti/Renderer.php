@@ -70,4 +70,16 @@ class Renderer extends \Schoolbox\Admin\Settings\FieldType\Select\Renderer
         }
         return implode(self::VALUE_DELIMITER, $validValues);
     }
+
+    /**
+     * Never render empty option, as user can just deselect all options
+     *
+     * @param Config $config
+     * @param bool   $isValidValue
+     * @return bool
+     */
+    protected function renderEmptyOption(Config $config, bool $isValidValue): bool
+    {
+        return false;
+    }
 }
