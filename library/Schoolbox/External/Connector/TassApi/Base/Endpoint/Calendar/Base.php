@@ -350,10 +350,9 @@ class Base
                 $event = $this->eventMapper->createModel();
 
                 $this->log->debug(sprintf(
-                    'Creating a new %s event "%s" (%s) using guid %s',
+                    'Creating a new %s event "%s" using guid %s',
                     $this->source,
-                    $event->getTitle(),
-                    $event->getId(),
+                    $title,
                     $guid
                 ));
             }
