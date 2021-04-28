@@ -17,7 +17,7 @@
 
         {# These config elements can be either hidden or shown, contextually
          #}
-        var configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency');
+        var configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours');
 
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
@@ -34,6 +34,18 @@
         $('#schooldata_import_data_source').on('change', function(event) {
             switchIslands($(this).val());
         });
+
+        {# On import frequence change, show/hide the custom hours field #}
+        let $fieldImportFrequency = $('#schooldata_import_frequency');
+        let $fieldCustomHours = $('#schooldata_import_managed_hours').parent();
+        $fieldImportFrequency.on('change', function () {
+            if ($(this).val() === 'sb') {
+                $fieldCustomHours.show();
+            } else {
+                $fieldCustomHours.hide();
+            }
+        });
+        $fieldImportFrequency.trigger('change');
 
         /**
          * Switch configuration options
