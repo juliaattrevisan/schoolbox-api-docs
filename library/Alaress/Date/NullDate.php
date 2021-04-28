@@ -46,7 +46,7 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
     /**
      * This is a null date
      *
-     * @return true
+     * @return bool
      */
     public function isNull()
     {
