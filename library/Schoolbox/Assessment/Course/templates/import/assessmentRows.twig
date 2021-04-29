@@ -46,7 +46,7 @@
             $input.val(date).trigger('change');
 
             // Sync dates as required
-            syncDatesOnElement($input, adtp.getOptions($input), '');
+            adtp.syncDatesOnElement($input, adtp.getOptions($input), '');
         });
 
     });
