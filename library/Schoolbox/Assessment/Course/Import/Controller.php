@@ -586,7 +586,7 @@ class Controller extends Base\Base
         } else {
             // UPDATE
             $newAssessment = null;
-            $this->assessmentMapperProxy->save($assessment);
+            $this->assessmentMapperProxy->save($assessment, $this->getUser());
             $notifier->notify($assessment, $this->getUser(), $before);
         }
 

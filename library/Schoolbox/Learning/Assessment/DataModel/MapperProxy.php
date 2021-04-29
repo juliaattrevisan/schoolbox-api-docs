@@ -919,13 +919,15 @@ class MapperProxy
      * Saves an assessable
      *
      * @param IAssessable $assessable
+     * @param User        $sessionUser The user who's doing the saving
+     *
      * @throws MapperException If no instance of model is found
      * @throws MapperException\Deleted If the model was found but has been deleted
      * @throws UnexpectedValueException If a triggered callback failed, and caller should know about it
      * @throws PDOException If unable to execute SQL
      * @throws LogicException If cyclic graph detected during translation
      */
-    public function save(IAssessable $assessable)
+    public function save(IAssessable $assessable, User $sessionUser)
     {
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable);
@@ -1027,7 +1029,7 @@ class MapperProxy
                     if ($projectAssessable instanceof ProjectObject) {
                         throw new UnexpectedValueException('Projects may not contain projects');
                     }
-                    $this->save($projectAssessable);
+                    $this->save($projectAssessable, $sessionUser);
                 }
             }
         }

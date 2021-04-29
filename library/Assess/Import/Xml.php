@@ -147,9 +147,13 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
             }
         }
 
+        // TODO inject current user
+        /** @var \Schoolbox\User $currentUser */
+        $currentUser = $_SESSION['user'];
+
         // Create the IAssessable
         $quizAssessable = (new QuizAssessable())
-            ->setCreator($_SESSION['user'])
+            ->setCreator($currentUser)
             ->setCompletionMessage($parser->getCompletionMessage())
             ->setDuration($parser->getDuration())
             ->setTitle($parser->getTitle())
@@ -171,10 +175,10 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
         }
         $quizAssessable->setContext($context);
 
-        $this->assessmentMapperProxy->save($quizAssessable);
+        $this->assessmentMapperProxy->save($quizAssessable, $currentUser);
 
         // Notify about what was just made
-        $this->assessmentMapperProxy->getNotifier()->notify($quizAssessable, $_SESSION['user'], []);
+        $this->assessmentMapperProxy->getNotifier()->notify($quizAssessable, $currentUser, []);
 
         $this->quiz = $quizAssessable;
         $this->assess_id = QuizMapper::getInstance()->findIdsByColumn('assessment_id', $this->quiz->getId())[0];
