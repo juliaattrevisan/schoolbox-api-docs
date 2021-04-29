@@ -206,8 +206,8 @@ class Controller extends BaseController
      */
     public function getCreateAppForm()
     {
-        $data     = [];
-        $provider = strtoupper($this->getRequest()->query->get('provider'));
+        $provider = $this->getRequest()->query->get('provider');
+        $data     = ['provider' => $provider];
         switch ($provider) {
             case MobileApp\Registry::PROVIDER_APPLE:
                 $template           = '@adminMessages/providers/APNS/create.twig';
