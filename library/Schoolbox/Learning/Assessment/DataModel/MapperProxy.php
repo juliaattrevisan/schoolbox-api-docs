@@ -919,7 +919,7 @@ class MapperProxy
      * Saves an assessable
      *
      * @param IAssessable $assessable
-     * @param User        $sessionUser The user who's doing the saving
+     * @param User        $currentUser The user who's doing the saving
      *
      * @throws MapperException If no instance of model is found
      * @throws MapperException\Deleted If the model was found but has been deleted
@@ -927,7 +927,7 @@ class MapperProxy
      * @throws PDOException If unable to execute SQL
      * @throws LogicException If cyclic graph detected during translation
      */
-    public function save(IAssessable $assessable, User $sessionUser)
+    public function save(IAssessable $assessable, User $currentUser)
     {
         // Save assessment
         $dataModel = $this->translateToDataModel($assessable);
@@ -1002,7 +1002,7 @@ class MapperProxy
 
                     /* Disregard grid changes if CourseManaged is on
                      */
-                    $courseManagedFields = new CourseManagedFields($this->sessionUser, $assessable);
+                    $courseManagedFields = new CourseManagedFields($currentUser, $assessable);
 
                     if (!$courseManagedFields->isReadonly()) {
                         $rubricMapper->persistGrid($dueWork->getRubricGrid(), $originalGrid);
@@ -1029,7 +1029,7 @@ class MapperProxy
                     if ($projectAssessable instanceof ProjectObject) {
                         throw new UnexpectedValueException('Projects may not contain projects');
                     }
-                    $this->save($projectAssessable, $sessionUser);
+                    $this->save($projectAssessable, $currentUser);
                 }
             }
         }
