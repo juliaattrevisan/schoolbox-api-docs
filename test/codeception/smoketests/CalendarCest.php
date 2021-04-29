@@ -223,16 +223,16 @@ class CalendarCest
 
 
     /**
-     * Approve all attendees for a Calendar Event.
+     * Remove an attendee for a Calendar Event.
      *
      * @param IntegrationTester              $i
      */
-    public function approveAttendees(IntegrationTester $i): void
+    public function removeAttendees(IntegrationTester $i): void
     {
         #GIVEN
         $timestamp      = time();
         $admin          = $i->grabUser('alaress');
-        $title          = 'Test Event, rsvp campus event and approve the rsvp at ' . $timestamp;
+        $title          = 'Test Event, rsvp campus event and remove the guest at ' . $timestamp;
         $targetCampuses = [$i->grabCampusByName('Secondary')->getId(), $i->grabCampusByName('Primary')->getId()];
         $targetRoles    = [$i->grabRoleByTitle('Administration')->getId(), $i->grabRoleByTitle('Teacher')->getId()];
 
@@ -257,20 +257,14 @@ class CalendarCest
 
         #WHEN
         $attendanceList       = $i->grabCalendarEventAttendanceList($event->getId());
-        $RSVP_Approve_Payload = new Payload\Base('POST', '/calendar/attendance/list/' . $event->getId(), '/calendar/attendance/processModifyAttendanceList');
-        $RSVP_Approve_Payload->setFormParam('event[id]', $event->getId());
-        $RSVP_Approve_Payload->setFormParam('approve', 'Approve Selected');
-        foreach ($attendanceList as $attendee) {
-            $RSVP_Approve_Payload->setFormParam('attendanceList[' . $attendee['user_id'] . '][id]', $attendee['id']);
-        }
-        $i->amGoingTo('Send request to RSVP to campus calendar event.');
-        $i->sendRequest($RSVP_Approve_Payload);
+        $RSVP_Remove_Payload = new Payload\Base('POST', '/calendar/event/'.$event->getId(), '/calendar/event/attendance/'.$event->getId().'/delete');
+        $RSVP_Remove_Payload->setFormParam('userId',$admin->getId());
+
+        $i->amGoingTo('Send request to Remove an attendee from the calendar event.');
+        $i->sendRequest($RSVP_Remove_Payload);
 
         #THEN
-        $i->seeResponseCodeIs(302);
-        $i->seeHttpHeader('location', 'https://vagrant.dev.schoolbox.cloud/calendar/attendance/list/' . $event->getId());
-
-        $i->sendGET('https://vagrant.dev.schoolbox.cloud/calendar/attendance/list/' . $event->getId());
+        $i->sendGET('https://vagrant.dev.schoolbox.cloud/calendar/event/' . $event->getId());
         $i->seeResponseCodeIs(200);
     }
 }
