@@ -282,7 +282,7 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
                 $user->getId(),
                 $campus,
                 $dayNumber,
-                $date->getDatabaseDate()
+                $date
             );
         } catch (Schoolbox\External\Exception $e) {
             // Can't fetch timetable? assume it's empty

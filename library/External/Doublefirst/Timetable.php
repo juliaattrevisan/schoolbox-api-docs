@@ -397,7 +397,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getDayTimetable(string $externalUserId, $userId, CampusModel $campus, $dayNumber, $date = null): array
+    public function getDayTimetable(string $externalUserId, $userId, CampusModel $campus, $dayNumber, ?Alaress_Date_Format $date = null): array
     {
         // Can't do anything without the user being supplied
         if (empty($externalUserId)) {
