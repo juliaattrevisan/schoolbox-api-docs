@@ -188,13 +188,23 @@ class ServiceManager implements IServiceManager
                     );
 
                 case Registry::PROVIDER_GOOGLE:
-                    return new Cloud\Google\GCM($this->registryMapper, $identifier, $key);
+                    return new Cloud\Google\GCM(
+                        $this->registryMapper,
+                        $identifier,
+                        $key
+                    );
 
                 case Registry::PROVIDER_DIGISTORM:
-                    return new Cloud\Digistorm\Service($this->registryMapper, $identifier, $key);
+                    return new Cloud\Digistorm\Service(
+                        $this->registryMapper,
+                        $identifier,
+                        $key
+                    );
             }
 
-            throw new Mapper\Exception("Invalid provider: must be one of APNS or GCM, '$provider' given.");
+            throw new Mapper\Exception(
+                "Invalid provider: must be one of APNS, GCM or Digistorm: '$provider' given."
+            );
         }
 
         return $this->serviceCache[$provider][$identifier];
