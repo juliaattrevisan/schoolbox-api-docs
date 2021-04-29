@@ -92,7 +92,11 @@ class Controller extends Base
      */
     public function register(string $provider): void
     {
-        $providers = [Registry::PROVIDER_APPLE, Registry::PROVIDER_GOOGLE];
+        $providers = [
+            Registry::PROVIDER_APPLE,
+            Registry::PROVIDER_GOOGLE,
+            Registry::PROVIDER_DIGISTORM,
+        ];
 
         // check the provider is valid
         if (!in_array($provider, $providers, true)) {
