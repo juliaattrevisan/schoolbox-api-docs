@@ -19,16 +19,6 @@
             </div>
         {% endif %}
     {% endif %}
-    {% for message in externalUser.AlertMessages %}
-        {% block contacts_alert %}
-            {# Only staff may view contact alerts #}
-            {% if showContactsAlert %}
-                <div class="alert-box alert icon-alert no-margin">
-                    {{ message | nl2br }}
-                </div>
-            {% endif %}
-        {% endblock contacts_alert %}
-    {% endfor %}
 
     <section>
         <div class="content no-pad">
