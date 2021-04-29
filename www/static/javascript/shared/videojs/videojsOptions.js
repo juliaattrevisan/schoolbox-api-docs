@@ -17,7 +17,7 @@ WaveSurfer.microphone = MicrophonePlugin;
 * @returns { Object }
 */ 
 export const getRecordCameraOptions = () => {
-    return {
+	return {
         controls: true,
         autoplay: false,
         fluid: true,
@@ -39,9 +39,14 @@ export const getRecordCameraOptions = () => {
                 debug: true,
             }
         }
-    }
+	}
 }
 
+/*
+* set up a camera recording for safari, which uses mp4 rather than default webm
+* 
+* @returns { Object }
+*/ 
 export const getRecordCameraOptionsForSafari = () => {
     return {
         controls: true,
@@ -98,6 +103,37 @@ export const getRecordScreenOptions = () => {
     }
 }
 
+
+/*
+* set up a screen recording for Safari
+* 
+* @returns { Object }
+*/ 
+export const getRecordScreenOptionsForSafari = () => {
+    return {
+        controls: true,
+        autoplay: false,
+        fluid: true,
+        aspectRatio: '16:9',
+        loop: false,
+        bigPlayButton: false,
+        controlBar: {
+            volumePanel: false,
+        },
+        plugins: {
+            record: {
+                audio: true,
+				screen: true,
+				videoMimeType: 'video/mp4', //all supported excluding Safari use webm
+                maxLength: 300, //five minutes
+				frameWidth: 640,
+           		frameHeight: 480,
+                debug: true,
+            }
+        }
+    }
+}
+
 /*
 * Once a video has been recorded, need to pass to another videojs component to be able to use the progress controls
 * 
@@ -129,7 +165,7 @@ export const getVideoPlaybackOptions = (recordedData) => {
 * @returns { Object }
 */ 
 export const getAudioOnlyRecordOptions = () => {
-    return {
+    const options = {
         controls: true,
         autoplay: false,
         fluid: true,
@@ -166,9 +202,36 @@ export const getAudioOnlyRecordOptions = () => {
                 maxLength: 300, //5 minutes
                 audioEngine: 'vmsg',
                 audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
-                // audioWebAssemblyURL: 'https://unpkg.com/vmsg/vmsg.wasm', //currently issues with loading .wasm files...
                 debug: true,
             }
         }
+	}
+	applyAudioWorkarounds(options);
+	return options;
+}
+
+/*
+* few audio fixes for safari/edge audio
+* see https://github.com/collab-project/videojs-record/blob/master/examples/browser-workarounds.js
+* 
+*/ 
+const applyAudioWorkarounds = (options) => {
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+	const isEdge = /Edge/.test(navigator.userAgent);
+	if (isSafari || isEdge) {
+        if (isSafari && window.MediaRecorder !== undefined) {
+            // this version of Safari has MediaRecorder
+            // but use the only supported mime type
+            options.plugins.record.audioMimeType = 'audio/mp4';
+        } else {
+            // support recording in safari 11/12
+            // see https://github.com/collab-project/videojs-record/issues/295
+            options.plugins.record.audioRecorderType = StereoAudioRecorder;
+            options.plugins.record.audioSampleRate = 44100;
+            options.plugins.record.audioBufferSize = 4096;
+            options.plugins.record.audioChannels = 2;
+        }
+
+        console.log('applied audio workarounds for this browser');
     }
 }

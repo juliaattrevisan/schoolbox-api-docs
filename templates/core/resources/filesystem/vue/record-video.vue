@@ -16,7 +16,7 @@ import axios from 'axios';
 import { gsap } from 'gsap/all';
 import VideoPlayer from '@schoolbox/videojs/video-player';
 import RecordMediaModal from './record-media-modal';
-import { getRecordCameraOptions, getRecordScreenOptions, getVideoPlaybackOptions } from '@shared/videojs/videojsOptions';
+import { getRecordCameraOptions, getRecordCameraOptionsForSafari, getRecordScreenOptions, getRecordScreenOptionsForSafari, getVideoPlaybackOptions } from '@shared/videojs/videojsOptions';
 import mediaTypes from '../js/mediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
@@ -164,7 +164,7 @@ export default {
 	watch: {
 
 		/*
-		 * ensure no invalid chars are added to the filename
+		 * ensure no invalid chars are added to the user added filename
 		 *
 		 */
 		newFilename (newValue) {
@@ -174,6 +174,8 @@ export default {
 	},
 
 	activated () {
+		this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+		this.initKeyboardEvents();
 		this.updateContainerHeight();
 		this.hideForAnimateOn();
 		this.initVideojs();
@@ -184,6 +186,20 @@ export default {
 	},
 
 	methods: {
+
+		/**
+         * to be able to select enter to save filename
+         *
+         */
+		initKeyboardEvents () {
+			document.addEventListener('keyup', (event) => {
+                const keyName = event.key;
+                if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
+                    this.onSaveFilenameSelected();
+
+                } 
+            });
+		},
 
 		/*
 		 * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
@@ -212,14 +228,18 @@ export default {
 		},
 
 		/*
-		 * to return different options for CAMERA or SCREEN
+		 * to return different options for CAMERA or SCREEN and in regards to Safari
 		 *
 		 * @returns {Object}
 		 */
 		getVideojsOptions () {
-			if (this.mediaType === mediaTypes.CAMERA) {
+			if (this.mediaType === mediaTypes.CAMERA && this.isSafari) {
+				return getRecordCameraOptionsForSafari();
+			} else if (this.mediaType === mediaTypes.CAMERA && !this.isSafari) {
 				return getRecordCameraOptions();
-			} else if (this.mediaType === mediaTypes.SCREEN) {
+			} else if (this.mediaType === mediaTypes.SCREEN && this.isSafari) {
+				return getRecordScreenOptionsForSafari();
+			} else if (this.mediaType === mediaTypes.SCREEN && !this.isSafari) {
 				return getRecordScreenOptions();
 			}
 		},
@@ -254,8 +274,11 @@ export default {
 		initVideojsRecordListeners () {
 			this.player.on('deviceReady', this.onDeviceReady);
 			this.player.on('startRecord', this.onStartRecord);
-			// this.player.on('finishRecord', this.onFinishRecord);
-			this.player.on('finishConvert', this.onFinishConvert);
+			if (this.isSafari) { //safari uses mp4 to record, while all others use default webm (with conversion to enable seekable webm)
+				this.player.on('finishRecord', this.onFinishRecord);
+			} else {
+				this.player.on('finishConvert', this.onFinishConvert);
+			}
 			this.player.on('error', this.onError);
 			this.player.on('deviceError', this.onDeviceError);
 		},
@@ -278,25 +301,29 @@ export default {
 		},
 
 		/*
-		 * the seekable media file is ready
+		 * the record mp4 file is ready (Safari)
 		 *
 		 */
 		onFinishRecord () {
-			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-			this.isRecording = false;
-			this.recordedData = this.player.recordedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
-			this.canConvert = true; //enable the convert button
-			this.isPlaybackActive = true;
+			this.recordedVideoReady(this.player.recordedData);
 		},
 
 		/*
-		 * the seekable media file is ready
+		 * the seekable webm file is ready
 		 *
 		 */
 		onFinishConvert () {
+			this.recordedVideoReady(this.player.convertedData);
+		},
+
+		/*
+		 * a video has been recorded, so can now either upload it, delete and re-record or play it back
+		 *
+		 */
+		recordedVideoReady (videoData) {
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
 			this.isRecording = false;
-			this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
+			this.recordedData = videoData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
 			this.canUpload = true; //enable the upload button
 			this.isPlaybackActive = true;
 		},
