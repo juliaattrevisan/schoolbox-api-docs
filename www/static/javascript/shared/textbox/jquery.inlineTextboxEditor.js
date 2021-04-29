@@ -99,37 +99,67 @@
      */
     InlineTextboxEditor.prototype.switchState = function (newState) {
         // Show/hide and add/remove processing from buttons dependent on state
+
+        /* The Save button should never be visible at the same time as Modify;
+         *
+         * You're either already modifying it, at which point you only need Save
+         * Or, you haven't started modifying it, and you need the Modify button
+         * but not the Save button.
+         *
+         * The Delete button is always available so you can delete a textbox at
+         * any time during the editing process
+         */
         switch (newState) {
+
+            /* The textbox renders in its initial state
+             * You haven't touched or tainted it yet, it's just on screen
+             * You can Modify or Delete, but you can't save anything (nothing to save)
+             */
             case this.states.clean:
                 this.modifyButton.removeClass('hide');
                 this.removeProcessing(this.saveButton.addClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
+            /* You've clicked the Modify button
+             * You can save or delete, but you can't Modify again
+             */
             case this.states.cleanModify:
                 this.modifyButton.addClass('hide');
                 this.removeProcessing(this.saveButton.removeClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
+            /* When you blur the editor, this executes. You should only have Save and Delete
+             * But this doesn't know if you changed the content; it always fires upon losing
+             * focus in the editor, so it's not really -dirty- as such. You can click in it
+             * and lose focus without having changed anything, and this will still fire
+             */
             case this.states.dirty:
-                this.modifyButton.removeClass('hide');
+                this.modifyButton.addClass('hide');
                 this.removeProcessing(this.saveButton.removeClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
+            /* You've changed some content in the textbox, but you haven't saved it yet
+             * This executes while you're typing, too, which seems extreme
+             */
             case this.states.dirtyModify:
                 this.modifyButton.addClass('hide');
                 this.removeProcessing(this.saveButton.removeClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
                 break;
 
+            /* When you finally hit the Save button
+             */
             case this.states.saving:
                 this.modifyButton.addClass('hide');
                 this.addProcessing(this.saveButton.removeClass('hide'), true);
                 this.addProcessing(this.deleteButton.removeClass('hide'), false);
                 break;
 
+            /* When you hit the Delete button
+             */
             case this.states.deleting:
                 this.modifyButton.addClass('hide');
                 this.addProcessing(this.saveButton.removeClass('hide'), false);
