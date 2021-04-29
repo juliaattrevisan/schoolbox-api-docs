@@ -189,8 +189,9 @@ class Controller extends BaseController
             'apps'        => $apps,
             'attachzones' => $zones,
             'providers'   => [
-                'apns' => 'Apple Push Notification Service',
-                'gcm'  => 'Google Cloud Messaging',
+                MobileApp\Registry::PROVIDER_APPLE     => 'Apple Push Notification Service',
+                MobileApp\Registry::PROVIDER_GOOGLE    => 'Google Cloud Messaging',
+                MobileApp\Registry::PROVIDER_DIGISTORM => 'Digistorm',
             ],
         ];
 
