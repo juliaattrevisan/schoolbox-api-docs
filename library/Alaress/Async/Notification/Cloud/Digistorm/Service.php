@@ -12,6 +12,7 @@ use Alaress\Async\Notification\Cloud\AbstractService;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
+use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 
@@ -57,10 +58,13 @@ class Service extends AbstractService
     protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
         $headers = [
-            'X-Auth-Token: ' . $this->key,
+            'X-Auth-Token' => $this->key,
+            'Content-Type' => 'application/json',
         ];
         $payload = [
-            'title'       => $title,
+            // TODO inject title
+            'title'       => ConfigLoader::getInstance()->get('title'),
+            'message'     => $title,
             'ids'         => $tokens,
             'custom_data' => [
                 'notice_id' => $id,
@@ -73,12 +77,13 @@ class Service extends AbstractService
             $response = $client->post(
                 self::BASE_URL,
                 [
-                    RequestOptions::BODY    => $payload,
+                    RequestOptions::BODY    => json_encode($payload),
                     RequestOptions::HEADERS => $headers,
                 ]
             );
 
             // Check the response: maybe not all IDs exist?
+            // That might be an issue worth checking?
         } catch (RuntimeException $e) {
             if ($e->getCode() === 401) {
                 // your API key is bad: don't try to do anything else
