@@ -175,18 +175,6 @@ function upgrade_instances(){
 
     rm -f /etc/facter/facts.d/"$i"_update.txt;
 
-    if [[ $is_primary_host == '1' ]]; then
-    {
-      echo "set default (no puppet) values"
-      if [[ $package == 'schoolboxdev' ]]; then
-        INSTANCE_ID="$i" "$site_root"/tools/module.sh set 'debug_show_stack_trace' '1'
-        INSTANCE_ID="$i" "$site_root"/tools/module.sh set 'site_type' 'dev'
-      else
-        INSTANCE_ID="$i" "$site_root"/tools/module.sh set 'debug_show_stack_trace' '0'
-      fi
-    } >> "$instance_log_file" 2>&1
-    fi
-
     {
       echo "$(date) - cleaning cache dirs..."
       INSTANCE_ID="$i" "$site_root"/tools/clean-cache-dir.sh

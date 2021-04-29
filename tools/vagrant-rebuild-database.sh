@@ -51,8 +51,3 @@ rm -vR /var/lib/vagrant > /dev/null;
 
 echo "$vag Applying UTF8 schema patch";
 /vagrant/tools/schema/collation2.sh schoolbox;
-
-# Need to re-enable modules too, because they're off by default
-echo "$vag Enabling modules";
-/vagrant/tools/module.sh enable leave;
-/vagrant/tools/module.sh enable resource;
