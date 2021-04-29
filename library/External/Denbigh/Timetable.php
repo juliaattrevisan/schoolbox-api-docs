@@ -253,7 +253,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
     /**
      * {@inheritDoc}
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, ?Alaress_Date_Format $date = null): array
     {
         if (empty($externalUserId)) {
             return [];

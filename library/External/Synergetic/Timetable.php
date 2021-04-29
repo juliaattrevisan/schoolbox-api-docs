@@ -51,6 +51,12 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
+     * @var array
+     */
+    private $semesters;
+
+
+    /**
      * @var Cache
      */
     private static $timetableDefinitionCache;
@@ -135,6 +141,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     private function fetchTimetableDefinition(?string $externalUserId, Campus $campus, $day = 0, $date = null): array
     {
         // check if there is a calendar event remapping the day number for this specific date
+        $dateObject = null;
         if ($date != null) {
             $statement = $this->getDatabase()->query("SELECT CalendarType FROM CalendarEvents WHERE CalendarDate = '{$date}' AND CalendarType LIKE '%=D%'");
             if ($row = $statement->fetch()) {
@@ -149,6 +156,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     $day = (int)$overrideDay;
                 }
             }
+            $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
         }
 
         $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
@@ -164,8 +172,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $statement = $this->getDatabase()->query(
             $query,
             [
-                'fileSemester'   => $this->externalUser->getCurrentSemester($externalUserId),
-                'fileYear'       => $this->externalUser->getCurrentYear($externalUserId),
+                'fileSemester'   => $this->getFileSemester($externalUserId, $dateObject),
+                'fileYear'       => $this->getFileYear($externalUserId, $dateObject),
                 'timetableGroup' => $campus->getExtTimetableCode(),
                 'day'            => $day,
             ]
@@ -174,8 +182,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $periodCount = 0;
 
         while ($period = $statement->fetch()) {
-
-
             $timetableDef['desc'][]     = $period['Description'];
             $timetableDef['start'][]    = date("g:ia", strtotime($period['TimeFrom']));
             $timetableDef['end'][]      = date("g:ia", strtotime($period['TimeTo']));
@@ -221,7 +227,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $date = time();
         }
 
-        if (!$this->isDateWithinCurrentFileSemester($date)) {
+        if (empty($this->getFileSemesterFileYear(Alaress_Date_Format::newFromTimestamp($date)))) {
             return 0;
         }
 
@@ -249,32 +255,84 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
+     * @param string|null              $externalId
+     * @param Alaress_Date_Format|null $date
+     * @return string|null
+     */
+    private function getFileYear(?string $externalId = null, ?Alaress_Date_Format $date = null): ?string
+    {
+        // if date is provided and is not today, get fileSemester and year from the date
+        if ($date && !$date->isToday()) {
+            $dateFileSemesterYear = $this->getFileSemesterFileYear($date);
+            if (isset($dateFileSemesterYear['fileYear'])) {
+                return $dateFileSemesterYear['fileYear'];
+            }
+        }
+        return $this->externalUser->getCurrentYear($externalId);
+    }
+
+
+    /**
+     * @param string|null              $externalId
+     * @param Alaress_Date_Format|null $date
+     * @return string|null
+     */
+    private function getFileSemester(?string $externalId = null, ?Alaress_Date_Format $date = null): ?string
+    {
+        // if date is provided and is not today, get fileSemester and year from the date
+        if ($date && !$date->isToday()) {
+            $dateFileSemesterYear = $this->getFileSemesterFileYear($date);
+            if (isset($dateFileSemesterYear['fileSemester'])) {
+                return $dateFileSemesterYear['fileSemester'];
+            }
+        }
+        return $this->externalUser->getCurrentSemester($externalId);
+    }
+
+
+    /**
      * Is this date timestamp within the current file semester?
      *
      * If not, day numbers and timetables won't be shown.
      *
-     * @param int $date
-     * @return bool
+     * @param Alaress_Date_Format $date
+     * @return array
      */
-    private function isDateWithinCurrentFileSemester(int $date): bool
+    private function getFileSemesterFileYear(Alaress_Date_Format $date): array
     {
-        $query      = '
-            SELECT COUNT(*)
-            FROM   FileSemesters
-            WHERE  FileYear                 =  :year
-            AND    FileSemester             =  :semester
-            AND    CONVERT(DATE, StartDate) <= :startDate
-            AND    CONVERT(DATE, EndDate)   >= :endDate
+        if (!$this->semesters) {
+            $query  = '
+            SELECT FileYear, FileSemester, CONVERT(DATE, StartDate) as SemesterStart, CONVERT(DATE, EndDate) as SemesterEnd
+            FROM FileSemesters
+            WHERE ActivatedFlag = 1
+            AND EndDate >= (SELECT TOP 1 StartDate FROM FileSemesters WHERE FileYear = :year AND FileSemester = :semester ORDER BY StartDate)
         ';
-        $dateObject = Alaress_Date_Format::newFromTimestamp($date);
-        $params     = [
-            'year'      => $this->externalUser->getCurrentYear(),
-            'semester'  => $this->externalUser->getCurrentSemester(),
-            'startDate' => $dateObject->getDatabaseDate(),
-            'endDate'   => $dateObject->getDatabaseDate(),
-        ];
+            $params = [
+                'year'     => $this->externalUser->getCurrentYear(),
+                'semester' => $this->externalUser->getCurrentSemester(),
+            ];
 
-        return $this->database->query($query, $params)->fetchColumn() > 0;
+            $semesters = $this->database->query($query, $params)->fetchAll();
+
+            foreach ($semesters as $semester) {
+                $this->semesters[] = [
+                    'fileYear'     => $semester['FileYear'],
+                    'fileSemester' => $semester['FileSemester'],
+                    'start'        => (new Alaress_Date_Format($semester['SemesterStart'], Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay(),
+                    'end'          => (new Alaress_Date_Format($semester['SemesterEnd'], Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay(),
+                ];
+            }
+        }
+
+        foreach ($this->semesters as $semester) {
+            if ($date->between($semester['start'], $semester['end'])) {
+                return [
+                    'fileYear'     => $semester['fileYear'],
+                    'fileSemester' => $semester['fileSemester'],
+                ];
+            }
+        }
+        return [];
     }
 
 
@@ -375,8 +433,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $campusString = $campus->getExtTimetableCode();
 
-        $fileSemester = $this->externalUser->getCurrentSemester($externalUserId);
-        $fileYear     = $this->externalUser->getCurrentYear($externalUserId);
+        $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+        $fileSemester = $this->getFileSemester($externalUserId, $dateObject);
+        $fileYear     = $this->getFileYear($externalUserId, $dateObject);
 
         $allowedFileTypes = $this->getAllowedFileTypes();
 
@@ -579,7 +638,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, ?Alaress_Date_Format $date = null): array
     {
         $key = sprintf('%d-%d-%s-%d-%s', $externalUserId, $userId, $campus->getExtTimetableCode(), $dayNumber, $date);
 
@@ -588,27 +647,27 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @param string $externalUserId
-     * @param int    $userId
-     * @param Campus $campus
-     * @param int    $dayNumber
-     * @param string $date
+     * @param string                   $externalUserId
+     * @param int                      $userId
+     * @param Campus                   $campus
+     * @param int                      $dayNumber
+     * @param Alaress_Date_Format|null $date
      * @return array
      */
-    private function fetchDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, $date = null): array
+    private function fetchDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, ?Alaress_Date_Format $date = null): array
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
         }
-        $timetableDef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
+        $timetableDef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date->getDatabaseDate());
 
         if (!is_array($timetableDef['desc'])) {
             return [];
         }
 
-        $fileSemester = $this->externalUser->getCurrentSemester($externalUserId);
-        $fileYear     = $this->externalUser->getCurrentYear($externalUserId);
-        $periodList = $this->getTimetablePeriods($externalUserId, (int)$userId, (int)$dayNumber, null, $fileSemester, $fileYear, $campus);
+        $fileSemester = $this->getFileSemester($externalUserId, $date);
+        $fileYear     = $this->getFileYear($externalUserId, $date);
+        $periodList   = $this->getTimetablePeriods($externalUserId, (int)$userId, (int)$dayNumber, null, $fileSemester, $fileYear, $campus);
 
         $timetable = $this->appendPeriodsToTimetable($timetableDef, $periodList, []);
         if (is_array($timetable)) {

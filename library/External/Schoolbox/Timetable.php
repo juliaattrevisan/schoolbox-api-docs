@@ -372,9 +372,9 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             FROM        sis_class c
             INNER JOIN  sis_class_period cp ON c.id = cp.class_id AND cp.teacher_external_id = :externalId
             LEFT JOIN   user u ON cp.teacher_external_id = u.synergy_id)
-            
-            UNION 
-            
+
+            UNION
+
             -- Regular class involvements where the teacher_external_id is a meaningless value
             -- (null or empty string) but you are still involved in it
             (SELECT
@@ -433,7 +433,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
     /**
      * {@inheritDoc}
      */
-    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber): array
+    public function getDayTimetable(string $externalUserId, $userId, Campus $campus, $dayNumber, ?Alaress_Date_Format $date = null): array
     {
         if (empty($externalUserId) || empty($dayNumber)) {
             return [];
@@ -523,7 +523,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
                             sis_timetable_cycle.finish >= DATE(NOW()) AND
                             sis_class_period.room IN ({$predicate["placeholders"]}) AND
                             luCampus.deleted_at IS NULL
-                GROUP BY    RoomCode, TimetableGroup, DayNumber, PeriodNumber, PeriodStart, PeriodEnd, ClassCode 
+                GROUP BY    RoomCode, TimetableGroup, DayNumber, PeriodNumber, PeriodStart, PeriodEnd, ClassCode
                 ORDER BY    sis_timetable_period.day ASC,
                             sis_timetable_period.sequence ASC
             ",
