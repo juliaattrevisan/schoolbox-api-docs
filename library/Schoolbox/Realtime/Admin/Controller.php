@@ -200,18 +200,34 @@ class Controller extends BaseController
 
 
     /**
+     * Get the create app form.
+     *
+     * @api GET /adminv2/messages/apps/new
      */
     public function getCreateAppForm()
     {
+        $data     = [];
         $provider = strtoupper($this->getRequest()->query->get('provider'));
+        switch ($provider) {
+            case MobileApp\Registry::PROVIDER_APPLE:
+                $template           = '@adminMessages/providers/APNS/create.twig';
+                $data['attachzone'] = (new Zone('apns'))->getTwigContext();
+                break;
 
-        $data = [];
+            case MobileApp\Registry::PROVIDER_GOOGLE:
+                $template = '@adminMessages/providers/GCM/create.twig';
+                break;
 
-        if ($provider === 'APNS') {
-            $data['attachzone'] = (new Zone('apns'))->getTwigContext();
+            case MobileApp\Registry::PROVIDER_DIGISTORM:
+                $template = '@adminMessages/providers/Digistorm/create.twig';
+                break;
+
+            default:
+                $this->sendError('Service does not exist');
+                return;
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@adminMessages/providers/{$provider}/create.twig", $data));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput($template, $data));
     }
 
 
