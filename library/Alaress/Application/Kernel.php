@@ -1171,7 +1171,6 @@ abstract class Kernel
             'baseMapper'            => $mapperFactory->getLazy(AssessmentMapper::class),
             'translator'            => $di->lazyGet('assessmentTranslator'),
             'participantDataSource' => $di->lazyGet('participantDataSource'),
-            'sessionUser'           => $di->lazyGet('user')
         ];
         $di->set('assessmentDataSource', $di->lazyNew(AssessmentDataSource::class));
 

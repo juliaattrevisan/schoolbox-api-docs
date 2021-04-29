@@ -89,30 +89,21 @@ class MapperProxy
 
 
     /**
-     * @var User|null
-     */
-    private ?User $sessionUser;
-
-
-    /**
      * Constructor
      *
      * @param Mapper                $baseMapper
      * @param Translator            $translator
      * @param ParticipantDataSource $participantDataSource
-     * @param User                  $sessionUser
      */
     public function __construct(
         Mapper $baseMapper,
         Translator $translator,
-        ParticipantDataSource $participantDataSource,
-        User $sessionUser
+        ParticipantDataSource $participantDataSource
     ) {
         $this->baseMapper            = $baseMapper;
         $this->translator            = $translator;
         $this->participantDataSource = $participantDataSource;
         $this->model                 = IAssessable::class;
-        $this->sessionUser           = $sessionUser;
     }
 
 
