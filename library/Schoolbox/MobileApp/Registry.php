@@ -16,7 +16,7 @@ class Registry {
 
     const PROVIDER_GOOGLE    = 'GCM';
     const PROVIDER_APPLE     = 'APNS';
-    const PROVIDER_DIGISTORM = 'DIGISTORM';
+    const PROVIDER_DIGISTORM = 'Digistorm';
 
 
     /** @var User */
