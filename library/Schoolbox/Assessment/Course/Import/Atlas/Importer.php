@@ -489,7 +489,7 @@ class Importer
 
 
         // And finally save
-        $this->assessmentDataSource->save($dueWork);
+        $this->assessmentDataSource->save($dueWork, $this->currentUser);
         return $dueWork;
     }
 

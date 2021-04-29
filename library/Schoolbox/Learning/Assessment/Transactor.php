@@ -25,6 +25,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\User;
 use UnexpectedValueException;
 
 /**
@@ -127,8 +128,9 @@ class Transactor
     /**
      * Figure out a returnUrl when creating/updating assessments
      *
-     * @param IAssessable $assessment
-     * @param array       $before
+     * @param IAssessable      $assessment
+     * @param User             $currentUser
+     * @param array            $before
      * @param IAssessable|null $originalAssessment
      * @return array
      * @throws MapperException
@@ -139,8 +141,12 @@ class Transactor
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    public function transact(IAssessable $assessment, array $before = [], ?IAssessable $originalAssessment = null): array
-    {
+    public function transact(
+        IAssessable $assessment,
+        User $currentUser,
+        array $before = [],
+        ?IAssessable $originalAssessment = null
+    ): array {
         $this->assessment = $assessment;
         $relocated = false;
         // Verify that the context of the assessment is valid
@@ -152,13 +158,13 @@ class Transactor
         if (!$this->assessment->getId()) {
             try {
                 if ($assessmentContext instanceof Folder) {
-                    $returnUrl = $this->transactFolderContext();
+                    $returnUrl = $this->transactFolderContext($currentUser);
                 } elseif ($assessmentContext instanceof UnitImplementation) {
-                    $returnUrl = $this->transactUnitImplementationContext();
+                    $returnUrl = $this->transactUnitImplementationContext($currentUser);
                 } elseif ($assessmentContext instanceof UnitSpecification) {
-                    $returnUrl = $this->transactUnitSpecificationContext();
+                    $returnUrl = $this->transactUnitSpecificationContext($currentUser);
                 } elseif ($assessmentContext instanceof Project) {
-                    $returnUrl = $this->transactProjectContext();
+                    $returnUrl = $this->transactProjectContext($currentUser);
                 } else {
                     throw new InvalidArgumentException('Please select a valid context');
                 }
@@ -169,7 +175,7 @@ class Transactor
         /* Otherwise you came from the update screen, just go back there for now
          */
         else {
-            $this->assessmentMapperProxy->save($this->assessment);
+            $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
             /* Due Work has a special thing going on where it can upload to Plagscan
              *
@@ -209,6 +215,7 @@ class Transactor
     /**
      * Transact from Folder context
      *
+     * @param  User $currentUser
      * @return string
      * @throws LogicException
      * @throws MapperException
@@ -217,7 +224,7 @@ class Transactor
      * @throws UnexpectedValueException
      * @throws DefinitionException
      */
-    private function transactFolderContext(): string
+    private function transactFolderContext(User $currentUser): string
     {
 
         /* TODO: Pass contextId as a param into this method
@@ -226,7 +233,7 @@ class Transactor
          */
         $context = $this->folderMapper->findById($this->assessment->getContext()->getId());
 
-        $this->assessmentMapperProxy->save($this->assessment);
+        $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
         return "/homepage/{$context->getId()}";
     }
@@ -235,6 +242,7 @@ class Transactor
     /**
      * Transact from Unit Implementation context
      *
+     * @param  User $currentUser
      * @return string
      * @throws LogicException
      * @throws MapperException
@@ -242,11 +250,11 @@ class Transactor
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    private function transactUnitImplementationContext(): string
+    private function transactUnitImplementationContext(User $currentUser): string
     {
         $context = $this->unitImplementationMapper->findById($this->assessment->getContext()->getId());
 
-        $this->assessmentMapperProxy->save($this->assessment);
+        $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
         return "/homepage/{$context->getId()}";
     }
@@ -255,6 +263,7 @@ class Transactor
     /**
      * Transact from Unit Specification context
      *
+     * @param  User $currentUser
      * @return string
      * @throws LogicException
      * @throws MapperException
@@ -263,13 +272,13 @@ class Transactor
      * @throws RouteNotFound
      * @throws UnexpectedValueException
      */
-    private function transactUnitSpecificationContext(): string
+    private function transactUnitSpecificationContext(User $currentUser): string
     {
         // The unit spec doesn't contain a reference back to its course spec.
         // It should, or I should be able to find one.
         $context = $this->unitSpecificationMapper->findById($this->assessment->getContext()->getId());
 
-        $this->assessmentMapperProxy->save($this->assessment);
+        $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
         return $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]);
     }
@@ -280,6 +289,7 @@ class Transactor
      *
      * Check that you don't spawn a Project in a Project
      *
+     * @param  User $currentUser
      * @return string
      * @throws LogicException
      * @throws MapperException
@@ -288,14 +298,14 @@ class Transactor
      * @throws UnexpectedValueException
      * @throws DomainException
      */
-    private function transactProjectContext(): string
+    private function transactProjectContext(User $currentUser): string
     {
         if ($this->assessment instanceof Project) {
             throw new DomainException('You cannot create nested projects.');
         }
 
         // TODO figure out what to do about this
-        $this->assessmentMapperProxy->save($this->assessment);
+        $this->assessmentMapperProxy->save($this->assessment, $currentUser);
 
         return "/homepage/{$this->assessment->getContext()->getId()}";
     }
