@@ -469,7 +469,7 @@ class ListController extends Web\Controller\Base
             $assessmentFactory = new Factory($user, $postData, $postData['assessmentType'], $originalAssessment);
             $assessment        = $assessmentFactory->produce($assessment);
 
-            $transactionSummary = $this->transactor->transact($assessment, $before, $originalAssessment);
+            $transactionSummary = $this->transactor->transact($assessment, $this->getUser(), $before, $originalAssessment);
 
             // assessment is saved; persist plans
 
