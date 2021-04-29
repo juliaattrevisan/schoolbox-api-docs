@@ -21,7 +21,7 @@
         {{ dataVar }}="{{ dataValue }}"
     {% endfor %}
 
-    {% if readonly %}readonly{% endif %}
+    {% if readonly ?? false %}readonly{% endif %}
 >
     {% if showPrompt ?? false %}
     <option disabled selected="selected" value="">Please Select</option>
