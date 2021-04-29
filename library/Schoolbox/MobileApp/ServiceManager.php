@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -173,19 +173,25 @@ class ServiceManager implements IServiceManager
 
             switch ($provider) {
                 case Registry::PROVIDER_APPLE:
-
-                    /** @var Storage\Model $storageObj */
                     $storageObj = $service->getCertificate();
-
-                    if (!$storageObj) {
+                    if (!$storageObj instanceof Storage\Model) {
                         // invalid PEM reference
                         throw new Mapper\Exception('No PEM certificate given for APNS service.');
                     }
 
-                    return new Cloud\Apple\APNS($this->registryMapper, $identifier, Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
+                    return new Cloud\Apple\APNS(
+                        $this->registryMapper,
+                        $identifier,
+                        Apns\Client\Message::PRODUCTION_URI,
+                        $this->getPemPath($storageObj),
+                        $key
+                    );
 
                 case Registry::PROVIDER_GOOGLE:
                     return new Cloud\Google\GCM($this->registryMapper, $identifier, $key);
+
+                case Registry::PROVIDER_DIGISTORM:
+                    return new Cloud\Digistorm\Service($this->registryMapper, $identifier, $key);
             }
 
             throw new Mapper\Exception("Invalid provider: must be one of APNS or GCM, '$provider' given.");
