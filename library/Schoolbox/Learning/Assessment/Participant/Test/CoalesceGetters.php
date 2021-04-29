@@ -189,7 +189,7 @@ class CoalesceGetters extends TestCase
 
 
     /**
-     * @return null[]|Alaress_Date_NullDate[]
+     * @return null[]|Alaress_Date_NullDate[]|Alaress_Date_Format[]
      */
     private function getDates(): array
     {

@@ -1462,9 +1462,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * This isn't a null date
+     * This isn't a null date: however, subclasses might be
      *
-     * @return false
+     * @return bool
      */
     public function isNull()
     {

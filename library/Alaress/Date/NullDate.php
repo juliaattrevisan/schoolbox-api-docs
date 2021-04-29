@@ -44,7 +44,7 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
     }
 
     /**
-     * This is a null date
+     * This is a null date: thus it will always return true
      *
      * @return true
      */
