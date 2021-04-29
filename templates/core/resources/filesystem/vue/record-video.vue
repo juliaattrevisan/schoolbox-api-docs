@@ -59,71 +59,6 @@ export default {
 	computed: {
 
 		/*
-		 * To know that you'll be re-recording a video, overwriting the previously recorded
-		 *
-		 * @returns { String }
-		 */
-		turnOnText () {
-			if (this.mediaType === mediaTypes.CAMERA) {
-				return 'Turn on Camera';
-			} else if (this.mediaType === mediaTypes.SCREEN) {
-				return 'Enable Screen Sharing';
-			}
-		},
-
-		/*
-		 * To know whether to show the record button
-		 *
-		 * @returns { Boolean }
-		 */
-		showRecordButton () {
-			if (this.isDeviceReady && !this.canUpload && !this.isRecording && !this.isUploading) {
-				return true;
-			} else {
-				return false;
-			}
-		},
-
-		/*
-		 * To know whether to show the stop button
-		 *
-		 * @returns { Boolean }
-		 */
-		showStopButton () {
-			if (this.isDeviceReady && !this.canUpload && this.isRecording && !this.isUploading) {
-				return true;
-			} else {
-				return false;
-			}
-		},
-
-		/*
-		 * To know whether to show the play recording button
-		 *
-		 * @returns { Boolean }
-		 */
-		showPlayRecordingButton () {
-			if (this.isPlaybackVideoActive && !this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isUploading) {
-				return true;
-			} else {
-				return false;
-			}
-		},
-
-		/*
-		 * To know whether to show the stop recording button
-		 *
-		 * @returns { Boolean }
-		 */
-		showStopRecordingButton () {
-			if (this.isPlaybackVideoActive && this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isUploading) {
-				return true;
-			} else {
-				return false;
-			}
-		},
-
-		/*
 		 * To know whether to show the upload button
 		 *
 		 * @returns { Boolean }
@@ -150,7 +85,7 @@ export default {
 		},
 
 		/*
-		 * grab the new filename with the extension
+		 * grab the new filename with the relevant extension (can be webm or mp4)
 		 *
 		 * @returns { String }
 		 */
@@ -188,7 +123,7 @@ export default {
 	methods: {
 
 		/**
-         * to be able to select enter to save filename
+         * to be able to press enter to save filename
          *
          */
 		initKeyboardEvents () {
@@ -348,31 +283,6 @@ export default {
 				this.hasPermissionDeniedError = true;
 			}
 			console.warn(this.player.deviceErrorCode);
-		},
-
-		/*
-		 * enable the device, initially it's a blank screen until enabled
-		 * may request permission on first use
-		 *
-		 */
-		onEnableSelected () {
-			this.player.record().getDevice();
-		},
-
-		/*
-		 * start the record
-		 *
-		 */
-		onStartRecordSelected () {
-			this.player.record().start();
-		},
-
-		/*
-		 * stop the record
-		 *
-		 */
-		onStopRecordSelected () {
-			this.player.record().stop();
 		},
 
 		/*
@@ -559,6 +469,9 @@ export default {
 								@on-video-ready="onPlaybackVideoReady"
 							/>
 						</div>
+						<transition name="fade">
+							<a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="delete-button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
+						</transition>
 					</div>
 
 					<record-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
@@ -606,20 +519,8 @@ export default {
 		<div class="component-action" ref="actions">
 			<section>
 				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
-				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#turn-on" key="camera">{{ turnOnText }}</a>
 				<transition name="fade">
 					<a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button" title="Upload" href="#upload" key="upload">Upload</a>
-				</transition>
-				<transition name="fade">
-					<a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" role="button" class="button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
-				</transition>
-				<transition name="fade" mode="out-in">
-					<a v-if="showRecordButton" @click.prevent="onStartRecordSelected" role="button" class="button" title="Record" href="#record-video" key="record">Record</a>
-					<a v-else-if="showStopButton" @click.prevent="onStopRecordSelected" role="button" class="button" title="Stop Video" href="#stop-recording-video" key="stop">Stop</a>
-				</transition>
-				<transition name="fade" mode="out-in">
-					<a v-if="showPlayRecordingButton" @click.prevent="$refs.playbackVideo.play()" role="button" class="button" title="Play Video" href="#play-video" key="play">Play Recording</a>
-					<a v-else-if="showStopRecordingButton" @click.prevent="$refs.playbackVideo.pause()" role="button" class="button" title="Pause Video" href="#pause-video" key="pause">Pause Recording</a>
 				</transition>
 			</section>
 		</div><!-- .component-action -->
@@ -646,6 +547,13 @@ export default {
 	height: 100%;
 	left: 0;
 	top: 0;
+}
+
+.delete-button {
+	position: absolute;
+	z-index: 1;
+	right: 20px;
+	top: 20px;
 }
 
 .modal-actions {

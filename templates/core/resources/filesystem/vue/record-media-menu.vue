@@ -49,8 +49,9 @@ export default {
 		 */ 
 		setInitialPosition () {
 			const allMenuItems = Array.from(this.$refs.menu.children);
+			const toHideHeight = this.$refs.menu.offsetHeight; //to hide the menu items underneath
 			allMenuItems.forEach((element) => {
-				gsap.set(element, { top: 44 } );
+				gsap.set(element, { top: toHideHeight } );
 			});
 		},
 

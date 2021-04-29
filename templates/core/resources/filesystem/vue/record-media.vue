@@ -7,9 +7,10 @@
 
 import RecordMediaMenu from './record-media-menu';
 import RecordMediaUnset from './record-media-unset';
-import RecordVideo from './record-video';
 import RecordAudioOnly from './record-audio-only';
+import RecordVideo from './record-video';
 import mediaTypes from '../js/mediaTypes';
+import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
 
 
 export default {
@@ -17,8 +18,8 @@ export default {
 	components: {
 		RecordMediaMenu,
 		RecordMediaUnset,
-		RecordVideo,
-		RecordAudioOnly
+		RecordAudioOnly,
+		RecordVideo
 	},
 
 	data () {
