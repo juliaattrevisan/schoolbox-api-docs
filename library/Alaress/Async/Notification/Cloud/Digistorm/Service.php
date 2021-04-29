@@ -84,6 +84,8 @@ class Service extends AbstractService
 
             // Check the response: maybe not all IDs exist?
             // That might be an issue worth checking?
+            // Maybe also check rate limit, as the response contains an
+            // "X-RateLimit-Remaining" header.
         } catch (RuntimeException $e) {
             if ($e->getCode() === 401) {
                 // your API key is bad: don't try to do anything else
