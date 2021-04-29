@@ -257,7 +257,6 @@ class CohortAnalysis
             return $this->compareAssessments($assessment1, $assessment2);
         });
 
-
         // Calculate student weighted average mark
         /** @var array $assessmentGradePairs */
         foreach ($involvedAssessments as $userId => $assessmentGradePairs) {
@@ -273,7 +272,9 @@ class CohortAnalysis
                 $totalWeight += $weight;
             }
 
-            if (0 !== $totalWeight) {
+            /* Weights are floats now
+             */
+            if ((float)0 !== $totalWeight) {
                 $this->courseGrades[$userId] = $weightedSum / $totalWeight;
             }
         }
