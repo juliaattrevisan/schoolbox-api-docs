@@ -71,6 +71,22 @@ abstract class Request
     }
 
     /**
+     * Set the 'Content-Type' header of the request
+     * @param string $type
+     */
+    public function setContentType(string $type) {
+        $this->setHeader('Content-Type', $type);
+    }
+
+    /**
+     * Set the 'Accept' header of the request
+     * @param string $type
+     */
+    public function setAccepts(string $type) {
+        $this->setHeader('Accept', $type);
+    }
+
+    /**
      * Returns this request's HTTP method
      *
      * @return string

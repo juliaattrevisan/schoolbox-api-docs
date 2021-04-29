@@ -5,7 +5,7 @@
                 <div>
                     {# raw HTML reluctantly sanctioned - this should not be HTML, but maybe some error codes are? #}
 
-                    {% if message %}
+                    {% if message is defined %}
                     <h1>
                         {{ message|striptags }}
                     </h1>

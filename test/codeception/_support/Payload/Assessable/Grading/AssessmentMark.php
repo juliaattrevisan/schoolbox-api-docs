@@ -38,6 +38,8 @@ class AssessmentMark extends Request
             ? "/learning/assessments/$assessmentId/$studentId/responses"
             : "/learning/assessments/$assessmentId/$studentId/responses/$submissionId";
         $this->setReferer($referer);
+        $this->setContentType('application/json');
+        $this->setAccepts('application/json, text/javascript, */*; q=0.01');
 
         $this->setFormParam('responseId', $submissionId === null ? '' : (string)$submissionId);
         $this->setFormParam('fromInlineGrader', true);
