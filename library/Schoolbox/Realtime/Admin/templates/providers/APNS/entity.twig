@@ -20,7 +20,7 @@
             <form style="display:none;" id="change-apns-{{ appId }}" action="{{ routeLookup('adminMessages.postModifyApp') }}" method="post">
                 <input type="hidden" name="id" value="{{ app.id }}" />
                 <input type="hidden" name="app" value="{{ app.appIdentifier }}" />
-                <input type="hidden" name="provider" value="apns" />
+                <input type="hidden" name="provider" value="{{ app.providerName }}" />
                 <div class="row">
                     <div class="small-12 medium-6 column">
                         <label>New APNS Certificate File</label>

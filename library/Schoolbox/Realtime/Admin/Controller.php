@@ -193,9 +193,18 @@ class Controller extends BaseController
             'apps'           => $apps,
             'attachzones'    => $zones,
             'providers'      => [
-                MobileApp\Registry::PROVIDER_APPLE     => 'Apple Push Notification Service',
-                MobileApp\Registry::PROVIDER_GOOGLE    => 'Google Cloud Messaging',
-                MobileApp\Registry::PROVIDER_DIGISTORM => 'Digistorm',
+                MobileApp\Registry::PROVIDER_APPLE     => [
+                    'template'    => '@adminMessages/providers/APNS/entity.twig',
+                    'description' => 'Apple Push Notification Service'
+                ],
+                MobileApp\Registry::PROVIDER_GOOGLE    => [
+                    'template'    => '@adminMessages/providers/GCM/entity.twig',
+                    'description' => 'Google Cloud Messaging',
+                ],
+                MobileApp\Registry::PROVIDER_DIGISTORM => [
+                    'template'    => '@adminMessages/providers/Digistorm/entity.twig',
+                    'description' => 'Digistorm',
+                ],
             ],
         ];
 

@@ -1,0 +1,37 @@
+{% set appId = app.appIdentifier | replace({'.': '-'}) %}
+<div class="small-12 column content">
+    <dl class="inline-dl">
+        <dt class="small-12 medium-4">App ID</dt>
+        <dd class="small-12 medium-8"><p>{{ app.appIdentifier }}</p></dd>
+
+        <dt class="small-12 medium-4">Provider</dt>
+        <dd class="small-12 medium-8"><p>Digistorm</p></dd>
+
+        <dt class="small-12 medium-4">Digistorm API Key</dt>
+        <dd class="small-12 medium-8">
+            <p>
+                <code>{{ app.key }}</code>
+                (<a href="#" data-open="change-digistorm-{{ appId }}">Change</a>)
+            </p>
+        </dd>
+    </dl>
+    <div class="row">
+        <div class="small-12 column">
+            <form style="display:none;" id="change-digistorm-{{ appId }}" action="{{ routeLookup('adminMessages.postModifyApp') }}" method="post">
+                <input type="hidden" name="id" value="{{ app.id }}" />
+                <input type="hidden" name="app" value="{{ app.appIdentifier }}" />
+                <input type="hidden" name="provider" value="{{ app.providerName }}" />
+                <div class="row">
+                    <div class="small-12 column">
+                        <label>New Digistorm API Key
+                            <input type="text" name="key" value="" />
+                        </label>
+                    </div>
+                    <div class="small-12 column">
+                        <input type="submit" value="Install New Key">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
