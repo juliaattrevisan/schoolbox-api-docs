@@ -34,10 +34,34 @@ export const getRecordCameraOptions = () => {
                     width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
                     height: { min: 240, ideal: 360, max: 720 }
 				},
-				videoMimeType: 'video/mp4',
-                screen: true,
+				convertEngine: 'ts-ebml', //to be able to have seekable webm files
                 maxLength: 300, //five minutes
-                // convertEngine: 'ts-ebml', //to be able to have seekable webm files
+                debug: true,
+            }
+        }
+    }
+}
+
+export const getRecordCameraOptionsForSafari = () => {
+    return {
+        controls: true,
+        autoplay: false,
+        fluid: true,
+        aspectRatio: '16:9',
+        loop: false,
+        bigPlayButton: false,
+        controlBar: {
+            volumePanel: false,
+        },
+        plugins: {
+            record: {
+                audio: true,
+                video: {
+                    width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
+                    height: { min: 240, ideal: 360, max: 720 }
+				},
+				videoMimeType: 'video/mp4', //all supported excluding Safari use webm
+                maxLength: 300, //five minutes
                 debug: true,
             }
         }
@@ -65,7 +89,9 @@ export const getRecordScreenOptions = () => {
                 audio: true,
                 screen: true,
                 maxLength: 300, //five minutes
-                convertEngine: 'ts-ebml', //to be able to have seekable webm files
+				convertEngine: 'ts-ebml', //to be able to have seekable webm files
+				frameWidth: 640,
+           		frameHeight: 480,
                 debug: true,
             }
         }

@@ -17,8 +17,6 @@ import { gsap } from 'gsap/all';
 import VideoPlayer from '@schoolbox/videojs/video-player';
 import RecordMediaModal from './record-media-modal';
 import { getRecordCameraOptions, getRecordScreenOptions, getVideoPlaybackOptions } from '@shared/videojs/videojsOptions';
-import { convertFilenameExtension } from '@shared/util/fileUtils';
-import { convertToMp4 } from '@shared/video/convertVideo';
 import mediaTypes from '../js/mediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
@@ -51,10 +49,7 @@ export default {
 			isFilenameModalActive: false, //prompt the filename change modal
 			newFilename: '',
 			isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
-			canConvert: false, //when there's a video available to convert, provide convert button
-			isConverting: false, //converting video to mp4, to notify user
-			conversionProgress: 0, //to indicate to the user conversion progress
-			hasConversionError: false, //converting video to mp4, to notify user
+			canUpload: false, //to upload the file
 			isUploading: false, //to notify of update
 			hasUploadError: false, //to notify of upload error, try again?
 			hasUploaded: false //notify UI of upload complete
@@ -82,7 +77,7 @@ export default {
 		 * @returns { Boolean }
 		 */
 		showRecordButton () {
-			if (this.isDeviceReady && !this.canConvert && !this.isRecording && !this.isConverting && !this.isUploading) {
+			if (this.isDeviceReady && !this.canUpload && !this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -95,7 +90,7 @@ export default {
 		 * @returns { Boolean }
 		 */
 		showStopButton () {
-			if (this.isDeviceReady && !this.canConvert && this.isRecording && !this.isConverting && !this.isUploading) {
+			if (this.isDeviceReady && !this.canUpload && this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -108,7 +103,7 @@ export default {
 		 * @returns { Boolean }
 		 */
 		showPlayRecordingButton () {
-			if (this.isPlaybackVideoActive && !this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isConverting && !this.isUploading) {
+			if (this.isPlaybackVideoActive && !this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -121,7 +116,7 @@ export default {
 		 * @returns { Boolean }
 		 */
 		showStopRecordingButton () {
-			if (this.isPlaybackVideoActive && this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isConverting && !this.isUploading) {
+			if (this.isPlaybackVideoActive && this.$refs.playbackVideo.isPlaying && !this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -129,12 +124,12 @@ export default {
 		},
 
 		/*
-		 * To know whether to show the convert button
+		 * To know whether to show the upload button
 		 *
 		 * @returns { Boolean }
 		 */
-		showConvertAndUploadButton () {
-			if (this.canConvert && !this.isRecording && !this.isConverting && !this.isUploading) {
+		showUploadButton () {
+			if (this.canUpload && !this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -147,7 +142,7 @@ export default {
 		 * @returns { Boolean }
 		 */
 		showDeleteRecordingButton () {
-			if (this.canConvert && !this.isRecording && !this.isConverting && !this.isUploading) {
+			if (this.canUpload && !this.isRecording && !this.isUploading) {
 				return true;
 			} else {
 				return false;
@@ -155,22 +150,13 @@ export default {
 		},
 
 		/*
-		 * convert the filename to use .mp4 instead of whatever it was
+		 * grab the new filename with the extension
 		 *
 		 * @returns { String }
 		 */
-		currentRecordedFilenameToMp4 () {
-			return convertFilenameExtension(this.newFilename, '.mp4');
-		},
-
-		/*
-		 * to set a percentage width on an element
-		 *
-		 * @returns { String }
-		 */
-		currentConvertedPercentage () {
-			const percentage = (this.conversionProgress * 100.0).toFixed(2);
-			return percentage + '%';
+		newFilenameWithExtension () {
+			const extension = this.recordedData.name.split('.').pop();
+			return this.newFilename + '.' + extension;
 		},
 
 	},
@@ -268,8 +254,8 @@ export default {
 		initVideojsRecordListeners () {
 			this.player.on('deviceReady', this.onDeviceReady);
 			this.player.on('startRecord', this.onStartRecord);
-			this.player.on('finishRecord', this.onFinishRecord);
-			// this.player.on('finishConvert', this.onFinishConvert);
+			// this.player.on('finishRecord', this.onFinishRecord);
+			this.player.on('finishConvert', this.onFinishConvert);
 			this.player.on('error', this.onError);
 			this.player.on('deviceError', this.onDeviceError);
 		},
@@ -307,13 +293,13 @@ export default {
 		 * the seekable media file is ready
 		 *
 		 */
-		// onFinishConvert () {
-		// 	this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-		// 	this.isRecording = false;
-		// 	this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
-		// 	this.canConvert = true; //enable the convert button
-		// 	this.isPlaybackActive = true;
-		// },
+		onFinishConvert () {
+			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
+			this.isRecording = false;
+			this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
+			this.canUpload = true; //enable the upload button
+			this.isPlaybackActive = true;
+		},
 
 		/*
 		 * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
@@ -369,7 +355,7 @@ export default {
 		 */
 		onConfirmDeleteRecordingSelected () {
 			this.isDeleteRecordingModalActive = false;
-			this.canConvert = false;
+			this.canUpload = false;
 			this.isPlaybackActive = false;
 			this.isPlaybackVideoActive = false;
 			this.player.record().getDevice();
@@ -379,7 +365,7 @@ export default {
 		 * present the save file name modal to name the file
 		 *
 		 */
-		onConvertSelected () {
+		onUploadSelected () {
 			this.isFilenameModalActive = true;
 		},
 
@@ -387,19 +373,10 @@ export default {
 		 * the user has set a file name and selected save
 		 *
 		 */
-		onSaveFilenameSelected () {
+		async onSaveFilenameSelected () {
 			this.isFilenameModalActive = false;
-			this.convertAndUploadVideo();
-		},
-
-		/*
-		 * convert and upload to SB
-		 * 
-		 */
-		async convertAndUploadVideo () {
 			try {
-				// await this.convertVideo();
-				const responseData = await this.uploadConvertedVideo();
+				const responseData = await this.uploadVideo();
 				this.postUploadedMessage(responseData);
 			} catch (error) {
 				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
@@ -408,46 +385,15 @@ export default {
 		},
 
 		/*
-		 * convert all browser videos to mp4 for consistency
-		 * refer to https://github.com/ffmpegwasm/ffmpeg.wasm/blob/master/docs/api.md for further details
+		 * the video is ready, so upload it up to SchoolBox
+		 *
 		 */
-		async convertVideo () {
+		async uploadVideo () {
 			try {
 				this.$emit(recordMediaEvents.PROCCESS_STARTED);
-				this.isConverting = true;
-				this.convertedData = await convertToMp4(this.recordedData, this.currentRecordedFilenameToMp4, this.updateConversionProgress) //into blob format for uplaod to Schoolbox
-				this.isConverting = false;
-			} catch (error) {
-				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-				this.isConverting = false;
-				this.hasConversionError = true;
-				console.log(error);
-			}
-		},
-
-		/*
-		 * to inform the user of progress to track estimated time of completion
-		 *
-		 * @params { ratio }
-		 */
-		updateConversionProgress (progress) {
-			if (progress < 0) {
-				this.conversionProgress = 0;
-			} else {
-				this.conversionProgress = progress;
-			}
-		},
-
-		/*
-		 * the mp4 is ready, so upload it up to SchoolBox
-		 *
-		 */
-		async uploadConvertedVideo () {
-			try {
 				this.isUploading = true;
 				const formData = new FormData();
-				// formData.append('upload', this.convertedData, this.currentRecordedFilenameToMp4);
-				formData.append('upload', this.recordedData, this.recordedData.name);
+				formData.append('upload', this.recordedData, this.newFilenameWithExtension);
 				const response = await axios.post('/storage/asyncUpload.php', formData);
 				return response.data;
 			} catch (error) {
@@ -467,11 +413,8 @@ export default {
 		 */
 		postUploadedMessage (responseData) {
 			const data = {
-				// title:    this.currentRecordedFilenameToMp4,
-				title:    this.recordedData.name,
-				// mimeType: this.convertedData.type,
+				title:    this.newFilenameWithExtension,
 				mimeType: this.recordedData.type,
-				// filesize: this.convertedData.size,
 				filesize: this.recordedData.size,
 				hash:     responseData.hash
 			};
@@ -508,7 +451,6 @@ export default {
 		onErrorModalClosed () {
 			this.hasDeviceAlreadyInUseError = false;
 			this.hasPermissionDeniedError = false;
-			this.hasConversionError = false;
 		},
 
 		/*
@@ -593,17 +535,13 @@ export default {
 						</div>
 					</div>
 
-					<record-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError || hasConversionError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
+					<record-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
 						<template v-if="hasDeviceAlreadyInUseError">
 			 				 <div class="alert-box warning">The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 						<template v-else-if="hasPermissionDeniedError">
 			 	 			<div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
-							<button @click.prevent="onCloseErrorModalSelected">Close</button>
-						</template>
-						<template v-else-if="hasConversionError">
-			  				<div class="alert-box alert">There was an error while converting.</div>
 							<button @click.prevent="onCloseErrorModalSelected">Close</button>
 						</template>
 					</record-media-modal>
@@ -621,14 +559,9 @@ export default {
 						<label for="filename" class="required" aria-required="true">Filename</label>
 						<input type="text" id="filename" name="filename" v-model="newFilename">
 						<div class="modal-actions">
-							<button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Save and convert</button>
+							<button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
 							<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
 						</div>	
-					</record-media-modal>
-
-					<record-media-modal v-else-if="isConverting" ref="convertingModal" key="convertingModal">
-						<div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ width: currentConvertedPercentage }"></span></div>
-						<p><em>Converting the video to mp4, please wait...</em></p>
 					</record-media-modal>
 
 					<record-media-modal v-else-if="isUploading" ref="uploadingModal" key="uploadingModal">
@@ -637,7 +570,7 @@ export default {
 					</record-media-modal>
 					
 					<record-media-modal v-else-if="hasUploaded" ref="uploadedModal" key="uploadedModal">
-						<p><em>Video successfully converted &amp; uploaded.</em></p>
+						<p><em>Video successfully uploaded.</em></p>
 					</record-media-modal>
 
 				</div>
@@ -649,7 +582,7 @@ export default {
 				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
 				<a v-if="!isDeviceReady" @click.prevent="onEnableSelected" role="button" class="button" title="Enable Video" href="#turn-on" key="camera">{{ turnOnText }}</a>
 				<transition name="fade">
-					<a v-if="showConvertAndUploadButton" @click.prevent="onConvertSelected" role="button" class="button button-convert" title="Convert &amp; Upload" href="#convert-and-upload" key="convert">Convert &amp; upload</a>
+					<a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button" title="Upload" href="#upload" key="upload">Upload</a>
 				</transition>
 				<transition name="fade">
 					<a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" role="button" class="button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>

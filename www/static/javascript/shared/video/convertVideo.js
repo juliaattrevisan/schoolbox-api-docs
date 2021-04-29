@@ -1,6 +1,8 @@
 
 /*
  * Convert video to other formats
+ * SB is not ready for this yet though 
+ * lots of cross-header security related issues to overcome first
  *
  */
 
