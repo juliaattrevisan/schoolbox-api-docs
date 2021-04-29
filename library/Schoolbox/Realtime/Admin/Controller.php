@@ -167,6 +167,10 @@ class Controller extends BaseController
 
 
     /**
+     * Show list of apps.
+     *
+     * @api GET /adminv2/messages/apps
+     *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getApps()
@@ -184,11 +188,11 @@ class Controller extends BaseController
         }
 
         $data = [
-            'pageCurrent' => $this->router->generate('adminMessages.getApps'),
+            'pageCurrent'    => $this->router->generate('adminMessages.getApps'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMessages.getApps')),
-            'apps'        => $apps,
-            'attachzones' => $zones,
-            'providers'   => [
+            'apps'           => $apps,
+            'attachzones'    => $zones,
+            'providers'      => [
                 MobileApp\Registry::PROVIDER_APPLE     => 'Apple Push Notification Service',
                 MobileApp\Registry::PROVIDER_GOOGLE    => 'Google Cloud Messaging',
                 MobileApp\Registry::PROVIDER_DIGISTORM => 'Digistorm',
