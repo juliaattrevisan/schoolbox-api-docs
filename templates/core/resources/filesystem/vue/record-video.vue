@@ -1,7 +1,7 @@
 <script>
 
 /*
- * To record, playback, convert and upload a video into SB 
+ * To record, playback, convert and upload a camera/screen recording into SB 
  *
  */
 
@@ -196,7 +196,6 @@ export default {
                 const keyName = event.key;
                 if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
                     this.onSaveFilenameSelected();
-
                 } 
             });
 		},
@@ -445,11 +444,11 @@ export default {
 				filesize: this.recordedData.size,
 				hash:     responseData.hash
 			};
-			this.isUploading = false;
 			this.hasUploaded = true;
 			setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
 				window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
+				this.isUploading = false;
 			}, 1000);
 		},
 

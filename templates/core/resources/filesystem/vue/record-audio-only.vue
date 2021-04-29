@@ -155,6 +155,7 @@ export default {
 	},
 
 	mounted () {
+		this.initKeyboardEvents();
 		this.updateContainerHeight();
 		this.hideForAnimateOn();
 		this.initVideojs();
@@ -165,6 +166,19 @@ export default {
 	},
 
 	methods: {
+
+		/**
+         * to be able to select enter to save filename
+         *
+         */
+		initKeyboardEvents () {
+			document.addEventListener('keyup', (event) => {
+                const keyName = event.key;
+                if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
+                    this.onSaveFilenameSelected();
+                } 
+            });
+		},
 
 		/*
 		 * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
@@ -369,11 +383,11 @@ export default {
 				filesize: this.recordedData.size,
 				hash:     responseData.hash
 			};
-			this.isUploading = false;
 			this.hasUploaded = true;
 			setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
 				window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 				this.$emit(recordMediaEvents.PROCCESS_STOPPED);
+				this.isUploading = false;
 			}, 1000);
 		},
 

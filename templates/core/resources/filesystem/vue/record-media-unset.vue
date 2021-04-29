@@ -184,9 +184,8 @@ $font-family-icon: 'schoolbox';
 
 .icon {
 	font-family: $font-family-icon;
-
 	&:before {
-		color: $content-ui-foreground;
+	color: $content-ui-foreground;
 	font-size: 3rem;
 		padding: 0;
 	}

@@ -52,7 +52,7 @@ export default {
 		},
 
 		/**
-		 * to be able to disable certain behavour when conversions/uploads are taking place
+		 * to be able to re-enable certain behavour when conversions/uploads are taking place
 		 *
 		 */
 		onProcessStopped () {
