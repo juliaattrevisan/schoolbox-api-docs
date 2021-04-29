@@ -41,17 +41,29 @@ class ServiceManager implements IServiceManager
     /** @var Schoolbox\Instance */
     protected $serverInstance;
 
+    /**
+     * The app's title: this title may be used as the title of notifications.
+     */
+    private string $appTitle;
 
     /**
+     * Constructor
+     *
      * @param LoggerInterface    $log
      * @param RegistryMapper     $registryMapper
      * @param Schoolbox\Instance $serverInstance
+     * @param string             $appTitle
      */
-    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper, Schoolbox\Instance $serverInstance)
-    {
+    public function __construct(
+        LoggerInterface $log,
+        RegistryMapper $registryMapper,
+        Schoolbox\Instance $serverInstance,
+        string $appTitle
+    ) {
         $this->registryMapper = $registryMapper;
-        $this->log = $log;
+        $this->log            = $log;
         $this->serverInstance = $serverInstance;
+        $this->appTitle       = $appTitle;
     }
 
 
@@ -191,14 +203,16 @@ class ServiceManager implements IServiceManager
                     return new Cloud\Google\GCM(
                         $this->registryMapper,
                         $identifier,
-                        $key
+                        $key,
+                        $this->appTitle
                     );
 
                 case Registry::PROVIDER_DIGISTORM:
                     return new Cloud\Digistorm\Service(
                         $this->registryMapper,
                         $identifier,
-                        $key
+                        $key,
+                        $this->appTitle
                     );
             }
 

@@ -35,16 +35,28 @@ class GCM extends AbstractService
     /** @var string */
     protected $apiKey;
 
+    /**
+     * The app's title: this title will be used as the title of notifications.
+     */
+    private string $appTitle;
 
     /**
+     * Constructor
+     *
      * @param RegistryMapper $registryMapper
      * @param string         $appIdentifier
      * @param string         $apiKey
+     * @param string         $appTitle
      */
-    public function __construct(RegistryMapper $registryMapper, $appIdentifier, $apiKey)
-    {
+    public function __construct(
+        RegistryMapper $registryMapper,
+        $appIdentifier,
+        $apiKey,
+        string $appTitle
+    ) {
         parent::__construct($registryMapper, $appIdentifier);
-        $this->apiKey = $apiKey;
+        $this->apiKey   = $apiKey;
+        $this->appTitle = $appTitle;
     }
 
     /**
@@ -77,7 +89,7 @@ class GCM extends AbstractService
     {
         $data = [
             'id'           => $id,
-            'title'        => ConfigLoader::getInstance()->get('title'),
+            'title'        => $this->appTitle,
             'body'         => $title,
             'vibrate'      => true,
             'click_action' => 'MainActivity',

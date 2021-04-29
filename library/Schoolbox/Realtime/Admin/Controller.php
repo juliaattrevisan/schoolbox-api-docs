@@ -512,7 +512,8 @@ class Controller extends BaseController
         $cloudManager = new MobileApp\ServiceManager(
             $log,
             MobileApp\RegistryMapper::getInstance(),
-            $this->getDi()->get('instance')
+            $this->getDi()->get('instance'),
+            $this->getConfigLoader()->get('title')
         );
 
         // just grab... anything

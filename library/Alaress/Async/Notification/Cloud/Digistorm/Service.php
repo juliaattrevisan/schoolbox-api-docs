@@ -32,16 +32,27 @@ class Service extends AbstractService
     private string $key;
 
     /**
+     * The app's title: this title may be used as the title of notifications.
+     */
+    private string $appTitle;
+
+    /**
      * Constructor
      *
      * @param RegistryMapper $registryMapper
      * @param string         $appIdentifier
      * @param string         $key
+     * @param string         $appTitle
      */
-    public function __construct(RegistryMapper $registryMapper, string $appIdentifier, string $key)
-    {
+    public function __construct(
+        RegistryMapper $registryMapper,
+        $appIdentifier,
+        string $key,
+        string $appTitle
+    ) {
         parent::__construct($registryMapper, $appIdentifier);
-        $this->key = $key;
+        $this->key      = $key;
+        $this->appTitle = $appTitle;
     }
 
     /**
@@ -62,8 +73,7 @@ class Service extends AbstractService
             'Content-Type' => 'application/json',
         ];
         $payload = [
-            // TODO inject title
-            'title'       => ConfigLoader::getInstance()->get('title'),
+            'title'       => $this->appTitle,
             'message'     => $title,
             'ids'         => $tokens,
             'custom_data' => [
