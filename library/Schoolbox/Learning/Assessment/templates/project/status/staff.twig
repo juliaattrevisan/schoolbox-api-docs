@@ -34,7 +34,16 @@ Data:
 
             $(this).confirmDialog({
                 header: 'Are you sure you wish to delete this activity?',
+
+                {# When you're managing activities in a Course Specification context
+                 # there is nothing to delete like responses/feedback/marks, so just don't
+                 # really show anything in particular in that case
+                 #}
+                {% if baseContext is not unitSpecification %}
                 text: '<span class=\"alert alert-box\"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>',
+                {% else %}
+                text: '',
+                {% endif %}
                 format: 'html',
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
