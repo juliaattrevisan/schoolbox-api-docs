@@ -81,7 +81,7 @@ class Replicator
             $newAssessment->setSequence($sequence);
         }
 
-        $this->assessmentMapperProxy->save($newAssessment);
+        $this->assessmentMapperProxy->save($newAssessment, $newOwner);
         $destination->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
