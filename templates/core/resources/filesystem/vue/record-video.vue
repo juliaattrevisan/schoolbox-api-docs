@@ -268,7 +268,8 @@ export default {
 		initVideojsRecordListeners () {
 			this.player.on('deviceReady', this.onDeviceReady);
 			this.player.on('startRecord', this.onStartRecord);
-			this.player.on('finishConvert', this.onFinishConvert);
+			this.player.on('finishRecord', this.onFinishRecord);
+			// this.player.on('finishConvert', this.onFinishConvert);
 			this.player.on('error', this.onError);
 			this.player.on('deviceError', this.onDeviceError);
 		},
@@ -294,13 +295,25 @@ export default {
 		 * the seekable media file is ready
 		 *
 		 */
-		onFinishConvert () {
+		onFinishRecord () {
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
 			this.isRecording = false;
-			this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
+			this.recordedData = this.player.recordedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
 			this.canConvert = true; //enable the convert button
 			this.isPlaybackActive = true;
 		},
+
+		/*
+		 * the seekable media file is ready
+		 *
+		 */
+		// onFinishConvert () {
+		// 	this.$emit(recordMediaEvents.PROCCESS_STOPPED);
+		// 	this.isRecording = false;
+		// 	this.recordedData = this.player.convertedData; // the blob object contains the recorded data that we could convert, it's converted as it's a seekable webm
+		// 	this.canConvert = true; //enable the convert button
+		// 	this.isPlaybackActive = true;
+		// },
 
 		/*
 		 * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
@@ -385,7 +398,7 @@ export default {
 		 */
 		async convertAndUploadVideo () {
 			try {
-				await this.convertVideo();
+				// await this.convertVideo();
 				const responseData = await this.uploadConvertedVideo();
 				this.postUploadedMessage(responseData);
 			} catch (error) {
@@ -433,7 +446,8 @@ export default {
 			try {
 				this.isUploading = true;
 				const formData = new FormData();
-				formData.append('upload', this.convertedData, this.currentRecordedFilenameToMp4);
+				// formData.append('upload', this.convertedData, this.currentRecordedFilenameToMp4);
+				formData.append('upload', this.recordedData, this.recordedData.name);
 				const response = await axios.post('/storage/asyncUpload.php', formData);
 				return response.data;
 			} catch (error) {
@@ -453,9 +467,12 @@ export default {
 		 */
 		postUploadedMessage (responseData) {
 			const data = {
-				title:    this.currentRecordedFilenameToMp4,
-				mimeType: this.convertedData.type,
-				filesize: this.convertedData.size,
+				// title:    this.currentRecordedFilenameToMp4,
+				title:    this.recordedData.name,
+				// mimeType: this.convertedData.type,
+				mimeType: this.recordedData.type,
+				// filesize: this.convertedData.size,
+				filesize: this.recordedData.size,
 				hash:     responseData.hash
 			};
 			this.isUploading = false;

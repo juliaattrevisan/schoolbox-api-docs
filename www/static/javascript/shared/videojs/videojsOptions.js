@@ -31,12 +31,13 @@ export const getRecordCameraOptions = () => {
             record: {
                 audio: true,
                 video: {
-                    width: { min: 640, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                    height: { min: 360, ideal: 360, max: 720 }
-                },
+                    width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
+                    height: { min: 240, ideal: 360, max: 720 }
+				},
+				videoMimeType: 'video/mp4',
                 screen: true,
                 maxLength: 300, //five minutes
-                convertEngine: 'ts-ebml', //to be able to have seekable webm files
+                // convertEngine: 'ts-ebml', //to be able to have seekable webm files
                 debug: true,
             }
         }
