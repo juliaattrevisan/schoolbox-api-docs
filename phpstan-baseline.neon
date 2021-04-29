@@ -8811,11 +8811,6 @@ parameters:
 			path: library/Schoolbox/MobileApp/ServiceManager.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/MobileApp/ServiceManager.php
-
-		-
 			message: "#^Ternary operator condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Module/RestfulModule.php
