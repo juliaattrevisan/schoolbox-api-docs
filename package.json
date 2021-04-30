@@ -50,6 +50,7 @@
     "vue-resize": "^1.0.0",
     "vue-select": "^3.11.2",
     "vue-style-loader": "^4.1.2",
+    "vue-tables-2": "git+https://gwN_lOKvQ6W8X2hlJU6ejnY-cmk@git.xscode.com/matfish2/vue-tables-2.git",
     "vuejs-paginate": "2.0.1"
   },
   "devDependencies": {
