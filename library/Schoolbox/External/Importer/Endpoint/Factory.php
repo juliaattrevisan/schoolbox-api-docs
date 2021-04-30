@@ -36,7 +36,7 @@ use UnexpectedValueException;
  *
  * @package Schoolbox\External\Importer\Endpoint
  */
-class Factory
+class Factory implements IFactory
 {
 
     /**
@@ -54,7 +54,7 @@ class Factory
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
@@ -62,19 +62,19 @@ class Factory
      *
      * @var string
      */
-    private $key;
+    private string $key;
 
 
     /**
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var LoggerInterface
      */
-    private $logger;
+    private LoggerInterface $logger;
 
 
     /**

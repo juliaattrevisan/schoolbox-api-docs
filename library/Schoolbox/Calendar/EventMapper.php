@@ -38,6 +38,7 @@ use UnexpectedValueException;
  * @package Schoolbox\Calendar
  * @method Event hydrate(array $row, $alias = '', $callback = null)
  * @method Event findById($identifierValue)
+ * @method Event createModel()
  */
 class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanable
 {

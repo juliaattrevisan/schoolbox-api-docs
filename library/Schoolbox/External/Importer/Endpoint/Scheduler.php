@@ -8,12 +8,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Alaress\IDatabase;
-use DomainException;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
-use Schoolbox\Mapper\Exception;
-use UnexpectedValueException;
 
 /**
  * Class Scheduler
@@ -47,7 +43,7 @@ class Scheduler
 
 
     /**
-     * @var Factory
+     * @var IFactory
      */
     private $factory;
 
@@ -78,13 +74,19 @@ class Scheduler
      *
      * @param IDatabase       $db
      * @param string          $frequency
-     * @param Factory         $factory
+     * @param IFactory        $factory
      * @param string          $type
      * @param string|null     $file
      * @param LoggerInterface $logger
      */
-    public function __construct(IDatabase $db, string $frequency, Factory $factory, string $type, ?string $file, LoggerInterface $logger)
-    {
+    public function __construct(
+        IDatabase $db,
+        string $frequency,
+        IFactory $factory,
+        string $type,
+        ?string $file,
+        LoggerInterface $logger
+    ) {
         $this->db = $db;
         $this->frequency = $frequency;
         $this->factory = $factory;
@@ -98,11 +100,6 @@ class Scheduler
      * Execute the importer at $now
      *
      * @param int $now
-     * @throws RuntimeException
-     * @throws UnexpectedValueException
-     * @throws DomainException
-     * @throws InvalidArgumentException
-     * @throws Exception
      */
     public function run(int $now): void
     {
