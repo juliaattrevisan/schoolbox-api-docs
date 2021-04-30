@@ -16,10 +16,10 @@ class LoginCest
      */
     public function _before(AcceptanceTester $i)
     {
-        $i->runShellCommand('./test/codeception/_support/BashScripts/disable_ssl_SAML.sh');
-        $i->changeDBConfig('saml_sso_url', 'https://ad.dev.schoolbox.cloud/adfs/ls');
-        $i->changeDBConfig('saml_logout_url', 'https://ad.dev.schoolbox.cloud/adfs/ls/IdpInitiatedSignon.aspx');
-        $i->changeDBConfig('saml_idp_metadata_url', 'https://ad.dev.schoolbox.cloud/FederationMetadata/2007-06/FederationMetadata.xml');
+//        $i->runShellCommand('./test/codeception/_support/BashScripts/disable_ssl_SAML.sh');
+//        $i->changeDBConfig('saml_sso_url', 'https://ad.dev.schoolbox.cloud/adfs/ls');
+//        $i->changeDBConfig('saml_logout_url', 'https://ad.dev.schoolbox.cloud/adfs/ls/IdpInitiatedSignon.aspx');
+//        $i->changeDBConfig('saml_idp_metadata_url', 'https://ad.dev.schoolbox.cloud/FederationMetadata/2007-06/FederationMetadata.xml');
         $i->amOnPage(LoginPage::URL);
     }
 
@@ -30,10 +30,10 @@ class LoginCest
      */
     public function _after(AcceptanceTester $i)
     {
-        $i->runShellCommand('./test/codeception/_support/BashScripts/enable_ssl_SAML.sh');
-        $i->changeDBConfig('saml_sso_url', '');
-        $i->changeDBConfig('saml_logout_url', '');
-        $i->changeDBConfig('saml_idp_metadata_url', '');
+//        $i->runShellCommand('./test/codeception/_support/BashScripts/enable_ssl_SAML.sh');
+//        $i->changeDBConfig('saml_sso_url', '');
+//        $i->changeDBConfig('saml_logout_url', '');
+//        $i->changeDBConfig('saml_idp_metadata_url', '');
         $i->logout();
         $i->restartBrowser();
     }
@@ -45,11 +45,11 @@ class LoginCest
      * @param LoginPage        $loginPage
      * @throws Exception
      */
-    public function loginSAMLSuccessfully(AcceptanceTester $i, LoginPage $loginPage)
-    {
-        $loginPage->loginSAML('AD\drhodes', 'Password2000');
-        $loginPage->verifyLoginSuccess();
-    }
+//    public function loginSAMLSuccessfully(AcceptanceTester $i, LoginPage $loginPage)
+//    {
+//        $loginPage->loginSAML('AD\drhodes', 'Password2000');
+//        $loginPage->verifyLoginSuccess();
+//    }
 
     /**
      * Test for SAML login failed !!Issue with test, SAML keeps you logged in.
@@ -58,16 +58,16 @@ class LoginCest
      * @param LoginPage        $loginPage
      * @throws Exception
      */
-    public function loginSAMLFailure(AcceptanceTester $i, LoginPage $loginPage)
-    {
-        $loginPage->loginSAML('AD\drhodes', 'wrong');
-
-        // SAML returns a different failure message
-        $loginPage->verifyLoginFailure('Incorrect user ID or password');
-
-        // Test DB contents
-        $i->dontSeeInDatabase('user', ['username' => 'wrong']);
-    }
+//    public function loginSAMLFailure(AcceptanceTester $i, LoginPage $loginPage)
+//    {
+//        $loginPage->loginSAML('AD\drhodes', 'wrong');
+//
+//        // SAML returns a different failure message
+//        $loginPage->verifyLoginFailure('Incorrect user ID or password');
+//
+//        // Test DB contents
+//        $i->dontSeeInDatabase('user', ['username' => 'wrong']);
+//    }
 
     /**
      * Test for login success
