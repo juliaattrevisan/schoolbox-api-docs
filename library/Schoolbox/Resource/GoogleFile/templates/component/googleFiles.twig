@@ -1,4 +1,64 @@
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/apiloader.js"></script>
+<style type="text/css">
+    div.picker-dialog {
+        z-index: 2000;
+    }
+</style>
 <div class="empty-state">
     <i class="icon-google-drive"></i>
-    <p><a>Find a Google file</a> to share with users and allow them to view, edit or suggest changes.</p>
+    <p><a id="find-files">Find a Google file</a> to share with users and allow them to view, edit or suggest changes.
+    </p>
 </div>
+<div id="gfile" class="modal-backdrop" data-reveal aria-labelledby="Google Files" aria-hidden="true"
+     role="dialog">
+</div>
+<script type="text/javascript">
+    let allowedFileTypes = [
+        'application/msword',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.ms-excel',
+        'application/vnd.google-apps.document',
+        'application/vnd.google-apps.presentation',
+        'application/vnd.google-apps.spreadsheet'
+    ];
+
+    function handleAuthResult(authResult) {
+        if (authResult && !authResult.error) {
+            createPicker(authResult.access_token);
+        }
+    }
+
+    // Create and render a Picker object for searching images.
+    function createPicker(oauthToken) {
+        let view = new google.picker.View(google.picker.ViewId.DOCS);
+        view.setMimeTypes(allowedFileTypes.join(','));
+        let picker = new google.picker.PickerBuilder()
+                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+                .setOAuthToken(oauthToken)
+                .addView(view)
+//                .addView(new google.picker.DocsUploadView())
+                .setCallback(pickerCallback)
+                .build();
+        picker.setVisible(true);
+    }
+
+    function pickerCallback(data) {
+        if (data.action === google.picker.Action.PICKED) {
+            var fileId = data.docs[0].id;
+            alert('To be implemented: ' + fileId);
+        }
+    }
+
+    let loadPicker = function () {
+        window.gapi.auth2.authorize(
+                {
+                    'client_id': '{{ config.googleapps_client_id }}',
+                    'scope': 'https://www.googleapis.com/auth/drive.file'
+                },
+                handleAuthResult);
+    };
+    $('#find-files').on('click', function () {
+        loadGoogleApi(['auth2', 'picker'], loadPicker);
+        $('#gfile').foundation('reveal', 'open');
+    });
+</script>
