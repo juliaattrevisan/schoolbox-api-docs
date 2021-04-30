@@ -54,7 +54,7 @@
         if (o.title === null) {
             builder.hideTitleBar();
         }
-        else if (o.title != '') {
+        else if (o.title !== '') {
             builder.setTitle(o.title);
         }
 
@@ -69,8 +69,7 @@
         }
 
         builder
-            .setOAuthToken(this.oauthToken)
-            .setDeveloperKey(o.developerKey)
+            .setOAuthToken(this.oauthToken.access_token)
             .setCallback(function (data) {
                 self.handleResponse(data);
             });
@@ -87,33 +86,26 @@
             }
         }
         this.pickerInstance.setVisible();
-    }
+    };
 
 
     GPick.prototype.handleResponse = function (data) {
-        var docs,
-            token,
-            elem = $(this.element);
+        var elem = $(this.element);
 
-
-
-        if (data[picker.Response.ACTION] == picker.Action.LOADED) {
+        if (data[picker.Response.ACTION] === picker.Action.LOADED) {
             this.options.onLoaded.call(elem, this.pickerInstance);
             return;
         }
 
-        if (data[picker.Response.ACTION] == picker.Action.PICKED) {
-            docs  = data.docs;
-            token = auth.getToken();
-
-            this.options.onSelect.call(elem, docs, token);
+        if (data[picker.Response.ACTION] === picker.Action.PICKED) {
+            this.options.onSelect.call(elem, data.docs, this.oauthToken);
             return;
         }
 
-        if (data[picker.Response.ACTION] == picker.Action.CANCEL) {
+        if (data[picker.Response.ACTION] === picker.Action.CANCEL) {
             this.options.onCancel.call(elem);
         }
-    }
+    };
 
 
     GPick.prototype.handleAuthResult = function(authResult) {
@@ -121,7 +113,7 @@
         var self = this;
 
         if (authResult && !authResult.error) {
-            this.oauthToken = authResult.access_token;
+            this.oauthToken = authResult;
             this.show();
             authBtn.removeClass(this.options.authNeededClass);
         }
@@ -138,12 +130,11 @@
     };
 
 
-    GPick.prototype.authorize = function(immediate) {
+    GPick.prototype.authorize = function() {
         var self = this;
         auth.authorize({
                 'client_id': this.options.clientId,
-                'scope':     this.options.scopes,
-                'immediate': immediate
+                'scope': this.options.scopes.join(' ')
             },
             function (authResult)
             {
@@ -159,6 +150,6 @@
                 $.data(this, 'plugin_' + pluginName, new GPick(this, options));
             }
         });
-    }
+    };
 
-})(jQuery, window, document, window.gapi.auth, window.google.picker);
+})(jQuery, window, document, window.gapi.auth2, window.google.picker);

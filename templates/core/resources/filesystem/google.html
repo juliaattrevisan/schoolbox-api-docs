@@ -50,7 +50,7 @@
           window.top.postMessage(JSON.stringify({text: 'Connecting to your Google Drive...'}), location.origin);
       }
 
-      loadGoogleApi(['auth', 'picker'], function () {
+      loadGoogleApi(['auth2', 'picker'], function () {
           jQuery
           .ajax({
               url: '{CDN_PREFIX}/javascript/resource/jquery.gpick.js',
