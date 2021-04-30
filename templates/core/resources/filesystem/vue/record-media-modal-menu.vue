@@ -6,12 +6,12 @@
  */
 
 import { gsap } from 'gsap/all';
-import mediaTypes from '../js/mediaTypes';
+import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 
 export default {
 	
 	props: {
-		currentMediaType: { //to be able to respond to the initial change from UNSET
+		currentRecordMediaType: { //to be able to respond to the initial change from UNSET
 	 		type: String,
 	  		required: true,
 	  		default: ''
@@ -25,8 +25,8 @@ export default {
 
 	watch: {
 
-		currentMediaType (value) { 
-			if (value !== mediaTypes.UNSET)  { //show the top menu now
+		currentRecordMediaType (value) { 
+			if (value !== recordMediaTypes.UNSET)  { //show the top menu now
 				this.animateOn();
 			}      
 		}
@@ -34,7 +34,7 @@ export default {
 	},
 
 	created () {
-		this.mediaTypes = mediaTypes; //to be able to move between media types
+		this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
 	},
 
 	mounted () {
@@ -75,8 +75,8 @@ export default {
 		 *
 		 * @params {String}
 		 */
-		mediaTypeSelected (selectedMediaType) {
-			this.$emit('on-media-type-selected', selectedMediaType);
+		recordMediaTypeSelected (selectedRecordMediaType) {
+			this.$emit('on-record-media-type-selected', selectedRecordMediaType);
 		},
 
 	}
@@ -86,14 +86,14 @@ export default {
 
 <template>
 	<dl class="tabs menu" ref="menu">
-		<dd class="menu-item" :class="[currentMediaType === mediaTypes.AUDIO_ONLY ? 'active' : '']">
-			<a @click.prevent="mediaTypeSelected(mediaTypes.AUDIO_ONLY)" href="#record-audio" title="Record audio" :disabled="isProcessActive">Record audio</a>
+		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.AUDIO_ONLY ? 'active' : '']">
+			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)" href="#record-audio" title="Record audio" :disabled="isProcessActive">Record audio</a>
 		</dd>
-		<dd class="menu-item" :class="[currentMediaType === mediaTypes.CAMERA ? 'active' : '']">
-			<a @click.prevent="mediaTypeSelected(mediaTypes.CAMERA)" href="#record-a-video" title="Record a video" :disabled="isProcessActive">Record a video</a>
+		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.CAMERA ? 'active' : '']">
+			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.CAMERA)" href="#record-a-video" title="Record a video" :disabled="isProcessActive">Record a video</a>
 		</dd>
-		<dd class="menu-item" :class="[currentMediaType === mediaTypes.SCREEN ? 'active' : '']">
-			<a @click.prevent="mediaTypeSelected(mediaTypes.SCREEN)" href="#record-your-screen" title="Record your screen" :disabled="isProcessActive">Record your screen</a>
+		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.SCREEN ? 'active' : '']">
+			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.SCREEN)" href="#record-your-screen" title="Record your screen" :disabled="isProcessActive">Record your screen</a>
 		</dd>
 	</dl>
 </template>

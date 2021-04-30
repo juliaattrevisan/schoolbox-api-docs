@@ -188,8 +188,8 @@ module.exports = {
         usageSpecificFiletype: './library/Schoolbox/Admin/Usage/vue/specific/filetype.main.js',
         usageSpecificFile: './library/Schoolbox/Admin/Usage/vue/specific/file.main.js',
 
-        //Record Media
-        recordMedia: './templates/core/resources/filesystem/vue/initRecordMedia.js',
+        //Record Media Modal
+        recordMediaModal: './templates/core/resources/filesystem/vue/initRecordMediaModal.js',
 
         //Sass
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',

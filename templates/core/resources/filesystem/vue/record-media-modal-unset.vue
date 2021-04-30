@@ -1,17 +1,18 @@
 <script>
 
-import { gsap } from 'gsap/all';
-import mediaTypes from '../js/mediaTypes';
-
 /*
  * The initial menu, given maximum presence
  *
  */
 
+import { gsap } from 'gsap/all';
+import recordMediaTypes from '@shared/record-media/recordMediaTypes';
+
+
 export default {
 
 	created () {
-		this.mediaTypes = mediaTypes; //to be able to move between media types
+		this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
 	},
 
 	mounted () {
@@ -58,8 +59,8 @@ export default {
 		 *
 		 * @params {String}
 		 */
-		mediaTypeSelected (selectedMediaType) {
-			this.selectedMediaType = selectedMediaType;
+		recordMediaTypeSelected (selectedRecordMediaType) {
+			this.selectedRecordMediaType = selectedRecordMediaType;
 			this.animateOutMenu();
 		},
 
@@ -90,7 +91,7 @@ export default {
 				backgroundColor: '#000',
 				delay: 0.5,
 				ease: 'power2.in',
-				onComplete: () => this.$emit('on-media-type-selected', this.selectedMediaType)
+				onComplete: () => this.$emit('on-record-media-type-selected', this.selectedRecordMediaType)
 			} );
 		},
 		
@@ -101,39 +102,28 @@ export default {
 </script>
 
 <template>
-	<div>
-		<div class="ab-pane">
+	<div class="pseudo-video" ref="pseudoVideo">
+		<button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
 			<div>
-				<div class="pseudo-video" ref="pseudoVideo">
-					<button class="menu-item" @click="mediaTypeSelected(mediaTypes.AUDIO_ONLY)">
-						<div>
-							<span class='icon-mic'></span>
-							<span>Record audio</span>
-							<aside>Say something with an audio only recording.</aside>
-						</div>
-					</button>
-					<button class="menu-item" @click="mediaTypeSelected(mediaTypes.CAMERA)">
-						<div>
-							<div class='icon-video'></div>
-							<span>Record a video</span>
-							<aside>Use a computer camera to create a video recording.</aside>
-						</div>
-					</button>
-					<button class="menu-item" @click="mediaTypeSelected(mediaTypes.SCREEN)">
-						<div>
-							<div class='icon-screen-capture'></div>
-							<span>Record your screen</span>
-							<aside>Choose a computer screen to create a screen recording.</aside>
-						</div>
-					</button>
-				</div>
+				<span class='icon-mic'></span>
+				<span>Record audio</span>
+				<aside>Say something with an audio only recording.</aside>
 			</div>
-		</div>
-		<div class="component-action">
-			<section>
-				<a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
-			</section>
-		</div>
+		</button>
+		<button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
+			<div>
+				<div class='icon-video'></div>
+				<span>Record a video</span>
+				<aside>Use a computer camera to create a video recording.</aside>
+			</div>
+		</button>
+		<button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
+			<div>
+				<div class='icon-screen-capture'></div>
+				<span>Record your screen</span>
+				<aside>Choose a computer screen to create a screen recording.</aside>
+			</div>
+		</button>
 	</div>
 </template>
 

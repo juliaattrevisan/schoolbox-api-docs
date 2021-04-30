@@ -1,0 +1,81 @@
+<script>
+
+/*
+ * To notify of various media events, like camera not available or video converting/uploading
+ * Just a slot really, the parent puts whatever it needs in it
+ *
+ */
+
+import { gsap } from 'gsap/all';
+
+export default {
+    
+    props: {
+        closedCallBack: { //what to do when the modal is closed
+     		type: Function,
+      		required: false,
+    	},
+    },
+
+    mounted () {
+        this.animateOn();
+    },
+
+    methods: {
+
+        /*
+         * to present the modal
+         * 
+         */ 
+        animateOn () {
+            gsap.from(this.$refs.modal, 0.3, { alpha: 0, marginTop: 40, delay: 0 } );
+        },
+
+        /*
+         * to close the modal
+         * 
+         */ 
+        animateOff () {
+            gsap.to(this.$refs.modal, 0.2, { alpha: 0, marginTop: 40, ease: 'power2.in', onComplete: this.closedCallBack } );
+        }
+
+    }
+
+}
+</script>
+
+<template>
+    <div class="modal-container" ref="modalContainer">
+        <div class="modal" ref="modal">
+            <slot></slot>
+        </div>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+
+.modal-container {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 99;
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+  	justify-content: center;
+	background: rgba(0, 0, 0, 0.8);
+}
+
+.modal {
+    box-sizing: border-box;
+    max-width: 80%;
+	min-width: 50%;
+	padding: 20px;
+	background: white;
+	button {
+		width: 100%;
+	}
+}
+
+</style>

@@ -1,7 +1,7 @@
 <script>
 
 /*
- * To play a video
+ * To play a video, which can also just be audio only with a waveform visualizer
  *
  */
 
@@ -21,60 +21,14 @@ export default {
 		},
 	},
 
-	data () {
-		return {
-			player: null,
-			isPlaying: false
-		}
-	},
-
 	mounted () {
-		this.initVideojs();
+		this.player = videojs(this.$refs.videoPlayer, this.options);
 	},
 
 	beforeDestroy () {
 		if (this.player) {
 			this.player.dispose();
 		}
-	},
-
-	methods: {
-
-		/*
-		 * Start it up
-		 *
-		 */
-		initVideojs () {
-			this.player = videojs(this.$refs.videoPlayer, this.options, () => {
-				this.$emit(recordMediaEvents.VIDEO_READY);
-			});
-			this.player.on('play', () => {
-				this.isPlaying = true;
-			});
-			this.player.on('pause', () => {
-				this.isPlaying = false;
-			});
-			this.player.on('ended', () => {
-				this.isPlaying = false;
-			});
-		},
-
-		/*
-		 * for template/external control
-		 *
-		 */
-		play () {
-			this.player.play();
-		},
-
-		/*
-		 * for template/external control
-		 *
-		 */
-		pause () {
-			this.player.pause();
-		}
-
 	}
 
 }
@@ -82,7 +36,7 @@ export default {
 
 <template>
 	<div>
-		<video ref="videoPlayer" class="video-js vjs-matrix"></video>
+		<video ref="videoPlayer" class="video-js vjs-custom-skin"></video>
 	</div>
 </template>
 
@@ -125,15 +79,15 @@ export default {
 	margin-top: -24px
   }
   .vjs-progress-holder,
-  .vjs-matrix .vjs-play-progress,
-  .vjs-matrix .vjs-slider-bar,
+  .vjs-custom-skin .vjs-play-progress,
+  .vjs-custom-skin .vjs-slider-bar,
   .vjs-volume-panel .vjs-volume-control,
   .vjs-big-play-button .vjs-icon-placeholder::before {
 	color: white;
   }
-  .vjs-matrix .vjs-volume-level,
-  .vjs-matrix .vjs-play-progress,
-  .vjs-matrix .vjs-slider-bar {
+  .vjs-custom-skin .vjs-volume-level,
+  .vjs-custom-skin .vjs-play-progress,
+  .vjs-custom-skin .vjs-slider-bar {
 	background: white;
   }
 }

@@ -6,5 +6,6 @@
 export default Object.freeze({
   PROCCESS_STARTED: 'on-process-started', //usually to block/notify UI until it's stopped
   PROCCESS_STOPPED: 'on-process-stopped',
-  VIDEO_READY: 'on-video-ready' //to safely access an initiated videojs instance
+  RECORDED_MEDIA_READY: 'on-recorded-media-ready', //to notify a video can be uploaded 
+  RECORDED_MEDIA_DELETED: 'on-recorded-media-deleted', //to notify a video can be uploaded 
 })
