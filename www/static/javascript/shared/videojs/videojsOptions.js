@@ -34,13 +34,13 @@ export const getRecordOptions = (recordMediaType) => {
 }
 
 /*
-* The options for an audio only videojs-record
+* The videojs options all camera/screen setups share
 * 
 * @returns { Object }
 */ 
-const getAudioOnlyRecordOptions = () => {
-    const options = {
-        controls: true,
+const getDefaultVideojsRecordOptions = () => {
+	return {
+		controls: true,
         autoplay: false,
         fluid: true,
         aspectRatio: '16:9',
@@ -48,37 +48,46 @@ const getAudioOnlyRecordOptions = () => {
         bigPlayButton: false,
         controlBar: {
             volumePanel: true,
-        },
-        plugins: {
-            wavesurfer: { // this plugin is only needed when recording audio-only
-                backend: 'WebAudio',
-                waveColor: '#fff',
-                progressColor: '#ccc',
-                debug: true,
-                cursorWidth: 1,
-                displayMilliseconds: true,
-                hideScrollbar: true,
-                plugins: [
-                    WaveSurfer.microphone.create({ // enable microphone plugin
-                        bufferSize: 4096,
-                        numberOfInputChannels: 1,
-                        numberOfOutputChannels: 1,
-                        constraints: {
-                            video: false,
-                            audio: true
-                        }
-                    })
-                ]
-            },
-            record: {
-                audio: true,
-                video: false,
-                maxLength: 300, //5 minutes
-                audioEngine: 'vmsg',
-                audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
-                debug: true,
-            }
         }
+	}
+}
+
+/*
+* The options for an audio only videojs-record
+* 
+* @returns { Object }
+*/ 
+const getAudioOnlyRecordOptions = () => {
+	const options = getDefaultVideojsRecordOptions();
+    options.plugins = {
+		wavesurfer: { // this plugin is only needed when recording audio-only
+			backend: 'WebAudio',
+			waveColor: '#fff',
+			progressColor: '#ccc',
+			debug: true,
+			cursorWidth: 1,
+			displayMilliseconds: true,
+			hideScrollbar: true,
+			plugins: [
+				WaveSurfer.microphone.create({ // enable microphone plugin
+					bufferSize: 4096,
+					numberOfInputChannels: 1,
+					numberOfOutputChannels: 1,
+					constraints: {
+						video: false,
+						audio: true
+					}
+				})
+			]
+		},
+		record: {
+			audio: true,
+			video: false,
+			maxLength: 300, //5 minutes
+			audioEngine: 'vmsg',
+			audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
+			debug: true,
+		}
 	}
 	applyAudioWorkarounds(options);
 	return options;
@@ -115,29 +124,20 @@ const applyAudioWorkarounds = (options) => {
 * @returns { Object }
 */ 
 const getRecordCameraOptions = () => {
-	return {
-        controls: true,
-        autoplay: false,
-        fluid: true,
-        aspectRatio: '16:9',
-        loop: false,
-        bigPlayButton: false,
-        controlBar: {
-            volumePanel: false,
-        },
-        plugins: {
-            record: {
-                audio: true,
-                video: {
-                    width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                    height: { min: 240, ideal: 360, max: 720 }
-				},
-				convertEngine: 'ts-ebml', //to be able to have seekable webm files
-                maxLength: 300, //five minutes
-                debug: true,
-            }
-        }
+	const options = getDefaultVideojsRecordOptions();
+	options.plugins = {
+		record: {
+			audio: true,
+			video: {
+				width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
+				height: { min: 240, ideal: 360, max: 720 }
+			},
+			convertEngine: 'ts-ebml', //to be able to have seekable webm files
+			maxLength: 300, //five minutes
+			debug: true,
+		}
 	}
+	return options;
 }
 
 /*
@@ -146,29 +146,20 @@ const getRecordCameraOptions = () => {
 * @returns { Object }
 */ 
 const getRecordCameraOptionsForSafari = () => {
-    return {
-        controls: true,
-        autoplay: false,
-        fluid: true,
-        aspectRatio: '16:9',
-        loop: false,
-        bigPlayButton: false,
-        controlBar: {
-            volumePanel: false,
-        },
-        plugins: {
-            record: {
-                audio: true,
-                video: {
-                    width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                    height: { min: 240, ideal: 360, max: 720 }
-				},
-				videoMimeType: 'video/mp4', //all supported excluding Safari use webm
-                maxLength: 300, //five minutes
-                debug: true,
-            }
-        }
-    }
+    const options = getDefaultVideojsRecordOptions();
+    options.plugins = {
+		record: {
+			audio: true,
+			video: {
+				width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
+				height: { min: 240, ideal: 360, max: 720 }
+			},
+			videoMimeType: 'video/mp4', //all supported excluding Safari use webm
+			maxLength: 300, //five minutes
+			debug: true,
+		}
+	}
+	return options;
 }
 
 /*
@@ -177,28 +168,19 @@ const getRecordCameraOptionsForSafari = () => {
 * @returns { Object }
 */ 
 const getRecordScreenOptions = () => {
-    return {
-        controls: true,
-        autoplay: false,
-        fluid: true,
-        aspectRatio: '16:9',
-        loop: false,
-        bigPlayButton: false,
-        controlBar: {
-            volumePanel: false,
-        },
-        plugins: {
-            record: {
-                audio: true,
-                screen: true,
-                maxLength: 300, //five minutes
-				convertEngine: 'ts-ebml', //to be able to have seekable webm files
-				frameWidth: 640,
-           		frameHeight: 480,
-                debug: true,
-            }
-        }
-    }
+    const options = getDefaultVideojsRecordOptions();
+    options.plugins = {
+		record: {
+			audio: true,
+			screen: true,
+			maxLength: 300, //five minutes
+			convertEngine: 'ts-ebml', //to be able to have seekable webm files
+			frameWidth: 640,
+			frameHeight: 480,
+			debug: true,
+		}
+	}
+	return options;
 }
 
 
@@ -208,28 +190,19 @@ const getRecordScreenOptions = () => {
 * @returns { Object }
 */ 
 const getRecordScreenOptionsForSafari = () => {
-    return {
-        controls: true,
-        autoplay: false,
-        fluid: true,
-        aspectRatio: '16:9',
-        loop: false,
-        bigPlayButton: false,
-        controlBar: {
-            volumePanel: false,
-        },
-        plugins: {
-            record: {
-                audio: true,
-				screen: true,
-				videoMimeType: 'video/mp4', //all supported excluding Safari use webm
-                maxLength: 300, //five minutes
-				frameWidth: 640,
-           		frameHeight: 480,
-                debug: true,
-            }
-        }
-    }
+    const options = getDefaultVideojsRecordOptions();
+    options.plugins = {
+		record: {
+			audio: true,
+			screen: true,
+			videoMimeType: 'video/mp4', //all supported excluding Safari use webm
+			maxLength: 300, //five minutes
+			frameWidth: 640,
+			frameHeight: 480,
+			debug: true,
+		}
+	}
+	return options;
 }
 
 /*

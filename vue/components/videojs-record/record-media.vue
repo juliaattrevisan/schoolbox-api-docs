@@ -42,10 +42,10 @@ export default {
 		return {
 			player: null, //videojs-record instance
 			isDeviceReady: false, //to toggle the device display
+			isOverMediaModalClosing: false, //to animate out the over-media-modal
 			hasDeviceAlreadyInUseError: false, //can't access the requested device
 			hasPermissionDeniedError: false, //didn't allow permission
 			targetHeight: '0px', //to set the height based on the aspect ratio of the video
-			isRecording: false, //track recording status to toggle record/stop buttons
 			isPlaybackActive: false, //need a different videojs player for playback to enable the progress controls
 			isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
 		}
@@ -59,7 +59,7 @@ export default {
 		 * @returns { Boolean }
 		 */
 		showDeleteRecordingButton () {
-			if (this.isPlaybackActive && !this.isUploading) {
+			if (this.isPlaybackActive) {
 				return true;
 			} else {
 				return false;
@@ -169,7 +169,6 @@ export default {
 		 */
 		onStartRecord () {
 			this.$emit(recordMediaEvents.PROCCESS_STARTED);
-			this.isRecording = true;
 		},
 
 		/*
@@ -194,7 +193,6 @@ export default {
 		 */
 		recordedVideoReady (videoData) {
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-			this.isRecording = false;
 			this.recordedData = videoData; // the blob object contains the recorded data 
 			this.isPlaybackActive = true; //show the <video-player></video-player>
 			this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
@@ -238,7 +236,7 @@ export default {
 		 *
 		 */
 		onCloseErrorModalSelected () {
-			this.$refs.errorModal.animateOff();
+			this.isOverMediaModalClosing = true;
 		},
 
 		/*
@@ -246,6 +244,7 @@ export default {
 		 *
 		 */
 		onErrorModalClosed () {
+			this.isOverMediaModalClosing = false;
 			this.hasDeviceAlreadyInUseError = false;
 			this.hasPermissionDeniedError = false;
 		},
@@ -266,7 +265,7 @@ export default {
 			this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
 			this.isDeleteRecordingModalActive = false;
 			this.isPlaybackActive = false;
-			this.player.record().getDevice();
+			this.player.record().getDevice(); //relaunch the recorder 
 		},
 
 		/*
@@ -274,14 +273,15 @@ export default {
 		 *
 		 */
 		onCancelDeleteRecordingSelected () {
-			this.$refs.deleteRecordingModal.animateOff();
+			this.isOverMediaModalClosing = true;
 		},
 
 		/*
-		 * close the delete recording modal, cancel has been selected rather than confirm
+		 * closed the delete recording modal, cancel has been selected rather than confirm
 		 *
 		 */
 		onDeleteRecordingModalClosed () {
+			this.isOverMediaModalClosing = false;
 			this.isDeleteRecordingModalActive = false;
 		},
 
@@ -318,7 +318,7 @@ export default {
 			</transition>
 		</div><!-- recordingVideoContainer -->
 
-		<over-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError" ref="errorModal" :closed-call-back="onErrorModalClosed" key="errorModal">
+		<over-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
 			<template v-if="hasDeviceAlreadyInUseError">
 					<div class="alert-box warning">The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</div>
 				<button @click.prevent="onCloseErrorModalSelected">Close</button>
@@ -329,7 +329,7 @@ export default {
 			</template>
 		</over-media-modal>
 
-		<over-media-modal v-else-if="isDeleteRecordingModalActive" ref="deleteRecordingModal" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
+		<over-media-modal v-else-if="isDeleteRecordingModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
 			<div class="alert-box alert">Are you sure you wish to delete the current recording?</div>
 			<div class="modal-actions">
 				<button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>

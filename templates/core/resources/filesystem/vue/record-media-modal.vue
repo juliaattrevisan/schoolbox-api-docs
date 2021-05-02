@@ -29,6 +29,7 @@ export default {
 			isProcessActive: false, //to be able to disable certain behavour when recordings/conversions/uploads are taking place
 			recordedData: null, //could be audio, video, image etc
 			canUpload: false, //to upload the file
+			isOverMediaModalClosing: false, //to animate out the over-media-modal
 			isFilenameModalActive: false, //prompt the filename change modal
 			newFilename: '', //name the file
 			isUploading: false, //to notify of update
@@ -164,7 +165,7 @@ export default {
 		 *
 		 */
 		onCloseFilenameModalSelected () {
-			this.$refs.filenameModal.animateOff();
+			this.isOverMediaModalClosing = true;
 		},
 
 		/*
@@ -172,6 +173,7 @@ export default {
 		 *
 		 */
 		onFilenameModalClosed () {
+			this.isOverMediaModalClosing = false;
 			this.isFilenameModalActive = false;
 		},
 
@@ -283,7 +285,7 @@ export default {
 					</template>
 				</keep-alive>
 
-				<over-media-modal v-if="isFilenameModalActive" ref="filenameModal" :closed-call-back="onFilenameModalClosed" key="filenameModal">
+				<over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
 					<h3><em>Please add a filename prior to continuing.</em></h3>
 					<label for="filename" class="required" aria-required="true">Filename</label>
 					<input type="text" id="filename" name="filename" v-model="newFilename">
@@ -292,11 +294,11 @@ export default {
 						<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
 					</div>	
 				</over-media-modal>
-				<over-media-modal v-else-if="isUploading" ref="isUploadingModal" key="isUploadingModal">
+				<over-media-modal v-else-if="isUploading" key="isUploadingModal">
 					<div class="loader"></div>
 					<p><em>Uploading video, please wait...</em></p>
 				</over-media-modal>
-				<over-media-modal v-else-if="hasUploaded" ref="hasUploadedModal" key="hasUploadedModal">
+				<over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
 					<p><em>Media successfully uploaded.</em></p>
 				</over-media-modal>	
 

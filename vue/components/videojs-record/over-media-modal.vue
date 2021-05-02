@@ -3,6 +3,7 @@
 /*
  * To notify of various media events, like camera not available or video converting/uploading
  * Just a slot really, the parent puts whatever it needs in it
+ * Typically toggled by a v-if in the parent component, which when toggled will animateOn() on mounted()
  *
  */
 
@@ -11,13 +12,25 @@ import { gsap } from 'gsap/all';
 export default {
     
     props: {
-        closedCallBack: { //what to do when the modal is closed
+		isClosing: { //to toggle an animate out 
+     		type: Boolean,
+      		required: false,
+    	},
+        closedCallBack: { //optional method that is notified when the animateOff is complete
      		type: Function,
       		required: false,
     	},
     },
 
-    mounted () {
+	watch:  { 
+        isClosing (newValue) {
+			if (newValue) {
+				this.animateOff();
+			}
+		}
+    },
+
+    mounted () { 
         this.animateOn();
     },
 
