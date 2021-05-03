@@ -116,8 +116,18 @@
         // Visit here to find all the view ids:
         //   https://developers.google.com/picker/docs/reference#view-id
         function createPicker(oauthToken) {
+            let allowedFileTypes = [
+                'application/msword',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.ms-excel',
+                'application/vnd.google-apps.document',
+                'application/vnd.google-apps.presentation',
+                'application/vnd.google-apps.spreadsheet'
+            ].join(',');
+
             let picker = new google.picker.PickerBuilder()
                 .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+                .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
                 .setOAuthToken(oauthToken)
 
                 /* This is documented in the API but it's currently kind of broken
@@ -126,8 +136,31 @@
                  * and you can choose them from the search bar/dropdown in the modal, regardless
                  * of any other addView() commands here
                  */
-                .addViewGroup(
-                    new google.picker.ViewGroup(google.picker.ViewId.DOCS)
+                .addView(
+                    new google.picker.DocsView()
+                        .setOwnedByMe(true)
+                        .setMimeTypes(allowedFileTypes)
+                )
+                .addView(
+                    new google.picker.DocsView()
+                        .setOwnedByMe(false)
+                        .setMimeTypes(allowedFileTypes)
+                )
+                .addView(
+                    new google.picker.DocsView()
+                        .setEnableDrives(true)
+                        .setMimeTypes(allowedFileTypes)
+                )
+                .addView(
+                    new google.picker.DocsView()
+                        .setLabel('Starred')
+                        .setStarred(true)
+                        .setMimeTypes(allowedFileTypes)
+                )
+                .addView(
+                    new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED)
+                        .setLabel('Recent')
+                        .setMimeTypes(allowedFileTypes)
                 )
                 .setCallback(pickerCallback)
                 .build();
