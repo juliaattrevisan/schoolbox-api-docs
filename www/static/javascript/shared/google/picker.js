@@ -117,6 +117,13 @@
                 .setCallback(pickerCallback)
                 .build();
             picker.setVisible(true);
+
+            /* Shut google modal when we shut our modal
+             * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
+             */
+            $(document).on('close.fndtn.reveal', config.modalId, function() {
+                picker.setVisible(false);
+            });
         }
 
 
