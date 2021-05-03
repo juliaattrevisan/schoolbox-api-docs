@@ -271,6 +271,11 @@ class Group extends DeprecatedModel
         }
     }
 
+    /**
+     * @deprecated use `\Schoolbox\Resource\GroupMapper` delete methods instead
+     *
+     * @param $relationID
+     */
     function disbandGroup($relationID)
     {
         //delete an entire group including owner
