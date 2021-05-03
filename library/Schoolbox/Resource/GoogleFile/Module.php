@@ -83,9 +83,14 @@ class Module extends BaseModule
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
+
     /**
      * @param array $params
      * @return array
+     * @throws BaseMapper\DefinitionException
+     * @throws InvalidPath
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     private function preloadFolder(array $params): array
     {
@@ -103,11 +108,16 @@ class Module extends BaseModule
         return $preload;
     }
 
+
     /**
-     * @return FolderMapper|BaseMapper
+     * @return FolderMapper
+     * @throws \InvalidArgumentException
      */
     private function getFolderMapper(): FolderMapper
     {
-        return $this->getMapperFactory()->get(FolderMapper::class);
+        /** @var FolderMapper $mapper **/
+        $mapper = $this->getMapperFactory()->get(FolderMapper::class);
+
+        return $mapper;
     }
 }
