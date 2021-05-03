@@ -26,9 +26,16 @@
         let picker = new google.picker.PickerBuilder()
                 .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
                 .setOAuthToken(oauthToken)
-                .addView(new google.picker.View(google.picker.ViewId.DOCUMENTS))
-                .addView(new google.picker.View(google.picker.ViewId.SPREADSHEETS))
-                .addView(new google.picker.View(google.picker.ViewId.PRESENTATIONS))
+
+                /* This is documented in the API but it's currently kind of broken
+                 *
+                 * You can't do what their example tells you...DOCS encompasses all the types
+                 * and you can choose them from the search bar/dropdown in the modal, regardless
+                 * of any other addView() commands here
+                 */
+                .addViewGroup(
+                    new google.picker.ViewGroup(google.picker.ViewId.DOCS)
+                )
                 .setCallback(pickerCallback)
                 .build();
         picker.setVisible(true);
