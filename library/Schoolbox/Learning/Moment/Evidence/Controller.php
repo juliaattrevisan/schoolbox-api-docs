@@ -398,33 +398,6 @@ class Controller extends Base
              ->setMulti(false)
              ->setThumbnailSize(64)
              ->setModalTitle('Select file');
-        switch ($momentType) {
-            case Model::MOMENT_TYPE_PHOTO:
-                $zone->setAttachPrompt('take a picture')
-                     ->setIconClass('icon-camera')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('image/*');
-                break;
-            case Model::MOMENT_TYPE_AUDIO:
-                $zone->setAttachPrompt('record audio')
-                     ->setIconClass('icon-audio')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('audio/*');
-                break;
-            case Model::MOMENT_TYPE_VIDEO:
-                $zone->setAttachPrompt('record video')
-                     ->setIconClass('icon-video')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('video/*');
-                break;
-            case Model::MOMENT_TYPE_UPLOAD:
-            case Model::MOMENT_TYPE_TEXT:
-            default:
-                break;
-        }
         return $zone;
     }
 
