@@ -126,48 +126,6 @@ class Module extends BaseModule
 
 
     /**
-     * Preload a User instance with the url from Geosnapshot
-     *
-     * @return Rule\IAuthorizationRule
-     */
-    private function canGetStudentPhotos(): Rule\IAuthorizationRule
-    {
-        return new Rule\LazyCallback(function () {
-            return new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
-                    try {
-                        $viewee = $this->getUserMapper()->findById($params['id']);
-                    } catch (MapperException $e) {
-                        throw new NotFound();
-                    }
-
-                    /* No Geosnapshot? No trabajo
-                     *
-                     * One or more misconfigurations or access controls could have caused this
-                     * but all result in nothing to see for the current user
-                     */
-                    $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
-                        ->isSatisifiedBy(
-                            $this->getConfig()->get('geosnapshot_api_key'),
-                            $this->getConfig()->get('geosnapshot_enabled'),
-                            $sessionUser,
-                            $viewee
-                        );
-
-                    if (!$isGeosnapshotAvailable) {
-                        throw new NotFound();
-                    }
-
-                    return [
-                        'viewee' => $viewee,
-                        'url' => Redirect::decode($params['url'])
-                    ];
-                })
-            );
-        });
-    }
-    /**
      * @inheritdoc
      */
     public function initControllers(ContainerInterface $injector): void
