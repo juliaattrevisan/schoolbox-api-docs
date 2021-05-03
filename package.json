@@ -5,8 +5,6 @@
   "description": "Schoolbox LMS",
   "dependencies": {
     "@andxor/jquery-ui-touch-punch-fix": "1.0.2",
-    "@ffmpeg/core": "^0.8.5",
-    "@ffmpeg/ffmpeg": "^0.9.7",
     "@fullcalendar/core": "^4.3.1",
     "@fullcalendar/daygrid": "^4.3.0",
     "@fullcalendar/interaction": "^4.3.0",

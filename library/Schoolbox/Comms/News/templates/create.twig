@@ -455,19 +455,6 @@
     /** @param {Codec} codec */
     var codec = new Codec();
 
-    //the maths equation plugin is currently overwriting the global URL variable, ensure this doesnt happen
-    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#custom_setters_and_getters
-    (function() {
-        var actualURL = window.URL;
-        Object.defineProperty(window, 'URL', {
-            set: function(newValue) {
-                //debugger;
-                console.log('someone is changing URL with - ' + newValue); // <-- breakpoint here!
-            },
-            get: function() { return actualURL; }
-        });
-    })();
-
 </script>
 {% endautoescape %}
 

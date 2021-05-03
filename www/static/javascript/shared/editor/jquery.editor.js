@@ -270,3 +270,15 @@
     });
 
 })(jQuery);
+
+//the maths equation plugin is currently overwriting the global URL variable, ensure this doesnt happen
+//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty#custom_setters_and_getters
+(function() {
+	var actualURL = window.URL;
+	Object.defineProperty(window, 'URL', {
+		set: function(newValue) {
+			()=>{} //just prevent anything from happening, because nothing should //https://stackoverflow.com/questions/21634886/what-is-the-javascript-convention-for-no-operation
+		},
+		get: function() { return actualURL; }
+	});
+})();
