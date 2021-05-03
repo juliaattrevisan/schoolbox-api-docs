@@ -1,18 +1,10 @@
 @font-face {
-	font-family: 'schoolbox';
-<<<<<<< HEAD
-	src: url("#{$cdn-prefix}/fonts/schoolbox.eot?fln4u5");
-	src: url("#{$cdn-prefix}/fonts/schoolbox.eot?fln4u5#iefix") format('embedded-opentype'),
-		 url("#{$cdn-prefix}/fonts/schoolbox.ttf?fln4u5") format('truetype'),
-		 url("#{$cdn-prefix}/fonts/schoolbox.woff?fln4u5") format('woff'),
-		 url("#{$cdn-prefix}/fonts/schoolbox.svg?fln4u5#schoolbox") format('svg');
-=======
-	src: url("#{$cdn-prefix}/fonts/schoolbox.eot?k53vyh");
-	src: url("#{$cdn-prefix}/fonts/schoolbox.eot?k53vyh#iefix") format('embedded-opentype'),
-		 url("#{$cdn-prefix}/fonts/schoolbox.ttf?k53vyh") format('truetype'),
-		 url("#{$cdn-prefix}/fonts/schoolbox.woff?k53vyh") format('woff'),
-		 url("#{$cdn-prefix}/fonts/schoolbox.svg?k53vyh#schoolbox") format('svg');
->>>>>>> cb75c2317c... Screen cap icon / random tweaks [SA-11822]
-	font-weight: normal;
-	font-style: normal;
+  font-family: "schoolbox";
+  src: url("#{$cdn-prefix}/fonts/schoolbox.eot?k53vyh");
+  src: url("#{$cdn-prefix}/fonts/schoolbox.eot?k53vyh#iefix") format("embedded-opentype"),
+    url("#{$cdn-prefix}/fonts/schoolbox.ttf?k53vyh") format("truetype"),
+    url("#{$cdn-prefix}/fonts/schoolbox.woff?k53vyh") format("woff"),
+    url("#{$cdn-prefix}/fonts/schoolbox.svg?k53vyh#schoolbox") format("svg");
+  font-weight: normal;
+  font-style: normal;
 }

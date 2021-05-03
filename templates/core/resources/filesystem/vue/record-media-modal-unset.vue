@@ -105,7 +105,7 @@ export default {
 	<div class="pseudo-video" ref="pseudoVideo">
 		<button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
 			<div>
-				<span class='icon-mic'></span>
+				<div class='icon-mic'></div>
 				<span>Record audio</span>
 				<aside>Say something with an audio only recording.</aside>
 			</div>
