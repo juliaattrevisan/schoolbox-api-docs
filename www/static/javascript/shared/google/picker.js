@@ -30,10 +30,22 @@
          */
         function init(options, element) {
             let defaults = {
+
+                /* The link which activates the google picker
+                 */
                 element: element,
+
+                /* Our modal. The google modal appears on top of this
+                 */
                 modalId: '#gfile',
+
+                /* Client id si required, as is postGoogleFileUrl
+                 */
                 clientId: '',
                 postGoogleFileUrl: '',
+
+                /* A google setting
+                 */
                 scope: 'https://www.googleapis.com/auth/drive.file'
             };
 
@@ -63,7 +75,8 @@
 
 
         /**
-         * Respond to google
+         * Respond to google when you get past the authentication request
+         * Spawn our modal and detect when we close the google modal; react accordingly
          */
         function handleAuthResult(authResult) {
             if (authResult && !authResult.error) {
