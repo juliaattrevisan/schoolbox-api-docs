@@ -77,11 +77,12 @@ export default {
 						}
 					}
 				},
-				// pagination: {
-				// 	dropdown: true //use drop down rather than pagination buttons
-				// },
-				perPage: 10, 
-				perPageValues: [10, 20, 30],
+				pagination: {
+					edge: false,
+					dropdown: true 
+				},
+				perPage: 100, 
+				perPageValues: [100, 200, 300],
 				selectable: {
 					mode: 'multiple' //to enable multi-select
 				},
@@ -179,6 +180,18 @@ export default {
 		 */
 		onContainerResize (dimensions) {
 			this.selectContainer.style.width = (dimensions.width) + 'px';
+			if (this.$refs.table) { //won't exist at startup, as the data isn't loaded
+				this.updateSelectContainerXPos();
+			}
+		},
+
+		/**
+		 * To move the fixed position select container in line with opened/closed pinned menus
+		 *
+		 */
+		updateSelectContainerXPos () {
+			const xPos = this.$refs.table.$el.getBoundingClientRect().x;
+			this.selectContainer.style.left = xPos + 'px';
 		},
 
 		/**
@@ -190,6 +203,9 @@ export default {
 				.then((response) => {
 					this.rows = response.data;
 					this.hasRowsLoaded = true;
+					this.$nextTick(() => {
+						this.updateSelectContainerXPos();
+					})
 				}).catch((error) => {
 					this.hasLoadError = true; //display error note in the DOM
 			});
@@ -235,6 +251,7 @@ export default {
 					this.$refs.deleteModal.close();
 					this.rows = this.getUpdatedRowsAfterUserDeletion();
 					this.clearRows();
+					this.$refs.table.resetSelectedRows();
 
 				}).catch((error) => {
 					this.$refs.toast.timeout('Unable to delete', false, 2000);
@@ -279,7 +296,7 @@ export default {
 		 */
 		onClearUsersToSelected () {
 			this.clearRows();
-			this.$refs.table.resetSelectedRows() 
+			this.$refs.table.resetSelectedRows();
 		},
 
 	}
@@ -307,7 +324,7 @@ export default {
 			@select="onRowSelected"
 		/>
 
-	 <toast ref="toast"></toast>
+	 	<toast ref="toast"></toast>
 
 		<reveal-modal ref="deleteModal">
 			<h2>Please Confirm Multiple User Deletion</h2>

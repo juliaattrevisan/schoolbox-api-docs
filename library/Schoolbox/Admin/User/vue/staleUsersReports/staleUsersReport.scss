@@ -13,7 +13,7 @@
   width: 100%; //will be updated within stale-users-report.vue to properly align
   height: 120px;
   bottom: 0px;
-  right: 2rem;
+  left: 0px; //will be updated in #stale-users-report based on pinned elements
   padding: 1rem;
 
   h3,

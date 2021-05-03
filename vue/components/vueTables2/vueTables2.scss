@@ -1,4 +1,4 @@
-$cdn-prefix: '/static';
+$cdn-prefix: "/static";
 
 .VueTables input[type="checkbox"] {
   position: static;
@@ -37,7 +37,7 @@ $cdn-prefix: '/static';
   content: url("#{$cdn-prefix}/images/svg/sort-down.svg");
 }
 
-.VuePagination__count {
-  margin-bottom: .5rem;
-  text-align: left !important;
+.VuePagination,
+.VueTables__limit-field {
+  display: none;
 }
