@@ -51,7 +51,6 @@ foreach ($_POST['docs'] as $doc) {
         $meta = $grive->fetchMetaData($doc['id']);
 
         $filename = $grive->deriveFileName($meta);
-        $filename = $doc['id'] . $filename;
 
         $dest = $grive->fetchToFile($doc['id']);
     } catch (DomainException $e) {

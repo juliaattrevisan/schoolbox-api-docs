@@ -52,7 +52,6 @@ class Controller extends Base
             $this->googleFileMapper->save($googleFile);
         }
 
-        // Return the badge just created
         $this->getResponse()->status->set(200);
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
