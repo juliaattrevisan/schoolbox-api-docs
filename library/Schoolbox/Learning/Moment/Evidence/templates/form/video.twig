@@ -1,11 +1,37 @@
-{% extends '@learningMomentEvidence/form/capture.twig' %}
+{% extends '@learningMomentEvidence/form.twig' %}
 
-{% block formInputFileLabel %}
-    Record something
-{% endblock formInputFileLabel %}
+{% block formInputs %}
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                {% block formInputFile %}
+                    <label class="required" for="evidence-filename">
+                        Record something
+                    </label>
+                    <input type="hidden" name="filename" id="evidence-filename" {{ isCreate ? '' : 'value="'~evidence.filename~'"' }}/>
+                {% endblock formInputFile %}
+            </div>
+        </fieldset>
+    </section>
+{% endblock formInputs %}
 
-{% block formInputFilePreviewElement %}
-    <div class="evidence-storage-preview">
-    <video id="evidence-storage-preview" class="hide" controls src="#"  width="100%" height="100%"></video>
-    </div>
-{% endblock formInputFilePreviewElement %}
+{% block formInputBody %}
+    <label for="evidence-body">
+        Description
+    </label>
+    <textarea name="body" id="evidence-body">{{ isCreate ? '' : evidence.body | purify }}</textarea>
+{% endblock formInputBody %}
+
+{% block formJs %}
+    {% autoescape 'js' %}
+        <script type="text/javascript">
+            let buildValidationRules = function () {
+                return {
+                    filename: {
+                        required: true,
+                    },
+                }
+            };
+        </script>
+    {% endautoescape %}
+{% endblock formJs %}
