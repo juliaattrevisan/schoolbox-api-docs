@@ -4,8 +4,8 @@ INSERT INTO `config`
     (`name`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES
        ('geosnapshot_api_key',
-        'Geosnapshot API Key',
-        'Allow integration to Geosnapshot by providing an API Key.',
+        'GeoSnapShot API Key',
+        'The key used to securely integrate GeoSnapShot, this will be provided when the service is enabled',
         (SELECT id FROM lu_config_field WHERE field = 'input'),
         (SELECT id FROM lu_config_type WHERE type = '3rd Party Services'),
         'true',
@@ -24,8 +24,8 @@ INSERT INTO `config`
 VALUES
        ('geosnapshot_enabled',
         '0',
-        'Geosnapshot Integration',
-        'If ON, Geosnapshot integration is enabled.',
+        'GeoSnapShot Integration',
+        'If ON, parents may view photos of their students uploaded to GeoSnapShot and photo galleries embedded into pages, note you must also have a valid API key.',
         (SELECT id FROM lu_config_field WHERE field = 'boolean'),
         (SELECT id FROM lu_config_type WHERE type = 'Modules'),
         'true',
@@ -39,4 +39,4 @@ VALUES
 
 -- Generic error message for now
 INSERT INTO `error` (id, message)
-VALUES (230, 'Geosnapshot is not available at this time; try again later.');
+VALUES (230, 'GeoSnapShot is not available at this time; try again later.');

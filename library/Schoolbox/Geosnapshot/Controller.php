@@ -60,7 +60,11 @@ class Controller extends Base
         try {
             $response = (new Api($this->getConfigLoader()->get('geosnapshot_api_key')))
                 ->retrieveStudentPhotos($viewee);
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException|\DomainException $e) {
+
+            /* RuntimeException is thrown when student doesn't have a profile pic
+             * DomainException is thrown when json can't be decoded
+             */
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_GEOSNAPSHOT_UNAVAILABLE);
         }
 
