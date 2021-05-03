@@ -36,7 +36,7 @@
                 .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
                 .setOAuthToken(oauthToken)
                 .addView(view)
-//                .addView(new google.picker.DocsUploadView())
+                //                .addView(new google.picker.DocsUploadView())
                 .setCallback(pickerCallback)
                 .build();
         picker.setVisible(true);
@@ -44,8 +44,14 @@
 
     function pickerCallback(data) {
         if (data.action === google.picker.Action.PICKED) {
-            var fileId = data.docs[0].id;
-            alert('To be implemented: ' + fileId);
+            $.ajax({
+                type: 'POST',
+                url: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {}) }}',
+                data: {docs: data.docs, fid: {{ component.context.id }}},
+                success: function (data) {
+                    window.location.reload();
+                }
+            });
         }
     }
 
