@@ -271,25 +271,6 @@ class Group extends DeprecatedModel
         }
     }
 
-    /**
-     * @deprecated use `\Schoolbox\Resource\GroupMapper` delete methods instead
-     *
-     * @param $relationID
-     */
-    function disbandGroup($relationID)
-    {
-        //delete an entire group including owner
-
-        $query = "DELETE FROM userAccess WHERE service = " . $this->_service . " AND sid = $relationID";
-        $this->db->query($query);
-
-        $this->db->delete('userGroups', 'cid', $relationID);
-
-        // Do not delete group events anymore.
-        // Quoting the disband group dialog:
-        // "All members of the group will be removed, but all homepage content will remain."
-    }
-
     function getMemberList($relationID)
     {
         $query = "SELECT title, firstname, lastname, uid, synergy_id, type, group_id, local_email, alt_email, username
