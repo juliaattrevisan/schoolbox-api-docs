@@ -7761,11 +7761,6 @@ parameters:
 			path: library/Schoolbox/Permission/Access/Test/AccessTest.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Permission/Access/UserAccessMapper.php
-
-		-
 			message: "#^Variable \\$roleMapper in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: library/Schoolbox/Permission/Access/UserAccessMapper.php
