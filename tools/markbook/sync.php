@@ -216,6 +216,8 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
     $log->info('Markbook synchronisation starting...');
     $log->info("Syncing work due between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}...");
 
+    $totalSuccess=0;
+    $totalFailure=0;
 
     foreach ($folderList as $folder) {
 
@@ -295,28 +297,49 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
 
                 // Output the HR and normalized mark that are synced
                 $markLog = '(missing)';
+                $level = 'info';
+
                 if ($feedback) {
                     $hrMark   = $feedback->getHumanReadableMark();
                     $normMark = $feedback->getNormalisedMark();
                     $markLog  = sprintf('%s (%s)', $hrMark, isset($normMark) ? round($normMark, 2) : 'null');
                 }
-                $log->info(
+
+
+                if (!$dryRun) {
+                    if ($feedback) {
+                        if(!$markbookExternal->syncFeedback($feedback)) {
+                            $level = 'warning';
+                            $markLog = '(failed)';
+                            $totalFailure++;
+                        }
+                        else {
+                            $totalSuccess++;
+                        }
+//                    } else {
+//                        $markbookExternal->deleteFeedback($assessment, $student);
+                    }
+                }
+
+                $log->$level(
                     sprintf(
                         "        %s%s",
                         str_pad("{$student->getFirstname()} {$student->getLastname()} ({$student->getExternalId()}):", 26, " "),
                         $markLog
                     )
                 );
-
-                if (!$dryRun) {
-                    if ($feedback) {
-                        $markbookExternal->syncFeedback($participant->findMostRecentInstructorGivenFeedback());
-//                    } else {
-//                        $markbookExternal->deleteFeedback($assessment, $student);
-                    }
-                }
             }
         }
     }
 
+    $totalAttempts = $totalFailure + $totalSuccess;
+    $log->info(
+        sprintf(
+            "Sync completed: %d successful, %d failed (%d%%)",
+            $totalSuccess,
+            $totalFailure,
+            // Maybe no results were processed: don't DBZ
+            $totalAttempts === 0 ? 0 : ($totalFailure / $totalAttempts * 100)
+        )
+    );
 });

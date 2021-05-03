@@ -81,6 +81,12 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
     private $resultTypeCache = [];
 
     /**
+     * A cache of assessments in the synergetic markbook
+     * Is keyed with FileYear, FileSemester, FolderCodes, AssessmentCode
+     */
+    private $synMarkbook = [];
+
+    /**
      * The type of mark to sync, normal or human readable
      * @var int
      */
@@ -151,45 +157,48 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return false;
         }
 
-        $markbookId = $this->getMarkbookIdentifier($assessment);
-        if (!isset($markbookId)) {
-            return false;
-        }
-
-        $this->insertMarkbooksIfNotExists(
+        if( $this->insertMarkbooksIfNotExists(
             $assessment,
             $folderCodes,
             $this->getSystemFileYear(),
             $this->getSystemFileSemester()
-        );
+        ) ) {
+            return true;
+        } else {
 
-        $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
-        $resultType            = $this->getResultType($assessment);
+            $markbookId = $this->getMarkbookIdentifier($assessment);
+            if (!isset($markbookId)) {
+                return false;
+            }
 
-        $sql = "
-            UPDATE StaffAssessmentMarkBook
-            SET    Heading         = :heading,
-                   HdgAbbrev1      = :headingAbbreviation1,
-                   WeightingFactor = :weightingFactor,
-                   ResultType      = :resultType,
-                   TestDate        = :dueDate
-            WHERE  HdgAbbrev2      = :headingAbbreviation2
-            AND    FileYear        = :fileYear
-            AND    FileSemester    = :fileSemester
-        ";
+            $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
+            $resultType            = $this->getResultType($assessment);
 
-        $params = [
-            'heading'              => $assessmentFieldValues["Heading"],
-            'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
-            'headingAbbreviation2' => $markbookId,
-            'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
-            'resultType'           => $resultType,
-            'fileYear'             => $this->getSystemFileYear(),
-            'fileSemester'         => $this->getSystemFileSemester(),
-            'dueDate'              => $assessment->getDueAt()->getDatabase(),
-        ];
+            $sql = "
+                UPDATE StaffAssessmentMarkBook
+                SET    Heading         = :heading,
+                       HdgAbbrev1      = :headingAbbreviation1,
+                       WeightingFactor = :weightingFactor,
+                       ResultType      = :resultType,
+                       TestDate        = :dueDate
+                WHERE  HdgAbbrev2      = :headingAbbreviation2
+                AND    FileYear        = :fileYear
+                AND    FileSemester    = :fileSemester
+            ";
 
-        return $this->getConnector()->prepareQuery($sql, $params)->execute();
+            $params = [
+                'heading'              => $assessmentFieldValues["Heading"],
+                'headingAbbreviation1' => $assessmentFieldValues["HdgAbbrev1"],
+                'headingAbbreviation2' => $markbookId,
+                'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
+                'resultType'           => $resultType,
+                'fileYear'             => $this->getSystemFileYear(),
+                'fileSemester'         => $this->getSystemFileSemester(),
+                'dueDate'              => $assessment->getDueAt()->getDatabase(),
+            ];
+
+            return $this->getConnector()->prepareQuery($sql, $params)->execute();
+        }
     }
 
 
@@ -340,18 +349,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $marker  = $feedback->getReviewer();
 
         // Don't sync marks if:
-        // * Student is deleted
         // * Student's ID is invalid
         // * Marker's ID is invalid
-        if ($student->isDeleted()) {
-            return false;
-        }
         if (!$this->isExternalIdValid($student->getExternalId())) {
             return false;
         }
-        if (!$this->isExternalIdValid($marker->getExternalId())) {
+       if (!$this->isExternalIdValid($marker->getExternalId())) {
             return false;
-        }
+       }
 
         return $this->setActivityMark($feedback);
     }
@@ -468,7 +473,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'weightingFactor'      => $assessmentFieldValues["WeightingFactor"],
             'dueDate'              => $assessment->getDueAt()->getDatabase(),
         ]);
-
         return $statement->execute();
     }
 
@@ -559,13 +563,22 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
          */
         /** @var string[] $folderCodes */
         $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
-        $classCodes  = array_column($this->externalUser->getSubjectList($student), 'code');
 
-        // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
-        $markbookFolderCodes = array_intersect(
-            $this->normalizeClassCodes($folderCodes),
-            $this->normalizeClassCodes($classCodes)
-        );
+        // Performance optimization:
+        // Only filter the folder codes to the student's class codes if the
+        // folder has more than one folder code:
+        // otherwise assume the folder's code is one of the student's
+        if (count($folderCodes) > 1) {
+            $classCodes = array_column($this->externalUser->getSubjectList($student), 'code');
+
+            // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
+            $markbookFolderCodes = array_intersect(
+                $this->normalizeClassCodes($folderCodes),
+                $this->normalizeClassCodes($classCodes)
+            );
+        } else {
+            $markbookFolderCodes = $this->normalizeClassCodes($folderCodes);
+        }
 
         // In this context, we need to ensure the fileYear etc match the student, not the marker
         $this->insertMarkbooksIfNotExists($activity, $markbookFolderCodes, $studentFileYear, $studentFileSemester);
@@ -847,7 +860,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
 
         $owner = $this->retrieveOwnerFromAssessment($activity);
         if (!($owner && $this->isExternalIdValid($owner->getExternalId()))) {
-            return false;
+              return false;
         }
 
         $remoteAssessmentList = $this->getSynergeticMarkbookList($activity, $fileYear, $fileSemester);
@@ -941,6 +954,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return [];
         }
 
+        $folderCodeKey = implode(';', $folderCodes);
+        if (isset($this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId])) {
+            return $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId];
+        }
+
         $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
 
         $sql = "
@@ -970,7 +988,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             'fileSemester'       => $fileSemester,
         ], $folderCodeBindings->getParams());
 
-        return $this->getConnector()->executeQuery($sql, $params)->fetchAll();
+        $result = $this->getConnector()->executeQuery($sql, $params)->fetchAll();
+        $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId] = $result;
+        return $result;
     }
 
 
