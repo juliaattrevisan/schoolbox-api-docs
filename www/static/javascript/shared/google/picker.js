@@ -47,8 +47,6 @@
         function setupListeners() {
             $(config.element).on('click', function() {
                 loadGoogleApi(['auth2', 'picker'], loadPicker);
-
-                $(config.modalId).foundation('reveal', 'open');
             });
         }
 
@@ -70,6 +68,10 @@
         function handleAuthResult(authResult) {
             if (authResult && !authResult.error) {
                 createPicker(authResult.access_token);
+
+                /* Only spawn our modal if they authenticate past the popup thing
+                 */
+                $(config.modalId).foundation('reveal', 'open');
 
                 /* As painful as this is...
                  * https://stackoverflow.com/questions/45809722/how-do-i-execute-an-action-when-an-attribute-value-changes-using-jquery-or-javas
