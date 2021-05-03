@@ -48,7 +48,7 @@
             $(config.element).on('click', function() {
                 loadGoogleApi(['auth2', 'picker'], loadPicker);
 
-                $(config.modal).foundation('reveal', 'open');
+                $(config.modalId).foundation('reveal', 'open');
             });
         }
 
@@ -70,6 +70,29 @@
         function handleAuthResult(authResult) {
             if (authResult && !authResult.error) {
                 createPicker(authResult.access_token);
+
+                /* As painful as this is...
+                 * https://stackoverflow.com/questions/45809722/how-do-i-execute-an-action-when-an-attribute-value-changes-using-jquery-or-javas
+                 *
+                 * After the picker dom gets rammed in, watch for state changes
+                 * so we can shut our modal when we shut the google modal
+                 */
+                let MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver
+
+                let observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === "attributes") {
+                            if (mutation.target.getAttribute('aria-hidden') !== "true") {
+                                $(config.modalId).foundation('reveal', 'close');
+                            }
+                        }
+                    });
+                });
+
+                observer.observe(document.querySelector('.picker-dialog-bg'), {
+                    attributes: true, //configure it to listen to attribute changes
+                    attributeFilter: ['aria-hidden'] // filter your attributes
+                });
             }
         }
 
