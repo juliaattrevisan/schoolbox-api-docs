@@ -564,7 +564,11 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         /** @var string[] $folderCodes */
         $folderCodes = $this->retrieveFolderCodesFromAssessment($activity);
 
-        if(count($folderCodes) > 1 ) {
+        // Performance optimization:
+        // Only filter the folder codes to the student's class codes if the
+        // folder has more than one folder code:
+        // otherwise assume the folder's code is one of the student's
+        if (count($folderCodes) > 1) {
             $classCodes = array_column($this->externalUser->getSubjectList($student), 'code');
 
             // Only push to codes are currently attached to the assessment's folder, and the student is enrolled in
@@ -572,9 +576,8 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 $this->normalizeClassCodes($folderCodes),
                 $this->normalizeClassCodes($classCodes)
             );
-        }
-        else {
-            $markbookFolderCodes =  $this->normalizeClassCodes($folderCodes);
+        } else {
+            $markbookFolderCodes = $this->normalizeClassCodes($folderCodes);
         }
 
         // In this context, we need to ensure the fileYear etc match the student, not the marker
