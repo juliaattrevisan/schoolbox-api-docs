@@ -219,7 +219,13 @@ class Controller extends Base
         if (!isset($email)) {
             throw new UnexpectedValueException(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
         }
-        $this->auth->createSession((string)$email);
+
+        // The email must be valid too, or at least not blank
+        $email = (string)$email;
+        if (trim($email) === '') {
+            throw new UnexpectedValueException(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
+        }
+        $this->auth->createSession($email);
     }
 
     /**
