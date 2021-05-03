@@ -1,6 +1,7 @@
 {% autoescape 'js' %}
     <script type="text/javascript">
         window.fullCalendarConfig = {
+            schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
             userId: Number('{{ user.id }}') || null,
             folderId: null,
             // Days: 0 = max, must be at least 1.
@@ -17,6 +18,6 @@
     </script>
 {% endautoescape %}
     <div id="calendar">
-        <div class="loader"></div>
+        <calendar-component />
     </div>
     <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/calendarComponent.bundle.js?v={{ config.site_version }}"></script>

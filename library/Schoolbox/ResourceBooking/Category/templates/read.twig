@@ -40,36 +40,19 @@
         eventLimit:             Boolean('{{ config.calendar_collapse_events }}'),
         firstDay:               Number('{{ config.calendar_start_day }}'),
         defaultView:            calendarView,
-        schedulerLicenseKey:    {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
+        schedulerLicenseKey:    '{{ config.fullcalendar_scheduler_license_key }}',
         dateDisplayFormats:     dateDisplayFormats,
         resourceBookingEndpoint:{{ routeLookup('resourceCategory.calendar', {id: category.id})|json_encode|raw }},
         createBookingPath:      {{ routeLookup('resourceBooking.book', {id: ''})|json_encode|raw }},
         resourceId:             Number('{{ category.id }}'),
         resourceColumns: [{
-            labelText: 'Resource',
-
-            text: function(resource) {
-                var extendedProps = resource.extendedProps;
-                var name = extendedProps.name;
-                var roomCode = extendedProps.room_code;
-
-                if (roomCode) {
-                    name = name + ' [' + roomCode + ']';
-                }
-
-                return name;
-            },
-            render: function(resource, el) {
-                var name = el.getElementsByClassName('fc-cell-text')[0].innerText;
-
-                var link = document.createElement("a");
-                    link.setAttribute('href', '/resource-booking/item/' + resource.id);
-                    link.innerHTML = name;
-
-                el.getElementsByClassName('fc-cell-text')[0].innerHTML = '';
-                el.getElementsByClassName('fc-cell-text')[0].appendChild(link);
-                el.getElementsByClassName('fc-cell-text')[0].setAttribute('class', 'resource-link');
-
+            headerContent: 'Resource',
+            cellContent: function(args) {
+                let link = document.createElement('a');
+                link.setAttribute('href', '/resource-booking/item/' + args.fieldValue);
+                link.setAttribute('class', 'resource-link');
+                link.innerText = args.resource.extendedProps.name;
+                return { domNodes: [ link ] }
             }
         }],
         resources: {{ resources|json_encode|raw }},
@@ -86,9 +69,10 @@
             <span class="hint has-tip tip-top" data-tooltip title="Click the calendar to add a booking for that time.">?</span>
         </h2>
         <section>
-            <div id="calendar"></div>
+            <div id="calendar">
+                <resource-booking-category-calendar />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/resourceBookingCategoryCalendar.bundle.js?v={{ config.site_version }}"></script>
         </section>
     </section>
 </div>
-
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/resourceBookingCategoryCalendar.bundle.js"></script>

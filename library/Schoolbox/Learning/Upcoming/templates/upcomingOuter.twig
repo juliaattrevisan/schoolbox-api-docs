@@ -60,6 +60,7 @@
         });
 
         window.fullCalendarConfig = {
+            schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
             eventLimit:         Boolean('{{ config.calendar_collapse_events }}'),
             firstDay:           Number('{{ config.calendar_start_day }}'),
             dateDisplayFormats: dateDisplayFormats,
@@ -71,12 +72,13 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-            <div id="calendar"></div>
+            <div id="calendar">
+                <upcoming-due-work-calendar />
+            </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/upcomingDueWorkCalendar.bundle.js?v={{ config.site_version }}"></script>
         </section>
     </div>
 </div>
-
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/upcomingDueworkCalendar.bundle.js"></script>
 
 <div class="row">
     <div class="small-12 medium-6 columns island">

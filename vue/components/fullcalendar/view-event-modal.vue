@@ -1,624 +1,634 @@
 <script>
-    import RevealModal        from '@schoolbox/reveal-modal'
-    import MetaList           from '@schoolbox/meta/list'
-    import MetaItem           from '@schoolbox/meta/item'
-    import axios              from 'axios';
-    import qs                 from 'qs';
-    import FullCalendarHelper from "@schoolbox/fullcalendar/helper";
 
-    /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
-     */
-    import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
-    import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
-    import checks              from '@schoolboxCalendarEvent/checks';
+import RevealModal        from '@schoolbox/reveal-modal'
+import MetaList           from '@schoolbox/meta/list'
+import MetaItem           from '@schoolbox/meta/item'
+import axios              from 'axios';
+import qs                 from 'qs';
+import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 
-    const EFFICACY_SELF = 'self';
-    const EFFICACY_SERIES = 'series';
+/* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
+    */
+import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
+import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
+import checks              from '@schoolboxCalendarEvent/checks';
 
-    const EVENT_MODIFIED = 'eventModified';
-    const EVENT_DELETED = 'eventDeleted';
+const EFFICACY_SELF = 'self';
+const EFFICACY_SERIES = 'series';
 
-    /* Initialise vars
-     *
-     * Mirrors backend Payload instance to prevent random js error about
-     * undefined vars being accessed; null operator doesn't work when supplying
-     * as an arg, apparently
-     *
-     * This gets updated asynchronously when modals open
-     */
-    const INITIAL_PAYLOAD = {
-        level: null,
-        currentUser: {
-            user: {
-                id: null
-            },
-            status: null,
-            canModify: null,
-            canInvite: null
+const EVENT_MODIFIED = 'eventModified';
+const EVENT_DELETED = 'eventDeleted';
+
+/* Initialise vars
+    *
+    * Mirrors backend Payload instance to prevent random js error about
+    * undefined vars being accessed; null operator doesn't work when supplying
+    * as an arg, apparently
+    *
+    * This gets updated asynchronously when modals open
+    */
+const INITIAL_PAYLOAD = {
+    level: null,
+    currentUser: {
+        user: {
+            id: null
         },
-        attendees: {
-            guests: [],
-            accepted: null,
-            available: null,
-            declined: null,
-            max: null,
-            num: null,
-            pending: null
+        status: null,
+        canModify: null,
+        canInvite: null
+    },
+    attendees: {
+        guests: [],
+        accepted: null,
+        available: null,
+        declined: null,
+        max: null,
+        num: null,
+        pending: null
+    }
+};
+
+export default {
+
+    name: "view-event-modal",
+
+    components: {
+        MetaItem,
+        MetaList,
+        RevealModal
+    },
+
+    mixins: [
+        mixinFullCalendarHelper
+    ],
+
+    props: {
+        toMoment: {},
+        eventModifyFormUrl: {},
+        eventModifyFormActionUrl: {},
+        eventDeleteUrl: {},
+        eventUpdateUrl: {},
+        formatDisplayDate: {},
+        formatDisplayTime: {},
+        formatDisplayDatetime: {},
+        returnUrl: {}
+    },
+
+    data () {
+        return {
+            payload: INITIAL_PAYLOAD,
+            event: {},
+
+            /* Keep track of when an async request is in progress, locking
+                * out other async requests until this has finished, preventing
+                * rsvp-button spamming
+                */
+            isTransacting: false
         }
-    };
+    },
 
-    export default {
-        name: "view-event-modal",
-        props: {
-            toMoment: {},
-            eventModifyFormUrl: {},
-            eventModifyFormActionUrl: {},
-            eventDeleteUrl: {},
-            eventUpdateUrl: {},
-            formatDisplayDate: {},
-            formatDisplayTime: {},
-            formatDisplayDatetime: {},
-            returnUrl: {}
-        },
-        components: {
-            MetaItem,
-            MetaList,
-            RevealModal
-        },
-        created() {
-            this.ENDPOINTS = ENDPOINTS;
-            this.canRsvp = checks.canRsvp;
-            this.showRsvpButtons = checks.showRsvpButtons;
-            this.isInvited = checks.isInvited;
-            this.isPending = checks.isPending;
-            this.isAccepted = checks.isAccepted;
-            this.isDeclined = checks.isDeclined;
-            this.isLimitedAttendance = checks.isLimitedAttendance;
-        },
-        data() {
+    computed: {
+        window: () => window,
+        jQuery: () => window.jQuery,
+
+        /**
+         * Generate extended properties for the component's event.
+         *
+         * TODO simplify this format
+         * (This format this is a mess necessitated by the mess that is the
+         *  events API.)
+         *
+         * @return {Object}
+         */
+        eventExtendedProps() {
+            // Also need to render the event's buttons
+
+            /* [Vue warn]: Error in render: "TypeError: Cannot read property 'extendedProps' of undefined"
+                *
+                * There's a weird modal overlay that now spawns, which can cause
+                * this.event to be undefined. That leads to subsequent crashes
+                * Therefore we now have to check whether this exists before using it
+                */
+            // if (this.event == undefined) {
+            //     return;
+            // }
+
+            let event = this.event,
+                    data = event?.extendedProps?.data,
+                    metadata = data?.meta,
+                    modifyLink = null,
+                    deleteLink = null;
+
+            // Modify/delete links
+            if (metadata?.editable) {
+                if (data?.custom?.modifyLink) {
+                    modifyLink = data?.custom?.modifyLink;
+                } else if (metadata?.eventId) {
+                    // this.returnUrl does not get updated while switching months
+                    let returnUrl = btoa(window.location.pathname);
+                    modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, returnUrl);
+                    deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, returnUrl);
+                }
+            }
+
             return {
-                payload: INITIAL_PAYLOAD,
-                event: {},
+                eventId: metadata?.eventId,
+                seriesId: metadata?.seriesId,
+                editable: metadata?.editable,
+                detail: metadata?.detail,
+                location: metadata?.location,
+                classCancelled: data?.styles?.visible,
+                author: {
+                    id: Math.max(0, metadata?.authorId || 0),
+                    name: metadata?.author,
+                },
+                reviewer: {
+                    id: Math.max(0, metadata?.reviewerId || 0),
+                    name: metadata?.reviewer,
+                },
+                folder: {
+                    id: Math.max(0, data?.links?.category?.id || 0),
+                },
+                dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
+                booking: {
+                    isBooking: (data?.booking?.status || '').length,
+                    status: data?.booking?.status,
+                    related: data?.booking?.related || [],
+                    actions: (data?.booking?.buttons || []).filter(button => button?.href),
+                },
+                attendance: {
+                    payload: this.payload
+                },
+                classAttendance: {
+                    url: data?.classAttendance?.url,
+                    target: data?.classAttendance?.target,
+                },
+                task: {
+                    isTask: this.$_fullCalendarHelper_isTask(event),
+                    completed: metadata?.completed,
+                },
+                links: {
+                    view: data?.custom?.moreDetailsLink,
+                    modify: modifyLink,
+                    delete: deleteLink,
+                    path: data?.links?.path
+                },
+            };
+        }
+    },
 
-                /* Keep track of when an async request is in progress, locking
-                 * out other async requests until this has finished, preventing
-                 * rsvp-button spamming
-                 */
-                isTransacting: false
-            }
+    created () {
+        this.ENDPOINTS = ENDPOINTS;
+        this.canRsvp = checks.canRsvp;
+        this.showRsvpButtons = checks.showRsvpButtons;
+        this.isInvited = checks.isInvited;
+        this.isPending = checks.isPending;
+        this.isAccepted = checks.isAccepted;
+        this.isDeclined = checks.isDeclined;
+        this.isLimitedAttendance = checks.isLimitedAttendance;
+    },
+
+    methods: {
+
+        /**
+         * Decide whether the modal has component actions or not
+         *
+         * Show the bar if you can do anything with its contents
+         * Otherwise, hide it
+         *
+         * @return boolean
+         */
+        hasComponentActions() {
+            return this.eventExtendedProps.folder.id ||
+                this.eventExtendedProps.links.view ||
+                this.eventExtendedProps.links.modify ||
+                this.eventExtendedProps.links.delete ||
+                this.eventExtendedProps.classAttendance.url ||
+                this.eventExtendedProps.booking.actions.length > 0 ||
+                this.canRsvp(
+                    this.eventExtendedProps.attendance.payload.level,
+                    this.eventExtendedProps.attendance.payload.attendees.guests,
+                    this.eventExtendedProps.attendance.payload.currentUser.user.id,
+                    this.eventExtendedProps.attendance.payload.currentUser.status,
+                    this.eventExtendedProps.attendance.payload.attendees.max,
+                    this.eventExtendedProps.attendance.payload.attendees.available
+                )
         },
-        beforeMount() {
-            this.helper = new FullCalendarHelper(this, this.window.fullCalendarConfig, this.window.jQuery);
-        },
-        computed: {
-            window: () => window,
-            jQuery: () => window.jQuery,
 
-            /**
-             * Generate extended properties for the component's event.
-             *
-             * TODO simplify this format
-             * (This format this is a mess necessitated by the mess that is the
-             *  events API.)
-             *
-             * @return {Object}
-             */
-            eventExtendedProps() {
-                // Also need to render the event's buttons
 
-                /* [Vue warn]: Error in render: "TypeError: Cannot read property 'extendedProps' of undefined"
-                 *
-                 * There's a weird modal overlay that now spawns, which can cause
-                 * this.event to be undefined. That leads to subsequent crashes
-                 * Therefore we now have to check whether this exists before using it
-                 */
-                // if (this.event == undefined) {
-                //     return;
-                // }
+        /**
+         * Accept an invitation
+         */
+        rsvpAccept() {
+            if (!this.isAccepted(this.eventExtendedProps.attendance.payload.currentUser.status)) {
+                if (!this.isTransacting) {
 
-                let event = this.event,
-                        data = event?.extendedProps?.data,
-                        metadata = data?.meta,
-                        modifyLink = null,
-                        deleteLink = null;
-
-                // Modify/delete links
-                if (metadata?.editable) {
-                    if (data?.custom?.modifyLink) {
-                        modifyLink = data?.custom?.modifyLink;
-                    } else if (metadata?.eventId) {
-                        // this.returnUrl does not get updated while switching months
-                        let returnUrl = btoa(window.location.pathname);
-                        modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, returnUrl);
-                        deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, returnUrl);
-                    }
+                    /* If you haven't already accepted,
+                        * async request to accept invitation
+                        */
+                    this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId));
                 }
-
-                return {
-                    eventId: metadata?.eventId,
-                    seriesId: metadata?.seriesId,
-                    editable: metadata?.editable,
-                    detail: metadata?.detail,
-                    location: metadata?.location,
-                    classCancelled: data?.styles?.visible,
-                    author: {
-                        id: Math.max(0, metadata?.authorId || 0),
-                        name: metadata?.author,
-                    },
-                    reviewer: {
-                        id: Math.max(0, metadata?.reviewerId || 0),
-                        name: metadata?.reviewer,
-                    },
-                    folder: {
-                        id: Math.max(0, data?.links?.category?.id || 0),
-                    },
-                    dateSpan: this.determineDateSpan(event?.start, event?.end, event?.allDay),
-                    booking: {
-                        isBooking: (data?.booking?.status || '').length,
-                        status: data?.booking?.status,
-                        related: data?.booking?.related || [],
-                        actions: (data?.booking?.buttons || []).filter(button => button?.href),
-                    },
-                    attendance: {
-                        payload: this.payload
-                    },
-                    classAttendance: {
-                        url: data?.classAttendance?.url,
-                        target: data?.classAttendance?.target,
-                    },
-                    task: {
-                        isTask: this.helper.isTask(event),
-                        completed: metadata?.completed,
-                    },
-                    links: {
-                        view: data?.custom?.moreDetailsLink,
-                        modify: modifyLink,
-                        delete: deleteLink,
-                        path: data?.links?.path
-                    },
-                };
             }
         },
-        methods: {
-
-            /**
-             * Decide whether the modal has component actions or not
-             *
-             * Show the bar if you can do anything with its contents
-             * Otherwise, hide it
-             *
-             * @return boolean
-             */
-            hasComponentActions() {
-                return this.eventExtendedProps.folder.id ||
-                    this.eventExtendedProps.links.view ||
-                    this.eventExtendedProps.links.modify ||
-                    this.eventExtendedProps.links.delete ||
-                    this.eventExtendedProps.classAttendance.url ||
-                    this.eventExtendedProps.booking.actions.length > 0 ||
-                    this.canRsvp(
-                        this.eventExtendedProps.attendance.payload.level,
-                        this.eventExtendedProps.attendance.payload.attendees.guests,
-                        this.eventExtendedProps.attendance.payload.currentUser.user.id,
-                        this.eventExtendedProps.attendance.payload.currentUser.status,
-                        this.eventExtendedProps.attendance.payload.attendees.max,
-                        this.eventExtendedProps.attendance.payload.attendees.available
-                    )
-            },
 
 
-            /**
-             * Accept an invitation
-             */
-            rsvpAccept() {
-                if (!this.isAccepted(this.eventExtendedProps.attendance.payload.currentUser.status)) {
+        /**
+         * Decline an invitation
+         */
+        rsvpDecline() {
+            if (this.isInvited(this.eventExtendedProps.attendance.payload.currentUser.status)) {
+                if (!this.isDeclined(this.eventExtendedProps.attendance.payload.currentUser.status)) {
                     if (!this.isTransacting) {
-
-                        /* If you haven't already accepted,
-                         * async request to accept invitation
-                         */
-                        this.rsvp(ATTENDANCE_STATUS.ACCEPTED, ENDPOINTS.rsvpAcceptPath(this.eventExtendedProps.eventId));
+                        this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
                     }
                 }
-            },
+            }
+        },
 
 
-            /**
-             * Decline an invitation
-             */
-            rsvpDecline() {
-                if (this.isInvited(this.eventExtendedProps.attendance.payload.currentUser.status)) {
-                    if (!this.isDeclined(this.eventExtendedProps.attendance.payload.currentUser.status)) {
-                        if (!this.isTransacting) {
-                            this.rsvp(ATTENDANCE_STATUS.DECLINED, ENDPOINTS.rsvpDeclinePath(this.eventExtendedProps.eventId));
-                        }
-                    }
-                }
-            },
+        /**
+         * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
+         *
+         * @param status
+         * @param endpoint
+         */
+        rsvp(status, endpoint) {
+            let self = this;
+            let toast = this.jQuery('[data-toast]');
 
+            /* Set a flag to prevent async spammage
+                */
+            self.isTransacting = true;
 
-            /**
-             * Respond to an invitation with new status $status, using accept/decline endpoint $endpoint
-             *
-             * @param status
-             * @param endpoint
-             */
-            rsvp(status, endpoint) {
-                let self = this;
-                let toast = this.jQuery('[data-toast]');
+            let request = {
+                url: endpoint,
+                method: 'post',
+                responseType: 'json'
+            }
 
-                /* Set a flag to prevent async spammage
-                 */
-                self.isTransacting = true;
+            toast.toastActivate({
+                text: 'Updating invitation...'
+            });
 
-                let request = {
-                    url: endpoint,
-                    method: 'post',
-                    responseType: 'json'
-                }
-
-                toast.toastActivate({
-                    text: 'Updating invitation...'
-                });
-
-                axios.request(request)
-                        .then(function (response) {
-
-                            /* Update data with the result from async request
-                             */
-                            self.payload.currentUser.status = status;
-                            self.payload.attendees = response.data.attendees;
-
-                            // Update event's status so its rendering updates
-                            if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
-                                self.event.extendedProps.data.attendance.status.current = status;
-                                self.event.setExtendedProp('data', self.event.extendedProps.data);
-                            }
-
-                            toast.toastTimeout({
-                                text: 'Invitation successfully updated',
-                                css: 'success'
-                            });
-                        })
-                        .catch(error => {
-                            if (error.response) {
-                                toast.toastTimeout({
-                                    text: 'Unable to update invitation. ' + error.response.data.message,
-                                    css: 'alert'
-                                });
-                            }
-                        })
-                        .finally(function () {
-
-                            /* Reset flag
-                             */
-                            self.isTransacting = false;
-                        });
-            },
-
-
-            /**
-             * Update whether the form can be submitted.
-             *
-             * It can be submitted if the title contains at least one non-space
-             * character.
-             */
-            updateFormSubmittable() {
-                this.$refs.eventSubmit.disabled = this.$refs.eventTitleInput.value.trim().length === 0;
-            },
-
-
-            /**
-             * Persist changes to the event.
-             *
-             * TODO consider whether this should be in the base FullCalendar component
-             */
-            updateEvent() {
-                let self = this,
-                    form = self.$refs.updateForm,
-                    data = {
-                        eventId:   this.eventExtendedProps.eventId,
-                        completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
-                        title:     this.$refs.eventTitleInput.value.trim(),
-                        detail:    this.$refs.eventDetailInput.value,
-                    },
-                    request = {
-                        url:          form.action,
-                        data:         qs.stringify(data),
-                        method:       form.method,
-                        responseType: 'json',
-                    };
-                axios
-                    .request(request)
+            axios.request(request)
                     .then(function (response) {
-                        // Assign updated values into existing event
-                        let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
-                        if (typeof eventData?.meta === 'object') {
-                            eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
-                            eventData.meta.detail    = response?.data?.data?.meta?.detail;
+
+                        /* Update data with the result from async request
+                            */
+                        self.payload.currentUser.status = status;
+                        self.payload.attendees = response.data.attendees;
+
+                        // Update event's status so its rendering updates
+                        if (typeof self?.event?.extendedProps?.data?.attendance?.status === 'object') {
+                            self.event.extendedProps.data.attendance.status.current = status;
+                            self.event.setExtendedProp('data', self.event.extendedProps.data);
                         }
-                        self.event.setExtendedProp('data', eventData);
-                        self.event.setProp('title', response?.data?.title);
+
+                        toast.toastTimeout({
+                            text: 'Invitation successfully updated',
+                            css: 'success'
+                        });
+                    })
+                    .catch(error => {
+                        if (error.response) {
+                            toast.toastTimeout({
+                                text: 'Unable to update invitation. ' + error.response.data.message,
+                                css: 'alert'
+                            });
+                        }
                     })
                     .finally(function () {
-                        self.$refs.modal.close();
+
+                        /* Reset flag
+                            */
+                        self.isTransacting = false;
                     });
-            },
-
-            /**
-             * Open this modal.
-             */
-            open(event) {
-                let self = this;
-
-                /* Initialise data
-                 */
-                this.event = event;
-                this.payload = INITIAL_PAYLOAD;
-
-                /* Pop modal open
-                 */
-                this.$refs.modal.open();
-
-                /* Non-numeric eventIds are ignored
-                 * These could be hashes sourced from a third party, like the sis or a subscription
-                 * In those cases, we can't do anything about their attendance
-                 * We can only deal with attendance in our local db
-                 */
-                if (isNaN(this.eventExtendedProps.eventId)) {
-                    return;
-                }
-
-                /* Events with the hasAttendance flag set to false should also exit early
-                 * Beware that this flag has dual meaning: it also refers to the timetable events'
-                 * ability to mark rolls for student attendance, in addition to the ability to invite
-                 * people to attend your regular calendar events
-                 */
-                if (!this.event?.extendedProps?.data?.attendance?.hasAttendance) {
-                    return;
-                }
-
-                /* Asynchronously fetch attendance payload
-                 * This will update the modal in realtime when it's ready
-                 */
-                let request = {
-                    url: ENDPOINTS.payloadPath(this.eventExtendedProps.eventId),
-                    method: 'get',
-                    responseType: 'json'
-                }
-
-                axios.request(request)
-                        .then(function (response) {
-                            self.payload = response.data;
-                        })
-                        .catch(function(error) {
-
-                            /* Attendance won't be available for some events such as those
-                             * streamed from a third party source, or a sis; looking for their
-                             * identifying hashes will result in 404 because they won't exist
-                             * in our local db
-                             */
-                        });
-            },
-
-            /**
-             * Determine how to render the start and end date as date range.
-             *
-             * @param startDate
-             * @param endDate
-             * @param allDay
-             * @return {string}
-             */
-            determineDateSpan(startDate, endDate, allDay) {
-                if (!startDate) {
-                    return '';
-                }
-                let format      = allDay ? this.formatDisplayDate : this.formatDisplayDatetime,
-                    momentStart = this.toMoment(startDate),
-                    start       = momentStart.format(format),
-                    momentEnd   = null,
-                    end         = null;
-
-                if (endDate != null) {
-                    momentEnd = this.toMoment(endDate);
-                    if (allDay) {
-                        // Event end dates in FullCalendar are exclusive.
-                        // This means that all-day events from the event source
-                        // have had their end date incremented by one day:
-                        // roll it back for rendering the user-visible end.
-                        end = momentEnd.subtract(1, 'd').format(format);
-                    } else {
-                        end = momentEnd.format(format);
-                    }
-                }
-
-                if (momentEnd && momentEnd.isValid() && !momentStart.isSame(momentEnd)) {
-                    // Start and end aren't the same - stitch them together.
-                    if (!allDay && momentStart.isSame(momentEnd, 'day')) {
-                        // Between two times on the same day - show the timespan but only one date
-                        return start + " – " + momentEnd.format(this.formatDisplayTime);
-                    } else {
-                        // Between two different days - show the whole timespan
-                        return start + " – " + end;
-                    }
-                }
-
-                // Otherwise start and end are the same - just show the start
-                return start;
-            },
-
-            /**
-             * Handle the clicking of a booking button.
-             *
-             * @param $event
-             */
-            clickBookingButton($event) {
-                switch ($event.target.dataset.bookingAction) {
-                    case 'approve':
-                        $event.preventDefault();
-                        if (this.eventExtendedProps.seriesId) {
-                            this.$refs.bookingApproveSeriesModal.open();
-                        } else {
-                            this.bookingApprove(false);
-                        }
-                        break;
-
-                    case 'reject':
-                        $event.preventDefault();
-                        if (this.eventExtendedProps.seriesId) {
-                            this.$refs.bookingRejectSeriesModal.open();
-                        } else {
-                            this.bookingReject(false);
-                        }
-                        break;
-
-                    case 'cancel':
-                        $event.preventDefault();
-                        this.$refs.bookingDeleteModal.open();
-                        break;
-
-                    case 'modify':
-                    default:
-                        // Just follow the link
-                        break;
-                }
-            },
-
-            /**
-             * Confirm deletion of a single event.
-             */
-            confirmEventDeleteSelf() {
-                this.eventDelete(EFFICACY_SELF);
-            },
-
-            /**
-             * Confirm deletion of a series of events.
-             */
-            confirmEventDeleteSeries() {
-                this.eventDelete(EFFICACY_SERIES);
-            },
-
-            /**
-             * Confirm deletion of a single booking.
-             */
-            confirmBookingDeleteSelf() {
-                this.bookingDelete(EFFICACY_SELF);
-            },
-
-            /**
-             * Confirm deletion of a series of bookings.
-             */
-            confirmBookingDeleteSeries() {
-                this.bookingDelete(EFFICACY_SERIES);
-            },
-
-            /**
-             * Confirm approval of a single booking.
-             */
-            confirmBookingApproveSelf() {
-                this.bookingApprove(EFFICACY_SELF);
-            },
-
-            /**
-             * Confirm approval of a series of bookings.
-             */
-            confirmBookingApproveSeries() {
-                this.bookingApprove(EFFICACY_SERIES);
-            },
-
-            /**
-             * Confirm rejection of a single booking.
-             */
-            confirmBookingRejectSelf() {
-                this.bookingReject(EFFICACY_SELF);
-            },
-
-            /**
-             * Confirm rejection of a series of bookings.
-             */
-            confirmBookingRejectSeries() {
-                this.bookingReject(EFFICACY_SERIES);
-            },
-
-            /**
-             * Delete an event from the database.
-             *
-             * TODO consider whether this should be in the base FullCalendar component
-             *
-             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
-             * @return {Promise}
-             */
-            eventDelete(efficacy) {
-                this.$refs.eventDeleteModal.close();
-                let data = {
-                    id: this.eventExtendedProps.eventId,
-                    action: 'Delete',
-                    efficacy: efficacy,
-                };
-                return axios
-                    .post(this.eventExtendedProps.links.delete, qs.stringify(data))
-                    .then(() => this.event.remove())
-                    .then(() => this.$emit(EVENT_DELETED, this.event));
-            },
-
-            /**
-             * Delete a booking from the database.
-             *
-             * TODO consider whether this should be in the base FullCalendar component
-             *
-             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
-             * @return {Promise}
-             */
-            bookingDelete(efficacy) {
-                this.$refs.bookingDeleteModal.close();
-                let data = {
-                    efficacy: efficacy,
-                };
-                return axios
-                    .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href, qs.stringify(data))
-                    .then(() => this.event.remove())
-                    .then(() => this.$emit(EVENT_DELETED, this.event));
-            },
-
-            /**
-             * Approve a booking.
-             *
-             * TODO consider whether this should be in the base FullCalendar component
-             *
-             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
-             * @return {Promise}
-             */
-            bookingApprove(efficacy) {
-                this.$refs.bookingApproveSeriesModal.close();
-                let data = {
-                    efficacy: efficacy,
-                };
-                return axios
-                    .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href, qs.stringify(data))
-                    .then(() => this.event.remove())
-                    .then(() => this.$emit(EVENT_MODIFIED, this.event));
-            },
-
-            /**
-             * Reject a booking.
-             *
-             * TODO consider whether this should be in the base FullCalendar component
-             *
-             * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
-             * @return {Promise}
-             */
-            bookingReject(efficacy) {
-                this.$refs.bookingRejectSeriesModal.close();
-                let data = {
-                    efficacy: efficacy,
-                };
-                return axios
-                    .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href, qs.stringify(data))
-                    .then(() => this.event.remove())
-                    .then(() => this.$emit(EVENT_MODIFIED, this.event));
-            },
         },
-    }
+
+
+        /**
+         * Update whether the form can be submitted.
+         *
+         * It can be submitted if the title contains at least one non-space
+         * character.
+         */
+        updateFormSubmittable() {
+            this.$refs.eventSubmit.disabled = this.$refs.eventTitleInput.value.trim().length === 0;
+        },
+
+
+        /**
+         * Persist changes to the event.
+         *
+         * TODO consider whether this should be in the base FullCalendar component
+         */
+        updateEvent() {
+            let self = this,
+                form = self.$refs.updateForm,
+                data = {
+                    eventId:   this.eventExtendedProps.eventId,
+                    completed: this.$refs.eventCompletedInput.checked ? 1 : 0,
+                    title:     this.$refs.eventTitleInput.value.trim(),
+                    detail:    this.$refs.eventDetailInput.value,
+                },
+                request = {
+                    url:          form.action,
+                    data:         qs.stringify(data),
+                    method:       form.method,
+                    responseType: 'json',
+                };
+            axios
+                .request(request)
+                .then(function (response) {
+                    // Assign updated values into existing event
+                    let eventData = Object.assign({}, self.event?.extendedProps?.data || {});
+                    if (typeof eventData?.meta === 'object') {
+                        eventData.meta.completed = Boolean(response?.data?.data?.meta?.completed);
+                        eventData.meta.detail    = response?.data?.data?.meta?.detail;
+                    }
+                    self.event.setExtendedProp('data', eventData);
+                    self.event.setProp('title', response?.data?.title);
+                })
+                .finally(function () {
+                    self.$refs.modal.close();
+                });
+        },
+
+        /**
+         * Open this modal.
+         */
+        open(event) {
+            let self = this;
+
+            /* Initialise data
+                */
+            this.event = event;
+            this.payload = INITIAL_PAYLOAD;
+
+            /* Pop modal open
+                */
+            this.$refs.modal.open();
+
+            /* Non-numeric eventIds are ignored
+                * These could be hashes sourced from a third party, like the sis or a subscription
+                * In those cases, we can't do anything about their attendance
+                * We can only deal with attendance in our local db
+                */
+            if (isNaN(this.eventExtendedProps.eventId)) {
+                return;
+            }
+
+            /* Events with the hasAttendance flag set to false should also exit early
+                * Beware that this flag has dual meaning: it also refers to the timetable events'
+                * ability to mark rolls for student attendance, in addition to the ability to invite
+                * people to attend your regular calendar events
+                */
+            if (!this.event?.extendedProps?.data?.attendance?.hasAttendance) {
+                return;
+            }
+
+            /* Asynchronously fetch attendance payload
+                * This will update the modal in realtime when it's ready
+                */
+            let request = {
+                url: ENDPOINTS.payloadPath(this.eventExtendedProps.eventId),
+                method: 'get',
+                responseType: 'json'
+            }
+
+            axios.request(request)
+                    .then(function (response) {
+                        self.payload = response.data;
+                    })
+                    .catch(function(error) {
+
+                        /* Attendance won't be available for some events such as those
+                            * streamed from a third party source, or a sis; looking for their
+                            * identifying hashes will result in 404 because they won't exist
+                            * in our local db
+                            */
+                    });
+        },
+
+        /**
+         * Determine how to render the start and end date as date range.
+         *
+         * @param startDate
+         * @param endDate
+         * @param allDay
+         * @return {string}
+         */
+        determineDateSpan(startDate, endDate, allDay) {
+            if (!startDate) {
+                return '';
+            }
+            let format      = allDay ? this.formatDisplayDate : this.formatDisplayDatetime,
+                momentStart = this.toMoment(startDate),
+                start       = momentStart.format(format),
+                momentEnd   = null,
+                end         = null;
+
+            if (endDate != null) {
+                momentEnd = this.toMoment(endDate);
+                if (allDay) {
+                    // Event end dates in FullCalendar are exclusive.
+                    // This means that all-day events from the event source
+                    // have had their end date incremented by one day:
+                    // roll it back for rendering the user-visible end.
+                    end = momentEnd.subtract(1, 'd').format(format);
+                } else {
+                    end = momentEnd.format(format);
+                }
+            }
+
+            if (momentEnd && momentEnd.isValid() && !momentStart.isSame(momentEnd)) {
+                // Start and end aren't the same - stitch them together.
+                if (!allDay && momentStart.isSame(momentEnd, 'day')) {
+                    // Between two times on the same day - show the timespan but only one date
+                    return start + " – " + momentEnd.format(this.formatDisplayTime);
+                } else {
+                    // Between two different days - show the whole timespan
+                    return start + " – " + end;
+                }
+            }
+
+            // Otherwise start and end are the same - just show the start
+            return start;
+        },
+
+        /**
+         * Handle the clicking of a booking button.
+         *
+         * @param $event
+         */
+        clickBookingButton($event) {
+            switch ($event.target.dataset.bookingAction) {
+                case 'approve':
+                    $event.preventDefault();
+                    if (this.eventExtendedProps.seriesId) {
+                        this.$refs.bookingApproveSeriesModal.open();
+                    } else {
+                        this.bookingApprove(false);
+                    }
+                    break;
+
+                case 'reject':
+                    $event.preventDefault();
+                    if (this.eventExtendedProps.seriesId) {
+                        this.$refs.bookingRejectSeriesModal.open();
+                    } else {
+                        this.bookingReject(false);
+                    }
+                    break;
+
+                case 'cancel':
+                    $event.preventDefault();
+                    this.$refs.bookingDeleteModal.open();
+                    break;
+
+                case 'modify':
+                default:
+                    // Just follow the link
+                    break;
+            }
+        },
+
+        /**
+         * Confirm deletion of a single event.
+         */
+        confirmEventDeleteSelf() {
+            this.eventDelete(EFFICACY_SELF);
+        },
+
+        /**
+         * Confirm deletion of a series of events.
+         */
+        confirmEventDeleteSeries() {
+            this.eventDelete(EFFICACY_SERIES);
+        },
+
+        /**
+         * Confirm deletion of a single booking.
+         */
+        confirmBookingDeleteSelf() {
+            this.bookingDelete(EFFICACY_SELF);
+        },
+
+        /**
+         * Confirm deletion of a series of bookings.
+         */
+        confirmBookingDeleteSeries() {
+            this.bookingDelete(EFFICACY_SERIES);
+        },
+
+        /**
+         * Confirm approval of a single booking.
+         */
+        confirmBookingApproveSelf() {
+            this.bookingApprove(EFFICACY_SELF);
+        },
+
+        /**
+         * Confirm approval of a series of bookings.
+         */
+        confirmBookingApproveSeries() {
+            this.bookingApprove(EFFICACY_SERIES);
+        },
+
+        /**
+         * Confirm rejection of a single booking.
+         */
+        confirmBookingRejectSelf() {
+            this.bookingReject(EFFICACY_SELF);
+        },
+
+        /**
+         * Confirm rejection of a series of bookings.
+         */
+        confirmBookingRejectSeries() {
+            this.bookingReject(EFFICACY_SERIES);
+        },
+
+        /**
+         * Delete an event from the database.
+         *
+         * TODO consider whether this should be in the base FullCalendar component
+         *
+         * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+         * @return {Promise}
+         */
+        eventDelete(efficacy) {
+            this.$refs.eventDeleteModal.close();
+            let data = {
+                id: this.eventExtendedProps.eventId,
+                action: 'Delete',
+                efficacy: efficacy,
+            };
+            return axios
+                .post(this.eventExtendedProps.links.delete, qs.stringify(data))
+                .then(() => this.event.remove())
+                .then(() => this.$emit(EVENT_DELETED, this.event));
+        },
+
+        /**
+         * Delete a booking from the database.
+         *
+         * TODO consider whether this should be in the base FullCalendar component
+         *
+         * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+         * @return {Promise}
+         */
+        bookingDelete(efficacy) {
+            this.$refs.bookingDeleteModal.close();
+            let data = {
+                efficacy: efficacy,
+            };
+            return axios
+                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'cancel').href, qs.stringify(data))
+                .then(() => this.event.remove())
+                .then(() => this.$emit(EVENT_DELETED, this.event));
+        },
+
+        /**
+         * Approve a booking.
+         *
+         * TODO consider whether this should be in the base FullCalendar component
+         *
+         * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+         * @return {Promise}
+         */
+        bookingApprove(efficacy) {
+            this.$refs.bookingApproveSeriesModal.close();
+            let data = {
+                efficacy: efficacy,
+            };
+            return axios
+                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'approve').href, qs.stringify(data))
+                .then(() => this.event.remove())
+                .then(() => this.$emit(EVENT_MODIFIED, this.event));
+        },
+
+        /**
+         * Reject a booking.
+         *
+         * TODO consider whether this should be in the base FullCalendar component
+         *
+         * @param efficacy EFFICACY_SELF or EFFICACY_SERIES
+         * @return {Promise}
+         */
+        bookingReject(efficacy) {
+            this.$refs.bookingRejectSeriesModal.close();
+            let data = {
+                efficacy: efficacy,
+            };
+            return axios
+                .post(this.eventExtendedProps.booking.actions.find(action => action.action === 'reject').href, qs.stringify(data))
+                .then(() => this.event.remove())
+                .then(() => this.$emit(EVENT_MODIFIED, this.event));
+        },
+    },
+}
+
 </script>
 
 <template>
@@ -730,7 +740,7 @@
             <template v-if="eventExtendedProps.booking.related.length">
                 <h3>Related Bookings</h3>
                 <ul>
-                    <li v-for="relatedBooking in eventExtendedProps.booking.related">
+                    <li v-for="(relatedBooking, index) in eventExtendedProps.booking.related" :key="index">
                         ({{ relatedBooking.status.name }})
                         <a :href="relatedBooking.href">{{ relatedBooking.title }}</a>
                     </li>
@@ -794,7 +804,7 @@
                                    @click.prevent="$refs.eventDeleteModal.open">Delete</a>
                             </span>
                             <!-- Booking buttons: handle random events -->
-                            <span v-for="action in eventExtendedProps.booking.actions">
+                            <span v-for="(action, index) in eventExtendedProps.booking.actions" :key="index">
                                 <a class="button"
                                    :data-booking-action="String(action.action)"
                                    @click="clickBookingButton($event)"

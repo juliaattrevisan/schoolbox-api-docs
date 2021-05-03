@@ -30,6 +30,7 @@
     }
 
     window.fullCalendarConfig = {
+        schedulerLicenseKey: '{{ config.fullcalendar_scheduler_license_key }}',
         userId:             Number('{{ user.id }}'),
         canInvite:          Boolean('{{ canInvite }}'),
         token:              '{{ user.key }}',
@@ -78,7 +79,9 @@
 <div class="row">
     <div class="small-12 island">
         <section>
-            <div id="calendar"></div>
+            <div id="calendar">
+                <sb-full-calendar />
+            </div>
             <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/fullCalendar.bundle.js?v={{ config.site_version }}"></script>
         </section>
     </div>

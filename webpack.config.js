@@ -149,14 +149,14 @@ module.exports = {
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
 
         //Calendars
-        fullCalendar: './library/Schoolbox/Calendar/vue/fullCalendar.main.js',
-        assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/calendar.main.js',
-        upcomingDueworkCalendar: './library/Schoolbox/Learning/Upcoming/vue/calendar.main.js',
-        resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/calendar.main.js',
-        resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/calendar.main.js',
-        eventDetails: './library/Schoolbox/Calendar/Event/templates/vue/index.js',
-        calendarComponent: './library/Schoolbox/Calendar/vue/component.main.js',
-
+		fullCalendar: './library/Schoolbox/Calendar/vue/initSbFullCalendar.main.js',
+        assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/initAssessmentCalendar.js',
+        upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/initUpcomingDueWorkCalendar.js',
+        resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/initResourceBookingItemCalendar.js',
+        resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/initResourceBookingCategoryCalendar.js',
+        calendarComponent: './library/Schoolbox/Calendar/vue/initCalendarComponent.js',
+        calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/initCalendarEventDetails.js',
+		
         //News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/initArticleList.js',
@@ -197,9 +197,9 @@ module.exports = {
 
     },
     output: {
-        path: path.resolve(__dirname, "www/static/javascript/components"),
-        publicPath: "/static/javascript/components/",
-        filename: "[name].bundle.js"
+        path: path.resolve(__dirname, 'www/static/javascript/components'),
+        publicPath: '/static/javascript/components/',
+        filename: '[name].bundle.js'
     },
     module: { //https://webpack.js.org/configuration/module/
         rules: [
@@ -339,7 +339,8 @@ module.exports = {
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
             '@shared': path.resolve(__dirname, 'www/static/javascript/shared'),
-            '@css': path.resolve(__dirname, 'www/static/css/foundation')
+            '@css': path.resolve(__dirname, 'www/static/css/foundation'),
+            '@styles': path.resolve(__dirname, 'www/static/css/foundation')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

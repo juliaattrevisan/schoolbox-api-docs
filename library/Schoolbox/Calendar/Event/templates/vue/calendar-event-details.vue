@@ -1,6 +1,6 @@
 <script>
     import moment           from 'moment';
-    import audiencesModal   from './audiencesModal';
+    import AudiencesModal   from './audiences-modal';
     import qs               from 'qs';
     import axios            from "axios";
 
@@ -30,6 +30,13 @@
 
     export default {
 
+        name: "event-details",
+
+        components: {
+            AudiencesModal,
+            vSelect
+        },
+        
         /* All props form a one-way-down binding between the child property and the parent one:
          * when the parent property updates, it will flow down to the child, but not the other way around
          * https://vuejs.org/v2/guide/components-props.html
@@ -37,28 +44,7 @@
         props: [
             'event'
         ],
-        name: "event-details",
-        components: {
-            audiencesModal,
-            vSelect
-        },
-        watch: {
-            selected: function() {
-                if (this.selected.id) {
-                    this.rsvpCreate(this.selected.id, this.selected.first_name + ' ' + this.selected.last_name);
-                }
-            }
-        },
-        created() {
-            this.ENDPOINTS = ENDPOINTS;
-            this.canRsvp = checks.canRsvp;
-            this.showRsvpButtons = checks.showRsvpButtons;
-            this.isInvited = checks.isInvited;
-            this.isPending = checks.isPending;
-            this.isAccepted = checks.isAccepted;
-            this.isDeclined = checks.isDeclined;
-            this.isLimitedAttendance = checks.isLimitedAttendance;
-        },
+        
         data() {
             return {
                 currentAttendanceStatus: this.event.attendance.status.current,
@@ -90,6 +76,7 @@
                 isTransacting: false
             }
         },
+
         computed: {
             window: () => window,
             jQuery: () => window.jQuery,
@@ -150,6 +137,26 @@
                 return (this.event.audiences.folders.length - 1) + ' more ' + suffix;
             }
         },
+
+        watch: {
+            selected: function() {
+                if (this.selected.id) {
+                    this.rsvpCreate(this.selected.id, this.selected.first_name + ' ' + this.selected.last_name);
+                }
+            }
+        },
+
+        created() {
+            this.ENDPOINTS = ENDPOINTS;
+            this.canRsvp = checks.canRsvp;
+            this.showRsvpButtons = checks.showRsvpButtons;
+            this.isInvited = checks.isInvited;
+            this.isPending = checks.isPending;
+            this.isAccepted = checks.isAccepted;
+            this.isDeclined = checks.isDeclined;
+            this.isLimitedAttendance = checks.isLimitedAttendance;
+        },
+
         methods: {
 
             /**
@@ -504,7 +511,9 @@
                 this.$refs.audiencesModal.open();
             }
         }
+
     }
+
 </script>
 
 <template>
@@ -597,7 +606,7 @@
                             </strong></p>
 
                             <ul class="action-list attendance-guest-list" v-if="guests">
-                                <li class="actions-small-1" v-for="(guest, index) in guests">
+                                <li class="actions-small-1" v-for="guest in guests" :key="guest.id">
                                     <div class="compact card small-11">
                                         <a :href="'/search/user/' + guest.id" title="View Profile">
                                             <img :src="'/portrait.php?id=' + guest.id + '&size=square64'" />
@@ -622,11 +631,12 @@
         <div data-toast class="toast"></div>
 
         <audiences-modal
-                ref="audiencesModal"
-                :campus-audiences="this.event.audiences.campus"
-                :role-audiences="this.event.audiences.roles"
-                :group-audiences="this.event.audiences.folders"
-                :is-group="this.isGroupEvent"
-        ></audiences-modal>
+            ref="audiencesModal"
+            :campus-audiences="this.event.audiences.campus"
+            :role-audiences="this.event.audiences.roles"
+            :group-audiences="this.event.audiences.folders"
+            :is-group="this.isGroupEvent"
+        />
+
     </div>
 </template>

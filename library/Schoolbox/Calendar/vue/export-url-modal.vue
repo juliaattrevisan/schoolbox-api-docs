@@ -3,23 +3,20 @@
     import ClipboardJs from 'clipboard/dist/clipboard';
 
     export default {
+
         name: "export-url-modal",
+        
+        components: { RevealModal },
+
         props: [
             'url',
         ],
-        components: {RevealModal},
+
+        
         data() {
             return {
                 clipboardJs: null
             }
-        },
-        methods: {
-            /**
-             * Open this modal.
-             */
-            open() {
-                this.$refs.modal.open();
-            },
         },
 
         /**
@@ -40,7 +37,18 @@
         beforeDestroy() {
             this.clipboardJs.destroy();
         },
+
+        methods: {
+            /**
+             * Open this modal.
+             */
+            open() {
+                this.$refs.modal.open();
+            },
+        },
+        
     }
+
 </script>
 
 <template>
