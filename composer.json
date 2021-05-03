@@ -80,7 +80,6 @@
         "mpratt/embera": "~2.0",
         "nesbot/carbon": "~2.0",
         "league/flysystem-ziparchive": "^1.0",
-        "phpoffice/phpexcel": "dev-master",
         "zendframework/zend-uri": "~2.7.1",
         "onelogin/php-saml": "~3.5.1",
         "karriere/json-decoder": "~4.0.3",
@@ -114,7 +113,8 @@
         "ext-mbstring": "*",
         "ext-intl": "^7.4",
         "guzzlehttp/guzzle": "^7.3",
-        "thecodingmachine/gotenberg-php-client": "^6.3"
+        "thecodingmachine/gotenberg-php-client": "^6.3",
+        "phpoffice/phpspreadsheet": "^1.17"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

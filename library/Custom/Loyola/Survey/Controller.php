@@ -10,10 +10,10 @@ namespace Custom\Loyola\Survey;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use External_Class;
-use PHPExcel;
-use PHPExcel_Style_Alignment;
-use PHPExcel_Worksheet;
-use PHPExcel_Writer_Excel2007;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
 use Schoolbox\Survey\Model as Survey;
@@ -28,10 +28,10 @@ class Controller extends Base
     /** @var SurveyMapper */
     private $surveyMapper;
 
-    /** @var PHPExcel $excel */
+    /** @var Spreadsheet $excel */
     private $excel;
 
-    /** @var PHPExcel_Worksheet $activeSheet */
+    /** @var Worksheet $activeSheet */
     private $activeSheet;
 
     /** @var int $tabIndex */
@@ -121,7 +121,7 @@ class Controller extends Base
     private function renderSpreadsheet(Survey $survey, $responses): void
     {
 
-        $this->excel = new PHPExcel();
+        $this->excel = new Spreadsheet();
         $answersRenderArray = [];
 
 
@@ -189,7 +189,7 @@ class Controller extends Base
                 $this->activeSheet->getColumnDimensionByColumn($currentQuestionColumn)->setAutoSize(true);
 
                 $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getFont()->setBold(true);
-                $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                 $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setIndent(1);
                 $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setWrapText(true);
 
@@ -202,9 +202,9 @@ class Controller extends Base
                     $user = $this->userMapper->findByIdWithFallback($userId);
 
                     $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getFont()->setBold(true);
-                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                     $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
-                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+                    $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                     $name = $survey->getAnonymousResult()
                         ? ''
                         : "{$user->getLastname()}, {$user->getFirstname()}";
@@ -223,9 +223,9 @@ class Controller extends Base
                         $rows++;
                     }
 
-                    $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
+                    $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
                     $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setIndent(1);
-                    $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+                    $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
                     $this->activeSheet->setCellValueByColumnAndRow($currentQuestionColumn, $this->currentRow, $answerText);
                     $this->activeSheet->getStyleByColumnAndRow($currentQuestionColumn, $this->currentRow)->getAlignment()->setWrapText(true);
 
@@ -272,30 +272,30 @@ class Controller extends Base
         $this->activeSheet->getColumnDimensionByColumn(0)->setAutoSize(true);
 
         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getFont()->setBold(true);
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
         $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, "Classroom Learning Snapshot");
         $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(20);
         $this->currentRow++;
 
         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getFont()->setBold(true);
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
         $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, $title);
         $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(20);
         $this->currentRow += 2;
 
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
         $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, "Prepared By: " . $this->getUser()->getFullName());
         $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(20);
         $this->currentRow++;
 
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_LEFT);
-        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_CENTER);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+        $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $this->activeSheet->getStyleByColumnAndRow(0, $this->currentRow)->getAlignment()->setIndent(1);
         $this->activeSheet->setCellValueByColumnAndRow(0, $this->currentRow, "Date/Time: " . Alaress_Date_Format::now()->getShort());
         $this->activeSheet->getRowDimension($this->currentRow)->setRowHeight(20);
@@ -311,7 +311,7 @@ class Controller extends Base
     {
         $tempFilename = tempnam(sys_get_temp_dir(), 'cls_');
 
-        $excelWriter = new PHPExcel_Writer_Excel2007($this->excel);
+        $excelWriter = new Xlsx($this->excel);
         $excelWriter->save($tempFilename);
 
         header('Content-Type: application/ms-excel');
