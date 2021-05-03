@@ -133,7 +133,7 @@ class Processor
         // Is this a SVG? just stream it if so, don't even attempt to transform
         if ($fileFormat === 'svg') {
             // Assume the stream to the base SVG exists
-            return new StreamableFile(true, $fileFormat, $this->file->getSize(), $this->file->readStream());
+            return new StreamableFile(true, (string)$this->file->getMimetype(), $this->file->getSize(), $this->file->readStream());
         }
 
         // TODO SA-8354 inject dependencies
@@ -149,7 +149,7 @@ class Processor
             // also exists on disk and can be immediately streamed:
             // check the file exists before attempting to stream it.
             try {
-                return new StreamableFile(true, $fileFormat, $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
+                return new StreamableFile(true, (string)$this->file->getMimetype(), $transformModel->getSize(), self::readStream($fileSystem, $transformPath));
             } catch (Flysystem\FileNotFoundException $e) {
                 // Check if hash exists on disk. If it does, reset back to 'processing', if not, set to 'failed'
                 $state = $fileSystem->has($this->file->getPath())
@@ -172,7 +172,7 @@ class Processor
             } else {
                 $transformMapper->createRecord($this->file->getHash(), $this->cacheKey, $transformSize, Storage\Transform\Model::STATE_DONE);
             }
-            return new StreamableFile(true, $fileFormat, $transformSize, self::readStream($fileSystem, $transformPath));
+            return new StreamableFile(true, (string)$this->file->getMimetype(), $transformSize, self::readStream($fileSystem, $transformPath));
         }
 
         // Transform does not exist on disk. Has the transformation been attempted before?
@@ -217,7 +217,7 @@ class Processor
 
         return new StreamableFile(
             false,
-            $fileFormat,
+            (string)$this->file->getMimetype(),
             $transformModel->getSize(),
             self::readStream($fileSystem, $transformPath)
         );
