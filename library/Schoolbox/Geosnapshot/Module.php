@@ -62,7 +62,16 @@ class Module extends BaseModule
     {
         try {
             $user = $this->getUserMapper()->findById($params['id']);
+
+            /* Only students can be a viewee; parents and staff don't get pictures
+             */
+            if (!$user->getRole()->isStudent()) {
+                throw new NotFound();
+            }
         } catch (MapperException $e) {
+
+            /* User doesn't really exist
+             */
             throw new NotFound();
         }
 
