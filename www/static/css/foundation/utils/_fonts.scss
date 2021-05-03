@@ -667,6 +667,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-screen-capture:before {
+    content: "\e920";
+    font-family: $font-family-icon;
+}
+
 .icon-search:before {
     content: '\e660';
     font-family: $font-family-icon;
