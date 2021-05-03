@@ -748,9 +748,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
             calendar.render();
         }
 
-        if (template == 'duework' && data.students.length > 0) {
-            $modal.find('[data-collapser]').collapsable();
-        }
+        $modal.find('[data-collapser]').unbind().collapsable();
     }
 
 
