@@ -331,6 +331,15 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
             }
         }
     }
-    $log->info(sprintf("Sync completed: %d successful, %d failed (%d%%)", $totalSuccess, $totalFailure, ($totalFailure/($totalSuccess+$totalFailure)) ));
 
+    $totalAttempts = $totalFailure + $totalSuccess;
+    $log->info(
+        sprintf(
+            "Sync completed: %d successful, %d failed (%d%%)",
+            $totalSuccess,
+            $totalFailure,
+            // Maybe no results were processed: don't DBZ
+            $totalAttempts === 0 ? 0 : ($totalFailure / $totalAttempts * 100)
+        )
+    );
 });
