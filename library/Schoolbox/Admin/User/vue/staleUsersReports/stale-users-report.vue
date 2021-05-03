@@ -77,11 +77,11 @@ export default {
 						}
 					}
 				},
-				pagination: {
-					dropdown: true //use drop down rather than pagination buttons
-				},
-				perPage: 50, 
-				perPageValues: [50, 100, 200],
+				// pagination: {
+				// 	dropdown: true //use drop down rather than pagination buttons
+				// },
+				perPage: 10, 
+				perPageValues: [10, 20, 30],
 				selectable: {
 					mode: 'multiple' //to enable multi-select
 				},
@@ -98,7 +98,8 @@ export default {
 					down: 'glyphicon-chevron-down'
 				},
 				debounce: 100, //faster debouce as data is stored on the client side,
-				resizableColumns: false
+				resizableColumns: false,
+				tabbable: false
 			},
 			singleRowName: 'user',
 			pluralRowName: 'users',
