@@ -36,11 +36,11 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
-            if (!$this->getConfigLoader()->get('googledrive_enabled')
-                || !$this->getConfigLoader()->get('googleapps_api_key')
-                || !$this->getConfigLoader()->get('googleapps_client_id')) {
-                return false;
-            };
+        if (!$this->getConfigLoader()->get('googledrive_enabled')
+            || !$this->getConfigLoader()->get('googleapps_api_key')
+            || !$this->getConfigLoader()->get('googleapps_client_id')) {
+            return false;
+        }
 
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission

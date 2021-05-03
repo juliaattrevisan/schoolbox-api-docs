@@ -12,58 +12,12 @@
 <div id="gfile" class="modal-backdrop" data-reveal aria-labelledby="Google Files" aria-hidden="true"
      role="dialog">
 </div>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/google/picker.js"></script>
 <script type="text/javascript">
-    function handleAuthResult(authResult) {
-        if (authResult && !authResult.error) {
-            createPicker(authResult.access_token);
-        }
-    }
-
-    // Create and render a Picker object for searching images.
-    // Visit here to find all the view ids:
-    //   https://developers.google.com/picker/docs/reference#view-id
-    function createPicker(oauthToken) {
-        let picker = new google.picker.PickerBuilder()
-                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-                .setOAuthToken(oauthToken)
-
-                /* This is documented in the API but it's currently kind of broken
-                 *
-                 * You can't do what their example tells you...DOCS encompasses all the types
-                 * and you can choose them from the search bar/dropdown in the modal, regardless
-                 * of any other addView() commands here
-                 */
-                .addViewGroup(
-                    new google.picker.ViewGroup(google.picker.ViewId.DOCS)
-                )
-                .setCallback(pickerCallback)
-                .build();
-        picker.setVisible(true);
-    }
-
-    function pickerCallback(data) {
-        if (data.action === google.picker.Action.PICKED) {
-            $.ajax({
-                type: 'POST',
-                url: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: component.context.id, folder: component.context}) }}',
-                data: {docs: data.docs},
-                success: function (data) {
-                    window.location.reload();
-                }
-            });
-        }
-    }
-
-    let loadPicker = function () {
-        window.gapi.auth2.authorize(
-                {
-                    'client_id': '{{ config.googleapps_client_id }}',
-                    'scope': 'https://www.googleapis.com/auth/drive.file'
-                },
-                handleAuthResult);
-    };
-    $('#find-files').on('click', function () {
-        loadGoogleApi(['auth2', 'picker'], loadPicker);
-        $('#gfile').foundation('reveal', 'open');
+    $(function() {
+        $('#find-files').googlePicker({
+            clientId: '{{ config.googleapps_client_id }}',
+            postGoogleFileUrl: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: component.context.id, folder: component.context}) }}'
+        });
     });
 </script>
