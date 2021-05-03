@@ -14,6 +14,16 @@ use SitePage;
 
 class Controller extends Component_Homepage_ControllerAbstract
 {
+
+    /**
+     * Has this component been properly configured?
+     * Assume yes to begin with
+     *
+     * @var bool
+     */
+    private bool $hasError = false;
+
+
     /**
      * Injectable constructor
      *
@@ -29,6 +39,20 @@ class Controller extends Component_Homepage_ControllerAbstract
         parent::__construct($instance, $user, $sitepage);
     }
 
+
+    /**
+     * Decdie whether Google had all its parts provided
+     *
+     * @return bool
+     */
+    private function isGoogleEnabled(): bool
+    {
+        return $this->getConfigLoader()->get('googledrive_enabled')
+            && $this->getConfigLoader()->get('googleapps_api_key')
+            && $this->getConfigLoader()->get('googleapps_client_id');
+    }
+
+
     /**
      * Loads the grid component into its set configuration.
      *
@@ -36,14 +60,26 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
-        // If current user can't view component's source, only display the
-        // component if the user has context WRITE+ permission
-        if (!$this->hasContextWriteAccess()) {
-            return false;
+
+        /* If you're a WRITE access user, tell them their Google setup is misconfigured
+         * Otherwise hide the component
+         */
+        if ($this->isGoogleEnabled()) {
+            return true;
         }
 
-        return true;
+        /* Show write-access folks that something is misconfigured
+         */
+        if ($this->hasWriteAccess()) {
+            $this->hasError = true;
+            return true;
+        }
+
+        /* Hide the component from everyone else
+         */
+        return false;
     }
+
 
     /**
      * @param String $templateHandle
@@ -53,8 +89,10 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         $twigTemplate = '@googleFile/component/googleFiles.twig';
-        $twigData     = [
-            'component'   => $this,
+        $twigData = [
+            'clientId' => $this->getConfigLoader()->get('googleapps_client_id'),
+            'folder' => $this->getContext(),
+            'hasError' => $this->hasError,
             'writeAccess' => $this->hasWriteAccess(),
         ];
 

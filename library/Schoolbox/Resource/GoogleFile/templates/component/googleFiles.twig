@@ -1,4 +1,34 @@
+{##
+ # Google Files integration thing
+ #
+ # You need postGoogleFileUrl as a routeLookup here because we don't have a Router
+ # instance inside our component hierarchy, which is a bit bleah
+ #
+ # @param string $clientID      A string that you get when you set up google drive integration (mandatory)
+ # @param bool $hasError        A bool flag indicating something is misconfigured
+ # @param Folder\Model $folder  The current homepage instance
+ #}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/apiloader.js"></script>
 <div class="empty-state">
     <i class="icon-google-drive"></i>
-    <p><a>Find a Google file</a> to share with users and allow them to view, edit or suggest changes.</p>
+
+    <p>
+    {% if hasError %}
+        Unfortunately Google integration is currently not configured; please contact your system administrator for support.
+    {% else %}
+        <a id="find-files">Find a Google file</a> to share with users and allow them to view, edit or suggest changes.
+    {% endif %}
+    </p>
 </div>
+<div id="gfile" class="modal-backdrop" data-reveal aria-labelledby="Google Files" aria-hidden="true"
+     role="dialog">
+</div>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/google/picker.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#find-files').googlePicker({
+            clientId: '{{ clientId }}',
+            postGoogleFileUrl: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}'
+        });
+    });
+</script>
