@@ -55,8 +55,8 @@ if($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
 
 // Handle disbandment before anything else
 if (isset($_GET['disband'])) {
-	$groupHandler->disbandGroup($categoryId);
-	SitePage::localRedir('/');
+    $groupMapper->deleteByColumn('cid', $categoryId);
+    SitePage::localRedir('/');
 }
 
 if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {

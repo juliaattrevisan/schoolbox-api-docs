@@ -10,6 +10,8 @@ use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use \PDO;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
@@ -31,6 +33,8 @@ class GroupMapper extends Mapper
         $this->uses('type', self::TYPE_INTEGER);
         $this->uses('force_follow', self::TYPE_BOOLEAN);
         $this->joins('cid', FolderMapper::class, 'id', null, self::COLUMN_IDENTIFIER, 'folder', 'folder');
+
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [ $this, 'deleteGroupMemberships' ]);
     }
 
 
@@ -115,5 +119,21 @@ class GroupMapper extends Mapper
         }
 
         return $allFolders;
+    }
+
+    /**
+     * On deletion (a.k.a. disband) of a group: remove all memberships to that
+     * group.
+     *
+     * This in turn triggers a recalculation of user subscriptions.
+     *
+     * @param Group $group
+     */
+    public function deleteGroupMemberships(Group $group): void
+    {
+        UserAccessMapper::getInstance()->deleteByColumnList([
+            'sid'     => $group->getFolder()->getId(),
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+        ]);
     }
 }

@@ -11,6 +11,7 @@ namespace Schoolbox\Permission\Access;
 
 use Alaress\Database\Predicate;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\Realtime\Routing\Cache\Redis\WriteCache;
 use External_Class;
 use InvalidArgumentException;
 use PDO;
@@ -86,8 +87,8 @@ class UserAccessMapper extends Mapper
             return;
         }
 
+        /** @var WriteCache|null $cache */
         $cache = self::getDi()->get('subscriptionCache');
-
         if ($cache) {
             $cache->cacheUsers(INSTANCE_ID, [ $model->getUser()->getId() ]);
         }
