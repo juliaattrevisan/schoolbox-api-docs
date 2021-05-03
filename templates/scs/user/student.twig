@@ -40,13 +40,11 @@
     {% endif %}
 {% endblock synergeticComments %}
 
-{% for message in externalUser.AlertMessages %}
-    {% block contacts_alert %}
-        {# Only staff may view contact alerts #}
-        {% if showContactsAlert %}
-        <div class="alert-box-icon alert">
-            <span class="icon-alert" title="{{ message | nl2br }}"></span>
-        </div>
-        {% endif %}
-    {% endblock contacts_alert %}
-{% endfor %}
+{% block contacts_alert %}
+    {# Only staff may view contact alerts #}
+    {% if showContactsAlert %}
+    <div class="alert-box-icon alert">
+        <span class="icon-alert" title="{{ message | nl2br }}"></span>
+    </div>
+    {% endif %}
+{% endblock contacts_alert %}
