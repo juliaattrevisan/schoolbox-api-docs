@@ -954,8 +954,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             return [];
         }
 
-        if(isset($this->synMarkbook[$fileYear][$fileSemester][implode(';',$folderCodes)][$markbookId])) {
-            return $this->synMarkbook[$fileYear][$fileSemester][implode(';',$folderCodes)][$markbookId];
+        $folderCodeKey = implode(';', $folderCodes);
+        if (isset($this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId])) {
+            return $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId];
         }
 
         $folderCodeBindings = Predicate\Builder::getBindings($folderCodes, 'code');
@@ -988,7 +989,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ], $folderCodeBindings->getParams());
 
         $result = $this->getConnector()->executeQuery($sql, $params)->fetchAll();
-        $this->synMarkbook[$fileYear][$fileSemester][implode(';',$folderCodes)][$markbookId] = $result;
+        $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId] = $result;
         return $result;
     }
 
