@@ -13,15 +13,6 @@
      role="dialog">
 </div>
 <script type="text/javascript">
-    let allowedFileTypes = [
-        'application/msword',
-        'application/vnd.ms-powerpoint',
-        'application/vnd.ms-excel',
-        'application/vnd.google-apps.document',
-        'application/vnd.google-apps.presentation',
-        'application/vnd.google-apps.spreadsheet'
-    ];
-
     function handleAuthResult(authResult) {
         if (authResult && !authResult.error) {
             createPicker(authResult.access_token);
@@ -29,14 +20,15 @@
     }
 
     // Create and render a Picker object for searching images.
+    // Visit here to find all the view ids:
+    //   https://developers.google.com/picker/docs/reference#view-id
     function createPicker(oauthToken) {
-        let view = new google.picker.View(google.picker.ViewId.DOCS);
-        view.setMimeTypes(allowedFileTypes.join(','));
         let picker = new google.picker.PickerBuilder()
                 .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
                 .setOAuthToken(oauthToken)
-                .addView(view)
-                //                .addView(new google.picker.DocsUploadView())
+                .addView(new google.picker.View(google.picker.ViewId.DOCUMENTS))
+                .addView(new google.picker.View(google.picker.ViewId.SPREADSHEETS))
+                .addView(new google.picker.View(google.picker.ViewId.PRESENTATIONS))
                 .setCallback(pickerCallback)
                 .build();
         picker.setVisible(true);
@@ -46,8 +38,8 @@
         if (data.action === google.picker.Action.PICKED) {
             $.ajax({
                 type: 'POST',
-                url: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {}) }}',
-                data: {docs: data.docs, fid: {{ component.context.id }}},
+                url: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: component.context.id, folder: component.context}) }}',
+                data: {docs: data.docs},
                 success: function (data) {
                     window.location.reload();
                 }

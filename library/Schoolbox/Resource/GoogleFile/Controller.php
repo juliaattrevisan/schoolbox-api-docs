@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\GoogleFile;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 class Controller extends Base
 {
@@ -33,11 +34,12 @@ class Controller extends Base
     /**
      * Create a google file from POST data.
      *
-     * @api   POST /googleFile/
+     * @api   POST /googleFile/{folderId}
      * @since 21.0
+     * @param Folder $folder
      * @throws MapperException
      */
-    public function postGoogleFile()
+    public function postGoogleFile(Folder $folder)
     {
         $docs = $this->request->post->get('docs');
         if (!$docs) {
@@ -46,7 +48,7 @@ class Controller extends Base
 
         foreach ($docs as $doc) {
             $googleFile = $this->googleFileMapper->createModel();
-            $googleFile->setFolderId((int)$this->request->post->get('fid'))
+            $googleFile->setFolderId($folder->getId())
                        ->setGoogleId($doc['id'])
                        ->setOwnerId($this->getUser()->getId());
             $this->googleFileMapper->save($googleFile);
