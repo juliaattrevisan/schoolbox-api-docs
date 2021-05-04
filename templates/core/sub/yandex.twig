@@ -5,6 +5,8 @@
  #}
 {% if config.yandex_enabled and USER.role.parent %}
 <script src="{{ CDN_PREFIX }}/javascript/shared/yandex/v1/widget.js"></script>
-<div id="ytWidget"></div><script src="https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=en&widgetTheme=light&autoMode=false" type="text/javascript"></script>
+<div class="hide-for-print">
+    <div id="ytWidget"></div><script src="https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=en&widgetTheme=light&autoMode=false" type="text/javascript"></script>
+</div>
 {% endif %}
 
