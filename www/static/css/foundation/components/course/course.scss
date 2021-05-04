@@ -114,13 +114,13 @@ input[type="submit"][readonly] {
 /* New Unit special div
  */
 .new-unit {
-    padding: 0.75rem 1.75rem 0rem 1.75rem;
+    padding: 0.75rem 1.75rem 0 1.75rem;
 
     @media #{$medium-only} {
-        padding: 0.75rem 1.5rem 0rem 1.5rem;
+        padding: 0.75rem 1.5rem 0 1.5rem;
     }
 
     @media #{$small-only} {
-        padding: 0.75rem 1.15rem 0rem 1.15rem;
+        padding: 0.75rem 1rem 0 1rem;
     }
 }
