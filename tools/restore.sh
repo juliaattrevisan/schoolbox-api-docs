@@ -44,7 +44,6 @@ fullpath=${filepath%/*};
 conffile=`readlink -f $fullpath/../www/conf/conf.php`;
 
 instdir=`readlink -f $fullpath/../`;
-baselength=`echo $instdir/updates/ | wc -m`;
 package=${instdir##*/};
 
 curdir=`pwd`;
