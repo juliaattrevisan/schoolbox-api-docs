@@ -49,6 +49,35 @@ package=${instdir##*/};
 
 curdir=`pwd`;
 
+# Outputs the instance_id of the destination. Typically the staging instance.
+# If multiple found, prompts user to select one.
+get_destination_instance_id(){
+  local ini_file="/etc/$package/instances.ini"
+  local instance_list
+  instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list)
+  if [[ $(echo -e "$instance_list" | wc -l) -gt 1 ]]; then
+    echo "Multiple instances found. Please select the instance you wish to restore into:" >&2
+    local i
+    while true; do
+      i=0
+      for instance in $instance_list; do
+        ((i++))
+        echo "$i. $instance" >&2
+      done
+      read -r -p 'Choice: ' choice
+      if [[ $choice -lt 1 ]] || [[ $choice -gt $i ]]; then
+        echo "Invalid choice" >&2
+      else
+        break
+      fi
+    done
+    echo "$instance_list" | sed -n "${choice}p"
+  else
+    echo "$instance_list"
+  fi
+}
+destination_instance_id="$(get_destination_instance_id)"
+
 error() {
 	# Display an error message in red then exit with error code
 	echo -e "\033[38;5;1m"
