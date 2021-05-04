@@ -8,4 +8,5 @@ export default Object.freeze({
   AUDIO_ONLY: 'AUDIO_ONLY',
   CAMERA: 'CAMERA',
   SCREEN: 'SCREEN',
+  PHOTO: 'PHOTO',
 })

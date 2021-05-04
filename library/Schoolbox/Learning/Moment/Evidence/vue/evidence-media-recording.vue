@@ -1,6 +1,6 @@
 <script>
 
-/*
+/**
  * To record a learning moment photo, audio, or video
  *
  */
@@ -19,6 +19,13 @@ export default {
     },
 
     props: {
+        momentType: {  //to determine how to set up the recording/playback
+            type: String,
+            required: true,
+            validator: function (value) {
+                return ['video', 'audio', 'photo'].indexOf(value) !== -1 // The value must match one of these strings
+            }
+        },
         preRecordedData: {  //to display an already existing recording on startup, should contain hash, size, and mime
             type: Object,
             required: false
@@ -27,8 +34,7 @@ export default {
 
     data () {
         return {
-            currentRecordMediaType: recordMediaTypes.UNSET, //the currently selected media recording
-            recordMediaTypeList: [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN],
+            recordMediaType: '', //to determine display will be retrieved comparing with props.momentType 
             recordedData: null, //could be audio, video, image etc
             canUpload: false, //to upload the file
             isOverMediaModalClosing: false, //to animate out the over-media-modal
@@ -43,7 +49,7 @@ export default {
 
     computed: {
 
-        /*
+        /**
          * To know whether to show the upload button
          *
          * @returns { Boolean }
@@ -56,7 +62,7 @@ export default {
             }
         },
 
-        /*
+        /**
          * grab the new filename with the relevant extension (can be webm/mp4/mp3)
          *
          * @returns { String }
@@ -70,7 +76,7 @@ export default {
 
     watch: {
 
-        /*
+        /**
          * ensure no invalid chars are added to the user added filename
          *
          */
@@ -81,7 +87,7 @@ export default {
     },
 
     created () {
-        this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+        this.recordMediaType = this.getMomentTypeToRecordMediaType();
     },
 
     mounted () {
@@ -91,6 +97,21 @@ export default {
 
     methods: {
         
+        /**
+         * to know how to display the record-media
+         * object literals intead of switch: https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals
+         *
+         * @returns { String }
+         */
+        getMomentTypeToRecordMediaType () {
+            const momentTypes = {
+                'video': recordMediaTypes.CAMERA,
+                'audio': recordMediaTypes.AUDIO_ONLY,
+                'photo': recordMediaTypes.PHOTO
+            };
+            return momentTypes[this.momentType];
+        },
+
         /**
          * to be able to press enter to save filename
          *
@@ -104,7 +125,7 @@ export default {
             });
         },
 
-        /*
+        /**
          * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
          *
          */
@@ -130,7 +151,7 @@ export default {
             this.clearHiddenInputs();
         },
 
-        /*
+        /**
          * ensure the form cannot be processed when there's no recording available
          *
          */
@@ -139,7 +160,7 @@ export default {
             document.getElementById('file').value = '';
         },
 
-        /*
+        /**
          * present the save file name modal to name the file
          *
          */
@@ -147,7 +168,7 @@ export default {
             this.isFilenameModalActive = true;
         },
 
-        /*
+        /**
          * the user has set a file name and selected save
          *
          */
@@ -162,16 +183,14 @@ export default {
             }
         },
 
-        /*
+        /**
          * the video is ready, so upload it up to SchoolBox and return response
          *
          */
         async uploadMediaAndReturnResponse () {
             try {
                 this.isUploading = true; //show the upload modal
-                const formData = new FormData();
-                formData.append('upload', this.recordedData, this.newFilenameWithExtension);
-                const response = await axios.post('/storage/asyncUpload.php', formData, {
+                const response = await axios.post('/storage/asyncUpload.php', this.getFormData(), {
                     onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent)
                 });
                 this.isUploading = false; //hide the upload modal
@@ -183,7 +202,18 @@ export default {
             }
         },
 
-        /*
+        /**
+         * What to send in the upload
+         *
+         * @returns {String}
+         */
+        getFormData () {
+            const formData = new FormData();
+            formData.append('upload', this.recordedData, this.newFilenameWithExtension);
+            return formData;
+        },
+
+        /**
          * To visualise the upload progress
          *
          * @params {ProgressEvent}
@@ -195,7 +225,7 @@ export default {
             }
         },
 
-        /*
+        /**
          * populate the input fields in order to validate and submit on save
          *
          * @params {Object}
@@ -205,7 +235,7 @@ export default {
             document.getElementById('file').value = `${responseData.hash}:${this.newFilenameWithExtension}`;
         },
 
-        /*
+        /**
          * To show the upload successful note
          *
          */
@@ -217,7 +247,7 @@ export default {
             }, 2000);
         },
 
-        /*
+        /**
          * close the filename modal
          *
          */
@@ -225,7 +255,7 @@ export default {
             this.isOverMediaModalClosing = true;
         },
 
-        /*
+        /**
          * close the filename modal, cancel has been selected rather than save
          *
          */
@@ -246,7 +276,7 @@ export default {
         <div class="record-media-container" ref="container" :style="{ height: targetHeight }">
 
             <record-media
-                :record-media-type="recordMediaTypes.CAMERA"
+                :record-media-type="recordMediaType"
                 :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
                 @on-recorded-media-ready="onRecordedMediaReady"
                 @on-recorded-media-deleted="onRecordedMediaDeleted"

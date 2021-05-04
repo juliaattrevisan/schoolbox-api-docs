@@ -1,7 +1,7 @@
 <script>
 
-/*
- * To record, playback, convert and upload a camera/screen recording into SB
+/**
+ * To record, playback, convert and upload a camera/screen recording into SB 
  *
  */
 
@@ -63,7 +63,7 @@ export default {
 
     computed: {
 
-        /*
+        /**
          * To know whether to show the delete recording button
          *
          * @returns { Boolean }
@@ -100,7 +100,7 @@ export default {
 
     methods: {
         
-        /*
+        /**
          * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
          *
          */
@@ -108,7 +108,7 @@ export default {
             this.targetHeight = (this.$refs.container.getBoundingClientRect().width * 0.5625) + 'px'; //so there's no height jumps on switching videos
         },
 
-        /*
+        /**
          * to animate on when videojs ready
          *
          */
@@ -116,7 +116,7 @@ export default {
             gsap.set(this.$refs.recordingVideoContainer, { alpha: 0 } );
         },
 
-        /*
+        /**
          * Start it up
          *
          */
@@ -124,7 +124,7 @@ export default {
             this.player = videojs(this.$refs.recordingVideo, getRecordOptions(this.recordMediaType), this.onVideojsReady);
         },
 
-        /*
+        /**
          * videojs is ready, so set up listeners and animate on
          *
          */
@@ -134,7 +134,7 @@ export default {
             this.determinePlaybackStatus();
         },
 
-        /*
+        /**
          * an existing recording could have been passed through, so check whether to display it 
          *
          */
@@ -153,7 +153,7 @@ export default {
             }, 200);
         },
 
-        /*
+        /**
          * show the video and controls
          *
          */
@@ -161,7 +161,7 @@ export default {
             gsap.to(this.$refs.recordingVideoContainer, 0.5, { alpha: 1 } );
         },
 
-        /*
+        /**
          * track the events videojs-record offers to manage display
          *
          */
@@ -184,7 +184,7 @@ export default {
 
         },
 
-        /*
+        /**
          * onDeviceReady
          *
          */
@@ -192,7 +192,7 @@ export default {
             this.isDeviceReady = true;
         },
 
-        /*
+        /**
          * onStartRecord
          *
          */
@@ -200,7 +200,7 @@ export default {
             this.$emit(recordMediaEvents.PROCCESS_STARTED);
         },
 
-        /*
+        /**
          * the record mp3 or mp4 (Safari) is ready
          *
          */
@@ -208,7 +208,7 @@ export default {
             this.recordedVideoReady(this.player.recordedData);
         },
 
-        /*
+        /**
          * the seekable webm file is ready
          *
          */
@@ -216,7 +216,7 @@ export default {
             this.recordedVideoReady(this.player.convertedData);
         },
 
-        /*
+        /**
          * a video has been recorded, so can now either upload it, delete and re-record or play it back
          *
          */
@@ -227,7 +227,7 @@ export default {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
         },
 
-        /*
+        /**
          * not sure what would cause this trigger yet, but it's in the videojs-record examples, probably an invalid src etc
          *
          */
@@ -235,7 +235,7 @@ export default {
             console.warn(error);
         },
 
-        /*
+        /**
          * onDeviceError - try and manage as many errors as possible
          *
          */
@@ -250,7 +250,7 @@ export default {
             console.warn(this.player.deviceErrorCode);
         },
 
-        /*
+        /**
          * ensure everything reset on possible modal re-display
          *
          */
@@ -260,7 +260,7 @@ export default {
             }
         },
 
-        /*
+        /**
          * close the error modal, animating out
          *
          */
@@ -268,7 +268,7 @@ export default {
             this.isOverMediaModalClosing = true;
         },
 
-        /*
+        /**
          * it's closed now, so disable the errors to allow trying again
          *
          */
@@ -278,7 +278,7 @@ export default {
             this.hasPermissionDeniedError = false;
         },
 
-        /*
+        /**
          * to be able to record another video
          *
          */
@@ -286,7 +286,7 @@ export default {
             this.isDeleteRecordingModalActive = true;
         },
 
-        /*
+        /**
          * confirm deletion of the latest recording, setting up for another recording
          *
          */
@@ -298,7 +298,7 @@ export default {
             this.player.record().getDevice(); //relaunch the recorder 
         },
 
-        /*
+        /**
          * close the delete recording modal
          *
          */
@@ -306,7 +306,7 @@ export default {
             this.isOverMediaModalClosing = true;
         },
 
-        /*
+        /**
          * closed the delete recording modal, cancel has been selected rather than confirm
          *
          */
@@ -315,7 +315,7 @@ export default {
             this.isDeleteRecordingModalActive = false;
         },
 
-        /*
+        /**
          * Pass through the video options to play the latest recorded video
          *
          * @returns { Object }
@@ -428,7 +428,7 @@ export default {
     transition: opacity 0.2s;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+.fade-enter, .fade-leave-to /** .fade-leave-active below version 2.1.8 */ {
       opacity: 0;
 }
 
