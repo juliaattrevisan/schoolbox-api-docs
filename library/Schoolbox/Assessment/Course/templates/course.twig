@@ -369,10 +369,12 @@ Usage:
                                         <label for="newUnitName">Unit name</label>
                                         <div class="input-group">
                                             <input type="text" value="" placeholder="New unit name" id="noonit-name" name="newUnitName" maxlength="255"/>
-                                            <a href="#" class="button icon-add">Create new {{ locale.unit.proper }}</a>
-{#                                            <input name="spawn-unit" type="submit" class="button icon-add" value="Create new {{ locale.unit.proper }}"#}
-{#                                                   data-mage-next="spawn-unit" data-mage-working="Working..."#}
-{#                                                   formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>#}
+                                            <button name="spawn-unit"
+                                                    class="button icon-add"
+                                                    data-mage-next="spawn-unit"
+                                                    data-mage-working="Working..."
+                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"
+                                            >Create new {{ locale.unit.proper }}</button>
                                         </div>
                                     </div>
                                     <div>
