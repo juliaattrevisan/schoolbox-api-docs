@@ -22,13 +22,41 @@ export default {
 	},
 
 	mounted () {
-		this.player = videojs(this.$refs.videoPlayer, this.options);
+		this.initVideojs();
 	},
 
 	beforeDestroy () {
-		if (this.player) {
-			this.player.dispose();
-		}
+		this.destroyVideojs();
+	},
+
+	methods: {
+
+		/*
+         * set up videojs
+         *
+         */
+        initVideojs () {
+            this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideojsReady);
+        },
+
+ 		/*
+         * videojs is ready, dispatch event in case anyone listening
+         *
+         */
+        onVideojsReady () {
+            this.$emit('on-ready');
+        },
+
+		/*
+         * destroy the instnace for garbage collection
+         *
+         */
+        destroyVideojs () {
+            if (this.player) {
+				this.player.dispose();
+			}
+        }
+
 	}
 
 }

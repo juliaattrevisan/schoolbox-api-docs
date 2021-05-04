@@ -205,6 +205,7 @@ export default {
 				const response = await axios.post('/storage/asyncUpload.php', formData, {
 					onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent)
 				});
+				this.isUploading = false;
 				return response.data;
 			} catch (error) {
 				this.isUploading = false;
@@ -240,10 +241,11 @@ export default {
 				hash:     responseData.hash
 			};
 			this.hasUploaded = true;
+			this.canUpload = false;
 			setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
 				window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
 				this.isProcessActive = false;
-				this.isUploading = false;
+				this.hasUploaded = false;
 			}, 1000);
 		},
 
@@ -277,6 +279,7 @@ export default {
 							v-if="currentRecordMediaType === recordMediaType"
 							:record-media-type="recordMediaType"
 							:key="recordMediaType"
+							:is-keep-alive="true"
 							@on-process-started="onProcessStarted"
 							@on-process-stopped="onProcessStopped"
 							@on-recorded-media-ready="onRecordedMediaReady"
@@ -336,6 +339,14 @@ export default {
 	button {
 		margin: 0 2px;
 	}
+}
+
+.fade-enter-active, .fade-leave-active {
+	transition: opacity 0.2s;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  	opacity: 0;
 }
 
 
