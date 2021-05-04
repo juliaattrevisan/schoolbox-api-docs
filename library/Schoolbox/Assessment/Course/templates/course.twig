@@ -364,7 +364,7 @@ Usage:
 
                             {# Enable UnitSpec creation if creating new Course, or write access to Course Folder #}
                             {% if not courseSpec or folderAccess[courseSpec.folder.id] > 1 %}
-                                <li class="actions-small-1" data-new-unit>
+                                <li data-new-unit>
                                     <div class="list-item">
                                         <label for="newUnitName">Unit name</label>
                                         <div class="input-group">
@@ -374,7 +374,7 @@ Usage:
                                                     data-mage-next="spawn-unit"
                                                     data-mage-working="Working..."
                                                     formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"
-                                            >Create new {{ locale.unit.proper }}</button>
+                                            >Create {{ locale.unit.proper }}</button>
                                         </div>
                                     </div>
                                     <div>
