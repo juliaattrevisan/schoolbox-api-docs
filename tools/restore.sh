@@ -744,6 +744,9 @@ restore_pre_v20.1_config_dirs;
 ## Fix SQL config paths to data directory
 "$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mysql -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
 
+echo -e "\nEnsuring data dirs exist on disk"
+"$instdir"/tools/site/create-data-dirs.sh --instance "$destination_instance_id"
+
 ## Build SQL updates if required
 sqlupdates=`ls -1 $instdir/updates/*/scripts_list 2>/dev/null | wc -l`;
 if [ $sqlupdates -eq 0 ];
