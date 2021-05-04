@@ -35,9 +35,38 @@ $.fn.alaressDateTimeModal = function (twigVars) {
     // Timetable picker
     var $byDate      = $('#byDate-' + twigVars.id),
         $byTimetable = $('#byTimetable-' + twigVars.id);
-    $byDate.on('toggled', resizeCalendars);
-    $byTimetable.on('toggled', resizeCalendars);
 
+    /* Every time you switch between Select By Date and Select By Timetable
+     * do all the stuff here: resize calendar height and shut any accordions
+     * which may have opened
+     */
+    $byDate.on('toggled', function() {
+        resizeCalendars();
+        shutOpenedAccordions($modal);
+    });
+
+    $byTimetable.on('toggled', function() {
+        resizeCalendars();
+        shutOpenedAccordions($modal);
+    });
+
+
+    /**
+     * Shut any opened accordions when viewing student workloads
+     * Used when changing between the tabs and works in conjunction
+     * with the collapsible event rebind
+     * 
+     * @param $modal
+     */
+    function shutOpenedAccordions($modal) {
+        $.each($modal.find('[data-collapse-state="uncollapsed"]'), function(index, element) {
+            let collapser = $(element).attr('data-collapsable');
+
+            $modal.find('[data-collapser="'+collapser+'"]').trigger('click');
+        });
+    }
+
+    
     // Timetable elements
     var timetable = {
         campus: $byTimetable.find('[data-adtp-tt-campus]'),
@@ -60,7 +89,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
 
     if (twigVars.timetable) {
 
-        // Converting JS date to database short format
+        // Converting JS date to database short formatbyDate-
         var initialDate = momentDate.format(adtp.momentFormats.databaseShort);
 
         // Set initial value to the timetable picker
