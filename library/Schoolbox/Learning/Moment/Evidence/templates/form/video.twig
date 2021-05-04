@@ -1,47 +1,5 @@
-{% extends '@learningMomentEvidence/record-media.twig' %}
+{% extends '@learningMomentEvidence/form/record-media.twig' %}
 
-{% block formInputs %}
-    <section>
-        <fieldset class="content">
-            <div class="small-12 columns">
-                {% block formInputFile %}
-                    <label class="required" for="evidence-filename">
-                        Record something
-                    </label>
-                    <input type="hidden" name="filename" id="evidence-filename" value="{{ isCreate ? '' : evidence.filename }}" />
-                    <input type="hidden" name="file" id="file" value="{{ isCreate ? '' : 'store:' ~ evidence.storage.hash ~ ':' ~ evidence.filename }}" />
-                    <div id="evidence-media-recording">
-                        <evidence-media-recording  
-                            moment-type="{{ momentType }}"
-                            {% if isCreate == false %} 
-                            :pre-recorded-data="{{ evidence.storage|json_encode }}"
-                            {% endif %}
-                        />
-                    </div>
-                    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/evidenceMediaRecording.bundle.js?v={{ config.site_version }}"></script>
-                {% endblock formInputFile %}
-            </div>
-        </fieldset>
-    </section>
-{% endblock formInputs %}
-
-{% block formInputBody %}
-    <label for="evidence-body">
-        Description
-    </label>
-    <textarea name="body" id="evidence-body">{{ isCreate ? '' : evidence.body | purify }}</textarea>
-{% endblock formInputBody %}
-
-{% block formJs %}
-    {% autoescape 'js' %}
-        <script type="text/javascript">
-            let buildValidationRules = function () {
-                return {
-                    filename: {
-                        required: true,
-                    },
-                }
-            };
-        </script>
-    {% endautoescape %}
-{% endblock formJs %}
+{% block formInputFileLabel %}
+    Record something
+{% endblock formInputFileLabel %}

@@ -30,6 +30,8 @@ export const getRecordOptions = (recordMediaType) => {
         return getRecordScreenOptionsForSafari();
     } else if (recordMediaType === recordMediaTypes.SCREEN && !isSafari) {
         return getRecordScreenOptions();
+	} else if (recordMediaType === recordMediaTypes.PHOTO) {
+        return getRecordPhotoOptions();
     }
 }
 
@@ -175,14 +177,11 @@ const getRecordScreenOptions = () => {
             screen: true,
             maxLength: 300, //five minutes
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-            frameWidth: 640,
-            frameHeight: 480,
             debug: true,
         }
     }
     return options;
 }
-
 
 /*
 * set up a screen recording for Safari
@@ -206,6 +205,33 @@ const getRecordScreenOptionsForSafari = () => {
 }
 
 /*
+* set up a screen recording
+* 
+* @returns { Object }
+*/ 
+const getRecordPhotoOptions = () => {
+	const options = getDefaultVideojsRecordOptions();
+	options.width =  640,
+    options.height =  360,
+    options.plugins = {
+        record: {
+            imageOutputType: 'blob',
+            // imageOutputType: 'dataURL',
+            // imageOutputFormat: 'image/png',
+            // imageOutputQuality: 0.92,
+            image: { // image media constraints: set resolution of camera
+              width: { min: 640, ideal: 640, max: 1280 },
+              height: { min: 360, ideal: 360, max: 760 }
+            },
+            frameWidth: 640, // dimensions of captured video frames
+            frameHeight: 360,
+            debug: true,
+        }
+    }
+    return options;
+}
+
+/*
 * the default playback options
 * 
 * @returns { Object }
@@ -217,10 +243,10 @@ const getPlaybackOptions = () => {
         fluid: true,
         aspectRatio: '16:9',
         loop: false,
-        bigPlayButton: true,
+		bigPlayButton: true,
         controlBar: {
             pictureInPictureToggle: false
-        }
+		}
     }
 }
 

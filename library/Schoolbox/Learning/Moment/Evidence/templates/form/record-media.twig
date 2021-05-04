@@ -6,7 +6,8 @@
             <div class="small-12 columns">
                 {% block formInputFile %}
                     <label class="required" for="evidence-filename">
-                        Record something
+                        {% block formInputFileLabel %}
+						{% endblock formInputFileLabel %}
                     </label>
                     <input type="hidden" name="filename" id="evidence-filename" value="{{ isCreate ? '' : evidence.filename }}" />
                     <input type="hidden" name="file" id="file" value="{{ isCreate ? '' : 'store:' ~ evidence.storage.hash ~ ':' ~ evidence.filename }}" />

@@ -11,27 +11,27 @@ import videojs from 'video.js';
 
 export default {
 
-	props: {
-		options: {
-			type: Object,
-			required: true,
-			default () {
-				return {};
-			}
-		},
-	},
+    props: {
+        options: {
+            type: Object,
+            required: true,
+            default () {
+                return {};
+            }
+        },
+    },
 
-	mounted () {
-		this.initVideojs();
-	},
+    mounted () {
+        this.initVideojs();
+    },
 
-	beforeDestroy () {
-		this.destroyVideojs();
-	},
+    beforeDestroy () {
+        this.destroyVideojs();
+    },
 
-	methods: {
+    methods: {
 
-		/*
+        /*
          * set up videojs
          *
          */
@@ -39,7 +39,7 @@ export default {
             this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideojsReady);
         },
 
- 		/*
+         /*
          * videojs is ready, dispatch event in case anyone listening
          *
          */
@@ -47,25 +47,25 @@ export default {
             this.$emit('on-ready');
         },
 
-		/*
-         * destroy the instnace for garbage collection
+        /*
+         * destroy the instance for garbage collection
          *
          */
         destroyVideojs () {
             if (this.player) {
-				this.player.dispose();
-			}
+                this.player.dispose();
+            }
         }
 
-	}
+    }
 
 }
 </script>
 
 <template>
-	<div>
-		<video ref="videoPlayer" class="video-js vjs-custom-skin"></video>
-	</div>
+    <div>
+        <video ref="videoPlayer" class="video-js vjs-custom-skin"></video>
+    </div>
 </template>
 
 <style lang="scss">
@@ -74,16 +74,16 @@ export default {
 
 .video-js {
   .vjs-control-bar {
-	  height: 5em;
+      height: 5em;
   }
   .vjs-control {
-	  width: 5em;
+      width: 5em;
   }
   .vjs-volume-bar {
-	  margin: 2.4em 0.45em;
+      margin: 2.4em 0.45em;
   }
   .vjs-slider-horizontal .vjs-volume-level::before {
-	  top: -0.4em;
+      top: -0.4em;
   }
   .vjs-time-control {
     color: white;
@@ -113,12 +113,12 @@ export default {
   .vjs-custom-skin .vjs-slider-bar,
   .vjs-volume-panel .vjs-volume-control,
   .vjs-big-play-button .vjs-icon-placeholder::before {
-	  color: white;
+      color: white;
   }
   .vjs-custom-skin .vjs-volume-level,
   .vjs-custom-skin .vjs-play-progress,
   .vjs-custom-skin .vjs-slider-bar {
-	  background: white;
+      background: white;
   }
 }
 
@@ -129,7 +129,7 @@ export default {
     height: 1em;
   }
   .vjs-control.vjs-record-indicator::before {
-	  font-size: 1em;
+      font-size: 1em;
   }
   .vjs-control.vjs-record-indicator::after {
     height: calc(1em - 4px);
