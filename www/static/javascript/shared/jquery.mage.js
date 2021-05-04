@@ -67,7 +67,7 @@
 
             self.options.confirmRevert.call($(this).closest('[data-mage-trainstop]'), e, function () {
                 // if this callback is called by the confirmation, perform the reversion
-                var sectionToRestore = $(self.element).closest(self.options.submittable);
+                var sectionToRestore = self.findSubmittable($(self.element));
                 var sectionsToClear  = sectionToRestore.nextAll(self.options.submittable);
 
                 sectionsToClear.find(':submit').mage('hide');
@@ -153,8 +153,8 @@
     Mage.prototype.disableSection = function () {
 
         var $e = $(this.element);
-        var $t = $e.closest(this.options.submittable);
-        
+        var $t = this.findSubmittable($e);
+
         $t.attr('disabled', 'disabled');
         $t.find('[data-mage-error]').slideUp(slideFast);
 
@@ -173,7 +173,7 @@
     Mage.prototype.enableSection = function () {
 
         var $e = $(this.element);
-        var $t = $e.closest(this.options.submittable);
+        var $t = this.findSubmittable($e);
 
         $t.removeAttr('disabled');
 
@@ -198,15 +198,15 @@
     Mage.prototype.closeSection = function () {
 
         var $e = $(this.element);
-        var $t = $e.closest(this.options.submittable);
+        var $t = this.findSubmittable($e);
 
         this.disableSection();
 
         // slide away the submit for this section
-        $e.closest('[data-mage-submitrow]').slideUp(slideSlow);
+        $t.find('[data-mage-submitrow]').slideUp(slideSlow);
 
         // also slide away this section's helptext
-        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow, function() {
+        this.findSubmittable($e).find('[data-mage-helptext]').slideUp(slideSlow, function() {
             // disable all inputs in the closed section
             $t.find(':input').attr('disabled', 'disabled');
         });
@@ -223,26 +223,26 @@
     Mage.prototype.openSection = function () {
 
         var $e = $(this.element);
-        var $t = $e.closest(this.options.submittable);
+        var $t = this.findSubmittable($e);
 
         // enable all inputs in the section (that we have not explicitly declared to be excluded)
         $t.find(':input:not([data-mage-disabled])').removeAttr('disabled');
 
         // slide out the main content wrapper
-        var $content = $e.closest('[data-mage-collapsed]');
+        var $content = $t.find('[data-mage-collapsed]');
 
         if ($content.hasClass('hide')) {
             // swap .hide for jQuery.hide()
             $content.hide().removeClass('hide');
         }
 
-        $e.closest('[data-mage-collapsed]').slideDown(slideSlow);
+        $t.find('[data-mage-collapsed]').slideDown(slideSlow);
 
         // slide out the submit for this section
-        $e.closest('[data-mage-submitrow]').slideDown(slideSlow);
+        $t.find('[data-mage-submitrow]').slideDown(slideSlow);
 
         // also out this section's helptext
-        $e.closest(this.options.submittable).find('[data-mage-helptext]').slideDown(slideSlow);
+        $t.find('[data-mage-helptext]').slideDown(slideSlow);
     };
 
     /**
@@ -254,20 +254,21 @@
     Mage.prototype.hideSection = function () {
 
         var $e = $(this.element);
+        var $t = this.findSubmittable($e);
 
         var self = this;
 
-        $e.closest('[data-mage-collapsed]').slideUp(slideSlow, function () {
+        $t.find('[data-mage-collapsed]').slideUp(slideSlow, function () {
 
             // hide any previous errors
             $(this).find('[data-mage-error]').hide();
 
             // at this point you might think "wait what??" - what we're doing is hiding the overall
             // wrapper of this content, but preparing the content for the next time it's displayed
-            $e.closest('[data-mage-submitrow]').show();
+            $t.find('[data-mage-submitrow]').show();
 
             // also out this section's helptext
-            $e.closest(self.options.submittable).find('[data-mage-helptext]').show();
+            $t.find('[data-mage-helptext]').show();
 
         });
     };
@@ -285,6 +286,28 @@
 
         thisIsMyStop.addClass(c).siblings('.'+c).removeClass(c);
     };
+
+
+    /**
+     * Finds whatever the submittable for this element is.
+     *
+     * By order of preference it will use:
+     * * this element's closest node which matches the `submittable` option
+     * * if nothing found, it will use a `submittable` anywhere in the DOM whose
+     *   `mage-next` data value matches this element's `name` attribute
+     *
+     * @param {jQuery} element
+     * @return {jQuery}
+     */
+    Mage.prototype.findSubmittable = function (element) {
+        let submittable = element.closest(this.options.submittable);
+        if (submittable.length) {
+            return submittable;
+        }
+        return $(this.options.submittable).filter(function () {
+            return $(this).data('mage-next') === element.attr(name);
+        });
+    }
 
 
     /**
@@ -376,7 +399,7 @@
                 // HTML5 FTW
                 var method = elem.attr('formmethod') || (form.length ? form.attr('method') : 'post'),
                     action = elem.attr('formaction') || (form.length ? form.attr('action') : window.location.pathname),
-                    target = elem.closest(self.options.submittable);
+                    target = self.findSubmittable(elem);
 
                 // send it off
                 xhrSend.call(self, method, action, target);
@@ -400,7 +423,7 @@
 
         /* Find textareas with a name attribute
          */
-        var $textAreas = elem.closest(this.options.submittable).find('textarea[name]');
+        var $textAreas = this.findSubmittable(elem).find('textarea[name]');
 
         $textAreas.each(function(idx, elem){
             var $textArea = $(elem);

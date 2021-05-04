@@ -364,26 +364,25 @@ Usage:
 
                             {# Enable UnitSpec creation if creating new Course, or write access to Course Folder #}
                             {% if not courseSpec or folderAccess[courseSpec.folder.id] > 1 %}
-                                <li class="actions-small-1" data-new-unit>
-                                    <div class="list-item content">
-                                        <div class="small-1 column">
-                                            <span class="icon-add course-new-unit-icon"></span>
-                                        </div>
-                                        <div class="small-11 column">
-                                            <label>
-                                                <input type="text" value="" placeholder="New Unit" id="noonit-name" name="newUnitName" maxlength="255"/>
-                                            </label>
+                                <li data-new-unit>
+                                    <div class="list-item">
+                                        <div class="new-unit">
+                                            <label for="newUnitName">Unit name</label>
+                                            <div class="input-group">
+                                                <input type="text" value="" placeholder="New unit name" id="noonit-name" name="newUnitName" maxlength="255" />
+                                                <button name="spawn-unit"
+                                                        class="button icon-add"
+                                                        data-mage-next="spawn-unit"
+                                                        data-mage-working="Working..."
+                                                        formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"
+                                                >Create {{ locale.unit.proper }}</button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
                                         <div class="small-12 column">
                                             {# Don't delete the inline style, it's needed -#}
                                             <div data-mage-error style="display:none;" class="alert alert-box icon-alert"></div>
-                                        </div>
-                                        <div class="small-12 column">
-                                            <input name="spawn-unit" type="submit" value="Create {{ locale.unit.proper }}"
-                                                   data-mage-next="spawn-unit" data-mage-working="Working..."
-                                                   formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"/>
                                         </div>
                                     </div>
                                 </li>
