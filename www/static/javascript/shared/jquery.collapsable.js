@@ -104,6 +104,22 @@
         $.fn.executeIconToggle.call(this, icon);
     };
 
+
+    /**
+     * Explicitly and abruptly shut an accordion and reset its state and arrow
+     * Ignore all the ux animations and stuff; just slam it shut
+     *
+     * @param component
+     */
+    $.fn.executeCollapsableSnapShut = function(component) {
+        component.stop().slideUp(1).attr('data-collapse-state', 'collapsed');
+
+        let icon = $('[data-collapser="'+component.attr('data-collapsable')+'"]');
+
+        icon.removeClass('icon-up-arrow').addClass('icon-down-arrow');
+    }
+
+
     /**
      * Toggle expand/collapse icon state
      *
