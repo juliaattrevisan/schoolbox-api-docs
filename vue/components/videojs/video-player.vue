@@ -46,66 +46,86 @@ export default {
 
 .video-js {
   .vjs-control-bar {
-	height: 4em;
+	  height: 5em;
   }
   .vjs-control {
-	width: 5em;
+	  width: 5em;
   }
   .vjs-volume-bar {
-	margin: 1.9em 0.45em;
+	  margin: 1.9em 0.45em;
   }
   .vjs-slider-horizontal .vjs-volume-level::before {
-	top: -0.4em;
+	  top: -0.4em;
   }
   .vjs-time-control {
-	color: white;
-	font-size: .875rem;
-	padding-left: .5rem;
-	padding-right: .5rem;
-	width: auto;
-	min-width: 0;
-  }
-  .vjs-button > .vjs-icon-placeholder::before {
-	color: white;
-	font-size: 2.8em;
-	line-height: 1.4;
+    color: white;
+    font-size: .875rem;
+    padding-left: .5rem;
+    padding-right: .5rem;
+    width: auto;
+    min-width: 0;
+    line-height: 3.5em;
   }
   .vjs-big-play-button {
-	background-color: black;
-	border-color: white;
-	top: 50%;
-	left: 50%;
-	margin-left: -45px;
-	margin-top: -24px
+    background-color: black;
+    border-color: white;
+    top: 50%;
+    left: 50%;
+    margin-left: -45px;
+    margin-top: -24px;
   }
   .vjs-progress-holder,
   .vjs-custom-skin .vjs-play-progress,
   .vjs-custom-skin .vjs-slider-bar,
   .vjs-volume-panel .vjs-volume-control,
   .vjs-big-play-button .vjs-icon-placeholder::before {
-	color: white;
+	  color: white;
   }
   .vjs-custom-skin .vjs-volume-level,
   .vjs-custom-skin .vjs-play-progress,
   .vjs-custom-skin .vjs-slider-bar {
-	background: white;
+	  background: white;
   }
 }
 
 .vjs-record.video-js {
   .vjs-control.vjs-record-indicator {
-	line-height: 1.4;
-	width: 1em;
-	height: 1em;
+    line-height: 1.4;
+    width: 1em;
+    height: 1em;
   }
   .vjs-control.vjs-record-indicator::before {
-	font-size: 1em;
+	  font-size: 1em;
   }
   .vjs-control.vjs-record-indicator::after {
-	height: calc(1em - 4px);
-	width: calc(1em - 4px);
-	top: 3px;
-	left: 3px;
+    height: calc(1em - 4px);
+    width: calc(1em - 4px);
+    top: 3px;
+    left: 3px;
+  }
+
+  .vjs-record-button.vjs-control.vjs-icon-record-start::before,
+  .vjs-record-button.vjs-control.vjs-icon-record-stop::before {
+    color: #f03;
+    &:hover {
+      color: #fa1542;
+    }
+  }
+  .vjs-record-button.vjs-control.vjs-icon-record-start::before {
+    font-size: 3.5em;
+    line-height: .9em;
+  }
+  .vjs-record-button.vjs-control.vjs-icon-record-stop::before {
+    font-size: 5em;
+    line-height: 1em;
+  }
+  .vjs-button > .vjs-icon-placeholder::before {
+    color: white;
+    font-size: 4em;
+    line-height: 1.25;
+  }
+  .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
+    text-shadow: none;
   }
 }
 

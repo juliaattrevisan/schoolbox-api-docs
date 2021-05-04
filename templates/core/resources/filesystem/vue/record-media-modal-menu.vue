@@ -9,7 +9,7 @@ import { gsap } from 'gsap/all';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 
 export default {
-	
+
 	props: {
 		currentRecordMediaType: { //to be able to respond to the initial change from UNSET
 	 		type: String,
@@ -25,10 +25,10 @@ export default {
 
 	watch: {
 
-		currentRecordMediaType (value) { 
+		currentRecordMediaType (value) {
 			if (value !== recordMediaTypes.UNSET)  { //show the top menu now
 				this.animateOn();
-			}      
+			}
 		}
 
 	},
@@ -45,8 +45,8 @@ export default {
 
 		/*
 		 * to animate on the menu when an item within #record-media-unset is selected
-		 * 
-		 */ 
+		 *
+		 */
 		setInitialPosition () {
 			const allMenuItems = Array.from(this.$refs.menu.children);
 			const toHideHeight = this.$refs.menu.offsetHeight; //to hide the menu items underneath
@@ -57,15 +57,15 @@ export default {
 
 		/*
 		 * to show selection options
-		 * 
-		 */ 
+		 *
+		 */
 		animateOn () {
 			const allMenuItems = Array.from(this.$refs.menu.children);
 			allMenuItems.forEach((element, index) => {
-				gsap.to(element, 0.5, { 
-					top: 0, 
-					ease: 'power2.inOut', 
-					delay: index * 0.1 
+				gsap.to(element, 0.5, {
+					top: 0,
+					ease: 'power2.inOut',
+					delay: index * 0.1
 				} );
 			});
 		},
@@ -108,6 +108,13 @@ export default {
 .menu-item {
 	width: calc(33.333333%);
 	text-align: center;
+}
+
+@media screen and (max-width: 640px) {
+  .tabs dd a {
+    padding: .5rem;
+    font-size: .875rem;
+  }
 }
 
 </style>
