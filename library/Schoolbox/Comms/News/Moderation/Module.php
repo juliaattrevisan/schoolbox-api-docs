@@ -79,8 +79,9 @@ class Module extends BaseModule
         });
 
 
-        // Anyone who may approve an article may reject it?
-        $canReject = $canApprove;
+        // Anyone who may submit an article may reject it?
+        // This allows the author of an article to unpublish it.
+        $canReject = $canSubmit;
 
         $preloadArticle = function ($params) {
             return $this->preloadArticleWithAudience($params);
