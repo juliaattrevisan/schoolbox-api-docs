@@ -81,18 +81,8 @@ class Module extends BaseModule
         });
 
 
-        // loggedIn && (SU || CO || moderator || author)
-        $canReject = new Rule\LazyCallback(function () {
-            return new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                    new CanModerateAudience($this->getStrategyFactory()),
-                    new IsArticleAuthor(),
-                )
-            );
-        });
+        // Anyone who may submit an article may reject it?
+        $canReject = $canSubmit;
 
         $preloadArticle = function ($params) {
             return $this->preloadArticleWithAudience($params);
