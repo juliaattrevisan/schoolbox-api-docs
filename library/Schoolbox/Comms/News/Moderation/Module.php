@@ -19,8 +19,6 @@ use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Authorizer\Rule\IsNotYetApproved;
-use Schoolbox\Comms\News\Authorizer\Rule\IsPublishedOrExpired;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
