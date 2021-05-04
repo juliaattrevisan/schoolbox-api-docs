@@ -200,9 +200,7 @@ export default {
 		async uploadMedia () {
 			try {
 				this.isUploading = true;
-				const formData = new FormData();
-				formData.append('upload', this.recordedData, this.newFilenameWithExtension);
-				const response = await axios.post('/storage/asyncUpload.php', formData, {
+				const response = await axios.post('/storage/asyncUpload.php', this.getFormData(), {
 					onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent)
 				});
 				this.isUploading = false;
@@ -213,6 +211,17 @@ export default {
 				console.log(error);
 			}
 		},
+
+		/*
+         * What to send in the upload
+         *
+         * @returns { FormData }
+         */
+        getFormData () {
+            const formData = new FormData();
+            formData.append('upload', this.recordedData, this.newFilenameWithExtension);
+            return formData;
+        },
 
 		/*
 		 * To visualise the upload progress

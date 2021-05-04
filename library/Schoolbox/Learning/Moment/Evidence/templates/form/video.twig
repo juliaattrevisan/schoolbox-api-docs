@@ -1,4 +1,4 @@
-{% extends '@learningMomentEvidence/form.twig' %}
+{% extends '@learningMomentEvidence/record-media.twig' %}
 
 {% block formInputs %}
     <section>
@@ -12,6 +12,7 @@
                     <input type="hidden" name="file" id="file" value="{{ isCreate ? '' : 'store:' ~ evidence.storage.hash ~ ':' ~ evidence.filename }}" />
                     <div id="evidence-media-recording">
                         <evidence-media-recording  
+                            moment-type="{{ momentType }}"
                             {% if isCreate == false %} 
                             :pre-recorded-data="{{ evidence.storage|json_encode }}"
                             {% endif %}
