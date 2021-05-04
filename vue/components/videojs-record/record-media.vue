@@ -33,7 +33,7 @@ export default {
             type: String,
             required: true,
             validator: function (value) {
-                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN].indexOf(value) !== -1 // The value must match one of these strings
+                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN, recordMediaTypes.PHOTO].indexOf(value) !== -1 // The value must match one of these strings
             }
         },
         preRecordedData: { //to display an already existing recording on startup
@@ -171,8 +171,9 @@ export default {
             this.player.on('startRecord', this.onStartRecord);
 
             const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) { //to mp3 is ready
+            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY || this.recordMediaType === recordMediaTypes.PHOTO) { //the mp3 (AUDIO_ONLY) or png (PHOTO) is ready
                 this.player.on('finishRecord', this.onFinishRecord);
+                // this.player.on('waveReady', this.onWaveformReady);
             } else if (isSafari) { //safari uses mp4 to record, while all others use default webm (with conversion to enable seekable webm)
                 this.player.on('finishRecord', this.onFinishRecord);
             } else {
@@ -214,6 +215,14 @@ export default {
          */
         onFinishConvert () {
             this.recordedVideoReady(this.player.convertedData);
+        },
+
+		/**
+         * 
+         *
+         */
+        onWaveformReady () {
+            this.recordedVideoReady(this.player.recordedData);
         },
 
         /**

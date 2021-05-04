@@ -1,30 +1,5 @@
-{% extends '@learningMomentEvidence/form/upload.twig' %}
+{% extends '@learningMomentEvidence/form/record-media.twig' %}
 
 {% block formInputFileLabel %}
     Take a picture
 {% endblock formInputFileLabel %}
-
-{% block formInputFilePreview %}
-    <img class="evidence-storage-preview" id="evidence-storage-preview" class="hide" src="" alt=""/>
-
-    {% autoescape 'js' %}
-        <script type="text/javascript">
-            // Fill/clear preview
-            $(function () {
-                let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
-                if (dropzoneInstance) {
-                    let preview = document.getElementById('evidence-storage-preview');
-                    dropzoneInstance.on('success', (file) => {
-                        let reader = new FileReader();
-                        reader.addEventListener('load', () => {
-                            preview.classList.remove('hide');
-                            preview.src = reader.result;
-                        });
-                        reader.readAsDataURL(file);
-                    });
-                    dropzoneInstance.on('removedfile', () => preview.classList.add('hide'));
-                }
-            });
-        </script>
-    {% endautoescape %}
-{% endblock formInputFilePreview %}
