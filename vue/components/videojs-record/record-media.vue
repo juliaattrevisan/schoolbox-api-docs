@@ -14,9 +14,10 @@ import Record from 'videojs-record/dist/videojs.record.js';
 import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import { gsap } from 'gsap/all';
+import AudioPlayer from '@schoolbox/videojs/audio-player';
 import VideoPlayer from '@schoolbox/videojs/video-player';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
-import { getRecordOptions, getPlaybackOptionsWithBlob, getPlaybackOptionsWithSrc } from '@shared/videojs/videojsOptions';
+import { getRecordOptions, getVideoPlayerOptionsWithBlob, getVideoPlayerOptionsWithSrc, getAudioPlayerOptionsWithBlob, getAudioPlayerOptionsWithSrc } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
@@ -25,6 +26,7 @@ export default {
 
     components: {
         OverMediaModal,
+        AudioPlayer,
         VideoPlayer
     },
 
@@ -77,6 +79,10 @@ export default {
         },
 
     },
+
+	created () {
+		this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+	},
 
     mounted () {
         if (!this.isKeepAlive) {
@@ -331,9 +337,22 @@ export default {
          */
         getVideoPlayerOptions () {
             if (this.hasPreRecordedData) {
-                return getPlaybackOptionsWithSrc(this.playbackData);
+                return getVideoPlayerOptionsWithSrc(this.playbackData);
             } else {
-                return getPlaybackOptionsWithBlob(this.recordedData);
+                return getVideoPlayerOptionsWithBlob(this.recordedData);
+            }
+        },
+
+		/**
+         * Pass through the audio options to play the latest recorded video
+         *
+         * @returns { Object }
+         */
+        getAudioPlayerOptions () {
+            if (this.hasPreRecordedData) {
+                return getAudioPlayerOptionsWithSrc(this.playbackData);
+            } else {
+                return getAudioPlayerOptionsWithBlob(this.recordedData);
             }
         },
 
@@ -351,9 +370,13 @@ export default {
                 <video ref="recordingVideo" playsinline class="video-js"></video>
             </div>
             <div v-if="isPlaybackActive" class="video-container video-container-playback" key="playbackVideoContainer">
-                <video-player
-                    ref="playbackVideo"
-                    :options="getVideoPlayerOptions()"
+                <audio-player
+                    v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
+					:options="getAudioPlayerOptions()"
+                />
+				<video-player
+                    v-else
+					:options="getVideoPlayerOptions()"
                 />
             </div>
             <transition name="fade">

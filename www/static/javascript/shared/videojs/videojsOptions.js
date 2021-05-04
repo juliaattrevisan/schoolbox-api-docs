@@ -236,7 +236,7 @@ const getRecordPhotoOptions = () => {
 * 
 * @returns { Object }
 */ 
-const getPlaybackOptions = () => {
+const getVideoPlayerOptions = () => {
     return {
         controls: true,
         autoplay: false,
@@ -246,7 +246,7 @@ const getPlaybackOptions = () => {
 		bigPlayButton: true,
         controlBar: {
             pictureInPictureToggle: false
-		}
+		},
     }
 }
 
@@ -257,12 +257,12 @@ const getPlaybackOptions = () => {
 *
 * @returns { Object }
 */ 
-export const getPlaybackOptionsWithBlob = (recordedData) => {
-    const options = getPlaybackOptions();
-    options.sources = [ {
-        src: URL.createObjectURL(recordedData),
-        type: recordedData.type
-    }]
+export const getVideoPlayerOptionsWithBlob = (recordedData) => {
+    const options = getVideoPlayerOptions();
+	options.sources = [{
+		src: URL.createObjectURL(recordedData),
+		type: recordedData.type
+	}];
     return options;
 }
 
@@ -273,12 +273,63 @@ export const getPlaybackOptionsWithBlob = (recordedData) => {
 *
 * @returns { Object }
 */ 
-export const getPlaybackOptionsWithSrc = (recordedData) => {
-    const options = getPlaybackOptions();
-    options.sources = [ {
-        src: recordedData.src,
-        type: recordedData.type
-    }]
+export const getVideoPlayerOptionsWithSrc = (recordedData) => {
+    const options = getVideoPlayerOptions();
+	options.sources = [{
+		src: recordedData.src,
+		type: recordedData.type
+	}];
     return options;
 }
 
+
+/*
+* add in the wavesurfer to visulise the order
+* 
+* @returns { Object }
+*/ 
+const getAudioPlayerOptions = () => {
+	const options = getVideoPlayerOptions();
+    options.plugins = {
+		wavesurfer: { 
+			backend: 'MediaElement',
+			waveColor: '#fff',
+			progressColor: '#ccc',
+			debug: true,
+			cursorWidth: 1,
+			displayMilliseconds: false,
+			hideScrollbar: true,
+			interact: false,
+			responsive: true
+		}
+	}
+	return options;
+}
+
+/*
+* Once a audio has been recorded, need to pass to another videojs component to be able to use the progress controls
+* 
+* @params { Blob }
+*
+* @returns { Object }
+*/ 
+export const getAudioPlayerOptionsWithBlob = (recordedData) => {
+    const options = getAudioPlayerOptions();
+	options.audioPlayerSrc = URL.createObjectURL(recordedData);
+	options.audioPlayerType = recordedData.type;
+    return options;
+}
+
+/*
+* Show an existing audio with src
+* 
+* @params { Object: src, type }
+*
+* @returns { Object }
+*/ 
+export const getAudioPlayerOptionsWithSrc = (recordedData) => {
+    const options = getAudioPlayerOptions();
+	options.audioPlayerSrc = recordedData.src;
+	options.audioPlayerType = recordedData.type;
+    return options;
+}
