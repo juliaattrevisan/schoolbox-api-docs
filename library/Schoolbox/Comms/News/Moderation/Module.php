@@ -51,7 +51,7 @@ class Module extends BaseModule
         );
 
         // loggedIn && (SU || CO || moderator || (moderationEnabled && author))
-        $canSubmit = new Rule\LazyCallback(function() {
+        $canSubmit = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -69,7 +69,7 @@ class Module extends BaseModule
 
 
         // loggedIn && (SU || CO || moderator)
-        $canApprove = new Rule\LazyCallback(function() {
+        $canApprove = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -81,21 +81,15 @@ class Module extends BaseModule
         });
 
 
-        // loggedIn && (SU || CO || moderator)
+        // loggedIn && (SU || CO || moderator || author)
         $canReject = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\All(
-                        new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                        new IsPublishedOrExpired()
-                    ),
-                    new Rule\All(
-                        new IsArticleAuthor(),
-                        new CanModerateAudience($this->getStrategyFactory()),
-                        new IsPublishedOrExpired()
-                    ),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                    new CanModerateAudience($this->getStrategyFactory()),
+                    new IsArticleAuthor(),
                 )
             );
         });
