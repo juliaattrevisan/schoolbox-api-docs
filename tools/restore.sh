@@ -812,19 +812,9 @@ else
 fi
 
 # Restart schoolbox services
-echo -e "\nRestarting Schoolbox Services";
-if [ "$package" = 'schoolboxdev' ];
-then
-	/usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1;
-	/usr/sbin/service schoolboxdev-socketd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolboxdev-routed restart >/dev/null 2>&1;
-else
-	/usr/sbin/service schoolbox-digestd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolbox-scheduled restart >/dev/null 2>&1;
-	/usr/sbin/service schoolbox-socketd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolbox-routed restart >/dev/null 2>&1;
-fi
+echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
+"$package"cloud-restart-daemons "$destination_instance_id";
+
 
 ## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
 echo -e "\nReload the subscription cache";
