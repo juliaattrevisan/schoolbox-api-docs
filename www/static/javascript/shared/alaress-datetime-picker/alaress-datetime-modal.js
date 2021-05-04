@@ -60,9 +60,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      */
     function shutOpenedAccordions($modal) {
         $.each($modal.find('[data-collapse-state="uncollapsed"]'), function(index, element) {
-            let collapser = $(element).attr('data-collapsable');
-
-            $modal.find('[data-collapser="'+collapser+'"]').trigger('click');
+            $.fn.executeCollapsableSnapShut($(element));
         });
     }
 
