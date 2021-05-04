@@ -346,7 +346,7 @@ Usage:
                 <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not courseSpec %} disabled="disabled"{% endif %}>
                     <legend>{{ locale.unit.properPlural }}</legend>
                     {# Don't delete the inline style, it's needed -#}
-                    <div class="small-12 column"{% if not courseSpec %} style="display:none;"{% endif %} data-mage-collapsed>
+                    <div class="small-12 column no-pad"{% if not courseSpec %} style="display:none;"{% endif %} data-mage-collapsed>
                         <ul class="information-list">
                             {% if courseSpec %}
                             {% for unitSpec in courseSpec.units %}
@@ -366,15 +366,17 @@ Usage:
                             {% if not courseSpec or folderAccess[courseSpec.folder.id] > 1 %}
                                 <li data-new-unit>
                                     <div class="list-item">
-                                        <label for="newUnitName">Unit name</label>
-                                        <div class="input-group">
-                                            <input type="text" value="" placeholder="New unit name" id="noonit-name" name="newUnitName" maxlength="255"/>
-                                            <button name="spawn-unit"
-                                                    class="button icon-add"
-                                                    data-mage-next="spawn-unit"
-                                                    data-mage-working="Working..."
-                                                    formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"
-                                            >Create {{ locale.unit.proper }}</button>
+                                        <div class="new-unit">
+                                            <label for="newUnitName">Unit name</label>
+                                            <div class="input-group">
+                                                <input type="text" value="" placeholder="New unit name" id="noonit-name" name="newUnitName" maxlength="255" />
+                                                <button name="spawn-unit"
+                                                        class="button icon-add"
+                                                        data-mage-next="spawn-unit"
+                                                        data-mage-working="Working..."
+                                                        formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"
+                                                >Create {{ locale.unit.proper }}</button>
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
