@@ -1,7 +1,7 @@
 <script>
 
 /*
- * To play a video, which can also just be audio only with a waveform visualizer
+ * To play a video
  *
  */
 
