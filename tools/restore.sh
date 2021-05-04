@@ -820,7 +820,7 @@ schoolboxcloud-rebuild-cronjobs --site-root "$instdir" --is-primary-host 1
 
 ## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
 echo -e "\nReload the subscription cache";
-php $instdir/tools/notif/route/refresh-binding-cache.php --instance=vagrantx -vvv 2>/dev/null;
+php "$instdir"/tools/notif/route/refresh-binding-cache.php --instance="$destination_instance_id" -vvv;
 
 # Cleanup
 umount $backup_dir 2>/dev/null;
