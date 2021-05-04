@@ -8,7 +8,16 @@
                     <label class="required" for="evidence-filename">
                         Record something
                     </label>
-                    <input type="hidden" name="filename" id="evidence-filename" {{ isCreate ? '' : 'value="'~evidence.filename~'"' }}/>
+                    <input type="hidden" name="filename" id="evidence-filename" value="{{ isCreate ? '' : evidence.filename }}" />
+                    <input type="hidden" name="file" id="file" value="{{ isCreate ? '' : 'store:' ~ evidence.storage.hash ~ ':' ~ evidence.filename }}" />
+                    <div id="evidence-media-recording">
+                        <evidence-media-recording  
+                            {% if isCreate == false %} 
+                            :pre-recorded-data="{{ evidence.storage|json_encode }}"
+                            {% endif %}
+                        />
+                    </div>
+                    <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/evidenceMediaRecording.bundle.js?v={{ config.site_version }}"></script>
                 {% endblock formInputFile %}
             </div>
         </fieldset>

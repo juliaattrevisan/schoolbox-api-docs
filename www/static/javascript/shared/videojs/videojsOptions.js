@@ -19,18 +19,18 @@ import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 * @returns { Object }
 */ 
 export const getRecordOptions = (recordMediaType) => {
-	const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-	if (recordMediaType === recordMediaTypes.AUDIO_ONLY) {
-		return getAudioOnlyRecordOptions();
-	} else if (recordMediaType === recordMediaTypes.CAMERA && isSafari) {
-		return getRecordCameraOptionsForSafari();
-	} else if (recordMediaType === recordMediaTypes.CAMERA && !isSafari) {
-		return getRecordCameraOptions();
-	} else if (recordMediaType === recordMediaTypes.SCREEN && isSafari) {
-		return getRecordScreenOptionsForSafari();
-	} else if (recordMediaType === recordMediaTypes.SCREEN && !isSafari) {
-		return getRecordScreenOptions();
-	}
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (recordMediaType === recordMediaTypes.AUDIO_ONLY) {
+        return getAudioOnlyRecordOptions();
+    } else if (recordMediaType === recordMediaTypes.CAMERA && isSafari) {
+        return getRecordCameraOptionsForSafari();
+    } else if (recordMediaType === recordMediaTypes.CAMERA && !isSafari) {
+        return getRecordCameraOptions();
+    } else if (recordMediaType === recordMediaTypes.SCREEN && isSafari) {
+        return getRecordScreenOptionsForSafari();
+    } else if (recordMediaType === recordMediaTypes.SCREEN && !isSafari) {
+        return getRecordScreenOptions();
+    }
 }
 
 /*
@@ -39,8 +39,8 @@ export const getRecordOptions = (recordMediaType) => {
 * @returns { Object }
 */ 
 const getDefaultVideojsRecordOptions = () => {
-	return {
-		controls: true,
+    return {
+        controls: true,
         autoplay: false,
         fluid: true,
         aspectRatio: '16:9',
@@ -49,7 +49,7 @@ const getDefaultVideojsRecordOptions = () => {
         controlBar: {
             volumePanel: true,
         }
-	}
+    }
 }
 
 /*
@@ -58,39 +58,39 @@ const getDefaultVideojsRecordOptions = () => {
 * @returns { Object }
 */ 
 const getAudioOnlyRecordOptions = () => {
-	const options = getDefaultVideojsRecordOptions();
+    const options = getDefaultVideojsRecordOptions();
     options.plugins = {
-		wavesurfer: { // this plugin is only needed when recording audio-only
-			backend: 'WebAudio',
-			waveColor: '#fff',
-			progressColor: '#ccc',
-			debug: true,
-			cursorWidth: 1,
-			displayMilliseconds: true,
-			hideScrollbar: true,
-			plugins: [
-				WaveSurfer.microphone.create({ // enable microphone plugin
-					bufferSize: 4096,
-					numberOfInputChannels: 1,
-					numberOfOutputChannels: 1,
-					constraints: {
-						video: false,
-						audio: true
-					}
-				})
-			]
-		},
-		record: {
-			audio: true,
-			video: false,
-			maxLength: 300, //5 minutes
-			audioEngine: 'vmsg',
-			audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
-			debug: true,
-		}
-	}
-	applyAudioWorkarounds(options);
-	return options;
+        wavesurfer: { // this plugin is only needed when recording audio-only
+            backend: 'WebAudio',
+            waveColor: '#fff',
+            progressColor: '#ccc',
+            debug: true,
+            cursorWidth: 1,
+            displayMilliseconds: true,
+            hideScrollbar: true,
+            plugins: [
+                WaveSurfer.microphone.create({ // enable microphone plugin
+                    bufferSize: 4096,
+                    numberOfInputChannels: 1,
+                    numberOfOutputChannels: 1,
+                    constraints: {
+                        video: false,
+                        audio: true
+                    }
+                })
+            ]
+        },
+        record: {
+            audio: true,
+            video: false,
+            maxLength: 300, //5 minutes
+            audioEngine: 'vmsg',
+            audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
+            debug: true,
+        }
+    }
+    applyAudioWorkarounds(options);
+    return options;
 }
 
 /*
@@ -100,8 +100,8 @@ const getAudioOnlyRecordOptions = () => {
 */ 
 const applyAudioWorkarounds = (options) => {
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-	const isEdge = /Edge/.test(navigator.userAgent);
-	if (isSafari || isEdge) {
+    const isEdge = /Edge/.test(navigator.userAgent);
+    if (isSafari || isEdge) {
         if (isSafari && window.MediaRecorder !== undefined) {
             // this version of Safari has MediaRecorder
             // but use the only supported mime type
@@ -124,20 +124,20 @@ const applyAudioWorkarounds = (options) => {
 * @returns { Object }
 */ 
 const getRecordCameraOptions = () => {
-	const options = getDefaultVideojsRecordOptions();
-	options.plugins = {
-		record: {
-			audio: true,
-			video: {
-				width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-				height: { min: 240, ideal: 360, max: 720 }
-			},
-			convertEngine: 'ts-ebml', //to be able to have seekable webm files
-			maxLength: 300, //five minutes
-			debug: true,
-		}
-	}
-	return options;
+    const options = getDefaultVideojsRecordOptions();
+    options.plugins = {
+        record: {
+            audio: true,
+            video: {
+                width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
+                height: { min: 240, ideal: 360, max: 720 }
+            },
+            convertEngine: 'ts-ebml', //to be able to have seekable webm files
+            maxLength: 300, //five minutes
+            debug: true,
+        }
+    }
+    return options;
 }
 
 /*
@@ -148,18 +148,18 @@ const getRecordCameraOptions = () => {
 const getRecordCameraOptionsForSafari = () => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
-		record: {
-			audio: true,
-			video: {
-				width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-				height: { min: 240, ideal: 360, max: 720 }
-			},
-			videoMimeType: 'video/mp4', //all supported excluding Safari use webm
-			maxLength: 300, //five minutes
-			debug: true,
-		}
-	}
-	return options;
+        record: {
+            audio: true,
+            video: {
+                width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
+                height: { min: 240, ideal: 360, max: 720 }
+            },
+            videoMimeType: 'video/mp4', //all supported excluding Safari use webm
+            maxLength: 300, //five minutes
+            debug: true,
+        }
+    }
+    return options;
 }
 
 /*
@@ -170,17 +170,17 @@ const getRecordCameraOptionsForSafari = () => {
 const getRecordScreenOptions = () => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
-		record: {
-			audio: true,
-			screen: true,
-			maxLength: 300, //five minutes
-			convertEngine: 'ts-ebml', //to be able to have seekable webm files
-			frameWidth: 640,
-			frameHeight: 480,
-			debug: true,
-		}
-	}
-	return options;
+        record: {
+            audio: true,
+            screen: true,
+            maxLength: 300, //five minutes
+            convertEngine: 'ts-ebml', //to be able to have seekable webm files
+            frameWidth: 640,
+            frameHeight: 480,
+            debug: true,
+        }
+    }
+    return options;
 }
 
 
@@ -192,25 +192,25 @@ const getRecordScreenOptions = () => {
 const getRecordScreenOptionsForSafari = () => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
-		record: {
-			audio: true,
-			screen: true,
-			videoMimeType: 'video/mp4', //all supported excluding Safari use webm
-			maxLength: 300, //five minutes
-			frameWidth: 640,
-			frameHeight: 480,
-			debug: true,
-		}
-	}
-	return options;
+        record: {
+            audio: true,
+            screen: true,
+            videoMimeType: 'video/mp4', //all supported excluding Safari use webm
+            maxLength: 300, //five minutes
+            frameWidth: 640,
+            frameHeight: 480,
+            debug: true,
+        }
+    }
+    return options;
 }
 
 /*
-* Once a video has been recorded, need to pass to another videojs component to be able to use the progress controls
+* the default playback options
 * 
 * @returns { Object }
 */ 
-export const getPlaybackOptions = (recordedData) => {
+const getPlaybackOptions = () => {
     return {
         controls: true,
         autoplay: false,
@@ -220,13 +220,39 @@ export const getPlaybackOptions = (recordedData) => {
         bigPlayButton: true,
         controlBar: {
             pictureInPictureToggle: false
-        },
-        sources: [
-            {
-                src: URL.createObjectURL(recordedData),
-                type: recordedData.type
-            }
-        ]
+        }
     }
+}
+
+/*
+* Once a video has been recorded, need to pass to another videojs component to be able to use the progress controls
+* 
+* @params { Blob }
+*
+* @returns { Object }
+*/ 
+export const getPlaybackOptionsWithBlob = (recordedData) => {
+    const options = getPlaybackOptions();
+    options.sources = [ {
+        src: URL.createObjectURL(recordedData),
+        type: recordedData.type
+    }]
+    return options;
+}
+
+/*
+* Show an existing video with src
+* 
+* @params { Object: src, type }
+*
+* @returns { Object }
+*/ 
+export const getPlaybackOptionsWithSrc = (recordedData) => {
+    const options = getPlaybackOptions();
+    options.sources = [ {
+        src: recordedData.src,
+        type: recordedData.type
+    }]
+    return options;
 }
 
