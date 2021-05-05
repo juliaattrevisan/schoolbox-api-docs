@@ -7,7 +7,7 @@
  #}
 {% if config.yandex_enabled and USER.role.parent %}
 <script src="{{ CDN_PREFIX }}/javascript/shared/yandex/v1/widget.js"></script>
-<div class="alert-box hide-for-print">
+<div class="yandex hide-for-print">
     <div id="ytWidget"></div><script src="https://translate.yandex.net/website-widget/v1/widget.js?widgetId=ytWidget&pageLang=en&widgetTheme=light&autoMode=false" type="text/javascript"></script>
 </div>
 {% endif %}
