@@ -116,7 +116,6 @@
              * You can Modify or Delete, but you can't save anything (nothing to save)
              */
             case this.states.clean:
-                console.log('clean');
                 this.modifyButton.removeClass('hide');
                 this.removeProcessing(this.saveButton.addClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
@@ -126,7 +125,6 @@
              * You can save or delete, but you can't Modify again
              */
             case this.states.cleanModify:
-                console.log('cleanModify');
                 this.modifyButton.addClass('hide');
                 this.removeProcessing(this.saveButton.removeClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
@@ -138,7 +136,6 @@
              * and lose focus without having changed anything, and this will still fire
              */
             case this.states.dirty:
-                console.log('dirty');
                 this.modifyButton.addClass('hide');
                 this.removeProcessing(this.saveButton.removeClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
@@ -148,7 +145,6 @@
              * This executes while you're typing, too, which seems extreme
              */
             case this.states.dirtyModify:
-                console.log('dirtyModify');
                 this.modifyButton.addClass('hide');
                 this.removeProcessing(this.saveButton.removeClass('hide'));
                 this.removeProcessing(this.deleteButton.removeClass('hide'));
@@ -157,7 +153,6 @@
             /* When you finally hit the Save button
              */
             case this.states.saving:
-                console.log('saving');
                 this.modifyButton.addClass('hide');
                 this.addProcessing(this.saveButton.removeClass('hide'), true);
                 this.addProcessing(this.deleteButton.removeClass('hide'), false);
@@ -166,7 +161,6 @@
             /* When you hit the Delete button
              */
             case this.states.deleting:
-                console.log('deleting');
                 this.modifyButton.addClass('hide');
                 this.addProcessing(this.saveButton.removeClass('hide'), false);
                 this.addProcessing(this.deleteButton.removeClass('hide'), true);
@@ -219,7 +213,6 @@
          * thing by entering dirtyModify state
          */
         self.editor.on('change', function () {
-            console.log(self.editor.checkDirty());
             self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
             self.element.trigger('inlineTextboxEditor.change', [self]);
         });
