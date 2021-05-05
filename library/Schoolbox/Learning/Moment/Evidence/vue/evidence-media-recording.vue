@@ -92,8 +92,10 @@ export default {
          *
          */
         onDeviceReady (videojs) {
-            this.updateCurrentRatio(videojs);
-            this.updateContainerHeight();
+            if (this.recordMediaType !== recordMediaTypes.AUDIO_ONLY) { //audio doesn't need to change from 16:9
+                this.updateCurrentRatio(videojs);
+                this.updateContainerHeight();
+            }
         },
 
         /**

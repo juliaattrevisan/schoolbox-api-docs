@@ -378,7 +378,7 @@ export default {
                 <video ref="recordingVideo" playsinline class="video-js"></video>
             </div>
             <div v-if="isPlayerActive" class="media-container media-container-playback" key="playbackMediaContainer">
-                <audio-player
+                <audio-only-player
                     v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
 					:options="getAudioPlayerOptions()"
                 />
