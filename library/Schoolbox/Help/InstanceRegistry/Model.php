@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Help\InstanceRegistry;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -19,7 +20,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
  * This record contains all information which this instance needs to know about
  * another Schoolbox instance.
  */
-class Model
+class Model implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
