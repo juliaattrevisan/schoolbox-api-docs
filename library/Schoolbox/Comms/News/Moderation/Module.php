@@ -19,8 +19,6 @@ use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
-use Schoolbox\Comms\News\Authorizer\Rule\IsNotYetApproved;
-use Schoolbox\Comms\News\Authorizer\Rule\IsPublishedOrExpired;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -51,7 +49,7 @@ class Module extends BaseModule
         );
 
         // loggedIn && (SU || CO || moderator || (moderationEnabled && author))
-        $canSubmit = new Rule\LazyCallback(function() {
+        $canSubmit = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -69,7 +67,7 @@ class Module extends BaseModule
 
 
         // loggedIn && (SU || CO || moderator)
-        $canApprove = new Rule\LazyCallback(function() {
+        $canApprove = new Rule\LazyCallback(function () {
             return new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
@@ -81,24 +79,9 @@ class Module extends BaseModule
         });
 
 
-        // loggedIn && (SU || CO || moderator)
-        $canReject = new Rule\LazyCallback(function () {
-            return new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\All(
-                        new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
-                        new IsPublishedOrExpired()
-                    ),
-                    new Rule\All(
-                        new IsArticleAuthor(),
-                        new CanModerateAudience($this->getStrategyFactory()),
-                        new IsPublishedOrExpired()
-                    ),
-                )
-            );
-        });
+        // Anyone who may submit an article may reject it?
+        // This allows the author of an article to unpublish it.
+        $canReject = $canSubmit;
 
         $preloadArticle = function ($params) {
             return $this->preloadArticleWithAudience($params);
