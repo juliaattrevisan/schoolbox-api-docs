@@ -393,7 +393,7 @@ export default {
                 />
             </div>
             <transition name="fade">
-                <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="delete-button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
+                <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button delete-button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
             </transition>
         </div><!-- recordingMediaContainer -->
 
@@ -451,7 +451,7 @@ export default {
 
 .delete-button {
     position: absolute;
-    z-index: 1;
+    z-index: 3;
     left: 50%;
     top: 0;
     margin-bottom: 0;
