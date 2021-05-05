@@ -1,0 +1,9 @@
+.yandex {
+    @media #{$small-up} {
+        margin: 0 1rem;
+    }
+
+    @media #{$medium-up} {
+        margin: 0 2rem;
+    }
+}

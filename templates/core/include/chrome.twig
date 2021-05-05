@@ -238,11 +238,6 @@
                 </nav>
             </div>
 
-            {# Yandex translation service
-             # Only available to parents depending on config setting
-             #}
-            {% include 'sub/yandex.twig' %}
-
             <div id="container">
                 <div id="content">
                     {% include template with data only %}
@@ -261,6 +256,12 @@
                         {% endif %}
                     </ul>
                 </div>
+
+                {# Yandex translation service
+                 # Only available to parents depending on config setting
+                 #}
+                {% include 'sub/yandex.twig' %}
+
                 <script type="text/javascript">
                     Foundation.global.namespace = '';
                     $(document).foundation();
