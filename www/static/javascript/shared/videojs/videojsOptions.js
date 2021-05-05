@@ -45,11 +45,13 @@ const getDefaultVideojsRecordOptions = () => {
         controls: true,
         autoplay: false,
         fluid: true,
-        aspectRatio: '16:9',
+        responsive: true,
         loop: false,
         bigPlayButton: false,
         controlBar: {
-            volumePanel: true,
+            liveDisplay: false,
+            volumePanel: false,
+            pictureInPictureToggle: false
         }
     }
 }
@@ -132,7 +134,7 @@ const getRecordCameraOptions = () => {
             audio: true,
             video: {
                 width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                height: { min: 240, ideal: 360, max: 720 }
+                height: { min: 180, ideal: 360, max: 720 }
             },
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: 300, //five minutes
@@ -154,7 +156,7 @@ const getRecordCameraOptionsForSafari = () => {
             audio: true,
             video: {
                 width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                height: { min: 240, ideal: 360, max: 720 }
+                height: { min: 180, ideal: 360, max: 720 }
             },
             videoMimeType: 'video/mp4', //all supported excluding Safari use webm
             maxLength: 300, //five minutes
@@ -219,8 +221,8 @@ const getRecordPhotoOptions = () => {
             imageOutputFormat: 'image/jpeg',
             imageOutputQuality: 0.8,
             image: { // image media constraints: set resolution of camera
-              width: { min: 640, ideal: 640, max: 1280 },
-              height: { min: 360, ideal: 360, max: 760 }
+                width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
+                height: { min: 180, ideal: 360, max: 720 }
             },
             frameWidth: 640, // dimensions of captured video frames
             frameHeight: 360,
@@ -240,7 +242,7 @@ const getVideoPlayerOptions = () => {
         controls: true,
         autoplay: false,
         fluid: true,
-        aspectRatio: '16:9',
+        responsive: true,
         loop: false,
         bigPlayButton: true,
         controlBar: {
