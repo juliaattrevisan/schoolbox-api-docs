@@ -121,7 +121,6 @@ abstract class Evaluation_Import_Xml
 			$currentSection = $xml->section[$i];
 
 			$sectionData = array(
-                'section_id'  => '',
                 'assess_id'   => $assess_id,
                 'sequence'    => $i + 1,
                 'title'       => trim($currentSection->title),
@@ -142,7 +141,6 @@ abstract class Evaluation_Import_Xml
 				$config = $this->getQuestionConfig($currentQuestion, $version);
 
 				$question_id = $questionHandler->create(array(
-                    'question_id' => '',
                     'section_id'  => $section_id,
                     'sequence'    => $j + 1,
                     'type_id'     => $currentQuestion->typeid,
