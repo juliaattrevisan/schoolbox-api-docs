@@ -110,10 +110,10 @@ export default {
 	text-align: center;
 }
 
-@media screen and (max-width: 640px) {
+@media screen and (max-width: 950px) {
   .tabs dd a {
     padding: .5rem;
-    font-size: .875rem;
+    font-size: .8125rem;
   }
 }
 

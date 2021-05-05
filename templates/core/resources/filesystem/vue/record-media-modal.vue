@@ -88,7 +88,7 @@ export default {
 	},
 
 	methods: {
-		
+
 		/**
          * to be able to press enter to save filename
          *
@@ -98,7 +98,7 @@ export default {
                 const keyName = event.key;
                 if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
                     this.onSaveFilenameSelected();
-                } 
+                }
             });
 		},
 
@@ -255,7 +255,7 @@ export default {
 <template>
 
 	<div>
-		
+
 		<record-media-modal-menu
 			@on-record-media-type-selected="onRecordMediaTypeSelected"
 			:current-record-media-type="currentRecordMediaType"
@@ -263,9 +263,9 @@ export default {
 		/>
 
 		<div class="ab-pane">
-			
+
 			<div class="record-media-container" ref="container" :style="{ height: targetHeight }">
-			
+
 				<record-media-modal-unset
 					v-if="currentRecordMediaType === recordMediaTypes.UNSET"
 					@on-record-media-type-selected="onRecordMediaTypeSelected"
@@ -292,7 +292,7 @@ export default {
 					<div class="modal-actions">
 						<button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
 						<button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
-					</div>	
+					</div>
 				</over-media-modal>
 				<over-media-modal v-else-if="isUploading" key="isUploadingModal">
 					<div class="loader"></div>
@@ -300,9 +300,9 @@ export default {
 				</over-media-modal>
 				<over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
 					<p><em>Media successfully uploaded.</em></p>
-				</over-media-modal>	
+				</over-media-modal>
 
-			</div>	
+			</div>
 
 		</div><!-- .ab-pane -->
 
@@ -334,7 +334,7 @@ export default {
 .modal-actions {
 	display: flex;
 	button {
-		margin: 0px 2px; 
+		margin: 0 2px;
 	}
 }
 

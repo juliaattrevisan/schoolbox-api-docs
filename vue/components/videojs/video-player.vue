@@ -68,11 +68,17 @@ export default {
   }
   .vjs-big-play-button {
     background-color: black;
-    border-color: white;
+    border: 2px solid white;
+    border-radius: 0;
     top: 50%;
     left: 50%;
     margin-left: -45px;
     margin-top: -24px;
+  }
+  .vjs-button > .vjs-icon-placeholder::before {
+    color: white;
+    font-size: 4em;
+    line-height: 1.25;
   }
   .vjs-progress-holder,
   .vjs-custom-skin .vjs-play-progress,
@@ -118,11 +124,6 @@ export default {
   .vjs-record-button.vjs-control.vjs-icon-record-stop::before {
     font-size: 5em;
     line-height: 1em;
-  }
-  .vjs-button > .vjs-icon-placeholder::before {
-    color: white;
-    font-size: 4em;
-    line-height: 1.25;
   }
   .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
     text-shadow: none;

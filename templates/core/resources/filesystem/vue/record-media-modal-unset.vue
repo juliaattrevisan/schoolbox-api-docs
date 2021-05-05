@@ -151,11 +151,12 @@ $font-family-icon: 'schoolbox';
 		margin-right: 0;
 	}
 	span {
+    font-size: .8125rem;
 		display: block;
 		transition: padding-bottom 0.2s;
 	}
 	aside {
-		font-size: 0.875rem;
+		font-size: .8125rem;
 		font-style:  italic;
 		opacity: 0;
 		transition: opacity 0.2s;
@@ -208,9 +209,6 @@ $font-family-icon: 'schoolbox';
 }
 
 @media screen and (max-width: 640px) {
-  .menu-item span {
-    font-size: .875rem;
-  }
   .menu-item aside {
     display: none;
   }
