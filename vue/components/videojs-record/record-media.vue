@@ -363,8 +363,6 @@ export default {
 }
 
 .delete-button {
-  background-color: rgba(43, 51, 63, 0.7);
-  color: white;
 	position: absolute;
 	z-index: 1;
   left: 50%;

@@ -151,7 +151,6 @@ $font-family-icon: 'schoolbox';
 		margin-right: 0;
 	}
 	span {
-    font-size: .8125rem;
 		display: block;
 		transition: padding-bottom 0.2s;
 	}
@@ -203,6 +202,9 @@ $font-family-icon: 'schoolbox';
 }
 
 @media screen and (max-width: 950px) {
+  .menu-item span {
+    font-size: .875rem;
+  }
   .icon:before {
     font-size: 2rem;
   }

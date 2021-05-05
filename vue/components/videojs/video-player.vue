@@ -52,7 +52,7 @@ export default {
 	  width: 5em;
   }
   .vjs-volume-bar {
-	  margin: 1.9em 0.45em;
+	  margin: 2.4em 0.45em;
   }
   .vjs-slider-horizontal .vjs-volume-level::before {
 	  top: -0.4em;
