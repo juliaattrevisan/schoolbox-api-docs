@@ -94,7 +94,7 @@ export default {
 				onComplete: () => this.$emit('on-record-media-type-selected', this.selectedRecordMediaType)
 			} );
 		},
-		
+
 	}
 
 }
@@ -155,8 +155,7 @@ $font-family-icon: 'schoolbox';
 		transition: padding-bottom 0.2s;
 	}
 	aside {
-		padding: 10px 30px;
-		font-size: 0.8rem;
+		font-size: .8125rem;
 		font-style:  italic;
 		opacity: 0;
 		transition: opacity 0.2s;
@@ -202,7 +201,19 @@ $font-family-icon: 'schoolbox';
 	}
 }
 
+@media screen and (max-width: 950px) {
+  .menu-item span {
+    font-size: .875rem;
+  }
+  .icon:before {
+    font-size: 2rem;
+  }
+}
+
 @media screen and (max-width: 640px) {
+  .menu-item aside {
+    display: none;
+  }
 }
 
 </style>

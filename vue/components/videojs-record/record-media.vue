@@ -1,7 +1,7 @@
 <script>
 
 /*
- * To record, playback, convert and upload a camera/screen recording into SB 
+ * To record, playback, convert and upload a camera/screen recording into SB
  *
  */
 
@@ -79,7 +79,7 @@ export default {
 	},
 
 	methods: {
-		
+
 		/*
 		 * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
 		 *
@@ -193,7 +193,7 @@ export default {
 		 */
 		recordedVideoReady (videoData) {
 			this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-			this.recordedData = videoData; // the blob object contains the recorded data 
+			this.recordedData = videoData; // the blob object contains the recorded data
 			this.isPlaybackActive = true; //show the <video-player></video-player>
 			this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
 		},
@@ -265,7 +265,7 @@ export default {
 			this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
 			this.isDeleteRecordingModalActive = false;
 			this.isPlaybackActive = false;
-			this.player.record().getDevice(); //relaunch the recorder 
+			this.player.record().getDevice(); //relaunch the recorder
 		},
 
 		/*
@@ -300,9 +300,9 @@ export default {
 </script>
 
 <template>
-	
+
 	<div class="container" ref="container" :style="{ height: targetHeight }">
-		
+
 		<div ref="recordingVideoContainer">
 			<div class="video-container">
 				<video ref="recordingVideo" playsinline class="video-js"></video>
@@ -314,7 +314,7 @@ export default {
 				/>
 			</div>
 			<transition name="fade">
-				<a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="delete-button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
+				<a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button delete-button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
 			</transition>
 		</div><!-- recordingVideoContainer -->
 
@@ -330,9 +330,9 @@ export default {
 		</over-media-modal>
 
 		<over-media-modal v-else-if="isDeleteRecordingModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
-			<div class="alert-box alert">Are you sure you wish to delete the current recording?</div>
+			<div><p>Are you sure you wish to delete the current recording?</p></div>
 			<div class="modal-actions">
-				<button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
+				<button @click.prevent="onConfirmDeleteRecordingSelected" class="submit">Delete</button>
 				<button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
 			</div>
 		</over-media-modal>
@@ -365,14 +365,16 @@ export default {
 .delete-button {
 	position: absolute;
 	z-index: 1;
-	right: 20px;
-	top: 20px;
+  left: 50%;
+  top: 0;
+  margin-bottom: 0;
+  margin-left: -78px;
 }
 
 .modal-actions {
 	display: flex;
 	button {
-		margin: 0px 2px; 
+		margin: 0px 2px;
 	}
 }
 
