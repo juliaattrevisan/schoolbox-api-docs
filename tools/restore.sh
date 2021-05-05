@@ -44,10 +44,38 @@ fullpath=${filepath%/*};
 conffile=`readlink -f $fullpath/../www/conf/conf.php`;
 
 instdir=`readlink -f $fullpath/../`;
-baselength=`echo $instdir/updates/ | wc -m`;
 package=${instdir##*/};
 
 curdir=`pwd`;
+
+# Outputs the instance_id of the destination. Typically the staging instance.
+# If multiple found, prompts user to select one.
+get_destination_instance_id(){
+  local ini_file="/etc/$package/instances.ini"
+  local instance_list
+  instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list)
+  if [[ $(echo -e "$instance_list" | wc -l) -gt 1 ]]; then
+    echo "Multiple instances found. Please select the instance you wish to restore into:" >&2
+    local i
+    while true; do
+      i=0
+      for instance in $instance_list; do
+        ((i++))
+        echo "$i. $instance" >&2
+      done
+      read -r -p 'Choice: ' choice
+      if [[ $choice -lt 1 ]] || [[ $choice -gt $i ]]; then
+        echo "Invalid choice" >&2
+      else
+        break
+      fi
+    done
+    echo "$instance_list" | sed -n "${choice}p"
+  else
+    echo "$instance_list"
+  fi
+}
+destination_instance_id="$(get_destination_instance_id)"
 
 error() {
 	# Display an error message in red then exit with error code
@@ -715,6 +743,9 @@ restore_pre_v20.1_config_dirs;
 ## Fix SQL config paths to data directory
 "$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mysql -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
 
+echo -e "\nEnsuring data dirs exist on disk"
+"$instdir"/tools/site/create-data-dirs.sh --instance "$destination_instance_id"
+
 ## Build SQL updates if required
 sqlupdates=`ls -1 $instdir/updates/*/scripts_list 2>/dev/null | wc -l`;
 if [ $sqlupdates -eq 0 ];
@@ -726,7 +757,7 @@ fi
 
 ## Run SQL updates to current install
 echo "";
-$instdir/tools/update-sql.sh 2>&1 | tee -a /var/log/$package/upgrade.log;
+INSTANCE_ID="$destination_instance_id" "$instdir"/tools/update-sql.sh 2>&1 | tee -a /var/log/"$package"/upgrade.log;
 
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
@@ -783,23 +814,15 @@ else
 fi
 
 # Restart schoolbox services
-echo -e "\nRestarting Schoolbox Services";
-if [ "$package" = 'schoolboxdev' ];
-then
-	/usr/sbin/service schoolboxdev-digestd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolboxdev-scheduled restart >/dev/null 2>&1;
-	/usr/sbin/service schoolboxdev-socketd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolboxdev-routed restart >/dev/null 2>&1;
-else
-	/usr/sbin/service schoolbox-digestd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolbox-scheduled restart >/dev/null 2>&1;
-	/usr/sbin/service schoolbox-socketd restart >/dev/null 2>&1;
-	/usr/sbin/service schoolbox-routed restart >/dev/null 2>&1;
-fi
+echo -e "\nRestarting Schoolbox Services for instance: $destination_instance_id";
+"$package"cloud-restart-daemons "$destination_instance_id";
+
+echo -e "Rebuilding cron jobs (because timezone may be different in new DB). Assuming this host is primary"
+schoolboxcloud-rebuild-cronjobs --site-root "$instdir" --is-primary-host 1
 
 ## Run Notifications Binder so RabbitMQ has all the latest bindings for the new data
 echo -e "\nReload the subscription cache";
-php $instdir/tools/notif/route/refresh-binding-cache.php --instance=vagrantx -vvv 2>/dev/null;
+php "$instdir"/tools/notif/route/refresh-binding-cache.php --instance="$destination_instance_id" -vvv;
 
 # Cleanup
 umount $backup_dir 2>/dev/null;
