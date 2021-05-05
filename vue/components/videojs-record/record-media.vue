@@ -14,7 +14,8 @@ import Record from 'videojs-record/dist/videojs.record.js';
 import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import { gsap } from 'gsap/all';
-import AudioPlayer from '@schoolbox/videojs/audio-player';
+import AudioOnlyPlayer from '@schoolbox/videojs/audio-only-player';
+import PhotoPlayer from '@schoolbox/videojs/photo-player';
 import VideoPlayer from '@schoolbox/videojs/video-player';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getRecordOptions, getVideoPlayerOptionsWithBlob, getVideoPlayerOptionsWithSrc, getAudioPlayerOptionsWithBlob, getAudioPlayerOptionsWithSrc } from '@shared/videojs/videojsOptions';
@@ -26,7 +27,8 @@ export default {
 
     components: {
         OverMediaModal,
-        AudioPlayer,
+        AudioOnlyPlayer,
+        PhotoPlayer,
         VideoPlayer
     },
 
@@ -58,7 +60,7 @@ export default {
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
-            isPlaybackActive: false, //need a different videojs player for playback to enable the progress controls
+            isPlayerActive: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
         }
     },
@@ -71,7 +73,7 @@ export default {
          * @returns { Boolean }
          */
         showDeleteRecordingButton () {
-            if (this.isPlaybackActive) {
+            if (this.isPlayerActive) {
                 return true;
             } else {
                 return false;
@@ -149,14 +151,27 @@ export default {
                 if (this.preRecordedData) {
                     this.hasPreRecordedData = true; //to display pre recorded video
                     this.playbackData = {
-                        src: `/cms/sendVideo.php?id=${this.preRecordedData.hash}&type=storage`,
+                        src: this.getPlaybackDataSrc(),
                         type: this.preRecordedData.mime
                     } 
-                    this.isPlaybackActive = true;
+                    this.isPlayerActive = true;
                 } else {
                     this.player.record().getDevice();
                 }
             }, 200);
+        },
+
+        /**
+         * to know where to reference the saved file from
+         *
+         * @returns { String } 
+         */
+        getPlaybackDataSrc () {
+            if (this.recordMediaType === recordMediaTypes.PHOTO) {
+                return `/storage/image.php?hash=${this.preRecordedData.hash}`;
+            } else {
+                return `/cms/sendVideo.php?id=${this.preRecordedData.hash}&type=storage`;
+            }
         },
 
         /**
@@ -176,11 +191,8 @@ export default {
             this.player.on('deviceReady', this.onDeviceReady);
             this.player.on('startRecord', this.onStartRecord);
 
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY || this.recordMediaType === recordMediaTypes.PHOTO) { //the mp3 (AUDIO_ONLY) or png (PHOTO) is ready
-                this.player.on('finishRecord', this.onFinishRecord);
-                // this.player.on('waveReady', this.onWaveformReady);
-            } else if (isSafari) { //safari uses mp4 to record, while all others use default webm (with conversion to enable seekable webm)
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); //safari uses mp4 to record, while all others use default webm (with conversion to enable seekable webm)
+            if (isSafari || this.recordMediaType === recordMediaTypes.AUDIO_ONLY || this.recordMediaType === recordMediaTypes.PHOTO) { //the mp3 (AUDIO_ONLY) or png (PHOTO) is ready
                 this.player.on('finishRecord', this.onFinishRecord);
             } else {
                 this.player.on('finishConvert', this.onFinishConvert);
@@ -223,22 +235,14 @@ export default {
             this.recordedVideoReady(this.player.convertedData);
         },
 
-		/**
-         * 
-         *
-         */
-        onWaveformReady () {
-            this.recordedVideoReady(this.player.recordedData);
-        },
-
         /**
-         * a video has been recorded, so can now either upload it, delete and re-record or play it back
+         * a media has been recorded, so can now either upload it, delete and re-record or play it back
          *
          */
-        recordedVideoReady (videoData) {
+        recordedVideoReady (mediaData) {
             this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-            this.recordedData = videoData; // the blob object contains the recorded data 
-            this.isPlaybackActive = true; //show the <video-player></video-player>
+            this.recordedData = mediaData; // the blob object contains the recorded data 
+			this.isPlayerActive = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
         },
 
@@ -309,7 +313,7 @@ export default {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
             this.isDeleteRecordingModalActive = false;
             this.hasPreRecordedData = false;  //set to false again for possible display or a re-recording
-            this.isPlaybackActive = false;
+            this.isPlayerActive = false;
             this.player.record().getDevice(); //relaunch the recorder 
         },
 
@@ -331,19 +335,6 @@ export default {
         },
 
         /**
-         * Pass through the video options to play the latest recorded video
-         *
-         * @returns { Object }
-         */
-        getVideoPlayerOptions () {
-            if (this.hasPreRecordedData) {
-                return getVideoPlayerOptionsWithSrc(this.playbackData);
-            } else {
-                return getVideoPlayerOptionsWithBlob(this.recordedData);
-            }
-        },
-
-		/**
          * Pass through the audio options to play the latest recorded video
          *
          * @returns { Object }
@@ -353,6 +344,32 @@ export default {
                 return getAudioPlayerOptionsWithSrc(this.playbackData);
             } else {
                 return getAudioPlayerOptionsWithBlob(this.recordedData);
+            }
+        },
+
+        /**
+         * Pass through the audio options to play the latest recorded video
+         *
+         * @returns { String }
+         */
+        getImgSrc () {
+            if (this.hasPreRecordedData) { //otherwise its the already saved image src
+                return this.playbackData.src;
+            } else { //is already a Data URL that can be passed to <image-player></image-player>
+                return this.recordedData; 
+            }
+        },
+
+        /**
+         * Pass through the video options to play the latest recorded video
+         *
+         * @returns { Object }
+         */
+        getVideoPlayerOptions () {
+            if (this.hasPreRecordedData) {
+                return getVideoPlayerOptionsWithSrc(this.playbackData);
+            } else {
+                return getVideoPlayerOptionsWithBlob(this.recordedData);
             }
         },
 
@@ -369,10 +386,15 @@ export default {
             <div class="video-container video-container-record">
                 <video ref="recordingVideo" playsinline class="video-js"></video>
             </div>
-            <div v-if="isPlaybackActive" class="video-container video-container-playback" key="playbackVideoContainer">
+            <div v-if="isPlayerActive" class="video-container video-container-playback" key="playbackVideoContainer">
                 <audio-player
                     v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
 					:options="getAudioPlayerOptions()"
+                />
+				<photo-player
+                    v-else-if="recordMediaType === recordMediaTypes.PHOTO"
+					:img-src="getImgSrc()"
+                    :is-new-photo="hasPreRecordedData ? false : true"
                 />
 				<video-player
                     v-else
