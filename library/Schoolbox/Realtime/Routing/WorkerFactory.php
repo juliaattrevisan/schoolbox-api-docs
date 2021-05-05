@@ -86,7 +86,12 @@ class WorkerFactory
     public function build(LoopInterface $loop, $instanceId)
     {
         // set list factory dependencies
-        $cloudManager = new MobileApp\ServiceManager($this->log, $this->registryMapper, $this->instance);
+        $cloudManager = new MobileApp\ServiceManager(
+            $this->log,
+            $this->registryMapper,
+            $this->instance,
+            $this->conf->get('title')
+        );
 
         // factory for configuring instant emails
         $twigFactory = new TwigEmailFactory(new CoreContext($this->conf), $this->log);

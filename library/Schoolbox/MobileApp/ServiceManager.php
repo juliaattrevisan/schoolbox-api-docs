@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -41,17 +41,29 @@ class ServiceManager implements IServiceManager
     /** @var Schoolbox\Instance */
     protected $serverInstance;
 
+    /**
+     * The app's title: this title may be used as the title of notifications.
+     */
+    private string $appTitle;
 
     /**
+     * Constructor
+     *
      * @param LoggerInterface    $log
      * @param RegistryMapper     $registryMapper
      * @param Schoolbox\Instance $serverInstance
+     * @param string             $appTitle
      */
-    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper, Schoolbox\Instance $serverInstance)
-    {
+    public function __construct(
+        LoggerInterface $log,
+        RegistryMapper $registryMapper,
+        Schoolbox\Instance $serverInstance,
+        string $appTitle
+    ) {
         $this->registryMapper = $registryMapper;
-        $this->log = $log;
+        $this->log            = $log;
         $this->serverInstance = $serverInstance;
+        $this->appTitle       = $appTitle;
     }
 
 
@@ -173,22 +185,40 @@ class ServiceManager implements IServiceManager
 
             switch ($provider) {
                 case Registry::PROVIDER_APPLE:
-
-                    /** @var Storage\Model $storageObj */
                     $storageObj = $service->getCertificate();
-
-                    if (!$storageObj) {
+                    if (!$storageObj instanceof Storage\Model) {
                         // invalid PEM reference
                         throw new Mapper\Exception('No PEM certificate given for APNS service.');
                     }
 
-                    return new Cloud\Apple\APNS($this->registryMapper, $identifier, Apns\Client\Message::PRODUCTION_URI, $this->getPemPath($storageObj), $key);
+                    return new Cloud\Apple\APNS(
+                        $this->registryMapper,
+                        $identifier,
+                        Apns\Client\Message::PRODUCTION_URI,
+                        $this->getPemPath($storageObj),
+                        $key
+                    );
 
                 case Registry::PROVIDER_GOOGLE:
-                    return new Cloud\Google\GCM($this->registryMapper, $identifier, $key);
+                    return new Cloud\Google\GCM(
+                        $this->registryMapper,
+                        $identifier,
+                        $key,
+                        $this->appTitle
+                    );
+
+                case Registry::PROVIDER_DIGISTORM:
+                    return new Cloud\Digistorm\Service(
+                        $this->registryMapper,
+                        $identifier,
+                        $key,
+                        $this->appTitle
+                    );
             }
 
-            throw new Mapper\Exception("Invalid provider: must be one of APNS or GCM, '$provider' given.");
+            throw new Mapper\Exception(
+                "Invalid provider: must be one of APNS, GCM or Digistorm: '$provider' given."
+            );
         }
 
         return $this->serviceCache[$provider][$identifier];

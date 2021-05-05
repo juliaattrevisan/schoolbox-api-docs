@@ -68,7 +68,7 @@ abstract class AbstractService implements ServiceInterface
     {
         // ensure there's at least a dummy logger there
         if (empty($this->log)) {
-            $this->setLog(new Logger(null));
+            $this->setLog(new Logger('dummy'));
         }
         return $this->log;
     }

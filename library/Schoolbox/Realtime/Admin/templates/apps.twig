@@ -49,7 +49,7 @@
                 <ul class="information-list" id="app-list">
                     {% for app in apps %}
                         <li>
-                            {% include '@adminMessages/providers/' ~ app.providerName ~ '/entity.twig' with {
+                            {% include providers[app.providerName].template with {
                                 app:        app,
                                 attachzone: attachzones[app.id] ?? null,
                             } only %}
@@ -72,11 +72,11 @@
                         <div class="small-12 column">
                             {#<label>Select the provider of your new application to register:</label>#}
                         </div>
-                        {% for provider, description in providers %}
-                            <div class="column small-12 medium-6{%  if loop.last %} end{% endif %}">
+                        {% for provider, providerInfo in providers %}
+                            <div class="column small-12 medium-4{%  if loop.last %} end{% endif %}">
                                 <input type="radio" name="provider" value="{{ provider }}" id="provider-{{ provider }}" data-radio-block />
                                 <label for="provider-{{ provider }}" class="block">
-                                    <i class="icon-mobile"></i> {{ description }}
+                                    <i class="icon-mobile"></i> {{ providerInfo.description }}
                                 </label>
                             </div>
                         {% endfor %}

@@ -167,6 +167,10 @@ class Controller extends BaseController
 
 
     /**
+     * Show list of apps.
+     *
+     * @api GET /adminv2/messages/apps
+     *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function getApps()
@@ -184,13 +188,23 @@ class Controller extends BaseController
         }
 
         $data = [
-            'pageCurrent' => $this->router->generate('adminMessages.getApps'),
+            'pageCurrent'    => $this->router->generate('adminMessages.getApps'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMessages.getApps')),
-            'apps'        => $apps,
-            'attachzones' => $zones,
-            'providers'   => [
-                'apns' => 'Apple Push Notification Service',
-                'gcm'  => 'Google Cloud Messaging',
+            'apps'           => $apps,
+            'attachzones'    => $zones,
+            'providers'      => [
+                MobileApp\Registry::PROVIDER_APPLE     => [
+                    'template'    => '@adminMessages/providers/APNS/entity.twig',
+                    'description' => 'Apple Push Notification Service'
+                ],
+                MobileApp\Registry::PROVIDER_GOOGLE    => [
+                    'template'    => '@adminMessages/providers/GCM/entity.twig',
+                    'description' => 'Google Cloud Messaging',
+                ],
+                MobileApp\Registry::PROVIDER_DIGISTORM => [
+                    'template'    => '@adminMessages/providers/Digistorm/entity.twig',
+                    'description' => 'Digistorm',
+                ],
             ],
         ];
 
@@ -199,22 +213,42 @@ class Controller extends BaseController
 
 
     /**
+     * Get the create app form.
+     *
+     * @api GET /adminv2/messages/apps/new
      */
     public function getCreateAppForm()
     {
-        $provider = strtoupper($this->getRequest()->query->get('provider'));
+        $provider = $this->getRequest()->query->get('provider');
+        $data     = ['provider' => $provider];
+        switch ($provider) {
+            case MobileApp\Registry::PROVIDER_APPLE:
+                $template           = '@adminMessages/providers/APNS/create.twig';
+                $data['attachzone'] = (new Zone('apns'))->getTwigContext();
+                break;
 
-        $data = [];
+            case MobileApp\Registry::PROVIDER_GOOGLE:
+                $template = '@adminMessages/providers/GCM/create.twig';
+                break;
 
-        if ($provider === 'APNS') {
-            $data['attachzone'] = (new Zone('apns'))->getTwigContext();
+            case MobileApp\Registry::PROVIDER_DIGISTORM:
+                $template = '@adminMessages/providers/Digistorm/create.twig';
+                break;
+
+            default:
+                $this->sendError('Service does not exist');
+                return;
         }
 
-        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@adminMessages/providers/{$provider}/create.twig", $data));
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput($template, $data));
     }
 
 
     /**
+     * Create or modify an app.
+     *
+     * @api POST /adminv2/messages/apps
+     *
      * @throws \Alaress\Web\Controller\Exception
      */
     public function postModifyApp()
@@ -222,31 +256,41 @@ class Controller extends BaseController
         $rq   = $this->getRequest();
         $post = $rq->post;
 
-        $provider    = strtoupper($post->get('provider'));
+        $provider    = $post->get('provider');
         $appId       = trim($post->get('app'));
         $key         = trim($post->get('key'));
         $certificate = null;
 
-        if ($provider === MobileApp\Registry::PROVIDER_GOOGLE) {
-            // require key for GCM
-            if (empty($key)) {
-                $this->sendError("Unable to setup Google service, please provide a key");
-                return;
-            }
-        } elseif ($provider === MobileApp\Registry::PROVIDER_APPLE) {
-            // require a certificate for APNS
-            try {
-                $certificate = (new CollectorFactory())->build($post->get('attachment', []))->getFirst();
-
-                if (empty($certificate)) {
-                    // yes this looks contrived but it saves on duplicating the error message
-                    throw new Resource\Exception();
+        switch ($provider) {
+            case MobileApp\Registry::PROVIDER_APPLE:
+                // require a certificate for APNS
+                try {
+                    $certificate = (new CollectorFactory())->build($post->get('attachment', []))->getFirst();
+                } catch (Resource\Exception $e) {
+                    $this->sendError('A certificate is required to register a new Apple push notification service.');
+                    return;
                 }
+                break;
 
-            } catch (Resource\Exception $e) {
-                $this->sendError('A certificate is required to register a new Apple push notification service.');
+            case MobileApp\Registry::PROVIDER_GOOGLE:
+                // require key for GCM
+                if (empty($key)) {
+                    $this->sendError("Unable to setup Google service, please provide a key");
+                    return;
+                }
+                break;
+
+            case MobileApp\Registry::PROVIDER_DIGISTORM:
+                // require key for Digistorm
+                if (empty($key)) {
+                    $this->sendError("Unable to setup Digistorm service, please provide a key");
+                    return;
+                }
+                break;
+
+            default:
+                $this->sendError('Service does not exist');
                 return;
-            }
         }
 
         if (empty($appId)) {
@@ -468,7 +512,8 @@ class Controller extends BaseController
         $cloudManager = new MobileApp\ServiceManager(
             $log,
             MobileApp\RegistryMapper::getInstance(),
-            $this->getDi()->get('instance')
+            $this->getDi()->get('instance'),
+            $this->getConfigLoader()->get('title')
         );
 
         // just grab... anything

@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,8 +14,9 @@ use Schoolbox\User;
 
 class Registry {
 
-    const PROVIDER_GOOGLE = 'GCM';
-    const PROVIDER_APPLE  = 'APNS';
+    const PROVIDER_GOOGLE    = 'GCM';
+    const PROVIDER_APPLE     = 'APNS';
+    const PROVIDER_DIGISTORM = 'Digistorm';
 
 
     /** @var User */
@@ -158,4 +159,4 @@ class Registry {
 
 
 
-} 
+}
