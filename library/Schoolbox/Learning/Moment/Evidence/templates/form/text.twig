@@ -17,6 +17,13 @@
                     },
                 };
             };
+			let buildValidationMessages = function () {
+                return {
+                    body: {
+                        required: 'Please write something'
+                    }
+                }
+            };
         </script>
     {% endautoescape %}
 {% endblock formJs %}

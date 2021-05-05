@@ -36,10 +36,6 @@ export default {
         return {
             recordMediaType: '', //to determine display will be retrieved comparing with props.momentType 
             recordedData: null, //could be audio, video, image etc
-            canUpload: false, //to upload the file
-            isOverMediaModalClosing: false, //to animate out the over-media-modal
-            isFilenameModalActive: false, //prompt the filename change modal
-            newFilename: '', //name the file
             isUploading: false, //to notify of update
             hasUploadError: false, //to notify of upload error, try again?
             hasUploaded: false, //notify UI of upload complete
@@ -47,51 +43,11 @@ export default {
         }
     },
 
-    computed: {
-
-        /**
-         * To know whether to show the upload button
-         *
-         * @returns { Boolean }
-         */
-        showUploadButton () {
-            if (this.canUpload && !this.isUploading) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        /**
-         * grab the new filename with the relevant extension (can be webm/mp4/mp3)
-         *
-         * @returns { String }
-         */
-        newFilenameWithExtension () {
-            const extension = this.recordedData.name.split('.').pop();
-            return this.newFilename + '.' + extension;
-        },
-
-    },
-
-    watch: {
-
-        /**
-         * ensure no invalid chars are added to the user added filename
-         *
-         */
-        newFilename (newValue) {
-            this.newFilename = newValue.replace(/[\\/:"*?<>|]+/g, "");
-        }
-
-    },
-
     created () {
         this.recordMediaType = this.getMomentTypeToRecordMediaType();
     },
 
     mounted () {
-        this.initKeyboardEvents();
         this.updateContainerHeight();
     },
 
@@ -113,19 +69,6 @@ export default {
         },
 
         /**
-         * to be able to press enter to save filename
-         *
-         */
-        initKeyboardEvents () {
-            document.addEventListener('keyup', (event) => {
-                const keyName = event.key;
-                if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
-                    this.onSaveFilenameSelected();
-                } 
-            });
-        },
-
-        /**
          * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
          *
          */
@@ -139,45 +82,22 @@ export default {
          */
         onRecordedMediaReady (recordedData) {
             this.recordedData = recordedData;
-            this.canUpload = true; //show the upload button
+            document.getElementById('evidence-filename').value = this.recordedData.name; //to pass form submit validation check
+            document.addEventListener('evidence-media-recording__onFormSubmit', (event) => { //to prevent the form from being submitted until the media is uploaded
+                this.onFormSubmit();
+            }); 
         },
 
         /**
-         * recorded media is no longer available
+         * the form button has been pressed, so start uploading the file
          *
          */
-        onRecordedMediaDeleted () {
-            this.canUpload = false; //hide the upload button
-            this.clearHiddenInputs();
-        },
-
-        /**
-         * ensure the form cannot be processed when there's no recording available
-         *
-         */
-        clearHiddenInputs () {
-            document.getElementById('evidence-filename').value = '';
-            document.getElementById('file').value = '';
-        },
-
-        /**
-         * present the save file name modal to name the file
-         *
-         */
-        onUploadSelected () {
-            this.isFilenameModalActive = true;
-        },
-
-        /**
-         * the user has set a file name and selected save
-         *
-         */
-        async onSaveFilenameSelected () {
-            this.isFilenameModalActive = false; //close the save modal to show the upload modal
+        async onFormSubmit (event) {
             try {
                 const responseData = await this.uploadMediaAndReturnResponse();
                 this.addHiddenInputs(responseData);
                 this.displayUploadSuccessful();
+                document.dispatchEvent(new CustomEvent('evidence-media-recording__onUploadComplete')); //dispach to form.twig to continue form submit
             } catch (error) {
                 console.warn(error);
             }
@@ -209,7 +129,7 @@ export default {
          */
         getFormData () {
             const formData = new FormData();
-            formData.append('upload', this.recordedData, this.newFilenameWithExtension);
+            formData.append('upload', this.recordedData, this.recordedData.name);
             return formData;
         },
 
@@ -231,8 +151,7 @@ export default {
          * @params {Object}
          */
         addHiddenInputs (responseData) {
-            document.getElementById('evidence-filename').value = this.newFilenameWithExtension;
-            document.getElementById('file').value = `${responseData.hash}:${this.newFilenameWithExtension}`;
+            document.getElementById('file').value = `${responseData.hash}:${this.recordedData.name}`; //to retrieve the file reference
         },
 
         /**
@@ -241,28 +160,27 @@ export default {
          */
         displayUploadSuccessful () {
             this.hasUploaded = true; //to display
-            this.canUpload = false; //hide the upload button
             setTimeout(() => { 
                 this.hasUploaded = false; //and hide again
             }, 2000);
         },
 
         /**
-         * close the filename modal
+         * recorded media is no longer available
          *
          */
-        onCloseFilenameModalSelected () {
-            this.isOverMediaModalClosing = true;
+        onRecordedMediaDeleted () {
+            this.clearHiddenInputs();
         },
 
         /**
-         * close the filename modal, cancel has been selected rather than save
+         * ensure the form cannot be processed when there's no recording available
          *
          */
-        onFilenameModalClosed () {
-            this.isOverMediaModalClosing = false;
-            this.isFilenameModalActive = false;
-        }
+        clearHiddenInputs () {
+            document.getElementById('evidence-filename').value = '';
+            document.getElementById('file').value = '';
+        },
 
     }
 
@@ -282,16 +200,7 @@ export default {
                 @on-recorded-media-deleted="onRecordedMediaDeleted"
             />
 
-            <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
-                <h3><em>Please add a filename prior to continuing.</em></h3>
-                <label for="filename" class="required" aria-required="true">Filename</label>
-                <input type="text" id="filename" name="filename" v-model="newFilename">
-                <div class="modal-actions">
-                    <button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
-                    <button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
-                </div>	
-            </over-media-modal>
-            <over-media-modal v-else-if="isUploading" key="isUploadingModal">
+            <over-media-modal v-if="isUploading" key="isUploadingModal">
                 <div class="loader"></div>
                 <p><em>Uploading video, please wait...</em></p>
             </over-media-modal>
@@ -299,12 +208,6 @@ export default {
                 <p><em>Media successfully uploaded.</em></p>
             </over-media-modal>	
 
-        </div>
-
-        <div class="upload-button-container">
-            <transition name="slide">
-                <a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button upload-button" title="Upload" href="#upload" key="upload">Upload</a>
-            </transition>
         </div>	
 
     </div>
@@ -316,8 +219,9 @@ export default {
 .record-media-container {
     position: relative;
     width: 100%;
-    max-width: 800px;
+    max-width: 700px;
     height: 300px; //updated on mounted()
+    margin-bottom: 1rem;
     overflow: hidden;
     background: black;
     h2, h3 {
@@ -330,36 +234,6 @@ export default {
     button {
         margin: 0px 2px; 
     }
-}
-
-.upload-button-container {
-    position: relative;
-    width: 100%;
-    max-width: 800px;
-    height: 50px;
-    overflow: hidden;
-    margin-bottom: 1rem;
-}
-
-.upload-button {
-    position: absolute;
-    width: 100%;
-}
-
-.slide-enter-active {
-    transition: transform 0.3s ease-out;
-}
-.slide-leave-active {
-    transition: transform 0.3s ease-in;
-}
-.slide-enter-active {
-    transform: translateY(-100%);
-}
-.slide-enter-to {
-    transform: translateY(0%);
-}
-.slide-leave-to {
-    transform: translateY(-100%);
 }
 
 </style>

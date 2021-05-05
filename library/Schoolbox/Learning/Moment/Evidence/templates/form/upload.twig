@@ -45,7 +45,13 @@
                     },
                 }
             };
-
+			let buildValidationMessages = function () {
+                return {
+                    filename: {
+                        required: 'Please upload a file'
+                    }
+                }
+            };
             // Fill/clear filename input
             $(function () {
                 let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
