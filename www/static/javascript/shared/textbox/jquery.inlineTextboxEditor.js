@@ -190,28 +190,29 @@
         var self             = this,
             editorInstanceId = self.editorInstance.attr('id');
 
+        /* When you click the Modify button, the ckeditor spawns
+         */
         self.element.trigger('inlineTextboxEditor.preEditorCreate', [self]);
         self.editor = self.editorInline
             ? window.CKEDITOR.inline(editorInstanceId, self.editorInstanceOptions)
             : window.CKEDITOR.replace(editorInstanceId, self.editorInstanceOptions);
+
         self.editor.on('instanceReady', function (event) {
             // Focus on the editor
             event.editor.setReadOnly(false);
             event.editor.focus();
             self.element.trigger('inlineTextboxEditor.editorCreate', [self]);
         });
-        self.editor.on('focus', function () {
-            // Switch state of modify button
-            self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
-            self.element.trigger('inlineTextboxEditor.focus', [self]);
-        });
-        self.editor.on('blur', function () {
-            // Revert state of modify button
-            self.switchState(self.editor.checkDirty() ? self.states.dirty : self.states.clean);
-            self.element.trigger('inlineTextboxEditor.blur', [self]);
-        });
+
+        /* The Modify button should never be available initially, once you've already
+         * clicked it to enter the Modify workflow
+         */
+        self.switchState(self.states.cleanModify);
+
+        /* If you change the content, you're dirty; show the little Changes Not Saved
+         * thing by entering dirtyModify state
+         */
         self.editor.on('change', function () {
-            // Has the content changed since saved?
             self.switchState(self.editor.checkDirty() ? self.states.dirtyModify : self.states.cleanModify);
             self.element.trigger('inlineTextboxEditor.change', [self]);
         });
