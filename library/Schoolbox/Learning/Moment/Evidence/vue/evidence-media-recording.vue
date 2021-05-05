@@ -16,7 +16,7 @@ export default {
 
     components: {
         RecordMedia, //the media element
-        OverMediaModal //to slot in upload modal
+        OverMediaModal, //to slot in upload modal
     },
 
     props: {
@@ -40,6 +40,7 @@ export default {
             isUploading: false, //to notify of update
             hasUploadError: false, //to notify of upload error, try again?
             hasUploaded: false, //notify UI of upload complete
+            currentRatio: 0.5625, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
         }
     },
@@ -49,7 +50,7 @@ export default {
     },
 
     mounted () {
-        this.updateContainerHeight();
+        this.initContainerHeight();
     },
 
     methods: {
@@ -73,8 +74,37 @@ export default {
          * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
          *
          */
+        initContainerHeight () {
+            window.addEventListener('resize', this.updateContainerHeight);
+            this.updateContainerHeight();
+        },
+
+        /**
+         * Triggered on window resize
+         *
+         */
         updateContainerHeight () {
-            this.targetHeight = (this.$refs.container.getBoundingClientRect().width * 0.5625) + 'px'; //so there's no height jumps on switching videos
+            this.targetHeight = (this.$refs.container.getBoundingClientRect().width * this.currentRatio) + 'px'; //so there's no height jumps on switching videos
+        },
+
+        /**
+         * currently to update the container ratio to match the dimensions of the recording device
+         *
+         */
+        onDeviceReady (videojs) {
+            this.updateCurrentRatio(videojs);
+            this.updateContainerHeight();
+        },
+
+        /**
+         * devices have different aspect ratio of 16:9, 4:3 etc
+         *
+         */
+        updateCurrentRatio (videojs) {
+            const currentDeviceSettings = videojs.record().stream.getVideoTracks()[0].getSettings(); //dive dive dive!
+            const deviceWidth = currentDeviceSettings.width;
+            const deviceHeight = currentDeviceSettings.height;
+            this.currentRatio = deviceHeight / deviceWidth;
         },
 
         /**
@@ -91,13 +121,13 @@ export default {
         },
 
         /**
-         * currently just conver the PHOTO to be ready for upload
+         * currently just convert the PHOTO to be ready for upload
          *
          */
         checkRecordedData () {
             if (this.recordMediaType === recordMediaTypes.PHOTO) {
-                this.recordedData = dataURLtoBlob(this.recordedData); //the upload needs to be Blob
-                this.recordedData.name = 'photo.jpeg'; //just for passing validation checks, the file referenced through the hash
+                this.recordedData = dataURLtoBlob(this.recordedData); //the upload needs to be a Blob
+                this.recordedData.name = 'photo.jpeg'; //just for passing form submit validation checks, the file is referenced through the hash, so the name is not too relevant
             }
         },
 
@@ -209,6 +239,7 @@ export default {
             <record-media
                 :record-media-type="recordMediaType"
                 :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+                @on-device-ready="onDeviceReady"
                 @on-recorded-media-ready="onRecordedMediaReady"
                 @on-recorded-media-deleted="onRecordedMediaDeleted"
             />
@@ -236,7 +267,7 @@ export default {
     height: 300px; //updated on mounted()
     margin-bottom: 1rem;
     overflow: hidden;
-    background: black;
+    background: red;
     h2, h3 {
         max-width: none;
     }

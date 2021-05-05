@@ -35,7 +35,8 @@ export default {
 			isUploading: false, //to notify of update
 			hasUploadError: false, //to notify of upload error, try again?
 			hasUploaded: false, //notify UI of upload complete
-			targetHeight: '0px', //to set the height based on the aspect ratio of the video
+			currentRatio: 0.5625, //default to 16:9 ratio, but could change when the device is actually available
+            targetHeight: '0px', //to set the height based on the aspect ratio of the video
 		}
 	},
 
@@ -84,7 +85,7 @@ export default {
 
 	mounted () {
 		this.initKeyboardEvents();
-		this.updateContainerHeight();
+		this.initContainerHeight();
 	},
 
 	methods: {
@@ -102,13 +103,42 @@ export default {
             });
 		},
 
-		/*
-		 * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
-		 *
-		 */
-		updateContainerHeight () {
-			this.targetHeight = (this.$refs.container.getBoundingClientRect().width * 0.5625) + 'px'; //so there's no height jumps on switching videos
-		},
+		/**
+         * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
+         *
+         */
+        initContainerHeight () {
+            window.addEventListener('resize', this.updateContainerHeight);
+            this.updateContainerHeight();
+        },
+
+        /**
+         * Triggered on window resize
+         *
+         */
+        updateContainerHeight () {
+            this.targetHeight = (this.$refs.container.getBoundingClientRect().width * this.currentRatio) + 'px'; //so there's no height jumps on switching videos
+        },
+
+        /**
+         * currently to update the container ratio to match the dimensions of the recording device
+         *
+         */
+        onDeviceReady (videojs) {
+            this.updateCurrentRatio(videojs);
+            this.updateContainerHeight();
+        },
+
+        /**
+         * devices have different aspect ratio of 16:9, 4:3 etc
+         *
+         */
+        updateCurrentRatio (videojs) {
+            const currentDeviceSettings = videojs.record().stream.getVideoTracks()[0].getSettings(); //dive dive dive!
+            const deviceWidth = currentDeviceSettings.width;
+            const deviceHeight = currentDeviceSettings.height;
+            this.currentRatio = deviceHeight / deviceWidth;
+        },
 
 		/**
 		 * To toggle between the different media types
@@ -289,6 +319,7 @@ export default {
 							:record-media-type="recordMediaType"
 							:key="recordMediaType"
 							:is-keep-alive="true"
+                            @on-device-ready="onDeviceReady"
 							@on-process-started="onProcessStarted"
 							@on-process-stopped="onProcessStopped"
 							@on-recorded-media-ready="onRecordedMediaReady"

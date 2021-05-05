@@ -1,7 +1,8 @@
 <script>
 
 /**
- * To record, playback, convert and upload a camera/screen recording into SB 
+ * To record, playback and upload a camera/screen recording into SB 
+ * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
  *
  */
 
@@ -59,7 +60,6 @@ export default {
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
-            targetHeight: '0px', //to set the height based on the aspect ratio of the video
             isPlayerActive: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
         }
@@ -88,7 +88,6 @@ export default {
 
     mounted () {
         if (!this.isKeepAlive) {
-            this.updateContainerHeight();
             this.hideForAnimateOn();
             this.initVideojs();
         }
@@ -96,7 +95,6 @@ export default {
 
     activated () {
         if (this.isKeepAlive) {
-            this.updateContainerHeight();
             this.hideForAnimateOn();
             this.initVideojs();
         }
@@ -107,21 +105,13 @@ export default {
     },
 
     methods: {
-        
-        /**
-         * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
-         *
-         */
-        updateContainerHeight () {
-            this.targetHeight = (this.$refs.container.getBoundingClientRect().width * 0.5625) + 'px'; //so there's no height jumps on switching videos
-        },
 
         /**
          * to animate on when videojs ready
          *
          */
         hideForAnimateOn () {
-            gsap.set(this.$refs.recordingVideoContainer, { alpha: 0 } );
+            gsap.set(this.$refs.recordingMediaContainer, { alpha: 0 } );
         },
 
         /**
@@ -175,11 +165,11 @@ export default {
         },
 
         /**
-         * show the video and controls
+         * show the video
          *
          */
         animateOn () {
-            gsap.to(this.$refs.recordingVideoContainer, 0.5, { alpha: 1 } );
+            gsap.to(this.$refs.recordingMediaContainer, 0.5, { alpha: 1 } );
         },
 
         /**
@@ -204,11 +194,12 @@ export default {
         },
 
         /**
-         * onDeviceReady
+         * onDeviceReady, dispatch to anyone listening, maybe the parent
          *
          */
         onDeviceReady () {
             this.isDeviceReady = true;
+            this.$emit(recordMediaEvents.DEVICE_READY, this.player);
         },
 
         /**
@@ -380,13 +371,13 @@ export default {
 
 <template>
     
-    <div class="container" ref="container" :style="{ height: targetHeight }">
+    <div class="container">
         
-        <div ref="recordingVideoContainer">
-            <div class="video-container video-container-record">
+        <div ref="recordingMediaContainer">
+            <div class="media-container media-container-record">
                 <video ref="recordingVideo" playsinline class="video-js"></video>
             </div>
-            <div v-if="isPlayerActive" class="video-container video-container-playback" key="playbackVideoContainer">
+            <div v-if="isPlayerActive" class="media-container media-container-playback" key="playbackMediaContainer">
                 <audio-player
                     v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
 					:options="getAudioPlayerOptions()"
@@ -404,7 +395,7 @@ export default {
             <transition name="fade">
                 <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="delete-button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
             </transition>
-        </div><!-- recordingVideoContainer -->
+        </div><!-- recordingMediaContainer -->
 
         <over-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
             <template v-if="hasDeviceAlreadyInUseError">
@@ -434,7 +425,7 @@ export default {
 .container {
     position: absolute;
     width: 100%;
-    height: 300px; //will be updated by parent
+    height: 100%; //will be updated by the parent container, keeping it inline with the video dimensions
     background: black;
     overflow: hidden;
     h2, h3 {
@@ -442,7 +433,7 @@ export default {
     }
 }
 
-.video-container {
+.media-container {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -450,11 +441,11 @@ export default {
     top: 0;
 }
 
-    .video-container-record {
+    .media-container-record {
         z-index: 1;
     }
 
-    .video-container-playback {
+    .media-container-playback {
         z-index: 2;
     }
 
