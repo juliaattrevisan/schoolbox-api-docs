@@ -9,6 +9,7 @@ import RecordMedia from '@schoolbox/videojs-record/record-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
+import { dataURLtoBlob } from '@shared/util/fileUtils';
 
 
 export default {
@@ -82,10 +83,22 @@ export default {
          */
         onRecordedMediaReady (recordedData) {
             this.recordedData = recordedData;
+            this.checkRecordedData();
             document.getElementById('evidence-filename').value = this.recordedData.name; //to pass form submit validation check
             document.addEventListener('evidence-media-recording__onFormSubmit', (event) => { //to prevent the form from being submitted until the media is uploaded
                 this.onFormSubmit();
             }); 
+        },
+
+        /**
+         * currently just conver the PHOTO to be ready for upload
+         *
+         */
+        checkRecordedData () {
+            if (this.recordMediaType === recordMediaTypes.PHOTO) {
+                this.recordedData = dataURLtoBlob(this.recordedData); //the upload needs to be Blob
+                this.recordedData.name = 'photo.jpeg'; //just for passing validation checks, the file referenced through the hash
+            }
         },
 
         /**

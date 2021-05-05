@@ -30,7 +30,7 @@ export const getRecordOptions = (recordMediaType) => {
         return getRecordScreenOptionsForSafari();
     } else if (recordMediaType === recordMediaTypes.SCREEN && !isSafari) {
         return getRecordScreenOptions();
-	} else if (recordMediaType === recordMediaTypes.PHOTO) {
+    } else if (recordMediaType === recordMediaTypes.PHOTO) {
         return getRecordPhotoOptions();
     }
 }
@@ -210,15 +210,14 @@ const getRecordScreenOptionsForSafari = () => {
 * @returns { Object }
 */ 
 const getRecordPhotoOptions = () => {
-	const options = getDefaultVideojsRecordOptions();
-	options.width =  640,
+    const options = getDefaultVideojsRecordOptions();
+    options.width =  640,
     options.height =  360,
     options.plugins = {
         record: {
-            imageOutputType: 'blob',
-            // imageOutputType: 'dataURL',
-            // imageOutputFormat: 'image/png',
-            // imageOutputQuality: 0.92,
+            imageOutputType: 'dataURL',
+            imageOutputFormat: 'image/jpeg',
+            imageOutputQuality: 0.8,
             image: { // image media constraints: set resolution of camera
               width: { min: 640, ideal: 640, max: 1280 },
               height: { min: 360, ideal: 360, max: 760 }
@@ -243,10 +242,10 @@ const getVideoPlayerOptions = () => {
         fluid: true,
         aspectRatio: '16:9',
         loop: false,
-		bigPlayButton: true,
+        bigPlayButton: true,
         controlBar: {
             pictureInPictureToggle: false
-		},
+        },
     }
 }
 
@@ -259,10 +258,10 @@ const getVideoPlayerOptions = () => {
 */ 
 export const getVideoPlayerOptionsWithBlob = (recordedData) => {
     const options = getVideoPlayerOptions();
-	options.sources = [{
-		src: URL.createObjectURL(recordedData),
-		type: recordedData.type
-	}];
+    options.sources = [{
+        src: URL.createObjectURL(recordedData),
+        type: recordedData.type
+    }];
     return options;
 }
 
@@ -275,10 +274,10 @@ export const getVideoPlayerOptionsWithBlob = (recordedData) => {
 */ 
 export const getVideoPlayerOptionsWithSrc = (recordedData) => {
     const options = getVideoPlayerOptions();
-	options.sources = [{
-		src: recordedData.src,
-		type: recordedData.type
-	}];
+    options.sources = [{
+        src: recordedData.src,
+        type: recordedData.type
+    }];
     return options;
 }
 
@@ -289,21 +288,21 @@ export const getVideoPlayerOptionsWithSrc = (recordedData) => {
 * @returns { Object }
 */ 
 const getAudioPlayerOptions = () => {
-	const options = getVideoPlayerOptions();
+    const options = getVideoPlayerOptions();
     options.plugins = {
-		wavesurfer: { 
-			backend: 'MediaElement',
-			waveColor: '#fff',
-			progressColor: '#ccc',
-			debug: true,
-			cursorWidth: 1,
-			displayMilliseconds: false,
-			hideScrollbar: true,
-			interact: false,
-			responsive: true
-		}
-	}
-	return options;
+        wavesurfer: { 
+            backend: 'MediaElement',
+            waveColor: '#fff',
+            progressColor: '#ccc',
+            debug: true,
+            cursorWidth: 1,
+            displayMilliseconds: false,
+            hideScrollbar: true,
+            interact: false,
+            responsive: true
+        }
+    }
+    return options;
 }
 
 /*
@@ -315,8 +314,8 @@ const getAudioPlayerOptions = () => {
 */ 
 export const getAudioPlayerOptionsWithBlob = (recordedData) => {
     const options = getAudioPlayerOptions();
-	options.audioPlayerSrc = URL.createObjectURL(recordedData);
-	options.audioPlayerType = recordedData.type;
+    options.audioPlayerSrc = URL.createObjectURL(recordedData);
+    options.audioPlayerType = recordedData.type;
     return options;
 }
 
@@ -329,7 +328,7 @@ export const getAudioPlayerOptionsWithBlob = (recordedData) => {
 */ 
 export const getAudioPlayerOptionsWithSrc = (recordedData) => {
     const options = getAudioPlayerOptions();
-	options.audioPlayerSrc = recordedData.src;
-	options.audioPlayerType = recordedData.type;
+    options.audioPlayerSrc = recordedData.src;
+    options.audioPlayerType = recordedData.type;
     return options;
 }
