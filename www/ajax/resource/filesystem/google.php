@@ -46,6 +46,7 @@ $grive   = new GDriveFetcher(
 $mapper  = Storage\Mapper::getInstance();
 $files   = array();
 
+$errors = [];
 foreach ($_POST['docs'] as $doc) {
     try {
         $meta = $grive->fetchMetaData($doc['id']);
@@ -59,13 +60,14 @@ foreach ($_POST['docs'] as $doc) {
          * - Someone tried to access a restricted file, leave a bootprint in sentry
          *   because we can't inform the user via the ui atm
          */
-        trigger_error('Could not upload google drive file: ' . $e->getMessage(), E_USER_WARNING);
-
+       //  trigger_error('Could not upload google drive file: ' . $e->getMessage(), E_USER_WARNING);
+        $errors[] = 'Could not upload google drive file: ' . $e->getMessage();
         continue;
     } catch (Mapper\Exception $e) {
         /* noop: unknown file extension: silently disregard for now
          * because deriveFileName() couldn't figure out the extension
          */
+        $errors[] = ['err' => 'Could not upload google drive file: ' . $e->getMessage()];
         continue;
     }
 
@@ -77,7 +79,7 @@ foreach ($_POST['docs'] as $doc) {
 
         /* Get correct mimetype for compatibility with attachzone rendering
          */
-        $meta['mimeType'] = $grive->determineMimeIcon($meta);
+        $meta['mimeType'] = $storageFile->getMimetype()->getMime();
 
         $files[] = $meta;
     } catch (Schoolbox\File\Exception $e) {
@@ -94,4 +96,8 @@ foreach ($_POST['docs'] as $doc) {
 }
 
 header('Content-Type: application/json');
+if (empty($files) && !empty($errors)) {
+    http_response_code(400);
+    die(json_encode($errors));
+}
 die(json_encode($files));

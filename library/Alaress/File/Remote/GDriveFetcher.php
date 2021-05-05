@@ -19,12 +19,17 @@ class GDriveFetcher implements FetcherInterface
     /**
      * Google API Endpoint
      */
-    private const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
+    private const GOOGLE_API = 'https://www.googleapis.com/drive/v3';
 
     /**
      * The mimetypeMapping key that stores file extensions
      */
     private const CONTEXT_EXTENSION = 'ext';
+
+    /**
+     * The mimetypeMapping key that stores exporting file mimetypes
+     */
+    private const CONTEXT_EXPORT_MIMETYPE = 'exportMimetype';
 
     /**
      * The mimetypeMapping key that stores download urls (exportLinks)
@@ -35,11 +40,11 @@ class GDriveFetcher implements FetcherInterface
      * Metadata fields that might contain a download url
      * Google API sometimes changes causing fields to no longer exist
      */
-    private const FIELDS_EXPORTLINKS = ['downloadUrl'];
+//    private const FIELDS_EXPORTLINKS = ['downloadUrl'];
 
     /**
      * Mimetypes and their corresponding exportLinks, ext values
-     *
+     * https://developers.google.com/drive/api/v3/ref-export-formats?hl=en
      * @var array
      */
     private const MIMETYPE_MAPPING = [
@@ -47,22 +52,22 @@ class GDriveFetcher implements FetcherInterface
         /* Powerpoint slides
          */
         'application/vnd.google-apps.presentation' => [
-            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            self::CONTEXT_EXTENSION   => 'pptx',
+            self::CONTEXT_EXPORT_MIMETYPE => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            self::CONTEXT_EXTENSION       => 'pptx',
         ],
 
         /* Word doc
          */
         'application/vnd.google-apps.document'     => [
-            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            self::CONTEXT_EXTENSION   => 'docx',
+            self::CONTEXT_EXPORT_MIMETYPE => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            self::CONTEXT_EXTENSION       => 'docx',
         ],
 
         /* Spreadsheets
          */
         'application/vnd.google-apps.spreadsheet'  => [
-            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            self::CONTEXT_EXTENSION   => 'xlsx',
+            self::CONTEXT_EXPORT_MIMETYPE => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            self::CONTEXT_EXTENSION       => 'xlsx',
         ],
     ];
 
@@ -143,7 +148,7 @@ class GDriveFetcher implements FetcherInterface
 
     /**
      * Retrieves the metadata for the given fileId
-     *
+     * https://developers.google.com/drive/api/v3/reference/files?hl=en
      * @param int  $fileId
      * @param bool $refresh
      * @return array
@@ -152,13 +157,22 @@ class GDriveFetcher implements FetcherInterface
     public function fetchMetaData($fileId, $refresh = false): array
     {
         if ($refresh || empty($this->metaCache[$fileId])) {
+            $params = [
+                'fields'            => '*',
+                'supportsAllDrives' => 'true',
+            ];
+
             $ch = $this->curlPrepare([
-                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}",
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}?" . http_build_query($params),
                 CURLOPT_RETURNTRANSFER => 1,
             ]);
 
-            $this->metaCache[$fileId] = json_decode(curl_exec($ch), true);
+            $fetchedMetaData = json_decode(curl_exec($ch), true);
             curl_close($ch);
+
+            // copy name to title to support the key change from v2 to v3
+            $fetchedMetaData['title'] = $fetchedMetaData['name'];
+            $this->metaCache[$fileId] = $fetchedMetaData;
         }
 
         /* On some mysterious occasions google drive will return you an error payload
@@ -189,19 +203,32 @@ class GDriveFetcher implements FetcherInterface
      * Restore icon to attachzone for this file
      * The mimeType field doesn't contain a string that's known to our allowedFileTypes.mime
      * so we re-write this particular field in a way that supports allowedFileTypes.mime
+     * Returns null, when the file is not downloadable
      *
      * @param array $metadata
-     * @return string
+     * @return string|null
      */
-    public function determineMimeIcon(array $metadata): string
+    public function determineExportMimetype(array $metadata): ?string
     {
-        $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS] ?? null;
+        if (isset($metadata['capabilities']['canDownload']) && !$metadata['capabilities']['canDownload']) {
+            return null;
+        }
+
+        if ($this->isPdfExportEnabled($metadata)) {
+            return 'application/pdf';
+        }
+
+        $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORT_MIMETYPE] ?? null;
 
         if ($allowedFilesMime) {
             return $allowedFilesMime;
         }
 
-        return $metadata['mimeType'];
+        if (is_array($metadata[self::CONTEXT_EXPORTLINKS]) && !empty($metadata[self::CONTEXT_EXPORTLINKS])) {
+            return array_key_first($metadata[self::CONTEXT_EXPORTLINKS]);
+        }
+
+        return null;
     }
 
     /**
@@ -215,23 +242,11 @@ class GDriveFetcher implements FetcherInterface
     public function fetchToFile($fileId): string
     {
         $metadata = $this->fetchMetaData($fileId);
+        $mimeType = $this->determineExportMimetype($metadata);
 
-        if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
-            // if this file has been flagged by Drive as "restricted", disallow any download
+        if (!$mimeType) {
+            // if this does not provide export mimetype, this cannot be downloaded
             throw new DomainException('This file is restricted and cannot be downloaded.');
-        } elseif ($this->isPdfExportEnabled($metadata)) {
-            // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-            $url = $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
-        } else {
-
-            /* Inspect metadata fields to find a download url
-             */
-            $url = $this->inspectExportLinks($metadata);
-        }
-
-        if (!$url) {
-            // no valid URL was found
-            throw new OutOfBoundsException('No url found for download');
         }
 
         $destination = tempnam($this->dir, 'gdrive-');
@@ -247,46 +262,23 @@ class GDriveFetcher implements FetcherInterface
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException('Could not open target');
         }
+        $params = [
+            'mimeType' => $mimeType,
+        ];
 
-        $ch = $this->curlPrepare([
-            CURLOPT_URL            => $url,
-            CURLOPT_FILE           => $fp,
-            CURLOPT_FOLLOWLOCATION => true,
-        ]);
+        $ch = $this->curlPrepare(
+            [
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/export?" . http_build_query($params),
+                CURLOPT_FILE           => $fp,
+                CURLOPT_FOLLOWLOCATION => true,
+            ]
+        );
 
         curl_exec($ch);
         curl_close($ch);
         fclose($fp);
 
         return $destination;
-    }
-
-    /**
-     * Inspect metadata fields to find a download url
-     *
-     * @param array $metadata
-     * @return string
-     */
-    private function inspectExportLinks(array $metadata): string
-    {
-        if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
-            $key = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
-
-            return $metadata[self::CONTEXT_EXPORTLINKS][$key];
-        }
-
-        foreach (self::FIELDS_EXPORTLINKS as $field) {
-            if (!empty($metadata[$field])) {
-                return $metadata[$field];
-            }
-        }
-
-        /* If you got here, the api no longer provides the fields we were originally looking at
-         * https://developers.google.com/drive/api/v2/reference/
-         */
-        trigger_error('Google api fields for exportLinks not found: check api docs', E_USER_WARNING);
-
-        return '';
     }
 
 

@@ -79,6 +79,9 @@
                           data: {docs: docs},
                           success: function(data) {
                               window.top.postMessage(JSON.stringify({data: data}), location.origin);
+                          },
+                          error: function(data) {
+                              window.top.postMessage(JSON.stringify({data: data}), location.origin);
                           }
                       });
                   },
