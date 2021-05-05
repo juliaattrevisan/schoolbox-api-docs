@@ -312,7 +312,6 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
         }
 
         $object = array(
-            'answer_id'   => '',
             'question_id' => $question_id,
             'sequence'    => 1,
             'allAnswers'  => json_encode($allAnswers),
