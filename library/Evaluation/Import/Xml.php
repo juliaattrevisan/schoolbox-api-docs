@@ -125,8 +125,8 @@ abstract class Evaluation_Import_Xml
                 'sequence'    => $i + 1,
                 'title'       => trim($currentSection->title),
                 'description' => trim((string)$currentSection->description->text) ? trim((string)$currentSection->description->text) : trim($currentSection->description),
-                'random'      => $currentSection->random,
-                'pool'        => $currentSection->pool,
+                'random'      => $currentSection->random ? 1 : 0,
+                'pool'        => $currentSection->pool ? 1 : 0,
             );
 			$section_id = $this->getSectionHandler()->create($sectionData);
 
