@@ -40,7 +40,14 @@
                 return {
                     filename: {
                         required: true,
-                    },
+                    }
+                }
+            };
+			let buildValidationMessages = function () {
+                return {
+                    filename: {
+                        required: 'Please include a recording'
+                    }
                 }
             };
         </script>
