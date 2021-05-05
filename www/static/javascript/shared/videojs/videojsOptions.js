@@ -213,19 +213,17 @@ const getRecordScreenOptionsForSafari = () => {
 */ 
 const getRecordPhotoOptions = () => {
     const options = getDefaultVideojsRecordOptions();
-    options.width =  640,
-    options.height =  360,
+    options.width = 640,
+    options.height = 480,
     options.plugins = {
         record: {
             imageOutputType: 'dataURL',
             imageOutputFormat: 'image/jpeg',
             imageOutputQuality: 0.8,
-            image: { // image media constraints: set resolution of camera
+            image: {
                 width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                height: { min: 180, ideal: 360, max: 720 }
+                height: { min: 240, ideal: 480, max: 920 }
             },
-            frameWidth: 640, // dimensions of captured video frames
-            frameHeight: 360,
             debug: true,
         }
     }
