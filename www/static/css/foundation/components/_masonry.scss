@@ -410,7 +410,11 @@ $masonry-drop-background: $input-focus-bg-color;
 }
 .icon-masonry-Schoolbox_Geosnapshot_Component_Dashboard_Controller:before {
   @extend .icon-geosnapshot;
-  color: $icon-color-geosnap;
+  color: $icon-color-geosnapshot;
+}
+.icon-masonry-Schoolbox_Geosnapshot_Component_Homepage_Controller:before {
+  @extend .icon-geosnapshot;
+  color: $icon-color-geosnapshot;
 }
 .icon-masonry-Schoolbox_Resource_GoogleFile_Component_Homepage_Controller:before {
   @extend .icon-google-drive;

@@ -1,0 +1,24 @@
+.Schoolbox_Geosnapshot_Component_Homepage_Controller {
+    section {
+
+        /* Hide a random overhang of island
+         */
+        line-height: 0;
+
+        /* Don't let this render in a tiny skinny window
+         */
+        iframe {
+            min-height: 500px;
+        }
+    }
+}
+
+.Schoolbox_Geosnapshot_Component_Dashboard_Controller {
+
+    /* Don't let this render in a tiny skinny window
+     * 450px is about the right height for one row of items
+     */
+    iframe {
+        min-height: 426px;
+    }
+}
