@@ -9,4 +9,5 @@ export default Object.freeze({
   PROCCESS_STOPPED: 'on-process-stopped',
   RECORDED_MEDIA_READY: 'on-recorded-media-ready', //to notify a video can be uploaded 
   RECORDED_MEDIA_DELETED: 'on-recorded-media-deleted', //to notify a video can be uploaded 
+  RATIO_READY: 'on-ratio-ready', //can change between media
 })

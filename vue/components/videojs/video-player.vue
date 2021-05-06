@@ -31,23 +31,24 @@ export default {
 
     methods: {
 
-        /*
+        /** 
          * set up videojs
          *
          */
         initVideojs () {
-            this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideojsReady);
+            this.player = videojs(this.$refs.videoPlayer, this.options);
+            this.player.on('loadeddata', this.onVideoDataLoaded);
         },
 
-         /*
-         * videojs is ready, dispatch event in case anyone listening
+        /** 
+         * first frame of video is loaded, so can pass details through to anyone listening
          *
          */
-        onVideojsReady () {
-            this.$emit('on-ready');
+        onVideoDataLoaded () {
+            this.$emit('on-video-data-loaded', this.$refs.videoPlayer);
         },
 
-        /*
+        /** 
          * destroy the instance for garbage collection
          *
          */
@@ -64,15 +65,13 @@ export default {
 
 <template>
     <div>
-        <video ref="videoPlayer" class="video-js vjs-custom-skin"></video>
+        <video ref="videoPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
-//DEMO - see https://docs.videojs.com/tutorial-skins.html to update further
-
-.video-js {
+.vjs-play-skin::v-deep {
   .vjs-control-bar {
       height: 5em;
   }
@@ -109,52 +108,16 @@ export default {
     line-height: 1.25;
   }
   .vjs-progress-holder,
-  .vjs-custom-skin .vjs-play-progress,
-  .vjs-custom-skin .vjs-slider-bar,
+  .vjs-play-progress,
+  .vjs-slider-bar,
   .vjs-volume-panel .vjs-volume-control,
   .vjs-big-play-button .vjs-icon-placeholder::before {
       color: white;
   }
-  .vjs-custom-skin .vjs-volume-level,
-  .vjs-custom-skin .vjs-play-progress,
-  .vjs-custom-skin .vjs-slider-bar {
+  .vjs-volume-level,
+  .vjs-slider-horizontal.vjs-play-progress,
+  .vjs-slider-bar {
       background: white;
-  }
-}
-
-.vjs-record.video-js {
-  .vjs-control.vjs-record-indicator {
-    line-height: 1.4;
-    width: 1em;
-    height: 1em;
-  }
-  .vjs-control.vjs-record-indicator::before {
-      font-size: 1em;
-  }
-  .vjs-control.vjs-record-indicator::after {
-    height: calc(1em - 4px);
-    width: calc(1em - 4px);
-    top: 3px;
-    left: 3px;
-  }
-
-  .vjs-record-button.vjs-control.vjs-icon-record-start::before,
-  .vjs-record-button.vjs-control.vjs-icon-record-stop::before {
-    color: #f03;
-    &:hover {
-      color: #fa1542;
-    }
-  }
-  .vjs-record-button.vjs-control.vjs-icon-record-start::before {
-    font-size: 3.5em;
-    line-height: .9em;
-  }
-  .vjs-record-button.vjs-control.vjs-icon-record-stop::before {
-    font-size: 5em;
-    line-height: 1em;
-  }
-  .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
-    text-shadow: none;
   }
 }
 

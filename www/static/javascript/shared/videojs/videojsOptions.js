@@ -6,7 +6,6 @@
  *
  */
 
-import videojs_wavesurfer_css from 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css';
 import WaveSurfer from 'wavesurfer.js';
 import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
 import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js';
@@ -62,39 +61,40 @@ const getDefaultVideojsRecordOptions = () => {
 * @returns { Object }
 */ 
 const getAudioOnlyRecordOptions = () => {
-    const options = getDefaultVideojsRecordOptions();
+	const options = getDefaultVideojsRecordOptions();
     options.plugins = {
-        wavesurfer: { // this plugin is only needed when recording audio-only
-            backend: 'WebAudio',
-            waveColor: '#fff',
-            progressColor: '#ccc',
-            debug: true,
-            cursorWidth: 1,
-            displayMilliseconds: true,
+		wavesurfer: { // this plugin is only needed when recording audio-only
+			backend: 'WebAudio',
+			waveColor: '#fff',
+			progressColor: '#ccc',
+			debug: true,
+			cursorWidth: 1,
+			displayMilliseconds: false,
             hideScrollbar: true,
-            plugins: [
-                WaveSurfer.microphone.create({ // enable microphone plugin
-                    bufferSize: 4096,
-                    numberOfInputChannels: 1,
-                    numberOfOutputChannels: 1,
-                    constraints: {
-                        video: false,
-                        audio: true
-                    }
-                })
-            ]
-        },
-        record: {
-            audio: true,
-            video: false,
-            maxLength: 300, //5 minutes
-            audioEngine: 'vmsg',
-            audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
-            debug: true,
-        }
-    }
-    applyAudioWorkarounds(options);
-    return options;
+            responsive: true,
+			plugins: [
+				WaveSurfer.microphone.create({ // enable microphone plugin
+					bufferSize: 4096,
+					numberOfInputChannels: 1,
+					numberOfOutputChannels: 1,
+					constraints: {
+						video: false,
+						audio: true
+					}
+				})
+			]
+		},
+		record: {
+			audio: true,
+			video: false,
+			maxLength: 300, //5 minutes
+			audioEngine: 'vmsg',
+			audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
+			debug: true,
+		}
+	}
+	applyAudioWorkarounds(options);
+	return options;
 }
 
 /*
@@ -299,7 +299,7 @@ const getAudioPlayerOptions = () => {
             displayMilliseconds: false,
             hideScrollbar: true,
             interact: false,
-            responsive: true
+            responsive: true,
         }
     }
     return options;

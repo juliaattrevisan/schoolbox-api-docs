@@ -8,8 +8,7 @@
 import 'video.js/dist/video-js.css';
 import 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css'
 import videojs from 'video.js';
-import WaveSurfer from 'wavesurfer.js'
-import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js'
+import { swapElements } from '@shared/util/domTools';
 
 
 export default {
@@ -34,15 +33,16 @@ export default {
 
     methods: {
 
-        /*
+        /**
          * set up videojs
          *
          */
         initVideojs () {
             this.player = videojs(this.$refs.audioPlayer, this.options, this.onVideojsReady);
+            this.player.on('waveReady', this.onWaveformReady);
         },
 
-         /*
+        /** 
          * videojs is ready, dispatch event in case anyone listening
          *
          */
@@ -54,7 +54,20 @@ export default {
 			this.$emit('on-ready');
         },
 
-        /*
+        /** 
+         * the waveform has been put into the video component
+         *
+         */
+        onWaveformReady () {
+            this.$nextTick(() => { //can I put the element behind so can just toggle playback on select?
+                const waveformElement = document.querySelector('.vjs-wavedisplay');
+                const trackDisplayElement = document.querySelector('.vjs-text-track-display');
+                swapElements(waveformElement, trackDisplayElement);
+            });
+            console.warn('audio-player-only : onWaveformReady');
+        },
+
+        /**
          * destroy the instance for garbage collection
          *
          */
@@ -71,26 +84,24 @@ export default {
 
 <template>
     <div>
-        <audio ref="audioPlayer" class="video-js vjs-custom-skin"></audio>
+        <video ref="audioPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
-//DEMO - see https://docs.videojs.com/tutorial-skins.html to update further
-
-.video-js {
+.vjs-play-skin::v-deep {
   .vjs-control-bar {
-    height: 4em;
+      height: 5em;
   }
   .vjs-control {
-    width: 5em;
+      width: 5em;
   }
   .vjs-volume-bar {
-    margin: 1.9em 0.45em;
+      margin: 2.4em 0.45em;
   }
   .vjs-slider-horizontal .vjs-volume-level::before {
-    top: -0.4em;
+      top: -0.4em;
   }
   .vjs-time-control {
     color: white;
@@ -99,48 +110,33 @@ export default {
     padding-right: .5rem;
     width: auto;
     min-width: 0;
-  }
-  .vjs-button > .vjs-icon-placeholder::before {
-    color: white;
-    font-size: 2.8em;
-    line-height: 1.4;
+    line-height: 3.5em;
   }
   .vjs-big-play-button {
     background-color: black;
-    border-color: white;
+    border: 2px solid white;
+    border-radius: 0;
     top: 50%;
     left: 50%;
     margin-left: -45px;
-    margin-top: -24px
+    margin-top: -24px;
+  }
+  .vjs-button > .vjs-icon-placeholder::before {
+    color: white;
+    font-size: 4em;
+    line-height: 1.25;
   }
   .vjs-progress-holder,
-  .vjs-custom-skin .vjs-play-progress,
-  .vjs-custom-skin .vjs-slider-bar,
+  .vjs-play-progress,
+  .vjs-slider-bar,
   .vjs-volume-panel .vjs-volume-control,
   .vjs-big-play-button .vjs-icon-placeholder::before {
-    color: white;
+      color: white;
   }
-  .vjs-custom-skin .vjs-volume-level,
-  .vjs-custom-skin .vjs-play-progress,
-  .vjs-custom-skin .vjs-slider-bar {
-    background: white;
-  }
-}
-
-.vjs-record.video-js {
-  .vjs-control.vjs-record-indicator {
-    line-height: 1.4;
-    width: 1em;
-    height: 1em;
-  }
-  .vjs-control.vjs-record-indicator::before {
-    font-size: 1em;
-  }
-  .vjs-control.vjs-record-indicator::after {
-    height: calc(1em - 4px);
-    width: calc(1em - 4px);
-    top: 3px;
-    left: 3px;
+  .vjs-volume-level,
+  .vjs-slider-horizontal.vjs-play-progress,
+  .vjs-slider-bar {
+      background: white;
   }
 }
 
