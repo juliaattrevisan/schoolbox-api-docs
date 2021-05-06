@@ -149,17 +149,8 @@ class Controller extends Base
                         $this->registryMapper->getDatabase()->transact(function () use ($token, $registry, $sessionUser) {
                             $this->registryMapper->deleteByColumn('app_token', $token);
                             if ($registry->getService()->getProviderName() === Registry::PROVIDER_DIGISTORM) {
-                                // Find which apps are actually Digistorm,
-                                // and delete registrations for other apps for this user
-                                $digistormAppIds = $this->serviceMapper->findScalarByPredicates(
-                                    'id',
-                                    $this->serviceMapper->getPredicateBuilder()
-                                        ->equals('provider', Registry::PROVIDER_DIGISTORM)
-                                );
-                                $pb = $this->registryMapper->getPredicateBuilder()
-                                    ->notIn('app_id', $digistormAppIds)
-                                    ->equals('user_id', $sessionUser->getId());
-                                $this->registryMapper->deleteByPredicates($pb);
+                                $this->registryMapper->deregisterForProvider($sessionUser, Registry::PROVIDER_GOOGLE);
+                                $this->registryMapper->deregisterForProvider($sessionUser, Registry::PROVIDER_APPLE);
                             }
                             $this->registryMapper->save($registry);
                         });
