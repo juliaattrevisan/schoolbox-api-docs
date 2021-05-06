@@ -9,6 +9,7 @@ namespace Schoolbox\Geosnapshot;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
 
@@ -94,6 +95,45 @@ class Api
         /* Manufacture a payload with the necessary parts and send it out there
          */
         $payload = (new StudentPhoto())->build($viewee);
+
+        /* Remember it if we need to inspect it for some reason
+         */
+        $this->lastPayload = $payload;
+
+        /* Portrait contents need to be POSTed, not GETted, despite us not mutating any data
+         * in the third party system. We have to send it in json format, otherwise it returns
+         * a default set of unfiltered photos and stuff
+         *
+         * https://docs.guzzlephp.org/en/latest/request-options.html#json
+         */
+        $response = $this->build()->request('POST', self::GEOSNAPSHOT_ENDPOINT, [
+            RequestOptions::JSON => $payload
+        ]);
+
+        /* Responds with this tuple: {"url":"https://geosnapshot.com/e/schoolbox-office-re-opening-from-iso-to-posh"}
+         */
+        if ((int)$response->getStatusCode() === 200) {
+            return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+        }
+
+        throw new \DomainException('Geosnapshot: Invalid response from Geosnapshot; could not decode json response');
+    }
+
+
+    /**
+     * @param string $eventName
+     * @return array
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function retrieveEventPhotos(string $eventName): array
+    {
+        /* Manufacture a payload with the necessary parts and send it out there
+         */
+        $payload = (new EventPhoto())->build($eventName);
 
         /* Remember it if we need to inspect it for some reason
          */

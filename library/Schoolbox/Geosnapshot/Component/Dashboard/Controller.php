@@ -6,6 +6,7 @@
 namespace Schoolbox\Geosnapshot\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
+use Schoolbox\Geosnapshot\Api;
 use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
 
 
@@ -30,6 +31,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * Only render this component if Geosnapshot has been set up
      *
      * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
      */
     public function execute(): bool
     {
@@ -39,12 +43,24 @@ class Controller extends Component_Dashboard_ControllerAbstract
             $this->getConfig('eventName')
         )) {
 
-            /* Request event galleries from Geosnapshot
+            /* Set up guzzle with the authentication pieces
+             *
+             * If it dies, it dies (throw out a generic error screen when that happens)
              */
+            try {
+                $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
+
+                $response = $api->retrieveEventPhotos($this->getConfig('eventName'));
+            } catch (\RuntimeException|\DomainException $e) {
+
+                /* DomainException is thrown when json can't be decoded
+                 */
+                return false;
+            }
 
             /* Get the iframe and shank it into our component, if successful
              */
-            $this->url = '';
+            $this->url = $response['url'];
 
             return true;
         }
