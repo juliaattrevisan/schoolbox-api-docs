@@ -30,7 +30,7 @@ class ValidEventPhotosAvailableTest extends TestCase
      * @dataProvider provider_validEventPhotosAvailable
      * @param null|string $apiKey
      * @param bool        $featureFlag
-     * @param             $eventName
+     * @param null|string $eventName
      * @param int         $expected
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
