@@ -118,10 +118,12 @@ class Controller extends Base
             if (!empty($token)) {
                 $now = \Alaress_Date_Format::now();
 
+                $deleteExistingToken = false;
                 try {
                     $registry = $this->registryMapper->findById($sessionUser->getId(), $token, $provider);
                     $registry->setTouchedAt($now);
                 } catch (MapperException $e) {
+                    $deleteExistingToken = true;
                     try {
                         /** @var Registry $registry */
                         $registry = $this->registryMapper->createModel();
@@ -140,20 +142,6 @@ class Controller extends Base
                         if (isset($deviceId)) {
                             $registry->setDeviceId($deviceId);
                         }
-
-                        // De-register existing logins for other users for the
-                        // same token when saving.
-                        // Also, if this is the Digistorm provider:
-                        // de-register all other registrations for this user
-                        // (as the Digistorm provider is superseding the others)
-                        $this->registryMapper->getDatabase()->transact(function () use ($token, $registry, $sessionUser) {
-                            $this->registryMapper->deleteByColumn('app_token', $token);
-                            if ($registry->getService()->getProviderName() === Registry::PROVIDER_DIGISTORM) {
-                                $this->registryMapper->deregisterForProvider($sessionUser, Registry::PROVIDER_GOOGLE);
-                                $this->registryMapper->deregisterForProvider($sessionUser, Registry::PROVIDER_APPLE);
-                            }
-                            $this->registryMapper->save($registry);
-                        });
                     } catch (MapperException $e) {
                         /** @noinspection PhpUnhandledExceptionInspection */
                         $this->response->status->setCode(400);
@@ -161,6 +149,22 @@ class Controller extends Base
                         return;
                     }
                 }
+
+                // If this is a new registration: delete registrations for the
+                // token when saving.
+                // Also, if this is the Digistorm provider:
+                // de-register all other registrations for this user
+                // (as the Digistorm provider is superseding the others)
+                $this->registryMapper->getDatabase()->transact(function () use ($token, $registry, $sessionUser, $deleteExistingToken) {
+                    if ($deleteExistingToken) {
+                        $this->registryMapper->deleteByColumn('app_token', $token);
+                    }
+                    if ($registry->getService()->getProviderName() === Registry::PROVIDER_DIGISTORM) {
+                        $this->registryMapper->deregisterForProvider($sessionUser, Registry::PROVIDER_GOOGLE);
+                        $this->registryMapper->deregisterForProvider($sessionUser, Registry::PROVIDER_APPLE);
+                    }
+                    $this->registryMapper->save($registry);
+                });
             }
 
             $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionUser));
