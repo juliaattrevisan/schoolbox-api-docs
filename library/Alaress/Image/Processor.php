@@ -293,15 +293,18 @@ class Processor
 
         // getimagesizefromstring() sometimes generates an E_WARNING in this case:
         // "corrupt JPEG data: 38 extraneous bytes before marker"
-        // We can probably ignore this, so long as we check the function returned a sane result
-        $errorLevel = error_reporting();
-        error_reporting($errorLevel & ~E_WARNING);
-        $imageSize = getimagesizefromstring($this->file->read());
-        error_reporting($errorLevel);
-        if ($imageSize === false) {
-            throw new CorruptImageException();
-        }
-        [$width, $height] = $imageSize;
+        // Since some browsers (eg Chrome) won't display the transformed image, hard fail
+        $oldErrorLevel = error_reporting();
+        error_reporting($oldErrorLevel | E_WARNING);
+        $oldErrorHandler = set_error_handler(
+            static function (int $error_number, string $error_msg) {
+                throw new CorruptImageException($error_msg);
+            },
+            E_WARNING
+        );
+        [$width, $height] = getimagesizefromstring($this->file->read());
+        set_error_handler($oldErrorHandler);
+        error_reporting($oldErrorLevel);
 
         // Check host's image magick limits (these are controlled by Puppet)
         $resourceLimitMap = $this->parseImageMagickResourceLimits();
