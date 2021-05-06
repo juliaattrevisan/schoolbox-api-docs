@@ -276,7 +276,7 @@ export default {
 .record-media-container {
     position: relative;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     height: 300px; //updated on mounted()
     margin-bottom: 1rem;
     overflow: hidden;

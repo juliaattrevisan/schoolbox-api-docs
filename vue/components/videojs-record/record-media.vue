@@ -190,6 +190,7 @@ export default {
          *
          */
         onStartRecord () {
+            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'rgba(255, 0, 0, 0.25)');
             this.$emit(recordMediaEvents.PROCCESS_STARTED);
         },
 
@@ -198,6 +199,7 @@ export default {
          *
          */
         onFinishRecord () {
+            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
             this.recordedVideoReady(this.player.recordedData);
         },
 
@@ -206,6 +208,7 @@ export default {
          *
          */
         onFinishConvert () {
+            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
             this.recordedVideoReady(this.player.convertedData);
         },
 
@@ -513,7 +516,7 @@ export default {
     }
     .vjs-control-bar { //fatten up the bottom control panel
         height: 5em;
-        padding: 0px 10px;
+        padding: 0px;
     }
     .vjs-control {
         width: 5em;
@@ -532,39 +535,51 @@ export default {
         transition: color 0.2s, transform 0.2s;
         &:hover {
             transform: scale(2.8);
-            color: rgb(250, 54, 93);
         }
     }
     .vjs-icon-photo-camera { //shrink a bit, bit big compared to the other icons
         transform: scale(2.3);
         color: #fff;
+        &:hover {
+            transform: scale(2.1);
+        }
     }
     .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
         text-shadow: none;
     }
-    .vjs-time-control {
+    .vjs-time-control { //make the time stand out a bit more
         width: auto;
         min-width: 0;
         padding: 0px 2px;
         font-size: 1.1rem;
+        transition: background-color 0.3s;
     }
-    .vjs-button > .vjs-icon-placeholder::before {
+    .vjs-current-time { //and pull of from the side
+        padding-left: 10px;
+    }
+    .vjs-duration {
+        padding-right: 10px;
+    }
+    .vjs-button > .vjs-icon-placeholder::before { //make all the buttons bigger
         color: white;
         font-size: 4em;
         line-height: 1.25;
     }
-    .vjs-control.vjs-record-indicator {
+    .vjs-play-control { //it'll never be shown, as once recored moves to another player
+        display: none;
+    }
+    .vjs-control.vjs-record-indicator { //move the record note further down
         top: 20px;
     }
     .vjs-control.vjs-record-indicator,
     .vjs-control.vjs-record-indicator:before,
-    .vjs-control.vjs-record-indicator:after {
+    .vjs-control.vjs-record-indicator:after { //and make the record note stand out more
         transform: scale(1.8);
     }
-    .vjs-control.vjs-record-indicator:before {
+    .vjs-control.vjs-record-indicator:before { //provide a bit more padding to the recording dot
         left: -1.8rem;
     }
-    @media screen and (max-width: 640px) {
+    @media screen and (max-width: 640px) { //shrink down a bit
         .vjs-time-control  {
             font-size: 0.9rem;
             line-height: 3.3rem;

@@ -133,8 +133,8 @@ const getRecordCameraOptions = () => {
         record: {
             audio: true,
             video: {
-                width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                height: { min: 180, ideal: 360, max: 720 }
+                width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
+                height: { min: 180, ideal: 405, max: 720 }
             },
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: 300, //five minutes
@@ -155,8 +155,8 @@ const getRecordCameraOptionsForSafari = () => {
         record: {
             audio: true,
             video: {
-                width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                height: { min: 180, ideal: 360, max: 720 }
+                width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
+                height: { min: 180, ideal: 405, max: 720 }
             },
             videoMimeType: 'video/mp4', //all supported excluding Safari use webm
             maxLength: 300, //five minutes
@@ -213,16 +213,16 @@ const getRecordScreenOptionsForSafari = () => {
 */ 
 const getRecordPhotoOptions = () => {
     const options = getDefaultVideojsRecordOptions();
-    options.width = 640,
-    options.height = 480,
+    options.width = 720,
+    options.height = 540,
     options.plugins = {
         record: {
             imageOutputType: 'dataURL',
             imageOutputFormat: 'image/jpeg',
             imageOutputQuality: 0.8,
             image: {
-                width: { min: 320, ideal: 640, max: 1280 }, // video media constraints: set resolution of camera
-                height: { min: 240, ideal: 480, max: 920 }
+                width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
+                height: { min: 240, ideal: 540, max: 920 }
             },
             debug: true,
         }
