@@ -108,6 +108,16 @@ class Kernel extends CliKernelAbstract
      */
     public function runApp(bool $forcePerform = false): void
     {
+        $requiredUser = $this->app->getRequiredProcessUser();
+        if ($requiredUser !== null) {
+            $actualUser = posix_getpwuid(posix_geteuid())['name'];
+            if ($requiredUser !== $actualUser) {
+                $this->logger()->error("Invalid process user. Required '$requiredUser', Actual: '$actualUser'");
+                $scriptAndArgs = implode(' ', array_merge([$this->app->getToolFilenameAbsolute()], $this->app->getToolArguments()));
+                $this->logger()->notice("Maybe try something like:\n\tsu -s /bin/bash -c 'php $scriptAndArgs' $requiredUser");
+                exit(self::EXIT_STATUS_KERNEL_ERROR);
+            }
+        }
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);
         $this->app->setup($this->appOpts, $this->getDependencyInjector(), $this->outStream, $this->logger(), $perform);
         $this->app->run();

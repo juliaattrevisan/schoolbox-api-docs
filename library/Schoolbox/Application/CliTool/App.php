@@ -155,6 +155,23 @@ abstract class App
 
 
     /**
+     * If this App must be run as a specific user, then this should return that user's name.
+     *
+     * Returns NULL if it does not matter.
+     *
+     * This is critical for scripts that write to local storage, and where we need to ensure:
+     * 1. We can actually write the files, and
+     * 2. The files and any parent directories have the correct ownership
+     *
+     * @return string|null
+     */
+    public function getRequiredProcessUser(): ?string
+    {
+        return null;
+    }
+
+
+    /**
      * Hands off execution over to the App
      */
     abstract public function run(): void;
@@ -303,6 +320,31 @@ abstract class App
             $scriptName = substr($scriptName, $lastIndex + 1);
         }
         return "./$scriptName";
+    }
+
+    /**
+     * Returns absolute path to executed script
+     *
+     * @return string
+     */
+    public function getToolFilenameAbsolute(): string
+    {
+        $workingDirectory = $_SERVER['PWD'];
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $scriptName = preg_replace("#^$workingDirectory/#", '', $scriptName);
+        return realpath("$workingDirectory/$scriptName");
+    }
+
+    /**
+     * Returns any CLI arguments passed to this script
+     *
+     * @return string[]
+     */
+    public function getToolArguments(): array
+    {
+        $args = $_SERVER['argv'];
+        array_shift($args);
+        return $args;
     }
 
 
