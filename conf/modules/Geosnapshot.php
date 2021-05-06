@@ -23,6 +23,7 @@ class Geosnapshot extends ModuleLoader
     public function configure($kernel): void
     {
         $this->loadModule($kernel, \Schoolbox\Geosnapshot\Component\Dashboard\Module::class, "/geosnapshot/component/dashboard");
+        $this->loadModule($kernel, \Schoolbox\Geosnapshot\Component\Homepage\Module::class, "/geosnapshot/component/homepage");
         $this->loadModule($kernel, \Schoolbox\Geosnapshot\Module::class, "/geosnapshot");
     }
 }
