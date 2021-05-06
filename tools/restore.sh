@@ -477,9 +477,16 @@ if [ "$syncType" == "" ] || [ "$syncType" == "local" ]; then
   # Provide feedback for confirmation of what is to be done based on above questions.
   echo -e "\n $restorepretty";
   echo -e "\n     Restore into '$package' at '$instdir'";
-  echo -e "\nIs this the correct option? (y/n): \c" && read confirm;
-  if [ "$confirm" != "y" ];
-  then
+  while true; do
+    echo -e "\nIs this the correct option? (y/n): \c" && read -r confirm;
+    if [[ $confirm =~ [ynYN] ]]; then
+      break;
+    else
+      echo "Invalid input. Please enter 'y' or 'n'"
+    fi
+  done
+
+  if [[ ! "$confirm" =~ [yY] ]]; then
   	errmsg="Restore Cancelled";
   	error;
   fi
