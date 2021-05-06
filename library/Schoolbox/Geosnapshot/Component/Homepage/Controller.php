@@ -8,6 +8,8 @@ namespace Schoolbox\Geosnapshot\Component\Homepage;
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Geosnapshot\Api;
 use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
+use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
+use Schoolbox\Permission\Access\UserAccess;
 
 
 /**
@@ -22,9 +24,9 @@ class Controller extends Component_Homepage_ControllerAbstract
 {
 
     /**
-     * @var string
+     * @var string|null
      */
-    private string $url;
+    private ?string $url;
 
 
     /**
@@ -37,10 +39,14 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute(): bool
     {
+        $this->url = null;
+
+        /* If the component has a search term, ask Geosnapshot for an answer
+         */
         if ((new ValidEventPhotosAvailable())->isSatisfiedBy(
             $this->getConfigLoader()->get('geosnapshot_api_key'),
             $this->getConfigLoader()->get('geosnapshot_enabled'),
-            'posh'
+            $this->getConfig('eventName')
         )) {
 
             /* Set up guzzle with the authentication pieces
@@ -65,6 +71,18 @@ class Controller extends Component_Homepage_ControllerAbstract
             return true;
         }
 
+        /* Maybe there isn't an event name specified yet; you should spawn an empty
+         * homepage component so someone can specify an event name
+         */
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && (new ValidGeosnapshotAvailable())->isConfigured(
+            $this->getConfigLoader()->get('geosnapshot_api_key'),
+            $this->getConfigLoader()->get('geosnapshot_enabled')
+        )) {
+            return true;
+        }
+
+        /* Component not ready for usage; hide it
+         */
         return false;
     }
 
