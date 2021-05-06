@@ -40,7 +40,7 @@ export default {
             isUploading: false, //to notify of update
             hasUploadError: false, //to notify of upload error, try again?
             hasUploaded: false, //notify UI of upload complete
-            currentRatio: 0.5625, //default to 16:9 ratio, but could change when the device is actually available
+            currentRatio: 0.5625, //default to 16:9 ratio, but could change when the device is actually available or moving between the recorded media and new media
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
         }
     },
@@ -90,23 +90,24 @@ export default {
         /**
          * currently to update the container ratio to match the dimensions of the recording device
          *
+         * @params { MediaStreamTrack }
          */
-        onDeviceReady (videojs) {
+        onDeviceReady (mediaStreamTrack) {
             if (this.recordMediaType !== recordMediaTypes.AUDIO_ONLY) { //audio doesn't need to change from 16:9
-                this.updateCurrentRatio(videojs);
-                this.updateContainerHeight();
+                const currentDeviceSettings = mediaStreamTrack.getSettings(); 
+                this.updateCurrentRatio(currentDeviceSettings.width, currentDeviceSettings.height);
             }
         },
 
         /**
-         * devices have different aspect ratio of 16:9, 4:3 etc
+         * devices have different aspect ratio of 16:9, 9:16, 4:3, 3:4 etc, so ensure the container is kept the same
          *
+         * @params { Number } width
+         * @params { Number } height
          */
-        updateCurrentRatio (videojs) {
-            const currentDeviceSettings = videojs.record().stream.getVideoTracks()[0].getSettings(); //dive dive dive!
-            const deviceWidth = currentDeviceSettings.width;
-            const deviceHeight = currentDeviceSettings.height;
-            this.currentRatio = deviceHeight / deviceWidth;
+        updateCurrentRatio (width, height) {
+            this.currentRatio = height / width;
+            this.updateContainerHeight();
         },
 
         /**
@@ -227,6 +228,15 @@ export default {
             document.getElementById('file').value = '';
         },
 
+        /**
+         * Ensure the recorded video ratio is respected
+         *
+         * @params { HTMLVideoElement }
+         */
+        onRatioReady (htmlVideoElement) {
+            this.updateCurrentRatio(htmlVideoElement.videoWidth, htmlVideoElement.videoHeight);
+        },
+
     }
 
 }
@@ -244,6 +254,7 @@ export default {
                 @on-device-ready="onDeviceReady"
                 @on-recorded-media-ready="onRecordedMediaReady"
                 @on-recorded-media-deleted="onRecordedMediaDeleted"
+                @on-ratio-ready="onRatioReady"
             />
 
             <over-media-modal v-if="isUploading" key="isUploadingModal">
@@ -265,11 +276,11 @@ export default {
 .record-media-container {
     position: relative;
     width: 100%;
-    max-width: 700px;
+    max-width: 600px;
     height: 300px; //updated on mounted()
     margin-bottom: 1rem;
     overflow: hidden;
-    background: red;
+    background: black;
     h2, h3 {
         max-width: none;
     }

@@ -60,7 +60,7 @@ export default {
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
-            isPlayerActive: false, //need a different videojs player for playback to enable the progress controls
+            hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
         }
     },
@@ -73,7 +73,7 @@ export default {
          * @returns { Boolean }
          */
         showDeleteRecordingButton () {
-            if (this.isPlayerActive) {
+            if (this.hasPreRecordedData || this.hasNewRecording) {
                 return true;
             } else {
                 return false;
@@ -83,20 +83,19 @@ export default {
     },
 
 	created () {
-		this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+        this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+        this.checkForPreRecordedData();
 	},
 
     mounted () {
-        if (!this.isKeepAlive) {
-            this.hideForAnimateOn();
-            this.initVideojs();
+        if (!this.isKeepAlive && !this.hasPreRecordedData) { //only if no pre recording available
+            this.initVideojsRecord();
         }
     },
 
     activated () {
-        if (this.isKeepAlive) {
-            this.hideForAnimateOn();
-            this.initVideojs();
+        if (this.isKeepAlive && !this.hasPreRecordedData) { //only if no pre recording available
+            this.initVideojsRecord();
         }
     },
 
@@ -107,48 +106,19 @@ export default {
     methods: {
 
         /**
-         * to animate on when videojs ready
+         * Do we need to request the media device straight away? 
+         * If not wait until it's requested - by deleting the pre recorded media recording
+         * Otherwise we will just be displaying the existing pre recorded media
          *
          */
-        hideForAnimateOn () {
-            gsap.set(this.$refs.recordingMediaContainer, { alpha: 0 } );
-        },
-
-        /**
-         * Start it up
-         *
-         */
-        initVideojs () {
-            this.player = videojs(this.$refs.recordingVideo, getRecordOptions(this.recordMediaType), this.onVideojsReady);
-        },
-
-        /**
-         * videojs is ready, so set up listeners and animate on
-         *
-         */
-        onVideojsReady () {
-            this.animateOn();
-            this.initVideojsRecordListeners();
-            this.determinePlaybackStatus();
-        },
-
-        /**
-         * an existing recording could have been passed through, so check whether to display it 
-         *
-         */
-        determinePlaybackStatus () {
-            setTimeout(() => { //dodgy, trying to wait until 'VIDEOJS: wavesurfer.js microphone plugin enabled.' but can't see any event to track this...
-                if (this.preRecordedData) {
-                    this.hasPreRecordedData = true; //to display pre recorded video
-                    this.playbackData = {
-                        src: this.getPlaybackDataSrc(),
-                        type: this.preRecordedData.mime
-                    } 
-                    this.isPlayerActive = true;
-                } else {
-                    this.player.record().getDevice();
-                }
-            }, 200);
+        checkForPreRecordedData () {
+            if (this.preRecordedData) {
+                this.hasPreRecordedData = true;
+                this.playbackData = {
+                    src: this.getPlaybackDataSrc(),
+                    type: this.preRecordedData.mime
+                } 
+            }
         },
 
         /**
@@ -165,18 +135,29 @@ export default {
         },
 
         /**
-         * show the video
+         * Start up the videojs-record instance, which is just videojs with record functionality wrapped around it
          *
          */
-        animateOn () {
-            gsap.to(this.$refs.recordingMediaContainer, 0.5, { alpha: 1 } );
+        initVideojsRecord () {
+            // gsap.set(this.$refs.recordingMediaContainer, { alpha: 0 } ); //to fade on
+            this.player = videojs(this.$refs.recordingVideo, getRecordOptions(this.recordMediaType), this.onVideojsReady);
+        },
+
+        /**
+         * videojs is ready, so set up listeners and animate on
+         *
+         */
+        onVideojsReady () {
+            this.initVideojsRecordRecordListeners();
+            this.player.record().getDevice(); //request the device to avoid needing to click the activate button
+            // gsap.to(this.$refs.recordingMediaContainer, 0.5, { alpha: 1 } ); //fade on
         },
 
         /**
          * track the events videojs-record offers to manage display
          *
          */
-        initVideojsRecordListeners () {
+        initVideojsRecordRecordListeners () {
 
             this.player.on('deviceReady', this.onDeviceReady);
             this.player.on('startRecord', this.onStartRecord);
@@ -199,7 +180,7 @@ export default {
          */
         onDeviceReady () {
             this.isDeviceReady = true;
-            this.$emit(recordMediaEvents.DEVICE_READY, this.player);
+            this.$emit(recordMediaEvents.DEVICE_READY, this.player.record().stream.getVideoTracks()[0]);
         },
 
         /**
@@ -233,7 +214,7 @@ export default {
         recordedVideoReady (mediaData) {
             this.$emit(recordMediaEvents.PROCCESS_STOPPED);
             this.recordedData = mediaData; // the blob object contains the recorded data 
-			this.isPlayerActive = true; //show the <player></player>
+			this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
         },
 
@@ -304,8 +285,13 @@ export default {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
             this.isDeleteRecordingModalActive = false;
             this.hasPreRecordedData = false;  //set to false again for possible display or a re-recording
-            this.isPlayerActive = false;
-            this.player.record().getDevice(); //relaunch the recorder 
+            this.hasNewRecording = false;
+            if (this.player) { //relaunch the recorder if it's already set up
+                this.player.record().getDevice(); 
+                console.warn('relaunch');
+            } else { //otherwise lets fire it up
+                this.initVideojsRecord();
+            }
         },
 
         /**
@@ -364,6 +350,15 @@ export default {
             }
         },
 
+        /**
+         * Just pass through to the parent so they can ensure the container's height is kept up to date
+         *
+         * @params { HTMLVideoElement }
+         */
+        onRecordPlayerLoaded (htmlVideoElement) {
+            this.$emit(recordMediaEvents.RATIO_READY, htmlVideoElement);
+        }
+
     }
 
 }
@@ -374,26 +369,27 @@ export default {
     <div class="container">
         
         <div ref="recordingMediaContainer">
-            <div class="media-container media-container-record">
-                <video ref="recordingVideo" playsinline class="video-js"></video>
+            <div class="media-container media-container-record" key="recordMediaContainer">
+                <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
             </div>
-            <div v-if="isPlayerActive" class="media-container media-container-playback" key="playbackMediaContainer">
+            <div v-if="hasPreRecordedData || hasNewRecording" class="media-container media-container-playback" key="playbackMediaContainer">
                 <audio-only-player
                     v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
-					:options="getAudioPlayerOptions()"
+                    :options="getAudioPlayerOptions()"
                 />
-				<photo-player
+                <photo-player
                     v-else-if="recordMediaType === recordMediaTypes.PHOTO"
-					:img-src="getImgSrc()"
+                    :img-src="getImgSrc()"
                     :is-new-photo="hasPreRecordedData ? false : true"
                 />
-				<video-player
+                <video-player
                     v-else
-					:options="getVideoPlayerOptions()"
+                    :options="getVideoPlayerOptions()"
+                    @on-video-data-loaded="onRecordPlayerLoaded"
                 />
             </div>
             <transition name="fade">
-                <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button delete-button" title="Delete &amp; Re-record" href="#delete-and-re-record" key="delete">Delete &amp; Re-record</a>
+                <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button delete-button" title="Delete" href="#delete" key="delete">Delete</a>
             </transition>
         </div><!-- recordingMediaContainer -->
 
@@ -409,7 +405,7 @@ export default {
         </over-media-modal>
 
         <over-media-modal v-else-if="isDeleteRecordingModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
-            <div class="alert-box alert">Are you sure you wish to delete the current recording?</div>
+            <p>Are you sure you wish to delete the current recording?</p>
             <div class="modal-actions">
                 <button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
                 <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
@@ -452,10 +448,8 @@ export default {
 .delete-button {
     position: absolute;
     z-index: 3;
-    left: 50%;
-    top: 0;
-    margin-bottom: 0;
-    margin-left: -78px;
+    right: 10px;
+    top: 10px;
 }
 
 .modal-actions {
@@ -465,16 +459,64 @@ export default {
     }
 }
 
-.vjs-icon-record-start, .vjs-icon-record-stop {
-    min-height: 0;
-}
-
 .fade-enter-active, .fade-leave-active {
     transition: opacity 0.2s;
 }
 
 .fade-enter, .fade-leave-to /** .fade-leave-active below version 2.1.8 */ {
-      opacity: 0;
+    opacity: 0;
+}
+
+.vjs-record-skin::v-deep {
+    .vjs-control-bar { //fatten up the bottom control panel
+        height: 5em;
+        padding: 0px 10px;
+    }
+    .vjs-control {
+        width: 5em;
+    }
+    .vjs-icon-record-start,
+    .vjs-icon-record-stop,
+    .vjs-icon-photo-camera { //make the start/stop record buttons big and fat and put in the middle
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        margin-left: -20px;
+        bottom: 0px; 
+        transform-origin: center;
+        transform: scale(3.1);
+        color: #f03;
+        transition: color 0.2s;
+        &:hover {
+            color: rgb(250, 54, 93);
+        }
+    }
+    .vjs-icon-photo-camera {
+        transform: scale(2.3);
+        color: #fff;
+    }
+    .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
+        text-shadow: none;
+    }
+    .vjs-time-control  {
+        width: auto;
+        min-width: 0;
+        padding: 0px 2px;
+        font-size: 1.1rem;
+    }
+    .vjs-button > .vjs-icon-placeholder::before {
+        color: white;
+        font-size: 4em;
+        line-height: 1.25;
+    }
+    .vjs-control.vjs-record-indicator,
+    .vjs-control.vjs-record-indicator:before,
+    .vjs-control.vjs-record-indicator:after {
+        transform: scale(1.5);
+    }
+    .vjs-control.vjs-record-indicator:before {
+        left: -1.9rem;
+    }
 }
 
 </style>
