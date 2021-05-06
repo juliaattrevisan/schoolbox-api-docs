@@ -6,6 +6,7 @@
  */
 
 import RecordMedia from '@schoolbox/videojs-record/record-media';
+import DropzoneInputCaptureOnly from '@schoolbox/dropzone/dropzone-input-capture-only';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
@@ -16,7 +17,8 @@ export default {
 
     components: {
         RecordMedia, //the media element
-        OverMediaModal, //to slot in upload modal
+        DropzoneInputCaptureOnly, //for mobile devices to use instead of record-media
+        OverMediaModal
     },
 
     props: {
@@ -248,13 +250,16 @@ export default {
             
         <div class="record-media-container" ref="container" :style="{ height: targetHeight }">
 
-            <record-media
+            <!-- <record-media
                 :record-media-type="recordMediaType"
                 :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
                 @on-device-ready="onDeviceReady"
                 @on-recorded-media-ready="onRecordedMediaReady"
                 @on-recorded-media-deleted="onRecordedMediaDeleted"
                 @on-ratio-ready="onRatioReady"
+            /> -->
+
+            <dropzone-input-capture-only 
             />
 
             <over-media-modal v-if="isUploading" key="isUploadingModal">
@@ -277,10 +282,10 @@ export default {
     position: relative;
     width: 100%;
     max-width: 700px;
-    height: 300px; //updated on mounted()
+    height: 200px; //updated on mounted()
     margin-bottom: 1rem;
     overflow: hidden;
-    background: black;
+    background: white;
     transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
     h2, h3 {
         max-width: none;
