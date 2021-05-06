@@ -12,16 +12,16 @@ use Component_Dashboard_ControllerAbstract;
 /**
  * Class Controller
  *
- * Display an iframe of a Geosnapshot gallery
+ * Display an iframe of Geosnapshot galleries that matched a search string
+ * specified in the component's configuration
  *
  * @package Schoolbox\Geosnapshot\Component\Dashboard
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
 
-
     /**
-     * Only render this component if the geosnapshot school code has been setup
+     * Only render this component if Geosnapshot has been set up
      *
      * @return bool
      */
@@ -40,6 +40,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        return $this->renderTwigTemplate($templateHandle, '@geosnapshot/component.twig', [], false, false, true);
+        return $this->renderTwigTemplate($templateHandle, '@geosnapshotDashboard/component.twig', [], false, false, true);
     }
 }
