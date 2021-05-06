@@ -141,9 +141,19 @@ class Controller extends Base
                             $registry->setDeviceId($deviceId);
                         }
 
-                        // De-register existing logins for other users when saving
-                        $this->registryMapper->getDatabase()->transact(function () use ($token, $registry) {
+                        // De-register existing logins for other users for the
+                        // same token when saving.
+                        // Also, if this is the Digistorm provider:
+                        // de-register all other registrations for this user
+                        // (as the Digistorm provider is superseding the others)
+                        $this->registryMapper->getDatabase()->transact(function () use ($token, $registry, $sessionUser) {
                             $this->registryMapper->deleteByColumn('app_token', $token);
+                            if ($registry->getService()->getProviderName() === Registry::PROVIDER_DIGISTORM) {
+                                $pb = $this->registryMapper->getPredicateBuilder()
+                                    ->notEquals('service.provider', Registry::PROVIDER_DIGISTORM)
+                                    ->equals('user_id', $sessionUser->getId());
+                                $this->registryMapper->deleteByPredicates($pb);
+                            }
                             $this->registryMapper->save($registry);
                         });
                     } catch (MapperException $e) {
