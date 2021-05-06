@@ -281,6 +281,7 @@ export default {
     margin-bottom: 1rem;
     overflow: hidden;
     background: black;
+    transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
     h2, h3 {
         max-width: none;
     }

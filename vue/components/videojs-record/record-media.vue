@@ -58,8 +58,10 @@ export default {
             isDeviceReady: false, //to toggle the device display
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
+            hasError: false, //to manage UI elements
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
+            hasRecordPlayerError: false, //error with the record player
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
         }
@@ -73,7 +75,7 @@ export default {
          * @returns { Boolean }
          */
         showDeleteRecordingButton () {
-            if (this.hasPreRecordedData || this.hasNewRecording) {
+            if ((this.hasPreRecordedData || this.hasNewRecording) && !this.hasError) {
                 return true;
             } else {
                 return false;
@@ -149,8 +151,10 @@ export default {
          */
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
-            this.player.record().getDevice(); //request the device to avoid needing to click the activate button
-            // gsap.to(this.$refs.recordingMediaContainer, 0.5, { alpha: 1 } ); //fade on
+            setTimeout(() => { //dodgy, trying to wait until 'VIDEOJS: wavesurfer.js microphone plugin enabled.' but can't see any event to track this...
+                // this.player.record().getDevice(); //request the device to avoid needing to click the activate button
+                // gsap.to(this.$refs.recordingMediaContainer, 0.5, { alpha: 1 } ); //fade on
+            }, 200);    
         },
 
         /**
@@ -223,6 +227,7 @@ export default {
          *
          */
         onError (element, error) {
+            this.hasError = true;
             console.warn(error);
         },
 
@@ -231,6 +236,7 @@ export default {
          *
          */
         onDeviceError () {
+            this.hasError = true;
             const errorCode = String(this.player.deviceErrorCode);
             console.warn('errorCode = ' + errorCode);
             if (errorCode === 'NotReadableError: Could not start video source' || 'AbortError: Starting video failed') {
@@ -264,9 +270,11 @@ export default {
          *
          */
         onErrorModalClosed () {
+            this.hasError = false;
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
+            this.hasRecordPlayerError = false;
         },
 
         /**
@@ -357,6 +365,15 @@ export default {
          */
         onRecordPlayerLoaded (htmlVideoElement) {
             this.$emit(recordMediaEvents.RATIO_READY, htmlVideoElement);
+        },
+
+        /**
+         * A record player has got an error
+         *
+         */
+        onRecordPlayerError () {
+            this.hasRecordPlayerError = true;
+            this.hasError = true;
         }
 
     }
@@ -386,6 +403,7 @@ export default {
                     v-else
                     :options="getVideoPlayerOptions()"
                     @on-video-data-loaded="onRecordPlayerLoaded"
+                    @on-video-error="onRecordPlayerError"
                 />
             </div>
             <transition name="fade">
@@ -393,7 +411,7 @@ export default {
             </transition>
         </div><!-- recordingMediaContainer -->
 
-        <over-media-modal v-if="hasDeviceAlreadyInUseError || hasPermissionDeniedError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
+        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
             <template v-if="hasDeviceAlreadyInUseError">
                     <div class="alert-box warning">The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>
@@ -401,6 +419,9 @@ export default {
             <template v-else-if="hasPermissionDeniedError">
                 <div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>
+            </template>
+            <template v-else-if="hasRecordPlayerError">
+                <div class="alert-box alert">Sorry, the recorded media cannot be accessed.</div>
             </template>
         </over-media-modal>
 
@@ -468,6 +489,10 @@ export default {
 }
 
 .vjs-record-skin::v-deep {
+    .vjs-device-button.vjs-control { //not in the centre of the frame, something from SB css is probably getting in the way
+        top: 42%;
+        margin-left: -2.6em;
+    }
     .vjs-control-bar { //fatten up the bottom control panel
         height: 5em;
         padding: 0px 10px;
@@ -517,6 +542,13 @@ export default {
     .vjs-control.vjs-record-indicator:before {
         left: -1.9rem;
     }
+    @media screen and (max-width: 640px) {
+        .vjs-time-control  {
+            font-size: 0.9rem;
+            line-height: 3.3rem;
+        }
+    }
 }
+
 
 </style>

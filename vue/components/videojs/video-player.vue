@@ -38,6 +38,7 @@ export default {
         initVideojs () {
             this.player = videojs(this.$refs.videoPlayer, this.options);
             this.player.on('loadeddata', this.onVideoDataLoaded);
+            this.player.on('error', this.onVideoError);
         },
 
         /** 
@@ -46,6 +47,14 @@ export default {
          */
         onVideoDataLoaded () {
             this.$emit('on-video-data-loaded', this.$refs.videoPlayer);
+        },
+
+        /** 
+         * unable to load for whatever reason
+         *
+         */
+        onVideoError () {
+            this.$emit('on-video-error');
         },
 
         /** 
