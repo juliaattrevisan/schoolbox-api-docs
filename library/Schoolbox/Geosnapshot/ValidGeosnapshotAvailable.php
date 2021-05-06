@@ -30,6 +30,6 @@ class ValidGeosnapshotAvailable
          * Feature Flag is off; exit early
          * No connectivity allowed
          */
-        return ('' !== (string)$apiKey && $featureFlag);
+        return ('' !== trim((string)$apiKey) && $featureFlag);
     }
 }
