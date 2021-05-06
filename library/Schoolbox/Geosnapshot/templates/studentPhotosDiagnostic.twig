@@ -1,0 +1,22 @@
+{##
+ # Student Photos Diagnostic
+ #
+ # Lets you see inside the json payload we send and the contents of the base64 image
+ # with which we intended to filter results
+ #
+ # @param array|null $payload
+ #}
+{% if payload %}
+<div class="row">
+    <div class="small-4 columns">
+        <h2 class="subheader">Portrait</h2>
+        <img src="data:image/jpeg;base64, {{ payload.face_image }}" />
+    </div>
+    <div class="small-8 columns">
+        <h2 class="subheader">Payload</h2>
+        <div style="overflow-wrap: anywhere;overflow-x:hidden;overflow-y:scroll;max-height:200px">
+            <span style="font-family: 'Courier New', sans-serif;">{{ payload|json_encode }}</span>
+        </div>
+    </div>
+</div>
+{% endif %}
