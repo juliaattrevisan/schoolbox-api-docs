@@ -79,9 +79,11 @@ class Module extends BaseModule
         });
 
 
-        // Anyone who may submit an article may reject it?
-        // This allows the author of an article to unpublish it.
-        $canReject = $canSubmit;
+        // Reject rule: same as approve rule
+        // This allows any user who may submit an article to reject
+        // (a.k.a. unpublish) it, but grants the article author no special
+        // permission to reject news which they have created.
+        $canReject = $canApprove;
 
         $preloadArticle = function ($params) {
             return $this->preloadArticleWithAudience($params);
