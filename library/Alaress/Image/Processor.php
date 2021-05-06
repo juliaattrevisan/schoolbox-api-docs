@@ -9,11 +9,13 @@
 namespace Alaress\Image;
 
 use Alaress\Image\Exception\ConcurrentTransformationException;
+use Alaress\Image\Exception\CorruptImageException;
 use Alaress\Image\Exception\LayeredNonGifException;
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
 use DomainException;
 use Imagick;
+use ImagickException;
 use Imagine\Exception as ImagineException;
 use Alaress\Image\Transform\RotateOrientation;
 use Imagine\Image\ImageInterface;
@@ -205,7 +207,8 @@ class Processor
             ImagineException\OutOfBoundsException |
             ImagineException\RuntimeException |
             OverflowException |
-            LayeredNonGifException $e
+            LayeredNonGifException |
+            CorruptImageException $e
         ) {
             $transformModel->setState(Storage\Transform\Model::STATE_FAILED);
             $transformMapper->save($transformModel);
@@ -269,6 +272,8 @@ class Processor
      * @throws OverflowException If file contents are too big
      * @throws ImagineException\RuntimeException If cannot read file into an image
      * @throws FileNotFoundException If original storage file not found on disk
+     * @throws CorruptImageException If unable to parse width/height dimensions from image contents
+     * @throws ImagickException If we can't set the Imagick processing timeout
      */
     private function loadImageFromFile(int $maxAttempts): ImageInterface
     {
@@ -285,7 +290,18 @@ class Processor
         // It is important to check this here prior to attempting to read the file with ImageMagick because
         // that can segfault and not throw an exception, leading to difficult to debug errors.
         // We need to read the file into memory as it may not be local.
-        [$width, $height] = getimagesizefromstring($this->file->read());
+
+        // getimagesizefromstring() sometimes generates an E_WARNING in this case:
+        // "corrupt JPEG data: 38 extraneous bytes before marker"
+        // We can probably ignore this, so long as we check the function returned a sane result
+        $errorLevel = error_reporting();
+        error_reporting($errorLevel & !E_WARNING);
+        $imageSize = getimagesizefromstring($this->file->read());
+        error_reporting($errorLevel);
+        if ($imageSize === false) {
+            throw new CorruptImageException();
+        }
+        [$width, $height] = $imageSize;
 
         // Check host's image magick limits (these are controlled by Puppet)
         $resourceLimitMap = $this->parseImageMagickResourceLimits();
