@@ -318,7 +318,7 @@ class UserAccessMapper extends Mapper
      */
     public function findUsersInCategory(
         FolderModel $folder,
-        string $roleType = null,
+        ?string $roleType = null,
         int $accessType = UserAccess::ACCESS_READ,
         bool $includeSynergy = true,
         bool $exactAccess = false

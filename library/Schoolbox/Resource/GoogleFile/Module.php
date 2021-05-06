@@ -19,9 +19,11 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -70,6 +72,8 @@ class Module extends BaseModule
                 Controller::class,
                 [
                     'googleFileMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
+                    'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
                 ]
             )
         );

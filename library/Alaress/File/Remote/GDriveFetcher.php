@@ -37,12 +37,6 @@ class GDriveFetcher implements FetcherInterface
     private const CONTEXT_EXPORTLINKS = 'exportLinks';
 
     /**
-     * Metadata fields that might contain a download url
-     * Google API sometimes changes causing fields to no longer exist
-     */
-//    private const FIELDS_EXPORTLINKS = ['downloadUrl'];
-
-    /**
      * Mimetypes and their corresponding exportLinks, ext values
      * https://developers.google.com/drive/api/v3/ref-export-formats?hl=en
      * @var array
@@ -97,6 +91,10 @@ class GDriveFetcher implements FetcherInterface
      */
     private $extensionMapper;
 
+    /**
+     * http header
+     */
+    private array $httpHeader;
 
     /**
      * Constructor
@@ -117,14 +115,8 @@ class GDriveFetcher implements FetcherInterface
         $this->extensionMapper = $extensionMapper;
         $this->dir             = $storageDir;
         $this->ch              = $curl ?: curl_init();
-
-        if ($httpAuth) {
-            curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
-                'Authorization: ' . $httpAuth,
-            ]);
-        }
-
-        $this->allowPdfExport = $allowPdfExport;
+        $this->httpHeader[]    = 'Authorization: ' . $httpAuth;
+        $this->allowPdfExport  = $allowPdfExport;
     }
 
     /**
@@ -162,10 +154,12 @@ class GDriveFetcher implements FetcherInterface
                 'supportsAllDrives' => 'true',
             ];
 
-            $ch = $this->curlPrepare([
-                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}?" . http_build_query($params),
-                CURLOPT_RETURNTRANSFER => 1,
-            ]);
+            $ch = $this->curlPrepare(
+                [
+                    CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}?" . http_build_query($params),
+                    CURLOPT_RETURNTRANSFER => 1,
+                ]
+            );
 
             $fetchedMetaData = json_decode(curl_exec($ch), true);
             curl_close($ch);
@@ -181,23 +175,76 @@ class GDriveFetcher implements FetcherInterface
         $metadata = $this->metaCache[$fileId];
 
         if (isset($metadata['error'])) {
-            $errors = [];
-
-            /** @var array $errorIndex */
-            $errorIndex = $metadata['error']['errors'];
-
-            foreach ($errorIndex as $currentError) {
-                $errors[] = $currentError['message'];
-            }
-
-            $errorMessage = implode('; ', $errors);
-
-            throw new DomainException($errorMessage);
+            throw new DomainException($this->getErrorMessage($metadata));
         }
 
         return $metadata;
     }
 
+    /**
+     * Fetches Permission
+     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
+     * @param string $fileId
+     * @return mixed
+     */
+    public function fetchPermissions(string $fileId)
+    {
+        $params = [
+            'fields'            => '*',
+            'supportsAllDrives' => 'true',
+        ];
+
+        $ch = $this->curlPrepare(
+            [
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params),
+                CURLOPT_RETURNTRANSFER => 1,
+            ]
+        );
+
+        $fetchedPermission = json_decode(curl_exec($ch), true);
+        curl_close($ch);
+        return $fetchedPermission;
+    }
+
+    /**
+     * Sets permission to a google file
+     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
+     * @param string $fileId
+     * @param string $accessRole
+     * @param string $email
+     * @return bool|string
+     */
+    public function setPermissions(string $fileId, string $accessRole, string $email)
+    {
+        $params   = [
+            'fileId'                => $fileId,
+            'fields'                => '*',
+            'supportsAllDrives'     => 'true',
+            'sendNotificationEmail' => 'true', // this is necessary for non google accounts
+        ];
+        $postdata = [
+            'role'         => $accessRole,
+            'type'         => 'user',
+            'emailAddress' => $email,
+        ];
+
+        $ch = $this->curlPrepare(
+            [
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params),
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => json_encode($postdata),
+            ]
+        );
+
+        $result = json_decode(curl_exec($ch), true);
+        if ($this->getErrorMessage($result)) {
+            // TODO: handle errors
+        }
+        curl_close($ch);
+        return $result;
+    }
 
     /**
      * Restore icon to attachzone for this file
@@ -292,11 +339,9 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata): string
     {
-
         /* If this is one of the google docs filetypes we know about
          */
         if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
-
             /* If there is a PDF-export option for this file (and the config is set to do pdf export),
              * always give that preference
              *
@@ -320,7 +365,6 @@ class GDriveFetcher implements FetcherInterface
          * "originalFilename" and "fileExtension"
          */
         if ('' !== (string)$metadata['fileExtension']) {
-
             /* "originalFilename" might already contain the extension if you uploaded a file
              * If the last characters of "originalFilename" are the same as "fileExtension"
              * then just return "originalFilename" with no alterations required
@@ -353,9 +397,35 @@ class GDriveFetcher implements FetcherInterface
      */
     private function curlPrepare(array $opts)
     {
-        $ch = curl_copy_handle($this->ch);
+        $httpHeader = $this->httpHeader;
+        if (isset($opts[CURLOPT_HTTPHEADER])) {
+            $httpHeader = array_merge($httpHeader, $opts[CURLOPT_HTTPHEADER]);
+        }
+        $opts[CURLOPT_HTTPHEADER] = $httpHeader;
+        $ch                       = curl_copy_handle($this->ch);
         curl_setopt_array($ch, $opts);
 
         return $ch;
+    }
+
+    /**
+     * @param array $result
+     * @return string|null
+     */
+    private function getErrorMessage(array $result): ?string
+    {
+        if (!isset($result['error'])) {
+            return null;
+        }
+        $errors = [];
+
+        /** @var array $errorIndex */
+        $errorIndex = $result['error']['errors'];
+
+        foreach ($errorIndex as $currentError) {
+            $errors[] = $currentError['message'];
+        }
+
+        return implode('; ', $errors);
     }
 }
