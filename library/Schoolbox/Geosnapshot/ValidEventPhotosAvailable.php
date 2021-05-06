@@ -7,6 +7,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot;
 
+
 /**
  * Class ValidEventPhotosAvailable
  *
@@ -15,7 +16,7 @@ namespace Schoolbox\Geosnapshot;
  *
  * @package Schoolbox\Geosnapshot
  */
-class ValidEventPhotosAvailable
+class ValidEventPhotosAvailable extends ValidGeosnapshotAvailable
 {
 
     /**
@@ -26,17 +27,14 @@ class ValidEventPhotosAvailable
      */
     public function isSatisfiedBy(?string $apiKey, bool $featureFlag, ?string $eventName): bool
     {
+
         /* Invalid API key; exit early
          * No connectivity allowed
-         */
-        if ('' === (string)$apiKey) {
-            return false;
-        }
-
-        /* Feature Flag is off; exit early
+         *
+         * Feature Flag is off; exit early
          * No connectivity allowed
          */
-        if (!$featureFlag) {
+        if (!$this->isConfigured($apiKey, $featureFlag)) {
             return false;
         }
 
