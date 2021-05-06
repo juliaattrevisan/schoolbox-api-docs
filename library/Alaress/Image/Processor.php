@@ -235,12 +235,14 @@ class Processor
      * @param FilesystemInterface $fileSystem
      * @param string              $transformPath
      * @return int
+     * @throws CorruptImageException
      * @throws FileExistsException
+     * @throws FileNotFoundException If original storage file not found on disk
+     * @throws ImagickException
      * @throws ImagineException\OutOfBoundsException
      * @throws ImagineException\RuntimeException
-     * @throws OverflowException
-     * @throws FileNotFoundException If original storage file not found on disk
      * @throws LayeredNonGifException
+     * @throws OverflowException
      */
     private function generateTransformation(int $maxAttempts, string $fileFormat, FilesystemInterface $fileSystem, string $transformPath): int
     {
@@ -302,9 +304,13 @@ class Processor
             },
             E_WARNING
         );
-        [$width, $height] = getimagesizefromstring($this->file->read());
+        $imageSize = getimagesizefromstring($this->file->read());
         set_error_handler($oldErrorHandler);
         error_reporting($oldErrorLevel);
+        if ($imageSize === false) {
+            throw new CorruptImageException("Unable to derive image size");
+        }
+        [$width, $height] = $imageSize;
 
         // Check host's image magick limits (these are controlled by Puppet)
         $resourceLimitMap = $this->parseImageMagickResourceLimits();
