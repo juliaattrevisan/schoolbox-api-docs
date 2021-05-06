@@ -473,11 +473,12 @@ export default {
     height: 44px;
     background: none;
     color: white;
+    border: 2px solid white;
     background: rgba(43, 51, 63, 0.7);
     transition: 0.2s opacity;
     &::before {
         text-align: center;
-        font-size: 1.6rem;
+        font-size: 1.4rem;
     }
     &:hover {
         opacity: 0.8;
@@ -491,9 +492,11 @@ export default {
     }
 }
 
-.slide-enter-active,
+.slide-enter-active {
+    transition: right 0.4s ease-out;
+}
 .slide-leave-active {
-  transition: right 0.3s ease-out;
+  transition: right 0.2s ease-in;
 }
 .slide-enter-active, 
 .slide-leave-to {
@@ -526,8 +529,9 @@ export default {
         transform-origin: center;
         transform: scale(3.1);
         color: #f03;
-        transition: color 0.2s;
+        transition: color 0.2s, transform 0.2s;
         &:hover {
+            transform: scale(2.8);
             color: rgb(250, 54, 93);
         }
     }
@@ -548,6 +552,9 @@ export default {
         color: white;
         font-size: 4em;
         line-height: 1.25;
+    }
+    .vjs-control.vjs-record-indicator {
+        top: 20px;
     }
     .vjs-control.vjs-record-indicator,
     .vjs-control.vjs-record-indicator:before,
