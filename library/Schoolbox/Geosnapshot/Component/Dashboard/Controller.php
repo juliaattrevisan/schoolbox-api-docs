@@ -1,13 +1,13 @@
 <?php
-
 /**
  * @copyright   Copyright 2021, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Geosnapshot\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
+use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
+
 
 /**
  * Class Controller
@@ -21,13 +21,35 @@ class Controller extends Component_Dashboard_ControllerAbstract
 {
 
     /**
+     * @var string
+     */
+    private string $url;
+
+
+    /**
      * Only render this component if Geosnapshot has been set up
      *
      * @return bool
      */
     public function execute(): bool
     {
-        return true;
+        if ((new ValidEventPhotosAvailable())->isSatisfiedBy(
+            $this->getConfigLoader()->get('geosnapshot_api_key'),
+            $this->getConfigLoader()->get('geosnapshot_enabled'),
+            $this->getConfig('eventName')
+        )) {
+
+            /* Request event galleries from Geosnapshot
+             */
+
+            /* Get the iframe and shank it into our component, if successful
+             */
+            $this->url = '';
+
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -40,6 +62,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        return $this->renderTwigTemplate($templateHandle, '@geosnapshotDashboard/component.twig', [], false, false, true);
+        return $this->renderTwigTemplate($templateHandle, '@geosnapshotDashboard/component.twig', [
+            'url' => $this->url
+        ], false, false, true);
     }
 }

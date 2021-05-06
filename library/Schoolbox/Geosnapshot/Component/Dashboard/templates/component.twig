@@ -1,8 +1,3 @@
-{% if config.geosnapshot_school_code %}
-<iframe src="https://geosnapshot.com/org/{{ config.geosnapshot_school_code }}?embed=true" allow="camera; geolocation" style="height: 600px; border: 1px solid #E6E7E8;"></iframe>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-geosnapshot"></i>
-        <p>To display a GeoSnapShot gallery you must provide an organisation code</p>
-    </div>
+{% if url %}
+<iframe src="url"></iframe>
 {% endif %}
