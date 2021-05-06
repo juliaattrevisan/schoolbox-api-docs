@@ -42,3 +42,14 @@ INSERT INTO component_config_definition (
     'Heading',
     null
 );
+
+-- Allow users to hide/show the heading to readonly users
+INSERT INTO
+    component_config_definition (`component_definition_id`, `key`, `default_value`, `label`, `description`)
+    (
+        SELECT
+            id, 'showComponentTitle', 1, 'Show Title to Read-Only Users', null
+        FROM component_definition
+        WHERE `module` = 'homepage'
+          AND `class` = 'Schoolbox\\Geosnapshot\\Component\\Homepage\\Controller'
+    );
