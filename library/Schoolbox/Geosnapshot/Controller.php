@@ -45,7 +45,6 @@ class Controller extends Base
      * and/or b) whether something about the setup/access changed in the meantime
      *
      * @param User $viewee
-     * @throws \DomainException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \GuzzleHttp\Exception\InvalidArgumentException
      * @throws \JsonException
@@ -58,8 +57,9 @@ class Controller extends Base
          * If it dies, it dies (throw out a generic error screen when that happens)
          */
         try {
-            $response = (new Api($this->getConfigLoader()->get('geosnapshot_api_key')))
-                ->retrieveStudentPhotos($viewee);
+            $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
+
+            $response = $api->retrieveStudentPhotos($viewee);
         } catch (\RuntimeException|\DomainException $e) {
 
             /* RuntimeException is thrown when student doesn't have a profile pic
@@ -77,7 +77,11 @@ class Controller extends Base
                     ['Photos', null]
                 ],
                 'viewee' => $viewee,
-                'url' => $response['url']
+                'url' => $response['url'],
+
+                /* Enable this to see what we sent to Geosnapshot
+                 */
+                 // 'payload' => $api->getLastPayload()
             ]
         ));
     }

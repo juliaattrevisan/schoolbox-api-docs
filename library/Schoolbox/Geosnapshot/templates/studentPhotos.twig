@@ -10,6 +10,13 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
+{# Null payload prevents this from rendering
+ # Used while we're developing and testing with random base64 images
+ #}
+{% include '@geosnapshotApi/studentPhotosDiagnostic.twig' with {
+    payload: payload ?? null
+} %}
+
 <div class="row">
     <div class="small-12 columns">
         <iframe src="{{ url }}" class="fullscreen"></iframe>

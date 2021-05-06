@@ -8,6 +8,7 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
 
@@ -41,6 +42,14 @@ class Api
 
 
     /**
+     * Last payload we generated, so we can inspect it for diagnostic purposes
+     *
+     * @var array
+     */
+    private array $lastPayload;
+
+
+    /**
      * Api constructor.
      *
      * @param string $apiKey
@@ -58,10 +67,9 @@ class Api
      */
     private function build(): Client
     {
-        $headers = array_combine(
-            ['X-API-KEY'],
-            [$this->apiKey]
-        );
+        $headers = [
+            'X-API-KEY' => $this->apiKey,
+        ];
 
         return new Client([
             'headers' => $headers,
@@ -87,10 +95,19 @@ class Api
          */
         $payload = (new StudentPhoto())->build($viewee);
 
-        /* Portrait contents need to be POSTed, not GETted, despite us not mutating any data
-         * in the third party system
+        /* Remember it if we need to inspect it for some reason
          */
-        $response = $this->build()->request('POST', self::GEOSNAPSHOT_ENDPOINT, $payload);
+        $this->lastPayload = $payload;
+
+        /* Portrait contents need to be POSTed, not GETted, despite us not mutating any data
+         * in the third party system. We have to send it in json format, otherwise it returns
+         * a default set of unfiltered photos and stuff
+         *
+         * https://docs.guzzlephp.org/en/latest/request-options.html#json
+         */
+        $response = $this->build()->request('POST', self::GEOSNAPSHOT_ENDPOINT, [
+            RequestOptions::JSON => $payload
+        ]);
 
         /* Responds with this tuple: {"url":"https://geosnapshot.com/e/schoolbox-office-re-opening-from-iso-to-posh"}
          */
@@ -99,5 +116,14 @@ class Api
         }
 
         throw new \DomainException('Geosnapshot: Invalid response from Geosnapshot; could not decode json response');
+    }
+
+
+    /**
+     * @return array
+     */
+    public function getLastPayload(): array
+    {
+        return $this->lastPayload;
     }
 }
