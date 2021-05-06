@@ -404,8 +404,8 @@ export default {
                     @on-video-error="onRecordPlayerError"
                 />
             </div>
-            <transition name="fade">
-                <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button delete-button" title="Delete" href="#delete" key="delete">Delete</a>
+            <transition name="slide">
+                <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
             </transition>
         </div><!-- recordingMediaContainer -->
 
@@ -469,6 +469,19 @@ export default {
     z-index: 3;
     right: 10px;
     top: 10px;
+    width: 42px;
+    height: 44px;
+    background: none;
+    color: white;
+    background: rgba(43, 51, 63, 0.7);
+    transition: 0.2s opacity;
+    &::before {
+        text-align: center;
+        font-size: 1.6rem;
+    }
+    &:hover {
+        opacity: 0.8;
+    }
 }
 
 .modal-actions {
@@ -478,12 +491,16 @@ export default {
     }
 }
 
-.fade-enter-active, .fade-leave-active {
-    transition: opacity 0.2s;
+.slide-enter-active,
+.slide-leave-active {
+  transition: right 0.3s ease-out;
 }
-
-.fade-enter, .fade-leave-to /** .fade-leave-active below version 2.1.8 */ {
-    opacity: 0;
+.slide-enter-active, 
+.slide-leave-to {
+  right: -50px; 
+}
+.slide-enter-to {
+  right: 10px; 
 }
 
 .vjs-record-skin::v-deep {
@@ -514,14 +531,14 @@ export default {
             color: rgb(250, 54, 93);
         }
     }
-    .vjs-icon-photo-camera {
+    .vjs-icon-photo-camera { //shrink a bit, bit big compared to the other icons
         transform: scale(2.3);
         color: #fff;
     }
     .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
         text-shadow: none;
     }
-    .vjs-time-control  {
+    .vjs-time-control {
         width: auto;
         min-width: 0;
         padding: 0px 2px;
@@ -535,10 +552,10 @@ export default {
     .vjs-control.vjs-record-indicator,
     .vjs-control.vjs-record-indicator:before,
     .vjs-control.vjs-record-indicator:after {
-        transform: scale(1.5);
+        transform: scale(1.8);
     }
     .vjs-control.vjs-record-indicator:before {
-        left: -1.9rem;
+        left: -1.8rem;
     }
     @media screen and (max-width: 640px) {
         .vjs-time-control  {

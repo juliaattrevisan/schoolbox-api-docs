@@ -7,6 +7,7 @@
 
 import 'video.js/dist/video-js.css';
 import videojs from 'video.js';
+import { gsap } from 'gsap/all';
 
 
 export default {
@@ -39,6 +40,7 @@ export default {
             this.player = videojs(this.$refs.videoPlayer, this.options);
             this.player.on('loadeddata', this.onVideoDataLoaded);
             this.player.on('error', this.onVideoError);
+            gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } ); 
         },
 
         /** 
@@ -103,13 +105,17 @@ export default {
     line-height: 3.5em;
   }
   .vjs-big-play-button {
-    background-color: black;
+    background: rgba(43, 51, 63, 0.7);
     border: 2px solid white;
     border-radius: 0;
     top: 50%;
     left: 50%;
     margin-left: -45px;
     margin-top: -24px;
+    transition: 0.2s opacity;
+    &:hover {
+        opacity: 0.8;
+    }
   }
   .vjs-button > .vjs-icon-placeholder::before {
     color: white;
