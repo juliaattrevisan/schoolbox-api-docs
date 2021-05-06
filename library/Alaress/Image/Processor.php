@@ -295,7 +295,7 @@ class Processor
         // "corrupt JPEG data: 38 extraneous bytes before marker"
         // We can probably ignore this, so long as we check the function returned a sane result
         $errorLevel = error_reporting();
-        error_reporting($errorLevel & !E_WARNING);
+        error_reporting($errorLevel & ~E_WARNING);
         $imageSize = getimagesizefromstring($this->file->read());
         error_reporting($errorLevel);
         if ($imageSize === false) {
