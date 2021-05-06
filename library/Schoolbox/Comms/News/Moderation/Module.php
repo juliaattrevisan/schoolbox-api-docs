@@ -19,6 +19,7 @@ use Schoolbox\Comms\News\Authorizer\Rule\CanModerateAudience;
 use Schoolbox\Comms\News\Authorizer\Rule\IsModerationEnabled;
 use Schoolbox\Comms\News\Authorizer\Rule\IsArticleAuthor;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Authorizer\Rule\IsPublishedOrExpired;
 use Schoolbox\Error;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -79,11 +80,26 @@ class Module extends BaseModule
         });
 
 
-        // Reject rule: same as approve rule
-        // This allows any user who may submit an article to reject
-        // (a.k.a. unpublish) it, but grants the article author no special
-        // permission to reject news which they have created.
-        $canReject = $canApprove;
+        // Reject rules are not quite the same as approve rules.
+        // Once an article is published:
+        // * it can't be retracted by its audience's moderators, only a super or
+        //   a news moderator
+        // * however, it can be retracted by its author if said author may still
+        //   moderate the article's audience
+        $canReject = new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL),
+                    new Rule\All(
+                        new IsArticleAuthor(),
+                        new CanModerateAudience($this->getStrategyFactory()),
+                        new IsPublishedOrExpired()
+                    ),
+                )
+            );
+        });
 
         $preloadArticle = function ($params) {
             return $this->preloadArticleWithAudience($params);
