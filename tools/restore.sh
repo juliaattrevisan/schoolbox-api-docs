@@ -51,7 +51,11 @@ curdir=`pwd`;
 # Outputs the instance_id of the destination. Typically the staging instance.
 # If multiple found, prompts user to select one.
 get_destination_instance_id(){
-  local ini_file="/etc/$package/instances.ini"
+  local etc_dir="/etc/$package"
+  if [[ $package == "vagrant" ]]; then
+    etc_dir="/etc/schoolbox"
+  fi
+  local ini_file="$etc_dir/instances.ini"
   local instance_list
   instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list)
   if [[ $(echo -e "$instance_list" | wc -l) -gt 1 ]]; then
@@ -76,6 +80,10 @@ get_destination_instance_id(){
   fi
 }
 destination_instance_id="$(get_destination_instance_id)"
+if [[ -z "$destination_instance_id" ]]; then
+  echo "Unable to derive destination instance_id" >&2
+  exit 1
+fi
 
 error() {
 	# Display an error message in red then exit with error code
