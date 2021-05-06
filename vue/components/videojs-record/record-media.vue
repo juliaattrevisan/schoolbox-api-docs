@@ -141,7 +141,6 @@ export default {
          *
          */
         initVideojsRecord () {
-            // gsap.set(this.$refs.recordingMediaContainer, { alpha: 0 } ); //to fade on
             this.player = videojs(this.$refs.recordingVideo, getRecordOptions(this.recordMediaType), this.onVideojsReady);
         },
 
@@ -152,8 +151,7 @@ export default {
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
             setTimeout(() => { //dodgy, trying to wait until 'VIDEOJS: wavesurfer.js microphone plugin enabled.' but can't see any event to track this...
-                // this.player.record().getDevice(); //request the device to avoid needing to click the activate button
-                // gsap.to(this.$refs.recordingMediaContainer, 0.5, { alpha: 1 } ); //fade on
+                this.player.record().getDevice(); //request the device to avoid needing to click the activate button
             }, 200);    
         },
 
