@@ -38,7 +38,7 @@
     "jquery-ui": "1.12.1",
     "jquery-validation": "1.15.1",
     "locutus": "^2.0.14",
-    "lodash": "4.17.19",
+    "lodash": "4.17.21",
     "magnific-popup": "1.0.0",
     "mediaelement": "4.2.16",
     "moment": "^2.29.1",
