@@ -393,11 +393,11 @@ class Base
                     $this->eventTypes->first()->getType()
                 ));
 
+                $event->setType($this->eventTypes->first());
+
                 /* Remember it so we can tell the user which event types were missing
                  */
                 $missingEventTypes[$eventType] = $eventType;
-
-                continue;
             }
 
             /* Set up the Event Source so we know where this came from
