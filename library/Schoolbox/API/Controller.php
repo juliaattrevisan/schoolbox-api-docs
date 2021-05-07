@@ -120,7 +120,11 @@ class Controller extends Base
 
                 $deleteExistingToken = false;
                 try {
-                    $registry = $this->registryMapper->findById($sessionUser->getId(), $token, $provider);
+                    $registry = $this->registryMapper->findByTokenAndProviderForUser(
+                        $sessionUser->getId(),
+                        $token,
+                        $provider
+                    );
                     $registry->setTouchedAt($now);
                 } catch (MapperException $e) {
                     $deleteExistingToken = true;

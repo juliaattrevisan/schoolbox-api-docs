@@ -48,7 +48,7 @@ class RegistryMapper extends Mapper
 
 
     /**
-     * TODO do not override findById
+     * Find a registry entry by its token and provider for a given user ID.
      *
      * @param int    $userId
      * @param string $token
@@ -56,7 +56,7 @@ class RegistryMapper extends Mapper
      * @return Registry
      * @throws Mapper\Exception
      */
-    public function findById($userId, $token = null, $provider = null)
+    public function findByTokenAndProviderForUser(int $userId, string $token, string $provider): Registry
     {
         // mobile_app_registry.provider is a dead field:
         // look up the service's provider
