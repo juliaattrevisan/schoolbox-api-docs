@@ -44,8 +44,11 @@ if (isset($_POST['resize']) && $_POST['resize']) {
 } else {
     /* Otherwise you are moving an event on the Month view, which makes
      * the new datetime transfer as a difference value -_-
+     *
+     * (Need to default $minuteDelta to 0 because addMinutes defaults to 1 if
+     *  its parameter is null!)
      */
-    $minuteDelta = $_POST['minuteDelta'];
+    $minuteDelta = $_POST['minuteDelta'] ?? 0;
 
     $startTime = Alaress_Date_Format::newFromTimestamp(strtotime($event['start_datetime']));
     $startTime->addMinutes($minuteDelta);
