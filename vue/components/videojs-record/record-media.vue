@@ -279,7 +279,7 @@ export default {
         },
 
         /**
-         * to be able to record another video
+         * to be able to record another media
          *
          */
         onDeleteRecordingSelected () {
@@ -297,7 +297,6 @@ export default {
             this.hasNewRecording = false;
             if (this.player) { //relaunch the recorder if it's already set up
                 this.player.record().getDevice(); 
-                console.warn('relaunch');
             } else { //otherwise lets fire it up
                 this.initVideojsRecord();
             }
@@ -386,31 +385,29 @@ export default {
     
     <div class="container">
         
-        <div ref="recordingMediaContainer">
-            <div class="media-container media-container-record" key="recordMediaContainer">
-                <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
-            </div>
-            <div v-if="hasPreRecordedData || hasNewRecording" class="media-container media-container-playback" key="playbackMediaContainer">
-                <audio-only-player
-                    v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
-                    :options="getAudioPlayerOptions()"
-                />
-                <photo-player
-                    v-else-if="recordMediaType === recordMediaTypes.PHOTO"
-                    :img-src="getImgSrc()"
-                    :is-new-photo="hasPreRecordedData ? false : true"
-                />
-                <video-player
-                    v-else
-                    :options="getVideoPlayerOptions()"
-                    @on-video-data-loaded="onRecordPlayerLoaded"
-                    @on-video-error="onRecordPlayerError"
-                />
-            </div>
-            <transition name="slide">
-                <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
-            </transition>
-        </div><!-- recordingMediaContainer -->
+        <div class="media-container media-container-record" key="recordMediaContainer">
+            <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
+        </div>
+        <div v-if="hasPreRecordedData || hasNewRecording" class="media-container media-container-playback" key="playbackMediaContainer">
+            <audio-only-player
+                v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
+                :options="getAudioPlayerOptions()"
+            />
+            <photo-player
+                v-else-if="recordMediaType === recordMediaTypes.PHOTO"
+                :img-src="getImgSrc()"
+                :is-new-photo="hasPreRecordedData ? false : true"
+            />
+            <video-player
+                v-else
+                :options="getVideoPlayerOptions()"
+                @on-video-data-loaded="onRecordPlayerLoaded"
+                @on-video-error="onRecordPlayerError"
+            />
+        </div>
+        <transition name="slide">
+            <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
+        </transition>
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
             <template v-if="hasDeviceAlreadyInUseError">

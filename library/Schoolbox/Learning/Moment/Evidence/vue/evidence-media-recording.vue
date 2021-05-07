@@ -260,6 +260,8 @@ export default {
             /> -->
 
             <dropzone-input-capture-only 
+                :record-media-type="recordMediaType"
+                :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             />
 
             <over-media-modal v-if="isUploading" key="isUploadingModal">
