@@ -7,7 +7,7 @@ namespace Schoolbox\Geosnapshot\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 use Schoolbox\Geosnapshot\Api;
-use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
+use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
 
 
 /**
@@ -37,10 +37,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function execute(): bool
     {
-        if ((new ValidEventPhotosAvailable())->isSatisfiedBy(
+        if ((new ValidGeosnapshotAvailable())->isConfigured(
             $this->getConfigLoader()->get('geosnapshot_api_key'),
-            $this->getConfigLoader()->get('geosnapshot_enabled'),
-            $this->getConfig('eventName')
+            $this->getConfigLoader()->get('geosnapshot_enabled')
         )) {
 
             /* Set up guzzle with the authentication pieces
