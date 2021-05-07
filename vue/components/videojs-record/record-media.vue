@@ -478,13 +478,13 @@ export default {
     color: white;
     border: 2px solid white;
     background: rgba(43, 51, 63, 0.7);
-    transition: 0.2s opacity;
+    transition: 0.2s background-color;
     &::before {
         text-align: center;
         font-size: 1.4rem;
     }
     &:hover {
-        opacity: 0.8;
+        background: rgba(43, 51, 63, 0.3);
     }
 }
 
