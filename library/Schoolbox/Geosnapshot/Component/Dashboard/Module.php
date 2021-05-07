@@ -16,7 +16,7 @@ class Module extends BaseModule
     /**
      * @var string
      */
-    protected $basename = 'geosnapshot';
+    protected $basename = 'geosnapshotDashboard';
 
     /**
      * {@inheritdoc}

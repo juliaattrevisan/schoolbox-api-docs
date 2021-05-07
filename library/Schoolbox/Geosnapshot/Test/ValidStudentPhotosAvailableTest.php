@@ -1,6 +1,6 @@
 <?php
 /**
- * ValidGeosnapshotAvailableTest
+ * ValidStudentPhotosAvailableTest
  *
  * See SD-10 for usages
  *

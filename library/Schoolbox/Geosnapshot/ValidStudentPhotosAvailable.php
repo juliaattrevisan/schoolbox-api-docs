@@ -18,7 +18,7 @@ use Schoolbox\User;
  *
  * @package Schoolbox\Geosnapshot
  */
-class ValidStudentPhotosAvailable
+class ValidStudentPhotosAvailable extends ValidGeosnapshotAvailable
 {
 
     /**
@@ -36,15 +36,11 @@ class ValidStudentPhotosAvailable
 
         /* Invalid API key; exit early
          * No connectivity allowed
-         */
-        if ('' === (string)$apiKey) {
-            return false;
-        }
-
-        /* Feature Flag is off; exit early
+         *
+         * Feature Flag is off; exit early
          * No connectivity allowed
          */
-        if (!$featureFlag) {
+        if (!$this->isConfigured($apiKey, $featureFlag)) {
             return false;
         }
 

@@ -1,0 +1,13 @@
+{##
+ # Geosnapshot Homepage component
+ #
+ # @param string|null $url  A url from Geosnapshots, contains all the image galleries
+ #}
+{% if url %}
+<iframe src="{{ url }}"></iframe>
+{% else %}
+<div class="empty-state">
+    <i class="icon-geosnapshot"></i>
+    <p>Provide an event name in the component configuration to retrieve photo galleries.</p>
+</div>
+ {% endif %}

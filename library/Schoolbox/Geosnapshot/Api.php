@@ -9,6 +9,7 @@ namespace Schoolbox\Geosnapshot;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
+use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
 
@@ -81,6 +82,10 @@ class Api
 
 
     /**
+     * Find all the photos matching a $viewee's portrait picture
+     *
+     * Manufacture a payload with the necessary parts and send it out there
+     *
      * @param User $viewee
      * @return array
      * @throws \DomainException
@@ -91,10 +96,42 @@ class Api
      */
     public function retrieveStudentPhotos(User $viewee): array
     {
-        /* Manufacture a payload with the necessary parts and send it out there
-         */
-        $payload = (new StudentPhoto())->build($viewee);
+        return $this->retrieve((new StudentPhoto())->build($viewee));
+    }
 
+
+    /**
+     * Find all the events matching a given $eventName
+     *
+     * Manufacture a payload with the necessary parts and send it out there
+     *
+     * @param string $eventName
+     * @return array
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    public function retrieveEventPhotos(string $eventName): array
+    {
+        return $this->retrieve((new EventPhoto())->build($eventName));
+    }
+
+
+    /**
+     * Send a payload to the endpoint
+     *
+     * @param array $payload
+     * @return array
+     * @throws \DomainException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
+     * @throws \RuntimeException
+     */
+    private function retrieve(array $payload): array
+    {
         /* Remember it if we need to inspect it for some reason
          */
         $this->lastPayload = $payload;

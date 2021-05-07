@@ -1,33 +1,70 @@
 <?php
-
 /**
  * @copyright   Copyright 2021, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Geosnapshot\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
+use Schoolbox\Geosnapshot\Api;
+use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
+
 
 /**
  * Class Controller
  *
- * Display an iframe of a Geosnapshot gallery
+ * Display an iframe of Geosnapshot galleries that matched a search string
+ * specified in the component's configuration
  *
  * @package Schoolbox\Geosnapshot\Component\Dashboard
  */
 class Controller extends Component_Dashboard_ControllerAbstract
 {
 
+    /**
+     * @var string
+     */
+    private string $url;
+
 
     /**
-     * Only render this component if the geosnapshot school code has been setup
+     * Only render this component if Geosnapshot has been set up
      *
      * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws \JsonException
      */
     public function execute(): bool
     {
-        return true;
+        if ((new ValidGeosnapshotAvailable())->isConfigured(
+            $this->getConfigLoader()->get('geosnapshot_api_key'),
+            $this->getConfigLoader()->get('geosnapshot_enabled')
+        )) {
+
+            /* Set up guzzle with the authentication pieces
+             *
+             * If it dies, it dies (throw out a generic error screen when that happens)
+             */
+            try {
+                $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
+
+                $response = $api->retrieveEventPhotos($this->getConfig('eventName'));
+            } catch (\RuntimeException|\DomainException $e) {
+
+                /* DomainException is thrown when json can't be decoded
+                 */
+                return false;
+            }
+
+            /* Get the iframe and shank it into our component, if successful
+             */
+            $this->url = $response['url'];
+
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -40,6 +77,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
-        return $this->renderTwigTemplate($templateHandle, '@geosnapshot/component.twig', [], false, false, true);
+        return $this->renderTwigTemplate($templateHandle, '@geosnapshotDashboard/component.twig', [
+            'url' => $this->url
+        ], false, false, true);
     }
 }
