@@ -48,6 +48,8 @@ class RegistryMapper extends Mapper
 
 
     /**
+     * TODO do not override findById
+     *
      * @param int    $userId
      * @param string $token
      * @param string $provider
@@ -56,10 +58,12 @@ class RegistryMapper extends Mapper
      */
     public function findById($userId, $token = null, $provider = null)
     {
+        // mobile_app_registry.provider is a dead field:
+        // look up the service's provider
         return $this->findOneByColumnList(array(
-            'user_id'   => $userId,
-            'app_token' => $token,
-            'provider'  => $provider,
+            'user_id'    => $userId,
+            'app_token'  => $token,
+            's.provider' => $provider,
         ));
     }
 
