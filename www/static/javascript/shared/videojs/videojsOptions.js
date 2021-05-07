@@ -18,6 +18,7 @@ import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 * @returns { Object }
 */ 
 export const getRecordOptions = (recordMediaType) => {
+    console.warn(navigator.userAgent);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     if (recordMediaType === recordMediaTypes.AUDIO_ONLY) {
         return getAudioOnlyRecordOptions();
@@ -136,6 +137,7 @@ const getRecordCameraOptions = () => {
                 width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
                 height: { min: 180, ideal: 405, max: 720 }
             },
+            videoMimeType: 'video/webm',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: 300, //five minutes
             debug: true,
@@ -178,6 +180,7 @@ const getRecordScreenOptions = () => {
             audio: true,
             screen: true,
             maxLength: 300, //five minutes
+            videoMimeType: 'video/webm',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             debug: true,
         }
