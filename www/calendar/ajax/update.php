@@ -7,8 +7,13 @@
 use Calendar\Event\Type\Day\Renderer\Javascript;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
+// not in SitePage context?
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+
+/** @var SitePage $this */
 
 $calendarHandler = new Calendar();
 
@@ -39,8 +44,11 @@ if (isset($_POST['resize']) && $_POST['resize']) {
 } else {
     /* Otherwise you are moving an event on the Month view, which makes
      * the new datetime transfer as a difference value -_-
+     *
+     * (Need to default $minuteDelta to 0 because addMinutes defaults to 1 if
+     *  its parameter is null!)
      */
-    $minuteDelta = $_POST['minuteDelta'];
+    $minuteDelta = $_POST['minuteDelta'] ?? 0;
 
     $startTime = Alaress_Date_Format::newFromTimestamp(strtotime($event['start_datetime']));
     $startTime->addMinutes($minuteDelta);
@@ -97,8 +105,8 @@ if ($eventId = $calendarHandler->update($updatedEvent)) {
     foreach ($connector->getEvent($eventId) as $calendarEvent) {
         // Only one event should ever be gotten here, so render that one only
         $renderer = new Javascript(
-            $kernel->getDependencyInjector()->get('authorizer'),
-            $kernel->getDependencyInjector()->get('router'),
+            $this->getDi()->get('authorizer'),
+            $this->getDi()->get('router'),
             $calendarEvent,
             $_SESSION['user'],
             $_SESSION['user']
