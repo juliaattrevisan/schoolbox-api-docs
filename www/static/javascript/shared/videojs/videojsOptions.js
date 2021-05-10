@@ -302,7 +302,8 @@ const getAudioPlayerOptions = () => {
             displayMilliseconds: false,
             hideScrollbar: true,
             interact: false,
-            responsive: true,
+            fluid: true,
+            responsive: true
         }
     }
     return options;

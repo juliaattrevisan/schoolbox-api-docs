@@ -32,10 +32,6 @@ export default {
         this.initVideojs();
     },
 
-    beforeDestroy () {
-        this.destroyVideojs();
-    },
-
     methods: {
 
         /** 
@@ -90,26 +86,6 @@ export default {
         onVideoError () {
             this.$emit('on-video-error');
         },
-
-        /** 
-         * destroy the instance for garbage collection
-         *
-         */
-        destroyVideojs () {
-            if (this.player) {
-                this.player.dispose();
-            }
-        },
-
-        /**
-		 * To keep the width of the selected-action-container the same as the parent container
-		 * which will change depending on whether the side menu is opened/closed
-		 *
-		 * @returns { width, height }
-		 */
-		onContainerResize (dimensions) {
-			debugger;
-		},
 
     }
 

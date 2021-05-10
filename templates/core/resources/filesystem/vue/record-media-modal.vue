@@ -7,7 +7,7 @@
 
 import RecordMediaModalMenu from './record-media-modal-menu';
 import RecordMediaModalUnset from './record-media-modal-unset';
-import RecordMedia from '@schoolbox/videojs-record/record-media';
+import BrowserCaptureMedia from '@schoolbox/videojs-record/browser-capture-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
@@ -18,7 +18,7 @@ export default {
     components: {
         RecordMediaModalMenu, //top menu appears after unset menu selection
         RecordMediaModalUnset, //the initial big menu
-        RecordMedia, //the media element
+        BrowserCaptureMedia, //the media element
         OverMediaModal //to slot in upload modal
     },
 
@@ -123,21 +123,24 @@ export default {
         /**
          * currently to update the container ratio to match the dimensions of the recording device
          *
+         * @params { MediaStreamTrack }
          */
-        onDeviceReady (videojs) {
-            this.updateCurrentRatio(videojs);
-            this.updateContainerHeight();
+        onDeviceReady (mediaStreamTrack) {
+            if (this.currentRecordMediaType !== recordMediaTypes.AUDIO_ONLY) { //audio doesn't need to change from 16:9
+                const currentDeviceSettings = mediaStreamTrack.getSettings(); 
+                this.updateCurrentRatio(currentDeviceSettings.width, currentDeviceSettings.height);
+            }
         },
 
         /**
-         * devices have different aspect ratio of 16:9, 4:3 etc
+         * devices have different aspect ratio of 16:9, 9:16, 4:3, 3:4 etc, so ensure the container is kept the same
          *
+         * @params { Number } width
+         * @params { Number } height
          */
-        updateCurrentRatio (videojs) {
-            const currentDeviceSettings = videojs.record().stream.getVideoTracks()[0].getSettings(); //dive dive dive!
-            const deviceWidth = currentDeviceSettings.width;
-            const deviceHeight = currentDeviceSettings.height;
-            this.currentRatio = deviceHeight / deviceWidth;
+        updateCurrentRatio (width, height) {
+            this.currentRatio = height / width;
+            this.updateContainerHeight();
         },
 
         /**
@@ -288,6 +291,17 @@ export default {
             }, 1000);
         },
 
+        /**
+         * Ensure the recorded video ratio is respected
+         *
+         * @params { Number }
+         * @params { Number }
+         */
+        onRatioReady (width, height) {
+            this.updateCurrentRatio(width, height);
+        },
+
+
     }
 
 }
@@ -314,7 +328,7 @@ export default {
 
                 <keep-alive><!-- to maintain recordings etc https://vuejs.org/v2/api/#keep-alive -->
                     <template v-for="recordMediaType in recordMediaTypeList">
-                        <record-media
+                        <browser-capture-media
                             v-if="currentRecordMediaType === recordMediaType"
                             :record-media-type="recordMediaType"
                             :key="recordMediaType"
@@ -324,6 +338,7 @@ export default {
                             @on-process-stopped="onProcessStopped"
                             @on-recorded-media-ready="onRecordedMediaReady"
                             @on-recorded-media-deleted="onRecordedMediaDeleted"
+                            @on-ratio-ready="onRatioReady"
                         />
                     </template>
                 </keep-alive>
