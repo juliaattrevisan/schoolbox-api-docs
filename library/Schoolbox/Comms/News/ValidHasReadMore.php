@@ -21,11 +21,23 @@ class ValidHasReadMore
 {
 
     /**
-     * @param Model $article
+     * Decide if $article should show a Read More link, depending on the contents
+     * of the article, and whether your configs are set up in a particular way
+     *
+     * @param Model  $article
+     * @param string $readMoreString
+     * @param bool   $commentsAllowed
      * @return bool
      */
-    public function isSatisfiedBy(Model $article): bool
+    public function isSatisfiedBy(Model $article, string $readMoreString, bool $commentsAllowed): bool
     {
+
+        /* If the $readMoreString set in admin var "Read More" Link for Truncated News Articles
+         * is empty, it should never display
+         */
+        if ('' === $readMoreString) {
+            return false;
+        }
 
         /* If there are files, there's something to download from the detail screen
          * Show the link
@@ -38,7 +50,17 @@ class ValidHasReadMore
          * Show the link
          */
         if ($article->getCommentsAllowed()) {
-            return true;
+
+            /* But, if the global admin config Enable Comments On News Articles
+             * is currently set to Off, you aren't meant to have access to comments
+             * anyway, and the entire comment thread will be hidden; nothing to see
+             * Hide the link
+             *
+             * Otherwise your article has comment thread and your instance allows
+             * people to witness and interact with its contents
+             * Show the link
+             */
+            return $commentsAllowed;
         }
 
         /* If the article has a body content, there's something to read

@@ -27,10 +27,10 @@ class ValidHasReadMoreTest extends TestCase
      * @param Model $input
      * @param bool  $expected
      */
-    public function testValidHasReadmore(Model $input, bool $expected)
+    public function testValidHasReadmore(Model $article, string $readMore, bool $commentsAllowed, bool $expected)
     {
 
-        $outcome = (new ValidHasReadMore())->isSatisfiedBy($input);
+        $outcome = (new ValidHasReadMore())->isSatisfiedBy($article, $readMore, $commentsAllowed);
 
         /* There are other assertions that you can try (ctrl-click to follow)
          */
@@ -107,38 +107,86 @@ class ValidHasReadMoreTest extends TestCase
         return [
             'Empty article, avoid of everything' => [
                 $emptyArticle,
+                'Read more by clicking here',
+                true,
                 false
             ],
             'Article with a title only' => [
                 $titleOnlyArticle,
+                'Read more by clicking here',
+                true,
                 false
             ],
             'Article with a blurb only' => [
                 $blurbOnlyArticle,
+                'Read more by clicking here',
+                true,
                 false
             ],
             'Article with a body only' => [
                 $bodyOnlyArticle,
+                'Read more by clicking here',
+                true,
                 true
             ],
             'Article with a blurb and a body together' => [
                 $bothArticle,
+                'Read more by clicking here',
+                true,
                 true
             ],
             'Article with only files' => [
                 $filesOnlyArticle,
+                'Read more by clicking here',
+                true,
                 true
             ],
             'Article with comment enabled' => [
                 $commentOnlyArticle,
+                'Read more by clicking here',
+                true,
                 true
             ],
             'Article with comments and files' => [
                 $filesAndCommentsArticle,
+                'Read more by clicking here',
+                true,
                 true
             ],
             'Article with everything - the works' => [
                 $everythingArticle,
+                'Read more by clicking here',
+                true,
+                true
+            ],
+
+            /* Configuration settings affect the outcome
+             */
+            'Article with everything, read more string is empty, comments disabled' => [
+                $everythingArticle,
+                '',
+                false,
+                false
+            ],
+
+            'Article with everything, read more string is empty, comments enabled' => [
+                $everythingArticle,
+                '',
+                true,
+                false
+            ],
+
+            'Article with everything, read more string exists, comments disabled' => [
+                $everythingArticle,
+                'Read more by clicking here',
+                false,
+                true
+            ],
+
+            'Article with everything, read more string exists, comments enabled' => [
+                $everythingArticle,
+                'Read more by clicking here',
+                true,
                 true
             ],
 
@@ -146,6 +194,8 @@ class ValidHasReadMoreTest extends TestCase
              */
             'Article with a blurb only, but with comments and files' => [
                 $arcane1,
+                'Read more by clicking here',
+                true,
                 true
             ],
         ];
