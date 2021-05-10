@@ -1,5 +1,3 @@
-@import "../original-foundation/components/tables";
-
 //
 // TABLES
 //
@@ -32,6 +30,8 @@ $table-row-font-color: $black;
 // $table-layout: auto;
 // $table-display: table-cell;
 $table-margin-bottom: rem-calc(($base-font-size - 2));
+
+@import "../original-foundation/components/tables";
 
 table {
   border-collapse: collapse;
@@ -126,7 +126,6 @@ tr:hover {
     }
   }
 }
-
 
 /* Don't use row hovers on Timetable Grid screens anymore
  * They don't do much now due to fully-expanding coloured blocks
@@ -290,4 +289,9 @@ $rotate-span-width: 11rem;
       overflow-x: hidden;
     }
   }
+}
+
+// Tables in homepage textboxs
+.Schoolbox_Resource_Textbox_Component_Homepage_Controller table {
+  background: transparent;
 }
