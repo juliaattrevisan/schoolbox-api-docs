@@ -9,6 +9,7 @@
 namespace Schoolbox\WebDav\LegacyConfiguration;
 
 use Schoolbox\User;
+use Schoolbox\YearLevel;
 
 /**
  * Builder for legacy WebDAV configurations
@@ -28,6 +29,8 @@ class Factory
      */
     public static function build($siteLocation, User $user, $session)
     {
+        /** @var YearLevel\Model $year */
+        $year     = $session['year'];
         $settings = [];
         $paths    = [];
         if ($siteLocation === 'wenona') {
@@ -46,7 +49,7 @@ class Factory
                 $settings['baseUri'] = 'http://mercury/';
 
                 $paths = array(
-                    '/StudentHome/' . (12 - $session['year'] + date('y')) . '/' . $session['username'] . '/',
+                    '/StudentHome/' . (12 - (int)$year->getName() + date('y')) . '/' . $session['username'] . '/',
                     '/StudentData/',
                 );
             }
@@ -64,7 +67,7 @@ class Factory
                 );
             } else {
                 $paths = array(
-                    '/Students/' . (date('Y') - ($session['year'] - 7)) . '/' . strtolower($session['username']) . '/',
+                    '/Students/' . (date('Y') - ((int)$year->getName() - 7)) . '/' . strtolower($session['username']) . '/',
                 );
             }
         } elseif ($siteLocation === 'cathedral') {
@@ -116,7 +119,7 @@ class Factory
                 }
             } elseif ($user->getRole()->isStudent()) {
                 $paths = array(
-                    '/H-DRIVE/USERS/STUDENTS/YEAR%20' . str_pad($session['year'], 2, '0', STR_PAD_LEFT) . '/' . $session['username'] . '/',
+                    '/H-DRIVE/USERS/STUDENTS/YEAR%20' . str_pad($year->getName(), 2, '0', STR_PAD_LEFT) . '/' . $session['username'] . '/',
                 );
             }
         } elseif ($siteLocation === 'stmichaels') {
@@ -148,7 +151,7 @@ class Factory
                 );
             } elseif ($user->getRole()->isStudent()) {
                 $paths = array(
-                    $settings['baseUri'] . 'studenthome/' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/',
+                    $settings['baseUri'] . 'studenthome/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
         } elseif ($siteLocation === 'mggs') {
@@ -169,7 +172,7 @@ class Factory
             } elseif ($user->getRole()->isStudent()) {
                 $settings['baseUri'] = 'http://mggs-fs02/';
                 $paths = array(
-                    '/STUDENTS/' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/',
+                    '/STUDENTS/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
         } elseif ($siteLocation === 'tintern') {
@@ -185,7 +188,7 @@ class Factory
                 );
             } elseif ($user->getRole()->isStudent()) {
                 $paths = array(
-                    '/Student/' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/',
+                    '/Student/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
         } elseif ($siteLocation === 'oakburn') {
@@ -231,13 +234,13 @@ class Factory
                     $paths[] = $settings['baseUri'] . '/' . $share . '/';
                 }
             } elseif ($user->getRole()->isStudent()) {
-                if ($session['year'] >= '6') {
+                if ((int)$year->getName() >= '6') {
                     $paths = array(
-                        $settings['baseUri'] . 'penquitestudents/Year12in' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/Documents/',
+                        $settings['baseUri'] . 'penquitestudents/Year12in' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/Documents/',
                     );
                 } else {
                     $paths = array(
-                        $settings['baseUri'] . 'elphinstudents/Year12in' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/Documents/',
+                        $settings['baseUri'] . 'elphinstudents/Year12in' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/Documents/',
                     );
                 }
             }
@@ -275,7 +278,7 @@ class Factory
                 );
             } elseif ($user->getRole()->isStudent()) {
                 $paths = array(
-                    $settings['baseUri'] . '/StudentHome/' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/'
+                    $settings['baseUri'] . '/StudentHome/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/'
                 );
             }
         } elseif ($siteLocation === 'btac') {
@@ -320,7 +323,7 @@ class Factory
                 );
             } elseif ($user->getRole()->isStudent()) {
                 $paths = array(
-                    $settings['baseUri'] . 'Student%20Home/' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/',
+                    $settings['baseUri'] . 'Student%20Home/' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
         } elseif ($siteLocation === 'sheldon') {
@@ -386,7 +389,7 @@ class Factory
                 );
             } elseif ($user->getRole()->isStudent()) {
                 $paths = array(
-                    $settings['baseUri'] . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/',
+                    $settings['baseUri'] . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 );
             }
         } elseif ($siteLocation === 'diocesan') {
@@ -467,7 +470,7 @@ class Factory
             }
             if ($user->getRole()->isParent()) {
                 $paths = array(
-                    $settings['baseUri'] . '/reports/' . $session['year'] . '/',
+                    $settings['baseUri'] . '/reports/' . $year->getName() . '/',
                 );
             }
         } elseif ($siteLocation === 'sicol') {
@@ -479,7 +482,7 @@ class Factory
             if ($user->getRole()->isStaff()) {
                 $paths = [$settings['baseUri'] . 'StaffHome/' . $session['username'] . '/',];
             } elseif ($user->getRole()->isStudent()) {
-                $paths = [$settings['baseUri'] . 'StudentHome/CL' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/',];
+                $paths = [$settings['baseUri'] . 'StudentHome/CL' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',];
             }
         } elseif ($siteLocation === 'ducv') {
             $settings = array(
@@ -557,7 +560,7 @@ class Factory
                 ];
             } elseif ($user->getRole()->isStudent()) {
                 $paths = [
-                    $settings['baseUri'] . 'students/year_12_of_' . (12 - $session['year'] + date('Y')) . '/' . $session['username'] . '/',
+                    $settings['baseUri'] . 'students/year_12_of_' . (12 - (int)$year->getName() + date('Y')) . '/' . $session['username'] . '/',
                 ];
             }
         } elseif ($siteLocation === 'agsbot') {
