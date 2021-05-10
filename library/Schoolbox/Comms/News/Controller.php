@@ -911,7 +911,8 @@ class Controller extends Base
                 'name',
                 'slug',
                 'sequence'
-            ]
+            ],
+            'hasReadMore' => false
         ];
 
         // Link auth requires hydrated audiences
@@ -936,6 +937,10 @@ class Controller extends Base
                 new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
                 new MetadataDecorator($commentCounts),
                 new AttachmentDecorator($attachmentCounts)
+
+                /* TODO Add ReadMoreDecorator here which uses the spec pattern
+                 *  to determine if the Read More link should be available
+                 */
             )
         );
 
