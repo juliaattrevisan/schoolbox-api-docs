@@ -645,7 +645,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
         $classCode = $timetabledClass['ClassCode'];
         $basePart  = [
             'description'    => $timetabledClass['ClassName'],
-            'code'           => $timetabledClass['ClassCode'],
+            'code'           => $timetabledClass['ClassCode'] ?? '',
             'campus'         => $timetabledClass['ClassCampus'],
             'room'           => $timetabledClass['ReplacementRoom'] ?? $timetabledClass['BaseRoom'] ?? '',
         ];
