@@ -9,6 +9,8 @@ namespace Schoolbox\Resource\GoogleFile\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\GenericCollection;
+use Schoolbox\Resource\GoogleFile\Mapper;
 use Schoolbox\User;
 use SitePage;
 
@@ -23,6 +25,7 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     private bool $hasError = false;
 
+    private GenericCollection $googleFiles;
 
     /**
      * Injectable constructor
@@ -60,24 +63,27 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
-
         /* If you're a WRITE access user, tell them their Google setup is misconfigured
          * Otherwise hide the component
          */
-        if ($this->isGoogleEnabled()) {
-            return true;
+        if (!$this->hasWriteAccess()) {
+            return false;
         }
 
-        /* Show write-access folks that something is misconfigured
-         */
-        if ($this->hasWriteAccess()) {
+        if (!$this->isGoogleEnabled()) {
             $this->hasError = true;
             return true;
         }
 
-        /* Hide the component from everyone else
-         */
-        return false;
+        $googleFileMapper = Mapper::getInstance();
+
+        $this->googleFiles = $googleFileMapper->findByColumn('folder_id', $this->getContext()->getId());
+
+        if ($this->googleFiles->count() === 0) {
+            return $this->hasWriteAccess();
+        }
+
+        return true;
     }
 
 
@@ -89,10 +95,11 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         $twigTemplate = '@googleFile/component/googleFiles.twig';
-        $twigData = [
-            'clientId' => $this->getConfigLoader()->get('googleapps_client_id'),
-            'folder' => $this->getContext(),
-            'hasError' => $this->hasError,
+        $twigData     = [
+            'clientId'    => $this->getConfigLoader()->get('googleapps_client_id'),
+            'folder'      => $this->getContext(),
+            'googleFiles' => $this->googleFiles,
+            'hasError'    => $this->hasError,
             'writeAccess' => $this->hasWriteAccess(),
         ];
 

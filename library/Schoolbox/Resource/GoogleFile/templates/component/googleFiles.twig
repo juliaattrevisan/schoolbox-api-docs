@@ -9,18 +9,47 @@
  # @param Folder\Model $folder  The current homepage instance
 #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/apiloader.js"></script>
-<div class="empty-state">
-    <i class="icon-google-drive"></i>
+{% if googleFiles is empty %}
+    <div class="empty-state">
+        <i class="icon-google-drive"></i>
+        <p>
+            {% if hasError %}
+                Unfortunately Google integration is currently not configured; please contact your system administrator for support.
+            {% else %}
+                <a id="find-files">Find a Google
+                    file</a> to share with users and allow them to view, edit or suggest changes.
+            {% endif %}
+        </p>
+    </div>
+{% else %}
+    {% for googleFile in googleFiles %}
+        <ul data-dz-container class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="compact card small-12">
+                        <a>
+                            <img class="mime" alt="" src="{{ googleFile.icon | replace({'16': '64'}) }}"/>
+                            <h3>{{ googleFile.name }}</h3>
+                        </a>
+                    </div>
+                </div>
+                <nav>
+                    <a class="icon-more" title="" data-dropdown="google-file-{{ loop.index }}"></a>
+                </nav>
+                <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
+                    <li><a class="icon-bin" href="" title="Remove">Remove</a></li>
+                    <li><a class="icon-group" href="" title="Change permissions">Change permissions</a></li>
+                </ul>
+            </li>
 
-    <p>
-        {% if hasError %}
-            Unfortunately Google integration is currently not configured; please contact your system administrator for support.
-        {% else %}
-            <a id="find-files">Find a Google
-                file</a> to share with users and allow them to view, edit or suggest changes.
-        {% endif %}
-    </p>
-</div>
+        </ul>
+    {% endfor %}
+    <div class="component-action">
+        <section>
+            <a id="find-files" class="button">Add</a>
+        </section>
+    </div>
+{% endif %}
 <div id="gfile" class="modal-backdrop" data-reveal aria-labelledby="Google Files" aria-hidden="true"
      role="dialog">
 </div>
