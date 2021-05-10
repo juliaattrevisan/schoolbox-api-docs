@@ -77,10 +77,19 @@
                         </nav>
                         {% endif %}
 
-                        {% set blurb = macro.newsBlurb(article, readMore) %}
-                        {% if blurb|length %}
-                            <article>{{ blurb }}</article>
-                        {% endif %}
+                        {% set blurb = macro.newsBlurb(article) %}
+                        <article>
+                            {% if blurb|length %}
+                            {{ blurb }}
+                            {% endif %}
+
+                            {% if readMores[article.id].available %}
+                                {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
+                                {% set readMoreLink = '<div class="article-read-more"><a href="' ~ detailUrl ~ '" title="Read more">' ~ readMores[article.id].string ~ '</a></div>' %}
+
+                                {{ readMoreLink|trim|purify }}
+                            {% endif %}
+                        </article>
                     </li>
                 {% endfor %}
             </ul>

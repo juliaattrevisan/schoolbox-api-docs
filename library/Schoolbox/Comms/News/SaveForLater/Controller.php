@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\SaveForLater;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\ValidHasReadMore;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\User;
@@ -77,12 +78,33 @@ class Controller extends Base
          */
         $attachmentCounts = $this->fileMapper->findCounts($articles->getPropertyValues('id'));
 
+        /* Build a lookup of Read More links for each article id, which aren't json but
+         * Model instances that don't comprehend the Read More status like this
+         */
+        $readMores = [];
+
+        foreach ($articles as $article) {
+            /* Attachments aren't actually hydrated in $model, but we got the counts
+             * for use in a metadata elsewhere, so we can reuse that fact here by
+             * artificially representing the number of files without having the actual
+             * files themselves with all their mimes etc.
+             */
+            if ($attachmentCounts[$article->getId()]) {
+                $article->getAttachedFiles()->add(true);
+            }
+
+            $readMores[$article->getId()] = [
+                'string' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                'available' => (new ValidHasReadMore())->isSatisfiedBy($article, $this->getConfigLoader()->get(ConfigMapper::_READ_MORE), $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED))
+            ];
+        }
+
         $data = array_merge(
             [
                 'articles' => $articles,
                 'attachmentCounts' => $attachmentCounts,
                 'referrer' => $params->getReferrer(),
-                'readMore' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                'readMores' => $readMores,
                 'fallbackImage' => [
                     'type' => $this->getConfigLoader()->get('comms_news_article_list_fallback_image'),
                     'hash' => $this->getConfigLoader()->get('skin_logo_large')
