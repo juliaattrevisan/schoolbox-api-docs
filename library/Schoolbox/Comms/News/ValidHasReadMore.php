@@ -29,27 +29,37 @@ class ValidHasReadMore
         /* If there are files, there's something to download from the detail screen
          * Show the link
          */
-        return true;
+        if ($article->getAttachedFiles()->count()) {
+            return true;
+        }
 
         /* If comments enabled, there's something to do on the detail screen
          * Show the link
          */
-        return true;
+        if ($article->getCommentsAllowed()) {
+            return true;
+        }
 
         /* If the article has a body content, there's something to read
          * It might be the same as the blurb, but there are complications with
          * that comparison. For now, presume there's something to see
          * Show the link
          */
-        return true;
+        if ('' !== $article->getBody()) {
+            return true;
+        }
 
         /* If the article is a blurb only (the body is empty)
          * There's nothing to see
          * Hide the link
          */
-        return false;
 
-        /* Default case: hide the link
+        /* Circumstantially, in a Component context, there's a Compact Mode setting
+         * which should also hide the link but it won't actually manifest?
+         */
+
+        /* Default case
+         * Hide the link
          */
         return false;
     }
