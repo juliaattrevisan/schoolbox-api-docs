@@ -27,10 +27,6 @@ export default {
         this.initVideojs();
     },
 
-    beforeDestroy () {
-        this.destroyVideojs();
-    },
-
     methods: {
 
         /**
@@ -55,26 +51,61 @@ export default {
         },
 
         /** 
-         * the waveform has been put into the video component
+         * the waveform has been put into the video component,
+         * which is put at the top of the container, so need to re-apply some 
+         * divs to still behave the same as a standard video
          *
          */
         onWaveformReady () {
-            this.$nextTick(() => { //can I put the element behind so can just toggle playback on select?
-                const waveformElement = document.querySelector('.vjs-wavedisplay');
-                const trackDisplayElement = document.querySelector('.vjs-text-track-display');
-                swapElements(waveformElement, trackDisplayElement);
-            });
-            console.warn('audio-player-only : onWaveformReady');
+            const audioContainer = this.$refs.audioContainer.firstChild;
+            this.addPlayToggle(audioContainer);
+            this.updateBigPlayButton(audioContainer);
+            this.updateControlBar(audioContainer);
         },
 
-        /**
-         * destroy the instance for garbage collection
+        /** 
+         * Put a toggle play/pause over the top of the waveform
          *
          */
-        destroyVideojs () {
-            if (this.player) {
-                this.player.dispose();
-            }
+        addPlayToggle (audioContainer) {
+            const bigPlayButton = audioContainer.querySelector('.vjs-big-play-button');
+            const playToggle = document.createElement('div'); //cover the entire video container
+            playToggle.style.position = 'absolute';
+            playToggle.style.left = '0';
+            playToggle.style.top = '0';
+            playToggle.style.width = '100%';
+            playToggle.style.height = '100%';
+            playToggle.addEventListener('click', () => {
+                if (this.player.paused()) {
+                    this.player.play();
+                    bigPlayButton.classList.add('vjs-hidden');
+                } else {
+                    this.player.pause();
+                }
+            });
+            audioContainer.appendChild(playToggle);  
+        },
+
+        /** 
+         * Move the big play button above the waveform and ensure behaves as expected
+         *
+         */
+        updateBigPlayButton (audioContainer) {
+            const bigPlayButton = audioContainer.querySelector('.vjs-big-play-button');
+            bigPlayButton.classList.remove('vjs-hidden');
+            bigPlayButton.addEventListener('click', () => {
+                bigPlayButton.classList.add('vjs-hidden');
+            });
+            audioContainer.appendChild(bigPlayButton);
+        },
+
+        /** 
+         * Put the control above the waveform
+         *
+         */
+        updateControlBar (audioContainer) {
+            const controlBar = audioContainer.querySelector('.vjs-control-bar');
+            audioContainer.appendChild(controlBar);   
         }
 
     }
@@ -83,7 +114,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div ref="audioContainer">
         <video ref="audioPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
@@ -113,6 +144,7 @@ export default {
     line-height: 3.5em;
   }
   .vjs-big-play-button {
+    display: block;
     background-color: black;
     border: 2px solid white;
     border-radius: 0;
