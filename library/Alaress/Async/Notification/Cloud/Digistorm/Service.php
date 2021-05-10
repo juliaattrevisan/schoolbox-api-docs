@@ -9,10 +9,11 @@ declare(strict_types=1);
 namespace Alaress\Async\Notification\Cloud\Digistorm;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
+use Alaress\Jitter\Jitter;
+use Alaress\Random\FloatGenerator;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
-use RuntimeException;
-use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
 
@@ -35,6 +36,17 @@ class Service extends AbstractService
         'platform' => 'schoolbox',
         'module'   => 'messages',
     ];
+
+    /**
+     * How many attempts may be made to send the message before we give up?
+     */
+    private const MAX_ATTEMPTS = 100;
+
+    /**
+     * The amount of time (in milliseconds) to wait for at first when
+     * re-attempting to send a message.
+     */
+    private const ATTEMPT_BASE_TIMEOUT = 1000;
 
     /**
      * API key for the service
@@ -78,6 +90,9 @@ class Service extends AbstractService
      */
     protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
+        $jitter = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
+        $client = new Client();
+
         $headers = [
             'X-Auth-Token' => $this->key,
             'Content-Type' => 'application/json',
@@ -87,30 +102,34 @@ class Service extends AbstractService
         $payload['message'] = $title;
         $payload['ids']     = $tokens;
 
-        // need a HTTP client (should this be injected?)
-        $client = new Client();
-        try {
-            $response = $client->post(
-                self::BASE_URL,
-                [
-                    RequestOptions::BODY    => json_encode($payload),
-                    RequestOptions::HEADERS => $headers,
-                ]
-            );
+        $attemptNum = 1;
+        while (!$jitter->tooManyAttempts($attemptNum)) {
+            try {
+                $response = $client->post(
+                    self::BASE_URL,
+                    [
+                        RequestOptions::BODY    => json_encode($payload),
+                        RequestOptions::HEADERS => $headers,
+                    ]
+                );
 
-            // Check the response: maybe not all IDs exist?
-            // That might be an issue worth checking?
-            // Maybe also check rate limit, as the response contains an
-            // "X-RateLimit-Remaining" header.
-        } catch (RuntimeException $e) {
-            if ($e->getCode() === 401) {
-                // your API key is bad: don't try to do anything else
-                throw $e;
+                // Check the response: maybe not all IDs exist?
+                // That might be an issue worth checking?
+                // Maybe also check rate limit, as the response contains an
+                // "X-RateLimit-Remaining" header.
+                return true;
+            } catch (GuzzleException $e) {
+                if ($e->getCode() === 401) {
+                    // your API key is bad: don't try to do anything else
+                    throw $e;
+                }
+                $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
+                return false;
             }
-            $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
-            return false;
-        }
 
-        return true;
+            usleep($jitter->calculateJitter($attemptNum));
+            $attemptNum++;
+        }
+        return false;
     }
 }
