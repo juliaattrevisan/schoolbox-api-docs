@@ -12,3 +12,7 @@
     border-left-color .15s linear,
     border-right-color .15s linear;
 }
+
+textarea.cke_source {
+  color: $input-font-color;
+}
