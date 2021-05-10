@@ -117,9 +117,16 @@
             clientId: '{{ clientId }}',
             postGoogleFileUrl: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}',
             onSelect: function (docs) {
+                let selected = docs.map(function (v) {
+                    return {
+                        'id': v.id,
+                        'name': v.name,
+                        'icon': v.iconUrl
+                    }
+                });
                 $('div.picker-dialog').hide();
                 $('#gfile-permission').foundation('reveal', 'open');
-                $('#gfile-google-ids').val(docs.map(e => e.id).join(","));
+                $('#gfile-google-ids').val(JSON.stringify(selected));
             },
         });
 
@@ -152,7 +159,7 @@
                 case 'continue':
                     let selected = $('input[name="gfileEdit"]:checked').val();
                     $('[data-gfile-comment]').each(function () {
-                        if ($(this).val() >= selected) {
+                        if ($(this).val() > selected) {
                             $(this).attr('disabled', true);
                         }
                     });

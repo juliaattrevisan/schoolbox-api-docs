@@ -23,6 +23,10 @@ class Model implements ISoftDeletable
 
     protected string $googleId;
 
+    protected string $name;
+
+    protected string $icon;
+
     protected int $folderId;
 
     protected int $ownerId;
@@ -42,6 +46,42 @@ class Model implements ISoftDeletable
     public function setGoogleId(string $googleId): self
     {
         $this->googleId = $googleId;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return static
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon(): string
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string $icon
+     * @return static
+     */
+    public function setIcon(string $icon): self
+    {
+        $this->icon = $icon;
         return $this;
     }
 

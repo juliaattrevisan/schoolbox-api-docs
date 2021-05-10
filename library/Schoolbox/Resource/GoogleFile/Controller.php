@@ -18,7 +18,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\File\ExtensionMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -45,8 +44,9 @@ class Controller extends Base
 
     /**
      * Constructor
-     *
-     * @param Mapper $googleFileMapper
+     * @param Mapper           $googleFileMapper
+     * @param UserMapper       $userMapper
+     * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
         Mapper $googleFileMapper,
@@ -74,15 +74,14 @@ class Controller extends Base
             return;
         }
 
+        $selectedFiles = json_decode($googleIdString);
         $editAccessLevel    = (int)$this->request->post->get('gfileEdit');
         $commentAccessLevel = (int)$this->request->post->get('gfileComment');
 
-        $googleIds = explode(',', $googleIdString);
-
         $proxy         = new Server($this->getConfigLoader());
         $gDriveFetcher = new GDriveFetcher(
-            ExtensionMapper::getInstance(),
-            sys_get_temp_dir(),
+            null,
+            null,
             $proxy->curlInit(),
             $this->request->post->get('tokenType') . ' ' . $this->request->post->get('accessToken'),
             false
@@ -92,21 +91,23 @@ class Controller extends Base
                                                       ->getPropertyValues('googleId');
         $email2accessRoleMap = $this->getEmail2AccessRoleMap($folder->getId(), $editAccessLevel, $commentAccessLevel);
 
-        foreach ($googleIds as $googleId) {
+        foreach ($selectedFiles as $selectedFile) {
             // if this file is already associated with this folder, skip
-            if (in_array($googleId, $existingGFileIds)) {
+            if (in_array($selectedFile->id, $existingGFileIds)) {
                 continue;
             }
             // store google file id in the db
             $googleFile = $this->googleFileMapper->createModel();
             $googleFile->setFolderId($folder->getId())
-                       ->setGoogleId($googleId)
+                       ->setGoogleId($selectedFile->id)
+                       ->setName($selectedFile->name)
+                       ->setIcon($selectedFile->icon)
                        ->setOwnerId($this->getUser()->getId());
             $this->googleFileMapper->save($googleFile);
             // provide access to google doc via api
             foreach ($email2accessRoleMap as $email => $accessRole) {
                 $gDriveFetcher->setPermissions(
-                    $googleId, $accessRole, $email
+                    $selectedFile->id, $accessRole, $email
                 );
             }
         }
@@ -133,7 +134,7 @@ class Controller extends Base
         $accesses             = $this->userAccessMapper->findByColumnList(
             ['sid' => $folderId, 'service' => UserAccess::SERVICE_HOMEPAGE]
         );
-        $users = $this->userMapper->hydrateCollection(new Collection($accesses->getPropertyValues('user')))->indexBy('id');
+        $users                = $this->userMapper->hydrateCollection(new Collection($accesses->getPropertyValues('user')))->indexBy('id');
         $userAccess2GFileRole = $this->getUserAccessToRoleMap($editAccessLevel, $commentAccessLevel);
 
         $map = [];

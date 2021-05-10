@@ -99,15 +99,15 @@ class GDriveFetcher implements FetcherInterface
     /**
      * Constructor
      *
-     * @param ExtensionMapper $extensionMapper a mapper for loading extensions from
-     * @param string          $storageDir      the target storage directory: typically `sys_get_temp_dir()`
+     * @param ExtensionMapper|null $extensionMapper a mapper for loading extensions from
+     * @param string|null          $storageDir      the target storage directory: typically `sys_get_temp_dir()`
      * @param resource        $curl            a custom curl handle if a default won't suffice
      * @param string          $httpAuth        an authorization header if not using an anonymous connection
      * @param bool            $allowPdfExport  Can this export PDFs?
      */
     public function __construct(
-        ExtensionMapper $extensionMapper,
-        string $storageDir,
+        ?ExtensionMapper $extensionMapper,
+        ?string $storageDir,
         $curl = null,
         string $httpAuth = '',
         bool $allowPdfExport = true
@@ -216,11 +216,28 @@ class GDriveFetcher implements FetcherInterface
      */
     public function setPermissions(string $fileId, string $accessRole, string $email)
     {
+        $result = $this->callSetPermissions($fileId, $accessRole, $email, false);
+        if ($this->getErrorMessage($result)) {
+            // retry with notification on
+            $result = $this->callSetPermissions($fileId, $accessRole, $email, true);
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $fileId
+     * @param string $accessRole
+     * @param string $email
+     * @param bool   $notify
+     * @return mixed
+     */
+    private function callSetPermissions(string $fileId, string $accessRole, string $email, bool $notify)
+    {
         $params   = [
             'fileId'                => $fileId,
             'fields'                => '*',
             'supportsAllDrives'     => 'true',
-            'sendNotificationEmail' => 'true', // this is necessary for non google accounts
+            'sendNotificationEmail' => $notify ? 'true' : 'false', // this is necessary for non google accounts
         ];
         $postdata = [
             'role'         => $accessRole,
@@ -239,9 +256,6 @@ class GDriveFetcher implements FetcherInterface
         );
 
         $result = json_decode(curl_exec($ch), true);
-        if ($this->getErrorMessage($result)) {
-            // TODO: handle errors
-        }
         curl_close($ch);
         return $result;
     }
