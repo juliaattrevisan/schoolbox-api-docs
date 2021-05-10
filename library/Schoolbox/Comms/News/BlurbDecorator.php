@@ -34,13 +34,21 @@ class BlurbDecorator implements IDecorator
 
 
     /**
+     * @var array
+     */
+    private array $attachmentCounts;
+
+
+    /**
      * @param string $readmore
      * @param bool   $commentsAllowed
+     * @param array  $attachmentCounts
      */
-    public function __construct(string $readmore, bool $commentsAllowed)
+    public function __construct(string $readmore, bool $commentsAllowed, array $attachmentCounts)
     {
         $this->readmore = $readmore;
         $this->commentsAllowed = $commentsAllowed;
+        $this->attachmentCounts = $attachmentCounts;
     }
 
 
@@ -58,6 +66,15 @@ class BlurbDecorator implements IDecorator
 
         if (strip_tags($model->getBlurb()) === '') {
             $json['blurb'] = TextFormatter::cutSentence(Scrub::html2text($model->getBody()), 300);
+        }
+
+        /* Attachments aren't actually hydrated in $model, but we got the counts
+         * for use in a metadata elsewhere, so we can reuse that fact here by
+         * artificially representing the number of files without having the actual
+         * files themselves with all their mimes etc.
+         */
+        if ($this->attachmentCounts[$model->getId()]) {
+            $model->getAttachedFiles()->add(true);
         }
 
         /* Decide if a Read More link is available; it depends on characteristics

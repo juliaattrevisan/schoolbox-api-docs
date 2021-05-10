@@ -936,6 +936,7 @@ class Controller extends Base
                 new BlurbDecorator(
                     $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                     $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                    $attachmentCounts
                 ),
                 new MetadataDecorator($commentCounts),
                 new AttachmentDecorator($attachmentCounts)
