@@ -16,6 +16,7 @@ namespace Schoolbox\Comms\News;
  *   comments
  *   attached files
  *   compact mode
+ *   config settings
  */
 class ValidHasReadMore
 {
@@ -54,6 +55,9 @@ class ValidHasReadMore
             /* But, if the global admin config Enable Comments On News Articles
              * is currently set to Off, you aren't meant to have access to comments
              * anyway, and the entire comment thread will be hidden; nothing to see
+             *
+             * This can manifest when your article once upon a time had comments, but
+             * the system has now disabled it; nothing to see anymore at the moment
              * Hide the link
              *
              * Otherwise your article has comment thread and your instance allows
@@ -64,8 +68,15 @@ class ValidHasReadMore
         }
 
         /* If the article has a body content, there's something to read
+         *
          * It might be the same as the blurb, but there are complications with
-         * that comparison. For now, presume there's something to see
+         * that comparison. The blurb could essentially be a strip_tags of the body,
+         * but if the body contained html only (e.g. an image or a video or an iframe)
+         * then strip_tags will remove whatever was there; it's valid content that should
+         * be seen by users, but has been inadvertently misunderstood by a boolean outcome
+         * and we don't have an easy answer to that problem
+         *
+         * For now, presume there's something to see
          * Show the link
          */
         if ('' !== (string)$article->getBody()) {
@@ -78,7 +89,8 @@ class ValidHasReadMore
          */
 
         /* Circumstantially, in a Component context, there's a Compact Mode setting
-         * which should also hide the link but it won't actually manifest?
+         * which should also hide the link but it won't actually manifest? It's controlled
+         * by the compactMode querystring param which affects partial.twig:87
          */
 
         /* Default case
