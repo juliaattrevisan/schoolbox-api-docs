@@ -194,7 +194,6 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
      */
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id) {
         $object = array(
-            'answer_id' => '',
             'question_id' => $question_id,
             'sequence' => 1,
             'answer' => trim((string)$xmlObj->answer->text),
