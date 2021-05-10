@@ -119,17 +119,27 @@ class Service extends AbstractService
                 // "X-RateLimit-Remaining" header.
                 return true;
             } catch (GuzzleException $e) {
-                if ($e->getCode() === 401) {
+                $responseCode = $e->getCode();
+                if ($responseCode === 401) {
                     // your API key is bad: don't try to do anything else
                     throw $e;
                 }
-                $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
-                return false;
+
+                // Some error other than rate-limit? raise an error
+                if ($responseCode !== 429) {
+                    $this->getLog()->warning($e->getMessage(), ['exception' => $e]);
+                    return false;
+                }
             }
 
             usleep($jitter->calculateJitter($attemptNum));
             $attemptNum++;
         }
+
+        // Too many attempts: log something
+        // (In practice, this ought never happen as we've been very generous
+        //  with the number of attempts)
+        $this->getLog()->warning(sprintf('Notification not sent after %d attempts!', self::MAX_ATTEMPTS));
         return false;
     }
 }
