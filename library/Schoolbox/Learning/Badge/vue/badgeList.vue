@@ -2,6 +2,7 @@
 
 import {stringify} from 'qs';
 import axios from 'axios';
+import foundationMixin from '@schoolbox/foundation-mixin';
 import Toast from "@schoolbox/toast";
 import RevealModal from "@schoolbox/reveal-modal";
 import BadgeAward from "../Award/vue/badgeAward";
@@ -41,7 +42,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [foundationMixin],
 
     components: {
         BadgeAward,
