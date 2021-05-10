@@ -16,6 +16,44 @@ use Schoolbox\Sync\Iterator;
 class Sync extends Base implements ISync
 {
     /**
+     * Default allowed student contact types for a contact record to be
+     * considered a student-guardian relation:
+     * * Contact 1/2/3 (SC1, SC2, SC3)
+     */
+    private const DEFAULT_STUDENT_CONTACT_TYPES = ['SC1', 'SC2', 'SC3',];
+
+
+    /**
+     * Default allowed relationship types for a contact record to be considered
+     * a student-guardian relation:
+     * * Son/daughter (SN, DR)
+     * * Stepson/stepdaughter (STSN, STDR)
+     * * Ward (WD)
+     * * Grandson/granddaughter (GRASN, GRADR)
+     * * Foster child (FC)
+     * * Host parent/child (HOPT, HOCD)
+     * ** added in SB-10620: don't know why parent is a default relationship
+     * * Homestay (HS, HOMES, HSS)
+     * ** HOMES added in SB-11362
+     * ** HSS added in SA-1955
+     */
+    private const DEFAULT_STUDENT_RELATIONSHIPS = [
+        'SN',
+        'STSN',
+        'DR',
+        'STDR',
+        'WD',
+        'GRASN',
+        'GRADR',
+        'FOCD',
+        'HOPT',
+        'HOCD',
+        'HS',
+        'HOMES',
+        'HSS',
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public function findAllStudents()
