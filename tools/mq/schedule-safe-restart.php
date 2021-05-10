@@ -38,8 +38,9 @@ error_reporting(E_ALL);
 restore_error_handler();
 restore_exception_handler();
 
-$opts      = getopt('v', [ 'perform' ]);
+$opts      = getopt('v', [ 'perform', 'no-delay' ]);
 $perform   = isset($opts['perform']);
+$noDelay   = isset($opts['no-delay']);
 $threshold = 0;
 
 if (isset($opts['v'])) {
@@ -61,8 +62,12 @@ $d = new \Alaress\Lumberjack\Logger(STDOUT, STDERR, $limits[$threshold], [ 'true
 $d->info('Starting schedule diagnostics...');
 
 if ($perform) {
-    $d->warning('Running with the safety off, you have 3 seconds to change your mind');
-    sleep(3);
+    if ($noDelay) {
+        $d->warning('Running with the safety off');
+    } else {
+        $d->warning('Running with the safety off, you have 3 seconds to change your mind');
+        sleep(3);
+    }
 } else {
     $d->notice('Doing diagnostic only, no data will be harmed (despite what messages say)');
 }
