@@ -90,9 +90,6 @@ class Service extends AbstractService
      */
     protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
-        $jitter = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
-        $client = new Client();
-
         $headers = [
             'X-Auth-Token' => $this->key,
             'Content-Type' => 'application/json',
@@ -102,7 +99,10 @@ class Service extends AbstractService
         $payload['message'] = $title;
         $payload['ids']     = $tokens;
 
+        // need a HTTP client (should this be injected?)
+        $client     = new Client();
         $attemptNum = 1;
+        $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
         while (!$jitter->tooManyAttempts($attemptNum)) {
             try {
                 $response = $client->post(
