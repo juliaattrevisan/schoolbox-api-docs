@@ -15,22 +15,19 @@ import Record from 'videojs-record/dist/videojs.record.js';
 import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import { gsap } from 'gsap/all';
-import AudioOnlyPlayer from '@schoolbox/videojs/audio-only-player';
-import PhotoPlayer from '@schoolbox/videojs/photo-player';
-import VideoPlayer from '@schoolbox/videojs/video-player';
+import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
-import { getRecordOptions, getVideoPlayerOptionsWithBlob, getVideoPlayerOptionsWithSrc, getAudioPlayerOptionsWithBlob, getAudioPlayerOptionsWithSrc } from '@shared/videojs/videojsOptions';
+import { getRecordOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
+import { isOfFileType, dataURLtoBlob } from '@shared/util/fileUtils';
 
 
 export default {
 
     components: {
-        OverMediaModal,
-        AudioOnlyPlayer,
-        PhotoPlayer,
-        VideoPlayer
+        RecordedMedia,
+        OverMediaModal
     },
 
     props: {
@@ -54,34 +51,17 @@ export default {
 
     data () {
         return {
-            player: null, //videojs-record instance
+            player: null, //videojs-record instance,
+            recordedData: null, //the recorded data that will be passed through to #recored-media
             isDeviceReady: false, //to toggle the device display
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
-            hasRecordPlayerError: false, //error with the record player
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
         }
-    },
-
-    computed: {
-
-        /**
-         * To know whether to show the delete recording button
-         *
-         * @returns { Boolean }
-         */
-        showDeleteRecordingButton () {
-            if ((this.hasPreRecordedData || this.hasNewRecording) && !this.hasError) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-
     },
 
 	created () {
@@ -116,23 +96,6 @@ export default {
         checkForPreRecordedData () {
             if (this.preRecordedData) {
                 this.hasPreRecordedData = true;
-                this.playbackData = {
-                    src: this.getPlaybackDataSrc(),
-                    type: this.preRecordedData.mime
-                } 
-            }
-        },
-
-        /**
-         * to know where to reference the saved file from
-         *
-         * @returns { String } 
-         */
-        getPlaybackDataSrc () {
-            if (this.recordMediaType === recordMediaTypes.PHOTO) {
-                return `/storage/image.php?hash=${this.preRecordedData.hash}`;
-            } else {
-                return `/cms/sendVideo.php?id=${this.preRecordedData.hash}&type=storage`;
             }
         },
 
@@ -160,20 +123,11 @@ export default {
          *
          */
         initVideojsRecordRecordListeners () {
-
             this.player.on('deviceReady', this.onDeviceReady);
             this.player.on('startRecord', this.onStartRecord);
-
-            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); //safari uses mp4 to record, while all others use default webm (with conversion to enable seekable webm)
-            if (isSafari || this.recordMediaType === recordMediaTypes.AUDIO_ONLY || this.recordMediaType === recordMediaTypes.PHOTO) { //the mp3 (AUDIO_ONLY) or png (PHOTO) is ready
-                this.player.on('finishRecord', this.onFinishRecord);
-            } else {
-                this.player.on('finishConvert', this.onFinishConvert);
-            }
-
+            this.player.on('finishRecord', this.onFinishRecord);
             this.player.on('error', this.onError);
             this.player.on('deviceError', this.onDeviceError);
-
         },
 
         /**
@@ -195,12 +149,15 @@ export default {
         },
 
         /**
-         * the record mp3 or mp4 (Safari) is ready
+         * the recorded file is ready
          *
          */
         onFinishRecord () {
-            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
-            this.recordedVideoReady(this.player.recordedData);
+            if (this.player.recordedData.name && isOfFileType(this.player.recordedData.name, 'webm')) { //webm's are converted so they are seekable on playback
+                this.player.on('finishConvert', this.onFinishConvert);
+            } else {
+                this.recordedVideoReady(this.player.recordedData);
+            }
         },
 
         /**
@@ -208,7 +165,6 @@ export default {
          *
          */
         onFinishConvert () {
-            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
             this.recordedVideoReady(this.player.convertedData);
         },
 
@@ -216,9 +172,16 @@ export default {
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
          *
          */
-        recordedVideoReady (mediaData) {
-            this.$emit(recordMediaEvents.PROCCESS_STOPPED);
-            this.recordedData = mediaData; // the blob object contains the recorded data 
+        async recordedVideoReady (mediaData) {
+            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
+            this.$emit(recordMediaEvents.PROCCESS_STOPPED); //notify any UI to re-enable
+            if (this.recordMediaType === recordMediaTypes.PHOTO) { //the recorded photo is just a DataURL, so need to set up a Blob
+                this.recordedData = await dataURLtoBlob(mediaData); 
+                this.recordedData.name = 'photo.jpeg'
+                this.recordedData.src = mediaData; 
+            } else {
+                this.recordedData = mediaData; // the blob object contains the recorded data 
+            }
 			this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
         },
@@ -275,24 +238,14 @@ export default {
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
-            this.hasRecordPlayerError = false;
-        },
-
-        /**
-         * to be able to record another media
-         *
-         */
-        onDeleteRecordingSelected () {
-            this.isDeleteRecordingModalActive = true;
         },
 
         /**
          * confirm deletion of the latest recording, setting up for another recording
          *
          */
-        onConfirmDeleteRecordingSelected () {
+        onRecordedMediaDeleted () {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
-            this.isDeleteRecordingModalActive = false;
             this.hasPreRecordedData = false;  //set to false again for possible display or a re-recording
             this.hasNewRecording = false;
             if (this.player) { //relaunch the recorder if it's already set up
@@ -303,78 +256,15 @@ export default {
         },
 
         /**
-         * close the delete recording modal
+         * Ensure the recorded video ratio is respected
          *
+         * @params { Number }
+         * @params { Number }
          */
-        onCancelDeleteRecordingSelected () {
-            this.isOverMediaModalClosing = true;
+        onRatioReady (width, height) {
+            this.$emit(recordMediaEvents.RATIO_READY, width, height);
         },
 
-        /**
-         * closed the delete recording modal, cancel has been selected rather than confirm
-         *
-         */
-        onDeleteRecordingModalClosed () {
-            this.isOverMediaModalClosing = false;
-            this.isDeleteRecordingModalActive = false;
-        },
-
-        /**
-         * Pass through the audio options to play the latest recorded video
-         *
-         * @returns { Object }
-         */
-        getAudioPlayerOptions () {
-            if (this.hasPreRecordedData) {
-                return getAudioPlayerOptionsWithSrc(this.playbackData);
-            } else {
-                return getAudioPlayerOptionsWithBlob(this.recordedData);
-            }
-        },
-
-        /**
-         * Pass through the audio options to play the latest recorded video
-         *
-         * @returns { String }
-         */
-        getImgSrc () {
-            if (this.hasPreRecordedData) { //otherwise its the already saved image src
-                return this.playbackData.src;
-            } else { //is already a Data URL that can be passed to <image-player></image-player>
-                return this.recordedData; 
-            }
-        },
-
-        /**
-         * Pass through the video options to play the latest recorded video
-         *
-         * @returns { Object }
-         */
-        getVideoPlayerOptions () {
-            if (this.hasPreRecordedData) {
-                return getVideoPlayerOptionsWithSrc(this.playbackData);
-            } else {
-                return getVideoPlayerOptionsWithBlob(this.recordedData);
-            }
-        },
-
-        /**
-         * Just pass through to the parent so they can ensure the container's height is kept up to date
-         *
-         * @params { HTMLVideoElement }
-         */
-        onRecordPlayerLoaded (htmlVideoElement) {
-            this.$emit(recordMediaEvents.RATIO_READY, htmlVideoElement);
-        },
-
-        /**
-         * A record player has got an error
-         *
-         */
-        onRecordPlayerError () {
-            this.hasRecordPlayerError = true;
-            this.hasError = true;
-        }
 
     }
 
@@ -388,26 +278,18 @@ export default {
         <div class="media-container media-container-record" key="recordMediaContainer">
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
-        <div v-if="hasPreRecordedData || hasNewRecording" class="media-container media-container-playback" key="playbackMediaContainer">
-            <audio-only-player
-                v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
-                :options="getAudioPlayerOptions()"
-            />
-            <photo-player
-                v-else-if="recordMediaType === recordMediaTypes.PHOTO"
-                :img-src="getImgSrc()"
-                :is-new-photo="hasPreRecordedData ? false : true"
-            />
-            <video-player
-                v-else
-                :options="getVideoPlayerOptions()"
-                @on-video-data-loaded="onRecordPlayerLoaded"
-                @on-video-error="onRecordPlayerError"
-            />
-        </div>
-        <transition name="slide">
-            <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
-        </transition>
+
+        <recorded-media 
+            v-if="hasPreRecordedData || hasNewRecording"
+            key="media-container-playback"
+            class="media-container media-container-playback"
+            :record-media-type="recordMediaType"
+            :has-pre-recorded-data="hasPreRecordedData"
+            :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+            :recorded-data="recordedData"
+            @on-recorded-media-deleted="onRecordedMediaDeleted"
+            @on-ratio-ready="onRatioReady"
+        />
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
             <template v-if="hasDeviceAlreadyInUseError">
@@ -418,17 +300,6 @@ export default {
                 <div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>
             </template>
-            <template v-else-if="hasRecordPlayerError">
-                <div class="alert-box alert">Sorry, the recorded media cannot be accessed.</div>
-            </template>
-        </over-media-modal>
-
-        <over-media-modal v-else-if="isDeleteRecordingModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
-            <p>Are you sure you wish to delete the current recording?</p>
-            <div class="modal-actions">
-                <button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
-                <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
-            </div>
         </over-media-modal>
 
     </div>
@@ -463,48 +334,6 @@ export default {
     .media-container-playback {
         z-index: 2;
     }
-
-.delete-button {
-    position: absolute;
-    z-index: 3;
-    right: 10px;
-    top: 10px;
-    width: 42px;
-    height: 44px;
-    background: none;
-    color: white;
-    border: 2px solid white;
-    background: rgba(43, 51, 63, 0.7);
-    transition: 0.2s background-color;
-    &::before {
-        text-align: center;
-        font-size: 1.4rem;
-    }
-    &:hover {
-        background: rgba(43, 51, 63, 0.3);
-    }
-}
-
-.modal-actions {
-    display: flex;
-    button {
-        margin: 0px 2px; 
-    }
-}
-
-.slide-enter-active {
-    transition: right 0.4s ease-out;
-}
-.slide-leave-active {
-  transition: right 0.2s ease-in;
-}
-.slide-enter-active, 
-.slide-leave-to {
-  right: -50px; 
-}
-.slide-enter-to {
-  right: 10px; 
-}
 
 .vjs-record-skin::v-deep {
     .vjs-device-button.vjs-control { //not in the centre of the frame, something from SB css is probably getting in the way
@@ -551,11 +380,14 @@ export default {
         font-size: 1.1rem;
         transition: background-color 0.3s;
     }
-    .vjs-current-time { //and pull of from the side
+    .vjs-current-time { //and pull the time of from the side
         padding-left: 10px;
     }
     .vjs-duration {
         padding-right: 10px;
+    }
+    .vjs-fullscreen-control { //currently if the user re-records in full screen, this will not be reflected, so prevent for now
+        display: none;
     }
     .vjs-button > .vjs-icon-placeholder::before { //make all the buttons bigger
         color: white;
@@ -583,6 +415,5 @@ export default {
         }
     }
 }
-
 
 </style>

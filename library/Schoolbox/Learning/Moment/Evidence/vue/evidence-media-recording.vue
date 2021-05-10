@@ -5,20 +5,20 @@
  *
  */
 
-import RecordMedia from '@schoolbox/videojs-record/record-media';
-import DropzoneInputCaptureOnly from '@schoolbox/dropzone/dropzone-input-capture-only';
+import BrowserCaptureMedia from '@schoolbox/videojs-record/browser-capture-media';
+import DeviceCaptureMedia from '@schoolbox/inputCapture/device-capture-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
-import { dataURLtoBlob } from '@shared/util/fileUtils';
+import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
 
 
 export default {
 
     components: {
-        RecordMedia, //the media element
-        DropzoneInputCaptureOnly, //for mobile devices to use instead of record-media
-        OverMediaModal
+        BrowserCaptureMedia, //to use the browser when input capture isn't supported
+        DeviceCaptureMedia, //for mobile devices to use instead of browser-media-capture
+        OverMediaModal //for UI notes, processing, errors, confirmations etc
     },
 
     props: {
@@ -38,6 +38,7 @@ export default {
     data () {
         return {
             recordMediaType: '', //to determine display will be retrieved comparing with props.momentType 
+            hasDeviceCapture: false, //to determine whether to use the devices native device capture rather then the browsers
             recordedData: null, //could be audio, video, image etc
             isUploading: false, //to notify of update
             hasUploadError: false, //to notify of upload error, try again?
@@ -47,8 +48,9 @@ export default {
         }
     },
 
-    created () {
-        this.recordMediaType = this.getMomentTypeToRecordMediaType();
+    created () { //these vars are created so they can be accessed within the template
+        this.hasDeviceCapture = hasDeviceCapture();
+        this.recordMediaType = this.getMomentTypeToBrowserMediaCaptureType();
     },
 
     mounted () {
@@ -58,12 +60,12 @@ export default {
     methods: {
         
         /**
-         * to know how to display the record-media
+         * to know how to display the browser-media-capture
          * object literals intead of switch: https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals
          *
          * @returns { String }
          */
-        getMomentTypeToRecordMediaType () {
+        getMomentTypeToBrowserMediaCaptureType () {
             const momentTypes = {
                 'video': recordMediaTypes.CAMERA,
                 'audio': recordMediaTypes.AUDIO_ONLY,
@@ -118,22 +120,10 @@ export default {
          */
         onRecordedMediaReady (recordedData) {
             this.recordedData = recordedData;
-            this.checkRecordedData();
             document.getElementById('evidence-filename').value = this.recordedData.name; //to pass form submit validation check
             document.addEventListener('evidence-media-recording__onFormSubmit', (event) => { //to prevent the form from being submitted until the media is uploaded
                 this.onFormSubmit();
             }); 
-        },
-
-        /**
-         * currently just convert the PHOTO to be ready for upload
-         *
-         */
-        checkRecordedData () {
-            if (this.recordMediaType === recordMediaTypes.PHOTO) {
-                this.recordedData = dataURLtoBlob(this.recordedData); //the upload needs to be a Blob
-                this.recordedData.name = 'photo.jpeg'; //just for passing form submit validation checks, the file is referenced through the hash, so the name is not too relevant
-            }
         },
 
         /**
@@ -207,7 +197,7 @@ export default {
          *
          */
         displayUploadSuccessful () {
-            this.hasUploaded = true; //to display
+            this.hasUploaded = true; //to display success note
             setTimeout(() => { 
                 this.hasUploaded = false; //and hide again
             }, 2000);
@@ -233,10 +223,11 @@ export default {
         /**
          * Ensure the recorded video ratio is respected
          *
-         * @params { HTMLVideoElement }
+         * @params { Number }
+         * @params { Number }
          */
-        onRatioReady (htmlVideoElement) {
-            this.updateCurrentRatio(htmlVideoElement.videoWidth, htmlVideoElement.videoHeight);
+        onRatioReady (width, height) {
+            this.updateCurrentRatio(width, height);
         },
 
     }
@@ -248,25 +239,29 @@ export default {
 
     <div>
             
-        <div class="record-media-container" ref="container" :style="{ height: targetHeight }">
+        <div class="browser-media-capture-container" ref="container" :style="{ height: targetHeight }">
 
-            <!-- <record-media
+            <device-capture-media
+                v-if="hasDeviceCapture"
+                :record-media-type="recordMediaType"
+                :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+                @on-recorded-media-ready="onRecordedMediaReady"
+                @on-recorded-media-deleted="onRecordedMediaDeleted"
+                @on-ratio-ready="onRatioReady"
+            />
+            <browser-capture-media
+                v-else
                 :record-media-type="recordMediaType"
                 :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
                 @on-device-ready="onDeviceReady"
                 @on-recorded-media-ready="onRecordedMediaReady"
                 @on-recorded-media-deleted="onRecordedMediaDeleted"
                 @on-ratio-ready="onRatioReady"
-            /> -->
-
-            <dropzone-input-capture-only 
-                :record-media-type="recordMediaType"
-                :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             />
 
             <over-media-modal v-if="isUploading" key="isUploadingModal">
                 <div class="loader"></div>
-                <p><em>Uploading video, please wait...</em></p>
+                <p><em>Uploading media, please wait...</em></p>
             </over-media-modal>
             <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
                 <p><em>Media successfully uploaded.</em></p>
@@ -280,7 +275,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.record-media-container {
+.browser-media-capture-container {
     position: relative;
     width: 100%;
     max-width: 700px;

@@ -5,6 +5,19 @@
  */
 
 /**
+* check whether a file name matches specific extension
+* 
+* @param { String } '593042579804375.webm'
+* @param { String } 'mp4'
+*
+* @returns { Boolean } depending of if matches
+*/ 
+export const isOfFileType = (filename, extension) => {
+    const filenameExtension = filename.split('.').pop();
+    return filenameExtension === extension;
+}
+
+/**
 * convert the filename to use the extension instead of whatever it was
 * 
 * @param { String } '593042579804375.webm'
@@ -48,12 +61,15 @@ export const dataURLtoBlob = (dataURL) => {
 * convert Blob to Data URL - https://gist.github.com/wuchengwei/b7e1820d39445f431aeaa9c786753d8e
 * 
 * @param { Blob } 
-* @param { Function } 
 *
 * @returns { DataURL } 
 */
-export const blobToDataURL = (blob, callback) => {
-    var a = new FileReader();
-    a.onload = function(e) { callback(e.target.result); }
-    a.readAsDataURL(blob);
+export const blobToDataURL = async (blob) => {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+        fileReader.readAsDataURL(blob);
+    });
 }
