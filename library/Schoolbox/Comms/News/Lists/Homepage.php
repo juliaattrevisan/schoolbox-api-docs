@@ -13,6 +13,7 @@ use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\Interactions;
 use Schoolbox\Comms\News\Statistics\Mapper;
+use Schoolbox\Comms\News\ValidHasReadMore;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -114,10 +115,22 @@ class Homepage extends Base
             $articles[$rootSegment->getCommsNewsArticle()->getId()]->getAudience()[$rootSegment->getId()] = $rootSegment;
         }
 
+        /* Build a lookup of Read More links for each article id, which aren't json but
+         * Model instances that don't comprehend the Read More status like this
+         */
+        $readMores = [];
+
+        foreach ($articles as $article) {
+            $readMores[$article->getId()] = [
+                'string' => $this->readMoreText,
+                'available' => (new ValidHasReadMore())->isSatisfiedBy($article, $this->readMoreText, $this->commentsIsEnabled)
+            ];
+        }
+
         return [
             'articles' => $this->populateMetadata($articles),
             'attachmentCounts' => $attachmentCounts,
-            'readMore' => $this->readMoreText,
+            'readMores' => $readMores,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
             'unsaved' => SaveForLater\Mapper::UNSAVED,
