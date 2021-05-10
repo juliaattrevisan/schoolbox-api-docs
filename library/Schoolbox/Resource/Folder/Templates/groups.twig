@@ -37,7 +37,7 @@
             {% set isAccessWrite = userAccess[group.id] == 2 %}
             {% set isAccessRead = userAccess[group.id] == 1 %}
             {% set isPrivate = group.group.private ?? false %}
-        <div class="small-6 medium-6 large-4 island">
+        <div class="small-12 medium-6 large-4 xlarge-3 island">
             <section>
                 <div class="v-card small-12">
                 <a href="/homepage/{{ group.id }}">
@@ -66,8 +66,8 @@
                         {% endif %}
                     </div>
                 </div>
-                </section>
-            </div>
+            </section>
+        </div>
         {% endfor %}
     {% endif %}
 </div>
