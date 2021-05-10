@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -48,18 +48,22 @@ class RegistryMapper extends Mapper
 
 
     /**
+     * Find a registry entry by its token and provider for a given user ID.
+     *
      * @param int    $userId
      * @param string $token
      * @param string $provider
      * @return Registry
      * @throws Mapper\Exception
      */
-    public function findById($userId, $token = null, $provider = null)
+    public function findByTokenAndProviderForUser(int $userId, string $token, string $provider): Registry
     {
+        // mobile_app_registry.provider is a dead field:
+        // look up the service's provider
         return $this->findOneByColumnList(array(
-            'user_id'   => $userId,
-            'app_token' => $token,
-            'provider'  => $provider,
+            'user_id'    => $userId,
+            'app_token'  => $token,
+            's.provider' => $provider,
         ));
     }
 
@@ -135,4 +139,27 @@ class RegistryMapper extends Mapper
     }
 
 
+    /**
+     * Deregister app registrations for the given user and provider.
+     *
+     * This is used for deprecating old providers when a registration arrives
+     * for a new provider.
+     *
+     * @param User   $user
+     * @param string $provider
+     */
+    public function deregisterForProvider(User $user, string $provider): void
+    {
+        // Which app IDs are registrations deregistered for?
+        $serviceMapper = $this->getJoinMapper('service');
+        $servicePb     = $serviceMapper->getPredicateBuilder()
+                                       ->equals('provider', $provider);
+        $appIds        = $serviceMapper->findScalarByPredicates('id', $servicePb);
+
+        // Deregister for those app IDs and the given user
+        $predicatePb = $this->getPredicateBuilder()
+            ->in('app_id', $appIds)
+            ->equals('user_id', $user->getId());
+        $this->deleteByPredicates($predicatePb);
+    }
 }
