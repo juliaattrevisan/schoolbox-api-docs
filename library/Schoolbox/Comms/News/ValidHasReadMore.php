@@ -26,6 +26,7 @@ class ValidHasReadMore
      */
     public function isSatisfiedBy(Model $article): bool
     {
+
         /* If there are files, there's something to download from the detail screen
          * Show the link
          */
@@ -45,7 +46,7 @@ class ValidHasReadMore
          * that comparison. For now, presume there's something to see
          * Show the link
          */
-        if ('' !== $article->getBody()) {
+        if ('' !== (string)$article->getBody()) {
             return true;
         }
 
