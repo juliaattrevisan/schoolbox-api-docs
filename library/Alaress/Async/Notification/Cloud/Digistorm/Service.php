@@ -27,6 +27,16 @@ class Service extends AbstractService
     private const BASE_URL = 'https://api.notifications.digistorm.io/v1/push';
 
     /**
+     * Base values to pass in the payload to requests to the Digistorm
+     * notification API.
+     */
+    private const BASE_PAYLOAD = [
+        'id_type'  => 'username',
+        'platform' => 'schoolbox',
+        'module'   => 'messages',
+    ];
+
+    /**
      * API key for the service
      */
     private string $key;
@@ -72,14 +82,10 @@ class Service extends AbstractService
             'X-Auth-Token' => $this->key,
             'Content-Type' => 'application/json',
         ];
-        $payload = [
-            'title'       => $this->appTitle,
-            'message'     => $title,
-            'ids'         => $tokens,
-            'custom_data' => [
-                'notice_id' => $id,
-            ],
-        ];
+        $payload            = self::BASE_PAYLOAD;
+        $payload['title']   = $this->appTitle;
+        $payload['message'] = $title;
+        $payload['ids']     = $tokens;
 
         // need a HTTP client (should this be injected?)
         $client = new Client();
