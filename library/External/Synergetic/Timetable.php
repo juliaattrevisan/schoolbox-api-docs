@@ -51,7 +51,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
 
     /**
-     * @var array
+     * @var array|null
      */
     private $semesters;
 
@@ -324,14 +324,17 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
         }
 
-        foreach ($this->semesters as $semester) {
-            if ($date->between($semester['start'], $semester['end'])) {
-                return [
-                    'fileYear'     => $semester['fileYear'],
-                    'fileSemester' => $semester['fileSemester'],
-                ];
+        if (is_array($this->semesters)) {
+            foreach ($this->semesters as $semester) {
+                if ($date->between($semester['start'], $semester['end'])) {
+                    return [
+                        'fileYear' => $semester['fileYear'],
+                        'fileSemester' => $semester['fileSemester'],
+                    ];
+                }
             }
         }
+
         return [];
     }
 
