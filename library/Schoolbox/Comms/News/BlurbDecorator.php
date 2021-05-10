@@ -4,27 +4,43 @@
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
-
 namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Decorator\IDecorator;
 use TextFormatter;
 use Scrub;
 
+
+/**
+ * Class BlurbDecorator
+ *
+ * Add blurb-related parts, such as the blurb itself, and any Read More link behaviours
+ *
+ * @package Schoolbox\Comms\News
+ */
 class BlurbDecorator implements IDecorator
 {
 
     /**
      * @var string
      */
-    private $readmore;
+    private string $readmore;
+
 
     /**
-     * @param string     $readmore
+     * @var bool
      */
-    public function __construct($readmore)
+    private bool $commentsAllowed;
+
+
+    /**
+     * @param string $readmore
+     * @param bool   $commentsAllowed
+     */
+    public function __construct(string $readmore, bool $commentsAllowed)
     {
         $this->readmore = $readmore;
+        $this->commentsAllowed = $commentsAllowed;
     }
 
 
@@ -40,27 +56,17 @@ class BlurbDecorator implements IDecorator
             return $json;
         }
 
-        if (strlen(strip_tags($model->getBlurb())) == 0) {
+        if (strip_tags($model->getBlurb()) === '') {
             $json['blurb'] = TextFormatter::cutSentence(Scrub::html2text($model->getBody()), 300);
         }
-       
-        $json['readmore'] = [
-            'string' => '',
-            'available' => false
-        ];
 
-        // Show 'read more' link if a body exists, and 'read more' text exists,
-        // Or just set readmore to available if body exists (for links from title and feature image)
-        if ($model->getBody()) {
-            if (\strlen($this->readmore)) {
-                $json['readmore'] = [
-                    'string' => $this->readmore,
-                    'available' => true
-                ];
-            } else {
-                $json['readmore']['available'] = true;
-            }
-        }
+        /* Decide if a Read More link is available; it depends on characteristics
+         * of the article and some admin config vars
+         */
+        $json['readmore'] = [
+            'string' => $this->readmore,
+            'available' => (new ValidHasReadMore())->isSatisfiedBy($model, $this->readmore, $this->commentsAllowed)
+        ];
 
         return $json;
     }

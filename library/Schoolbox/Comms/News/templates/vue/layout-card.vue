@@ -93,7 +93,10 @@
                     <article v-if="!isCompactMode" v-html="article.blurb"></article>
                 </div>
                 <div class="card-actions">
-                    <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
+                    <template v-if="article.readmore.available">
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-html="article.readmore.string"></a>
+                    </template>
+
                     <div class="card-spacer"></div>
                     <a v-if="article._links.update.auth" :href="article._links.update.href" class="icon-modify no-text" :title="'Modify this ' + localeNewsPlural"></a>
                     <a v-if="configSaveForLater" @click="saveForLater(article)"

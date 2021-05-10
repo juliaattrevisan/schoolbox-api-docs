@@ -912,7 +912,6 @@ class Controller extends Base
                 'slug',
                 'sequence'
             ],
-            'hasReadMore' => false
         ];
 
         // Link auth requires hydrated audiences
@@ -934,13 +933,12 @@ class Controller extends Base
             new PropertyDecorator(
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
+                new BlurbDecorator(
+                    $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                    $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                ),
                 new MetadataDecorator($commentCounts),
                 new AttachmentDecorator($attachmentCounts)
-
-                /* TODO Add ReadMoreDecorator here which uses the spec pattern
-                 *  to determine if the Read More link should be available
-                 */
             )
         );
 
