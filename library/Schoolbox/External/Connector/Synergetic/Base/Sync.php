@@ -97,19 +97,27 @@ class Sync extends Base implements ISync
      */
     public function findAllParents()
     {
+        // Contact types
         $contactTypes = trim($this->config->get('external_synergetic_student_contact_types'));
-
         if ($contactTypes === '') {
-            $contactTypes = "SC1,SC2,SC3";
+            $contactTypes = self::DEFAULT_STUDENT_CONTACT_TYPES;
+        } else {
+            $contactTypes = array_map("trim", explode(",", $contactTypes));
         }
-
-        $contactTypes = array_map("trim", explode(",", $contactTypes));
-
         $contactTypeBindings1 = $this->databaseExternal->prepareInBindings($contactTypes);
         $contactTypeBindings2 = $this->databaseExternal->prepareInBindings($contactTypes);
 
-        $guardianIterator = $this->databaseExternal->getQueryIterator("
+        // Relationships
+        $relationships = trim($this->config->get('external_synergetic_student_relationships'));
+        if ($relationships === '') {
+            $relationships = self::DEFAULT_STUDENT_RELATIONSHIPS;
+        } else {
+            $relationships = array_map("trim", explode(",", $relationships));
+        }
+        $relationshipBindings1 = $this->databaseExternal->prepareInBindings($relationships);
+        $relationshipBindings2 = $this->databaseExternal->prepareInBindings($relationships);
 
+        $guardianIterator = $this->databaseExternal->getQueryIterator("
             SELECT DISTINCT cp.NetworkLogin                               AS student_contact_network_login,
                             s.StudentContactID                            AS student_contact_id,
                             s.StudentContactTitle                         AS student_contact_title,
@@ -129,7 +137,9 @@ class Sync extends Base implements ISync
                             s.StudentSurname                              AS student_surname
             FROM            dbo.vStudentContactAllAddress s
             INNER JOIN      dbo.Community cp ON s.StudentContactID = cp.ID
+            INNER JOIN      dbo.Relationships r ON s.StudentID = r.relatedID
             WHERE           s.StudentContactType IN ({$contactTypeBindings1['sql']}) AND
+                            r.Relationship IN ({$relationshipBindings1['sql']}) AND
                             FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                             FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
 
@@ -154,7 +164,9 @@ class Sync extends Base implements ISync
                             s.StudentSurname                              AS student_surname
             FROM            dbo.vStudentContactAllAddress s
             INNER JOIN      dbo.Community cs ON s.StudentContactSpouseID = cs.ID
+            INNER JOIN      dbo.Relationships r ON s.StudentID = r.relatedID
             WHERE           s.StudentContactType IN ({$contactTypeBindings2['sql']}) AND
+                            r.Relationship IN ({$relationshipBindings2['sql']}) AND
                             FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                             FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
 
@@ -162,7 +174,9 @@ class Sync extends Base implements ISync
 
         ", array_merge(
                 $contactTypeBindings1['bindings'],
-                $contactTypeBindings2['bindings']
+                $contactTypeBindings2['bindings'],
+                $relationshipBindings1['bindings'],
+                $relationshipBindings2['bindings'],
             )
         );
 
