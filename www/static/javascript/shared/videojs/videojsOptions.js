@@ -137,7 +137,7 @@ const getRecordCameraOptions = () => {
                 width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
                 height: { min: 180, ideal: 405, max: 720 }
             },
-            videoMimeType: 'video/webm;codecs=vp8,opus',
+            videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: 300, //five minutes
             debug: true,

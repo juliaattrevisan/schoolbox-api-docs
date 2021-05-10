@@ -22,6 +22,12 @@ export default {
         },
     },
 
+    data () {
+        return {
+            videoHeight: 0
+        }
+    },
+
     mounted () {
         this.initVideojs();
     },
@@ -37,10 +43,36 @@ export default {
          *
          */
         initVideojs () {
-            this.player = videojs(this.$refs.videoPlayer, this.options);
-            this.player.on('loadeddata', this.onVideoDataLoaded);
+            
+            this.videoHeight = this.$refs.videoPlayer.offsetHeight;
+
+            this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideoPlayerReady);
             this.player.on('error', this.onVideoError);
             gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } ); 
+
+        },
+
+        /** 
+         * there's no fully cross-browser accurate load detection, and as all we need is height detection,
+         * just use an interval 
+         *
+         */
+        onVideoPlayerReady () {
+            this.checkInterval = setInterval(this.checkVideoHeight, 200);
+        },
+
+        /** 
+         * there's no fully cross-browser accurate load detection, and as all we need is height detection,
+         * just use an interval. This mainly relates to safari ios, which doesn't load a input captured video.
+         *
+         */
+        checkVideoHeight () {
+            const currentVideoHeight = this.$refs.container.firstChild.offsetHeight; //videojs wraps around the <video> element
+            if (this.videoHeight !== currentVideoHeight) {
+                this.videoHeight = currentVideoHeight;
+                clearInterval(this.checkInterval);
+                this.$emit('on-dimensions-ready', this.$refs.container.firstChild.offsetWidth, currentVideoHeight);
+            }
         },
 
         /** 
@@ -67,7 +99,17 @@ export default {
             if (this.player) {
                 this.player.dispose();
             }
-        }
+        },
+
+        /**
+		 * To keep the width of the selected-action-container the same as the parent container
+		 * which will change depending on whether the side menu is opened/closed
+		 *
+		 * @returns { width, height }
+		 */
+		onContainerResize (dimensions) {
+			debugger;
+		},
 
     }
 
@@ -75,7 +117,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div ref="container">
         <video ref="videoPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>

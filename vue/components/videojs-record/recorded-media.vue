@@ -1,12 +1,20 @@
 <script>
 
-/*
- * To show an image that's beeen generated from videojs-record
+/**
+ * To record, playback and upload a camera/screen recording into SB 
+ * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
  *
  */
 
+import 'video.js/dist/video-js.css';
+import 'videojs-record/dist/css/videojs.record.css';
+import videojs from 'video.js';
+import 'webrtc-adapter';
+import RecordRTC from 'recordrtc';
+import Record from 'videojs-record/dist/videojs.record.js';
+import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
+import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import { gsap } from 'gsap/all';
-import Dropzone from 'dropzone';
 import AudioOnlyPlayer from '@schoolbox/videojs/audio-only-player';
 import PhotoPlayer from '@schoolbox/videojs/photo-player';
 import VideoPlayer from '@schoolbox/videojs/video-player';
@@ -30,18 +38,28 @@ export default {
             type: String,
             required: true,
             validator: function (value) {
-                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.PHOTO].indexOf(value) !== -1 // The value must match one of these strings
+                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN, recordMediaTypes.PHOTO].indexOf(value) !== -1 // The value must match one of these strings
             }
+        },
+        hasPreRecordedData: { //if not, it must be a new recording
+            type: Boolean, 
+            required: true,
+            default: false
         },
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
         },
+        recordedData: { //new recording
+            type: Blob,
+            required: false,
+        }
     },
 
     data () {
         return {
-            hasPreRecordedData: false, //to display an existing recording on load
+            player: null, //videojs-record instance
+            isDeviceReady: false, //to toggle the device display
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
             hasRecordPlayerError: false, //error with the record player
@@ -50,50 +68,23 @@ export default {
         }
     },
 
-    computed: {
-
-        /**
-         * To know whether to show the delete recording button
-         *
-         * @returns { Boolean }
-         */
-        showDeleteRecordingButton () {
-            if ((this.hasPreRecordedData || this.hasNewRecording) && !this.hasError) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-    },
-
-    created () {
+	created () {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
         this.checkForPreRecordedData();
 	},
 
     mounted () {
-
-        // const dropzoneOptions = getOptions();
-        const dropzoneOptions = {};
-        dropzoneOptions.url = '/file/post';
-
-        const dropzone = new Dropzone(this.$refs.dropzone, dropzoneOptions);
-        dropzone.on('addedfile', (file) => this.onFileAdded(file));
-
-    },
+        gsap.from(this.$refs.deleteButton, 0.5, { right: '-50px', delay: 0.5 } ); //move it across to highlight
+	},
 
     methods: {
 
         /**
-         * Do we need to request the media device straight away? 
-         * If not wait until it's requested - by deleting the pre recorded media recording
-         * Otherwise we will just be displaying the existing pre recorded media
+         * Either display a previously recorded media, or something just recorded
          *
          */
         checkForPreRecordedData () {
             if (this.preRecordedData) {
-                this.hasPreRecordedData = true;
                 this.playbackData = {
                     src: this.getPlaybackDataSrc(),
                     type: this.preRecordedData.mime
@@ -115,41 +106,21 @@ export default {
         },
 
         /**
-         * get the correct options depending on the selected media type
+         * close the error modal, animating out
          *
-         * @returns { Object }
          */
-        getDropzoneOptions () {
-            if (this.recordMediaType === recordMediaTypes.PHOTO) {
-                return {
-                    uploadMultiple: false,
-                    capture: 'camera',
-                    acceptedFiles: 'image/*'
-                }
-            } else if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) {
-                return {
-                    uploadMultiple: false,
-                    capture: 'microphone',
-                    acceptedFiles: 'audio/*'
-                }
-            } else if (this.recordMediaType === recordMediaTypes.CAMERA) {
-                return {
-                    uploadMultiple: false,
-                    capture: 'camcorder',
-                    acceptedFiles: 'video/*'
-                }
-            }
+        onCloseErrorModalSelected () {
+            this.isOverMediaModalClosing = true;
         },
 
         /**
-         * get the correct options depending on the selected media type
+         * it's closed now, so disable the errors to allow trying again
          *
-         * @returns { Blob }
          */
-        onFileAdded (mediaData) {
-            this.recordedData = mediaData; // the blob object contains the recorded data 
-			this.hasNewRecording = true; //show the <player></player>
-            this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
+        onErrorModalClosed () {
+            this.hasError = false;
+            this.isOverMediaModalClosing = false;
+            this.hasRecordPlayerError = false;
         },
 
         /**
@@ -167,8 +138,6 @@ export default {
         onConfirmDeleteRecordingSelected () {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
             this.isDeleteRecordingModalActive = false;
-            this.hasPreRecordedData = false;  //set to false again for possible display or a re-recording
-            this.hasNewRecording = false;
         },
 
         /**
@@ -202,15 +171,15 @@ export default {
         },
 
         /**
-         * Pass through the audio options to play the latest recorded video
+         * Pass through the image src to display the photo
          *
          * @returns { String }
          */
         getImgSrc () {
-            if (this.hasPreRecordedData) { //otherwise its the already saved image src
+            if (this.hasPreRecordedData) { //otherwise it's the already saved image src
                 return this.playbackData.src;
-            } else { //is already a Data URL that can be passed to <image-player></image-player>
-                return this.recordedData; 
+            } else { 
+                return this.recordedData.src; //was put in by 
             }
         },
 
@@ -230,10 +199,11 @@ export default {
         /**
          * Just pass through to the parent so they can ensure the container's height is kept up to date
          *
-         * @params { HTMLVideoElement }
+         * @params { Number }
+         * @params { Number }
          */
-        onRecordPlayerLoaded (htmlVideoElement) {
-            this.$emit(recordMediaEvents.RATIO_READY, htmlVideoElement);
+        onMediaDimensionsReady (width, height) {
+            this.$emit(recordMediaEvents.RATIO_READY, width, height);
         },
 
         /**
@@ -243,16 +213,7 @@ export default {
         onRecordPlayerError () {
             this.hasRecordPlayerError = true;
             this.hasError = true;
-        },
-
-        /**
-         * it's closed now, so disable the errors to allow trying again
-         *
-         */
-        onErrorModalClosed () {
-            this.hasError = false;
-            this.hasRecordPlayerError = false;
-        },
+        }
 
     }
 
@@ -260,32 +221,28 @@ export default {
 </script>
 
 <template>
+    
+    <div>
 
-    <div class="container">
+        <audio-only-player
+            v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
+            :options="getAudioPlayerOptions()"
+        />
+        <photo-player
+            v-else-if="recordMediaType === recordMediaTypes.PHOTO"
+            :img-src="getImgSrc()"
+            :is-new-photo="hasPreRecordedData ? false : true"
+            @on-dimensions-ready="onMediaDimensionsReady"
+        />
+        <video-player
+            v-else
+            :options="getVideoPlayerOptions()"
+            @on-dimensions-ready="onMediaDimensionsReady"
+            @on-video-error="onRecordPlayerError"
+        />
 
-        <div class="media-container media-container-record">
-            <div class="dzone icon-attach" ref="dropzone">
-                <span>Click or drag here to attach a feature image</span>
-            </div>
-        </div>
-        <div v-if="hasPreRecordedData || hasNewRecording" class="media-container media-container-playback" key="playbackMediaContainer">
-            <audio-only-player
-                v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
-                :options="getAudioPlayerOptions()"
-            />
-            <photo-player
-                v-else-if="recordMediaType === recordMediaTypes.PHOTO"
-                :img-src="getImgSrc()"
-            />
-            <video-player
-                v-else
-                :options="getVideoPlayerOptions()"
-                @on-video-data-loaded="onRecordPlayerLoaded"
-                @on-video-error="onRecordPlayerError"
-            />
-        </div>
         <transition name="slide">
-            <a v-if="showDeleteRecordingButton" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
+            <a ref="deleteButton" v-if="!hasError" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
         </transition>
 
         <over-media-modal v-if="isDeleteRecordingModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
@@ -305,43 +262,10 @@ export default {
 
 <style lang="scss" scoped>
 
-.container {
-    position: absolute;
-    width: 100%;
-    height: 100%; //will be updated by the parent container, keeping it inline with the parent
-    background: white;
-    overflow: hidden;
-}
-
-.media-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-}
-
-    .media-container-record {
-        z-index: 1;
-    }
-
-    .media-container-playback {
-        z-index: 2;
-    }
-
-.dzone {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
 .delete-button {
     position: absolute;
     z-index: 3;
-    right: 10px;
+    right: 10px; 
     top: 10px;
     width: 42px;
     height: 44px;
@@ -370,14 +294,95 @@ export default {
     transition: right 0.4s ease-out;
 }
 .slide-leave-active {
-  transition: right 0.2s ease-in;
+    transition: right 0.2s ease-in;
 }
 .slide-enter-active, 
 .slide-leave-to {
-  right: -50px; 
+    right: -50px; 
 }
 .slide-enter-to {
-  right: 10px; 
+    right: 10px; 
+}
+
+.vjs-record-skin::v-deep {
+    .vjs-device-button.vjs-control { //not in the centre of the frame, something from SB css is probably getting in the way
+        top: 42%;
+        margin-left: -2.6em;
+    }
+    .vjs-control-bar { //fatten up the bottom control panel
+        height: 5em;
+        padding: 0px;
+    }
+    .vjs-control {
+        width: 5em;
+    }
+    .vjs-icon-record-start,
+    .vjs-icon-record-stop,
+    .vjs-icon-photo-camera { //make the start/stop record buttons big and fat and put in the middle
+        position: absolute;
+        z-index: 2;
+        left: 50%;
+        margin-left: -20px;
+        bottom: 0px; 
+        transform-origin: center;
+        transform: scale(3.1);
+        color: #f03;
+        transition: color 0.2s, transform 0.2s;
+        &:hover {
+            transform: scale(2.8);
+        }
+    }
+    .vjs-icon-photo-camera { //shrink a bit, bit big compared to the other icons
+        transform: scale(2.3);
+        color: #fff;
+        &:hover {
+            transform: scale(2.1);
+        }
+    }
+    .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
+        text-shadow: none;
+    }
+    .vjs-time-control { //make the time stand out a bit more
+        width: auto;
+        min-width: 0;
+        padding: 0px 2px;
+        font-size: 1.1rem;
+        transition: background-color 0.3s;
+    }
+    .vjs-current-time { //and pull the time of from the side
+        padding-left: 10px;
+    }
+    .vjs-duration {
+        padding-right: 10px;
+    }
+    .vjs-fullscreen-control { //currently if the user re-records in full screen, this will not be reflected, so prevent for now
+        display: none;
+    }
+    .vjs-button > .vjs-icon-placeholder::before { //make all the buttons bigger
+        color: white;
+        font-size: 4em;
+        line-height: 1.25;
+    }
+    .vjs-play-control { //it'll never be shown, as once recored moves to another player
+        display: none;
+    }
+    .vjs-control.vjs-record-indicator { //move the record note further down
+        top: 20px;
+    }
+    .vjs-control.vjs-record-indicator,
+    .vjs-control.vjs-record-indicator:before,
+    .vjs-control.vjs-record-indicator:after { //and make the record note stand out more
+        transform: scale(1.8);
+    }
+    .vjs-control.vjs-record-indicator:before { //provide a bit more padding to the recording dot
+        left: -1.8rem;
+    }
+    @media screen and (max-width: 640px) { //shrink down a bit
+        .vjs-time-control  {
+            font-size: 0.9rem;
+            line-height: 3.3rem;
+        }
+    }
 }
 
 </style>

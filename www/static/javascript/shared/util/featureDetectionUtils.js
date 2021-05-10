@@ -4,12 +4,12 @@
  *
  */
 
-/*
+/** 
 * To use the devices native capture tools
 * 
 * @returns { Boolean } 
 */ 
-export const hasDeviceCapture = (filname, extension) => {
+export const hasDeviceCapture = () => {
     const inputElement = document.createElement('input')
 	const isSupported = inputElement.capture != undefined;
 	return isSupported;

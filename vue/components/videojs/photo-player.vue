@@ -16,7 +16,7 @@ export default {
             required: true,
             default: ''
         },
-        isNewPhoto: { //will pass through a dataURL
+        isNewPhoto: { //to animate on
             type: Boolean,
             required: true,
             default: false
@@ -41,6 +41,14 @@ export default {
                     this.$refs.imgForeground.style.opacity = 0;
                 }
             });
+        },
+
+        /**
+         * The image is loaded, so dispatch size to anyone listening
+         *
+         */
+        onImgLoad () {
+            this.$emit('on-dimensions-ready', this.$refs.img.width, this.$refs.img.height);
         }
 
     }
@@ -50,7 +58,7 @@ export default {
 
 <template>
     <div>
-        <img :src="imgSrc">
+        <img ref="img" :src="imgSrc" @load="onImgLoad">
         <div class="img-foreground" ref='imgForeground'></div>
     </div>
 </template>
