@@ -115,8 +115,19 @@ class Service extends AbstractService
 
                 // Check the response: maybe not all IDs exist?
                 // That might be an issue worth checking?
-                // Maybe also check rate limit, as the response contains an
-                // "X-RateLimit-Remaining" header.
+                $responseContent = json_decode($response->getBody()->getContents(), true);
+                $errors          = $responseContent['errors'] ?? [];
+                if (is_iterable($errors)) {
+                    foreach ($errors as $error) {
+                        $this->getLog()->notice(
+                            sprintf(
+                                'Possible error response: %s: %s',
+                                $error['description'] ?? '',
+                                $error['id'] ?? '',
+                            )
+                        );
+                    }
+                }
                 return true;
             } catch (GuzzleException $e) {
                 $responseCode = $e->getCode();
