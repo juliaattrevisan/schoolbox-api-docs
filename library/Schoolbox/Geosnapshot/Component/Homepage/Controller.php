@@ -43,10 +43,9 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         /* If the component has a search term, ask Geosnapshot for an answer
          */
-        if ((new ValidEventPhotosAvailable())->isSatisfiedBy(
+        if ((new ValidGeosnapshotAvailable())->isConfigured(
             $this->getConfigLoader()->get('geosnapshot_api_key'),
-            $this->getConfigLoader()->get('geosnapshot_enabled'),
-            $this->getConfig('eventName')
+            $this->getConfigLoader()->get('geosnapshot_enabled')
         )) {
 
             /* Set up guzzle with the authentication pieces
@@ -68,16 +67,6 @@ class Controller extends Component_Homepage_ControllerAbstract
              */
             $this->url = $response['url'];
 
-            return true;
-        }
-
-        /* Maybe there isn't an event name specified yet; you should spawn an empty
-         * homepage component so someone can specify an event name
-         */
-        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && (new ValidGeosnapshotAvailable())->isConfigured(
-            $this->getConfigLoader()->get('geosnapshot_api_key'),
-            $this->getConfigLoader()->get('geosnapshot_enabled')
-        )) {
             return true;
         }
 
