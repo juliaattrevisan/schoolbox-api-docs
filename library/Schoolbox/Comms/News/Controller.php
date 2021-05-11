@@ -1462,12 +1462,6 @@ class Controller extends Base
             $article->setSticky((bool)$postData['sticky']);
         }
 
-        // Only set comments allowed if the value is passed in the form,
-        // and the feature is enabled
-        if (isset($postData['commentsAllowed']) && $this->getConfigLoader()->get('comms_comments_enabled')) {
-            $article->setCommentsAllowed((bool)$postData['commentsAllowed']);
-        }
-
         // Exception thrown when an invalid date is submitted; use last known value instead
         // This can occur with bad input; or when datepicker is still processing strtotime shuriken
         try {

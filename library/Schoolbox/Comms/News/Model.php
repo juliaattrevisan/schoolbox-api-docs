@@ -120,11 +120,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private $submittedAt;
 
     /**
-     * @var bool
-     */
-    private $commentsAllowed;
-
-    /**
      * The person who allowed this article to be published
      *
      * @var User|null
@@ -885,26 +880,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function setExpiresAt(\Alaress_Date_Format $expiresAt): self
     {
         $this->expiresAt = $expiresAt;
-        return $this;
-    }
-
-
-    /**
-     * @return null|bool
-     */
-    public function getCommentsAllowed(): ?bool
-    {
-        return $this->commentsAllowed;
-    }
-
-
-    /**
-     * @param bool $commentsAllowed
-     * @return static
-     */
-    public function setCommentsAllowed(bool $commentsAllowed): self
-    {
-        $this->commentsAllowed = $commentsAllowed;
         return $this;
     }
 
