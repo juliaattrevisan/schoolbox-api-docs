@@ -1256,9 +1256,20 @@ class Controller extends Base
 
         $this->hydrateArticleAudiences($articles);
 
+        /* Attachment counts for each article in this set
+         */
+        $attachmentCounts = $this->fileMapper->findCounts($articles->getPropertyValues('id'));
+
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)))
+            new PropertyDecorator(
+                $map,
+                new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                new BlurbDecorator(
+                    $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                    $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                    $attachmentCounts
+                ))
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));

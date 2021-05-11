@@ -134,6 +134,9 @@ class Archive extends Base
         foreach ($articles as $article) {
 
             /* Artificially represent the presence of one or more files without having to hydrate them
+             *
+             * Alternatively, implement this pseudocode
+             * $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
              */
             if ($attachmentCounts[$article->getId()]) {
                 $article->getAttachedFiles()->add(true);

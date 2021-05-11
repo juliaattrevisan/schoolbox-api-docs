@@ -604,6 +604,9 @@ class Notifier extends AbstractModuleNotifier
         /* Attachments aren't actually hydrated in $article
          * Artificially represent the number of files without having the actual
          * files themselves with all their mimes etc.
+         *
+         * Alternatively, implement this pseudocode
+         * $article->setAttachedFiles($this->mapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
          */
         $attachmentCounts = $this->fileMapper->findCounts([$article->getId()]);
 

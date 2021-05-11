@@ -84,10 +84,14 @@ class Controller extends Base
         $readMores = [];
 
         foreach ($articles as $article) {
+
             /* Attachments aren't actually hydrated in $model, but we got the counts
              * for use in a metadata elsewhere, so we can reuse that fact here by
              * artificially representing the number of files without having the actual
              * files themselves with all their mimes etc.
+             *
+             * Alternatively, implement this pseudocode
+             * $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
              */
             if ($attachmentCounts[$article->getId()]) {
                 $article->getAttachedFiles()->add(true);

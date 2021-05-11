@@ -72,6 +72,9 @@ class BlurbDecorator implements IDecorator
          * for use in a metadata elsewhere, so we can reuse that fact here by
          * artificially representing the number of files without having the actual
          * files themselves with all their mimes etc.
+         *
+         * Alternatively, implement this pseudocode
+         * $article->setAttachedFiles($this->getArticleMapper()->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
          */
         if ($this->attachmentCounts[$model->getId()]) {
             $model->getAttachedFiles()->add(true);
