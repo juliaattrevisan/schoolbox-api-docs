@@ -87,7 +87,6 @@ export default {
 
     created () {
         this.hasDeviceCapture = hasDeviceCapture();
-        this.hasDeviceCapture = true;
         this.initRatios();
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
     },
