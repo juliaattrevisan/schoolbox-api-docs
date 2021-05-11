@@ -77,6 +77,13 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 				color: $content-ui-foreground;
 			}
 		}
+        .selectize-input.input-active {
+            background-color: $form-bg-hover-color;
+            color: $form-bg-hover-color-contrast;
+            input {
+                color: $form-bg-hover-color-contrast;
+            }
+        }
 	}
 
 	&.single {
@@ -165,6 +172,13 @@ fieldset[disabled] div.selectize-control div.selectize-input.items > div.item > 
 	&.dropdown-active:before {
 		display: none;
 	}
+    &:hover, &:focus, &.input-active {
+        background-color: $form-bg-hover-color;
+        color: $form-bg-hover-color-contrast;
+        input {
+            color: $form-bg-hover-color-contrast;
+        }
+    }
 }
 
 .selectize-dropdown {

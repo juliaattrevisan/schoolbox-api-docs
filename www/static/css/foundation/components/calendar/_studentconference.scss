@@ -53,6 +53,10 @@
     border: 1px solid $form-border-color;
     border-radius: 0;
     padding: 0;
+
+    &:hover, &:focus {
+      background-color: $form-bg-hover-color;
+    }
   }
 
   /* That chevron expanderer thing can still go away
