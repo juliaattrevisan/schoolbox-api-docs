@@ -934,6 +934,7 @@ class Controller extends Base
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
                 new BlurbDecorator(
+                    $this->newsMapper,
                     $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                     $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
                     $attachmentCounts
@@ -1266,6 +1267,7 @@ class Controller extends Base
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
                 new BlurbDecorator(
+                    $this->newsMapper,
                     $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                     $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
                     $attachmentCounts

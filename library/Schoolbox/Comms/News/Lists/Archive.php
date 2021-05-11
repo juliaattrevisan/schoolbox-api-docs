@@ -135,11 +135,10 @@ class Archive extends Base
 
             /* Artificially represent the presence of one or more files without having to hydrate them
              *
-             * Alternatively, implement this pseudocode
-             * $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
+             * $article->getAttachedFiles()->add(true);
              */
             if ($attachmentCounts[$article->getId()]) {
-                $article->getAttachedFiles()->add(true);
+                $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
             }
 
             $article->setSticky(false);

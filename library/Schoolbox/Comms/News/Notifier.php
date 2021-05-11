@@ -605,13 +605,13 @@ class Notifier extends AbstractModuleNotifier
          * Artificially represent the number of files without having the actual
          * files themselves with all their mimes etc.
          *
-         * Alternatively, implement this pseudocode
-         * $article->setAttachedFiles($this->mapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
+         * $article->getAttachedFiles()->add(true);
          */
         $attachmentCounts = $this->fileMapper->findCounts([$article->getId()]);
 
         if ($attachmentCounts[$article->getId()]) {
-            $article->getAttachedFiles()->add(true);
+            $article->setAttachedFiles($this->mapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
+
         }
 
         /* Decide if you can have a Read More link; shank it on the end if you can

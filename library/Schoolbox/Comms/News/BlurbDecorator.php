@@ -22,6 +22,12 @@ class BlurbDecorator implements IDecorator
 {
 
     /**
+     * @var Mapper
+     */
+    private Mapper $newsMapper;
+
+
+    /**
      * @var string
      */
     private string $readmore;
@@ -40,12 +46,14 @@ class BlurbDecorator implements IDecorator
 
 
     /**
+     * @param Mapper $newsMapper
      * @param string $readmore
      * @param bool   $commentsAllowed
      * @param array  $attachmentCounts
      */
-    public function __construct(string $readmore, bool $commentsAllowed, array $attachmentCounts)
+    public function __construct(Mapper $newsMapper, string $readmore, bool $commentsAllowed, array $attachmentCounts)
     {
+        $this->newsMapper = $newsMapper;
         $this->readmore = $readmore;
         $this->commentsAllowed = $commentsAllowed;
         $this->attachmentCounts = $attachmentCounts;
@@ -56,6 +64,7 @@ class BlurbDecorator implements IDecorator
      * @param array  $json
      * @param object $model
      * @return array
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function decorate(array $json, $model): array
     {
@@ -73,11 +82,10 @@ class BlurbDecorator implements IDecorator
          * artificially representing the number of files without having the actual
          * files themselves with all their mimes etc.
          *
-         * Alternatively, implement this pseudocode
-         * $article->setAttachedFiles($this->getArticleMapper()->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
+         * $model->getAttachedFiles()->add(true);
          */
         if ($this->attachmentCounts[$model->getId()]) {
-            $model->getAttachedFiles()->add(true);
+            $model->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $model->getId()));
         }
 
         /* Decide if a Read More link is available; it depends on characteristics
