@@ -101,9 +101,9 @@ class GDriveFetcher implements FetcherInterface
      *
      * @param ExtensionMapper|null $extensionMapper a mapper for loading extensions from
      * @param string|null          $storageDir      the target storage directory: typically `sys_get_temp_dir()`
-     * @param resource        $curl            a custom curl handle if a default won't suffice
-     * @param string          $httpAuth        an authorization header if not using an anonymous connection
-     * @param bool            $allowPdfExport  Can this export PDFs?
+     * @param resource             $curl            a custom curl handle if a default won't suffice
+     * @param string               $httpAuth        an authorization header if not using an anonymous connection
+     * @param bool                 $allowPdfExport  Can this export PDFs?
      */
     public function __construct(
         ?ExtensionMapper $extensionMapper,
@@ -269,27 +269,27 @@ class GDriveFetcher implements FetcherInterface
      * @param array $metadata
      * @return string|null
      */
-    public function determineExportMimetype(array $metadata): ?string
+    public function determineDownloadUrl(array $metadata): ?string
     {
         if (isset($metadata['capabilities']['canDownload']) && !$metadata['capabilities']['canDownload']) {
             return null;
         }
 
-        if ($this->isPdfExportEnabled($metadata)) {
-            return 'application/pdf';
+        if ($this->isPdfExportEnabled($metadata) && $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']) {
+            return $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
         }
 
         $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORT_MIMETYPE] ?? null;
 
-        if ($allowedFilesMime) {
-            return $allowedFilesMime;
+        if ($allowedFilesMime && $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime]) {
+            return $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime];
         }
 
         if (is_array($metadata[self::CONTEXT_EXPORTLINKS]) && !empty($metadata[self::CONTEXT_EXPORTLINKS])) {
-            return array_key_first($metadata[self::CONTEXT_EXPORTLINKS]);
+            return array_shift($metadata[self::CONTEXT_EXPORTLINKS]);
         }
 
-        return null;
+        return self::GOOGLE_API . "/files/{$metadata['id']}?alt=media";
     }
 
     /**
@@ -303,9 +303,9 @@ class GDriveFetcher implements FetcherInterface
     public function fetchToFile($fileId): string
     {
         $metadata = $this->fetchMetaData($fileId);
-        $mimeType = $this->determineExportMimetype($metadata);
+        $url      = $this->determineDownloadUrl($metadata);
 
-        if (!$mimeType) {
+        if (!$url) {
             // if this does not provide export mimetype, this cannot be downloaded
             throw new DomainException('This file is restricted and cannot be downloaded.');
         }
@@ -323,21 +323,30 @@ class GDriveFetcher implements FetcherInterface
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException('Could not open target');
         }
-        $params = [
-            'mimeType' => $mimeType,
-        ];
 
         $ch = $this->curlPrepare(
             [
-                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/export?" . http_build_query($params),
+                CURLOPT_URL            => $url,
                 CURLOPT_FILE           => $fp,
                 CURLOPT_FOLLOWLOCATION => true,
             ]
         );
 
-        curl_exec($ch);
+        $result = curl_exec($ch);
+        $error  = curl_error($ch);
         curl_close($ch);
         fclose($fp);
+
+        if (!$result) {
+            throw new DomainException($error);
+        } elseif (mime_content_type($destination) === 'application/json') {
+            // for some reason, Google output error in the downloaded file
+            $fetchedData = file_get_contents($destination);
+            $errorMessage = $this->getErrorMessage(json_decode($fetchedData, true));
+            if (!empty($errorMessage)) {
+                throw new DomainException($errorMessage);
+            }
+        }
 
         return $destination;
     }
