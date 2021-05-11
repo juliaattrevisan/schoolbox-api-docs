@@ -71,7 +71,7 @@
     </div>
     <div class="content collapsible hide" data-participant-list data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
         <ul class="information-list">
-            {% for participant in assessment.allParticipants|filter(participant => participant.excluded) %}
+            {% for participant in assessment.allParticipants|filter(participant => not participant.excluded) %}
                 {% if participant.isFeedbackRequired %}
                     {% include '@learning/fragments/toMarkParticipant.twig' with {
                         participant: participant,
