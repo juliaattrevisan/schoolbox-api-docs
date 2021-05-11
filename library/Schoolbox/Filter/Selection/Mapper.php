@@ -67,13 +67,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function updateSelections(User $user, $page, Collection $selectionsPerFilter)
     {
-        // Delete user's current selections for this page
-        $this->deleteByColumnList([
-            'user_id' => $user->getId(),
-            'page'    => $page,
-        ]);
-
-        // Save User's current selections
+        // Build user's current selections
         $selectionsToSave = $this->createCollection();
 
         /** @var Model[] $filterSelections */
@@ -82,7 +76,15 @@ class Mapper extends \Schoolbox\Mapper
                 $selectionsToSave->add($selection);
             }
         }
-        return $this->save($selectionsToSave);
+
+        // Delete and save user's selections atomically
+        return $this->database->transact(function () use ($user, $page, $selectionsToSave) {
+            $this->deleteByColumnList([
+                'user_id' => $user->getId(),
+                'page'    => $page,
+            ]);
+            $this->save($selectionsToSave);
+        });
     }
 
 
