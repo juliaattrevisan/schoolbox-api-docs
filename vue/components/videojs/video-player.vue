@@ -54,7 +54,7 @@ export default {
          *
          */
         onVideoPlayerReady () {
-            this.checkInterval = setInterval(this.checkVideoHeight, 200);
+            this.checkInterval = setInterval(this.checkVideoHeight, 500);
         },
 
         /** 

@@ -87,13 +87,13 @@ export default {
 <template>
 	<dl class="tabs menu" ref="menu">
 		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.AUDIO_ONLY ? 'active' : '']">
-			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)" href="#record-audio" title="Record audio" :disabled="isProcessActive">Record audio</a>
+			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)" href="#record-audio" title="Record audio" :disabled="isProcessActive"><span>Record </span>Audio</a>
 		</dd>
 		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.CAMERA ? 'active' : '']">
-			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.CAMERA)" href="#record-a-video" title="Record a video" :disabled="isProcessActive">Record a video</a>
+			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.CAMERA)" href="#record-a-video" title="Record a video" :disabled="isProcessActive"><span>Record a </span>Video</a>
 		</dd>
 		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.SCREEN ? 'active' : '']">
-			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.SCREEN)" href="#record-your-screen" title="Record your screen" :disabled="isProcessActive">Record your screen</a>
+			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.SCREEN)" href="#record-your-screen" title="Record your screen" :disabled="isProcessActive"><span>Record your </span>Screen</a>
 		</dd>
 	</dl>
 </template>
@@ -106,7 +106,8 @@ export default {
 }
 
 .menu-item {
-	width: calc(33.333333%);
+	position: relative;
+    width: calc(33.333333%);
 	text-align: center;
 }
 
@@ -114,6 +115,9 @@ export default {
   .tabs dd a {
     padding: .5rem;
     font-size: .8125rem;
+    span { //simplify the text
+        display: none;
+    }
   }
 }
 

@@ -8,9 +8,11 @@
 import RecordMediaModalMenu from './record-media-modal-menu';
 import RecordMediaModalUnset from './record-media-modal-unset';
 import BrowserCaptureMedia from '@schoolbox/videojs-record/browser-capture-media';
+import DeviceCaptureMedia from '@schoolbox/inputCapture/device-capture-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
+import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
 
 
 export default {
@@ -18,7 +20,8 @@ export default {
     components: {
         RecordMediaModalMenu, //top menu appears after unset menu selection
         RecordMediaModalUnset, //the initial big menu
-        BrowserCaptureMedia, //the media element
+        BrowserCaptureMedia, //to use the browser when input capture isn't supported
+        DeviceCaptureMedia, //for mobile devices to use instead of browser-media-capture
         OverMediaModal //to slot in upload modal
     },
 
@@ -26,6 +29,7 @@ export default {
         return {
             currentRecordMediaType: recordMediaTypes.UNSET, //the currently selected media recording
             recordMediaTypeList: [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN],
+            hasDeviceCapture: false, //to determine whether to use the devices native device capture rather then the browsers
             isProcessActive: false, //to be able to disable certain behavour when recordings/conversions/uploads are taking place
             recordedData: null, //could be audio, video, image etc
             canUpload: false, //to upload the file
@@ -35,7 +39,8 @@ export default {
             isUploading: false, //to notify of update
             hasUploadError: false, //to notify of upload error, try again?
             hasUploaded: false, //notify UI of upload complete
-            currentRatio: 0.5625, //default to 16:9 ratio, but could change when the device is actually available
+            defaultRatio: 0, //a ratio to return to when a video is selected
+            currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
         }
     },
@@ -80,6 +85,8 @@ export default {
     },
 
     created () {
+        this.hasDeviceCapture = hasDeviceCapture();
+        this.initRatios();
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
     },
 
@@ -90,6 +97,15 @@ export default {
 
     methods: {
         
+        /**
+         * Set to ensure the container isn't too big
+         *
+         */
+        initRatios () {
+            this.defaultRatio = 0.5625;
+            this.currentRatio = this.defaultRatio;
+        },
+
         /**
          * to be able to press enter to save filename
          *
@@ -183,6 +199,10 @@ export default {
          */
         onRecordedMediaDeleted (recordedData) {
             this.canUpload = false; //hide the upload button
+            if (this.hasDeviceCapture) { //restore the height to a decent amount, especially if was a phone portrait capture
+                this.currentRatio = this.defaultRatio;
+                this.updateContainerHeight();
+            }
         },
 
         /*
@@ -301,7 +321,6 @@ export default {
             this.updateCurrentRatio(width, height);
         },
 
-
     }
 
 }
@@ -328,10 +347,18 @@ export default {
 
                 <keep-alive><!-- to maintain recordings etc https://vuejs.org/v2/api/#keep-alive -->
                     <template v-for="recordMediaType in recordMediaTypeList">
-                        <browser-capture-media
-                            v-if="currentRecordMediaType === recordMediaType"
+                        <device-capture-media
+                            v-if="currentRecordMediaType === recordMediaType && hasDeviceCapture"
                             :record-media-type="recordMediaType"
-                            :key="recordMediaType"
+                            :key="recordMediaType+'-device'"
+                            @on-recorded-media-ready="onRecordedMediaReady"
+                            @on-recorded-media-deleted="onRecordedMediaDeleted"
+                            @on-ratio-ready="onRatioReady"
+                        />
+                        <browser-capture-media
+                            v-else-if="currentRecordMediaType === recordMediaType"
+                            :record-media-type="recordMediaType"
+                            :key="recordMediaType+'-browser'"
                             :is-keep-alive="true"
                             @on-device-ready="onDeviceReady"
                             @on-process-started="onProcessStarted"
