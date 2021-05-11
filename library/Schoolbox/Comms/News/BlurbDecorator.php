@@ -30,7 +30,7 @@ class BlurbDecorator implements IDecorator
     /**
      * @var string
      */
-    private string $readmore;
+    private string $readMore;
 
 
     /**
@@ -47,14 +47,14 @@ class BlurbDecorator implements IDecorator
 
     /**
      * @param Mapper $newsMapper
-     * @param string $readmore
+     * @param string $readMore
      * @param bool   $commentsAllowed
      * @param array  $attachmentCounts
      */
-    public function __construct(Mapper $newsMapper, string $readmore, bool $commentsAllowed, array $attachmentCounts)
+    public function __construct(Mapper $newsMapper, string $readMore, bool $commentsAllowed, array $attachmentCounts)
     {
         $this->newsMapper = $newsMapper;
-        $this->readmore = $readmore;
+        $this->readMore = $readMore;
         $this->commentsAllowed = $commentsAllowed;
         $this->attachmentCounts = $attachmentCounts;
     }
@@ -91,9 +91,9 @@ class BlurbDecorator implements IDecorator
         /* Decide if a Read More link is available; it depends on characteristics
          * of the article and some admin config vars
          */
-        $json['readmore'] = [
-            'string' => $this->readmore,
-            'available' => (new ValidHasReadMore())->isSatisfiedBy($model, $this->readmore, $this->commentsAllowed)
+        $json['readMore'] = [
+            'string' => $this->readMore,
+            'available' => (new ValidHasReadMore())->isSatisfiedBy($model, $this->readMore, $this->commentsAllowed)
         ];
 
         return $json;

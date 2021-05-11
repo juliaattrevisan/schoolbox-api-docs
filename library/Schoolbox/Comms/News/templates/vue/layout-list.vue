@@ -96,9 +96,9 @@
                     <article>
                         <div v-if="!isCompactMode" v-html="article.blurb"></div>
 
-                        <template v-if="article.readmore.available">
+                        <template v-if="article.readMore.available">
                             <div class="article-read-more">
-                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-if="!isCompactMode" v-html="article.readmore.string"></a>
+                                <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer" v-if="!isCompactMode" v-html="article.readMore.string"></a>
                             </div>
                         </template>
                     </article>

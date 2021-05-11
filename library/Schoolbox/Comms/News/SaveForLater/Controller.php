@@ -92,7 +92,7 @@ class Controller extends Base
              *
              * $article->getAttachedFiles()->add(true);
              */
-            if ($attachmentCounts[$article->getId()]) {
+            if (isset($attachmentCounts[$article->getId()]) && $attachmentCounts[$article->getId()]) {
                 $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
             }
 
