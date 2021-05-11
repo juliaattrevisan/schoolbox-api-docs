@@ -41,6 +41,7 @@ export default {
             hasDeviceCapture: false, //to determine whether to use the devices native device capture rather then the browsers
             recordedData: null, //could be audio, video, image etc
             isUploading: false, //to notify of update
+            uploadProgressRatio: '0%', //to track the upload amount
             hasUploadError: false, //to notify of upload error, try again?
             hasUploaded: false, //notify UI of upload complete
             defaultRatio: 0, //a ratio to return to when a video is selected
@@ -167,9 +168,11 @@ export default {
         async uploadMediaAndReturnResponse () {
             try {
                 this.isUploading = true; //show the upload modal
+                this.uploadProgressRatio = '0%';
                 const response = await axios.post('/storage/asyncUpload.php', this.getFormData(), {
                     onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent)
                 });
+                this.uploadProgressRatio = '100%';
                 this.isUploading = false; //hide the upload modal
                 return response.data;
             } catch (error) {
@@ -197,8 +200,8 @@ export default {
          */
         onUploadProgress (progressEvent) {
             if (progressEvent.lengthComputable) {
-                const progressRatio = progressEvent.loaded / progressEvent.total;
-                console.warn(progressRatio);
+                this.uploadProgressRatio = (progressEvent.loaded / progressEvent.total) * 100;
+                this.uploadProgressRatio = this.uploadProgressRatio + '%';
             }
         },
 
@@ -283,7 +286,7 @@ export default {
             />
 
             <over-media-modal v-if="isUploading" key="isUploadingModal">
-                <div class="loader"></div>
+                <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
                 <p><em>Uploading media, please wait...</em></p>
             </over-media-modal>
             <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">

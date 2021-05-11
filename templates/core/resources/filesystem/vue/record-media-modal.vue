@@ -37,6 +37,7 @@ export default {
             isFilenameModalActive: false, //prompt the filename change modal
             newFilename: '', //name the file
             isUploading: false, //to notify of update
+            uploadProgressRatio: '0%', //to track the upload amount
             hasUploadError: false, //to notify of upload error, try again?
             hasUploaded: false, //notify UI of upload complete
             defaultRatio: 0, //a ratio to return to when a video is selected
@@ -254,9 +255,11 @@ export default {
         async uploadMedia () {
             try {
                 this.isUploading = true;
+                this.uploadProgressRatio = '0%';
                 const response = await axios.post('/storage/asyncUpload.php', this.getFormData(), {
                     onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent)
                 });
+                this.uploadProgressRatio = '100%';
                 this.isUploading = false;
                 return response.data;
             } catch (error) {
@@ -284,8 +287,8 @@ export default {
          */
         onUploadProgress (progressEvent) {
             if (progressEvent.lengthComputable) {
-                const progressRatio = progressEvent.loaded / progressEvent.total;
-                console.warn(progressRatio);
+                this.uploadProgressRatio = (progressEvent.loaded / progressEvent.total) * 100;
+                this.uploadProgressRatio = this.uploadProgressRatio + '%';
             }
         },
 
@@ -381,7 +384,7 @@ export default {
                     </div>	
                 </over-media-modal>
                 <over-media-modal v-else-if="isUploading" key="isUploadingModal">
-                    <div class="loader"></div>
+                    <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
                     <p><em>Uploading video, please wait...</em></p>
                 </over-media-modal>
                 <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
