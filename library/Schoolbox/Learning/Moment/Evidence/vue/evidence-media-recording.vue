@@ -43,13 +43,16 @@ export default {
             isUploading: false, //to notify of update
             hasUploadError: false, //to notify of upload error, try again?
             hasUploaded: false, //notify UI of upload complete
-            currentRatio: 0.5625, //default to 16:9 ratio, but could change when the device is actually available or moving between the recorded media and new media
+            defaultRatio: 0, //a ratio to return to when a video is selected
+            currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available or moving between the recorded media and new media
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
+            isFirstRecording: true //prevent multipled recordings coming through
         }
     },
 
     created () { //these vars are created so they can be accessed within the template
         this.hasDeviceCapture = hasDeviceCapture();
+        this.initRatios();
         this.recordMediaType = this.getMomentTypeToBrowserMediaCaptureType();
     },
 
@@ -59,6 +62,19 @@ export default {
 
     methods: {
         
+        /**
+         * Set to ensure the container isn't too big
+         *
+         */
+        initRatios () {
+            if (this.hasDeviceCapture) {
+                this.defaultRatio = 0.35;
+            } else {
+                this.defaultRatio = 0.5625;
+            }
+            this.currentRatio = this.defaultRatio;
+        },
+
         /**
          * to know how to display the browser-media-capture
          * object literals intead of switch: https://ultimatecourses.com/blog/deprecating-the-switch-statement-for-object-literals
@@ -121,9 +137,12 @@ export default {
         onRecordedMediaReady (recordedData) {
             this.recordedData = recordedData;
             document.getElementById('evidence-filename').value = this.recordedData.name; //to pass form submit validation check
-            document.addEventListener('evidence-media-recording__onFormSubmit', (event) => { //to prevent the form from being submitted until the media is uploaded
-                this.onFormSubmit();
-            }); 
+            if (this.isFirstRecording) {
+                this.isFirstRecording = false;
+                document.addEventListener('evidence-media-recording__onFormSubmit', (event) => { //to prevent the form from being submitted until the media is uploaded
+                    this.onFormSubmit();
+                }); 
+            }
         },
 
         /**
@@ -208,7 +227,11 @@ export default {
          *
          */
         onRecordedMediaDeleted () {
-            this.clearHiddenInputs();
+            this.clearHiddenInputs(); //clear the form elements
+            if (this.hasDeviceCapture) { //restore the height to a decent amount, especially if was a phone portrait capture
+                this.currentRatio = this.defaultRatio;
+                this.updateContainerHeight();
+            }
         },
 
         /**

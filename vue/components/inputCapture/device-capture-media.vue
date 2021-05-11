@@ -2,6 +2,7 @@
 
 /*
  * To use the devices native tools to capture a photo, video, or audio
+ * Screen capture is currently not supported
  *
  */
 
@@ -24,7 +25,7 @@ export default {
             type: String,
             required: true,
             validator: function (value) {
-                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.PHOTO].indexOf(value) !== -1 // The value must match one of these strings
+                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.PHOTO, recordMediaTypes.SCREEN].indexOf(value) !== -1 // The value must match one of these strings
             }
         },
         preRecordedData: { //to display an already existing recording on startup
@@ -47,12 +48,16 @@ export default {
 
     created () {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
-        this.checkForPreRecordedData();
-        this.captureOptions = this.getCaptureOptions();
+        if (this.recordMediaType !== recordMediaTypes.SCREEN) { //completely block functionality for screen
+            this.checkForPreRecordedData();
+            this.captureOptions = this.getCaptureOptions();
+        }
     },
 
     mounted () {
-        this.initInputCaptureElement();
+        if (this.recordMediaType !== recordMediaTypes.SCREEN) { //completely block functionality for screen
+            this.initInputCaptureElement();
+        }
     },
 
     methods: {
@@ -105,10 +110,8 @@ export default {
          *
          */
         initInputCaptureElement () {
-            const recorder = document.getElementById('recorder');
-            recorder.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                this.onFileAdded(file);
+            this.$refs.recorder.addEventListener('change', (event) => {
+                this.onFileAdded(event.target.files[0]);
             });
         },
 
@@ -116,7 +119,7 @@ export default {
          * get the correct options depending on the selected media type
          *
          * @returns { Blob }
-         */
+         */ 
         async onFileAdded (mediaData) {
             this.recordedData = mediaData; // the blob object contains the recorded data 
             if (this.recordMediaType === recordMediaTypes.PHOTO) { //set up a .src in order to display the image
@@ -124,6 +127,7 @@ export default {
             }
             this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
+            this.$refs.recorder.value = ''; //prevent the input capture element showing the preview
         },
 
         /**
@@ -132,6 +136,7 @@ export default {
          */
         onRecordedMediaDeleted () {
             this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
+            this.$refs.recorder.value = '';
             this.hasPreRecordedData = false;  //set to false again for possible display or a re-recording
             this.hasNewRecording = false;
         },
@@ -155,24 +160,36 @@ export default {
 
     <div class="container">
 
-        <div class="media-container media-container-record">
-            <div class="file-input-container">
-                <input class="dzone" type="file" :accept="captureOptions.accept" :capture="captureOptions.capture" id="recorder">
-                <span :class="'file-input-note ' + captureOptions.iconClass">Tap here to {{ captureOptions.attachPrompt }}</span>
+        <template v-if="recordMediaType === recordMediaTypes.SCREEN">
+
+            <div class="media-container media-container-record">
+                <div class="alert-box warn">Sorry, screen recording is not currently possible on this device. To record your screen, please use a desktop computer or laptop.</div>
             </div>
-        </div>
-        
-        <recorded-media 
-            v-if="hasPreRecordedData || hasNewRecording"
-            key="media-container-playback"
-            class="media-container media-container-playback"
-            :record-media-type="recordMediaType"
-            :has-pre-recorded-data="hasPreRecordedData"
-            :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-            :recorded-data="recordedData"
-            @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
-        />
+
+        </template>
+
+        <template v-else>
+            
+            <div class="media-container media-container-record">
+                <div class="file-input-container">
+                    <input ref="recorder" class="dzone" type="file" :accept="captureOptions.accept" :capture="captureOptions.capture">
+                    <span :class="'file-input-note ' + captureOptions.iconClass">Tap here to {{ captureOptions.attachPrompt }}</span>
+                </div>
+            </div>
+            
+            <recorded-media 
+                v-if="hasPreRecordedData || hasNewRecording"
+                key="media-container-playback"
+                class="media-container media-container-playback"
+                :record-media-type="recordMediaType"
+                :has-pre-recorded-data="hasPreRecordedData"
+                :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+                :recorded-data="recordedData"
+                @on-recorded-media-deleted="onRecordedMediaDeleted"
+                @on-ratio-ready="onRatioReady"
+            />
+
+        </template>
 
     </div>
 

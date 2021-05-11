@@ -87,7 +87,7 @@ export default {
             if (this.preRecordedData) {
                 this.playbackData = {
                     src: this.getPlaybackDataSrc(),
-                    type: this.preRecordedData.mime
+                    type: this.getPlaybackDataType()
                 } 
             }
         },
@@ -102,6 +102,19 @@ export default {
                 return `/storage/image.php?hash=${this.preRecordedData.hash}`;
             } else {
                 return `/cms/sendVideo.php?id=${this.preRecordedData.hash}&type=storage`;
+            }
+        },
+
+        /**
+         * to know what the media type is
+         *
+         * @returns { String } 
+         */
+        getPlaybackDataType () {
+            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) {
+                return 'audio/mpeg';
+            } else {
+                return 'video/mp4';
             }
         },
 

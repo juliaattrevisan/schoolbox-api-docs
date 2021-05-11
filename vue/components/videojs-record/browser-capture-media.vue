@@ -293,7 +293,7 @@ export default {
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
             <template v-if="hasDeviceAlreadyInUseError">
-                    <div class="alert-box warning">The camera appears to be already in use. Please close any Applications or Browser windows that may be using the camera and try again.</div>
+                    <div class="alert-box warning">The camera appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>
             </template>
             <template v-else-if="hasPermissionDeniedError">
