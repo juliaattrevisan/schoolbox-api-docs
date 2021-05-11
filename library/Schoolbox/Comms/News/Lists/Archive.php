@@ -132,6 +132,13 @@ class Archive extends Base
         /* Disregard the sticky bit for each article in the Archive
          */
         foreach ($articles as $article) {
+
+            /* Artificially represent the presence of one or more files without having to hydrate them
+             */
+            if ($attachmentCounts[$article->getId()]) {
+                $article->getAttachedFiles()->add(true);
+            }
+
             $article->setSticky(false);
         }
 

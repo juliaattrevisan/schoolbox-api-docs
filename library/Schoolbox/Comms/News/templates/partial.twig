@@ -105,10 +105,16 @@
                             {% endif %}
                         </article>
 
-                        {% include ('@commsNews/layout/file-list.twig') with {
-                            article: article,
-                            identifier: 'component-' ~ (componentId ?? '') ~ '-article-' ~ article.id
-                        } %}
+                        {# The only time files are rendered via partial.twig is in a homepage context
+                         # when users are viewing the non-compact-mode version of their component
+                         # Compact Mode usage and Archive usage shouldn't render the file list
+                         #}
+                        {% if componentId is defined and componentId %}
+                            {% include ('@commsNews/layout/file-list.twig') with {
+                                article: article,
+                                identifier: 'component-' ~ (componentId ?? '') ~ '-article-' ~ article.id
+                            } %}
+                        {% endif %}
                     {% endapply %}
                 {% endif %}
             </li>
