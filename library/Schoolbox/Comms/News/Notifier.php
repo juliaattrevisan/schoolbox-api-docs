@@ -62,6 +62,13 @@ class Notifier extends AbstractModuleNotifier
     private $userMapper;
 
     /**
+     * For derivations using the quantity of attached files
+     *
+     * @var File\Mapper
+     */
+    private \Schoolbox\Comms\News\File\Mapper $fileMapper;
+
+    /**
      * Prefix generator, for creating a fallback thumbnail
      */
     private PrefixGenerator $prefixGenerator;
@@ -90,6 +97,7 @@ class Notifier extends AbstractModuleNotifier
             'setAudienceResolver'  => $userResolver,
             'setModeratorResolver' => $moderatorResolver,
             'setPrefixGenerator'   => $di->lazyGet('cdnPrefixGenerator'),
+            'setFileMapper'        => $mf->getLazy(\Schoolbox\Comms\News\File\Mapper::class)
         ];
     }
 
@@ -145,6 +153,15 @@ class Notifier extends AbstractModuleNotifier
     public function setPrefixGenerator(PrefixGenerator $prefixGenerator)
     {
         $this->prefixGenerator = $prefixGenerator;
+    }
+
+
+    /**
+     * @param File\Mapper $fileMapper
+     */
+    public function setFileMapper(\Schoolbox\Comms\News\File\Mapper $fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
     }
 
     /**
@@ -580,10 +597,19 @@ class Notifier extends AbstractModuleNotifier
         $shortDate  = $activeDate->getDateOnly();
         $authorName = $author->formatName();
 
-
         $bob = new Builder();
 
         $notifBody = strlen($article->getBlurb()) > 0 ? $article->getBlurb() : $article->getBody();
+
+        /* Attachments aren't actually hydrated in $article
+         * Artificially represent the number of files without having the actual
+         * files themselves with all their mimes etc.
+         */
+        $attachmentCounts = $this->fileMapper->findCounts([$article->getId()]);
+
+        if ($attachmentCounts[$article->getId()]) {
+            $article->getAttachedFiles()->add(true);
+        }
 
         /* Decide if you can have a Read More link; shank it on the end if you can
          */
