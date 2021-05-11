@@ -24,7 +24,7 @@ INSERT INTO `config`
 VALUES
        ('geosnapshot_enabled',
         '0',
-        'GeoSnapShot Integration',
+        'Enable GeoSnapShot Integration',
         'If ON, parents may view photos of their students uploaded to GeoSnapShot and photo galleries embedded into pages, note you must also have a valid API key.',
         (SELECT id FROM lu_config_field WHERE field = 'boolean'),
         (SELECT id FROM lu_config_type WHERE type = 'Modules'),
