@@ -136,7 +136,7 @@ const getRecordCameraOptions = () => {
             },
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-            maxLength: 300, //five minutes
+            maxLength: 180, //three minutes
             debug: true,
         }
     }
@@ -158,7 +158,7 @@ const getRecordCameraOptionsForSafari = () => {
                 height: { min: 180, ideal: 405, max: 720 }
             },
             videoMimeType: 'video/mp4', //ensure mp4 on Safari
-            maxLength: 300, //five minutes
+            maxLength: 180, //three minutes
             debug: true,
         }
     }
@@ -176,7 +176,7 @@ const getRecordScreenOptions = () => {
         record: {
             audio: true,
             screen: true,
-            maxLength: 300, //five minutes
+            maxLength: 180, //three minutes
             videoMimeType: 'video/webm;codecs=vp8,opus',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             debug: true,
@@ -196,10 +196,8 @@ const getRecordScreenOptionsForSafari = () => {
         record: {
             audio: true,
             screen: true,
+            maxLength: 180, //three minutes
             videoMimeType: 'video/mp4', //all supported excluding Safari use webm
-            maxLength: 300, //five minutes
-            frameWidth: 640,
-            frameHeight: 480,
             debug: true,
         }
     }
