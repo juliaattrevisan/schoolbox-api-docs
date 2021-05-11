@@ -89,8 +89,6 @@ const getAudioOnlyRecordOptions = () => {
 			audio: true,
 			video: false,
 			maxLength: 300, //5 minutes
-			audioEngine: 'vmsg',
-			audioWebAssemblyURL: '/static/javascript/vendor/vmsg/vmsg.wasm',
 			debug: true,
 		}
 	}
@@ -119,7 +117,6 @@ const applyAudioWorkarounds = (options) => {
             options.plugins.record.audioBufferSize = 4096;
             options.plugins.record.audioChannels = 2;
         }
-        console.log('applied audio workarounds for this browser');
     }
 }
 
@@ -160,7 +157,7 @@ const getRecordCameraOptionsForSafari = () => {
                 width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
                 height: { min: 180, ideal: 405, max: 720 }
             },
-            videoMimeType: 'video/mp4', //all supported excluding Safari use webm
+            videoMimeType: 'video/mp4', //ensure mp4 on Safari
             maxLength: 300, //five minutes
             debug: true,
         }
