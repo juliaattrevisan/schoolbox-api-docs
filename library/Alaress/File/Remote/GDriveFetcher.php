@@ -279,9 +279,11 @@ class GDriveFetcher implements FetcherInterface
             return $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
         }
 
-        $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORT_MIMETYPE] ?? null;
+        $allowedFilesMime = isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])
+            ? self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORT_MIMETYPE]
+            : null;
 
-        if ($allowedFilesMime && $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime]) {
+        if (($allowedFilesMime !== null) && $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime]) {
             return $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime];
         }
 
@@ -341,7 +343,7 @@ class GDriveFetcher implements FetcherInterface
             throw new DomainException($error);
         } elseif (mime_content_type($destination) === 'application/json') {
             // for some reason, Google output error in the downloaded file
-            $fetchedData = file_get_contents($destination);
+            $fetchedData  = file_get_contents($destination);
             $errorMessage = $this->getErrorMessage(json_decode($fetchedData, true));
             if (!empty($errorMessage)) {
                 throw new DomainException($errorMessage);
