@@ -18,6 +18,18 @@ export const isOfFileType = (filename, extension) => {
 }
 
 /**
+* check whether a file is of a certain mime type
+* 
+* @param { String } 'audio/webm;codecs=opus'
+* @param { String } 'video/webm'
+*
+* @returns { Boolean } depending of if matches
+*/ 
+export const isOfMimeType = (mimeType, mimeTypeMatch) => {
+    return mimeType.includes(mimeTypeMatch);
+}
+
+/**
 * convert the filename to use the extension instead of whatever it was
 * 
 * @param { String } '593042579804375.webm'

@@ -1,8 +1,9 @@
 <script>
 
 /*
- * To use the devices native tools to capture a photo, video, or audio
- * Screen capture is currently not supported
+ * To use the devices native tools to capture a CAMERA or PHOTO
+ * SCREEN capture is currently not supported
+ * And neither is AUDIO_ONLY as it's not producing excpected results - ie ios Safari just loads a video, some Androids seem to do nothing
  *
  */
 
@@ -48,15 +49,17 @@ export default {
 
     created () {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
-        if (this.recordMediaType !== recordMediaTypes.SCREEN) { //completely block functionality for screen
+        if (this.recordMediaType === recordMediaTypes.PHOTO || this.recordMediaType === recordMediaTypes.CAMERA) { //otherwise just displays no support note
             this.checkForPreRecordedData();
             this.captureOptions = this.getCaptureOptions();
         }
     },
 
     mounted () {
-        if (this.recordMediaType !== recordMediaTypes.SCREEN) { //completely block functionality for screen
+        if (this.recordMediaType === recordMediaTypes.PHOTO || this.recordMediaType === recordMediaTypes.CAMERA) { //completely block functionality for screen
             this.initInputCaptureElement();
+        } else { //and just ensure that the entire message is visible
+            this.$emit(recordMediaEvents.RATIO_READY, this.$refs.noScreenNote.offsetWidth, this.$refs.noScreenNote.offsetHeight);
         }
     },
 
@@ -86,13 +89,6 @@ export default {
                     capture: 'user',
                     attachPrompt: 'take a picture',
                     iconClass: 'icon-camera'
-                }
-            } else if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) {
-                return {
-                    accept: 'audio/*',
-                    capture: 'microphone',
-                    attachPrompt: 'record audio',
-                    iconClass: 'icon-audio'
                 }
             } else if (this.recordMediaType === recordMediaTypes.CAMERA) {
                 return {
@@ -163,7 +159,15 @@ export default {
         <template v-if="recordMediaType === recordMediaTypes.SCREEN">
 
             <div class="media-container media-container-record">
-                <div class="alert-box warn">Sorry, screen recording is not currently possible on this device. To record your screen, please use a desktop computer or laptop.</div>
+                <div class="alert-box warn" ref="noScreenNote">Sorry, screen recording is not currently possible on this device. To record your screen, please use a desktop computer or laptop.</div>
+            </div>
+
+        </template>
+
+        <template v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY">
+
+            <div class="media-container media-container-record">
+                <div class="alert-box warn" ref="noScreenNote">Sorry, audio only recording is not currently possible on this device. To record audio only, please use a desktop computer or laptop.</div>
             </div>
 
         </template>
@@ -245,5 +249,6 @@ export default {
     font-size: 0.8rem;
     pointer-events: none;
 }
+
 
 </style>

@@ -12,7 +12,6 @@ import videojs from 'video.js';
 import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
-import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import { gsap } from 'gsap/all';
 import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
@@ -20,7 +19,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getRecordOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
-import { isOfFileType, dataURLtoBlob } from '@shared/util/fileUtils';
+import { isOfMimeType, dataURLtoBlob } from '@shared/util/fileUtils';
 
 
 export default {
@@ -153,7 +152,8 @@ export default {
          *
          */
         onFinishRecord () {
-            if (this.player.recordedData.name && isOfFileType(this.player.recordedData.name, 'webm')) { //webm's are converted so they are seekable on playback
+            // if (this.player.recordedData.name && isOfFileType(this.player.recordedData.name, 'webm')) { //webm's are converted so they are seekable on playback
+            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //webm's are converted so they are seekable on playback
                 this.player.on('finishConvert', this.onFinishConvert);
             } else {
                 this.recordedVideoReady(this.player.recordedData);

@@ -143,6 +143,7 @@
          * @params { <form> element }
          */
         const submitForm = (form) => {
+
             // Build a request to post the form
             let payload = buildPayload(form),
                 toast   = $('#toast'),
@@ -170,6 +171,8 @@
             submitHandler(form, event) {
                 
                 event.preventDefault();
+
+                document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
 
                 if (isMediaUploadRequired()) {
                     document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
