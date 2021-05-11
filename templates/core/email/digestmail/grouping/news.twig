@@ -42,8 +42,9 @@
             {% else %}
             <p>{{ msg.meta.body | cutSentence(200, true) }}</p>
             {% endif %}
-            {% if config.read_more | length %}
-            <a href="{{ msg.href }}" class="more">{{ config.read_more }}</a>
+
+            {% if msg.meta.readmore is defined and msg.meta.readmore.available %}
+                <a href="{{ msg.href }}" class="more">{{ msg.meta.readmore.string }}</a>
             {% endif %}
         </td>
     </tr>

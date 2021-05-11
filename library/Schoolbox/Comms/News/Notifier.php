@@ -19,6 +19,7 @@ use Schoolbox\Comms\News\Audience\IUserResolver;
 use Schoolbox\Comms\News\Model as Article;
 use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
 use Schoolbox\Comms\News\Moderation\UserResolver as ModeratorResolver;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
@@ -584,6 +585,26 @@ class Notifier extends AbstractModuleNotifier
 
         $notifBody = strlen($article->getBlurb()) > 0 ? $article->getBlurb() : $article->getBody();
 
+        /* Decide if you can have a Read More link; shank it on the end if you can
+         */
+        $readMoreString = $this->conf->get(ConfigMapper::_READ_MORE);
+
+        $readMore = [
+            'string' => '',
+            'available' => false
+        ];
+
+        if ((new ValidHasReadMore())->isSatisfiedBy(
+            $article,
+            $readMoreString,
+            $this->conf->get(ConfigMapper::COMMS_COMMENTS_ENABLED
+        ))) {
+            $readMore = [
+                'string' => $readMoreString,
+                'available' => true
+            ];
+        }
+
         $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setParams(
                 [
@@ -599,11 +620,12 @@ class Notifier extends AbstractModuleNotifier
             ->addTopic("news.$articleId." . ($update ? self::TRIGGER_UPDATED : self::TRIGGER_POSTED))
             // body and byline are optional, but recommended since they render out in emails
             ->setMeta([
-                'title'  => $heading,
-                'author' => $authorName,
-                'date'   => $activeDate->getLong(),
-                'thumb'  => $thumb,
-                'blurb'  => $article->getBlurb(),
+                'title'    => $heading,
+                'author'   => $authorName,
+                'date'     => $activeDate->getLong(),
+                'thumb'    => $thumb,
+                'blurb'    => $article->getBlurb(),
+                'readmore' => $readMore
             ])
             ->setBody($notifBody)
             ->setByline("$shortDate by $authorName")
