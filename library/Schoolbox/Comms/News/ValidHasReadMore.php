@@ -48,9 +48,13 @@ class ValidHasReadMore
         }
 
         /* If comments enabled, there's something to do on the detail screen
+         *
+         * Note that the presence of comments in discussion_thread determines
+         * whether Allow Comments was ticked; comments_allowed does not do anything
+         *
          * Show the link
          */
-        if ($article->getCommentsAllowed()) {
+        if ($article->getDiscussionThread()) {
 
             /* But, if the global admin config Enable Comments On News Articles
              * is currently set to Off, you aren't meant to have access to comments

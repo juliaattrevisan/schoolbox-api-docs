@@ -81,12 +81,12 @@ class ValidHasReadMoreTest extends TestCase
         /* Article with comment enabled
          */
         $commentOnlyArticle = (new Model())
-            ->setCommentsAllowed(true);
+            ->setDiscussionThread(new \Schoolbox\Discussion\Thread\Model());
 
         /* Article with comments and files
          */
         $filesAndCommentsArticle = (new Model())
-            ->setCommentsAllowed(true);
+            ->setDiscussionThread(new \Schoolbox\Discussion\Thread\Model());
         $filesAndCommentsArticle->getAttachedFiles()->add(new \Schoolbox\Comms\News\File\Model());
 
         /* Article with everything - the works
@@ -95,7 +95,7 @@ class ValidHasReadMoreTest extends TestCase
             ->setTitle('This is everything')
             ->setBlurb("Tonight is a particular honor for me because - let's face it - my presence on this stage is pretty unlikely. Like other black churches, Trinity's services are full of raucous laughter and sometimes bawdy humor. He contains within him the contradictions - the good and the bad - of the community that he has served diligently for so many years. But the record's clear: John McCain has voted with George Bush ninety percent of the time. But I am convinced that in order to move forward, we must say openly the things we hold in our hearts, and that too often are said only behind closed doors. In Turkey, Pakistan, Bangladesh and Indonesia, we have seen Muslim-majority countries elect a woman to lead.")
             ->setBody("And I'm glad to see that. Now let there be no doubt. We measure progress by how many people can find a job that pays the mortgage; whether you can put a little extra money away at the end of each month so you can someday watch your child receive her college diploma.")
-            ->setCommentsAllowed(true);
+            ->setDiscussionThread(new \Schoolbox\Discussion\Thread\Model());;
         $everythingArticle->getAttachedFiles()->add(new \Schoolbox\Comms\News\File\Model());
 
         /* More arcane cases
@@ -105,7 +105,7 @@ class ValidHasReadMoreTest extends TestCase
          */
         $arcane1 = (new Model())
             ->setBlurb("Tonight is a particular honor for me because - let's face it - my presence on this stage is pretty unlikely. Like other black churches, Trinity's services are full of raucous laughter and sometimes bawdy humor. He contains within him the contradictions - the good and the bad - of the community that he has served diligently for so many years. But the record's clear: John McCain has voted with George Bush ninety percent of the time. But I am convinced that in order to move forward, we must say openly the things we hold in our hearts, and that too often are said only behind closed doors. In Turkey, Pakistan, Bangladesh and Indonesia, we have seen Muslim-majority countries elect a woman to lead.")
-            ->setCommentsAllowed(true);
+            ->setDiscussionThread(new \Schoolbox\Discussion\Thread\Model());;
         $arcane1->getAttachedFiles()->add(new \Schoolbox\Comms\News\File\Model());
 
         return [
