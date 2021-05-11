@@ -262,46 +262,42 @@ export default {
 </script>
 
 <template>
-
-    <div>
             
-        <div class="browser-media-capture-container" ref="container" :style="{ height: targetHeight }">
+    <div class="capture-media-container" ref="container" :style="{ height: targetHeight }">
 
-            <device-capture-media
-                v-if="hasDeviceCapture"
-                :record-media-type="recordMediaType"
-                :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-                @on-recorded-media-ready="onRecordedMediaReady"
-                @on-recorded-media-deleted="onRecordedMediaDeleted"
-                @on-ratio-ready="onRatioReady"
-            />
-            <browser-capture-media
-                v-else
-                :record-media-type="recordMediaType"
-                :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-                @on-device-ready="onDeviceReady"
-                @on-recorded-media-ready="onRecordedMediaReady"
-                @on-recorded-media-deleted="onRecordedMediaDeleted"
-                @on-ratio-ready="onRatioReady"
-            />
+        <device-capture-media
+            v-if="hasDeviceCapture"
+            :record-media-type="recordMediaType"
+            :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+            @on-recorded-media-ready="onRecordedMediaReady"
+            @on-recorded-media-deleted="onRecordedMediaDeleted"
+            @on-ratio-ready="onRatioReady"
+        />
+        <browser-capture-media
+            v-else
+            :record-media-type="recordMediaType"
+            :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+            @on-device-ready="onDeviceReady"
+            @on-recorded-media-ready="onRecordedMediaReady"
+            @on-recorded-media-deleted="onRecordedMediaDeleted"
+            @on-ratio-ready="onRatioReady"
+        />
 
-            <over-media-modal v-if="isUploading" key="isUploadingModal">
-                <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
-                <p><em>Uploading media, please wait...</em></p>
-            </over-media-modal>
-            <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
-                <p><em>Media successfully uploaded.</em></p>
-            </over-media-modal>	
+        <over-media-modal v-if="isUploading" key="isUploadingModal">
+            <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
+            <p><em>Uploading media, please wait...</em></p>
+        </over-media-modal>
+        <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
+            <p><em>Media successfully uploaded.</em></p>
+        </over-media-modal>	
 
-        </div>	
-
-    </div>
+    </div>	
 
 </template>
 
 <style lang="scss" scoped>
 
-.browser-media-capture-container {
+.capture-media-container {
     position: relative;
     width: 100%;
     max-width: 700px;
