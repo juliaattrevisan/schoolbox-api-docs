@@ -58,12 +58,6 @@ class HomepageTemplateMapper extends Mapper
         return parent::delete($object);
     }
 
-    public function findAll($options = array())
-    {
-        $templates = parent::findAll($options);
-        $templates->prepend($this->getNoHomepageTemplate());
-        return $templates;
-    }
 
     /**
      * @return HomepageTemplate
