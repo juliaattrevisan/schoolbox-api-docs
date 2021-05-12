@@ -27,6 +27,8 @@ class Model implements ISoftDeletable
 
     protected string $icon;
 
+    protected string $url;
+
     protected int $folderId;
 
     protected int $ownerId;
@@ -82,6 +84,24 @@ class Model implements ISoftDeletable
     public function setIcon(string $icon): self
     {
         $this->icon = $icon;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl(): string
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     * @return static
+     */
+    public function setUrl(string $url): self
+    {
+        $this->url = $url;
         return $this;
     }
 

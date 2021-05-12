@@ -17,6 +17,7 @@ use Schoolbox\File\Remote\GDriveFetcher;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -38,6 +39,11 @@ class Controller extends Base
      */
     private UserAccessMapper $userAccessMapper;
 
+    /**
+     * FolderMapper
+     */
+    private FolderMapper $folderMapper;
+
     private const ROLE_WRITER    = 'writer';
     private const ROLE_COMMENTER = 'commenter';
     private const ROLE_READER    = 'reader';
@@ -47,26 +53,49 @@ class Controller extends Base
      * @param Mapper           $googleFileMapper
      * @param UserMapper       $userMapper
      * @param UserAccessMapper $userAccessMapper
+     * @param FolderMapper     $folderMapper
      */
     public function __construct(
         Mapper $googleFileMapper,
         UserMapper $userMapper,
-        UserAccessMapper $userAccessMapper
+        UserAccessMapper $userAccessMapper,
+        FolderMapper $folderMapper
     ) {
         $this->googleFileMapper = $googleFileMapper;
         $this->userMapper       = $userMapper;
         $this->userAccessMapper = $userAccessMapper;
+        $this->folderMapper     = $folderMapper;
+    }
+
+    /**
+     * @param Model $googleFile
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    public function getGoogleFile(Model $googleFile)
+    {
+        $folder = $this->folderMapper->findById($googleFile->getFolderId());
+
+        $this->response->content->set(
+            $this->buildHtmlOutput(
+                '@googleFile/detail.twig',
+                [
+                    'googleFile' => $googleFile,
+                    'folder'     => $folder,
+                ],
+                'Google File'
+            )
+        );
     }
 
     /**
      * Create a google file from POST data.
      *
      * @param Folder $folder
-     * @throws MapperException
      * @api   POST /googleFile/{folderId}
      * @since 21.0
      */
-    public function postGoogleFile(Folder $folder)
+    public function postGoogleFile(Folder $folder): void
     {
         $googleIdString = $this->request->post->get('googleIds');
         if (!$googleIdString) {
@@ -74,7 +103,7 @@ class Controller extends Base
             return;
         }
 
-        $selectedFiles = json_decode($googleIdString);
+        $selectedFiles      = json_decode($googleIdString, true);
         $editAccessLevel    = (int)$this->request->post->get('gfileEdit');
         $commentAccessLevel = (int)$this->request->post->get('gfileComment');
 
@@ -90,25 +119,33 @@ class Controller extends Base
         $existingGFileIds    = $this->googleFileMapper->findByColumn('folder_id', $folder->getId())
                                                       ->getPropertyValues('googleId');
         $email2accessRoleMap = $this->getEmail2AccessRoleMap($folder->getId(), $editAccessLevel, $commentAccessLevel);
-
+        $errors              = [];
         foreach ($selectedFiles as $selectedFile) {
             // if this file is already associated with this folder, skip
-            if (in_array($selectedFile->id, $existingGFileIds)) {
+            if (in_array($selectedFile['id'], $existingGFileIds)) {
                 continue;
             }
             // store google file id in the db
-            $googleFile = $this->googleFileMapper->createModel();
-            $googleFile->setFolderId($folder->getId())
-                       ->setGoogleId($selectedFile->id)
-                       ->setName($selectedFile->name)
-                       ->setIcon($selectedFile->icon)
-                       ->setOwnerId($this->getUser()->getId());
-            $this->googleFileMapper->save($googleFile);
-            // provide access to google doc via api
-            foreach ($email2accessRoleMap as $email => $accessRole) {
-                $gDriveFetcher->setPermissions(
-                    $selectedFile->id, $accessRole, $email
-                );
+            try {
+                $googleFile = $this->googleFileMapper->createModel();
+                $googleFile->setFolderId($folder->getId())
+                           ->setGoogleId($selectedFile['id'])
+                           ->setName($selectedFile['name'])
+                           ->setIcon($selectedFile['icon'])
+                           ->setUrl('')
+                           ->setOwnerId($this->getUser()->getId());
+                $this->googleFileMapper->save($googleFile);
+                // provide access to google doc via api
+                foreach ($email2accessRoleMap as $email => $accessRole) {
+                    $gDriveFetcher->setPermissions(
+                        $selectedFile['id'], $accessRole, $email
+                    );
+                }
+                $meta = $gDriveFetcher->fetchMetaData($selectedFile['id']);
+                $googleFile->setUrl($meta['webViewLink']);
+                $this->googleFileMapper->save($googleFile);
+            } catch (MapperException $e) {
+                $errors[] = "Failed to save : " . $e->getMessage();
             }
         }
 
@@ -116,7 +153,8 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildJsonOutput(
                 [
-                    'success' => true,
+                    'success'  => true,
+                    'messages' => $errors,
                 ]
             )
         );

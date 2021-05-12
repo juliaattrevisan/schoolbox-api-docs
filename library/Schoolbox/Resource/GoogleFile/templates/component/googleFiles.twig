@@ -27,7 +27,7 @@
             <li class="actions-small-1">
                 <div class="list-item">
                     <div class="compact card small-12">
-                        <a>
+                        <a href="{{ routeLookupIfAuthorized('googleFile.getGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}">
                             <img class="mime" alt="" src="{{ googleFile.icon | replace({'/16/type/': '/64/type/'}) }}"/>
                             <h3>{{ googleFile.name }}</h3>
                         </a>

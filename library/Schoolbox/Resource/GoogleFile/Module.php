@@ -38,6 +38,15 @@ class Module extends BaseModule
     function registerRoutes(): void
     {
         $this->register(
+            self::METHOD_GET,
+            '/{googleFileId:\d+}',
+            'getGoogleFile',
+            new IsLoggedIn(),
+            function ($params) {
+                return $this->preloadGoogleFile($params);
+            }
+        );
+        $this->register(
             self::METHOD_POST,
             '/{folderId:\d+}',
             'postGoogleFile',
@@ -74,6 +83,7 @@ class Module extends BaseModule
                     'googleFileMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
                     'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
                     'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 ]
             )
         );
@@ -112,6 +122,25 @@ class Module extends BaseModule
         return $preload;
     }
 
+    /**
+     * @param array $params
+     * @return array
+     */
+    private function preloadGoogleFile(array $params): array
+    {
+        if (($params['googleFile'] ?? null) instanceof Model) {
+            $preload['googleFile'] = $params['googleFile'];
+        } elseif (!\array_key_exists('googleFileId', $params)) {
+            throw new \UnexpectedValueException("No 'googleFileId' found in route params");
+        } else {
+            try {
+                $preload['googleFile'] = $this->getGoogleFileMapper()->findById($params['googleFileId']);
+            } catch (BaseMapper\Exception $e) {
+                throw new InvalidPath('GoogleFile Not Found', 0, $e);
+            }
+        }
+        return $preload;
+    }
 
     /**
      * @return FolderMapper
@@ -121,6 +150,17 @@ class Module extends BaseModule
     {
         /** @var FolderMapper $mapper **/
         $mapper = $this->getMapperFactory()->get(FolderMapper::class);
+
+        return $mapper;
+    }
+
+    /**
+     * @return Mapper
+     */
+    private function getGoogleFileMapper(): Mapper
+    {
+        /** @var Mapper $mapper */
+        $mapper = $this->getMapperFactory()->get(Mapper::class);
 
         return $mapper;
     }

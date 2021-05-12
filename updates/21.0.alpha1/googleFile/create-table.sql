@@ -1,10 +1,11 @@
 CREATE TABLE `google_file`
 (
     `id`         INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `google_id`  VARCHAR(100) CHARACTER SET 'ascii' NULL DEFAULT NULL,
+    `google_id`  VARCHAR(100) NULL DEFAULT NULL,
     `name`       TEXT NULL DEFAULT NULL,
     `icon`       VARCHAR(100) NULL DEFAULT NULL,
-    `folder_id`  INT(5) UNSIGNED NOT NULL,
+    `url`        VARCHAR(2048) DEFAULT NULL,
+    `folder_id`  INT (5) UNSIGNED NOT NULL,
     `owner_id`   INT(4) UNSIGNED NOT NULL,
     `created_at` DATETIME NOT NULL,
     `deleted_at` DATETIME NULL DEFAULT NULL,

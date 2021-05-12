@@ -30,6 +30,7 @@ class Mapper extends BaseMapper
         $this->uses('google_id', self::TYPE_STRING);
         $this->uses('name', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
+        $this->uses('url', self::TYPE_STRING);
         $this->uses('folder_id', self::TYPE_INTEGER);
         $this->uses('owner_id', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
