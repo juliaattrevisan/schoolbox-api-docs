@@ -38,7 +38,7 @@ class CalendarInitialCest
         $i->login("alaress", "alaress");
         $i->amOnPage('/calendar/full');
         sleep(5);
-        $element = Locator::contains('a.fc-day-grid-event', 'My Test Event');
+        $element = Locator::contains('a.fc-daygrid-event', 'My Test Event');
         $i->clickWithLeftButton($element);
         $element = Locator::contains('a.button', 'Delete');
         $i->clickWithLeftButton($element);
