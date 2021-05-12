@@ -101,7 +101,9 @@ class Subnav
             )
             ->groupByCallback(
                 function (Config $config) {
-                    return $config->getType()->getId();
+                    return $config->getType() instanceof ConfigType
+                        ? $config->getType()->getId()
+                        : 0;
                 }
             );
 
