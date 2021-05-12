@@ -10,7 +10,9 @@ namespace Schoolbox\Filter;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter\Page\Model as PageModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -296,7 +298,28 @@ class Controller extends BaseController
                 $filtersPerPage[$page][$class::getName()] = $instance;
             }
         }
-        return $filtersPerPage;
+
+        // Also filter out filters depending on whether they're available:
+        // * Pending Assessments: always available
+        // * Grades:              grades_enabled
+        // * Class markbook:      class_markbook_enable
+        // * Course markbook:     course_markbook_enable
+        // * Upcoming Due Work:   upcoming_assessments_enabled
+        // * Assessment Calendar: always available
+        // * Rubric Markbook:     rubric_markbook_enable
+        // * Badges:              badge_enable
+        $filterAvailability = [
+            PageModel::PAGE_PENDING_ASSESSMENTS  => true,
+            PageModel::PAGE_GRADES               => (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_GRADES_ENABLED),
+            PageModel::PAGE_CLASS_MARK_BOOK      => (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED),
+            PageModel::PAGE_COURSE_MARK_BOOK     => (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_COURSE_MARKBOOK_ENABLED),
+            PageModel::PAGE_UPCOMING_ASSESSMENTS => (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED),
+            PageModel::PAGE_ASSESSMENT_CALENDAR  => true,
+            PageModel::PAGE_RUBRIC_MARK_BOOK     => (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED),
+            PageModel::PAGE_BADGE_LIST           => (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED),
+        ];
+
+        return array_intersect_key($filtersPerPage, array_filter($filterAvailability));
     }
 
 

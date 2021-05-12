@@ -141,6 +141,9 @@ class ConfigMapper extends Mapper
     public const NAME_SHOW_SCHOOLBOX_HELP_LINK = 'show_schoolbox_help_link';
 
     public const NAME_EPORTFOLIO_ENABLED = 'eportfolio_enabled';
+    public const NAME_CLASS_MARKBOOK_ENABLED = 'class_markbook_enable';
+    public const NAME_COURSE_MARKBOOK_ENABLED = 'course_markbook_enable';
+    public const NAME_RUBRIC_MARKBOOK_ENABLED = 'rubric_markbook_enable';
 
     /**
      * @throws \InvalidArgumentException
