@@ -118,6 +118,9 @@ class Controller extends ConfigController
         $pageList = $subnav->generate();
 
         foreach ($pageList as $parentUrl => $parentData) {
+            if (!($parentData['visible'] ?? false)) {
+                continue;
+            }
             $jsonPayload[] = [
                 'name'        => $parentUrl,
                 'title'       => $parentData['name'],
@@ -126,6 +129,9 @@ class Controller extends ConfigController
             ];
 
             foreach ($parentData['children'] as $childUrl => $childData) {
+                if (!($childData['visible'] ?? false)) {
+                    continue;
+                }
                 $jsonPayload[] = [
                     'name'        => $childUrl,
                     'title'       => $parentData['name'] . ' › ' . $childData['name'],
