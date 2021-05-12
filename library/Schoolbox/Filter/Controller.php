@@ -13,6 +13,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter\Page\AvailabilityChecker;
+use Schoolbox\Filter\Page\LabelBuilder;
 use Schoolbox\Filter\Page\Model as PageModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
@@ -313,17 +314,17 @@ class Controller extends BaseController
      */
     private function buildFilteredPageLabels(): array
     {
-        $assessmentLocalised = $this->rosettaStone->translate('assessment', true, true);
+        $labelBuilder = new LabelBuilder($this->rosettaStone);
         return [
-            Page\Model::PAGE_PENDING_ASSESSMENTS  => "Pending {$assessmentLocalised}",
-            Page\Model::PAGE_GRADES               => 'Grades',
-            Page\Model::PAGE_CLASS_MARK_BOOK      => 'Class Markbook',
-            Page\Model::PAGE_COURSE_MARK_BOOK     => 'Course Markbook',
-            Page\Model::PAGE_RUBRIC_MARK_BOOK     => 'Rubric Markbook',
-            Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',
-            Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming Due Work", // intentionally not localised.
-            Page\Model::PAGE_ASSESSMENT_CALENDAR  => "{$assessmentLocalised} Calendar",
-            Page\Model::PAGE_BADGE_LIST           => "Badge List",
+            Page\Model::PAGE_PENDING_ASSESSMENTS  => $labelBuilder->buildLabel(Page\Model::PAGE_PENDING_ASSESSMENTS),
+            Page\Model::PAGE_GRADES               => $labelBuilder->buildLabel(Page\Model::PAGE_GRADES),
+            Page\Model::PAGE_CLASS_MARK_BOOK      => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_MARK_BOOK),
+            Page\Model::PAGE_COURSE_MARK_BOOK     => $labelBuilder->buildLabel(Page\Model::PAGE_COURSE_MARK_BOOK),
+            Page\Model::PAGE_RUBRIC_MARK_BOOK     => $labelBuilder->buildLabel(Page\Model::PAGE_RUBRIC_MARK_BOOK),
+            Page\Model::PAGE_LEARNING_ANALYTICS   => $labelBuilder->buildLabel(Page\Model::PAGE_LEARNING_ANALYTICS),
+            Page\Model::PAGE_UPCOMING_ASSESSMENTS => $labelBuilder->buildLabel(Page\Model::PAGE_UPCOMING_ASSESSMENTS),
+            Page\Model::PAGE_ASSESSMENT_CALENDAR  => $labelBuilder->buildLabel(Page\Model::PAGE_ASSESSMENT_CALENDAR),
+            Page\Model::PAGE_BADGE_LIST           => $labelBuilder->buildLabel(Page\Model::PAGE_BADGE_LIST),
         ];
     }
 }
