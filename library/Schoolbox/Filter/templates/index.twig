@@ -22,8 +22,7 @@
             <h2 class="subheader">Filterable Pages</h2>
             <section>
                 <ul class="information-list">
-                    {% for page, pageFilters in filtersPerPage | filter(page => showCourseMarkbook or page != 'courseMarkbook')  %}
-
+                    {% for page, pageFilters in filtersPerPage %}
                         {% set pageName = pageLabels[page]|default(page) %}
 
                         {# Filters on a page are all for same entity type, so just inspect first #}

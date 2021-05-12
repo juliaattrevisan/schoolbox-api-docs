@@ -105,7 +105,6 @@ class Controller extends BaseController
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
             'filtersPerPage'     => $filtersPerPage,
             'pageLabels'         => $this->buildFilteredPageLabels(),
-            'showCourseMarkbook' => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => $this->router->generate('filters.getIndex'),
