@@ -46,25 +46,38 @@ class Module extends BaseModule
                 return $this->preloadGoogleFile($params);
             }
         );
+
+        $canCreate = new All(
+            new IsLoggedIn(),
+            new Any(
+                new IsSuperuser(),
+                new HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
+                    function (array $params = []) {
+                        return $params['folderId'];
+                    },
+                    Access::getInstance()
+                )
+            ),
+        );
+
         $this->register(
             self::METHOD_POST,
             '/{folderId:\d+}',
             'postGoogleFile',
-            new All(
-                new IsLoggedIn(),
-                new Any(
-                    new IsSuperuser(),
-                    new HasHomepageAccess(
-                        UserAccess::ACCESS_WRITE,
-                        function (array $params = []) {
-                            return $params['folderId'];
-                        },
-                        Access::getInstance()
-                    )
-                ),
-            ),
+            $canCreate,
             function ($params) {
                 return $this->preloadFolder($params);
+            }
+        );
+
+        $this->register(
+            self::METHOD_DELETE,
+            '/{googleFileId:\d+}',
+            'deleteGoogleFile',
+            $canCreate,
+            function ($params) {
+                return $this->preloadGoogleFile($params);
             }
         );
     }
@@ -139,6 +152,7 @@ class Module extends BaseModule
                 throw new InvalidPath('GoogleFile Not Found', 0, $e);
             }
         }
+        $preload['folderId'] = $preload['googleFile']->getFolderId();
         return $preload;
     }
 

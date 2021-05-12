@@ -33,15 +33,18 @@
                         </a>
                     </div>
                 </div>
-                <nav>
-                    <a class="icon-more" title="" data-dropdown="google-file-{{ loop.index }}"></a>
-                </nav>
-                <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
-                    <li><a class="icon-bin" href="" title="Remove">Remove</a></li>
-                    <li><a class="icon-group" href="" title="Change permissions">Change permissions</a></li>
-                </ul>
+                {% if writeAccess %}
+                    <nav>
+                        <a class="icon-more" title="" data-dropdown="google-file-{{ loop.index }}"></a>
+                    </nav>
+                    <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
+                        <li><a class="icon-bin"
+                               href="{{ routeLookupIfAuthorized('googleFile.deleteGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}"
+                               data-action="delete" title="Remove">Remove</a></li>
+                        <li><a class="icon-group" href="" title="Change permissions">Change permissions</a></li>
+                    </ul>
+                {% endif %}
             </li>
-
         </ul>
     {% endfor %}
     <div class="component-action">
@@ -226,6 +229,23 @@
                     });
                     break;
             }
+        });
+        $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this google file?',
+                confirmLabel: 'Delete',
+                confirmEvent: function () {
+                    $.ajax({
+                        url: $(event.target).attr('href'),
+                        type: 'DELETE',
+                        success: function (result) {
+                            window.location.href = '/homepage/' +{{ folder.id }};
+                        },
+                    });
+
+                }
+            });
         });
     });
 </script>

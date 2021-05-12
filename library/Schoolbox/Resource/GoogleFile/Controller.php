@@ -68,9 +68,13 @@ class Controller extends Base
     }
 
     /**
+     * Displays a google file in a dedicated page
+     *
      * @param Model $googleFile
      * @throws MapperException
      * @throws MapperException\Deleted
+     * @since 21.0
+     * @api   GET /googleFile/{googleFileId}
      */
     public function getGoogleFile(Model $googleFile)
     {
@@ -88,12 +92,28 @@ class Controller extends Base
         );
     }
 
+
+    /**
+     * Deletes a google file
+     *
+     * @param Model $googleFile
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     * @since 21.0
+     * @api   DELETE /googleFile/{id}
+     */
+    public function deleteGoogleFile(Model $googleFile)
+    {
+        $this->googleFileMapper->delete($googleFile);
+    }
+
+
     /**
      * Create a google file from POST data.
      *
      * @param Folder $folder
-     * @api   POST /googleFile/{folderId}
      * @since 21.0
+     * @api   POST /googleFile/{folderId}
      */
     public function postGoogleFile(Folder $folder): void
     {

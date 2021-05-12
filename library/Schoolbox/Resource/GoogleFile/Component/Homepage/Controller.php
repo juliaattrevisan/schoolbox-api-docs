@@ -101,6 +101,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             'googleFiles' => $this->googleFiles,
             'hasError'    => $this->hasError,
             'writeAccess' => $this->hasWriteAccess(),
+            'component_id' => $this->getInstance()->getId(),
         ];
 
         /* Decide whether to show Component Title using showComponentTitle
