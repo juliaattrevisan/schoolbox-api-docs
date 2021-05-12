@@ -33,7 +33,7 @@ $kernel = new Kernel();
 $user = $kernel->get('user');
 if (!($user instanceof User && $user->getId())) {
     http_response_code(401);
-    exit;
+    die('User not logged in');
 }
 
 // What's the file?
