@@ -8,6 +8,9 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Navigation;
 
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Type\Model as ConfigType;
 use Schoolbox\IConfigLoader;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -81,6 +84,25 @@ class Subnav
      */
     public function generate(): array
     {
+        // TODO inject the config mapper
+        //      (loader will not suffice, I need to query the config DB)
+        $configMapper = ConfigMapper::getInstance();
+        $pb           = $configMapper->getPredicateBuilder()
+            ->equals('hidden', 'false')
+            ->notEquals('module', 'custom')
+            ->notNull('type_id');
+        $enabledConfigs = $configMapper->findByPredicates($pb)
+            ->filter(
+                function (Config $config) {
+                    return $config->getType() instanceof ConfigType;
+                }
+            )
+            ->groupByCallback(
+                function (Config $config) {
+                    return $config->getType()->getId();
+                }
+            );
+
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
          * URLs are semantically unique but sometimes things get a bit weird
@@ -287,8 +309,8 @@ class Subnav
                         'children' => []
                     ],
                     '/adminv2/setting/Document%20Management' => [
-                        'name' => 'Document Management',
-                        'visible' =>  true,
+                        'name'     => 'Document Management',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/grades' => [
@@ -297,8 +319,8 @@ class Subnav
                         'children' => []
                     ],
                     '/adminv2/setting/LMS%20Policy' => [
-                        'name' => 'LMS Policy',
-                        'visible' =>  true,
+                        'name'     => 'LMS Policy',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/lti' => [
@@ -424,13 +446,13 @@ class Subnav
                 'visible' =>  true,
                 'children' => [
                     '/adminv2/setting/Modules' => [
-                        'name' => 'Home',
-                        'visible' =>  true,
+                        'name'     => 'Home',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_MODULES] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Board%20Leave' => [
-                        'name' => 'Board Leave',
-                        'visible' =>  true,
+                        'name'     => 'Board Leave',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_BOARD] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/feature-tours' => [
@@ -444,8 +466,8 @@ class Subnav
                         'children' => []
                     ],
                     '/adminv2/setting/Pastoral%20Care' => [
-                        'name' => 'Pastoral Care',
-                        'visible' =>  true,
+                        'name'     => 'Pastoral Care',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PASTORAL_CARE] ?? []) > 0,
                         'children' => []
                     ],
                 ]
@@ -537,8 +559,8 @@ class Subnav
                         'children' => []
                     ],
                     '/adminv2/setting/Resources' => [
-                        'name' => 'Settings',
-                        'visible' =>  true,
+                        'name'     => 'Settings',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/restore' => [
@@ -589,33 +611,33 @@ class Subnav
                 'visible' =>  true,
                 'children' => [
                     '/adminv2/setting/3rd%20Party%20Services' => [
-                        'name' => '3rd Party Services',
-                        'visible' =>  true,
+                        'name'     => '3rd Party Services',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Debugging' => [
-                        'name' => 'Debugging',
-                        'visible' =>  true,
+                        'name'     => 'Debugging',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Email' => [
-                        'name' => 'Email',
-                        'visible' =>  true,
+                        'name'     => 'Email',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_EMAIL] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/External%20DB' => [
-                        'name' => 'External DB',
-                        'visible' =>  true,
+                        'name'     => 'External DB',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_EXTERNAL] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/LDAP' => [
-                        'name' => 'LDAP',
-                        'visible' =>  true,
+                        'name'     => 'LDAP',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LDAP] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Localisation' => [
-                        'name' => 'Localisation',
-                        'visible' =>  true,
+                        'name'     => 'Localisation',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LOCALISATION] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/oauth' => [
@@ -624,33 +646,33 @@ class Subnav
                         'children' => []
                     ],
                     '/adminv2/setting/Paths' => [
-                        'name' => 'Paths',
-                        'visible' =>  true,
+                        'name'     => 'Paths',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PATHS] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Policy' => [
-                        'name' => 'Policy',
-                        'visible' =>  true,
+                        'name'     => 'Policy',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_POLICY] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Proxy' => [
-                        'name' => 'Proxy',
-                        'visible' =>  true,
+                        'name'     => 'Proxy',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PROXY] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/SAML' => [
-                        'name' => 'SAML',
-                        'visible' =>  true,
+                        'name'     => 'SAML',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SAML] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Security' => [
-                        'name' => 'Security',
-                        'visible' =>  true,
+                        'name'     => 'Security',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SECURITY] ?? []) > 0,
                         'children' => []
                     ],
                     '/adminv2/setting/Site' => [
-                        'name' => 'Site',
-                        'visible' =>  true,
+                        'name'     => 'Site',
+                        'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SITE] ?? []) > 0,
                         'children' => []
                     ],
                 ]
