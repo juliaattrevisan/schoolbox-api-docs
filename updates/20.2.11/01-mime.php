@@ -71,7 +71,8 @@ HELP;
                 'text/richtext',
             'application/rtf',
             'Rich Text',
-        'application-text.svg'
+        'application-text.svg',
+            true
         );
 
         /* video/x-msvideo
@@ -83,7 +84,8 @@ HELP;
             'video/avi',
             'video/x-msvideo',
             'AVI Video',
-            'application-video.svg'
+            'application-video.svg',
+            false
         );
     }
 
@@ -96,6 +98,7 @@ HELP;
      * @param string         $newType
      * @param string         $description
      * @param string         $iconFile
+     * @param bool           $inline
      * @return void
      */
     public function updateByMimeType(
@@ -103,7 +106,8 @@ HELP;
         string $oldType,
         string $newType,
         string $description,
-        string $iconFile
+        string $iconFile,
+        bool $inline
     ): void {
         $existing = null;
 
@@ -187,7 +191,7 @@ HELP;
             ->setDescription($description)
             ->setMime($newType)
             ->setIconFile($iconFile)
-            ->setInline(true)
+            ->setInline($inline)
             ->setEnable(true)
             ->setMaxFileSize(0);
 
