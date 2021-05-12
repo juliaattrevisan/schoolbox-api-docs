@@ -11,6 +11,8 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Type\Model as ConfigType;
+use Schoolbox\Filter\Page\AvailabilityChecker;
+use Schoolbox\Filter\Page\Model as FilterPageModel;
 use Schoolbox\IConfigLoader;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
@@ -102,6 +104,8 @@ class Subnav
                     return $config->getType()->getId();
                 }
             );
+
+        $filterAvailabilityChecker = new AvailabilityChecker($this->configLoader);
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
@@ -218,42 +222,42 @@ class Subnav
                 'children' => [
                     '/adminv2/filters/assessmentCal' => [
                         'name'     => 'Assessments Calendar',
-                        'visible'  => true,
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
                         'children' => []
                     ],
                     '/adminv2/filters/badgeList' => [
                         'name'     => 'Badge List',
-                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED),
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
                         'children' => []
                     ],
                     '/adminv2/filters/classMarkbook' => [
                         'name'     => 'Class Markbook',
-                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED),
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK),
                         'children' => []
                     ],
                     '/adminv2/filters/courseMarkbook' => [
                         'name'     => 'Course Markbook',
-                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_COURSE_MARKBOOK_ENABLED),
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK),
                         'children' => []
                     ],
                     '/adminv2/filters/dueWorkCal' => [
                         'name'     => 'Upcoming Due Work',
-                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED),
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
                         'children' => []
                     ],
                     '/adminv2/filters/grades' => [
                         'name'     => 'Grades',
-                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_GRADES_ENABLED),
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES),
                         'children' => []
                     ],
                     '/adminv2/filters/pending' => [
                         'name'     => 'Pending Assessments',
-                        'visible'  => true,
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
                         'children' => []
                     ],
                     '/adminv2/filters/rubricMarkbook' => [
                         'name'     => 'Rubric Markbook',
-                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED),
+                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
                         'children' => []
                     ],
                 ]
