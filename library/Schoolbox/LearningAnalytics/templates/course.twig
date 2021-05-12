@@ -136,21 +136,6 @@
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
-        {% if classFolders | length %}
-        <dl class="sub-nav">
-            <dd{% if not classFolder %} class="active"{% endif %}>
-                <a href="{{ routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) }}" class="button">All classes</a>
-            </dd>
-            {% for folder in classFolders %}
-                {% set active = classFolder and (folder.id == classFolder.id) and (route == 'folder') %}
-                {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
-
-                <dd class="{% if active %}active{% endif %}">
-                    <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
-                </dd>
-            {% endfor %}
-        </dl>
-        {% endif %}
 
         <ul class="meta">
             <li class="icon-course-builder" title="Course"><a href="/homepage/{{ courseSpec.folder.id }}" title="Course Page">{{ courseSpec.title }}</a></li>
@@ -169,11 +154,29 @@
         {% include 'sub/semesterSelector.twig' with {
             currentTerm:        term,
             terms:              terms,
-            termsWithResults:    termsWithResults,
+            termsWithResults:   termsWithResults,
             route:              currentRoute,
             routeArgs:          routeArgs
         } only %}
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        {% if classFolders | length %}
+            <dl class="sub-nav">
+                {% for folder in classFolders %}
+                    {% set active = classFolder and (folder.id == classFolder.id) and (route == 'folder') %}
+                    {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
+
+                    <dd class="{% if active %}active{% endif %}">
+                        <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
+                    </dd>
+                {% endfor %}
+            </dl>
+        {% endif %}
+
     </div>
 </div>
 
