@@ -897,22 +897,16 @@ section > fieldset {
     margin: 0.2rem 0 0.5rem;
     font-weight: $header-font-weight;
   }
+}
 
-  fieldset,
-  fieldset.collapsible {
-    width: 100%;
-    border: none;
-    padding: 1rem 0;
-    margin: 0 0 0.5rem;
-    legend,
-    legend[class^="icon-"],
-    legend[class*=" icon-"],
-    legend[data-collapser] {
-      font-size: $h6-font-size;
-      font-weight: $font-weight-bold;
-      margin-bottom: 0.5rem;
-      text-transform: uppercase;
-      color: $iron;
+fieldset.collapsible {
+  legend,
+  legend[class^="icon-"],
+  legend[class*=" icon-"],
+  legend[data-collapser] {
+    color: $anchor-font-color;
+    &:hover {
+      cursor: pointer;
     }
   }
 }
