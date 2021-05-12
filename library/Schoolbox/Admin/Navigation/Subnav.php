@@ -213,47 +213,47 @@ class Subnav
                 ]
             ],
             '/adminv2/filters' => [
-                'name' => 'Filters',
-                'visible' =>  true,
+                'name'     => 'Filters',
+                'visible'  => true,
                 'children' => [
                     '/adminv2/filters/assessmentCal' => [
-                        'name' => 'Assessments Calendar',
-                        'visible' =>  true,
+                        'name'     => 'Assessments Calendar',
+                        'visible'  => true,
                         'children' => []
                     ],
                     '/adminv2/filters/badgeList' => [
-                        'name' => 'Badge List',
-                        'visible' =>  true,
+                        'name'     => 'Badge List',
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED),
                         'children' => []
                     ],
                     '/adminv2/filters/classMarkbook' => [
-                        'name' => 'Class Markbook',
-                        'visible' =>  true,
+                        'name'     => 'Class Markbook',
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_CLASS_MARKBOOK_ENABLED),
                         'children' => []
                     ],
                     '/adminv2/filters/courseMarkbook' => [
-                        'name' => 'Course Markbook',
-                        'visible' =>  true,
+                        'name'     => 'Course Markbook',
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_COURSE_MARKBOOK_ENABLED),
                         'children' => []
                     ],
                     '/adminv2/filters/dueWorkCal' => [
-                        'name' => 'Upcoming Due Work',
-                        'visible' =>  true,
+                        'name'     => 'Upcoming Due Work',
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED),
                         'children' => []
                     ],
                     '/adminv2/filters/grades' => [
-                        'name' => 'Grades',
-                        'visible' =>  true,
+                        'name'     => 'Grades',
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_GRADES_ENABLED),
                         'children' => []
                     ],
                     '/adminv2/filters/pending' => [
-                        'name' => 'Pending Assessments',
-                        'visible' =>  true,
+                        'name'     => 'Pending Assessments',
+                        'visible'  => true,
                         'children' => []
                     ],
                     '/adminv2/filters/rubricMarkbook' => [
-                        'name' => 'Rubric Markbook',
-                        'visible' =>  true,
+                        'name'     => 'Rubric Markbook',
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_RUBRIC_MARKBOOK_ENABLED),
                         'children' => []
                     ],
                 ]
