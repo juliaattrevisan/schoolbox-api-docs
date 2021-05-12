@@ -59,7 +59,38 @@ class AvailabilityChecker
                 return (bool)$this->config->get(ConfigMapper::NAME_BADGES_ENABLED);
 
             default:
+                // There exists `Model::PAGE_LEARNING_ANALYTICS` as well:
+                // I don't think the learning analytics filter is in use at all
                 return false;
         }
+    }
+
+    /**
+     * Is any filter page available at all?
+     *
+     * Currently, this is always true as the pending assessments calendar and
+     * assessment calendar filters are always available. This may change at some
+     * point.
+     *
+     * @return bool
+     */
+    public function isAnyFilterAvailable(): bool
+    {
+        $allFilters = [
+            Model::PAGE_PENDING_ASSESSMENTS,
+            Model::PAGE_ASSESSMENT_CALENDAR,
+            Model::PAGE_GRADES,
+            Model::PAGE_CLASS_MARK_BOOK,
+            Model::PAGE_COURSE_MARK_BOOK,
+            Model::PAGE_UPCOMING_ASSESSMENTS,
+            Model::PAGE_RUBRIC_MARK_BOOK,
+            Model::PAGE_BADGE_LIST,
+        ];
+        foreach ($allFilters as $filter) {
+            if ($this->isAvailable($filter)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

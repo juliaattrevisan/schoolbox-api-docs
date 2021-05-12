@@ -218,7 +218,7 @@ class Subnav
             ],
             '/adminv2/filters' => [
                 'name'     => 'Filters',
-                'visible'  => true,
+                'visible'  =>  $filterAvailabilityChecker->isAnyFilterAvailable(),
                 'children' => [
                     '/adminv2/filters/assessmentCal' => [
                         'name'     => 'Assessments Calendar',
