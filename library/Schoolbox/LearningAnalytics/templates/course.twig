@@ -165,16 +165,21 @@
 <div class="row">
     <div class="small-12 columns">
         {% if classFolders | length %}
-            <dl class="sub-nav">
-                {% for folder in classFolders %}
-                    {% set active = classFolder and (folder.id == classFolder.id) and (route == 'folder') %}
-                    {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
 
-                    <dd class="{% if active %}active{% endif %}">
-                        <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
-                    </dd>
-                {% endfor %}
-            </dl>
+            {% if route == 'folder' %}
+                <h2 class="subheader">{{ classFolder.nameWithCodes }}</h2>
+            {% else %}
+                <dl class="sub-nav">
+                    {% for folder in classFolders %}
+                        {% set active = classFolder and (folder.id == classFolder.id) and (route == 'folder') %}
+                        {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
+
+                        <dd class="{% if active %}active{% endif %}">
+                            <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
+                        </dd>
+                    {% endfor %}
+                </dl>
+            {% endif %}
         {% endif %}
 
     </div>
@@ -194,14 +199,14 @@
 
 <div class="row">
     <div class="small-12 large-6 island">
-        <h2 class="subheader">Overall Progress</h2>
+        <h3 class="subheader">Overall Progress</h3>
 
         <section class="content">
             <div data-graph='overall'></div>
         </section>
     </div>
     <div class="small-12 large-3 island">
-        <h3 class="subheader">Top Students</h3>
+        <h4 class="subheader">Top Students</h4>
 
         <section>
             {% if ranking.top | length > 0 %}
@@ -228,7 +233,7 @@
         </section>
     </div>
     <div class="small-12 large-3 island">
-        <h3 class="subheader">Bottom Students</h3>
+        <h4 class="subheader">Bottom Students</h4>
 
         <section>
             {% if ranking.bottom | length > 0 %}
@@ -259,7 +264,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h2 class="subheader">Results</h2>
+            <h3 class="subheader">Results</h3>
 
             {% if submissionType %}
             <ul class="meta">
