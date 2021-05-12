@@ -31,7 +31,7 @@ $kernel = new Kernel();
 
 // You must at least be logged in to check file status
 $user = $kernel->get('user');
-if (!$user instanceof User && $user->getId()) {
+if (!($user instanceof User && $user->getId())) {
     http_response_code(401);
     exit;
 }
