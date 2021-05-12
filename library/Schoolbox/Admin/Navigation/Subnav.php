@@ -12,8 +12,11 @@ use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Type\Model as ConfigType;
 use Schoolbox\Filter\Page\AvailabilityChecker;
+use Schoolbox\Filter\Page\LabelBuilder;
 use Schoolbox\Filter\Page\Model as FilterPageModel;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\Mapper as L10nMapper;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -86,7 +89,7 @@ class Subnav
      */
     public function generate(): array
     {
-        // TODO inject the config mapper
+        // TODO inject the config mapper either here or in the constructor
         //      (loader will not suffice, I need to query the config DB)
         $configMapper = ConfigMapper::getInstance();
         $pb           = $configMapper->getPredicateBuilder()
@@ -108,6 +111,10 @@ class Subnav
             );
 
         $filterAvailabilityChecker = new AvailabilityChecker($this->configLoader);
+
+        // TODO inject the translator as well
+        $translator         = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
+        $filterLabelBuilder = new LabelBuilder($translator);
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are
@@ -223,42 +230,42 @@ class Subnav
                 'visible'  =>  $filterAvailabilityChecker->isAnyFilterAvailable(),
                 'children' => [
                     '/adminv2/filters/assessmentCal' => [
-                        'name'     => 'Assessments Calendar',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
                         'children' => []
                     ],
                     '/adminv2/filters/badgeList' => [
-                        'name'     => 'Badge List',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
                         'children' => []
                     ],
                     '/adminv2/filters/classMarkbook' => [
-                        'name'     => 'Class Markbook',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK),
                         'children' => []
                     ],
                     '/adminv2/filters/courseMarkbook' => [
-                        'name'     => 'Course Markbook',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK),
                         'children' => []
                     ],
                     '/adminv2/filters/dueWorkCal' => [
-                        'name'     => 'Upcoming Due Work',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
                         'children' => []
                     ],
                     '/adminv2/filters/grades' => [
-                        'name'     => 'Grades',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES),
                         'children' => []
                     ],
                     '/adminv2/filters/pending' => [
-                        'name'     => 'Pending Assessments',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
                         'children' => []
                     ],
                     '/adminv2/filters/rubricMarkbook' => [
-                        'name'     => 'Rubric Markbook',
+                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
                         'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
                         'children' => []
                     ],
