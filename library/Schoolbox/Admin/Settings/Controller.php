@@ -119,22 +119,21 @@ class Controller extends ConfigController
 
         foreach ($pageList as $parentUrl => $parentData) {
             $jsonPayload[] = [
-                'name' =>  $parentUrl,
-                'title' => $parentData['name'],
+                'name'        => $parentUrl,
+                'title'       => $parentData['name'],
                 'description' => $parentData['description'],
-                'url'   => $parentUrl,
+                'url'         => $parentUrl,
             ];
 
             foreach ($parentData['children'] as $childUrl => $childData) {
                 $jsonPayload[] = [
-                    'name'  => $childUrl,
-                    'title' => $childData['name'],
+                    'name'        => $childUrl,
+                    'title'       => $parentData['name'] . ' › ' . $childData['name'],
                     'description' => $childData['description'],
-                    'url'   => $childUrl,
+                    'url'         => $childUrl,
                 ];
             }
         }
-
 
         $this->getResponse()->content->set($this->buildJsonOutput($jsonPayload));
     }
