@@ -197,8 +197,8 @@ class Subnav
                 ]
             ],
             '/adminv2/eportfolio' => [
-                'name' => 'ePortfolio',
-                'visible' =>  true,
+                'name'     => 'ePortfolio',
+                'visible'  => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                 'children' => [
                     '/adminv2/eportfolio/deploy' => [
                         'name' => 'Deployment',
