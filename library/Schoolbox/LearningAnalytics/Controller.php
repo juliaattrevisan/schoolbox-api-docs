@@ -381,15 +381,6 @@ class Controller extends Base
         $navigableTerms = TermMapper::getInstance()->findAll();
         $termsWithResults = $this->getNavigableTerms($courseSpecification, $classFolder);
 
-        foreach ($dueAssessments as $dueAssessment) {
-            new \Alaress_Probe(
-                $dueAssessment->getTitle(),
-                $dueAssessment->getDueAt()->getDatabase(),
-                $dueAssessment->getBaseContext()->getFolder()->getId(),
-                $dueAssessment->getBaseContext()->getFolder()->getTitle()
-            );
-        }
-
         $data = [
             'courseSpec'          => $courseSpecification,
             'classFolder'         => $classFolder,
