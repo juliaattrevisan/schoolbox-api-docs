@@ -22,6 +22,11 @@ class AvailabilityChecker
      */
     private IConfigLoader $config;
 
+    /**
+     * Constructor
+     *
+     * @param IConfigLoader $config
+     */
     public function __construct(IConfigLoader $config)
     {
         $this->config = $config;
