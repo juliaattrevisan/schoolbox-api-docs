@@ -22,8 +22,7 @@
             <h2 class="subheader">Filterable Pages</h2>
             <section>
                 <ul class="information-list">
-                    {% if showCourseMarkbook %}
-                    {% for page, pageFilters in filtersPerPage | filter(page => page != 'courseMarkbook' )  %}
+                    {% for page, pageFilters in filtersPerPage | filter(page => showCourseMarkbook or page != 'courseMarkbook')  %}
 
                         {% set pageName = pageLabels[page]|default(page) %}
 
@@ -52,7 +51,6 @@
                             </div>
                         </li>
                     {% endfor %}
-                    {% endif %}
                 </ul>
             </section>
         </div>
