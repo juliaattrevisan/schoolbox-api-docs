@@ -127,614 +127,643 @@ class Subnav
          * that there are multiple ways to match these urls
          */
         return [
-            '/adminv2/home' => [
-                'name' => 'Home',
-                'visible' =>  true,
-                'children' => []
+            '/adminv2/home'                           => [
+                'name'        => 'Home',
+                'visible'     => true,
+                'children'    => [],
+                'description' => 'Key system status information.',
             ],
-            '/adminv2/calendar/Cleanup' => [
-                'name' => 'Calendar',
-                'visible' =>  true,
+            '/adminv2/calendar/Cleanup'               => [
+                'name'     => 'Calendar',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/calendar/Cleanup' => [
-                        'name' => 'Cleanup',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/calendar/Cleanup'   => [
+                        'name'        => 'Cleanup',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'A tool to bulk or individually remove events from personal or group calendars.',
                     ],
-                    '/adminv2/calendar/Import' => [
-                        'name' => 'Import',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/calendar/Import'    => [
+                        'name'        => 'Import',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Import events into the school calendar via ICS or CSV.',
                     ],
                     '/adminv2/calendar/Subscribe' => [
-                        'name' => 'Subscribe',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'        => 'Subscribe',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
                     ],
-                ]
+                ],
             ],
             '/adminv2/engagement/index/collaboration' => [
-                'name' => 'Engagement',
-                'visible' =>  true,
+                'name'     => 'Engagement',
+                'visible'  => true,
                 'children' => [
                     '/adminv2/engagement/index/collaboration' => [
-                        'name' => 'Collaboration',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'        => 'Collaboration',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on how users are using the collaboration features like forums and social feeds.',
                     ],
-                    '/adminv2/engagement/index/components' => [
-                        'name' => 'Component Usage',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/components'    => [
+                        'name'        => 'Component Usage',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on which homepage components are currently in use.',
                     ],
-                    '/adminv2/engagement/index/dueWork' => [
-                        'name' => 'Due Work',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/dueWork'       => [
+                        'name'        => 'Due Work',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on how much the LMS features are being utilised including feedback and online submissions.',
                     ],
-                    '/adminv2/engagement/index/files' => [
-                        'name' => 'Files',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/files'         => [
+                        'name'        => 'Files',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on how many files are being created and accessed by different roles within the system.',
                     ],
-                    '/adminv2/engagement/index/fileTypes' => [
-                        'name' => 'File Types',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/fileTypes'     => [
+                        'name'        => 'File Types',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on how many videos and images are being viewed within the system.',
                     ],
-                    '/adminv2/engagement/index/links' => [
-                        'name' => 'Links',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/links'         => [
+                        'name'        => 'Links',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on how many links are being created and accessed by different roles within the system.',
                     ],
-                    '/adminv2/engagement/index/login' => [
-                        'name' => 'Login',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/login'         => [
+                        'name'        => 'Login',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on the total logins by role and also the percentage of users who have logged in at all.',
                     ],
-                    '/adminv2/engagement/index/mobile' => [
-                        'name' => 'Mobile Apps',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/mobile'        => [
+                        'name'        => 'Mobile Apps',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics related to the use of mobile apps by users to access the system.',
                     ],
-                    '/adminv2/engagement/index/news' => [
-                        'name' => 'News Posted',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/news'          => [
+                        'name'        => 'News Posted',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics regarding the amount of news being created within the system.',
                     ],
-                    '/adminv2/engagement/index/quiz' => [
-                        'name' => 'Quizzes',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/engagement/index/quiz'          => [
+                        'name'        => 'Quizzes',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Statistics on how many quizzes have been created and attempted.',
                     ],
-                ]
+                ],
             ],
-            '/adminv2/eportfolio' => [
+            '/adminv2/eportfolio'                     => [
                 'name'     => 'ePortfolio',
                 'visible'  => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                 'children' => [
                     '/adminv2/eportfolio/deploy' => [
-                        'name' => 'Deployment',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'        => 'Deployment',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Configure and setup the scaffolding templates that users can create ePortfolio pages from.',
                     ],
-                    '/adminv2/eportfolio' => [
-                        'name' => 'Templates',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/eportfolio'        => [
+                        'name'        => 'Templates',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Clone and deploy an ePortfolio page from one user to many other users.',
                     ],
-                ]
+                ],
             ],
-            '/adminv2/filters' => [
+            '/adminv2/filters'                        => [
                 'name'     => 'Filters',
-                'visible'  =>  $filterAvailabilityChecker->isAnyFilterAvailable(),
+                'visible'  => $filterAvailabilityChecker->isAnyFilterAvailable(),
                 'children' => [
-                    '/adminv2/filters/assessmentCal' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
-                        'children' => []
+                    '/adminv2/filters/assessmentCal'  => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the assessment calendar.',
                     ],
-                    '/adminv2/filters/badgeList' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
-                        'children' => []
+                    '/adminv2/filters/badgeList'      => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_BADGE_LIST),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_BADGE_LIST),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the goal and achievements search page.',
                     ],
-                    '/adminv2/filters/classMarkbook' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK),
-                        'children' => []
+                    '/adminv2/filters/classMarkbook'  => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_MARK_BOOK),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_MARK_BOOK),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the class markbook.',
                     ],
                     '/adminv2/filters/courseMarkbook' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK),
-                        'children' => []
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_COURSE_MARK_BOOK),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_COURSE_MARK_BOOK),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the course markbook.',
                     ],
-                    '/adminv2/filters/dueWorkCal' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
-                        'children' => []
+                    '/adminv2/filters/dueWorkCal'     => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_UPCOMING_ASSESSMENTS),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the students due work calendar.',
                     ],
-                    '/adminv2/filters/grades' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES),
-                        'children' => []
+                    '/adminv2/filters/grades'         => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_GRADES),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_GRADES),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the continuous report / class grades page.',
                     ],
-                    '/adminv2/filters/pending' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
-                        'children' => []
+                    '/adminv2/filters/pending'        => [
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_PENDING_ASSESSMENTS),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the pending assessments page.',
                     ],
                     '/adminv2/filters/rubricMarkbook' => [
-                        'name'     => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
-                        'visible'  => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
-                        'children' => []
+                        'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
+                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_RUBRIC_MARK_BOOK),
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on the class rubric markbook.',
                     ],
-                ]
+                ],
             ],
-            '/adminv2/import/directImport' => [
-                'name' => 'Import',
-                'visible' =>  true,
+            '/adminv2/import/directImport'            => [
+                'name'     => 'Import',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/import/directImport' => [
-                        'name' => 'Home',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/import/directImport'  => [
+                        'name'        => 'Home',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => '',
                     ],
-                    '/adminv2/import/folder' => [
-                        'name' => 'Pages',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/import/folder'        => [
+                        'name'        => 'Pages',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Import all school class pages via a CSV file.',
                     ],
-                    '/adminv2/import/pastoral' => [
-                        'name' => 'Pastoral Care',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/import/pastoral'      => [
+                        'name'        => 'Pastoral Care',
+                        'visible'     => $this->configLoader->get('external_type') === 'synergetic',
+                        'children'    => [],
+                        'description' => 'Import your pastoral care records from Synergetic.',
                     ],
                     '/adminv2/import/photos/upload' => [
-                        'name' => 'Portrait Photos',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'        => 'Portrait Photos',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Manually upload portrait photos for users when the SIS does not automatically provide them.',
                     ],
-                    '/adminv2/import/userAccount' => [
-                        'name' => 'User Accounts',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/import/userAccount'   => [
+                        'name'        => 'User Accounts',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => '',
                     ],
-                ]
+                ],
             ],
-            '/adminv2/terms' => [
-                'name' => 'LMS',
-                'visible' =>  true,
+            '/adminv2/terms'                          => [
+                'name'     => 'LMS',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/terms' => [
-                        'name' => 'Academic Period',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/terms'                         => [
+                        'name'     => 'Academic Period',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/rollover' => [
-                        'name' => 'Class Rollover',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/rollover'                      => [
+                        'name'     => 'Class Rollover',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/course-builder' => [
-                        'name' => 'Course Builder',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/course-builder'                => [
+                        'name'     => 'Course Builder',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/setting/Document%20Management' => [
                         'name'     => 'Document Management',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/grades' => [
-                        'name' => 'Grades',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/grades'                        => [
+                        'name'     => 'Grades',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/setting/LMS%20Policy' => [
+                    '/adminv2/setting/LMS%20Policy'          => [
                         'name'     => 'LMS Policy',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/lti' => [
-                        'name' => 'LTI Providers',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lti'                           => [
+                        'name'     => 'LTI Providers',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/rubric-results' => [
-                        'name' => 'Rubrics',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/rubric-results'                => [
+                        'name'     => 'Rubrics',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/lists/achievement-category' => [
-                'name' => 'Lists',
-                'visible' =>  true,
+            '/adminv2/lists/achievement-category'     => [
+                'name'     => 'Lists',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/lists/achievement-category' => [
-                        'name' => 'Badge Categories',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/achievement-category'             => [
+                        'name'     => 'Badge Categories',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/campus' => [
-                        'name' => 'Campus',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/campus'                           => [
+                        'name'     => 'Campus',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/component-definition' => [
-                        'name' => 'Components',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/component-definition'             => [
+                        'name'     => 'Components',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/webdav' => [
-                        'name' => 'Drives',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/webdav'                           => [
+                        'name'     => 'Drives',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/event-type' => [
-                        'name' => 'Event Types',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/event-type'                       => [
+                        'name'     => 'Event Types',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/house' => [
-                        'name' => 'Houses',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/house'                            => [
+                        'name'     => 'Houses',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/evidence-tag' => [
-                        'name' => 'Learning Moments',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/evidence-tag'                     => [
+                        'name'     => 'Learning Moments',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/news-topic' => [
-                        'name' => 'News Topics',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/news-topic'                       => [
+                        'name'     => 'News Topics',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/pastoral-severity' => [
-                        'name' => 'Pastoral Record Severity',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/pastoral-severity'                => [
+                        'name'     => 'Pastoral Record Severity',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/pastoral-tags' => [
-                        'name' => 'Pastoral Record Tags',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/pastoral-tags'                    => [
+                        'name'     => 'Pastoral Record Tags',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/lists/pastoral-document-classification' => [
-                        'name' => 'Pastoral SIS Document Classifications',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'     => 'Pastoral SIS Document Classifications',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/pastoral-category' => [
-                        'name' => 'Pastoral Sub-Types',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/pastoral-category'                => [
+                        'name'     => 'Pastoral Sub-Types',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/pastoral-type' => [
-                        'name' => 'Pastoral Types',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/pastoral-type'                    => [
+                        'name'     => 'Pastoral Types',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/residential-house' => [
-                        'name' => 'Residential Houses',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/residential-house'                => [
+                        'name'     => 'Residential Houses',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/roles' => [
-                        'name' => 'Roles',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/roles'                            => [
+                        'name'     => 'Roles',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/submission-errors' => [
-                        'name' => 'Submission States',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/submission-errors'                => [
+                        'name'     => 'Submission States',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/timetable-colour' => [
-                        'name' => 'Timetable Colours',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/timetable-colour'                 => [
+                        'name'     => 'Timetable Colours',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/user-title' => [
-                        'name' => 'User Titles',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/user-title'                       => [
+                        'name'     => 'User Titles',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/submission-type' => [
-                        'name' => 'Work Types',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/submission-type'                  => [
+                        'name'     => 'Work Types',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/lists/year-levels' => [
-                        'name' => 'Year Levels',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/lists/year-levels'                      => [
+                        'name'     => 'Year Levels',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/setting/Modules' => [
-                'name' => 'Modules',
-                'visible' =>  true,
+            '/adminv2/setting/Modules'                => [
+                'name'     => 'Modules',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/setting/Modules' => [
+                    '/adminv2/setting/Modules'         => [
                         'name'     => 'Home',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_MODULES] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Board%20Leave' => [
+                    '/adminv2/setting/Board%20Leave'   => [
                         'name'     => 'Board Leave',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_BOARD] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/feature-tours' => [
-                        'name' => 'Feature Tours',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/feature-tours'           => [
+                        'name'     => 'Feature Tours',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/package' => [
-                        'name' => 'Packages',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/package'                 => [
+                        'name'     => 'Packages',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/setting/Pastoral%20Care' => [
                         'name'     => 'Pastoral Care',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PASTORAL_CARE] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/news' => [
-                'name' => 'News',
-                'visible' =>  true,
-                'children' => []
+            '/adminv2/news'                           => [
+                'name'     => 'News',
+                'visible'  => true,
+                'children' => [],
             ],
-            '/adminv2/messages' => [
-                'name' => 'Notifications',
-                'visible' =>  true,
+            '/adminv2/messages'                       => [
+                'name'     => 'Notifications',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/messages' => [
-                        'name' => 'Home',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/messages'           => [
+                        'name'     => 'Home',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/messages/apps' => [
-                        'name' => 'Delivery Providers',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/messages/apps'      => [
+                        'name'     => 'Delivery Providers',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/messages/puush' => [
-                        'name' => 'Mobile App Registrations',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/messages/puush'     => [
+                        'name'     => 'Mobile App Registrations',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/messages/configure' => [
-                        'name' => 'Settings',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'     => 'Settings',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/dashboard' => [
-                'name' => 'Personalisation',
-                'visible' =>  true,
+            '/adminv2/dashboard'                      => [
+                'name'     => 'Personalisation',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/dashboard' => [
-                        'name' => 'Dashboard Templates',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/dashboard'             => [
+                        'name'     => 'Dashboard Templates',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/homepage' => [
-                        'name' => 'Homepage Templates',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/homepage'              => [
+                        'name'     => 'Homepage Templates',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/profile-button' => [
-                        'name' => 'Profile Buttons',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/profile-button'        => [
+                        'name'     => 'Profile Buttons',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/menu-side' => [
-                        'name' => 'Side Menu',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/menu-side'             => [
+                        'name'     => 'Side Menu',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/setting/Skin%20Config' => [
-                        'name' => 'Skin Config',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'     => 'Skin Config',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/terminology' => [
-                        'name' => 'Terminology',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/terminology'           => [
+                        'name'     => 'Terminology',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/menu-top' => [
-                        'name' => 'Top Menu',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/menu-top'              => [
+                        'name'     => 'Top Menu',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/setting/Resources' => [
-                'name' => 'Resources',
-                'visible' =>  true,
+            '/adminv2/setting/Resources'              => [
+                'name'     => 'Resources',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/allowed-file' => [
-                        'name' => 'Allowed Files',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/allowed-file'      => [
+                        'name'     => 'Allowed Files',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/video' => [
-                        'name' => 'Media Queue',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/video'             => [
+                        'name'     => 'Media Queue',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/setting/Resources' => [
                         'name'     => 'Settings',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/restore' => [
-                        'name' => 'Restore',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/restore'           => [
+                        'name'     => 'Restore',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/usage' => [
-                        'name' => 'Usage',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/usage'             => [
+                        'name'     => 'Usage',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/import/schoolDataImport' => [
-                'name' => 'School Data Import',
-                'visible' => $this->configLoader->get('external_type') === 'schoolbox',
+            '/adminv2/import/schoolDataImport'        => [
+                'name'     => 'School Data Import',
+                'visible'  => $this->configLoader->get('external_type') === 'schoolbox',
                 'children' => [
-                    '/adminv2/import/schoolDataImport' => [
-                        'name' => 'Home',
-                        'visible' => $this->configLoader->get('external_type') === 'schoolbox',
-                        'children' => []
+                    '/adminv2/import/schoolDataImport'   => [
+                        'name'     => 'Home',
+                        'visible'  => $this->configLoader->get('external_type') === 'schoolbox',
+                        'children' => [],
                     ],
-                    '/adminv2/import/profile' => [
-                        'name' => 'User Profiles',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/import/profile'            => [
+                        'name'     => 'User Profiles',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/import/timetableStructure' => [
-                        'name' => 'Timetable Structure',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'     => 'Timetable Structure',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/import/timetable' => [
-                        'name' => 'Timetable',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/import/timetable'          => [
+                        'name'     => 'Timetable',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/import/timetableEnrolment' => [
-                        'name' => 'Timetable Enrolment',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'     => 'Timetable Enrolment',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/setting' => [
-                'name' => 'System Settings',
-                'visible' =>  true,
+            '/adminv2/setting'                        => [
+                'name'     => 'System Settings',
+                'visible'  => true,
                 'children' => [
                     '/adminv2/setting/3rd%20Party%20Services' => [
                         'name'     => '3rd Party Services',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Debugging' => [
+                    '/adminv2/setting/Debugging'              => [
                         'name'     => 'Debugging',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Email' => [
+                    '/adminv2/setting/Email'                  => [
                         'name'     => 'Email',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_EMAIL] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/External%20DB' => [
+                    '/adminv2/setting/External%20DB'          => [
                         'name'     => 'External DB',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_EXTERNAL] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/LDAP' => [
+                    '/adminv2/setting/LDAP'                   => [
                         'name'     => 'LDAP',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LDAP] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Localisation' => [
+                    '/adminv2/setting/Localisation'           => [
                         'name'     => 'Localisation',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LOCALISATION] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/oauth' => [
-                        'name' => 'oAuth Provider Configuration',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/oauth'                          => [
+                        'name'     => 'oAuth Provider Configuration',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Paths' => [
+                    '/adminv2/setting/Paths'                  => [
                         'name'     => 'Paths',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PATHS] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Policy' => [
+                    '/adminv2/setting/Policy'                 => [
                         'name'     => 'Policy',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_POLICY] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Proxy' => [
+                    '/adminv2/setting/Proxy'                  => [
                         'name'     => 'Proxy',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PROXY] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/SAML' => [
+                    '/adminv2/setting/SAML'                   => [
                         'name'     => 'SAML',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SAML] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Security' => [
+                    '/adminv2/setting/Security'               => [
                         'name'     => 'Security',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SECURITY] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                    '/adminv2/setting/Site' => [
+                    '/adminv2/setting/Site'                   => [
                         'name'     => 'Site',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SITE] ?? []) > 0,
-                        'children' => []
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
-            '/adminv2/user' => [
-                'name' => 'User Management',
-                'visible' =>  true,
+            '/adminv2/user'                           => [
+                'name'     => 'User Management',
+                'visible'  => true,
                 'children' => [
-                    '/adminv2/user' => [
-                        'name' => 'Home',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/user'                 => [
+                        'name'     => 'Home',
+                        'visible'  => true,
+                        'children' => [],
                     ],
                     '/adminv2/reports/activity/all' => [
-                        'name' => 'Activity Report',
-                        'visible' =>  true,
-                        'children' => []
+                        'name'     => 'Activity Report',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/user/bulk/modify' => [
-                        'name' => 'Bulk Modify',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/user/bulk/modify'     => [
+                        'name'     => 'Bulk Modify',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/user/create' => [
-                        'name' => 'Create User',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/user/create'          => [
+                        'name'     => 'Create User',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/reports/login/all' => [
-                        'name' => 'Login Log',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/reports/login/all'    => [
+                        'name'     => 'Login Log',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/shaps' => [
-                        'name' => 'Schoolbox Help',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/shaps'                => [
+                        'name'     => 'Schoolbox Help',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/user/stale' => [
-                        'name' => 'Remove Users',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/user/stale'           => [
+                        'name'     => 'Remove Users',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                    '/adminv2/ups' => [
-                        'name' => 'User Provisioning System',
-                        'visible' =>  true,
-                        'children' => []
+                    '/adminv2/ups'                  => [
+                        'name'     => 'User Provisioning System',
+                        'visible'  => true,
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
         ];
     }
