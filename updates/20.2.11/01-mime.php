@@ -8,9 +8,10 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\File\MimetypeMapper;
 
 
-require_once __DIR__ . '/../conf/core/require.php';
+require_once __DIR__ . '/../../conf/core/require.php';
 
 /**
  * CLI Tool
@@ -59,39 +60,143 @@ HELP;
             exit;
         }
 
-        $this->getLogger()->info('Script commencing.');
+        $mapper = MimetypeMapper::getInstance();
 
         /* application/rtf
-         *
-         * Find out if this row already exists in Allowed Files. If it already exists,
-         * we don't need to do anything.
          */
+        $this->getLogger()->info('Trying to update text/richtext mimetype to application/rtf');
 
-        /* Otherwise, we need to find the old version: text/richtext. If that exists,
-         * update it with application/rtf instead and leave all the other settings intact.
-         */
-
-        /* If text/richtext doesn't exist for some reason, create a new row with application/rtf
-         * and some default information about richtext file types.
-         */
+        $this->updateByMimeType(
+                $mapper,
+                'text/richtext',
+            'application/rtf',
+            'Rich Text',
+        'application-text.svg'
+        );
 
         /* video/x-msvideo
-         *
-         * Find out if this row already exists in Allowed Files. If it already exists,
-         * we don't need to do anything.
          */
+        $this->getLogger()->info('Trying to update video/avi mimetype to video/x-msvideo');
 
-        /* Otherwise, we need to find the old version: video/avi. If that exists,
-         * update it with video/x-msvideo instead and leave all the other settings intact.
+        $this->updateByMimeType(
+                $mapper,
+            'video/avi',
+            'video/x-msvideo',
+            'AVI Video',
+            'application-video.svg'
+        );
+    }
+
+
+    /**
+     * Create/update a mime type
+     *
+     * @param MimetypeMapper $mapper
+     * @param string         $oldType
+     * @param string         $newType
+     * @param string         $description
+     * @param string         $iconFile
+     * @return void
+     */
+    public function updateByMimeType(
+        MimetypeMapper $mapper,
+        string $oldType,
+        string $newType,
+        string $description,
+        string $iconFile
+    ): void {
+        $existing = null;
+
+        /* Find out if this $newType row already exists in Allowed Files.
+         * If it already exists, we don't need to do anything.
          */
+        try {
+            $existing = $mapper->findOneByColumn('mime', $newType, [
+                'deleted' => true
+            ]);
+        } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
 
-        /* If video/avi doesn't exist for some reason, create a new row with video/x-msvideo
-         * and some default information about avi file types.
-         */
+            // noop
+            $this->getLogger()->info(sprintf(
+                'Mimetype %s not found; continuing to look for %s to see if we can update it.',
+                $newType,
+                $oldType
+            ));
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+            $this->getLogger()->info(sprintf(
+                'Mimetype %s already exists but is already deleted; cannot add it again. No change required.',
+                $newType
+            ));
 
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
+            return;
         }
+
+        if ($existing) {
+            $this->getLogger()->info(sprintf(
+                'Mimetype %s already exists; no change required.',
+                $newType
+            ));
+
+            return;
+        }
+
+        /* Otherwise, we need to find the old version $oldType. If that exists,
+         * update it with $newType instead and leave all the other settings intact.
+         */
+        try {
+            $existing = $mapper->findOneByColumn('mime', $oldType, [
+                'deleted' => true
+            ]);
+        } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+
+            // noop
+            $this->getLogger()->info(sprintf(
+                'Mimetype %s also not found; will need to make a new row.',
+                $oldType
+            ));
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+
+            // noop; row was softdeleted, but we should update that anyway
+
+            $this->getLogger()->info(sprintf(
+                'Mimetype %s already exists but is already deleted; updating it anyway.',
+                $oldType
+            ));
+
+            $existing = $e->getDeletedObject();
+        }
+
+        if ($existing) {
+            $existing->setMime($newType);
+
+            $mapper->save($existing);
+
+            $this->getLogger()->info(sprintf(
+                'Mimetype %s found, updating it to %s.',
+                $oldType,
+                $newType
+            ));
+
+            return;
+        }
+
+        /* If $oldType doesn't exist for some reason, create a new row with $newType
+         * and some default information about $newType file types.
+         */
+        $new = $mapper->createModel()
+            ->setDescription($description)
+            ->setMime($newType)
+            ->setIconFile($iconFile)
+            ->setInline(true)
+            ->setEnable(true)
+            ->setMaxFileSize(0);
+
+        $mapper->save($new);
+
+        $this->getLogger()->info(sprintf(
+            'Mimetype %s getting created.',
+            $newType
+        ));
     }
 
 
