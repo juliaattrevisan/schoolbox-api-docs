@@ -312,6 +312,20 @@
     font-family: $font-family-icon;
 }
 
+.icon-external-link:before {
+    content: "\e921";
+    font-family: $font-family-icon;
+}
+
+// This puts a smaller link icon to the right
+.external:after {
+  content: "\e921";
+  font-family: $font-family-icon;
+  font-size: 10px;
+  padding-left: 6px;
+  padding-right: 0;
+}
+
 .icon-favourite:before,
 .icon-star:before {
     content: '\e628';
