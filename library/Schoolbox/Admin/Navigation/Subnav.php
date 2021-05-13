@@ -247,6 +247,12 @@ class Subnav
                 'visible'    => $filterAvailabilityChecker->isAnyFilterAvailable(),
                 'searchable' => false,
                 'children'   => [
+                    '/adminv2/filters'  => [
+                        'name'        => 'Home',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Configure the default and available filter options on various pages.',
+                    ],
                     '/adminv2/filters/assessmentCal'  => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
