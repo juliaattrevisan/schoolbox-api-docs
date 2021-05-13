@@ -132,7 +132,6 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(trail) }}
 
-
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
@@ -167,7 +166,13 @@
         {% if classFolders | length %}
 
             {% if route == 'folder' %}
-                <h2 class="subheader">{{ classFolder.nameWithCodes }}</h2>
+                <h2 class="subheader">
+                    {% set courseRoute = routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) %}
+
+                    <a href="{{ courseRoute }}">{{ courseSpec.title }}</a> ›
+
+                    {{ classFolder.nameWithCodes }}
+                </h2>
             {% else %}
                 <dl class="sub-nav">
                     {% for folder in classFolders %}
