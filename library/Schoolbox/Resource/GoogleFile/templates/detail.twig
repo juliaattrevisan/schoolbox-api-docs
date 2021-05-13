@@ -1,0 +1,7 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ googleFile.name ]
+) }}
+<p style="margin-top: -1rem;"><a href="{{ googleFile.url }}" class="right external" target="_blank">Open in Google</a></p>
+<iframe class="fullscreen" src="{{ googleFile.url }}"></iframe>

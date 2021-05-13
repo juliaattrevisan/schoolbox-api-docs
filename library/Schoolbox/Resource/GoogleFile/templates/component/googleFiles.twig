@@ -1,4 +1,4 @@
-{##
+{# #
  # Google Files integration thing
  #
  # You need postGoogleFileUrl as a routeLookup here because we don't have a Router
@@ -7,28 +7,245 @@
  # @param string $clientID      A string that you get when you set up google drive integration (mandatory)
  # @param bool $hasError        A bool flag indicating something is misconfigured
  # @param Folder\Model $folder  The current homepage instance
- #}
+#}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/apiloader.js"></script>
-<div class="empty-state">
-    <i class="icon-google-drive"></i>
-
-    <p>
-    {% if hasError %}
-        Unfortunately Google integration is currently not configured; please contact your system administrator for support.
-    {% else %}
-        <a id="find-files">Find a Google file</a> to share with users and allow them to view, edit or suggest changes.
-    {% endif %}
-    </p>
-</div>
+{% if googleFiles is empty %}
+    <div class="empty-state">
+        <i class="icon-google-drive"></i>
+        <p>
+            {% if hasError %}
+                Unfortunately Google integration is currently not configured; please contact your system administrator for support.
+            {% else %}
+                <a id="find-files">Find a Google
+                    file</a> to share with users and allow them to view, edit or suggest changes.
+            {% endif %}
+        </p>
+    </div>
+{% else %}
+    {% for googleFile in googleFiles %}
+        <ul data-dz-container class="action-list">
+            <li class="actions-small-1">
+                <div class="list-item">
+                    <div class="compact card small-12">
+                        <a href="{{ routeLookupIfAuthorized('googleFile.getGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}">
+                            <img class="mime" alt="" src="{{ googleFile.icon | replace({'/16/type/': '/64/type/'}) }}"/>
+                            <h3>{{ googleFile.name }}</h3>
+                        </a>
+                    </div>
+                </div>
+                {% if writeAccess %}
+                    <nav>
+                        <a class="icon-more" title="" data-dropdown="google-file-{{ loop.index }}"></a>
+                    </nav>
+                    <ul id="google-file-{{ loop.index }}" class="f-dropdown" data-dropdown-content>
+                        <li><a class="icon-bin"
+                               href="{{ routeLookupIfAuthorized('googleFile.deleteGoogleFile', {googleFileId: googleFile.id, googleFile: googleFile}) }}"
+                               data-action="delete" title="Remove">Remove</a></li>
+                        <li><a class="icon-group" href="" title="Change permissions">Change permissions</a></li>
+                    </ul>
+                {% endif %}
+            </li>
+        </ul>
+    {% endfor %}
+    <div class="component-action">
+        <section>
+            <a id="find-files" class="button">Add</a>
+        </section>
+    </div>
+{% endif %}
 <div id="gfile" class="modal-backdrop" data-reveal aria-labelledby="Google Files" aria-hidden="true"
      role="dialog">
 </div>
+<div id="gfile-permission" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+    <form id="googleFileForm" method="POST"
+          action="{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}">
+        <div id="gfile-step1">
+            Who should be able to <strong>edit</strong> this file?
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileEdit" id="gfile-edit-4" data-gfile-edit value="4">
+                        <label class="radio-label" for="gfile-edit-4">Nobody</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileEdit" id="gfile-edit-3" data-gfile-edit value="3">
+                        <label class="radio-label" for="gfile-edit-3">Only group admins</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileEdit" id="gfile-edit-2" data-gfile-edit value="2">
+                        <label class="radio-label" for="gfile-edit-2">Only group members with write access</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileEdit" id="gfile-edit-1" data-gfile-edit value="1">
+                        <label class="radio-label" for="gfile-edit-1">All group members</label>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <ul class="flex-list buttons">
+                <li><a href="#" class="button submit" data-action="continue" disabled>Continue</a></li>
+                <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
+            </ul>
+        </div>
+        <div id="gfile-step2" style="display:none;">
+            Who should be able to <strong>comment</strong> on this file?
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileComment" id="gfile-comment-4" data-gfile-comment value="4">
+                        <label class="radio-label" for="gfile-comment-4">Nobody</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileComment" id="gfile-comment-3" data-gfile-comment value="3">
+                        <label class="radio-label" for="gfile-comment-3">Only group admins</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileComment" id="gfile-comment-2" data-gfile-comment value="2">
+                        <label class="radio-label" for="gfile-comment-2">Only group members with write access</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="radio" name="gfileComment" id="gfile-comment-1" data-gfile-comment value="1">
+                        <label class="radio-label" for="gfile-comment-1">All group members</label>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            Everyone in this group will be able to view the file.
+            Only group members with write access will be able to edit the file.
+            <ul class="flex-list buttons">
+                <li><a href="#" class="button submit" data-action="share" disabled>Share file</a></li>
+                <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
+            </ul>
+            <input type="hidden" id="gfile-google-ids" name="googleIds" value="">
+            <input type="hidden" id="gfile-access-token" name="accessToken" value="">
+            <input type="hidden" id="gfile-token-type" name="tokenType" value="">
+        </div>
+        <div data-overlay class="wait-overlay hide">
+            <p>
+                Working...
+                <span class="loader"></span>
+            </p>
+        </div>
+    </form>
+</div>
 <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/google/picker.js"></script>
 <script type="text/javascript">
-    $(function() {
+    $(function () {
         $('#find-files').googlePicker({
             clientId: '{{ clientId }}',
-            postGoogleFileUrl: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}'
+            postGoogleFileUrl: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}',
+            onSelect: function (docs) {
+                let selected = docs.map(function (v) {
+                    return {
+                        'id': v.id,
+                        'name': v.name,
+                        'icon': v.iconUrl
+                    }
+                });
+                $('div.picker-dialog').hide();
+                $('#gfile-permission').foundation('reveal', 'open');
+                $('#gfile-google-ids').val(JSON.stringify(selected));
+            },
+        });
+
+        let $permModal = $('#gfile-permission');
+        let $step1 = $('#gfile-step1');
+        let $step2 = $('#gfile-step2');
+
+        function clearSelections() {
+            $('[data-gfile-edit]').each(function () {
+                $(this).prop('checked', false);
+            });
+            $('[data-gfile-comment]').each(function () {
+                $(this).prop('checked', false);
+            });
+            $step1.show();
+            $step2.hide();
+        }
+
+        $step1.on('click', '[data-gfile-edit]', function (e) {
+            $('[data-action="continue"]').removeAttr('disabled');
+        });
+        $step1.on('click', 'a[data-action]', function (e) {
+            e.preventDefault();
+            $step1.hide();
+            switch ($(this).data('action')) {
+                case 'cancel':
+                    clearSelections();
+                    $permModal.foundation('reveal', 'close');
+                    return;
+                case 'continue':
+                    let selected = $('input[name="gfileEdit"]:checked').val();
+                    $('[data-gfile-comment]').each(function () {
+                        if ($(this).val() > selected) {
+                            $(this).attr('disabled', true);
+                        }
+                    });
+                    $step2.show();
+                    break;
+            }
+        });
+        $step2.on('click', '[data-gfile-comment]', function (e) {
+            $('[data-action="share"]').removeAttr('disabled');
+        });
+        $step2.on('click', 'a[data-action]', function (e) {
+            e.preventDefault();
+            switch ($(this).data('action')) {
+                case 'cancel':
+                    $permModal.foundation('reveal', 'close');
+                    clearSelections();
+                    return;
+                case 'share':
+                    // $('#googleFileForm').submit();
+                    $step2.hide();
+                    $('[data-overlay]').removeClass('hide');
+                    $.ajax({
+                        type: 'POST',
+                        url: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}',
+                        data: {
+                            googleIds: $('#gfile-google-ids').val(),
+                            gfileEdit: $('input[name="gfileEdit"]:checked').val(),
+                            gfileComment: $('input[name="gfileComment"]:checked').val(),
+                            accessToken: $('#gfile-access-token').val(),
+                            tokenType: $('#gfile-token-type').val(),
+                        },
+                        success: function (data) {
+                            window.location.reload();
+                        }
+                    });
+                    break;
+            }
+        });
+        $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
+            event.preventDefault();
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this google file?',
+                confirmLabel: 'Delete',
+                confirmEvent: function () {
+                    $.ajax({
+                        url: $(event.target).attr('href'),
+                        type: 'DELETE',
+                        success: function (result) {
+                            window.location.href = '/homepage/' +{{ folder.id }};
+                        },
+                    });
+
+                }
+            });
         });
     });
 </script>

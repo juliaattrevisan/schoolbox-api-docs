@@ -1,15 +1,15 @@
-
-(function() {
+(function () {
 
     /**
      * Google Picker
      *
      * Pick files from Google, save their links locally, share
      * it on a homepage
+     * TODO: we may want to merge this with gpick at some point
      *
      * @param options
      */
-    $.fn.googlePicker = function(options) {
+    $.fn.googlePicker = function (options) {
         options = options || {};
 
         let config = init(options, $(this));
@@ -44,11 +44,15 @@
                 clientId: '',
                 postGoogleFileUrl: '',
 
+                /* Callback
+                 */
+                onSelect: function () {
+                },
                 /* A google setting
                  */
-                scope: 'https://www.googleapis.com/auth/drive.file'
+                scope: 'https://www.googleapis.com/auth/drive'
             };
-
+            $('#gfile-google-ids').val('');
             return $.extend(defaults, options);
         }
 
@@ -57,16 +61,21 @@
          * Activate links
          */
         function setupListeners() {
-            $(config.element).on('click', function() {
-                loadGoogleApi(['auth2', 'picker'], loadPicker);
+            $(config.element).on('click', function () {
+                loadGoogleApi(['auth2', 'picker'], authorize);
             });
         }
 
 
         /**
          * Ask google to setup picker
+         * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
          */
-        function loadPicker() {
+        function authorize() {
+            if ($('#gfile-access-token').val().length > 0) {
+                createPicker($('#gfile-access-token').val());
+                return;
+            }
             window.gapi.auth2.authorize({
                 'client_id': config.clientId,
                 'scope': config.scope
@@ -80,34 +89,13 @@
          */
         function handleAuthResult(authResult) {
             if (authResult && !authResult.error) {
+                $('#gfile-access-token').val(authResult.access_token);
+                $('#gfile-token-type').val(authResult.token_type);
                 createPicker(authResult.access_token);
 
                 /* Only spawn our modal if they authenticate past the popup thing
                  */
                 $(config.modalId).foundation('reveal', 'open');
-
-                /* As painful as this is...
-                 * https://stackoverflow.com/questions/45809722/how-do-i-execute-an-action-when-an-attribute-value-changes-using-jquery-or-javas
-                 *
-                 * After the picker dom gets rammed in, watch for state changes
-                 * so we can shut our modal when we shut the google modal
-                 */
-                let MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver
-
-                let observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        if (mutation.type === "attributes") {
-                            if (mutation.target.getAttribute('aria-hidden') !== "true") {
-                                $(config.modalId).foundation('reveal', 'close');
-                            }
-                        }
-                    });
-                });
-
-                observer.observe(document.querySelector('.picker-dialog-bg'), {
-                    attributes: true, //configure it to listen to attribute changes
-                    attributeFilter: ['aria-hidden'] // filter your attributes
-                });
             }
         }
 
@@ -169,7 +157,7 @@
             /* Shut google modal when we shut our modal
              * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
              */
-            $(document).on('close.fndtn.reveal', config.modalId, function() {
+            $(document).on('close.fndtn.reveal', config.modalId, function () {
                 picker.setVisible(false);
             });
         }
@@ -181,15 +169,15 @@
          * @param data
          */
         function pickerCallback(data) {
-            if (data.action === google.picker.Action.PICKED) {
-                $.ajax({
-                    type: 'POST',
-                    url: config.postGoogleFileUrl,
-                    data: {docs: data.docs},
-                    success: function (data) {
-                        window.location.reload();
-                    }
-                });
+            var elem = $(this.element);
+
+            if (data[google.picker.Response.ACTION] === google.picker.Action.PICKED) {
+                config.onSelect.call(elem, data.docs);
+                return;
+            }
+
+            if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) {
+                $(config.modalId).foundation('reveal', 'close');
             }
         }
     }

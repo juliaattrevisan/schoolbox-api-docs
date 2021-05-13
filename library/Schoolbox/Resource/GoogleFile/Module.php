@@ -19,9 +19,11 @@ use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -36,24 +38,46 @@ class Module extends BaseModule
     function registerRoutes(): void
     {
         $this->register(
+            self::METHOD_GET,
+            '/{googleFileId:\d+}',
+            'getGoogleFile',
+            new IsLoggedIn(),
+            function ($params) {
+                return $this->preloadGoogleFile($params);
+            }
+        );
+
+        $canCreate = new All(
+            new IsLoggedIn(),
+            new Any(
+                new IsSuperuser(),
+                new HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
+                    function (array $params = []) {
+                        return $params['folderId'];
+                    },
+                    Access::getInstance()
+                )
+            ),
+        );
+
+        $this->register(
             self::METHOD_POST,
             '/{folderId:\d+}',
             'postGoogleFile',
-            new All(
-                new IsLoggedIn(),
-                new Any(
-                    new IsSuperuser(),
-                    new HasHomepageAccess(
-                        UserAccess::ACCESS_WRITE,
-                        function (array $params = []) {
-                            return $params['folderId'];
-                        },
-                        Access::getInstance()
-                    )
-                ),
-            ),
+            $canCreate,
             function ($params) {
                 return $this->preloadFolder($params);
+            }
+        );
+
+        $this->register(
+            self::METHOD_DELETE,
+            '/{googleFileId:\d+}',
+            'deleteGoogleFile',
+            $canCreate,
+            function ($params) {
+                return $this->preloadGoogleFile($params);
             }
         );
     }
@@ -70,6 +94,9 @@ class Module extends BaseModule
                 Controller::class,
                 [
                     'googleFileMapper' => $this->getMapperFactory()->getLazy(Mapper::class),
+                    'userMapper'       => $this->getMapperFactory()->getLazy(UserMapper::class),
+                    'userAccessMapper' => $this->getMapperFactory()->getLazy(UserAccessMapper::class),
+                    'folderMapper'     => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 ]
             )
         );
@@ -108,6 +135,26 @@ class Module extends BaseModule
         return $preload;
     }
 
+    /**
+     * @param array $params
+     * @return array
+     */
+    private function preloadGoogleFile(array $params): array
+    {
+        if (($params['googleFile'] ?? null) instanceof Model) {
+            $preload['googleFile'] = $params['googleFile'];
+        } elseif (!\array_key_exists('googleFileId', $params)) {
+            throw new \UnexpectedValueException("No 'googleFileId' found in route params");
+        } else {
+            try {
+                $preload['googleFile'] = $this->getGoogleFileMapper()->findById($params['googleFileId']);
+            } catch (BaseMapper\Exception $e) {
+                throw new InvalidPath('GoogleFile Not Found', 0, $e);
+            }
+        }
+        $preload['folderId'] = $preload['googleFile']->getFolderId();
+        return $preload;
+    }
 
     /**
      * @return FolderMapper
@@ -117,6 +164,17 @@ class Module extends BaseModule
     {
         /** @var FolderMapper $mapper **/
         $mapper = $this->getMapperFactory()->get(FolderMapper::class);
+
+        return $mapper;
+    }
+
+    /**
+     * @return Mapper
+     */
+    private function getGoogleFileMapper(): Mapper
+    {
+        /** @var Mapper $mapper */
+        $mapper = $this->getMapperFactory()->get(Mapper::class);
 
         return $mapper;
     }

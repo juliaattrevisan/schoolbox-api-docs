@@ -19,7 +19,7 @@ class GDriveFetcher implements FetcherInterface
     /**
      * Google API Endpoint
      */
-    private const GOOGLE_API = 'https://www.googleapis.com/drive/v2';
+    private const GOOGLE_API = 'https://www.googleapis.com/drive/v3';
 
     /**
      * The mimetypeMapping key that stores file extensions
@@ -27,19 +27,18 @@ class GDriveFetcher implements FetcherInterface
     private const CONTEXT_EXTENSION = 'ext';
 
     /**
+     * The mimetypeMapping key that stores exporting file mimetypes
+     */
+    private const CONTEXT_EXPORT_MIMETYPE = 'exportMimetype';
+
+    /**
      * The mimetypeMapping key that stores download urls (exportLinks)
      */
     private const CONTEXT_EXPORTLINKS = 'exportLinks';
 
     /**
-     * Metadata fields that might contain a download url
-     * Google API sometimes changes causing fields to no longer exist
-     */
-    private const FIELDS_EXPORTLINKS = ['downloadUrl'];
-
-    /**
      * Mimetypes and their corresponding exportLinks, ext values
-     *
+     * https://developers.google.com/drive/api/v3/ref-export-formats?hl=en
      * @var array
      */
     private const MIMETYPE_MAPPING = [
@@ -47,22 +46,22 @@ class GDriveFetcher implements FetcherInterface
         /* Powerpoint slides
          */
         'application/vnd.google-apps.presentation' => [
-            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            self::CONTEXT_EXTENSION   => 'pptx',
+            self::CONTEXT_EXPORT_MIMETYPE => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            self::CONTEXT_EXTENSION       => 'pptx',
         ],
 
         /* Word doc
          */
         'application/vnd.google-apps.document'     => [
-            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            self::CONTEXT_EXTENSION   => 'docx',
+            self::CONTEXT_EXPORT_MIMETYPE => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            self::CONTEXT_EXTENSION       => 'docx',
         ],
 
         /* Spreadsheets
          */
         'application/vnd.google-apps.spreadsheet'  => [
-            self::CONTEXT_EXPORTLINKS => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            self::CONTEXT_EXTENSION   => 'xlsx',
+            self::CONTEXT_EXPORT_MIMETYPE => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            self::CONTEXT_EXTENSION       => 'xlsx',
         ],
     ];
 
@@ -92,19 +91,23 @@ class GDriveFetcher implements FetcherInterface
      */
     private $extensionMapper;
 
+    /**
+     * http header
+     */
+    private array $httpHeader;
 
     /**
      * Constructor
      *
-     * @param ExtensionMapper $extensionMapper a mapper for loading extensions from
-     * @param string          $storageDir      the target storage directory: typically `sys_get_temp_dir()`
-     * @param resource        $curl            a custom curl handle if a default won't suffice
-     * @param string          $httpAuth        an authorization header if not using an anonymous connection
-     * @param bool            $allowPdfExport  Can this export PDFs?
+     * @param ExtensionMapper|null $extensionMapper a mapper for loading extensions from
+     * @param string|null          $storageDir      the target storage directory: typically `sys_get_temp_dir()`
+     * @param resource             $curl            a custom curl handle if a default won't suffice
+     * @param string               $httpAuth        an authorization header if not using an anonymous connection
+     * @param bool                 $allowPdfExport  Can this export PDFs?
      */
     public function __construct(
-        ExtensionMapper $extensionMapper,
-        string $storageDir,
+        ?ExtensionMapper $extensionMapper,
+        ?string $storageDir,
         $curl = null,
         string $httpAuth = '',
         bool $allowPdfExport = true
@@ -112,14 +115,8 @@ class GDriveFetcher implements FetcherInterface
         $this->extensionMapper = $extensionMapper;
         $this->dir             = $storageDir;
         $this->ch              = $curl ?: curl_init();
-
-        if ($httpAuth) {
-            curl_setopt($this->ch, CURLOPT_HTTPHEADER, [
-                'Authorization: ' . $httpAuth,
-            ]);
-        }
-
-        $this->allowPdfExport = $allowPdfExport;
+        $this->httpHeader[]    = 'Authorization: ' . $httpAuth;
+        $this->allowPdfExport  = $allowPdfExport;
     }
 
     /**
@@ -143,7 +140,7 @@ class GDriveFetcher implements FetcherInterface
 
     /**
      * Retrieves the metadata for the given fileId
-     *
+     * https://developers.google.com/drive/api/v3/reference/files?hl=en
      * @param int  $fileId
      * @param bool $refresh
      * @return array
@@ -152,13 +149,24 @@ class GDriveFetcher implements FetcherInterface
     public function fetchMetaData($fileId, $refresh = false): array
     {
         if ($refresh || empty($this->metaCache[$fileId])) {
-            $ch = $this->curlPrepare([
-                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}",
-                CURLOPT_RETURNTRANSFER => 1,
-            ]);
+            $params = [
+                'fields'            => '*',
+                'supportsAllDrives' => 'true',
+            ];
 
-            $this->metaCache[$fileId] = json_decode(curl_exec($ch), true);
+            $ch = $this->curlPrepare(
+                [
+                    CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}?" . http_build_query($params),
+                    CURLOPT_RETURNTRANSFER => 1,
+                ]
+            );
+
+            $fetchedMetaData = json_decode(curl_exec($ch), true);
             curl_close($ch);
+
+            // copy name to title to support the key change from v2 to v3
+            $fetchedMetaData['title'] = $fetchedMetaData['name'];
+            $this->metaCache[$fileId] = $fetchedMetaData;
         }
 
         /* On some mysterious occasions google drive will return you an error payload
@@ -167,41 +175,123 @@ class GDriveFetcher implements FetcherInterface
         $metadata = $this->metaCache[$fileId];
 
         if (isset($metadata['error'])) {
-            $errors = [];
-
-            /** @var array $errorIndex */
-            $errorIndex = $metadata['error']['errors'];
-
-            foreach ($errorIndex as $currentError) {
-                $errors[] = $currentError['message'];
-            }
-
-            $errorMessage = implode('; ', $errors);
-
-            throw new DomainException($errorMessage);
+            throw new DomainException($this->getErrorMessage($metadata));
         }
 
         return $metadata;
     }
 
+    /**
+     * Fetches Permission
+     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
+     * @param string $fileId
+     * @return mixed
+     */
+    public function fetchPermissions(string $fileId)
+    {
+        $params = [
+            'fields'            => '*',
+            'supportsAllDrives' => 'true',
+        ];
+
+        $ch = $this->curlPrepare(
+            [
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params),
+                CURLOPT_RETURNTRANSFER => 1,
+            ]
+        );
+
+        $fetchedPermission = json_decode(curl_exec($ch), true);
+        curl_close($ch);
+        return $fetchedPermission;
+    }
+
+    /**
+     * Sets permission to a google file
+     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
+     * @param string $fileId
+     * @param string $accessRole
+     * @param string $email
+     * @return bool|string
+     */
+    public function setPermissions(string $fileId, string $accessRole, string $email)
+    {
+        $result = $this->callSetPermissions($fileId, $accessRole, $email, false);
+        if ($this->getErrorMessage($result)) {
+            // retry with notification on
+            $result = $this->callSetPermissions($fileId, $accessRole, $email, true);
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $fileId
+     * @param string $accessRole
+     * @param string $email
+     * @param bool   $notify
+     * @return mixed
+     */
+    private function callSetPermissions(string $fileId, string $accessRole, string $email, bool $notify)
+    {
+        $params   = [
+            'fileId'                => $fileId,
+            'fields'                => '*',
+            'supportsAllDrives'     => 'true',
+            'sendNotificationEmail' => $notify ? 'true' : 'false', // this is necessary for non google accounts
+        ];
+        $postdata = [
+            'role'         => $accessRole,
+            'type'         => 'user',
+            'emailAddress' => $email,
+        ];
+
+        $ch = $this->curlPrepare(
+            [
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params),
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => json_encode($postdata),
+            ]
+        );
+
+        $result = json_decode(curl_exec($ch), true);
+        curl_close($ch);
+        return $result;
+    }
 
     /**
      * Restore icon to attachzone for this file
      * The mimeType field doesn't contain a string that's known to our allowedFileTypes.mime
      * so we re-write this particular field in a way that supports allowedFileTypes.mime
+     * Returns null, when the file is not downloadable
      *
      * @param array $metadata
-     * @return string
+     * @return string|null
      */
-    public function determineMimeIcon(array $metadata): string
+    public function determineDownloadUrl(array $metadata): ?string
     {
-        $allowedFilesMime = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS] ?? null;
-
-        if ($allowedFilesMime) {
-            return $allowedFilesMime;
+        if (isset($metadata['capabilities']['canDownload']) && !$metadata['capabilities']['canDownload']) {
+            return null;
         }
 
-        return $metadata['mimeType'];
+        if ($this->isPdfExportEnabled($metadata) && $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf']) {
+            return $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
+        }
+
+        $allowedFilesMime = isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])
+            ? self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORT_MIMETYPE]
+            : null;
+
+        if (($allowedFilesMime !== null) && $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime]) {
+            return $metadata[self::CONTEXT_EXPORTLINKS][$allowedFilesMime];
+        }
+
+        if (is_array($metadata[self::CONTEXT_EXPORTLINKS]) && !empty($metadata[self::CONTEXT_EXPORTLINKS])) {
+            return array_shift($metadata[self::CONTEXT_EXPORTLINKS]);
+        }
+
+        return self::GOOGLE_API . "/files/{$metadata['id']}?alt=media";
     }
 
     /**
@@ -215,23 +305,11 @@ class GDriveFetcher implements FetcherInterface
     public function fetchToFile($fileId): string
     {
         $metadata = $this->fetchMetaData($fileId);
-
-        if (isset($metadata['labels']['restricted']) && $metadata['labels']['restricted'] == true) {
-            // if this file has been flagged by Drive as "restricted", disallow any download
-            throw new DomainException('This file is restricted and cannot be downloaded.');
-        } elseif ($this->isPdfExportEnabled($metadata)) {
-            // if there is a PDF-export option for this file (and the config is set to do pdf export), always give that preference
-            $url = $metadata[self::CONTEXT_EXPORTLINKS]['application/pdf'];
-        } else {
-
-            /* Inspect metadata fields to find a download url
-             */
-            $url = $this->inspectExportLinks($metadata);
-        }
+        $url      = $this->determineDownloadUrl($metadata);
 
         if (!$url) {
-            // no valid URL was found
-            throw new OutOfBoundsException('No url found for download');
+            // if this does not provide export mimetype, this cannot be downloaded
+            throw new DomainException('This file is restricted and cannot be downloaded.');
         }
 
         $destination = tempnam($this->dir, 'gdrive-');
@@ -248,45 +326,31 @@ class GDriveFetcher implements FetcherInterface
             throw new OutOfBoundsException('Could not open target');
         }
 
-        $ch = $this->curlPrepare([
-            CURLOPT_URL            => $url,
-            CURLOPT_FILE           => $fp,
-            CURLOPT_FOLLOWLOCATION => true,
-        ]);
+        $ch = $this->curlPrepare(
+            [
+                CURLOPT_URL            => $url,
+                CURLOPT_FILE           => $fp,
+                CURLOPT_FOLLOWLOCATION => true,
+            ]
+        );
 
-        curl_exec($ch);
+        $result = curl_exec($ch);
+        $error  = curl_error($ch);
         curl_close($ch);
         fclose($fp);
 
-        return $destination;
-    }
-
-    /**
-     * Inspect metadata fields to find a download url
-     *
-     * @param array $metadata
-     * @return string
-     */
-    private function inspectExportLinks(array $metadata): string
-    {
-        if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
-            $key = self::MIMETYPE_MAPPING[$metadata['mimeType']][self::CONTEXT_EXPORTLINKS];
-
-            return $metadata[self::CONTEXT_EXPORTLINKS][$key];
-        }
-
-        foreach (self::FIELDS_EXPORTLINKS as $field) {
-            if (!empty($metadata[$field])) {
-                return $metadata[$field];
+        if (!$result) {
+            throw new DomainException($error);
+        } elseif (mime_content_type($destination) === 'application/json') {
+            // for some reason, Google output error in the downloaded file
+            $fetchedData  = file_get_contents($destination);
+            $errorMessage = $this->getErrorMessage(json_decode($fetchedData, true));
+            if (!empty($errorMessage)) {
+                throw new DomainException($errorMessage);
             }
         }
 
-        /* If you got here, the api no longer provides the fields we were originally looking at
-         * https://developers.google.com/drive/api/v2/reference/
-         */
-        trigger_error('Google api fields for exportLinks not found: check api docs', E_USER_WARNING);
-
-        return '';
+        return $destination;
     }
 
 
@@ -300,11 +364,9 @@ class GDriveFetcher implements FetcherInterface
      */
     public function deriveFileName(array $metadata): string
     {
-
         /* If this is one of the google docs filetypes we know about
          */
         if (isset(self::MIMETYPE_MAPPING[$metadata['mimeType']])) {
-
             /* If there is a PDF-export option for this file (and the config is set to do pdf export),
              * always give that preference
              *
@@ -328,7 +390,6 @@ class GDriveFetcher implements FetcherInterface
          * "originalFilename" and "fileExtension"
          */
         if ('' !== (string)$metadata['fileExtension']) {
-
             /* "originalFilename" might already contain the extension if you uploaded a file
              * If the last characters of "originalFilename" are the same as "fileExtension"
              * then just return "originalFilename" with no alterations required
@@ -361,9 +422,35 @@ class GDriveFetcher implements FetcherInterface
      */
     private function curlPrepare(array $opts)
     {
-        $ch = curl_copy_handle($this->ch);
+        $httpHeader = $this->httpHeader;
+        if (isset($opts[CURLOPT_HTTPHEADER])) {
+            $httpHeader = array_merge($httpHeader, $opts[CURLOPT_HTTPHEADER]);
+        }
+        $opts[CURLOPT_HTTPHEADER] = $httpHeader;
+        $ch                       = curl_copy_handle($this->ch);
         curl_setopt_array($ch, $opts);
 
         return $ch;
+    }
+
+    /**
+     * @param array $result
+     * @return string|null
+     */
+    private function getErrorMessage(array $result): ?string
+    {
+        if (!isset($result['error'])) {
+            return null;
+        }
+        $errors = [];
+
+        /** @var array $errorIndex */
+        $errorIndex = $result['error']['errors'];
+
+        foreach ($errorIndex as $currentError) {
+            $errors[] = $currentError['message'];
+        }
+
+        return implode('; ', $errors);
     }
 }
