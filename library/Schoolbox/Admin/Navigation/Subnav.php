@@ -136,7 +136,6 @@ class Subnav
             '/adminv2/calendar/Cleanup'               => [
                 'name'     => 'Calendar',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/calendar/Cleanup'   => [
                         'name'        => 'Cleanup',
@@ -161,7 +160,6 @@ class Subnav
             '/adminv2/engagement/index/collaboration' => [
                 'name'     => 'Engagement',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/engagement/index/collaboration' => [
                         'name'        => 'Collaboration',
@@ -228,7 +226,6 @@ class Subnav
             '/adminv2/eportfolio'                     => [
                 'name'     => 'ePortfolio',
                 'visible'  => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
-                'description' => '.',
                 'children' => [
                     '/adminv2/eportfolio/deploy' => [
                         'name'        => 'Deployment',
@@ -247,7 +244,6 @@ class Subnav
             '/adminv2/filters'                        => [
                 'name'     => 'Filters',
                 'visible'  => $filterAvailabilityChecker->isAnyFilterAvailable(),
-                'description' => '.',
                 'children' => [
                     '/adminv2/filters/assessmentCal'  => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
@@ -302,13 +298,12 @@ class Subnav
             '/adminv2/import/directImport'            => [
                 'name'     => 'Import',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/import/directImport'  => [
                         'name'        => 'Home',
                         'visible'     => true,
                         'children'    => [],
-                        'description' => '',
+                        'description' => '.',
                     ],
                     '/adminv2/import/folder'        => [
                         'name'        => 'Pages',
@@ -332,14 +327,13 @@ class Subnav
                         'name'        => 'User Accounts',
                         'visible'     => true,
                         'children'    => [],
-                        'description' => '',
+                        'description' => '.',
                     ],
                 ],
             ],
             '/adminv2/terms'                          => [
                 'name'     => 'LMS',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/terms'                         => [
                         'name'     => 'Academic Period',
@@ -394,7 +388,6 @@ class Subnav
             '/adminv2/lists/achievement-category'     => [
                 'name'     => 'Lists',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/lists/achievement-category'             => [
                         'name'     => 'Badge Categories',
@@ -521,7 +514,6 @@ class Subnav
             '/adminv2/setting/Modules'                => [
                 'name'     => 'Modules',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/setting/Modules'         => [
                         'name'     => 'Home',
@@ -564,7 +556,6 @@ class Subnav
             '/adminv2/messages'                       => [
                 'name'     => 'Notifications',
                 'visible'  => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
-                'description' => '.',
                 'children' => [
                     '/adminv2/messages'           => [
                         'name'     => 'Home',
@@ -595,7 +586,6 @@ class Subnav
             '/adminv2/dashboard'                      => [
                 'name'     => 'Personalisation',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/dashboard'             => [
                         'name'     => 'Dashboard Templates',
@@ -644,7 +634,6 @@ class Subnav
             '/adminv2/setting/Resources'              => [
                 'name'     => 'Resources',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/allowed-file'      => [
                         'name'     => 'Allowed Files',
@@ -681,7 +670,6 @@ class Subnav
             '/adminv2/import/schoolDataImport'        => [
                 'name'     => 'School Data Import',
                 'visible'  => $this->configLoader->get('external_type') === 'schoolbox',
-                'description' => '',
                 'children' => [
                     '/adminv2/import/schoolDataImport'   => [
                         'name'     => 'Home',
@@ -718,7 +706,6 @@ class Subnav
             '/adminv2/setting'                        => [
                 'name'     => 'System Settings',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/setting/3rd%20Party%20Services' => [
                         'name'     => '3rd Party Services',
@@ -803,7 +790,6 @@ class Subnav
             '/adminv2/user'                           => [
                 'name'     => 'User Management',
                 'visible'  => true,
-                'description' => '.',
                 'children' => [
                     '/adminv2/user'                 => [
                         'name'     => 'Home',
