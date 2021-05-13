@@ -229,13 +229,13 @@ class Subnav
                 'children' => [
                     '/adminv2/eportfolio/deploy' => [
                         'name'        => 'Deployment',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                         'children'    => [],
                         'description' => 'Configure and setup the scaffolding templates that users can create ePortfolio pages from.',
                     ],
                     '/adminv2/eportfolio'        => [
                         'name'        => 'Templates',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
                         'children'    => [],
                         'description' => 'Clone and deploy an ePortfolio page from one user to many other users.',
                     ],
