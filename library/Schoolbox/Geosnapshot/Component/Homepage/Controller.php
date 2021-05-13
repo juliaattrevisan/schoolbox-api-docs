@@ -7,7 +7,6 @@ namespace Schoolbox\Geosnapshot\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Geosnapshot\Api;
-use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
 use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -67,6 +66,12 @@ class Controller extends Component_Homepage_ControllerAbstract
              */
             $this->url = $response['url'];
 
+            return true;
+        }
+
+        /* Give write-accessors a chance to understand why this component might be broken
+         */
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
