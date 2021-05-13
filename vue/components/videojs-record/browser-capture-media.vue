@@ -19,7 +19,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getRecordOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
-import { isOfMimeType, dataURLtoBlob } from '@shared/util/fileUtils';
+import { isOfFileType, isOfMimeType, dataURLtoBlob } from '@shared/util/fileUtils';
 
 
 export default {
@@ -152,8 +152,7 @@ export default {
          *
          */
         onFinishRecord () {
-            // if (this.player.recordedData.name && isOfFileType(this.player.recordedData.name, 'webm')) { //webm's are converted so they are seekable on playback
-            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //webm's are converted so they are seekable on playback
+            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //video webm's are converted so they are seekable on playback
                 this.player.on('finishConvert', this.onFinishConvert);
             } else {
                 this.recordedVideoReady(this.player.recordedData);
@@ -203,9 +202,9 @@ export default {
             this.hasError = true;
             const errorCode = String(this.player.deviceErrorCode);
             console.warn('errorCode = ' + errorCode);
-            if (errorCode === 'NotReadableError: Could not start video source' || 'AbortError: Starting video failed') {
+            if (errorCode === 'NotReadableError: Could not start video source' || errorCode === 'AbortError: Starting video failed') {
                 this.hasDeviceAlreadyInUseError = true;
-            } else if (errorCode === 'NotAllowedError: Permission denied' || 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context.') {
+            } else if (errorCode === 'NotAllowedError: Permission denied' || errorCode === 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context.') {
                 this.hasPermissionDeniedError = true;
             }
             console.warn(this.player.deviceErrorCode);

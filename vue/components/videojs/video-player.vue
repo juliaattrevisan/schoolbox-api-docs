@@ -8,6 +8,7 @@
 import 'video.js/dist/video-js.css';
 import videojs from 'video.js';
 import { gsap } from 'gsap/all';
+import { timeout } from '@shared/util/jsUtils';
 
 
 export default {
@@ -24,15 +25,91 @@ export default {
 
     data () {
         return {
-            videoHeight: 0
+            videoHeight: 0, //to ensure the parent container is high enough when the video is loaded
+            isVideoEncoding: true //until it's checked at least once or confirmed the video is a blob
         }
     },
 
+    created () {
+        this.hasHash = this.checkForHash();
+    },
+
     mounted () {
-        this.initVideojs();
+        if (this.hasHash) {
+            this.checkVideoEncodingLoop();
+        } else {
+            this.isVideoEncoding = false; //no need to be checking a blob file
+            this.initVideojs();
+        }
+    },
+
+    unmounted () {
+        if (this.player) {
+            this.player.dispose();
+        }
     },
 
     methods: {
+
+        /** 
+         * if the file contains a hash, we should ensure the video isn't transcoding prior to displaying
+         *
+         * @returns { Boolean }
+         */
+        checkForHash () {
+            this.hash = this.options?.sources[0].hash;
+            if (this.hash) { //need to check its status first
+                return true;
+            } else { //otherwise it's a blob recording
+                return false;
+            }
+        },
+
+        /** 
+         * ensure the video has finished processing prior to displaying
+         *
+         */
+        async checkVideoEncodingLoop () {
+            this.isVideoEncoding = await this.checkIsVideoEncoding();
+            if (this.isVideoEncoding && document.body.contains(this.$el)) {  //ensure that the player is still in the DOM (could have been deleted)
+                await timeout(2000); //loop around until it's complete
+                this.checkVideoEncodingLoop();
+            } else if (!this.isVideoEncoding && document.body.contains(this.$el)) {
+                this.initVideojs();
+            }
+        },
+
+        /** 
+         * check whether SB has encoded the video yet
+         *
+         * @returns { Boolean }
+         */
+        async checkIsVideoEncoding () {
+            try {
+                const response = await axios.get('/storage/checkVideoStatus.php', this.getFormData());
+                const videoStatus = response.data.status;
+                if (videoStatus === 'pending' || videoStatus === 'processing') {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.warn(error);
+            }
+        },
+        
+        /**
+         * What to send in the GET request
+         *
+         * @returns { Object }
+         */
+        getFormData () {
+            return {
+                params: {
+                    hash: this.hash
+                }
+            }
+        },
 
         /** 
          * set up videojs
@@ -40,17 +117,21 @@ export default {
          */
         initVideojs () {
             
-            this.videoHeight = this.$refs.videoPlayer.offsetHeight;
+            this.$nextTick(() => {
+                
+                this.videoHeight = this.$refs.videoPlayer.offsetHeight;
+                
+                this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideoPlayerReady);
+                this.player.on('error', this.onVideoError);
+                gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } ); 
 
-            this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideoPlayerReady);
-            this.player.on('error', this.onVideoError);
-            gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } ); 
-
+            });
+           
         },
 
         /** 
-         * there's no fully cross-browser accurate load detection, and as all we need is height detection,
-         * just use an interval 
+         * there's no fully cross-browser accurate load detection, 
+         * and as all we need is height detection, just use an interval 
          *
          */
         onVideoPlayerReady () {
@@ -94,11 +175,17 @@ export default {
 
 <template>
     <div ref="container">
-        <video ref="videoPlayer" class="video-js vjs-play-skin"></video>
+        <img v-if="isVideoEncoding" class="processing-img" src="/static/images/core/video-processing.gif">
+        <video v-else ref="videoPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
 
 <style lang="scss" scoped>
+
+.processing-img {
+    width: 100%;
+    height: auto;
+}
 
 .vjs-play-skin::v-deep {
   .vjs-control-bar {

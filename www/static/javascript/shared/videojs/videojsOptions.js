@@ -18,7 +18,6 @@ import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 * @returns { Object }
 */ 
 export const getRecordOptions = (recordMediaType) => {
-    console.warn(navigator.userAgent);
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
     if (recordMediaType === recordMediaTypes.AUDIO_ONLY) {
         return getAudioOnlyRecordOptions();
@@ -66,7 +65,7 @@ const getAudioOnlyRecordOptions = () => {
     options.plugins = {
 		wavesurfer: { // this plugin is only needed when recording audio-only
 			backend: 'WebAudio',
-			waveColor: '#fff',
+			waveColor: '#ccc',
 			progressColor: '#ccc',
 			debug: true,
 			cursorWidth: 1,
@@ -88,7 +87,7 @@ const getAudioOnlyRecordOptions = () => {
 		record: {
 			audio: true,
 			video: false,
-			maxLength: 300, //5 minutes
+			maxLength: 180, //3 minutes
 			debug: true,
 		}
 	}
@@ -274,7 +273,8 @@ export const getVideoPlayerOptionsWithSrc = (recordedData) => {
     const options = getVideoPlayerOptions();
     options.sources = [{
         src: recordedData.src,
-        type: recordedData.type
+        type: recordedData.type,
+        hash: recordedData.hash
     }];
     return options;
 }
@@ -290,7 +290,7 @@ const getAudioPlayerOptions = () => {
     options.plugins = {
         wavesurfer: { 
             backend: 'MediaElement',
-            waveColor: '#fff',
+            waveColor: '#ccc',
             progressColor: '#ccc',
             debug: true,
             cursorWidth: 1,
@@ -329,5 +329,6 @@ export const getAudioPlayerOptionsWithSrc = (recordedData) => {
     const options = getAudioPlayerOptions();
     options.audioPlayerSrc = recordedData.src;
     options.audioPlayerType = recordedData.type;
+    options.audioPlayerHash = recordedData.hash;
     return options;
 }

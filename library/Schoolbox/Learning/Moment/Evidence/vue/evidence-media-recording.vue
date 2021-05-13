@@ -11,6 +11,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
+import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
 
 
 export default {
@@ -152,12 +153,23 @@ export default {
          */
         async onFormSubmit (event) {
             try {
+                this.checkRecording();
                 const responseData = await this.uploadMediaAndReturnResponse();
                 this.addHiddenInputs(responseData);
                 this.displayUploadSuccessful();
                 document.dispatchEvent(new CustomEvent('evidence-media-recording__onUploadComplete')); //dispach to form.twig to continue form submit
             } catch (error) {
                 console.warn(error);
+            }
+        },
+
+        /**
+         * currently to check for audio only webms
+         *
+         */
+        checkRecording () {
+            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY && isOfFileType(this.recordedData.name, 'webm')) { //convert if audio/webm to ogg to ensure SB encoder treats as audio only (rather than video)
+                this.recordedData.name = convertFilenameExtension(this.recordedData.name, '.ogg');
             }
         },
 

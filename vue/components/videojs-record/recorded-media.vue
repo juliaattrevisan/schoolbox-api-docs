@@ -6,14 +6,14 @@
  *
  */
 
-import 'video.js/dist/video-js.css';
-import 'videojs-record/dist/css/videojs.record.css';
-import videojs from 'video.js';
-import 'webrtc-adapter';
-import RecordRTC from 'recordrtc';
-import Record from 'videojs-record/dist/videojs.record.js';
-import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
-import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
+// import 'video.js/dist/video-js.css';
+// import 'videojs-record/dist/css/videojs.record.css';
+// import videojs from 'video.js';
+// import 'webrtc-adapter';
+// import RecordRTC from 'recordrtc';
+// import Record from 'videojs-record/dist/videojs.record.js';
+// import VmsgEngine from 'videojs-record/dist/plugins/videojs.record.vmsg.js';
+// import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
 import { gsap } from 'gsap/all';
 import AudioOnlyPlayer from '@schoolbox/videojs/audio-only-player';
 import PhotoPlayer from '@schoolbox/videojs/photo-player';
@@ -87,7 +87,8 @@ export default {
             if (this.preRecordedData) {
                 this.playbackData = {
                     src: this.getPlaybackDataSrc(),
-                    type: this.getPlaybackDataType()
+                    type: this.getPlaybackDataType(),
+                    hash: this.preRecordedData.hash
                 } 
             }
         },

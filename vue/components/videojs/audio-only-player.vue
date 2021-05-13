@@ -8,7 +8,7 @@
 import 'video.js/dist/video-js.css';
 import 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css'
 import videojs from 'video.js';
-import { swapElements } from '@shared/util/domTools';
+import { timeout } from '@shared/util/jsUtils';
 
 
 export default {
@@ -23,23 +23,107 @@ export default {
         },
     },
 
+    data () {
+        return {
+            isVideoEncoding: true //until it's checked at least once or confirmed the video is a blob
+        }
+    },
+
+    created () {
+        this.hasHash = this.checkForHash();
+    },
+
     mounted () {
-        this.initVideojs();
+        if (this.hasHash) {
+            this.checkVideoEncodingLoop();
+        } else {
+            this.isVideoEncoding = false; //no need to be checking a blob file
+            this.initVideojs();
+        }
+    },
+
+    unmounted () {
+        if (this.player) {
+            this.player.dispose();
+        }
     },
 
     methods: {
+
+        /** 
+         * if the file contains a hash, we should ensure the video isn't transcoding prior to displaying
+         *
+         * @returns { Boolean }
+         */
+        checkForHash () {
+            this.hash = this.options.audioPlayerHash;
+            if (this.hash) { //need to check its status first
+                return true;
+            } else { //otherwise it's a blob recording
+                return false;
+            }
+        },
+
+        /** 
+         * ensure the video has finished processing prior to displaying
+         *
+         */
+        async checkVideoEncodingLoop () {
+            this.isVideoEncoding = await this.checkIsVideoEncoding();
+            if (this.isVideoEncoding && document.body.contains(this.$el)) {  //ensure that the player is still in the DOM (could have been deleted)
+                await timeout(2000); //loop around until it's complete
+                this.checkVideoEncodingLoop();
+            } else if (!this.isVideoEncoding && document.body.contains(this.$el)) {
+                this.initVideojs();
+            }
+        },
+
+        /** 
+         * check whether SB has encoded the video yet
+         *
+         * @returns { Boolean }
+         */
+        async checkIsVideoEncoding () {
+            try {
+                const response = await axios.get('/storage/checkVideoStatus.php', this.getFormData());
+                const videoStatus = response.data.status;
+                if (videoStatus === 'pending' || videoStatus === 'processing') {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.warn(error);
+            }
+        },
+        
+        /**
+         * What to send in the GET request
+         *
+         * @returns { Object }
+         */
+        getFormData () {
+            return {
+                params: {
+                    hash: this.hash
+                }
+            }
+        },
 
         /**
          * set up videojs
          *
          */
         initVideojs () {
-            this.player = videojs(this.$refs.audioPlayer, this.options, this.onVideojsReady);
-            this.player.on('waveReady', this.onWaveformReady);
+            this.$nextTick(() => {
+                this.player = videojs(this.$refs.audioPlayer, this.options, this.onVideojsReady);
+                this.player.on('play', this.onPlay);
+                this.player.on('waveReady', this.onWaveformReady);
+            });
         },
 
         /** 
-         * videojs is ready, dispatch event in case anyone listening
+         * videojs is ready, dispatch event in case anyone listening and pass in the audio src
          *
          */
         onVideojsReady () {
@@ -48,6 +132,15 @@ export default {
                 type: this.options.audioPlayerType
             });
 			this.$emit('on-ready');
+        },
+
+        /** 
+         * ensure big play button is disabled on play
+         *
+         */
+        onPlay () {
+            const audioContainer = this.$refs.audioContainer.firstChild;
+            audioContainer.querySelector('.vjs-big-play-button').classList.add('vjs-hidden');
         },
 
         /** 
@@ -115,11 +208,17 @@ export default {
 
 <template>
     <div ref="audioContainer">
-        <video ref="audioPlayer" class="video-js vjs-play-skin"></video>
+        <img v-if="isVideoEncoding" class="processing-img" src="/static/images/core/video-processing.gif">
+        <video v-else ref="audioPlayer" class="video-js vjs-play-skin"></video>
     </div>
 </template>
 
 <style lang="scss" scoped>
+
+.processing-img {
+    width: 100%;
+    height: auto;
+}
 
 .vjs-play-skin::v-deep {
   .vjs-control-bar {
@@ -145,6 +244,8 @@ export default {
   }
   .vjs-big-play-button {
     display: block;
+    position: absolute;
+    z-index: 2;
     background-color: black;
     border: 2px solid white;
     border-radius: 0;

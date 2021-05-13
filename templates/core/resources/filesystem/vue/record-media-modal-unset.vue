@@ -106,21 +106,21 @@ export default {
         <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
                 <div class='icon-mic'></div>
-                <span><div>Record </div>Audio</span>
+                <span>Audio</span>
                 <aside>Say something with an audio only recording.</aside>
             </div>
         </button>
         <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
             <div>
                 <div class='icon-video'></div>
-                <span><div>Record a </div>Video</span>
+                <span>Video</span>
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
         </button>
         <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
             <div>
                 <div class='icon-screen-capture'></div>
-                <span><div>Record your </div>Screen</span>
+                <span>Screen</span>
                 <aside>Choose a computer screen to create a screen recording.</aside>
             </div>
         </button>
@@ -154,13 +154,13 @@ $font-family-icon: 'schoolbox';
     }
     span {
         display: block;
-        transition: padding-bottom 0.2s;
+        transition: padding-bottom 0.3s;
     }
     aside {
-        font-size: .8125rem;
+        font-size: 0rem;
         font-style:  italic;
         opacity: 0;
-        transition: opacity 0.2s;
+        transition: opacity 0.3s;
     }
     &:hover {
         background: white;
@@ -168,6 +168,7 @@ $font-family-icon: 'schoolbox';
             padding-bottom: 20px;
         }
         aside {
+            font-size: .8125rem;
             opacity: 1;
         }
     }
@@ -223,9 +224,6 @@ $font-family-icon: 'schoolbox';
             font-size: 1.5rem;
         }
         aside {
-            display: none;
-        }
-        span div { //simplify the text
             display: none;
         }
     }

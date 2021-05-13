@@ -239,11 +239,22 @@ export default {
             this.isFilenameModalActive = false;
             try {
                 this.isProcessActive = true;
+                this.checkRecording();
                 const responseData = await this.uploadMedia();
                 this.postUploadedMessage(responseData);
             } catch (error) {
                 this.isProcessActive = false;
                 console.log(error);
+            }
+        },
+
+        /**
+         * currently to check for audio only webms
+         *
+         */
+        checkRecording () {
+            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY && isOfFileType(this.recordedData.name, 'webm')) { //convert if audio/webm to ogg to ensure SB encoder treats as audio only (rather than video)
+                this.recordedData.name = convertFilenameExtension(this.recordedData.name, '.ogg');
             }
         },
 
