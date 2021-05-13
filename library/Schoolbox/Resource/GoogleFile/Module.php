@@ -54,7 +54,13 @@ class Module extends BaseModule
                 new HasHomepageAccess(
                     UserAccess::ACCESS_WRITE,
                     function (array $params = []) {
-                        return $params['folderId'];
+                        if (isset($params['folderId'])) {
+                            return $params['folderId'];
+                        }
+                        if ($params['googleFile'] instanceof Model) {
+                            return $params['googleFile']->getFolderId();
+                        }
+                        return null;
                     },
                     Access::getInstance()
                 )
@@ -152,7 +158,6 @@ class Module extends BaseModule
                 throw new InvalidPath('GoogleFile Not Found', 0, $e);
             }
         }
-        $preload['folderId'] = $preload['googleFile']->getFolderId();
         return $preload;
     }
 
