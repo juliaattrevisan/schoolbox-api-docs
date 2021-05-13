@@ -82,13 +82,20 @@ export default {
 
 .modal {
     box-sizing: border-box;
-    max-width: 80%;
+    max-width: 90%;
 	min-width: 50%;
 	padding: 20px;
 	background: white;
 	button {
 		width: 100%;
 	}
+    
+}
+
+@media screen and (max-width: 640px) {
+    .modal {
+        padding: 15px 10px;
+    }
 }
 
 </style>

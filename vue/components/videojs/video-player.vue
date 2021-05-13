@@ -1,61 +1,204 @@
 <script>
 
 /*
- * To play a video, which can also just be audio only with a waveform visualizer
+ * To play a video
  *
  */
 
 import 'video.js/dist/video-js.css';
 import videojs from 'video.js';
+import { gsap } from 'gsap/all';
+import { timeout } from '@shared/util/jsUtils';
 
 
 export default {
 
-	props: {
-		options: {
-			type: Object,
-			required: true,
-			default () {
-				return {};
-			}
-		},
-	},
+    props: {
+        options: {
+            type: Object,
+            required: true,
+            default () {
+                return {};
+            }
+        },
+    },
 
-	mounted () {
-		this.player = videojs(this.$refs.videoPlayer, this.options);
-	},
+    data () {
+        return {
+            videoHeight: 0, //to ensure the parent container is high enough when the video is loaded
+            isVideoEncoding: true //until it's checked at least once or confirmed the video is a blob
+        }
+    },
 
-	beforeDestroy () {
-		if (this.player) {
-			this.player.dispose();
-		}
-	}
+    created () {
+        this.hasHash = this.checkForHash();
+    },
+
+    mounted () {
+        if (this.hasHash) {
+            this.checkVideoEncodingLoop();
+        } else {
+            this.isVideoEncoding = false; //no need to be checking a blob file
+            this.initVideojs();
+        }
+    },
+
+    unmounted () {
+        if (this.player) {
+            this.player.dispose();
+        }
+    },
+
+    methods: {
+
+        /** 
+         * if the file contains a hash, we should ensure the video isn't transcoding prior to displaying
+         *
+         * @returns { Boolean }
+         */
+        checkForHash () {
+            this.hash = this.options?.sources[0].hash;
+            if (this.hash) { //need to check its status first
+                return true;
+            } else { //otherwise it's a blob recording
+                return false;
+            }
+        },
+
+        /** 
+         * ensure the video has finished processing prior to displaying
+         *
+         */
+        async checkVideoEncodingLoop () {
+            this.isVideoEncoding = await this.checkIsVideoEncoding();
+            if (this.isVideoEncoding && document.body.contains(this.$el)) {  //ensure that the player is still in the DOM (could have been deleted)
+                await timeout(2000); //loop around until it's complete
+                this.checkVideoEncodingLoop();
+            } else if (!this.isVideoEncoding && document.body.contains(this.$el)) {
+                this.initVideojs();
+            }
+        },
+
+        /** 
+         * check whether SB has encoded the video yet
+         *
+         * @returns { Boolean }
+         */
+        async checkIsVideoEncoding () {
+            try {
+                const response = await axios.get('/storage/checkVideoStatus.php', this.getFormData());
+                const videoStatus = response.data.status;
+                if (videoStatus === 'pending' || videoStatus === 'processing') {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (error) {
+                console.warn(error);
+            }
+        },
+        
+        /**
+         * What to send in the GET request
+         *
+         * @returns { Object }
+         */
+        getFormData () {
+            return {
+                params: {
+                    hash: this.hash
+                }
+            }
+        },
+
+        /** 
+         * set up videojs
+         *
+         */
+        initVideojs () {
+            
+            this.$nextTick(() => {
+                
+                this.videoHeight = this.$refs.videoPlayer.offsetHeight;
+                
+                this.player = videojs(this.$refs.videoPlayer, this.options, this.onVideoPlayerReady);
+                this.player.on('error', this.onVideoError);
+                gsap.from(this.$refs.videoPlayer, 0.5, { opacity: 0, scale: 1.025 } ); 
+
+            });
+           
+        },
+
+        /** 
+         * there's no fully cross-browser accurate load detection, 
+         * and as all we need is height detection, just use an interval 
+         *
+         */
+        onVideoPlayerReady () {
+            this.checkInterval = setInterval(this.checkVideoHeight, 500);
+        },
+
+        /** 
+         * there's no fully cross-browser accurate load detection, and as all we need is height detection,
+         * just use an interval. This mainly relates to safari ios, which doesn't load a input captured video.
+         *
+         */
+        checkVideoHeight () {
+            const currentVideoHeight = this.$refs.container.firstChild.offsetHeight; //videojs wraps around the <video> element
+            if (this.videoHeight !== currentVideoHeight) {
+                this.videoHeight = currentVideoHeight;
+                clearInterval(this.checkInterval);
+                this.$emit('on-dimensions-ready', this.$refs.container.firstChild.offsetWidth, currentVideoHeight);
+            }
+        },
+
+        /** 
+         * first frame of video is loaded, so can pass details through to anyone listening
+         *
+         */
+        onVideoDataLoaded () {
+            this.$emit('on-video-data-loaded', this.$refs.videoPlayer);
+        },
+
+        /** 
+         * unable to load for whatever reason
+         *
+         */
+        onVideoError () {
+            this.$emit('on-video-error');
+        },
+
+    }
 
 }
 </script>
 
 <template>
-	<div>
-		<video ref="videoPlayer" class="video-js vjs-custom-skin"></video>
-	</div>
+    <div ref="container">
+        <img v-if="isVideoEncoding" class="processing-img" src="/static/images/core/video-processing.gif">
+        <video v-else ref="videoPlayer" class="video-js vjs-play-skin"></video>
+    </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 
-//DEMO - see https://docs.videojs.com/tutorial-skins.html to update further
+.processing-img {
+    width: 100%;
+    height: auto;
+}
 
-.video-js {
+.vjs-play-skin::v-deep {
   .vjs-control-bar {
-	  height: 5em;
+      height: 5em;
   }
   .vjs-control {
-	  width: 5em;
+      width: 5em;
   }
   .vjs-volume-bar {
-	  margin: 2.4em 0.45em;
+      margin: 2.4em 0.45em;
   }
   .vjs-slider-horizontal .vjs-volume-level::before {
-	  top: -0.4em;
+      top: -0.4em;
   }
   .vjs-time-control {
     color: white;
@@ -67,13 +210,17 @@ export default {
     line-height: 3.5em;
   }
   .vjs-big-play-button {
-    background-color: black;
+    background: rgba(43, 51, 63, 0.7);
     border: 2px solid white;
     border-radius: 0;
     top: 50%;
     left: 50%;
     margin-left: -45px;
     margin-top: -24px;
+    transition: 0.2s opacity;
+    &:hover {
+        opacity: 0.8;
+    }
   }
   .vjs-button > .vjs-icon-placeholder::before {
     color: white;
@@ -81,52 +228,16 @@ export default {
     line-height: 1.25;
   }
   .vjs-progress-holder,
-  .vjs-custom-skin .vjs-play-progress,
-  .vjs-custom-skin .vjs-slider-bar,
+  .vjs-play-progress,
+  .vjs-slider-bar,
   .vjs-volume-panel .vjs-volume-control,
   .vjs-big-play-button .vjs-icon-placeholder::before {
-	  color: white;
+      color: white;
   }
-  .vjs-custom-skin .vjs-volume-level,
-  .vjs-custom-skin .vjs-play-progress,
-  .vjs-custom-skin .vjs-slider-bar {
-	  background: white;
-  }
-}
-
-.vjs-record.video-js {
-  .vjs-control.vjs-record-indicator {
-    line-height: 1.4;
-    width: 1em;
-    height: 1em;
-  }
-  .vjs-control.vjs-record-indicator::before {
-	  font-size: 1em;
-  }
-  .vjs-control.vjs-record-indicator::after {
-    height: calc(1em - 4px);
-    width: calc(1em - 4px);
-    top: 3px;
-    left: 3px;
-  }
-
-  .vjs-record-button.vjs-control.vjs-icon-record-start::before,
-  .vjs-record-button.vjs-control.vjs-icon-record-stop::before {
-    color: #f03;
-    &:hover {
-      color: #fa1542;
-    }
-  }
-  .vjs-record-button.vjs-control.vjs-icon-record-start::before {
-    font-size: 3.5em;
-    line-height: .9em;
-  }
-  .vjs-record-button.vjs-control.vjs-icon-record-stop::before {
-    font-size: 5em;
-    line-height: 1em;
-  }
-  .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
-    text-shadow: none;
+  .vjs-volume-level,
+  .vjs-slider-horizontal.vjs-play-progress,
+  .vjs-slider-bar {
+      background: white;
   }
 }
 

@@ -4,13 +4,84 @@
  *
  */
 
-/*
+/**
+* check whether a file name matches specific extension
+* 
+* @param { String } '593042579804375.webm'
+* @param { String } 'mp4'
+*
+* @returns { Boolean } depending of if matches
+*/ 
+export const isOfFileType = (filename, extension) => {
+    const filenameExtension = filename.split('.').pop();
+    return filenameExtension === extension;
+}
+
+/**
+* check whether a file is of a certain mime type
+* 
+* @param { String } 'audio/webm;codecs=opus'
+* @param { String } 'video/webm'
+*
+* @returns { Boolean } depending of if matches
+*/ 
+export const isOfMimeType = (mimeType, mimeTypeMatch) => {
+    return mimeType.includes(mimeTypeMatch);
+}
+
+/**
 * convert the filename to use the extension instead of whatever it was
 * 
-* @params { String } '593042579804375.webm'
-* @params { String } '.mp4'
+* @param { String } '593042579804375.webm'
+* @param { String } '.mp4'
+*
+* @returns { String } '593042579804375.mp4'
 */ 
 export const convertFilenameExtension = (filname, extension) => {
     const filenameWithoutExtension = filname.replace(/\.[^/.]+$/, "");
     return filenameWithoutExtension + extension;
+}
+
+/**
+* extract the media type from a Data URL
+* 
+* @param { String } ''data:image/png;base64,abcdefghijklm...' - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+*
+* @returns { String } 'image/png'
+*/ 
+export const getMediaTypeFromDataURL = (dataURL) => {
+    return dataURL.substring(dataURL.indexOf(':') + 1, dataURL.indexOf(';'));
+}
+
+/**
+* convert Data URL to Blob - https://gist.github.com/wuchengwei/b7e1820d39445f431aeaa9c786753d8e
+* 
+* @param { String } ''data:image/png;base64,abcdefghijklm...' - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+*
+* @returns { Blob } 
+*/
+export const dataURLtoBlob = (dataURL) => {
+    var arr = dataURL.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime } );
+}
+
+/**
+* convert Blob to Data URL - https://gist.github.com/wuchengwei/b7e1820d39445f431aeaa9c786753d8e
+* 
+* @param { Blob } 
+*
+* @returns { DataURL } 
+*/
+export const blobToDataURL = async (blob) => {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+        fileReader.readAsDataURL(blob);
+    });
 }

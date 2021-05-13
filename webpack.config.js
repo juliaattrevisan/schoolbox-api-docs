@@ -171,6 +171,7 @@ module.exports = {
         userProfileFeeds: './library/Schoolbox/Learning/vue/user-profile/feeds.main.js',
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
+        evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/initEvidenceMediaRecording.js',
 
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
