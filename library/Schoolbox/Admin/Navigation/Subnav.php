@@ -186,7 +186,7 @@ class Subnav
                         'description' => 'Statistics on how many files are being created and accessed by different roles within the system.',
                     ],
                     '/adminv2/engagement/index/fileTypes'     => [
-                        'name'        => 'File Types',
+                        'name'        => 'Media',
                         'visible'     => true,
                         'children'    => [],
                         'description' => 'Statistics on how many videos and images are being viewed within the system.',
@@ -247,12 +247,6 @@ class Subnav
                 'visible'    => $filterAvailabilityChecker->isAnyFilterAvailable(),
                 'searchable' => false,
                 'children'   => [
-                    '/adminv2/filters'  => [
-                        'name'        => 'Home',
-                        'visible'     => true,
-                        'children'    => [],
-                        'description' => 'Configure the default and available filter options on various pages.',
-                    ],
                     '/adminv2/filters/assessmentCal'  => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
                         'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),

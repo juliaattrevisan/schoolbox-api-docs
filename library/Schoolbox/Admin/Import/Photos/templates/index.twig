@@ -28,12 +28,6 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 columns">
-            <h2 class="subheader">Portrait Photos</h2>
-        </div>
-        <div class="small-12 island collapse">
-            {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
-        </div>
 
         <div class="small-12 island collapse">
             <form method="post" action="/adminv2/import/photos/upload">

@@ -10,14 +10,6 @@
 
         <div class="small-12 columns">
             <!-- BEGIN import -->
-            <h2 class="subheader">
-                Source
-                <span class="hint has-tip tip-right"
-                      data-tooltip
-                      title="The file that contains the calendar information can either be a CSV file
-                             matching the format in the template below, or a Microsoft Outlook ICS file">?</span>
-            </h2>
-
             <div class="row">
                 <div class="island small-12 medium-6">
                     <section>
@@ -54,41 +46,52 @@
                 </div>
             </div>
 
-            <h2 class="subheader">Select file (CSV or ICS)</h2>
+            <h2 class="subheader">Select file (CSV or ICS)
+                <span class="hint has-tip tip-right"
+                      data-tooltip
+                      title="The file that contains the calendar information can either be a CSV file
+                             matching the format in the template below, or a Microsoft Outlook ICS file">?</span>
+            </h2>
 
             <div class="row">
                 <div class="small-12 island">
                     <form action="/adminv2/bulkAddCalendar" method="post" enctype="multipart/form-data" name="form" id="importForm">
                         <section>
                             <fieldset class="content">
-                                <div class="island small-12">
-                                    <h3>Select File</h3>
-                                    <input type="file" name="bulkadd" />
-                                    <h3>
-                                        Campus
-                                        <span class="hint has-tip tip-right" data-tooltip title="Select the campuses that will be able to view these events">?</span>
-                                    </h3>
-                                    <!-- BEGIN campus_check_list -->
-                                    <input id="campus-{CAMPUSID}" type="checkbox" name="campusList[]" value="{CAMPUSID}" />
-                                    <label for="campus-{CAMPUSID}" class="checkbox-label">{CAMPUSNAME}</label>
-                                    <!-- END campus_check_list -->
-                                    <h3>
-                                        Roles
-                                        <span class="hint has-tip tip-right" data-tooltip title="Select the roles that will be able to view these events">?</span>
-                                    </h3>
-                                    <!-- BEGIN user_group_check_list -->
-                                    <input id="role-{USERGROUPID}" type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
-                                    <label for="role-{USERGROUPID}" class="checkbox-label">{USERGROUPNAME}</label>
-                                    <!-- END user_group_check_list -->
-                                    <h3>
+                                    <div class="small-12 columns">
+                                        <label>Select File</label>
+                                        <input type="file" name="bulkadd" />
+                                    </div>
+                                    <div class="small-12 medium-6 columns">
+                                        <label>
+                                            Campus
+                                            <span class="hint has-tip tip-right" data-tooltip title="Select the campuses that will be able to view these events">?</span>
+                                        </label>
+                                        <!-- BEGIN campus_check_list -->
+                                        <input id="campus-{CAMPUSID}" type="checkbox" name="campusList[]" value="{CAMPUSID}" />
+                                        <label for="campus-{CAMPUSID}" class="checkbox-label">{CAMPUSNAME}</label>
+                                        <!-- END campus_check_list -->
+                                    </div>
+                                    <div class="small-12 medium-6 columns">
+                                        <label>
+                                            Roles
+                                            <span class="hint has-tip tip-right" data-tooltip title="Select the roles that will be able to view these events">?</span>
+                                        </label>
+                                        <!-- BEGIN user_group_check_list -->
+                                        <input id="role-{USERGROUPID}" type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
+                                        <label for="role-{USERGROUPID}" class="checkbox-label">{USERGROUPNAME}</label>
+                                        <!-- END user_group_check_list -->
+                                    </div>
+                                    <div class="small-12 columns">
+                                    <label>
                                         Calendar Owner
                                         <span class="hint has-tip tip-right" data-tooltip title="Type in the name of the owner of the calendar. This field is optional: if empty, the current user will be used.">?</span>
-                                    </h3>
+                                    </label>
                                     <label>
                                         <input name="name" id="name" type="text" placeholder="Search Users" />
                                     </label>
                                     <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
-                                </div>
+                                    </div>
                             </fieldset>
                         </section>
 
