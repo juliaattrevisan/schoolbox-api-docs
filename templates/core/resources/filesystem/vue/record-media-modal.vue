@@ -13,6 +13,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
+import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
 
 
 export default {
@@ -253,7 +254,7 @@ export default {
          *
          */
         checkRecording () {
-            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY && isOfFileType(this.recordedData.name, 'webm')) { //convert if audio/webm to ogg to ensure SB encoder treats as audio only (rather than video)
+            if (this.currentRecordMediaType === recordMediaTypes.AUDIO_ONLY && isOfFileType(this.recordedData.name, 'webm')) { //convert if audio/webm to ogg to ensure SB encoder treats as audio only (rather than video)
                 this.recordedData.name = convertFilenameExtension(this.recordedData.name, '.ogg');
             }
         },
