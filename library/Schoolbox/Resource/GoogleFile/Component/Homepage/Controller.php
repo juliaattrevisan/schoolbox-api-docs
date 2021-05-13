@@ -11,6 +11,7 @@ use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\GoogleFile\Mapper;
+use Schoolbox\Resource\GoogleFile\Model;
 use Schoolbox\User;
 use SitePage;
 
@@ -66,18 +67,23 @@ class Controller extends Component_Homepage_ControllerAbstract
         /* If you're a WRITE access user, tell them their Google setup is misconfigured
          * Otherwise hide the component
          */
-        if (!$this->hasWriteAccess()) {
-            return false;
-        }
-
         if (!$this->isGoogleEnabled()) {
             $this->hasError = true;
-            return true;
+            return $this->hasWriteAccess();
         }
 
-        $googleFileMapper = Mapper::getInstance();
-
-        $this->googleFiles = $googleFileMapper->findByColumn('folder_id', $this->getContext()->getId());
+        $googleFileMapper  = Mapper::getInstance();
+        $this->googleFiles = $googleFileMapper->findByColumn('folder_id', $this->getContext()->getId())
+                                              ->sortByCallback(
+                                                  static function ($a, $b) {
+                                                      /** @var Model $a */
+                                                      /** @var Model $b */
+                                                      if (!$a->getCreatedAt()->issameDay($b->getCreatedAt())) {
+                                                          return $a->getCreatedAt()->lt($b->getCreatedAt());
+                                                      }
+                                                      return strnatcasecmp($a->getName(), $b->getName()) >= 1;
+                                                  }
+                                              );
 
         if ($this->googleFiles->count() === 0) {
             return $this->hasWriteAccess();
@@ -96,11 +102,12 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         $twigTemplate = '@googleFile/component/googleFiles.twig';
         $twigData     = [
-            'clientId'    => $this->getConfigLoader()->get('googleapps_client_id'),
-            'folder'      => $this->getContext(),
-            'googleFiles' => $this->googleFiles,
-            'hasError'    => $this->hasError,
-            'writeAccess' => $this->hasWriteAccess(),
+            'clientId'     => $this->getConfigLoader()->get('googleapps_client_id'),
+            'folder'       => $this->getContext(),
+            'googleFile'   => new Model(),
+            'googleFiles'  => $this->googleFiles,
+            'hasError'     => $this->hasError,
+            'writeAccess'  => $this->hasWriteAccess(),
             'component_id' => $this->getInstance()->getId(),
         ];
 
