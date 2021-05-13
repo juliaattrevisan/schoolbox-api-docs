@@ -119,23 +119,23 @@ class Component_Renderer
 
             if ($component->renderTemplate($templateHandle) !== false) {
                 $component->parse($templateTarget, $templateHandle, true);
+
+                /* Accumulate folder codes
+                 */
+                $component->getPageTemplate()->setVar([
+                    'ID' => (string)$folder->getId(),
+                    'HEADING' => Scrub::text($folder->getName()),
+                    'RETURN_URL_NAME' => Redirect::RETURN_URL,
+                    'RETURN_URL', Redirect::encode('/homepage/' . $_POST['cid'])
+                ]);
+
+                /* Localise terminologies
+                 */
+                $page->injectGlobalVars();
+
+                $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
             }
         }
-
-        /* Accumulate folder codes
-         */
-        $component->getPageTemplate()->setVar([
-            'ID' => (string)$folder->getId(),
-            'HEADING' => Scrub::text($folder->getName()),
-            'RETURN_URL_NAME' => Redirect::RETURN_URL,
-            'RETURN_URL', Redirect::encode('/homepage/' . $_POST['cid'])
-        ]);
-
-        /* Localise terminologies
-         */
-        $page->injectGlobalVars();
-
-        $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 
     /**
