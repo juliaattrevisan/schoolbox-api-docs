@@ -8,28 +8,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Filter\Page;
 
-use Schoolbox\L10n\RosettaStone;
-
 /**
- * Class LabelBuilder
+ * Single point of control for labels for the different pages which use filters.
+ *
+ * The labels are intentionally not localised, as these labels are intended for
+ * use within an admin panel; thus, consistent naming is a requirement so that
+ * admins are able to search for consistently named items within documentation.
  */
 class LabelBuilder
 {
-    /**
-     * Translator class: required for building some labels.
-     */
-    private RosettaStone $translator;
-
-    /**
-     * Constructor
-     *
-     * @param RosettaStone $translator
-     */
-    public function __construct(RosettaStone $translator)
-    {
-        $this->translator = $translator;
-    }
-
     /**
      * Builds a label for this page.
      *
@@ -40,12 +27,10 @@ class LabelBuilder
     {
         switch ($page) {
             case Model::PAGE_PENDING_ASSESSMENTS:
-                $assessmentLocalised = $this->translator->translate('assessment', true, true);
-                return "Pending $assessmentLocalised";
+                return "Pending Assessments";
 
             case Model::PAGE_ASSESSMENT_CALENDAR:
-                $assessmentLocalised = $this->translator->translate('assessment', true, true);
-                return "$assessmentLocalised Calendar";
+                return "Assessment Calendar";
 
             case Model::PAGE_GRADES:
                 return 'Grades';
@@ -57,7 +42,6 @@ class LabelBuilder
                 return 'Course Markbook';
 
             case Model::PAGE_UPCOMING_ASSESSMENTS:
-                // intentionally and contentiously not localised
                 return "Upcoming Due Work";
 
             case Model::PAGE_RUBRIC_MARK_BOOK:

@@ -111,10 +111,7 @@ class Subnav
             );
 
         $filterAvailabilityChecker = new AvailabilityChecker($this->configLoader);
-
-        // TODO inject the translator as well
-        $translator         = (new RosettaStoneFactory())->build(L10nMapper::getInstance());
-        $filterLabelBuilder = new LabelBuilder($translator);
+        $filterLabelBuilder        = new LabelBuilder();
 
         /* Keys of this array uniquely identify a page and its subpages
          * Used to preselect menu options so users have a sense of where they are

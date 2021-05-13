@@ -314,7 +314,7 @@ class Controller extends BaseController
      */
     private function buildFilteredPageLabels(): array
     {
-        $labelBuilder = new LabelBuilder($this->rosettaStone);
+        $labelBuilder = new LabelBuilder();
         return [
             Page\Model::PAGE_PENDING_ASSESSMENTS  => $labelBuilder->buildLabel(Page\Model::PAGE_PENDING_ASSESSMENTS),
             Page\Model::PAGE_GRADES               => $labelBuilder->buildLabel(Page\Model::PAGE_GRADES),
