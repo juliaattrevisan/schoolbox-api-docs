@@ -121,12 +121,18 @@ class Controller extends ConfigController
             if (!($parentData['visible'] ?? false)) {
                 continue;
             }
-            $jsonPayload[] = [
-                'name'        => $parentUrl,
-                'title'       => $parentData['name'],
-                'description' => $parentData['description'],
-                'url'         => $parentUrl,
-            ];
+
+            // Some parent items are intended only as root nodes for the HTML
+            // navigation: they are not designed to be navigable themselves.
+            // Do not add these items to the searchable payload.
+            if ($parentData['searchable'] ?? false) {
+                $jsonPayload[] = [
+                    'name'        => $parentUrl,
+                    'title'       => $parentData['name'],
+                    'description' => $parentData['description'],
+                    'url'         => $parentUrl,
+                ];
+            }
 
             foreach ($parentData['children'] as $childUrl => $childData) {
                 if (!($childData['visible'] ?? false)) {
