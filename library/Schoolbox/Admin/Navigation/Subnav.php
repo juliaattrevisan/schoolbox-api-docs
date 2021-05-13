@@ -130,12 +130,13 @@ class Subnav
             '/adminv2/home'                           => [
                 'name'        => 'Home',
                 'visible'     => true,
-                'children'    => [],
                 'description' => 'Key system status information.',
+                'children'    => [],
             ],
             '/adminv2/calendar/Cleanup'               => [
                 'name'     => 'Calendar',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/calendar/Cleanup'   => [
                         'name'        => 'Cleanup',
@@ -160,6 +161,7 @@ class Subnav
             '/adminv2/engagement/index/collaboration' => [
                 'name'     => 'Engagement',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/engagement/index/collaboration' => [
                         'name'        => 'Collaboration',
@@ -226,6 +228,7 @@ class Subnav
             '/adminv2/eportfolio'                     => [
                 'name'     => 'ePortfolio',
                 'visible'  => $this->configLoader->get(ConfigMapper::NAME_EPORTFOLIO_ENABLED),
+                'description' => '.',
                 'children' => [
                     '/adminv2/eportfolio/deploy' => [
                         'name'        => 'Deployment',
@@ -244,6 +247,7 @@ class Subnav
             '/adminv2/filters'                        => [
                 'name'     => 'Filters',
                 'visible'  => $filterAvailabilityChecker->isAnyFilterAvailable(),
+                'description' => '.',
                 'children' => [
                     '/adminv2/filters/assessmentCal'  => [
                         'name'        => $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_ASSESSMENT_CALENDAR),
@@ -298,6 +302,7 @@ class Subnav
             '/adminv2/import/directImport'            => [
                 'name'     => 'Import',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/import/directImport'  => [
                         'name'        => 'Home',
@@ -334,183 +339,219 @@ class Subnav
             '/adminv2/terms'                          => [
                 'name'     => 'LMS',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/terms'                         => [
                         'name'     => 'Academic Period',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
                     ],
                     '/adminv2/rollover'                      => [
                         'name'     => 'Class Rollover',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'At the end of the year or semester, archive your class pages so you can start fresh the following year.',
                     ],
                     '/adminv2/course-builder'                => [
                         'name'     => 'Course Builder',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the default page templates and permissions for course and unit pages.',
                     ],
                     '/adminv2/setting/Document%20Management' => [
                         'name'     => 'Document Management',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_DOC_MANAGE] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Configure which Synergetic DocMan documents are visible via the Academic Reports button on the students profile.',
                     ],
                     '/adminv2/grades'                        => [
                         'name'     => 'Grades',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the available grade scales that can be used for assessment and marking.',
                     ],
                     '/adminv2/setting/LMS%20Policy'          => [
                         'name'     => 'LMS Policy',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LMS_POLICY] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Configure policy related to continuous reporting, grades, due work, assessment and feedback.',
                     ],
                     '/adminv2/lti'                           => [
                         'name'     => 'LTI Providers',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the 3rd party LTI integrations that you wish to make available for use in the LTI component.',
                     ],
                     '/adminv2/rubric-results'                => [
                         'name'     => 'Rubrics',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Setup quick fill results for rubrics to help quickly building a rubric with generic level descriptors.',
                     ],
                 ],
             ],
             '/adminv2/lists/achievement-category'     => [
                 'name'     => 'Lists',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/lists/achievement-category'             => [
                         'name'     => 'Badge Categories',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the list of categories that badges can be defined within.',
                     ],
                     '/adminv2/lists/campus'                           => [
                         'name'     => 'Campus',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Setup the campus within the school and configure which timetables are used by the campus.',
                     ],
                     '/adminv2/lists/component-definition'             => [
                         'name'     => 'Components',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Control which components can be used on homepages, dashboards and ePortfolios.',
                     ],
                     '/adminv2/lists/webdav'                           => [
                         'name'     => 'Drives',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
                     ],
                     '/adminv2/lists/event-type'                       => [
                         'name'     => 'Event Types',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Setup the list of event types for filtering and colour coding.',
                     ],
                     '/adminv2/lists/house'                            => [
                         'name'     => 'Houses',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Setup the school pastoral houses.',
                     ],
                     '/adminv2/lists/evidence-tag'                     => [
                         'name'     => 'Learning Moments',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],
                     '/adminv2/lists/news-topic'                       => [
                         'name'     => 'News Topics',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the list of news topics to allow categorisation of news.',
                     ],
                     '/adminv2/lists/pastoral-severity'                => [
                         'name'     => 'Pastoral Record Severity',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
                         'children' => [],
+                        'description' => 'Setup appropriate severity or importance of your pastoral records.',
                     ],
                     '/adminv2/lists/pastoral-tags'                    => [
                         'name'     => 'Pastoral Record Tags',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
                         'children' => [],
+                        'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
                     ],
                     '/adminv2/lists/pastoral-document-classification' => [
                         'name'     => 'Pastoral SIS Document Classifications',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
                         'children' => [],
+                        'description' => 'Configure how file attachments in pastoral are synchronised back to DocMan in Synergetic.',
                     ],
                     '/adminv2/lists/pastoral-category'                => [
                         'name'     => 'Pastoral Sub-Types',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
                         'children' => [],
+                        'description' => 'Optionally configure further sub types under your existing types for more detailed categorisation of pastoral records.',
                     ],
                     '/adminv2/lists/pastoral-type'                    => [
                         'name'     => 'Pastoral Types',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
                         'children' => [],
+                        'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
                     ],
                     '/adminv2/lists/residential-house'                => [
                         'name'     => 'Residential Houses',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Setup the residential boarding houses that students attend.',
                     ],
                     '/adminv2/lists/roles'                            => [
                         'name'     => 'Roles',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure user roles within the system, the type of access they have and permissions.',
                     ],
                     '/adminv2/lists/submission-errors'                => [
                         'name'     => 'Submission States',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the alternative states an assessment can be in beyond being graded.',
                     ],
                     '/adminv2/lists/timetable-colour'                 => [
                         'name'     => 'Timetable Colours',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the set of colours used to randomly colour the timetable.',
                     ],
                     '/adminv2/lists/user-title'                       => [
                         'name'     => 'User Titles',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the drop down list of titles available for users.',
                     ],
                     '/adminv2/lists/submission-type'                  => [
                         'name'     => 'Work Types',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Setup the categorisation for assessments, useful for filtering and report creation.',
                     ],
                     '/adminv2/lists/year-levels'                      => [
                         'name'     => 'Year Levels',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the year levels and the policy settings related to those year levels.',
                     ],
                 ],
             ],
             '/adminv2/setting/Modules'                => [
                 'name'     => 'Modules',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/setting/Modules'         => [
                         'name'     => 'Home',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_MODULES] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Control which features and modules are currently available in your system.',
                     ],
                     '/adminv2/setting/Board%20Leave'   => [
                         'name'     => 'Board Leave',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_BOARD] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Configure policy settings related to the boarding leave application system.',
                     ],
                     '/adminv2/feature-tours'           => [
                         'name'     => 'Feature Tours',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Review the current guides that help new users get used to the system.',
                     ],
                     '/adminv2/package'                 => [
                         'name'     => 'Packages',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Install optional content packages supplied to get you started.',
                     ],
                     '/adminv2/setting/Pastoral%20Care' => [
                         'name'     => 'Pastoral Care',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PASTORAL_CARE] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
                 ],
             ],
@@ -518,250 +559,299 @@ class Subnav
                 'name'     => 'News',
                 'visible'  => true,
                 'children' => [],
+                'description' => 'Configure moderation and default values when posting and modifying news.',
             ],
             '/adminv2/messages'                       => [
                 'name'     => 'Notifications',
-                'visible'  => true,
+                'visible'  => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
+                'description' => '.',
                 'children' => [
                     '/adminv2/messages'           => [
                         'name'     => 'Home',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children' => [],
+                        'description' => 'Preview emailed notifications, and set a schedule for the sending of digest notifications.',
                     ],
                     '/adminv2/messages/apps'      => [
                         'name'     => 'Delivery Providers',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children' => [],
+                        'description' => 'Configure and review how push notifications are delivered to mobile phones.',
                     ],
                     '/adminv2/messages/puush'     => [
                         'name'     => 'Mobile App Registrations',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children' => [],
+                        'description' => 'Review the list of mobile devices that have registered to receive notifications.',
                     ],
                     '/adminv2/messages/configure' => [
                         'name'     => 'Settings',
-                        'visible'  => true,
+                        'visible'  => $this->configLoader->get(ConfigMapper::NAME_NOTIFICATIONS_ENABLED),
                         'children' => [],
+                        'description' => 'Configure the global notification settings for all user roles, how messages will be delivered, and what options they can select.',
                     ],
                 ],
             ],
             '/adminv2/dashboard'                      => [
                 'name'     => 'Personalisation',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/dashboard'             => [
                         'name'     => 'Dashboard Templates',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the layout of the initial landing page when you first login for each role.',
                     ],
                     '/adminv2/homepage'              => [
                         'name'     => 'Homepage Templates',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure and setup the scaffolding templates that users can create homepages from.',
                     ],
                     '/adminv2/profile-button'        => [
                         'name'     => 'Profile Buttons',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Add your own custom buttons to a users profile page.',
                     ],
                     '/adminv2/menu-side'             => [
                         'name'     => 'Side Menu',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Add and remove links to the hierarchical navigation menu on the left hand side of the screen.',
                     ],
                     '/adminv2/setting/Skin%20Config' => [
                         'name'     => 'Skin Config',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the look and feel of your system, including colours, images and logos.',
                     ],
                     '/adminv2/terminology'           => [
                         'name'     => 'Terminology',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Localise the words used to describe key features to your own language.',
                     ],
                     '/adminv2/menu-top'              => [
                         'name'     => 'Top Menu',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure the top menu navigation and give quick access to the most important features.',
                     ],
                 ],
             ],
             '/adminv2/setting/Resources'              => [
                 'name'     => 'Resources',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/allowed-file'      => [
                         'name'     => 'Allowed Files',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Define the file mime types that can be uploaded, the maximum filesize and the icon they will use.',
                     ],
                     '/adminv2/video'             => [
                         'name'     => 'Media Queue',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'A log of videos and audio that is currently being transcoded or failed to transcode.',
                     ],
                     '/adminv2/setting/Resources' => [
                         'name'     => 'Settings',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_RESOURCES] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Control how files are stored and processed when uploaded.',
                     ],
                     '/adminv2/restore'           => [
                         'name'     => 'Restore',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
                     ],
                     '/adminv2/usage'             => [
                         'name'     => 'Usage',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'View what files have been uploaded, by whom and how much disk space they are using.',
                     ],
                 ],
             ],
             '/adminv2/import/schoolDataImport'        => [
                 'name'     => 'School Data Import',
                 'visible'  => $this->configLoader->get('external_type') === 'schoolbox',
+                'description' => '',
                 'children' => [
                     '/adminv2/import/schoolDataImport'   => [
                         'name'     => 'Home',
                         'visible'  => $this->configLoader->get('external_type') === 'schoolbox',
                         'children' => [],
+                        'description' => 'Configure your school data (SIS) import process.',
                     ],
                     '/adminv2/import/profile'            => [
                         'name'     => 'User Profiles',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Import staff, student, parent and relationship data via CSV files.',
                     ],
                     '/adminv2/import/timetableStructure' => [
                         'name'     => 'Timetable Structure',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Import timetable definition and structure via CSV.',
                     ],
                     '/adminv2/import/timetable'          => [
                         'name'     => 'Timetable',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Import the classes and their periods via CSV.',
                     ],
                     '/adminv2/import/timetableEnrolment' => [
                         'name'     => 'Timetable Enrolment',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Import the students and teachers in classes via CSV.',
                     ],
                 ],
             ],
             '/adminv2/setting'                        => [
                 'name'     => 'System Settings',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/setting/3rd%20Party%20Services' => [
                         'name'     => '3rd Party Services',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Enable and configure API connectivity between your platform and many other integrated services.',
                     ],
                     '/adminv2/setting/Debugging'              => [
                         'name'     => 'Debugging',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Enable developer features for debugging issues and tracing problems.',
                     ],
                     '/adminv2/setting/Email'                  => [
                         'name'     => 'Email',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_EMAIL] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Control how we send email from the platform.',
                     ],
                     '/adminv2/setting/External%20DB'          => [
                         'name'     => 'External DB',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_EXTERNAL] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Configure the connection to your school database (SIS).',
                     ],
                     '/adminv2/setting/LDAP'                   => [
                         'name'     => 'LDAP',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LDAP] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Setup the LDAP servers to provide authentication services for users.',
                     ],
                     '/adminv2/setting/Localisation'           => [
                         'name'     => 'Localisation',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_LOCALISATION] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Customise dates and other local formatting options.',
                     ],
                     '/adminv2/oauth'                          => [
                         'name'     => 'oAuth Provider Configuration',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure an oAuth endpoint to validate tokens provided by mobile apps.',
                     ],
                     '/adminv2/setting/Paths'                  => [
                         'name'     => 'Paths',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PATHS] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Displays the location where files are stored on disk.',
                     ],
                     '/adminv2/setting/Policy'                 => [
                         'name'     => 'Policy',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_POLICY] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Set a wide variety of policy settings that will control the behaviour and default settings for many features.',
                     ],
                     '/adminv2/setting/Proxy'                  => [
                         'name'     => 'Proxy',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_PROXY] ?? []) > 0,
                         'children' => [],
+                        'description' => 'If required, you can configure the system to complete internet HTTP requests via a proxy server.',
                     ],
                     '/adminv2/setting/SAML'                   => [
                         'name'     => 'SAML',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SAML] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Configure your single sign-on identity provider.',
                     ],
                     '/adminv2/setting/Security'               => [
                         'name'     => 'Security',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SECURITY] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Control security related to authentication, logins and embedding of 3rd party content.',
                     ],
                     '/adminv2/setting/Site'                   => [
                         'name'     => 'Site',
                         'visible'  => count($enabledConfigs[ConfigMapper::TYPE_SITE] ?? []) > 0,
                         'children' => [],
+                        'description' => 'Setup and configure global settings related to the site, like name, domain and analytics.',
                     ],
                 ],
             ],
             '/adminv2/user'                           => [
                 'name'     => 'User Management',
                 'visible'  => true,
+                'description' => '.',
                 'children' => [
                     '/adminv2/user'                 => [
                         'name'     => 'Home',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Overview of user accounts and ability to modify and view service permissions.',
                     ],
                     '/adminv2/reports/activity/all' => [
                         'name'     => 'Activity Report',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Access recent CMS actions like delete, create and modify of files, folders and links.',
                     ],
                     '/adminv2/user/bulk/modify'     => [
                         'name'     => 'Bulk Modify',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Make changes to user accounts on bulk by searching on various account attributes.',
                     ],
                     '/adminv2/user/create'          => [
                         'name'     => 'Create User',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Setup a new user account for use in the platform.',
                     ],
                     '/adminv2/reports/login/all'    => [
                         'name'     => 'Login Log',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'View a list of all the recent successful and unsuccessful login attempts to the system.',
                     ],
                     '/adminv2/shaps'                => [
                         'name'     => 'Schoolbox Help',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Ensure your staff have access to our online training, guides and forums.',
                     ],
                     '/adminv2/user/stale'           => [
                         'name'     => 'Remove Users',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'View and remove users which have not logged into the platform for a while.',
                     ],
                     '/adminv2/ups'                  => [
                         'name'     => 'User Provisioning System',
                         'visible'  => true,
                         'children' => [],
+                        'description' => 'Configure automatic user account creation and updates from your school database (SIS).',
                     ],
                 ],
             ],
