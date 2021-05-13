@@ -58,7 +58,7 @@ class CourseLocationPickerCest
         $i->seeElement(CourseModify::SELECTOR_USE_FOLDER . '[disabled]');
 
         // User clicks current location
-        $i->click('#508_anchor');
+        $i->click('[href="/homepage/508"]');
 
         // 'Use This Folder' button is now enabled
         $i->seeElement(CourseModify::SELECTOR_USE_FOLDER . ':not([disabled])');
@@ -92,8 +92,21 @@ class CourseLocationPickerCest
     public function locationSelection(AcceptanceTester $i): void
     {
         // open the 'French' homepage node
-        $i->waitForElement('#519_anchor');
-        $i->click('#519_anchor');
+//        $i->waitForElement(a#519_anchor');
+//        $i->click('#519_anchor');
+        //$i->click('[href="/homepage/519"]');
+        $i->waitForElement('[href="/homepage/519"]');
+        sleep(2);
+//        $i->scrollTo('[href="/homepage/519"]');
+//        sleep(2);
+//        $i->click('li#519');
+//        $i->scrollAndClick('[href="/homepage/519"]');
+        $i->scrollTo('[href="/homepage/29"]');
+        $i->waitForElementClickable('[href="/homepage/519"]');
+        $i->moveMouseOver('[href="/homepage/519"]');
+        $i->click('[id="519"]');
+        $i->click('[href="/homepage/519"]');
+
 
         // 'French' homepage should be selected
         $i->assertEquals(true, $i->executeJS("return $('#519 > .jstree-wholerow.jstree-wholerow-clicked').length"));
@@ -102,7 +115,8 @@ class CourseLocationPickerCest
         $i->see('Year 9 French');
 
         // User clicks 'Year 9 French' course node
-        $i->click('#520_anchor');
+//        $i->click('#520_anchor');
+        $i->click('[href="/homepage/520"]');
 
         // 'Year 9 French' is not selected
         $i->assertEquals(false, $i->executeJS("return $('#520 > .jstree-wholerow.jstree-wholerow-clicked').length"));
