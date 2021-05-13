@@ -299,12 +299,12 @@ class Subnav
                 'name'     => 'Import',
                 'visible'  => true,
                 'children' => [
-                    '/adminv2/import/directImport'  => [
-                        'name'        => 'Home',
-                        'visible'     => true,
-                        'children'    => [],
-                        'description' => '.',
-                    ],
+//                    '/adminv2/import/directImport'  => [
+//                        'name'        => 'Home',
+//                        'visible'     => true,
+//                        'children'    => [],
+//                        'description' => '.',
+//                    ],
                     '/adminv2/import/folder'        => [
                         'name'        => 'Pages',
                         'visible'     => true,
@@ -327,7 +327,7 @@ class Subnav
                         'name'        => 'User Accounts',
                         'visible'     => true,
                         'children'    => [],
-                        'description' => '.',
+                        'description' => 'Import user accounts via a CSV file.',
                     ],
                 ],
             ],
