@@ -68,6 +68,11 @@ class GDriveFetcher implements FetcherInterface
     ];
 
     /**
+     * Roles which can be updated (i.e. we probably don't want to update owner/organizer/fileOrganizer)
+     */
+    private const UPDATABLE_ROLES = ['writer', 'commenter', 'reader'];
+
+    /**
      * @var bool
      */
     private bool $allowPdfExport;
@@ -80,6 +85,11 @@ class GDriveFetcher implements FetcherInterface
      * @var array
      */
     private array $metaCache = [];
+
+    /**
+     * @var array
+     */
+    private array $permissionCache = [];
 
     /**
      * http header
@@ -132,7 +142,17 @@ class GDriveFetcher implements FetcherInterface
     {
         if ($refresh || empty($this->metaCache[$fileId])) {
             $params = [
-                'fields'            => '*',
+                'fields'            => implode(
+                    ',', [
+                           'name',
+                           'capabilities',
+                           self::CONTEXT_EXPORTLINKS,
+                           'mimeType',
+                           'id',
+                           'webViewLink',
+                           'originalFilename',
+                       ]
+                ),
                 'supportsAllDrives' => 'true',
             ];
             $url    = self::GOOGLE_API . "/files/{$fileId}?" . http_build_query($params);
@@ -165,27 +185,6 @@ class GDriveFetcher implements FetcherInterface
         return $metadata;
     }
 
-    /**
-     * Fetches Permission
-     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
-     * @param string $fileId
-     * @return mixed
-     */
-    public function fetchPermissions(string $fileId)
-    {
-        $params = [
-            'fields'            => '*',
-            'supportsAllDrives' => 'true',
-        ];
-        $url    = self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params);
-
-        try {
-            $response = $this->client->get($url);
-            return json_decode($response->getBody(), true);
-        } catch (GuzzleException $e) {
-        }
-        return null;
-    }
 
     /**
      * Sets permission to a google file
@@ -194,8 +193,23 @@ class GDriveFetcher implements FetcherInterface
      * @param string $accessRole
      * @param string $email
      */
-    public function setPermissions(string $fileId, string $accessRole, string $email): void
+    public function setPermission(string $fileId, string $accessRole, string $email): void
     {
+        $existingPermission = $this->findPermissionByFileAndEmail($fileId, $email);
+
+        // if this file is already shared for this email, try updating it.
+        if ($existingPermission) {
+            if ($existingPermission['role'] === $accessRole || !in_array($existingPermission['role'], self::UPDATABLE_ROLES)) {
+                // no need to update
+                return;
+            }
+            $result = $this->callUpdatePermissions($fileId, $existingPermission['id'], $accessRole);
+            if ($error = $this->getErrorMessage($result)) {
+                throw new DomainException($error);
+            }
+            return;
+        }
+
         $result = $this->callSetPermissions($fileId, $accessRole, $email, false);
         if ($this->getErrorMessage($result)) {
             // retry with notification on
@@ -203,6 +217,72 @@ class GDriveFetcher implements FetcherInterface
             if ($error = $this->getErrorMessage($result)) {
                 throw new DomainException($error);
             }
+        }
+    }
+
+    /**
+     * Find permission by google file id and email
+     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
+     * @param string $fileId
+     * @param string $email
+     * @return array|null
+     */
+    public function findPermissionByFileAndEmail(string $fileId, string $email): ?array
+    {
+        if (!isset($this->permissionCache[$fileId])) {
+            // TODO: cache all results, for now caching first call only..
+            $this->permissionCache[$fileId] = $this->callListPermissions($fileId);
+        }
+
+        $permissions = $this->permissionCache[$fileId];
+        foreach ($permissions['permissions'] as $permission) {
+            if ($permission['emailAddress'] !== $email) {
+                continue;
+            }
+            return $permission;
+        }
+        // This can be recursively called, but I don't like recursive ...
+        while ($permissions['nextPageToken']) {
+            $permissions = $this->callListPermissions($fileId, $permissions['nextPageToken']);
+            foreach ($permissions as $permission) {
+                if ($permission['emailAddress'] !== $email) {
+                    continue;
+                }
+                return $permission;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string      $fileId
+     * @param string|null $pageToken
+     * @return mixed
+     */
+    private function callListPermissions(string $fileId, ?string $pageToken = null)
+    {
+        $params = [
+            'fields'            => implode(
+                ',', [
+                       'kind',
+                       'nextPageToken',
+                       'permissions/role',
+                       'permissions/emailAddress',
+                       'permissions/id',
+                   ]
+            ),
+            'supportsAllDrives' => 'true',
+        ];
+        if ($pageToken) {
+            $params['pageToken'] = $pageToken;
+        }
+        $url = self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params);
+
+        try {
+            $response = $this->client->get($url);
+            return json_decode($response->getBody(), true);
+        } catch (GuzzleException $e) {
+            throw new DomainException($e);
         }
     }
 
@@ -217,7 +297,6 @@ class GDriveFetcher implements FetcherInterface
     {
         $params = [
             'fileId'                => $fileId,
-            'fields'                => '*',
             'supportsAllDrives'     => 'true',
             'sendNotificationEmail' => $notify ? 'true' : 'false', // this is necessary for non google accounts
         ];
@@ -234,6 +313,41 @@ class GDriveFetcher implements FetcherInterface
 
         try {
             $response = $this->client->post(
+                $url,
+                [
+                    RequestOptions::HEADERS => $this->httpHeaders,
+                    RequestOptions::BODY    => json_encode($payload),
+                ]
+
+            );
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (GuzzleException $e) {
+            $error = $e->getResponse()->getBody()->getContents();
+            return json_decode($error, true);
+        }
+    }
+
+    /**
+     * @param string $fileId
+     * @param string $permissionId
+     * @param string $accessRole
+     * @return array
+     */
+    private function callUpdatePermissions(string $fileId, string $permissionId, string $accessRole): array
+    {
+        $params  = [
+            'supportsAllDrives' => 'true',
+        ];
+        $payload = [
+            'role' => $accessRole,
+        ];
+
+        $this->httpHeaders['Content-Type'] = 'application/json';
+
+        $url = self::GOOGLE_API . "/files/{$fileId}/permissions/{$permissionId}?" . http_build_query($params);
+
+        try {
+            $response = $this->client->patch(
                 $url,
                 [
                     RequestOptions::HEADERS => $this->httpHeaders,

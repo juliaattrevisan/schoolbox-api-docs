@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\GoogleFile;
 
 use Alaress\Web\Controller\Base;
-use Proxy\Server;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Collection;
 use Schoolbox\File\Remote\GDriveFetcher;
@@ -133,35 +132,43 @@ class Controller extends Base
             false
         );
 
-        $existingGFileIds    = $this->googleFileMapper->findByColumn('folder_id', $folder->getId())
-                                                      ->getPropertyValues('googleId');
+        $existingGFiles      = $this->googleFileMapper->findByColumn('folder_id', $folder->getId())
+                                                      ->indexBy('googleId');
         $email2accessRoleMap = $this->getEmail2AccessRoleMap($folder->getId(), $editAccessLevel, $commentAccessLevel);
         $errors              = [];
         foreach ($selectedFiles as $selectedFile) {
-            // if this file is already associated with this folder, skip
-            if (in_array($selectedFile['id'], $existingGFileIds)) {
-                continue;
+            // if this file is already associated with this folder, get it
+            if (in_array($selectedFile['id'], $existingGFiles->keys())) {
+                $googleFile = $existingGFiles->offsetGet($selectedFile['id']);
+            } else {
+                // store google file id in the db
+                try {
+                    $googleFile = $this->googleFileMapper->createModel();
+                    $googleFile->setFolderId($folder->getId())
+                               ->setGoogleId($selectedFile['id'])
+                               ->setName($selectedFile['name'])
+                               ->setIcon($selectedFile['icon'])
+                               ->setUrl('')
+                               ->setEditLevel($editAccessLevel)
+                               ->setCommentLevel($commentAccessLevel)
+                               ->setOwnerId($this->getUser()->getId());
+                    $this->googleFileMapper->save($googleFile);
+                } catch (MapperException $e) {
+                    $errors[] = "Failed to save : " . $e->getMessage();
+                    continue;
+                }
             }
-            // store google file id in the db
+
             try {
-                $googleFile = $this->googleFileMapper->createModel();
-                $googleFile->setFolderId($folder->getId())
-                           ->setGoogleId($selectedFile['id'])
-                           ->setName($selectedFile['name'])
-                           ->setIcon($selectedFile['icon'])
-                           ->setUrl('')
-                           ->setEditLevel($editAccessLevel)
-                           ->setCommentLevel($commentAccessLevel)
-                           ->setOwnerId($this->getUser()->getId());
-                $this->googleFileMapper->save($googleFile);
                 // provide access to google doc via api
                 foreach ($email2accessRoleMap as $email => $accessRole) {
-                    $gDriveFetcher->setPermissions(
+                    $gDriveFetcher->setPermission(
                         $selectedFile['id'], $accessRole, $email
                     );
                 }
                 $meta = $gDriveFetcher->fetchMetaData($selectedFile['id']);
                 $googleFile->setUrl($meta['webViewLink']);
+                $googleFile->setName($meta['name']);
                 $this->googleFileMapper->save($googleFile);
             } catch (\DomainException | MapperException $e) {
                 $errors[] = "Failed to save : " . $e->getMessage();

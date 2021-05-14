@@ -16,7 +16,7 @@
 
         /* Only proceed if both parts set
          */
-        if (config.clientId.length && config.postGoogleFileUrl.length) {
+        if (config.clientId.length && config.modules) {
             setupListeners();
         }
 
@@ -48,9 +48,15 @@
                  */
                 onSelect: function () {
                 },
+                onAuth: function (e) {
+                    createPicker(e);
+                },
                 /* A google setting
                  */
-                scope: 'https://www.googleapis.com/auth/drive'
+                scope: 'https://www.googleapis.com/auth/drive',
+                /* True to do auth only...
+                 */
+                modules: ['auth2', 'picker']
             };
             $('#gfile-google-ids').val('');
             return $.extend(defaults, options);
@@ -62,7 +68,7 @@
          */
         function setupListeners() {
             $(config.element).on('click', function () {
-                loadGoogleApi(['auth2', 'picker'], authorize);
+                loadGoogleApi(config.modules, authorize);
             });
         }
 
@@ -73,7 +79,7 @@
          */
         function authorize() {
             if ($('#gfile-access-token').val().length > 0) {
-                createPicker($('#gfile-access-token').val());
+                config.onAuth.call($(this.element), $('#gfile-access-token').val(), $(this.element));
                 return;
             }
             window.gapi.auth2.authorize({
@@ -91,7 +97,7 @@
             if (authResult && !authResult.error) {
                 $('#gfile-access-token').val(authResult.access_token);
                 $('#gfile-token-type').val(authResult.token_type);
-                createPicker(authResult.access_token);
+                config.onAuth.call($(this.element), authResult.access_token, $(this.element));
 
                 /* Only spawn our modal if they authenticate past the popup thing
                  */

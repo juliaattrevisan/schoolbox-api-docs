@@ -32,6 +32,8 @@ class Mapper extends BaseMapper
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('folder_id', self::TYPE_INTEGER);
+        $this->uses('edit_level', self::TYPE_INTEGER);
+        $this->uses('comment_level', self::TYPE_INTEGER);
         $this->uses('owner_id', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
