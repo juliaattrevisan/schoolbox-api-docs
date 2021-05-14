@@ -690,25 +690,29 @@ class Subnav
                     ],
                     '/adminv2/import/profile'            => [
                         'name'        => 'User Profiles',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
+                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import staff, student, parent and relationship data via CSV files.',
                     ],
                     '/adminv2/import/timetableStructure' => [
                         'name'        => 'Timetable Structure',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
+                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import timetable definition and structure via CSV.',
                     ],
                     '/adminv2/import/timetable'          => [
                         'name'        => 'Timetable',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
+                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import the classes and their periods via CSV.',
                     ],
                     '/adminv2/import/timetableEnrolment' => [
                         'name'        => 'Timetable Enrolment',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get('external_type') === 'schoolbox' &&
+                                         $this->configLoader->get('schooldata_import_data_source') === 'csv',
                         'children'    => [],
                         'description' => 'Import the students and teachers in classes via CSV.',
                     ],
