@@ -412,7 +412,7 @@ OR ml.name        LIKE :keyword
         foreach ($this->filterable as $field) {
             $output = array(
                 'FILTER_ID'          => $field,
-                'FILTER_NAME'        => $field,
+                'FILTER_NAME'        => ucwords($field),
                 'FILTER_PLACEHOLDER' => '', // not used
                 'FILTER_VALUE'       => $this->filter[$field],
             );
