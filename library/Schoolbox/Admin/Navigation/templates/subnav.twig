@@ -13,19 +13,23 @@
     $(function() {
         const mq = window.matchMedia( "(max-width: 950px)" );
         if (mq.matches) {
-            $("[data-parent-item] > a").on('click', function(event) {
+
+            $('[data-admin-subnav-flyout]').css( { display: 'none' } ); //ensure the flyouts open on first selection, as sligeToggle checks for display:none to determine status
+            
+            $("[data-parent-item] > a").on('click', function(event) { //to expand menu items
+                
                 event.preventDefault();
+                
+                let $target = $(this).closest('[data-parent-item]').find("[data-admin-subnav-flyout]").slideToggle(); //toggle selected
 
-                let $target = $(this).closest('[data-parent-item]').find("[data-admin-subnav-flyout]").slideToggle();
-
-                $('[data-admin-subnav-flyout]').not($target).slideUp();
+                $('[data-admin-subnav-flyout]').not($target).slideUp(); //and ensure all others are closed
             });
         }
 
-        $('[data-admin-subnav-dropdown]').on('click', function(event) {
+        $('[data-admin-subnav-dropdown]').on('click', function(event) { //toggle the 'Go to' menu to expand the core menu
             event.preventDefault();
 
-            $('[data-admin]').toggle();
+            $('[data-admin]').slideToggle();
         });
     });
 </script>
@@ -88,7 +92,7 @@
                 {% set parentSelectedCss = 'active' %}
             {% endif %}
 
-            <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
+            <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" {% if parentData.children|length %}data-parent-item{% endif %}>
 
                 {# Only link parent nodes if they have no children
                  # Otherwise rely entirely on the children
