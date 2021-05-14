@@ -9,8 +9,10 @@
 
 namespace Alaress\File\Remote;
 
+use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use DomainException;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 use OutOfBoundsException;
@@ -322,8 +324,11 @@ class GDriveFetcher implements FetcherInterface
             );
             return json_decode($response->getBody()->getContents(), true);
         } catch (GuzzleException $e) {
-            $error = $e->getResponse()->getBody()->getContents();
-            return json_decode($error, true);
+            if ($e instanceof ClientException) {
+                $error = $e->getResponse()->getBody()->getContents();
+                return json_decode($error, true);
+            }
+            throw new DomainException($e);
         }
     }
 
@@ -357,8 +362,11 @@ class GDriveFetcher implements FetcherInterface
             );
             return json_decode($response->getBody()->getContents(), true);
         } catch (GuzzleException $e) {
-            $error = $e->getResponse()->getBody()->getContents();
-            return json_decode($error, true);
+            if ($e instanceof ClientException) {
+                $error = $e->getResponse()->getBody()->getContents();
+                return json_decode($error, true);
+            }
+            throw new DomainException($e);
         }
     }
 
