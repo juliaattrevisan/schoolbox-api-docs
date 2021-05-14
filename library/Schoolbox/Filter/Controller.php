@@ -10,7 +10,11 @@ namespace Schoolbox\Filter;
 use Alaress\Web\Controller\Base as BaseController;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter\Page\AvailabilityChecker;
+use Schoolbox\Filter\Page\LabelBuilder;
+use Schoolbox\Filter\Page\Model as PageModel;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
@@ -102,7 +106,6 @@ class Controller extends BaseController
         $this->getResponse()->content->set($this->buildHtmlOutput('@filters/index.twig', [
             'filtersPerPage'     => $filtersPerPage,
             'pageLabels'         => $this->buildFilteredPageLabels(),
-            'showCourseMarkbook' => $this->getConfigLoader()->get('course_markbook_enable'),
             'ENTITY_ASSESSMENTS' => Assessment\Mapper::class,
             'ENTITY_BADGES'      => Badge\Mapper::class,
             'pageCurrent'        => $this->router->generate('filters.getIndex'),
@@ -289,13 +292,17 @@ class Controller extends BaseController
         });
 
         // Group filters by which pages they appear on
-        $filtersPerPage = [];
+        $availabilityChecker = new AvailabilityChecker($this->getConfigLoader());
+        $filtersPerPage      = [];
         foreach ($visibleFilters as $instance) {
             $class = $instance->getClass();
             foreach ($class::getPages($this->getConfigLoader()) as $page) {
-                $filtersPerPage[$page][$class::getName()] = $instance;
+                if ($availabilityChecker->isAvailable($page)) {
+                    $filtersPerPage[$page][$class::getName()] = $instance;
+                }
             }
         }
+
         return $filtersPerPage;
     }
 
@@ -307,17 +314,17 @@ class Controller extends BaseController
      */
     private function buildFilteredPageLabels(): array
     {
-        $assessmentLocalised = $this->rosettaStone->translate('assessment', true, true);
+        $labelBuilder = new LabelBuilder();
         return [
-            Page\Model::PAGE_PENDING_ASSESSMENTS  => "Pending {$assessmentLocalised}",
-            Page\Model::PAGE_GRADES               => 'Grades',
-            Page\Model::PAGE_CLASS_MARK_BOOK      => 'Class Markbook',
-            Page\Model::PAGE_COURSE_MARK_BOOK     => 'Course Markbook',
-            Page\Model::PAGE_RUBRIC_MARK_BOOK     => 'Rubric Markbook',
-            Page\Model::PAGE_LEARNING_ANALYTICS   => 'Learning Analytics',
-            Page\Model::PAGE_UPCOMING_ASSESSMENTS => "Upcoming Due Work", // intentionally not localised.
-            Page\Model::PAGE_ASSESSMENT_CALENDAR  => "{$assessmentLocalised} Calendar",
-            Page\Model::PAGE_BADGE_LIST           => "Badge List",
+            Page\Model::PAGE_PENDING_ASSESSMENTS  => $labelBuilder->buildLabel(Page\Model::PAGE_PENDING_ASSESSMENTS),
+            Page\Model::PAGE_GRADES               => $labelBuilder->buildLabel(Page\Model::PAGE_GRADES),
+            Page\Model::PAGE_CLASS_MARK_BOOK      => $labelBuilder->buildLabel(Page\Model::PAGE_CLASS_MARK_BOOK),
+            Page\Model::PAGE_COURSE_MARK_BOOK     => $labelBuilder->buildLabel(Page\Model::PAGE_COURSE_MARK_BOOK),
+            Page\Model::PAGE_RUBRIC_MARK_BOOK     => $labelBuilder->buildLabel(Page\Model::PAGE_RUBRIC_MARK_BOOK),
+            Page\Model::PAGE_LEARNING_ANALYTICS   => $labelBuilder->buildLabel(Page\Model::PAGE_LEARNING_ANALYTICS),
+            Page\Model::PAGE_UPCOMING_ASSESSMENTS => $labelBuilder->buildLabel(Page\Model::PAGE_UPCOMING_ASSESSMENTS),
+            Page\Model::PAGE_ASSESSMENT_CALENDAR  => $labelBuilder->buildLabel(Page\Model::PAGE_ASSESSMENT_CALENDAR),
+            Page\Model::PAGE_BADGE_LIST           => $labelBuilder->buildLabel(Page\Model::PAGE_BADGE_LIST),
         ];
     }
 }

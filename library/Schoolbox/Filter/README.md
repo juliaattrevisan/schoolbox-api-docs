@@ -282,6 +282,8 @@ of developing for filters.
 * Update these methods with cases for the new constant:
   * `\Schoolbox\Filter\Controller::buildFilteredPageLabels`
   * `\Schoolbox\Filter\Module::registerRoutes`
+  * `\Schoolbox\Filter\Page\AvailabilityChecker::isAvailable`
+  * `\Schoolbox\Filter\Page\LabelBuilder::buildLabel`
   * `\Schoolbox\Filter\Page\Model::getPageRoleTypes`
 * Update the `getPages` of each [Definition](#definition) implementation that
   you intend the [Page](#page) to use

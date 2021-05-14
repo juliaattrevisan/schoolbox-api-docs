@@ -9,10 +9,6 @@
 
     <div class="admin-content">
         <div class="small-12 island">
-            <h2 class="subheader">Terms</h2>
-        </div>
-
-        <div class="small-12 island">
             <section>
                 <ul class="action-list">
                     {% for term in terms %}
@@ -20,13 +16,13 @@
                     {% endfor %}
                 </ul>
             </section>
-            <a href="#" class="button submit" data-reveal-id="addTermModal">Add Term</a>
+            <a href="#" class="button submit" data-reveal-id="addTermModal">Add Academic Period</a>
         </div>
     </div>
 </div>
 
 <div id="addTermModal" class="reveal-modal" data-reveal aria-labelledby="addTermModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="addTermModalTitle">Add Term</h2>
+    <h2 id="addTermModalTitle">Add Academic Period</h2>
     {% include '@adminTerms/form.twig' %}
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

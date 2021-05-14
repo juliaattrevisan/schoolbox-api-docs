@@ -67,7 +67,6 @@
 </div>
 
 <nav id="admin-nav">
-    <h2 class="subheader">Menu</h2>
     <div id='admin-settings-search'>
         <admin-settings-search />
     </div>
@@ -75,7 +74,7 @@
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
     <ul class="admin side-nav" role="navigation" data-admin>
 
-        {% for parentUrl, parentData in adminSubnav %}
+        {% for parentUrl, parentData in adminSubnav | filter(parentData => parentData.visible) %}
 
             {# Decide if the current node is selected
              #
@@ -93,15 +92,16 @@
                 {# Only link parent nodes if they have no children
                  # Otherwise rely entirely on the children
                  #}
-                {% if parentData.children|length %}
+                {% set children = parentData.children | filter(childData => childData.visible) %}
+                {% if children | length %}
                     <a>{{ parentData.name }}</a>
                 {% else %}
                     <a href="{{ parentUrl }}">{{ parentData.name }}</a>
                 {% endif %}
 
-                {% if parentData.children|length %}
+                {% if children | length %}
                     <ul class="flyout" role="navigation" data-admin-subnav-flyout>
-                        {% for childUrl, childData in parentData.children %}
+                        {% for childUrl, childData in children %}
                             {% set childSelectedCss = '' %}
 
                             {% if childUrl == childSelectedUrl %}

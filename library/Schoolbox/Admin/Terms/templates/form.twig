@@ -14,7 +14,7 @@
 
 {% if term.id ?? false %}
     {% set saveRoute = routeLookup('adminTerms.postUpdateTerm', {id: term.id}) %}
-    {% set saveValue = 'Update Term' %}
+    {% set saveValue = 'Update Academic Period' %}
     {% set saveType  = 'update' %}
 {% else %}
     {% set saveRoute = routeLookup('adminTerms.postCreateTerm') %}

@@ -328,7 +328,7 @@ class Report_Login extends Report_Abstract implements Report_IReport
         foreach ($this->filterable as $field => $pholder) {
             $output = array(
                 'FILTER_ID'          => $field,
-                'FILTER_NAME'        => $field,
+                'FILTER_NAME'        => ucwords($field),
                 'FILTER_PLACEHOLDER' => $pholder,
                 'FILTER_VALUE'       => $this->filter[$field],
             );
