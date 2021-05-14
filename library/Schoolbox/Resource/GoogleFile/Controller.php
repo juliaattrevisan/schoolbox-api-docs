@@ -127,11 +127,8 @@ class Controller extends Base
         $editAccessLevel    = (int)$this->request->post->get('gfileEdit');
         $commentAccessLevel = (int)$this->request->post->get('gfileComment');
 
-        $proxy         = new Server($this->getConfigLoader());
         $gDriveFetcher = new GDriveFetcher(
-            null,
-            null,
-            $proxy->curlInit(),
+            $this->getConfigLoader(),
             $this->request->post->get('tokenType') . ' ' . $this->request->post->get('accessToken'),
             false
         );
@@ -153,6 +150,8 @@ class Controller extends Base
                            ->setName($selectedFile['name'])
                            ->setIcon($selectedFile['icon'])
                            ->setUrl('')
+                           ->setEditLevel($editAccessLevel)
+                           ->setCommentLevel($commentAccessLevel)
                            ->setOwnerId($this->getUser()->getId());
                 $this->googleFileMapper->save($googleFile);
                 // provide access to google doc via api
@@ -164,7 +163,7 @@ class Controller extends Base
                 $meta = $gDriveFetcher->fetchMetaData($selectedFile['id']);
                 $googleFile->setUrl($meta['webViewLink']);
                 $this->googleFileMapper->save($googleFile);
-            } catch (MapperException $e) {
+            } catch (\DomainException | MapperException $e) {
                 $errors[] = "Failed to save : " . $e->getMessage();
             }
         }
