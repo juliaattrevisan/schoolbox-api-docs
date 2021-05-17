@@ -130,7 +130,7 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function parentLounge()
     {
-        $this->redirectToTassProduct('PL', $this->appCodes['parentLounge'], '/ParentLounge/PIALogin.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
+        $this->redirectToTassProduct('PL', $this->appCodes['parentLounge'], '/parentlounge/login.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
     }
 
     /**
@@ -152,7 +152,7 @@ class Controller extends Alaress\Web\Controller\Base
      */
     public function teacherKiosk()
     {
-        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
+        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/login.cfm', $this->getDeepLinkV2(), $this->getProdMenu());
     }
 
 
@@ -174,7 +174,7 @@ class Controller extends Alaress\Web\Controller\Base
             'do'        => 'kiosk.students.main.student.details',
             'stud_code' => $student->getExternalId(),
         ];
-        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/TIALogin.cfm', $deepLinkV2, true, $deepLinkV1);
+        $this->redirectToTassProduct('TIA', $this->appCodes['teacherKiosk'], '/kiosk/login.cfm', $deepLinkV2, true, $deepLinkV1);
     }
 
 
