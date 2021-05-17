@@ -335,7 +335,6 @@ class Factory
                     $this->getMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
-                    $this->getSelfReviewable(),
                     $this->getSimilarityCheckEnabled(),
                     $originalDueWork
                 );

@@ -49,7 +49,6 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param float|null   $maxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
-     * @param string|null  $selfReviewable
      * @param bool         $similarityCheckEnabled
      * @param DueWork|null $original
      */
@@ -63,7 +62,6 @@ class CourseManagedDecorator implements DecoratorInterface
         ?float $maxMark,
         ?array $rubricData,
         array $attachedFiles,
-        ?string $selfReviewable,
         bool $similarityCheckEnabled,
         ?DueWork $original
     ) {
@@ -76,7 +74,6 @@ class CourseManagedDecorator implements DecoratorInterface
         $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
-        $this->setSelfReviewable($selfReviewable);
         $this->setSimilarityCheckEnabled($similarityCheckEnabled);
         $this->original = $original;
     }
@@ -92,13 +89,6 @@ class CourseManagedDecorator implements DecoratorInterface
      */
     public function decorate($assessment)
     {
-        if ($this->getSelfReviewable() !== null) {
-            // Something has come through from post, set to that
-            $assessment->setSelfReviewability($this->getSelfReviewable());
-        } elseif ($assessment->getSelfReviewability() === null) {
-            // $assessment doesn't have an existing setting - set to default
-            $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
-        } // Otherwise let the existing setting persist
 
         /* If there were attachments, accumulate them
          * Otherwise set attachedFiles to an empty collection
