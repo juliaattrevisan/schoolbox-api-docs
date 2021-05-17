@@ -123,8 +123,12 @@ class Controller extends Base
         }
 
         $selectedFiles      = json_decode($googleIdString, true);
-        $editAccessLevel    = (int)$this->request->post->get('gfileEdit');
-        $commentAccessLevel = (int)$this->request->post->get('gfileComment');
+        $editAccessLevel    = is_numeric($this->request->post->get('gfileEdit')) ? (int)$this->request->post->get('gfileEdit') : null;
+        $commentAccessLevel = is_numeric($this->request->post->get('gfileComment')) ? (int)$this->request->post->get('gfileComment') : null;
+        if (!$editAccessLevel || !$commentAccessLevel) {
+            $this->getResponse()->redirect->afterPost('/homepage/' . $folder->getId());
+            return;
+        }
 
         $gDriveFetcher = new GDriveFetcher(
             $this->getConfigLoader(),

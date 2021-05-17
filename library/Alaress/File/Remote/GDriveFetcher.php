@@ -9,7 +9,6 @@
 
 namespace Alaress\File\Remote;
 
-use Doctrine\Instantiator\Exception\InvalidArgumentException;
 use DomainException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -161,11 +160,8 @@ class GDriveFetcher implements FetcherInterface
 
             try {
                 $response = $this->client->get($url);
-                if ($response->getStatusCode() !== 200) {
-                    throw new DomainException("Failed to get metadata for file: {$fileId}");
-                }
             } catch (GuzzleException $e) {
-                throw new DomainException($e);
+                throw new DomainException("Failed to get metadata for file: {$fileId}", 0, $e);
             }
 
             $fetchedMetaData = json_decode($response->getBody(), true);
@@ -284,7 +280,7 @@ class GDriveFetcher implements FetcherInterface
             $response = $this->client->get($url);
             return json_decode($response->getBody(), true);
         } catch (GuzzleException $e) {
-            throw new DomainException($e);
+            throw new DomainException("Failed to list permission for {$fileId}", 0, $e);
         }
     }
 
@@ -328,7 +324,7 @@ class GDriveFetcher implements FetcherInterface
                 $error = $e->getResponse()->getBody()->getContents();
                 return json_decode($error, true);
             }
-            throw new DomainException($e);
+            throw new DomainException("Failed to list permission for {$fileId}", 0, $e);
         }
     }
 
@@ -366,7 +362,7 @@ class GDriveFetcher implements FetcherInterface
                 $error = $e->getResponse()->getBody()->getContents();
                 return json_decode($error, true);
             }
-            throw new DomainException($e);
+            throw new DomainException("Failed to update permission for {$fileId}", 0, $e);
         }
     }
 
@@ -436,7 +432,7 @@ class GDriveFetcher implements FetcherInterface
         try {
             $this->client->get($url, [RequestOptions::SINK => $fp]);
         } catch (GuzzleException $e) {
-            throw new DomainException($e);
+            throw new DomainException("Failed to download {$fileId}", 0, $e);
         }
 
         if (mime_content_type($destination) === 'application/json') {
