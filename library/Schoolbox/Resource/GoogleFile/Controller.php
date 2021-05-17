@@ -171,8 +171,11 @@ class Controller extends Base
                     );
                 }
                 $meta = $gDriveFetcher->fetchMetaData($selectedFile['id']);
-                $googleFile->setUrl($meta['webViewLink']);
-                $googleFile->setName($meta['name']);
+                $googleFile
+                    ->setUrl($meta['webViewLink'])
+                    ->setName($meta['name'])
+                    ->setEditLevel($editAccessLevel)
+                    ->setCommentLevel($commentAccessLevel);
                 $this->googleFileMapper->save($googleFile);
             } catch (\DomainException | MapperException $e) {
                 $errors[] = "Failed to save : " . $e->getMessage();
