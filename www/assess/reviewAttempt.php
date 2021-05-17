@@ -41,7 +41,7 @@ foreach ($_POST['selectedIds'] as $currentAttempt) {
         $actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
 
 
-        if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $this->getDi()->get('assessmentDataSource')->findByQuizId($attempt['assess_id'], $user))) {
+        if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $this->getDi()->get('assessmentDataSource')->findByQuizId($attempt['assess_id']))) {
             $this->pageNotFound();
         }
 
@@ -73,4 +73,3 @@ foreach ($allAttempts as $currentAttempt) {
 }
 header('Content-Type: application/json');
 die(json_encode($data));
-
