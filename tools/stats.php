@@ -106,7 +106,7 @@ $app = new class extends CliTool\App {
 
             //News
             'news_posts'    => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null',
-            'news_posts_comments_allowed'   => 'SELECT count(*) FROM comms_news_article WHERE deleted_at is null AND comments_allowed = 1',
+            'news_posts_comments_allowed'   => 'SELECT COUNT(*) FROM discussion_thread dt INNER JOIN comms_news_article cna ON dt.id = cna.discussion_thread_id WHERE cna.deleted_at IS NULL',
             'news_comments' => 'SELECT count(*) FROM comms_news_article JOIN discussion_thread ON discussion_thread_id = discussion_thread.id AND comms_news_article.deleted_at is null JOIN discussion_thread_comment ON discussion_thread.id = discussion_thread_comment.discussion_thread_id WHERE discussion_thread_comment.deleted_at IS NULL',
             'news_saveforlater' => 'SELECT count(*) FROM comms_news_saveforlater WHERE deleted_at IS NULL',
             'news_files'        => 'SELECT count(*) FROM comms_news_article_file WHERE deleted_at IS NULL',
