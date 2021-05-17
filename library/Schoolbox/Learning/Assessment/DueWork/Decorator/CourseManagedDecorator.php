@@ -49,7 +49,6 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param float|null   $maxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
-     * @param bool         $similarityCheckEnabled
      * @param DueWork|null $original
      */
     public function __construct(
@@ -62,7 +61,6 @@ class CourseManagedDecorator implements DecoratorInterface
         ?float $maxMark,
         ?array $rubricData,
         array $attachedFiles,
-        bool $similarityCheckEnabled,
         ?DueWork $original
     ) {
         $this->setMarkType(trim($markType));
@@ -74,7 +72,6 @@ class CourseManagedDecorator implements DecoratorInterface
         $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
-        $this->setSimilarityCheckEnabled($similarityCheckEnabled);
         $this->original = $original;
     }
 
@@ -110,9 +107,5 @@ class CourseManagedDecorator implements DecoratorInterface
         }
 
         $assessment->setAttachedFiles($newList);
-
-        /* Similarity Check
-         */
-        $assessment->setSimilarityCheckEnabled($this->getSimilarityCheckEnabled());
     }
 }
