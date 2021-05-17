@@ -85,8 +85,6 @@ class Controller extends Base
              * for use in a metadata elsewhere, so we can reuse that fact here by
              * artificially representing the number of files without having the actual
              * files themselves with all their mimes etc.
-             *
-             * $article->getAttachedFiles()->add(true);
              */
             $article->setAttachedFilesCount($attachmentCounts[$article->getId()] ?? 0);
         }
