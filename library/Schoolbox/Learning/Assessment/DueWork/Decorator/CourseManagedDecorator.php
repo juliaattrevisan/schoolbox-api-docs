@@ -40,7 +40,6 @@ class CourseManagedDecorator implements DecoratorInterface
     /**
      * Decorator constructor.
      *
-     * @param int          $acceptOnline
      * @param int          $markType
      * @param int          $gradingScheme
      * @param bool         $useRubric
@@ -50,12 +49,9 @@ class CourseManagedDecorator implements DecoratorInterface
      * @param float|null   $maxMark
      * @param array|null   $rubricData
      * @param array        $attachedFiles
-     * @param string|null  $selfReviewable
-     * @param bool         $similarityCheckEnabled
      * @param DueWork|null $original
      */
     public function __construct(
-        int $acceptOnline,
         int $markType,
         int $gradingScheme,
         bool $useRubric,
@@ -65,11 +61,8 @@ class CourseManagedDecorator implements DecoratorInterface
         ?float $maxMark,
         ?array $rubricData,
         array $attachedFiles,
-        ?string $selfReviewable,
-        bool $similarityCheckEnabled,
         ?DueWork $original
     ) {
-        $this->setAcceptOnline(trim($acceptOnline));
         $this->setMarkType(trim($markType));
         $this->setGradingScheme(trim($gradingScheme));
         $this->setUseRubric(trim($useRubric));
@@ -79,8 +72,6 @@ class CourseManagedDecorator implements DecoratorInterface
         $this->setMaxMark($maxMark);
         $this->setRubricData($rubricData);
         $this->setAttachedFiles($attachedFiles);
-        $this->setSelfReviewable($selfReviewable);
-        $this->setSimilarityCheckEnabled($similarityCheckEnabled);
         $this->original = $original;
     }
 
@@ -95,23 +86,6 @@ class CourseManagedDecorator implements DecoratorInterface
      */
     public function decorate($assessment)
     {
-        if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_NONE) {
-            $assessment->setAcceptsNone();
-        }
-        else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
-            $assessment->setAcceptsSingle();
-        }
-        else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
-            $assessment->setAcceptsMultiple();
-        }
-
-        if ($this->getSelfReviewable() !== null) {
-            // Something has come through from post, set to that
-            $assessment->setSelfReviewability($this->getSelfReviewable());
-        } elseif ($assessment->getSelfReviewability() === null) {
-            // $assessment doesn't have an existing setting - set to default
-            $assessment->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE);
-        } // Otherwise let the existing setting persist
 
         /* If there were attachments, accumulate them
          * Otherwise set attachedFiles to an empty collection
@@ -133,9 +107,5 @@ class CourseManagedDecorator implements DecoratorInterface
         }
 
         $assessment->setAttachedFiles($newList);
-
-        /* Similarity Check
-         */
-        $assessment->setSimilarityCheckEnabled($this->getSimilarityCheckEnabled());
     }
 }

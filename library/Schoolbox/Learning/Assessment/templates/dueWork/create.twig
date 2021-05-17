@@ -102,22 +102,37 @@
     <div class="row">
         <div class="medium-6 columns">
             <label for="acceptOnline">Accepts Online Submissions?</label>
-            <select name="acceptOnline" id="acceptOnline">
+            <select name="acceptOnline" id="acceptOnline" {% if courseManaged.isReadonly %}readonly{% endif %}>
                 {% set options = {
-                0: 'None',
-                1: 'Single',
-                2: 'Multiple'
+                    0: 'None',
+                    1: 'Single',
+                    2: 'Multiple'
                 } %}
                 {% for index, title in options %}
-                    <option value="{{ index }}"{% if assessment.acceptOnline == index %} selected="selected"{% endif %}>{{ title }}</option>
+                    <option value="{{ index }}"
+                        {% if assessment.acceptOnline == index %}
+                            selected="selected"
+                        {% elseif courseManaged.isReadonly %}
+                            disabled
+                        {% endif %}
+                    >{{ title }}</option>
                 {% endfor %}
             </select>
         </div>
 
         <div class="medium-6 columns" id="similarityRow"{% if not assessment.acceptOnline %} style="display: none"{% endif %}>
+            <input type="hidden" name="similarityCheckEnabled" value="{% if assessment.courseManaged %}{{ assessment.similarityCheckEnabled }}{% else %}0{% endif %}" />
+
             <label for="similarityCheckEnabled">Similarity Check</label> <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span>
             <div class="switch">
-                <input id="similarityCheckEnabled" name="similarityCheckEnabled" type="checkbox" {{ assessment.similarityCheckEnabled ? 'checked' : '' }}>
+                <input id="similarityCheckEnabled"
+                       name="similarityCheckEnabled"
+                       type="checkbox"
+                        {{ assessment.similarityCheckEnabled ? 'checked' : '' }}
+                        {% if courseManaged.isReadonly %}
+                            disabled
+                        {% endif %}
+                >
                 <label for="similarityCheckEnabled">
                     <span>On</span>
                     <span>Off</span>
@@ -144,10 +159,16 @@
 
     {% if selfAssessmentEnabled %}
         <label>{{ locale.selfReflection.proper }} <span data-tooltip class="hint has-tip tip-top"  title="Enabling '{{ locale.selfReflection.proper }}' allows students to reflect on their work with a comment, and rubric if provided. Also enabling '{{ locale.selfAssessment.proper }}' gives students the ability to provide themselves a grade.">?</span>
-            <select name="self_reviewable">
-                <option value="{{ selfReviewTypes.none }}" {% if assessment.selfReviewability == selfReviewTypes.none %}selected{% endif %}>None</option>
-                <option value="{{ selfReviewTypes.reflect }}" {% if assessment.selfReviewability == selfReviewTypes.reflect %}selected{% endif %}>{{ locale.selfReflection.proper }}</option>
-                <option value="{{ selfReviewTypes.full }}" {% if assessment.selfReviewability == selfReviewTypes.full %}selected{% endif %}>{{ locale.selfReflection.proper ~ ' + ' ~ locale.selfAssessment.proper }}</option>
+            <select name="self_reviewable" {% if courseManaged.isReadonly %}readonly{% endif %}>
+                {% for selfReviewType in selfReviewTypes %}
+                    <option value="{{ selfReviewType.value }}"
+                        {% if assessment.selfReviewability == selfReviewType.value %}
+                            selected
+                        {% elseif courseManaged.isReadonly %}
+                            disabled
+                        {% endif %}
+                    >{{ selfReviewType.label }}</option>
+                {% endfor %}
             </select>
         </label>
     {% endif %}

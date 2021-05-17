@@ -356,30 +356,42 @@
  # ...so just boot it off your screen instead. I'm sure people will laugh, but whatevers
  # Show an informative instead
  #}
-{% set viewportStyle = '' %}
-
 {% if courseManagedReadonly %}
-    {% set viewportStyle = 'position:absolute;margin-left:-9999px;' %}
-{% endif %}
+    <div class="row">
+        <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}">
+            <div class="small-12 columns no-pad">
 
-{% if courseManagedReadonly %}
-    <div class="alert-box warning">This rubric can only be modified via the course.</div>
-{% endif %}
-
-<div class="row" style="{{ viewportStyle }}">
-    <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
-        <div class="small-12 columns no-pad">
-            <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
-        </div>
-        <div class="small-12 columns no-pad">
-            {% include '@rubric/grid-csv.twig' with {
-                rubricGrid: rubricGrid,
-                attachzone: rubricAttachZone,
-                folderId: assessment.context.folder.id,
-                usingMarkPerCapability: assessment.isMarkPerCapability,
-                usingMarkRange: assessment.useMarkRange,
-                idSuffix: idSuffix ?? '',
-            } only %}
+                {% include '@rubric/grid.twig' with {
+                    rubricGrid: rubricGrid,
+                    folderId: assessment.context.folder.id,
+                    usingMarkPerCapability: assessment.isMarkPerCapability,
+                    usingMarkRange: assessment.useMarkRange,
+                    idSuffix: idSuffix ?? '',
+                    showRubricTotal: true,
+                    showGroupTotal: assessment.markPerCapability,
+                    rubricMarkedGrid: false,
+                    showDescriptorValue: true
+                } only %}
+            </div>
         </div>
     </div>
-</div>
+{% else %}
+    <div class="row">
+        <div id="rubric-section" class="small-12 columns{% if not assessment.useRubric %} hide{% endif %}" data-hide-watch="#useRubric">
+            <div class="small-12 columns no-pad">
+                <a href="#" id="apply-resultset" class="button">Apply Result Set</a>
+            </div>
+            <div class="small-12 columns no-pad">
+                {% include '@rubric/grid-csv.twig' with {
+                    rubricGrid: rubricGrid,
+                    attachzone: rubricAttachZone,
+                    folderId: assessment.context.folder.id,
+                    usingMarkPerCapability: assessment.isMarkPerCapability,
+                    usingMarkRange: assessment.useMarkRange,
+                    idSuffix: idSuffix ?? '',
+                } only %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+

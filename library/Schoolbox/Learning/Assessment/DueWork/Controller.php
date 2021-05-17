@@ -22,6 +22,7 @@ use PDOException;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
+use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
@@ -1227,6 +1228,8 @@ class Controller extends Assessment\Controller
     {
         $zoneFactory = new Assessment\Attachzone\Factory();
 
+        $stoneFactory = (new RosettaStoneFactory())->build(\Schoolbox\L10n\Mapper::getInstance());
+
         // setup some data...
         $data = [
             'acceptingResponses' => true,
@@ -1234,9 +1237,22 @@ class Controller extends Assessment\Controller
             'allMarkTypes'       => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'    => $this->getAllGradeSchemes(),
             'selfReviewTypes'    => [
-                'none'    => SubmissionBox::SELF_REVIEWABILITY_NONE,
-                'reflect' => SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY,
-                'full'    => SubmissionBox::SELF_REVIEWABILITY_FULL,
+                'none'    => [
+                    'value' => SubmissionBox::SELF_REVIEWABILITY_NONE,
+                    'label' => 'None',
+                ],
+                'reflect' => [
+                    'value' => SubmissionBox::SELF_REVIEWABILITY_REFLECT_ONLY,
+                    'label' => $stoneFactory->translate('selfReflection', false, true)
+                ],
+                'full' => [
+                    'value' => SubmissionBox::SELF_REVIEWABILITY_FULL,
+                    'label' => sprintf(
+                        '%s + %s',
+                        $stoneFactory->translate('selfReflection', false, true),
+                        $stoneFactory->translate('selfAssessment', false, true)
+                    )
+                ],
             ],
         ];
 

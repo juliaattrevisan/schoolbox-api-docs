@@ -326,7 +326,6 @@ class Factory
              */
             if ($courseManagedFields->isReadonly()) {
                 $decorator = new DueWorkCourseManagedDecorator(
-                    $this->getAcceptOnline(),
                     $this->getMarkType(),
                     $this->getGradingScheme(),
                     $this->getUseRubric(),
@@ -336,8 +335,6 @@ class Factory
                     $this->getMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
-                    $this->getSelfReviewable(),
-                    $this->getSimilarityCheckEnabled(),
                     $originalDueWork
                 );
             } else {
