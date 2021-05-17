@@ -911,7 +911,7 @@ class Controller extends Base
                 'name',
                 'slug',
                 'sequence'
-            ]
+            ],
         ];
 
         // Link auth requires hydrated audiences
@@ -933,7 +933,11 @@ class Controller extends Base
             new PropertyDecorator(
                 $map,
                 new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
-                new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)),
+                new BlurbDecorator(
+                    $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                    $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                    $attachmentCounts
+                ),
                 new MetadataDecorator($commentCounts),
                 new AttachmentDecorator($attachmentCounts)
             )
@@ -1252,9 +1256,20 @@ class Controller extends Base
 
         $this->hydrateArticleAudiences($articles);
 
+        /* Attachment counts for each article in this set
+         */
+        $attachmentCounts = $this->fileMapper->findCounts($articles->getPropertyValues('id'));
+
         $articles->reindex();
         $articles = $articles->jsonSerialize(
-            new PropertyDecorator($map, new LinkDecorator($this->router, $this->authorizer, $this->getUser()), new BlurbDecorator($this->getConfigLoader()->get(ConfigMapper::_READ_MORE)))
+            new PropertyDecorator(
+                $map,
+                new LinkDecorator($this->router, $this->authorizer, $this->getUser()),
+                new BlurbDecorator(
+                    $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
+                    $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
+                    $attachmentCounts
+                ))
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
@@ -1456,12 +1471,6 @@ class Controller extends Base
          */
         if ($this->isNewsModerator()) {
             $article->setSticky((bool)$postData['sticky']);
-        }
-
-        // Only set comments allowed if the value is passed in the form,
-        // and the feature is enabled
-        if (isset($postData['commentsAllowed']) && $this->getConfigLoader()->get('comms_comments_enabled')) {
-            $article->setCommentsAllowed((bool)$postData['commentsAllowed']);
         }
 
         // Exception thrown when an invalid date is submitted; use last known value instead

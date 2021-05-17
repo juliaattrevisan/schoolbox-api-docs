@@ -109,7 +109,7 @@ abstract class Base
     /**
      * @var bool
      */
-    private $commentsIsEnabled;
+    protected $commentsIsEnabled;
 
 
     /**

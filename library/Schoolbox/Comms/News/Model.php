@@ -120,11 +120,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     private $submittedAt;
 
     /**
-     * @var bool
-     */
-    private $commentsAllowed;
-
-    /**
      * The person who allowed this article to be published
      *
      * @var User|null
@@ -200,6 +195,19 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     protected $attachedFiles;
 
+
+    /**
+     * Specifically cache the count of $attachedFiles
+     *
+     * This is used in ReadMore calculations which require a count of files, but doesn't
+     * need the files themselves. Hydrating all the files simply to count them is extreme
+     * and might result in slowness especially in vue where we can load heaps of stuff at
+     * a time, instead of small paginated chunks like in other places. To get around this
+     * we can cache the count of attachedFiles with an arbitrary int instead
+     *
+     * @var int|null
+     */
+    protected ?int $attachedFilesCount = null;
 
     /**
      * Model constructor.
@@ -890,26 +898,6 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
 
 
     /**
-     * @return null|bool
-     */
-    public function getCommentsAllowed(): ?bool
-    {
-        return $this->commentsAllowed;
-    }
-
-
-    /**
-     * @param bool $commentsAllowed
-     * @return static
-     */
-    public function setCommentsAllowed(bool $commentsAllowed): self
-    {
-        $this->commentsAllowed = $commentsAllowed;
-        return $this;
-    }
-
-
-    /**
      * @return null|User
      */
     public function getAcceptedBy(): ?User
@@ -1156,6 +1144,27 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
     public function setAttachedFiles($attachedFiles)
     {
         $this->attachedFiles = $attachedFiles;
+        $this->attachedFilesCount = $attachedFiles->count();
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getAttachedFilesCount(): ?int
+    {
+        return $this->attachedFilesCount;
+    }
+
+
+    /**
+     * @param int|null $attachedFilesCount
+     * @return Model
+     */
+    public function setAttachedFilesCount(?int $attachedFilesCount): self
+    {
+        $this->attachedFilesCount = $attachedFilesCount;
         return $this;
     }
 }

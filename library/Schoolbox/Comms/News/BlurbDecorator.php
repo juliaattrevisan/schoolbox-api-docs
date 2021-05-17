@@ -4,27 +4,52 @@
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
-
 namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Decorator\IDecorator;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use TextFormatter;
 use Scrub;
 
+
+/**
+ * Class BlurbDecorator
+ *
+ * Add blurb-related parts, such as the blurb itself, and any Read More link behaviours
+ *
+ * @package Schoolbox\Comms\News
+ */
 class BlurbDecorator implements IDecorator
 {
 
     /**
      * @var string
      */
-    private $readmore;
+    private string $readMore;
+
 
     /**
-     * @param string     $readmore
+     * @var bool
      */
-    public function __construct($readmore)
+    private bool $commentsAllowed;
+
+
+    /**
+     * @var array
+     */
+    private array $attachmentCounts;
+
+
+    /**
+     * @param string $readMore
+     * @param bool   $commentsAllowed
+     * @param array  $attachmentCounts
+     */
+    public function __construct(string $readMore, bool $commentsAllowed, array $attachmentCounts)
     {
-        $this->readmore = $readmore;
+        $this->readMore = $readMore;
+        $this->commentsAllowed = $commentsAllowed;
+        $this->attachmentCounts = $attachmentCounts;
     }
 
 
@@ -40,27 +65,21 @@ class BlurbDecorator implements IDecorator
             return $json;
         }
 
-        if (strlen(strip_tags($model->getBlurb())) == 0) {
+        if (strip_tags($model->getBlurb()) === '') {
             $json['blurb'] = TextFormatter::cutSentence(Scrub::html2text($model->getBody()), 300);
         }
-       
-        $json['readmore'] = [
-            'string' => '',
-            'available' => false
-        ];
 
-        // Show 'read more' link if a body exists, and 'read more' text exists,
-        // Or just set readmore to available if body exists (for links from title and feature image)
-        if ($model->getBody()) {
-            if (\strlen($this->readmore)) {
-                $json['readmore'] = [
-                    'string' => $this->readmore,
-                    'available' => true
-                ];
-            } else {
-                $json['readmore']['available'] = true;
-            }
-        }
+        /* Attachments aren't actually hydrated in $model, but we got the counts
+         * for use in a metadata elsewhere, so we can reuse that fact here by
+         * artificially representing the number of files without having the actual
+         * files themselves with all their mimes etc.
+         */
+        $model->setAttachedFilesCount($this->attachmentCounts[$model->getId()] ?? 0);
+
+        /* Decide if a Read More link is available; it depends on characteristics
+         * of the article and some admin config vars
+         */
+        $json['readMore'] = (new ReadMore($this->readMore, $this->commentsAllowed))->generateForArticle($model);
 
         return $json;
     }

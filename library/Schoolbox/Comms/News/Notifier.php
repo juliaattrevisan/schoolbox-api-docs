@@ -15,10 +15,13 @@ use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\IUserResolver;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model as Article;
 use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
 use Schoolbox\Comms\News\Moderation\UserResolver as ModeratorResolver;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
@@ -61,6 +64,13 @@ class Notifier extends AbstractModuleNotifier
     private $userMapper;
 
     /**
+     * For derivations using the quantity of attached files
+     *
+     * @var File\Mapper
+     */
+    private \Schoolbox\Comms\News\File\Mapper $fileMapper;
+
+    /**
      * Prefix generator, for creating a fallback thumbnail
      */
     private PrefixGenerator $prefixGenerator;
@@ -89,6 +99,7 @@ class Notifier extends AbstractModuleNotifier
             'setAudienceResolver'  => $userResolver,
             'setModeratorResolver' => $moderatorResolver,
             'setPrefixGenerator'   => $di->lazyGet('cdnPrefixGenerator'),
+            'setFileMapper'        => $mf->getLazy(\Schoolbox\Comms\News\File\Mapper::class)
         ];
     }
 
@@ -144,6 +155,15 @@ class Notifier extends AbstractModuleNotifier
     public function setPrefixGenerator(PrefixGenerator $prefixGenerator)
     {
         $this->prefixGenerator = $prefixGenerator;
+    }
+
+
+    /**
+     * @param File\Mapper $fileMapper
+     */
+    public function setFileMapper(\Schoolbox\Comms\News\File\Mapper $fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
     }
 
     /**
@@ -579,10 +599,26 @@ class Notifier extends AbstractModuleNotifier
         $shortDate  = $activeDate->getDateOnly();
         $authorName = $author->formatName();
 
-
         $bob = new Builder();
 
         $notifBody = strlen($article->getBlurb()) > 0 ? $article->getBlurb() : $article->getBody();
+
+        /* Attachments aren't actually hydrated in $article
+         * Artificially represent the number of files without having the actual
+         * files themselves with all their mimes etc.
+         *
+         * $article->getAttachedFiles()->add(true);
+         */
+        $attachmentCounts = $this->fileMapper->findCounts([$article->getId()]);
+
+        $article->setAttachedFilesCount($attachmentCounts[$article->getId()] ?? 0);
+
+        /* Decide if you can have a Read More link; shank it on the end if you can
+         */
+        $readMoreString = $this->conf->get(ConfigMapper::_READ_MORE);
+        $commentsIsEnabled = $this->conf->get(ConfigMapper::COMMS_COMMENTS_ENABLED);
+
+        $readMore = (new ReadMore($readMoreString, $commentsIsEnabled))->generateForArticle($article);
 
         $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setParams(
@@ -599,11 +635,12 @@ class Notifier extends AbstractModuleNotifier
             ->addTopic("news.$articleId." . ($update ? self::TRIGGER_UPDATED : self::TRIGGER_POSTED))
             // body and byline are optional, but recommended since they render out in emails
             ->setMeta([
-                'title'  => $heading,
-                'author' => $authorName,
-                'date'   => $activeDate->getLong(),
-                'thumb'  => $thumb,
-                'blurb'  => $article->getBlurb(),
+                'title'    => $heading,
+                'author'   => $authorName,
+                'date'     => $activeDate->getLong(),
+                'thumb'    => $thumb,
+                'blurb'    => $article->getBlurb(),
+                'readMore' => $readMore
             ])
             ->setBody($notifBody)
             ->setByline("$shortDate by $authorName")

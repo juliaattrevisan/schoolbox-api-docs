@@ -8,11 +8,13 @@ namespace Schoolbox\Comms\News\Lists;
 
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
 use Schoolbox\Comms\News\Statistics\Interactions;
 use Schoolbox\Comms\News\Statistics\Mapper;
+use Schoolbox\Comms\News\ValidHasReadMore;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
@@ -114,10 +116,15 @@ class Homepage extends Base
             $articles[$rootSegment->getCommsNewsArticle()->getId()]->getAudience()[$rootSegment->getId()] = $rootSegment;
         }
 
+        /* Build a lookup of Read More links for each article id, which aren't json but
+         * Model instances that don't comprehend the Read More status like this
+         */
+        $readMores = (new ReadMore($this->readMoreText, $this->commentsIsEnabled))->generate($articles);
+
         return [
             'articles' => $this->populateMetadata($articles),
             'attachmentCounts' => $attachmentCounts,
-            'readMore' => $this->readMoreText,
+            'readMores' => $readMores,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $this->findSavedArticles($user, $this->saveForLaterEnabled),
             'unsaved' => SaveForLater\Mapper::UNSAVED,

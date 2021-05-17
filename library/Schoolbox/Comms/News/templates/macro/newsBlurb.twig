@@ -7,23 +7,8 @@
             {% set blurb = article.body|striptags|cutSentence(300, true)  %}
         {% endif %}
 
-        {# If there's more of the article to read:
-            - If read_more policy has a value, use that for the link text;
-            - Otherwise just append ellipses to the blurb
-         #}
         {# TODO when everywhere gets refactored into Vue, make sure that margin-top: .5rem is always applied to .article-read-more AND blurb is always in a single <p> tag #}
-        {% if article.body|length %}
-            {% if readMore|length %}
-                {% set detailUrl = routeLookup('commsNews.getDetail', {articleId: article.id}) %}
-                {% set readMoreLink = '<div class="article-read-more"><a href="' ~ detailUrl ~ '" title="Read more">' ~ readMore ~ '</a></div>' %}
-            {% endif %}
-        {% endif %}
 
         {{ blurb|purify }}
-
-        {% if article.body|length and readMore|length %}
-            {{ readMoreLink|trim|purify }}
-        {% endif %}
-
     {% endapply %}
 {% endmacro %}

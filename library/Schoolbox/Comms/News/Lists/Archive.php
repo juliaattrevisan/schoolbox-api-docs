@@ -12,10 +12,12 @@ use InvalidArgumentException;
 use OutOfRangeException;
 use PDOException;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
+use Schoolbox\Comms\News\ValidHasReadMore;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
 use UnderflowException;
@@ -131,17 +133,26 @@ class Archive extends Base
         /* Disregard the sticky bit for each article in the Archive
          */
         foreach ($articles as $article) {
+
+            /* Artificially represent the presence of one or more files without having to hydrate them
+             */
+            $article->setAttachedFilesCount($attachmentCounts[$article->getId()] ?? 0);
             $article->setSticky(false);
         }
 
         // Figure out the articles that this user has saved for later
         $savedArticleIds = $this->findSavedArticles($user, $this->saveForLaterEnabled);
 
+        /* Build a lookup of Read More links for each article id, which aren't json but
+         * Model instances that don't comprehend the Read More status like this
+         */
+        $readMores = (new ReadMore($this->readMoreText, $this->commentsIsEnabled))->generate($articles);
+
         // These pieces are needed to represent an article, due to Save For Later
         return [
             'articles' => $this->populateMetadata($articles),
             'attachmentCounts' => $attachmentCounts,
-            'readMore' => $this->readMoreText,
+            'readMores' => $readMores,
             'saveForLater' => $this->saveForLaterEnabled,
             'savedArticleIds' => $savedArticleIds,
             'unsaved' => SaveForLater\Mapper::UNSAVED,

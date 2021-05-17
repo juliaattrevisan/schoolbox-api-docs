@@ -226,8 +226,8 @@
                         </div>
                         <article>
                             <div v-html="article.blurb"></div>
-                            <div v-if="article.readmore.available" class="article-read-more">
-                                <a :href="article._links.self.href">{{ article.readmore.string }}</a>
+                            <div v-if="article.readMore.available" class="article-read-more">
+                                <a :href="article._links.self.href">{{ article.readMore.string }}</a>
                             </div>
                         </article>
                         <nav>
