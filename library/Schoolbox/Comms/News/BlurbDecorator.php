@@ -7,6 +7,7 @@
 namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Decorator\IDecorator;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use TextFormatter;
 use Scrub;
 
@@ -91,10 +92,7 @@ class BlurbDecorator implements IDecorator
         /* Decide if a Read More link is available; it depends on characteristics
          * of the article and some admin config vars
          */
-        $json['readMore'] = [
-            'string' => $this->readMore,
-            'available' => (new ValidHasReadMore())->isSatisfiedBy($model, $this->readMore, $this->commentsAllowed)
-        ];
+        $json['readMore'] = (new ReadMore($this->readMore, $this->commentsAllowed))->generateForArticle($model);
 
         return $json;
     }

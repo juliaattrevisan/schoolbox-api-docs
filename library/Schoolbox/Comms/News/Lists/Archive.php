@@ -12,6 +12,7 @@ use InvalidArgumentException;
 use OutOfRangeException;
 use PDOException;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Paginator;
 use Schoolbox\Comms\News\Querystring;
@@ -150,14 +151,7 @@ class Archive extends Base
         /* Build a lookup of Read More links for each article id, which aren't json but
          * Model instances that don't comprehend the Read More status like this
          */
-        $readMores = [];
-
-        foreach ($articles as $article) {
-            $readMores[$article->getId()] = [
-                'string' => $this->readMoreText,
-                'available' => (new ValidHasReadMore())->isSatisfiedBy($article, $this->readMoreText, $this->commentsIsEnabled)
-            ];
-        }
+        $readMores = (new ReadMore($this->readMoreText, $this->commentsIsEnabled))->generate($articles);
 
         // These pieces are needed to represent an article, due to Save For Later
         return [

@@ -11,6 +11,7 @@ namespace Schoolbox\Comms\News\SaveForLater;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Comms\News;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\ValidHasReadMore;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -78,11 +79,6 @@ class Controller extends Base
          */
         $attachmentCounts = $this->fileMapper->findCounts($articles->getPropertyValues('id'));
 
-        /* Build a lookup of Read More links for each article id, which aren't json but
-         * Model instances that don't comprehend the Read More status like this
-         */
-        $readMores = [];
-
         foreach ($articles as $article) {
 
             /* Attachments aren't actually hydrated in $model, but we got the counts
@@ -95,12 +91,12 @@ class Controller extends Base
             if (isset($attachmentCounts[$article->getId()]) && $attachmentCounts[$article->getId()]) {
                 $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
             }
-
-            $readMores[$article->getId()] = [
-                'string' => $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
-                'available' => (new ValidHasReadMore())->isSatisfiedBy($article, $this->getConfigLoader()->get(ConfigMapper::_READ_MORE), $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED))
-            ];
         }
+
+        /* Build a lookup of Read More links for each article id, which aren't json but
+         * Model instances that don't comprehend the Read More status like this
+         */
+        $readMores = (new ReadMore($this->getConfigLoader()->get(ConfigMapper::_READ_MORE), $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED)))->generate($articles);
 
         $data = array_merge(
             [

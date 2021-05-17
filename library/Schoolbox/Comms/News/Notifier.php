@@ -15,7 +15,9 @@ use Aura\Di\ContainerInterface;
 use Aura\Di\Exception\ServiceNotFound;
 use Monolog\Logger;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\IUserResolver;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model as Article;
 use Schoolbox\Comms\News\Moderation\IUserResolver as IModeratorResolver;
 use Schoolbox\Comms\News\Moderation\UserResolver as ModeratorResolver;
@@ -616,22 +618,9 @@ class Notifier extends AbstractModuleNotifier
         /* Decide if you can have a Read More link; shank it on the end if you can
          */
         $readMoreString = $this->conf->get(ConfigMapper::_READ_MORE);
+        $commentsIsEnabled = $this->conf->get(ConfigMapper::COMMS_COMMENTS_ENABLED);
 
-        $readMore = [
-            'string' => '',
-            'available' => false
-        ];
-
-        if ((new ValidHasReadMore())->isSatisfiedBy(
-            $article,
-            $readMoreString,
-            $this->conf->get(ConfigMapper::COMMS_COMMENTS_ENABLED
-        ))) {
-            $readMore = [
-                'string' => $readMoreString,
-                'available' => true
-            ];
-        }
+        $readMore = (new ReadMore($readMoreString, $commentsIsEnabled))->generateForArticle($article);
 
         $bob->setTitle(self::PATTERN_POSTED_TITLE)
             ->setParams(

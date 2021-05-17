@@ -8,6 +8,7 @@ namespace Schoolbox\Comms\News\Lists;
 
 use Schoolbox\Comms\News\Audience;
 use Schoolbox\Comms\News\Audience\Segment\Strategy\Folder;
+use Schoolbox\Comms\News\Lookup\ReadMore;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Comms\News\SaveForLater;
@@ -118,14 +119,7 @@ class Homepage extends Base
         /* Build a lookup of Read More links for each article id, which aren't json but
          * Model instances that don't comprehend the Read More status like this
          */
-        $readMores = [];
-
-        foreach ($articles as $article) {
-            $readMores[$article->getId()] = [
-                'string' => $this->readMoreText,
-                'available' => (new ValidHasReadMore())->isSatisfiedBy($article, $this->readMoreText, $this->commentsIsEnabled)
-            ];
-        }
+        $readMores = (new ReadMore($this->readMoreText, $this->commentsIsEnabled))->generate($articles);
 
         return [
             'articles' => $this->populateMetadata($articles),
