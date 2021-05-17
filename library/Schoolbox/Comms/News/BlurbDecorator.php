@@ -85,9 +85,7 @@ class BlurbDecorator implements IDecorator
          *
          * $model->getAttachedFiles()->add(true);
          */
-        if ($this->attachmentCounts[$model->getId()]) {
-            $model->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $model->getId()));
-        }
+        $model->setAttachedFilesCount($this->attachmentCounts[$model->getId()] ?? 0);
 
         /* Decide if a Read More link is available; it depends on characteristics
          * of the article and some admin config vars

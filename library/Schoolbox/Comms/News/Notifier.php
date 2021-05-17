@@ -611,9 +611,7 @@ class Notifier extends AbstractModuleNotifier
          */
         $attachmentCounts = $this->fileMapper->findCounts([$article->getId()]);
 
-        if (isset($attachmentCounts[$article->getId()]) && $attachmentCounts[$article->getId()]) {
-            $article->setAttachedFiles($this->mapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
-        }
+        $article->setAttachedFilesCount($attachmentCounts[$article->getId()] ?? 0);
 
         /* Decide if you can have a Read More link; shank it on the end if you can
          */

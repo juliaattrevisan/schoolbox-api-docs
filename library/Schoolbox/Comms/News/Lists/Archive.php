@@ -138,10 +138,7 @@ class Archive extends Base
              *
              * $article->getAttachedFiles()->add(true);
              */
-            if (isset($attachmentCounts[$article->getId()]) && $attachmentCounts[$article->getId()]) {
-                $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
-            }
-
+            $article->setAttachedFilesCount($this->attachmentCounts[$article->getId()] ?? 0);
             $article->setSticky(false);
         }
 

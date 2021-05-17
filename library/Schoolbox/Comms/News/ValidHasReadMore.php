@@ -43,7 +43,13 @@ class ValidHasReadMore
         /* If there are files, there's something to download from the detail screen
          * Show the link
          */
-        if ($article->getAttachedFiles()->count()) {
+        if ($article->getAttachedFilesCount() > 0) {
+            return true;
+        }
+
+        /* Look in the other place to see if that's got anything, too
+         */
+        if ($article->getAttachedFiles()->count() > 0) {
             return true;
         }
 
