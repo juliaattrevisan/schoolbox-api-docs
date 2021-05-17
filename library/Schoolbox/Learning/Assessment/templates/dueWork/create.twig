@@ -102,14 +102,20 @@
     <div class="row">
         <div class="medium-6 columns">
             <label for="acceptOnline">Accepts Online Submissions?</label>
-            <select name="acceptOnline" id="acceptOnline">
+            <select name="acceptOnline" id="acceptOnline" {% if courseManaged.isReadonly %}readonly{% endif %}>
                 {% set options = {
-                0: 'None',
-                1: 'Single',
-                2: 'Multiple'
+                    0: 'None',
+                    1: 'Single',
+                    2: 'Multiple'
                 } %}
                 {% for index, title in options %}
-                    <option value="{{ index }}"{% if assessment.acceptOnline == index %} selected="selected"{% endif %}>{{ title }}</option>
+                    <option value="{{ index }}"
+                        {% if assessment.acceptOnline == index %}
+                            selected="selected"
+                        {% elseif courseManaged.isReadonly %}
+                            disabled
+                        {% endif %}
+                    >{{ title }}</option>
                 {% endfor %}
             </select>
         </div>
