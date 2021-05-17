@@ -23,12 +23,6 @@ class BlurbDecorator implements IDecorator
 {
 
     /**
-     * @var Mapper
-     */
-    private Mapper $newsMapper;
-
-
-    /**
      * @var string
      */
     private string $readMore;
@@ -47,14 +41,12 @@ class BlurbDecorator implements IDecorator
 
 
     /**
-     * @param Mapper $newsMapper
      * @param string $readMore
      * @param bool   $commentsAllowed
      * @param array  $attachmentCounts
      */
-    public function __construct(Mapper $newsMapper, string $readMore, bool $commentsAllowed, array $attachmentCounts)
+    public function __construct(string $readMore, bool $commentsAllowed, array $attachmentCounts)
     {
-        $this->newsMapper = $newsMapper;
         $this->readMore = $readMore;
         $this->commentsAllowed = $commentsAllowed;
         $this->attachmentCounts = $attachmentCounts;
@@ -65,7 +57,6 @@ class BlurbDecorator implements IDecorator
      * @param array  $json
      * @param object $model
      * @return array
-     * @throws \Schoolbox\Mapper\DefinitionException
      */
     public function decorate(array $json, $model): array
     {
