@@ -887,6 +887,13 @@ section > fieldset {
     opacity: 0.8;
   }
 
+  fieldset {
+    width: 100%;
+    border: none;
+    padding: 1rem 0;
+    margin: 0 0 0.5rem;
+  }
+
   // second sibling onwards
   ~ fieldset {
     border-top: solid $fieldset-border-width $body-bg;
