@@ -66,9 +66,8 @@ if (!$count['all']) {
     $this->setFile('no_results', 'resource/search/noResults.html');
 
     $this->setVar(array(
-        'ENCODED_KEYWORD'   => $keyword,
-        'UNESCAPED_KEYWORD' => $keyword,
-        'ENABLED'           => AJAX_DISABLED,
+        'ENCODED_KEYWORD' => urlencode(Scrub::text($keyword)),
+        'ENABLED'         => AJAX_DISABLED,
     ));
 
     $this->parse('RESULT', 'no_results', true);
