@@ -283,6 +283,11 @@ function renderStudent(
         $subjects[$group][] = $subject;
     }
 
+    /* Forcibly sort the subjets alphabetically and as au naturale as possible
+     * as per the php docs
+     */
+    ksort($subjects, SORT_NATURAL);
+
     // Load the list of groups, and their owner and folder.
     $groups         = $groupHandler->involvedInCategoryList($user['uid'], false, UserAccess::ACCESS_READ, true);
     $groupFolderIds = array_column($groups, 'id');
