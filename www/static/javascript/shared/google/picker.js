@@ -16,7 +16,7 @@
 
         /* Only proceed if both parts set
          */
-        if (config.clientId.length && config.postGoogleFileUrl.length) {
+        if (config.clientId.length && config.modules) {
             setupListeners();
         }
 
@@ -48,9 +48,16 @@
                  */
                 onSelect: function () {
                 },
+                onAuth: function (e) {
+                    $(config.modalId).foundation('reveal', 'open');
+                    createPicker(e);
+                },
                 /* A google setting
                  */
-                scope: 'https://www.googleapis.com/auth/drive'
+                scope: 'https://www.googleapis.com/auth/drive',
+                /* True to do auth only...
+                 */
+                modules: ['auth2', 'picker']
             };
             $('#gfile-google-ids').val('');
             return $.extend(defaults, options);
@@ -62,7 +69,7 @@
          */
         function setupListeners() {
             $(config.element).on('click', function () {
-                loadGoogleApi(['auth2', 'picker'], authorize);
+                loadGoogleApi(config.modules, authorize);
             });
         }
 
@@ -72,14 +79,22 @@
          * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
          */
         function authorize() {
-            if ($('#gfile-access-token').val().length > 0) {
-                createPicker($('#gfile-access-token').val());
-                return;
-            }
-            window.gapi.auth2.authorize({
+            gapi.auth2.init({
                 'client_id': config.clientId,
                 'scope': config.scope
-            }, handleAuthResult);
+            }).then(function () {
+                let gAuth = gapi.auth2.getAuthInstance();
+                let gUser = gAuth.currentUser.get();
+                if (gUser.isSignedIn()) {
+                    handleAuthResult(gUser.getAuthResponse());
+                } else {
+                    gAuth.signIn({'prompt': 'select_account'}).then(
+                        function () {
+                            handleAuthResult(gUser.getAuthResponse());
+                        }
+                    );
+                }
+            });
         }
 
 
@@ -91,11 +106,7 @@
             if (authResult && !authResult.error) {
                 $('#gfile-access-token').val(authResult.access_token);
                 $('#gfile-token-type').val(authResult.token_type);
-                createPicker(authResult.access_token);
-
-                /* Only spawn our modal if they authenticate past the popup thing
-                 */
-                $(config.modalId).foundation('reveal', 'open');
+                config.onAuth.call($(this.element), authResult.access_token);
             }
         }
 

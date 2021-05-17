@@ -10,9 +10,12 @@
 namespace Alaress\File\Remote;
 
 use DomainException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\RequestOptions;
 use OutOfBoundsException;
-use Schoolbox\File\ExtensionMapper;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\IConfigLoader;
 
 class GDriveFetcher implements FetcherInterface
 {
@@ -66,65 +69,56 @@ class GDriveFetcher implements FetcherInterface
     ];
 
     /**
+     * Roles which can be updated (i.e. we probably don't want to update owner/organizer/fileOrganizer)
+     */
+    private const UPDATABLE_ROLES = ['writer', 'commenter', 'reader'];
+
+    /**
      * @var bool
      */
-    private $allowPdfExport;
+    private bool $allowPdfExport;
 
     /**
-     * @var false|resource
      */
-    private $ch;
-
-    /**
-     * @var string
-     */
-    private $dir;
+    private Client $client;
 
     /**
      * @var array
      */
-    private $metaCache = [];
-
+    private array $metaCache = [];
 
     /**
-     * @var ExtensionMapper
+     * @var array
      */
-    private $extensionMapper;
+    private array $permissionCache = [];
 
     /**
      * http header
      */
-    private array $httpHeader;
+    private array $httpHeaders;
 
     /**
      * Constructor
      *
-     * @param ExtensionMapper|null $extensionMapper a mapper for loading extensions from
-     * @param string|null          $storageDir      the target storage directory: typically `sys_get_temp_dir()`
-     * @param resource             $curl            a custom curl handle if a default won't suffice
-     * @param string               $httpAuth        an authorization header if not using an anonymous connection
-     * @param bool                 $allowPdfExport  Can this export PDFs?
+     * @param IConfigLoader $conf
+     * @param string        $httpAuth       an authorization header if not using an anonymous connection
+     * @param bool          $allowPdfExport Can this export PDFs?
      */
     public function __construct(
-        ?ExtensionMapper $extensionMapper,
-        ?string $storageDir,
-        $curl = null,
+        IConfigLoader $conf,
         string $httpAuth = '',
         bool $allowPdfExport = true
     ) {
-        $this->extensionMapper = $extensionMapper;
-        $this->dir             = $storageDir;
-        $this->ch              = $curl ?: curl_init();
-        $this->httpHeader[]    = 'Authorization: ' . $httpAuth;
-        $this->allowPdfExport  = $allowPdfExport;
-    }
-
-    /**
-     * Clean up the cURL handle
-     */
-    public function __destruct()
-    {
-        curl_close($this->ch);
+        $proxy                              = new \Proxy\Server($conf);
+        $this->client                       = new Client(
+            [
+                RequestOptions::HEADERS => ['Authorization' => $httpAuth],
+                'curl'                  => $proxy->buildCurlOptions(),
+                'timeout'               => 10,
+            ]
+        );
+        $this->httpHeaders['Authorization'] = $httpAuth;
+        $this->allowPdfExport               = $allowPdfExport;
     }
 
     /**
@@ -144,25 +138,33 @@ class GDriveFetcher implements FetcherInterface
      * @param int  $fileId
      * @param bool $refresh
      * @return array
-     * @throws DomainException
      */
     public function fetchMetaData($fileId, $refresh = false): array
     {
         if ($refresh || empty($this->metaCache[$fileId])) {
             $params = [
-                'fields'            => '*',
+                'fields'            => implode(
+                    ',', [
+                           'name',
+                           'capabilities',
+                           self::CONTEXT_EXPORTLINKS,
+                           'mimeType',
+                           'id',
+                           'webViewLink',
+                           'originalFilename',
+                       ]
+                ),
                 'supportsAllDrives' => 'true',
             ];
+            $url    = self::GOOGLE_API . "/files/{$fileId}?" . http_build_query($params);
 
-            $ch = $this->curlPrepare(
-                [
-                    CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}?" . http_build_query($params),
-                    CURLOPT_RETURNTRANSFER => 1,
-                ]
-            );
+            try {
+                $response = $this->client->get($url);
+            } catch (GuzzleException $e) {
+                throw new DomainException("Failed to get metadata for file: {$fileId}", 0, $e);
+            }
 
-            $fetchedMetaData = json_decode(curl_exec($ch), true);
-            curl_close($ch);
+            $fetchedMetaData = json_decode($response->getBody(), true);
 
             // copy name to title to support the key change from v2 to v3
             $fetchedMetaData['title'] = $fetchedMetaData['name'];
@@ -181,30 +183,6 @@ class GDriveFetcher implements FetcherInterface
         return $metadata;
     }
 
-    /**
-     * Fetches Permission
-     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
-     * @param string $fileId
-     * @return mixed
-     */
-    public function fetchPermissions(string $fileId)
-    {
-        $params = [
-            'fields'            => '*',
-            'supportsAllDrives' => 'true',
-        ];
-
-        $ch = $this->curlPrepare(
-            [
-                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params),
-                CURLOPT_RETURNTRANSFER => 1,
-            ]
-        );
-
-        $fetchedPermission = json_decode(curl_exec($ch), true);
-        curl_close($ch);
-        return $fetchedPermission;
-    }
 
     /**
      * Sets permission to a google file
@@ -212,16 +190,98 @@ class GDriveFetcher implements FetcherInterface
      * @param string $fileId
      * @param string $accessRole
      * @param string $email
-     * @return bool|string
      */
-    public function setPermissions(string $fileId, string $accessRole, string $email)
+    public function setPermission(string $fileId, string $accessRole, string $email): void
     {
+        $existingPermission = $this->findPermissionByFileAndEmail($fileId, $email);
+
+        // if this file is already shared for this email, try updating it.
+        if ($existingPermission) {
+            if ($existingPermission['role'] === $accessRole || !in_array($existingPermission['role'], self::UPDATABLE_ROLES)) {
+                // no need to update
+                return;
+            }
+            $result = $this->callUpdatePermissions($fileId, $existingPermission['id'], $accessRole);
+            if ($error = $this->getErrorMessage($result)) {
+                throw new DomainException($error);
+            }
+            return;
+        }
+
         $result = $this->callSetPermissions($fileId, $accessRole, $email, false);
         if ($this->getErrorMessage($result)) {
             // retry with notification on
             $result = $this->callSetPermissions($fileId, $accessRole, $email, true);
+            if ($error = $this->getErrorMessage($result)) {
+                throw new DomainException($error);
+            }
         }
-        return $result;
+    }
+
+    /**
+     * Find permission by google file id and email
+     * https://developers.google.com/drive/api/v3/reference/permissions?hl=en
+     * @param string $fileId
+     * @param string $email
+     * @return array|null
+     */
+    public function findPermissionByFileAndEmail(string $fileId, string $email): ?array
+    {
+        if (!isset($this->permissionCache[$fileId])) {
+            // TODO: cache all results, for now caching first call only..
+            $this->permissionCache[$fileId] = $this->callListPermissions($fileId);
+        }
+
+        $permissions = $this->permissionCache[$fileId];
+        foreach ($permissions['permissions'] as $permission) {
+            if ($permission['emailAddress'] !== $email) {
+                continue;
+            }
+            return $permission;
+        }
+        // This can be recursively called, but I don't like recursive ...
+        while ($permissions['nextPageToken']) {
+            $permissions = $this->callListPermissions($fileId, $permissions['nextPageToken']);
+            foreach ($permissions as $permission) {
+                if ($permission['emailAddress'] !== $email) {
+                    continue;
+                }
+                return $permission;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string      $fileId
+     * @param string|null $pageToken
+     * @return mixed
+     */
+    private function callListPermissions(string $fileId, ?string $pageToken = null)
+    {
+        $params = [
+            'fields'            => implode(
+                ',', [
+                       'kind',
+                       'nextPageToken',
+                       'permissions/role',
+                       'permissions/emailAddress',
+                       'permissions/id',
+                   ]
+            ),
+            'supportsAllDrives' => 'true',
+        ];
+        if ($pageToken) {
+            $params['pageToken'] = $pageToken;
+        }
+        $url = self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params);
+
+        try {
+            $response = $this->client->get($url);
+            return json_decode($response->getBody(), true);
+        } catch (GuzzleException $e) {
+            throw new DomainException("Failed to list permission for {$fileId}", 0, $e);
+        }
     }
 
     /**
@@ -229,35 +289,81 @@ class GDriveFetcher implements FetcherInterface
      * @param string $accessRole
      * @param string $email
      * @param bool   $notify
-     * @return mixed
+     * @return array
      */
-    private function callSetPermissions(string $fileId, string $accessRole, string $email, bool $notify)
+    private function callSetPermissions(string $fileId, string $accessRole, string $email, bool $notify): array
     {
-        $params   = [
+        $params = [
             'fileId'                => $fileId,
-            'fields'                => '*',
             'supportsAllDrives'     => 'true',
             'sendNotificationEmail' => $notify ? 'true' : 'false', // this is necessary for non google accounts
         ];
-        $postdata = [
+
+        $payload = [
             'role'         => $accessRole,
             'type'         => 'user',
             'emailAddress' => $email,
         ];
 
-        $ch = $this->curlPrepare(
-            [
-                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-                CURLOPT_URL            => self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params),
-                CURLOPT_RETURNTRANSFER => 1,
-                CURLOPT_POST           => true,
-                CURLOPT_POSTFIELDS     => json_encode($postdata),
-            ]
-        );
+        $this->httpHeaders['Content-Type'] = 'application/json';
 
-        $result = json_decode(curl_exec($ch), true);
-        curl_close($ch);
-        return $result;
+        $url = self::GOOGLE_API . "/files/{$fileId}/permissions?" . http_build_query($params);
+
+        try {
+            $response = $this->client->post(
+                $url,
+                [
+                    RequestOptions::HEADERS => $this->httpHeaders,
+                    RequestOptions::BODY    => json_encode($payload),
+                ]
+
+            );
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (GuzzleException $e) {
+            if ($e instanceof ClientException) {
+                $error = $e->getResponse()->getBody()->getContents();
+                return json_decode($error, true);
+            }
+            throw new DomainException("Failed to list permission for {$fileId}", 0, $e);
+        }
+    }
+
+    /**
+     * @param string $fileId
+     * @param string $permissionId
+     * @param string $accessRole
+     * @return array
+     */
+    private function callUpdatePermissions(string $fileId, string $permissionId, string $accessRole): array
+    {
+        $params  = [
+            'supportsAllDrives' => 'true',
+        ];
+        $payload = [
+            'role' => $accessRole,
+        ];
+
+        $this->httpHeaders['Content-Type'] = 'application/json';
+
+        $url = self::GOOGLE_API . "/files/{$fileId}/permissions/{$permissionId}?" . http_build_query($params);
+
+        try {
+            $response = $this->client->patch(
+                $url,
+                [
+                    RequestOptions::HEADERS => $this->httpHeaders,
+                    RequestOptions::BODY    => json_encode($payload),
+                ]
+
+            );
+            return json_decode($response->getBody()->getContents(), true);
+        } catch (GuzzleException $e) {
+            if ($e instanceof ClientException) {
+                $error = $e->getResponse()->getBody()->getContents();
+                return json_decode($error, true);
+            }
+            throw new DomainException("Failed to update permission for {$fileId}", 0, $e);
+        }
     }
 
     /**
@@ -299,8 +405,6 @@ class GDriveFetcher implements FetcherInterface
      *
      * @param int $fileId
      * @return string
-     * @throws DomainException
-     * @throws OutOfBoundsException
      */
     public function fetchToFile($fileId): string
     {
@@ -312,7 +416,7 @@ class GDriveFetcher implements FetcherInterface
             throw new DomainException('This file is restricted and cannot be downloaded.');
         }
 
-        $destination = tempnam($this->dir, 'gdrive-');
+        $destination = tempnam(sys_get_temp_dir(), 'gdrive-');
 
         /* null or false $destination when tempnam fails for some reason
         */
@@ -325,23 +429,13 @@ class GDriveFetcher implements FetcherInterface
         if (!($fp = fopen($destination, 'w'))) {
             throw new OutOfBoundsException('Could not open target');
         }
+        try {
+            $this->client->get($url, [RequestOptions::SINK => $fp]);
+        } catch (GuzzleException $e) {
+            throw new DomainException("Failed to download {$fileId}", 0, $e);
+        }
 
-        $ch = $this->curlPrepare(
-            [
-                CURLOPT_URL            => $url,
-                CURLOPT_FILE           => $fp,
-                CURLOPT_FOLLOWLOCATION => true,
-            ]
-        );
-
-        $result = curl_exec($ch);
-        $error  = curl_error($ch);
-        curl_close($ch);
-        fclose($fp);
-
-        if (!$result) {
-            throw new DomainException($error);
-        } elseif (mime_content_type($destination) === 'application/json') {
+        if (mime_content_type($destination) === 'application/json') {
             // for some reason, Google output error in the downloaded file
             $fetchedData  = file_get_contents($destination);
             $errorMessage = $this->getErrorMessage(json_decode($fetchedData, true));
@@ -358,11 +452,9 @@ class GDriveFetcher implements FetcherInterface
      * Derive the file name from the metadata
      *
      * @param array $metadata
-     * @return string
-     * @throws \PDOException
-     * @throws Exception
+     * @return string|null
      */
-    public function deriveFileName(array $metadata): string
+    public function deriveFileName(array $metadata): ?string
     {
         /* If this is one of the google docs filetypes we know about
          */
@@ -406,31 +498,7 @@ class GDriveFetcher implements FetcherInterface
              */
             return "{$metadata['title']}.{$metadata['fileExtension']}";
         }
-
-        /* Otherwise we might have a weird case where there's a title which is the same as originalFilename
-         * but neither have file extension information in it; we have to infer from the "mimeType" metadata
-         * field, look it up in our AllowedFiles to see what kind of extension it is, then concat that
-         */
-        $extension = $this->extensionMapper->findExtensionFromMimeType($metadata['mimeType']);
-
-        return "{$metadata['originalFilename']}.{$extension}";
-    }
-
-    /**
-     * @param array $opts
-     * @return resource
-     */
-    private function curlPrepare(array $opts)
-    {
-        $httpHeader = $this->httpHeader;
-        if (isset($opts[CURLOPT_HTTPHEADER])) {
-            $httpHeader = array_merge($httpHeader, $opts[CURLOPT_HTTPHEADER]);
-        }
-        $opts[CURLOPT_HTTPHEADER] = $httpHeader;
-        $ch                       = curl_copy_handle($this->ch);
-        curl_setopt_array($ch, $opts);
-
-        return $ch;
+        return null;
     }
 
     /**

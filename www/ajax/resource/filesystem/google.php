@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 /** @var SitePage $this */
 
 /** @var IConfigLoader $conf */
-$conf    = $this->getDi()->get('config');
+$conf = $this->getDi()->get('config');
 if (function_exists('apache_request_headers')) {
     $headers = apache_request_headers();
 } else {
@@ -35,23 +35,31 @@ if (function_exists('apache_request_headers')) {
      */
     $headers['Authorization'] = $_SERVER['HTTP_AUTHORIZATION'];
 }
-$proxy   = new Proxy\Server($conf);
-$grive   = new GDriveFetcher(
-    ExtensionMapper::getInstance(),
-    sys_get_temp_dir(),
-    $proxy->curlInit(),
+$proxy  = new Proxy\Server($conf);
+$grive  = new GDriveFetcher(
+    $conf,
     $headers['Authorization'],
     (bool)$conf->get('googledrive_export_pdf')
 );
-$mapper  = Storage\Mapper::getInstance();
-$files   = array();
+$mapper = Storage\Mapper::getInstance();
+$files  = [];
 
 $errors = [];
 foreach ($_POST['docs'] as $doc) {
     try {
-        $meta = $grive->fetchMetaData($doc['id']);
-
+        $meta     = $grive->fetchMetaData($doc['id']);
         $filename = $grive->deriveFileName($meta);
+        if (!$filename) {
+            /** Moved from GDriveFetcher */
+            /* Otherwise we might have a weird case where there's a title which is the same as originalFilename
+             * but neither have file extension information in it; we have to infer from the "mimeType" metadata
+             * field, look it up in our AllowedFiles to see what kind of extension it is, then concat that
+             */
+            $extensionMapper = ExtensionMapper::getInstance();
+            $extension       = $extensionMapper->findExtensionFromMimeType($meta['mimeType']);
+
+            $filename = "{$meta['originalFilename']}.{$extension}";
+        }
 
         $dest = $grive->fetchToFile($doc['id']);
     } catch (DomainException $e) {
@@ -60,7 +68,7 @@ foreach ($_POST['docs'] as $doc) {
          * - Someone tried to access a restricted file, leave a bootprint in sentry
          *   because we can't inform the user via the ui atm
          */
-       //  trigger_error('Could not upload google drive file: ' . $e->getMessage(), E_USER_WARNING);
+        //  trigger_error('Could not upload google drive file: ' . $e->getMessage(), E_USER_WARNING);
         $errors[] = 'Could not upload google drive file: ' . $e->getMessage();
         continue;
     } catch (Mapper\Exception $e) {
