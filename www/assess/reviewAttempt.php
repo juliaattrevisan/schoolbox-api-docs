@@ -3,6 +3,7 @@
  * Bulk assessment attempt review
  */
 
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Quiz\ActionValidator;
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Mapper;
@@ -18,6 +19,10 @@ $groupHandler = new Group();
 $user_id = $this->arg[1];
 
 $allAttempts = array();
+
+/** @var MapperProxy $assessmentDataSource */
+$assessmentDataSource = $this->getDi()->get('assessmentDataSource');
+$quizzes              = [];
 
 foreach ($_POST['selectedIds'] as $currentAttempt) {
 	if (is_numeric($currentAttempt)) {
@@ -40,8 +45,8 @@ foreach ($_POST['selectedIds'] as $currentAttempt) {
          */
         $actionValidator = new ActionValidator(\Alaress_Date_Format::now(), Access::getInstance());
 
-
-        if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $this->getDi()->get('assessmentDataSource')->findByQuizId($attempt['assess_id']))) {
+        $quizzes[$attempt['assess_id']] ??= $assessmentDataSource->findByQuizId($attempt['assess_id']);
+        if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $quizzes[$attempt['assess_id']])) {
             $this->pageNotFound();
         }
 
