@@ -78,6 +78,11 @@ class ValidHasReadMoreTest extends TestCase
         $filesOnlyArticle = new Model();
         $filesOnlyArticle->getAttachedFiles()->add(new \Schoolbox\Comms\News\File\Model());
 
+        /* Article with only files, as defined by getAttachedFilesCount rather than the collection
+         */
+        $fileCountOnlyArticle = (new Model())
+            ->setAttachedFilesCount(3);
+
         /* Article with comment enabled
          */
         $commentOnlyArticle = (new Model())
@@ -141,6 +146,12 @@ class ValidHasReadMoreTest extends TestCase
             ],
             'Article with only files' => [
                 $filesOnlyArticle,
+                'Read more by clicking here',
+                true,
+                true
+            ],
+            'Article with only files specified by a count' => [
+                $fileCountOnlyArticle,
                 'Read more by clicking here',
                 true,
                 true
