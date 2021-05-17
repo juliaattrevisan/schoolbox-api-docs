@@ -138,7 +138,7 @@ class Archive extends Base
              *
              * $article->getAttachedFiles()->add(true);
              */
-            $article->setAttachedFilesCount($this->attachmentCounts[$article->getId()] ?? 0);
+            $article->setAttachedFilesCount($attachmentCounts[$article->getId()] ?? 0);
             $article->setSticky(false);
         }
 
