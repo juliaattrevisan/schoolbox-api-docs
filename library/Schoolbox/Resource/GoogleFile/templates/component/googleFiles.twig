@@ -238,6 +238,7 @@
             clientId: '{{ clientId }}',
             modules: ['auth2'],
             onAuth: function () {
+                $('#gfile').foundation('reveal', 'open');
                 $('[data-action="continue"]').removeAttr('disabled');
                 $('[data-action="share"]').removeAttr('disabled');
                 $permModal.foundation('reveal', 'open');

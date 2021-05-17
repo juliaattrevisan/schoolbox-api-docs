@@ -49,6 +49,7 @@
                 onSelect: function () {
                 },
                 onAuth: function (e) {
+                    $(config.modalId).foundation('reveal', 'open');
                     createPicker(e);
                 },
                 /* A google setting
@@ -78,14 +79,22 @@
          * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
          */
         function authorize() {
-            if ($('#gfile-access-token').val().length > 0) {
-                config.onAuth.call($(this.element), $('#gfile-access-token').val(), $(this.element));
-                return;
-            }
-            window.gapi.auth2.authorize({
+            gapi.auth2.init({
                 'client_id': config.clientId,
                 'scope': config.scope
-            }, handleAuthResult);
+            }).then(function () {
+                let gAuth = gapi.auth2.getAuthInstance();
+                let gUser = gAuth.currentUser.get();
+                if (gUser.isSignedIn()) {
+                    handleAuthResult(gUser.getAuthResponse());
+                } else {
+                    gAuth.signIn({'prompt': 'select_account'}).then(
+                        function () {
+                            handleAuthResult(gUser.getAuthResponse());
+                        }
+                    );
+                }
+            });
         }
 
 
@@ -97,11 +106,7 @@
             if (authResult && !authResult.error) {
                 $('#gfile-access-token').val(authResult.access_token);
                 $('#gfile-token-type').val(authResult.token_type);
-                config.onAuth.call($(this.element), authResult.access_token, $(this.element));
-
-                /* Only spawn our modal if they authenticate past the popup thing
-                 */
-                $(config.modalId).foundation('reveal', 'open');
+                config.onAuth.call($(this.element), authResult.access_token);
             }
         }
 
