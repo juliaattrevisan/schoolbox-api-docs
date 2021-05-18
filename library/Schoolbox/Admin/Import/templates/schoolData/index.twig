@@ -36,7 +36,7 @@
         });
 
         {# On import frequence change, show/hide the custom hours field #}
-        let $fieldImportFrequency = $('#schooldata_import_frequency');
+        let $fieldImportFrequency = $('#schooldata_import_frequency-field');
         let $fieldCustomHours = $('#schooldata_import_managed_hours').parent();
         $fieldImportFrequency.on('change', function () {
             if ($(this).val() === 'sb' && ['','csv'].indexOf('{{ dataSource }}') === -1) {
