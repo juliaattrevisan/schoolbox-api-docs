@@ -1,12 +1,9 @@
 <?php
 /**
- * TextboxMapper
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 namespace Schoolbox\Resource\Textbox;
 
 use Schoolbox\Comms\News\Audience\ArticleResolver;
@@ -20,6 +17,8 @@ use Schoolbox\Resource\Textbox\Component\Homepage\Controller;
 
 
 /**
+ * Class Mapper
+ *
  * @method Model createModel($idValue = null)
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = array())
  */
@@ -120,7 +119,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         foreach ($textboxes as $textbox) {
             $stack[$textbox->getId()] = [
                 'textbox' => $textbox,
-                'folders' => [],
+                'folders' => new Collection(),
                 'dashboards' => [],
             ];
         }
@@ -132,8 +131,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $homepageUsageQuery = "
             SELECT 
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('category', 'f')},
-                COUNT(*) AS numUsages
+                {$this->getJoinColumnString('category', 'f')}
             FROM component_definition cd
             INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
             INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
@@ -162,10 +160,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
             $folder = $this->getJoinMapper('category')->hydrate($row, 'f');
 
-            $stack[$textboxId]['folders'][$folder->getId()] = [
-                'folder' => $folder,
-                'numUsages' => $row['numUsages']
-            ];
+            $stack[$textboxId]['folders']->add($folder);
         }
 
         /* Find dashboard usages too
@@ -173,8 +168,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $dashboardUsageQuery = "
             SELECT 
                 {$this->getColumnString()},
-                groups.id, groups.name,
-                COUNT(*) AS numUsages
+                groups.id, groups.name
             FROM component_definition cd
             INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
             INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
@@ -201,8 +195,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
             $stack[$textboxId]['dashboards'][$dashboardId] = [
                 'name' => $row['name'],
-                'numUsages' => $row['numUsages']
             ];
+        }
+
+        /* Sort the folder names naturally and alphabetically
+         */
+        foreach ($stack as $textboxData) {
+            $textboxData['folders']->sortNaturally('name', Collection::ORDER_ASCENDING);
         }
 
         return $stack;
