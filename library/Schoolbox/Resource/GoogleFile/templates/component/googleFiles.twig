@@ -51,11 +51,13 @@
             </li>
         </ul>
     {% endfor %}
+    {% if routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) %}
     <div class="component-action">
         <section>
             <a id="find-files" class="button">Add</a>
         </section>
     </div>
+    {% endif %}
 {% endif %}
 <div id="gfile" class="modal-backdrop" data-reveal aria-labelledby="Google Files" aria-hidden="true"
      role="dialog">
