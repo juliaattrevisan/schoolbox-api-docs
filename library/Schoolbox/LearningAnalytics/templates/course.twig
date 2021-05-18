@@ -132,25 +132,9 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(trail) }}
 
-
 <div class="row">
     <div class="small-12 columns">
         <h1>Learning Analytics</h1>
-        {% if classFolders | length %}
-        <dl class="sub-nav">
-            <dd{% if not classFolder %} class="active"{% endif %}>
-                <a href="{{ routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) }}" class="button">All classes</a>
-            </dd>
-            {% for folder in classFolders %}
-                {% set active = classFolder and (folder.id == classFolder.id) and (route == 'folder') %}
-                {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
-
-                <dd class="{% if active %}active{% endif %}">
-                    <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
-                </dd>
-            {% endfor %}
-        </dl>
-        {% endif %}
 
         <ul class="meta">
             <li class="icon-course-builder" title="Course"><a href="/homepage/{{ courseSpec.folder.id }}" title="Course Page">{{ courseSpec.title }}</a></li>
@@ -169,11 +153,40 @@
         {% include 'sub/semesterSelector.twig' with {
             currentTerm:        term,
             terms:              terms,
-            termsWithResults:    termsWithResults,
+            termsWithResults:   termsWithResults,
             route:              currentRoute,
             routeArgs:          routeArgs
         } only %}
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        {% if classFolders | length %}
+
+            {% if route == 'folder' %}
+                <h2 class="subheader">
+                    {% set courseRoute = routeLookup(currentRoute | replace({'folder': 'course'}), routeArgs) %}
+
+                    <a href="{{ courseRoute }}">{{ courseSpec.title }}</a> ›
+
+                    {{ classFolder.nameWithCodes }}
+                </h2>
+            {% else %}
+                <dl class="sub-nav">
+                    {% for folder in classFolders %}
+                        {% set active = classFolder and (folder.id == classFolder.id) and (route == 'folder') %}
+                        {% set href   = routeLookup(currentRoute | replace({'course': 'folder'}), routeArgs | merge({ folderId: folder.id })) %}
+
+                        <dd class="{% if active %}active{% endif %}">
+                            <a href="{{ href }}" class="button">{{ folder.nameWithCodes }}</a>
+                        </dd>
+                    {% endfor %}
+                </dl>
+            {% endif %}
+        {% endif %}
+
     </div>
 </div>
 
@@ -191,14 +204,14 @@
 
 <div class="row">
     <div class="small-12 large-6 island">
-        <h2 class="subheader">Overall Progress</h2>
+        <h3 class="subheader">Overall Progress</h3>
 
         <section class="content">
             <div data-graph='overall'></div>
         </section>
     </div>
     <div class="small-12 large-3 island">
-        <h3 class="subheader">Top Students</h3>
+        <h4 class="subheader">Top Students</h4>
 
         <section>
             {% if ranking.top | length > 0 %}
@@ -225,7 +238,7 @@
         </section>
     </div>
     <div class="small-12 large-3 island">
-        <h3 class="subheader">Bottom Students</h3>
+        <h4 class="subheader">Bottom Students</h4>
 
         <section>
             {% if ranking.bottom | length > 0 %}
@@ -256,7 +269,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h2 class="subheader">Results</h2>
+            <h3 class="subheader">Results</h3>
 
             {% if submissionType %}
             <ul class="meta">

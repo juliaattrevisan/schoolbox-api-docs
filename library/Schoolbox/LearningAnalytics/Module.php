@@ -17,6 +17,7 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -192,6 +193,10 @@ class Module extends BaseModule
             $unitImplementation->setCourse($courseImplementation);
         }
 
+        /* A list of folders which can be selected based on their assessments' due dates
+         */
+        $courseImplementationFolders = new Collection();
+
         // Load Assessments in Unit Impls (regardless of due date - as we need them for navigation)
         /** @var GenericCollection|IAssessable[] $assessmentImpls */
         $assessmentImpls = $this->getAssessmentDataSource()->findAllByUnitImplementationIds($unitImplementations->getColumnValues('id'))->indexBy('id');
@@ -199,6 +204,18 @@ class Module extends BaseModule
             $unitImplementation = $unitImplementations[$assessmentImpl->getContext()->getId()];
             $unitImplementation->getAssessables()->setOffset($assessmentImpl->getId(), $assessmentImpl);
             $assessmentImpl->setContext($unitImplementation);
+
+            /* These folders have assessments due inside the specified Term
+             * and should appear as part of the navigation system
+             *
+             * Folder options should never be restricted to a specific $classFolder
+             */
+            $dueAfterTermStart = $assessmentImpl->getDueAt()->gte($term->getStart());
+            $dueBeforeTermEnd  = $term->getActualFinish()->isNull() || $assessmentImpl->getDueAt()->lt($term->getActualFinish());
+
+            if ($dueAfterTermStart && $dueBeforeTermEnd) {
+                $courseImplementationFolders->setOffset($assessmentImpl->getBaseContext()->getFolder()->getId(), $assessmentImpl->getBaseContext()->getFolder());
+            }
         }
 
         // Get the assessments that are due in currently selected term, and match the class if a class filter is applied
@@ -230,14 +247,14 @@ class Module extends BaseModule
             $unitImplsInTerm->setOffset($assessment->getContext()->getId(), $assessment->getBaseContext());
         }
 
-
         return [
-            'courseSpecification' => $courseSpecification,
-            'unitImplsInTerm'     => $unitImplsInTerm,
-            'dueAssessments'      => $dueAssessments,
-            'term'                => $term,
-            'classFolder'         => $classFolder,
-            'submissionType'      => $submissionType,
+            'courseSpecification'         => $courseSpecification,
+            'unitImplsInTerm'             => $unitImplsInTerm,
+            'dueAssessments'              => $dueAssessments,
+            'term'                        => $term,
+            'courseImplementationFolders' => $courseImplementationFolders,
+            'classFolder'                 => $classFolder,
+            'submissionType'              => $submissionType,
         ];
     }
 

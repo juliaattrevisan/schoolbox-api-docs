@@ -80,13 +80,26 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm
      * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
+     * @param Collection                      $courseImplementationFolders
      * @throws ApplicationException
      * @throws \DomainException
      * @throws MapperException
      */
-    public function courseWithTerm(CourseSpecification $courseSpecification, Collection $unitImplsInTerm, Collection $dueAssessments, Term $term)
-    {
-        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'course');
+    public function courseWithTerm(
+        CourseSpecification $courseSpecification,
+        Collection $unitImplsInTerm,
+        Collection $dueAssessments,
+        Term $term,
+        Collection $courseImplementationFolders
+    ) {
+        $this->process(
+            $courseSpecification,
+            $unitImplsInTerm,
+            $dueAssessments,
+            $term,
+            'course',
+            $courseImplementationFolders
+        );
     }
 
 
@@ -120,6 +133,7 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm
      * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
+     * @param Collection                      $courseImplementationFolders
      * @param WorkType\Model                  $submissionType
      * @throws ApplicationException
      * @throws \DomainException
@@ -130,9 +144,19 @@ class Controller extends Base
         Collection $unitImplsInTerm,
         Collection $dueAssessments,
         Term $term,
+        Collection $courseImplementationFolders,
         WorkType\Model $submissionType
     ) {
-        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'course', null, $submissionType);
+        $this->process(
+            $courseSpecification,
+            $unitImplsInTerm,
+            $dueAssessments,
+            $term,
+            'course',
+            $courseImplementationFolders,
+            null,
+            $submissionType
+        );
     }
 
 
@@ -167,6 +191,7 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm
      * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
+     * @param Collection                      $courseImplementationFolders
      * @throws ApplicationException
      * @throws \DomainException
      * @throws MapperException
@@ -176,9 +201,18 @@ class Controller extends Base
         CourseSpecification $courseSpecification,
         Collection $unitImplsInTerm,
         Collection $dueAssessments,
-        Term $term
+        Term $term,
+        Collection $courseImplementationFolders
     ) {
-        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'folder', $classFolder);
+        $this->process(
+            $courseSpecification,
+            $unitImplsInTerm,
+            $dueAssessments,
+            $term,
+            'folder',
+            $courseImplementationFolders,
+            $classFolder
+        );
     }
 
 
@@ -215,6 +249,7 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm
      * @param Collection|IAssessable[]        $dueAssessments
      * @param Term                            $term
+     * @param Collection                      $courseImplementationFolders
      * @param WorkType\Model                  $submissionType
      * @throws ApplicationException
      * @throws \DomainException
@@ -226,9 +261,19 @@ class Controller extends Base
         Collection $unitImplsInTerm,
         Collection $dueAssessments,
         Term $term,
+        Collection $courseImplementationFolders,
         WorkType\Model $submissionType
     ) {
-        $this->process($courseSpecification, $unitImplsInTerm, $dueAssessments, $term, 'folder', $classFolder, $submissionType);
+        $this->process(
+            $courseSpecification,
+            $unitImplsInTerm,
+            $dueAssessments,
+            $term,
+            'folder',
+            $courseImplementationFolders,
+            $classFolder,
+            $submissionType
+        );
     }
 
 
@@ -303,12 +348,14 @@ class Controller extends Base
      * @param Collection|UnitImplementation[] $unitImplsInTerm     units containing assessments due in current term
      * @param Collection|IAssessable[]        $dueAssessments      assessments due in current Term
      * @param Term                            $term                term to filter
-     * @param Folder                          $classFolder         if given, the class folder to filter
      * @param string                          $routeType           'course'|'folder'
+     * @param Collection                      $courseImplementationFolders  A list of folder instances that contain relevant assessments
+     * @param Folder|null                     $classFolder         if given, the class folder to filter
      * @param null|WorkType\Model             $submissionType      if specified, a submission type filter
-     * @throws ApplicationException
-     * @throws \DomainException
      * @throws MapperException
+     * @throws \DebugBar\DebugBarException
+     * @throws \DomainException
+     * @throws \UnexpectedValueException
      */
     private function process(
         CourseSpecification $courseSpecification,
@@ -316,17 +363,12 @@ class Controller extends Base
         Collection $dueAssessments,
         Term $term,
         $routeType,
+        Collection $courseImplementationFolders,
         Folder $classFolder = null,
         WorkType\Model $submissionType = null
+
     ) {
         $analysis = new CohortAnalysis($dueAssessments, $classFolder, $submissionType);
-
-        // Get Classes to which this Course has been imported
-        $courseImplementationFolders = $this->folderMapper->createCollection();
-        foreach ($courseSpecification->getCourseImplementations() as $courseImplementation) {
-            $courseFolder = $courseImplementation->getFolder();
-            $courseImplementationFolders->setOffset($courseFolder->getId(), $courseFolder);
-        }
 
         // Ensure we have folder codes
         /** @var FolderCodeMapper $codeMapper */
