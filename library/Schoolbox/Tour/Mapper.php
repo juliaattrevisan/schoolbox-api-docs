@@ -56,6 +56,10 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model) {
             return $this->preSave($model);
         });
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, function (Model $model) {
+            return $this->postDelete($model);
+        });
     }
 
     /**
@@ -274,5 +278,23 @@ class Mapper extends BaseMapper
 
         $statement = $this->database->prepare($query);
         $statement->execute($bindings);
+    }
+
+    /**
+     * Deletes steps and triggers related to tour being deleted
+     * @param Model $model
+     * @return bool
+     */
+    private function postDelete(Model $model): bool
+    {
+        /** @var TourStepMapper $tourStepMapper */
+        $tourStepMapper = $this->getJoinMapper('firstStep');
+
+        /** @var TriggerMapper $triggerMapper */
+        $triggerMapper = $this->getJoinMapper('trigger');
+
+        $tourStepMapper->deleteByColumn('tour_uuid', $model->getUuid());
+        $triggerMapper->deleteByColumn('tour_uuid', $model->getUuid());
+        return true;
     }
 }
