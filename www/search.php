@@ -113,8 +113,9 @@ elseif ($count['all'] == 0) {
 
 // setup default values
 // escape any quotes in the keyword string, or the javascript will explode.
+
 $this->setVar(array(
-    'KEYWORD' => urlencode(Scrub::text($keyword)),
+    'KEYWORD' => json_encode(urlencode(Scrub::text($keyword))),
     'ENCODED_KEYWORD' => htmlentities($keyword),
 ));
 
