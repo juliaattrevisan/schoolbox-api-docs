@@ -12,21 +12,16 @@ tour:
         title: What's New
         type: modal
         content: " <img src='/static/images/tour/21_0_release.png' style='width:100%;margin-bottom:16px;'>
-                   <h6>Google Collaboration</h6>
-                   <p>The new Google Files component will allow you to quickly and easily embed Google Docs, Slides or Sheets into your page.</p>
-                   <h6>Video Capture</h6>
-                   <p>You can now capture video or record your screen, and easily attach your captures to tasks, due work, news or embed it onto your pages.</p>
-                   <h6>Course Improvements</h6>
-                   <p></p>
-                   <h6>Admin Area Enhancements</h6>
-                   <p>The entire Admin area is now searchable so you can quickly find what you need.</p>
-                   <h6>Improved Print Support</h6>
-                   <p></p>
-                   <h6>TASS API</h6>
-                   <p></p>
-                   <h6>GeoSnapShot Photo</h6>
-                   <p></p>
-                   <p><a href='https://help.schoolbox.com.au/homepage/'>Find out more via our release notes.</a><br />
-                   <b>Hercules & the Schoolbox Team</b>
-                   </p>"
+                   <h3>Share Google Files</h3>
+                   <p>Quickly embed and share Google Docs with your class or group to enable real-time collaboration.
+                   You get all of the features of Google, without leaving the system.</p>
+                  <h3>Video Capture</h6>
+                  <p>Record audio and video directly in your browser to share anywhere you can attach a file.</p>
+                  <h3>Download Class Feedback</h3>
+                  <p>When you download student submissions, we now include a PDF of the students’ work, rubric and grades.</p>
+                  <h3>Print in Full Colour</h3>
+                  <p>You can now print pages, timetables, calendars and rubrics in full colour to share with others.</p>
+                  <h3>Get Online Help</h3>
+                  <p>Access Schoolbox Help training and community groups by simply clicking the link under your profile photo.</p>
+                  <p><a href='https://help.schoolbox.com.au/homepage/3067'>Find out more via our release notes.</a><br />"
         class: introjs-newsmodal
