@@ -27,21 +27,34 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 {
 
     /**
-     * Textbox Homepage Controller
+     * Textbox Homepage Controller classname
      */
-    private const COMPONENT_CONTROLLER = Controller::class;
+    private const HOMEPAGE_COMPONENT_CONTROLLER = Controller::class;
 
 
     /**
-     * Component configuration key - alt source textboxes seem to share this config value too
+     * Textbox Dashboard Controller classname
      */
-    private const COMPONENT_KEY = 'textbox';
+    private const DASHBOARD_COMPONENT_CONTROLLER = 'Component_Dashboard_TextboxController';
+
+
+    /**
+     * Homepage uses "textbox" component config name to specify the textbox
+     */
+    private const HOMEPAGE_COMPONENT_KEY = 'textbox';
+
+
+    /**
+     * Dashboard uses "textboxSearch" component config name to specify the textbox
+     */
+    private const DASHBOARD_COMPONENT_KEY = 'textboxSearch';
 
 
     /**
      * Mapping
      *
      * @return Bool|void
+     * @throws \InvalidArgumentException
      */
     protected function mapping()
     {
@@ -57,6 +70,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
     /**
      * @return string
+     * @throws \Schoolbox\Mapper\DefinitionException
      */
     protected function getSelectString()
     {
@@ -127,7 +141,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             INNER JOIN textBox ON cci.value = textBox.textBoxID
             INNER JOIN folder f ON ci.identifier = f.id
             WHERE cd.`class` = :controller
-            AND ccd.`key` = 'textbox'
+            AND ccd.`key` = :key
             AND textBox.deleted IS NULL
             AND f.deleted_at IS NULL
             AND textBox.categoryID = :folderId
@@ -138,7 +152,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $homepageUsageStatement = $this->database->prepare($homepageUsageQuery);
 
         $homepageUsageStatement->execute([
-            'controller' => Controller::class,
+            'controller' => self::HOMEPAGE_COMPONENT_CONTROLLER,
+            'key' => self::HOMEPAGE_COMPONENT_KEY,
             'folderId' => $folderId,
         ]);
 
@@ -165,8 +180,8 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
             INNER JOIN textBox textBox ON cci.value = textBox.textBoxID
             INNER JOIN groups ON groups.id = ci.identifier
-            WHERE cd.`class` = 'Component_Dashboard_TextboxController'
-            AND ccd.`key` = 'textboxSearch'
+            WHERE cd.`class` = :controller 
+            AND ccd.`key` = :key
             AND textBox.deleted IS NULL
             AND groups.deleted_at IS NULL
             GROUP BY groups.id, textBox.textBoxID
@@ -175,22 +190,13 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $dashboardUsageStatement = $this->database->prepare($dashboardUsageQuery);
 
         $dashboardUsageStatement->execute([
-            'controller' => self::COMPONENT_CONTROLLER,
-            'key' => self::COMPONENT_KEY,
-            'folderId' => $folderId,
+            'controller' => self::DASHBOARD_COMPONENT_CONTROLLER,
+            'key' => self::DASHBOARD_COMPONENT_KEY,
         ]);
 
         while ($row = $dashboardUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
             $textbox = $this->hydrate($row);
             $dashboardId = $row['id'];
-
-            if (!isset($stack[$textbox->getId()])) {
-                $stack[$textbox->getId()] = [
-                    'textbox' => $textbox,
-                    'folders' => [],
-                    'dashboards' => [],
-                ];
-            }
 
             $stack[$textbox->getId()]['dashboards'][$dashboardId] = [
                 'name' => $row['name'],
