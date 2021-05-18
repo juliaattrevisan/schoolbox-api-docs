@@ -158,10 +158,11 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         ]);
 
         while ($row = $homepageUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $textbox = $this->hydrate($row);
+            $textboxId = $row['textboxID'];
+
             $folder = $this->getJoinMapper('category')->hydrate($row, 'f');
 
-            $stack[$textbox->getId()]['folders'][$folder->getId()] = [
+            $stack[$textboxId]['folders'][$folder->getId()] = [
                 'folder' => $folder,
                 'numUsages' => $row['numUsages']
             ];
@@ -195,10 +196,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         ]);
 
         while ($row = $dashboardUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
-            $textbox = $this->hydrate($row);
+            $textboxId = $row['textboxID'];
             $dashboardId = $row['id'];
 
-            $stack[$textbox->getId()]['dashboards'][$dashboardId] = [
+            $stack[$textboxId]['dashboards'][$dashboardId] = [
                 'name' => $row['name'],
                 'numUsages' => $row['numUsages']
             ];
