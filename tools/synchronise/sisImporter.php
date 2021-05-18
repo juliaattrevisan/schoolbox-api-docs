@@ -79,10 +79,12 @@ HELP;
         /* Spawn schedular based on args
          *
          * Use Hourly frequency, taking advantage of the functional equivalence
+         * (Custom hours don't matter for Hourly frequency)
          */
         $host = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
         $frequency = Endpoint\Scheduler::HOURLY;
+        $customHours = [];
         $type = $this->getConfig()->get('schooldata_import_data_source');
         $file = $this->getOpt(self::OPT_LONG_FILE);
 
@@ -108,7 +110,15 @@ NULLTYPE;
         $factory = new Endpoint\Factory($host, $key, $perform, $this->getLogger());
 
         $randomMapper = UserMapper::getInstance();
-        (new Endpoint\Scheduler($randomMapper->getDatabase(), $frequency, $factory, $type, $file, $this->getLogger()))->run(time());
+        (new Endpoint\Scheduler(
+            $randomMapper->getDatabase(),
+            $frequency,
+            $customHours,
+            $factory,
+            $type,
+            $file,
+            $this->getLogger()
+        ))->run(time());
 
         /* Announce conclusion
          */
