@@ -6,15 +6,27 @@
     options:           string[]
     required:          bool
     renderEmptyOption: bool            Should we insert an empty option in the dropdown select?
+    multi:             bool            Can we select multiple options?
 #}
+{# We need an empty option here so if no values are selected, the field is still included in payload #}
+{% if multi %}
+    <input type="hidden" name="{{ name }}" value="">
+{% endif %}
 
-<select name="{{ name }}" id="{{ name }}-field" {{ required ? 'required ' }} {% if not editable %}disabled="disabled"{% endif %}>
+<select name="{{ name }}{% if multi %}[]{% endif %}" id="{{ name }}-field" {{ required ? 'required ' }} {% if not editable %}disabled="disabled"{% endif %}{% if multi %} multiple{% endif %}>
     {% if renderEmptyOption %}
         <option value="" {% if required %} style="display: none;"{% endif %}{% if value is null %} selected="selected"{% endif %}>-- select an option --</option>
     {% endif %}
+    {% if multi %}
+        {% set values = value|split(',') %}
+        {% for option in options %}
+            <option value="{{ option }}" {% if option in values %}selected="selected"{% endif %}>{{ option }}</option>
+        {% endfor %}
+    {% else %}
     {% for key, option in options %}
         {# We still need to convert numeric keys to strings, eg 0 => '0' so that a falsy value (eg NULL, '') does not erroneously match a key of 0 #}
         {% set keyString = key ~ '' %}
         <option value="{{ key }}" {% if keyString is same as(value) %}selected="selected"{% endif %}>{{ option }}</option>
     {% endfor %}
+    {% endif %}
 </select>

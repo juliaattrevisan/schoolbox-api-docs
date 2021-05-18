@@ -1,26 +1,32 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint\Test;
 
+use PHPUnit\Framework as PHPUnitFramework;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Importer\Endpoint\Scheduler;
 use Schoolbox\External\Importer\Endpoint\ValidScheduleExecution;
+use SebastianBergmann\RecursionContext;
 
 /**
  * Class ScheduleTest
  *
  * @package Schoolbox\External\Importer\Endpoint\Test
+ * @codeCoverageIgnore
+ * @covers \Schoolbox\External\Importer\Endpoint\ValidScheduleExecution
  */
 class ScheduleTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validHourlyScheduleFrequency
+     * @dataProvider providerValidHourlyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -30,7 +36,7 @@ class ScheduleTest extends TestCase
     {
         $scheduler = new ValidScheduleExecution();
 
-        $this->assertEquals($expected, $scheduler->isSatisfiedBy($frequency, $now));
+        self::assertEquals($expected, $scheduler->isSatisfiedBy($frequency, [], $now));
     }
 
 
@@ -39,7 +45,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validHourlyScheduleFrequency(): array
+    public function providerValidHourlyScheduleFrequency(): array
     {
         return [
             'Hourly 1' => [
@@ -64,7 +70,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validTwiceDailyScheduleFrequency
+     * @dataProvider providerValidTwiceDailyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -74,7 +80,7 @@ class ScheduleTest extends TestCase
     {
         $scheduler = new ValidScheduleExecution();
 
-        $this->assertEquals($expected, $scheduler->isSatisfiedBy($frequency, $now));
+        self::assertEquals($expected, $scheduler->isSatisfiedBy($frequency, [], $now));
     }
 
 
@@ -83,7 +89,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validTwiceDailyScheduleFrequency(): array
+    public function providerValidTwiceDailyScheduleFrequency(): array
     {
         return [
             'Twice Daily 1' => [
@@ -138,7 +144,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validDailyScheduleFrequency
+     * @dataProvider providerValidDailyScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -148,7 +154,7 @@ class ScheduleTest extends TestCase
     {
         $scheduler = new ValidScheduleExecution();
 
-        $this->assertEquals($expected, $scheduler->isSatisfiedBy($frequency, $now));
+        self::assertEquals($expected, $scheduler->isSatisfiedBy($frequency, [], $now));
     }
 
 
@@ -157,7 +163,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDailyScheduleFrequency(): array
+    public function providerValidDailyScheduleFrequency(): array
     {
         return [
             'Daily 1' => [
@@ -212,7 +218,7 @@ class ScheduleTest extends TestCase
 
 
     /**
-     * @dataProvider provider_validNoneScheduleFrequency
+     * @dataProvider providerValidNoneScheduleFrequency
      *
      * @param string $frequency
      * @param int    $now
@@ -222,7 +228,7 @@ class ScheduleTest extends TestCase
     {
         $scheduler = new ValidScheduleExecution();
 
-        $this->assertEquals($expected, $scheduler->isSatisfiedBy($frequency, $now));
+        self::assertEquals($expected, $scheduler->isSatisfiedBy($frequency, [], $now));
     }
 
 
@@ -231,7 +237,7 @@ class ScheduleTest extends TestCase
      *
      * @return array
      */
-    public function provider_validNoneScheduleFrequency(): array
+    public function providerValidNoneScheduleFrequency(): array
     {
         return [
             'No schedule 1' => [
@@ -270,6 +276,41 @@ class ScheduleTest extends TestCase
                 strtotime('2019-12-02 17:13:00'),
                 false
             ],
+        ];
+    }
+
+
+    /**
+     * @dataProvider providerSchoolboxManagedScheduleFrequency
+     *
+     * @param string[] $customHours
+     * @param int      $now
+     * @param bool     $expected
+     * @throws PHPUnitFramework\ExpectationFailedException
+     * @throws RecursionContext\InvalidArgumentException
+     */
+    public function testSchoolboxManagedScheduleFrequency(array $customHours, int $now, bool $expected): void
+    {
+        $scheduler = new ValidScheduleExecution();
+
+        self::assertEquals($expected, $scheduler->isSatisfiedBy(Scheduler::SB, $customHours, $now));
+    }
+
+
+    /**
+     * Current hour must match one of the configured values
+     *
+     * @return array[]
+     */
+    public function providerSchoolboxManagedScheduleFrequency(): array
+    {
+        return [
+            'No hours'                 => [[], strtotime('2019-12-02 17:13:00'), false],
+            'Single matching hour'     => [['00'], strtotime('2019-12-02 00:13:00'), true],
+            'Single non-matching hour' => [['00'], strtotime('2019-12-02 01:13:00'), false],
+            'Multi matching hour'      => [['00','01'], strtotime('2019-12-02 00:13:00'), true],
+            'Multi non-matching hour'  => [['00','01'], strtotime('2019-12-02 02:13:00'), false],
+            'Multi matching hour 24'   => [['00','23'], strtotime('2019-12-02 23:13:00'), true],
         ];
     }
 }

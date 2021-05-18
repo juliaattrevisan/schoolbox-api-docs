@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
@@ -41,6 +43,13 @@ class Scheduler
      */
     private $frequency;
 
+    /**
+     * Custom hours to run tool at, eg ['00','03','15','23']
+     *
+     * @var string[]
+     */
+    private array $customHours;
+
 
     /**
      * @var IFactory
@@ -74,6 +83,7 @@ class Scheduler
      *
      * @param IDatabase       $db
      * @param string          $frequency
+     * @param string[]        $customHours
      * @param IFactory        $factory
      * @param string          $type
      * @param string|null     $file
@@ -82,6 +92,7 @@ class Scheduler
     public function __construct(
         IDatabase $db,
         string $frequency,
+        array $customHours,
         IFactory $factory,
         string $type,
         ?string $file,
@@ -89,6 +100,7 @@ class Scheduler
     ) {
         $this->db = $db;
         $this->frequency = $frequency;
+        $this->customHours = $customHours;
         $this->factory = $factory;
         $this->type = $type;
         $this->file = $file;
@@ -103,7 +115,7 @@ class Scheduler
      */
     public function run(int $now): void
     {
-        if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $now)) {
+        if ((new ValidScheduleExecution())->isSatisfiedBy($this->frequency, $this->customHours, $now)) {
             $composites = $this->factory->produce($this->file, $this->type);
 
             /* No composites produced; exit

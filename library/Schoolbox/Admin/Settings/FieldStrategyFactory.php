@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings;
@@ -116,6 +118,8 @@ class FieldStrategyFactory
                 return new FieldType\TimePicker\Renderer();
             case ConfigMapper::FIELD_NUMBER:
                 return new FieldType\Number\Renderer();
+            case ConfigMapper::FIELD_SELECT_MULTI:
+                return new FieldType\SelectMulti\Renderer();
         }
         throw new UnexpectedValueException("Unable to find a field renderer for config field '{$fieldId}'");
     }
@@ -148,6 +152,8 @@ class FieldStrategyFactory
             case ConfigMapper::FIELD_TIME_PICKER:
             case ConfigMapper::FIELD_NUMBER:
                 return new FieldValueSerializerBase();
+            case ConfigMapper::FIELD_SELECT_MULTI:
+                return new FieldType\SelectMulti\ValueSerializer();
             // Note that no default implicitly requires explicit registration to avoid logic errors.
         }
         throw new UnexpectedValueException("Unable to find a field value serializer for config field '{$fieldId}'");

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\Select;
@@ -31,16 +33,35 @@ class Renderer extends AbstractRenderer
 
         $isValidValue = $this->isValueValid($data['value'], $data['options']);
 
-        if(!$isValidValue){
-            $data['value'] = null;
+        if (!$isValidValue) {
+            $data['value'] = $this->castInvalidValue($data['value'], $data['options']);
         }
 
         // We need to render an empty option if:
         // * config is optional, or
         // * config value is invalid
-        $data['renderEmptyOption'] = !$config->getRequired() || !$isValidValue;
+        $data['renderEmptyOption'] = $this->renderEmptyOption($config, $isValidValue);
 
+        $data['multi'] = false;
         return $data;
+    }
+
+    protected function renderEmptyOption(Config $config, bool $isValidValue): bool
+    {
+        return !$config->getRequired() || !$isValidValue;
+    }
+
+
+    /**
+     * Converts an invalid value to a valid one suitable for passing to front-end
+     *
+     * @param string|null $value
+     * @param string[] $options
+     * @return mixed
+     */
+    protected function castInvalidValue(?string $value, array $options)
+    {
+        return null;
     }
 
 
@@ -60,9 +81,16 @@ class Renderer extends AbstractRenderer
     }
 
 
+    /**
+     * Returns whether the current value is valid because it matches one of the available options
+     *
+     * @param string|null $value
+     * @param string[]    $options
+     * @return bool
+     */
     protected function isValueValid(?string $value, array $options): bool
     {
-        foreach ($options as $key => $option) {
+        foreach ($options as $option) {
             if ($option === $value) {
                 return true;
             }
