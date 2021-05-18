@@ -9,7 +9,7 @@ VALUES (
    null,
    (SELECT id FROM lu_config_type WHERE type = 'Modules'),
    'true',
-   'false',
+   'true',
    'false',
    'settings',
    (SELECT MAX(sequence)+1 FROM config c WHERE type_id = (
