@@ -68,7 +68,7 @@
                                             {# If this folder is the only usage of it, don't display the meta
                                              # You'd be stating the obvious
                                              #}
-                                            {% if not (usage.folders|length == 1 and usage.folders[folder.id] is not null) %}
+                                            {% if not (usage.folders|length == 1 and usage.folders[0].id == folder.id) %}
                                             <p class="meta">
                                                 Pages:
                                                 {% for folderUsage in usage.folders %}
