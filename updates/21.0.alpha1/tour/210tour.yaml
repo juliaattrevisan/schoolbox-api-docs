@@ -1,0 +1,32 @@
+tour:
+  title: '21.0 Release'
+  description: 'Introduce staff to the new features of the 21.0 release'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: What's New
+        type: modal
+        content: " <img src='/static/images/tour/21_0_release.png' style='width:100%;margin-bottom:16px;'>
+                   <h6>Google Collaboration</h6>
+                   <p>The new Google Files component will allow you to quickly and easily embed Google Docs, Slides or Sheets into your page.</p>
+                   <h6>Video Capture</h6>
+                   <p>You can now capture video or record your screen, and easily attach your captures to tasks, due work, news or embed it onto your pages.</p>
+                   <h6>Course Improvements</h6>
+                   <p></p>
+                   <h6>Admin Area Enhancements</h6>
+                   <p>The entire Admin area is now searchable so you can quickly find what you need.</p>
+                   <h6>Improved Print Support</h6>
+                   <p></p>
+                   <h6>TASS API</h6>
+                   <p></p>
+                   <h6>GeoSnapShot Photo</h6>
+                   <p></p>
+                   <p><a href='https://help.schoolbox.com.au/homepage/'>Find out more via our release notes.</a><br />
+                   <b>Hercules & the Schoolbox Team</b>
+                   </p>"
+        class: introjs-newsmodal
