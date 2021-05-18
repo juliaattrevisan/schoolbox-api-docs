@@ -62,9 +62,10 @@ class Javascript extends Base
             'start'     => $start,
             'end'       => '',
 
-            /* Whether you can edit this event or not
-             */
-            'editable'  => $this->isEditable(),
+            // FullCalendar's editable setting: this controls whether the event
+            // itself may be moved or resized.
+            // (Assessments may never be moved or resized)
+            'editable'  => false,
 
             /* Whether it's an all-day event or not
              * If allDay is true, then you can't resize it
@@ -118,6 +119,9 @@ class Javascript extends Base
             'weighted'       => $assessable->getWeight() ? 1 : 0,
             'assessmentType' => $assessable->getFamilyName(),
             'colour'         => $folderColour ? $folderColour->getAsRgba() : null,
+            // Schoolbox's editable setting: controls whether the dialog show an
+            // edit button
+            'editable'       => $this->isEditable(),
         ];
     }
 
