@@ -184,5 +184,31 @@ export default {
      */
     isLimitedAttendance: function(max) {
         return max !== null;
-    }
+    },
+
+    /**
+     * Does the attendance meta show?
+     *
+     * @param currentAttendanceLevel
+     * @return {boolean}
+     */
+    showAttendanceMeta: function (currentAttendanceLevel) {
+        return currentAttendanceLevel === ATTENDANCE_LEVELS_OPEN || currentAttendanceLevel === ATTENDANCE_LEVELS_INVITE_ONLY;
+    },
+
+    /**
+     * Is this an open-attendance event?
+     *
+     * @param currentAttendanceLevel
+     * @return {boolean}
+     */
+    isOpen: (currentAttendanceLevel) => currentAttendanceLevel === ATTENDANCE_LEVELS_OPEN,
+
+    /**
+     * Is this an invite-only event?
+     *
+     * @param currentAttendanceLevel
+     * @return {boolean}
+     */
+    isInviteOnly: (currentAttendanceLevel) => currentAttendanceLevel === ATTENDANCE_LEVELS_INVITE_ONLY,
 }

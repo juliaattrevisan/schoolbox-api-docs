@@ -8,7 +8,8 @@ import qs                 from 'qs';
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
-    */
+ */
+import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
 import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
 import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
 import checks              from '@schoolboxCalendarEvent/checks';
@@ -186,6 +187,9 @@ export default {
         this.isAccepted = checks.isAccepted;
         this.isDeclined = checks.isDeclined;
         this.isLimitedAttendance = checks.isLimitedAttendance;
+        this.showAttendanceMeta = checks.showAttendanceMeta;
+        this.isOpen = checks.isOpen;
+        this.isInviteOnly = checks.isInviteOnly;
     },
 
     methods: {
@@ -720,6 +724,11 @@ export default {
                     <a :href="'/search/user/' + String(eventExtendedProps.reviewer.id)">
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
+                </meta-item>
+                <meta-item class="icon-class-list" v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)">
+                    Attendance:
+                    <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)">Invite only</template>
+                    <template v-else-if="isOpen(eventExtendedProps.attendance.payload.level)">Open</template>
                 </meta-item>
                 <template v-if="this.canRsvp(
                                 eventExtendedProps.attendance.payload.level,
