@@ -1612,6 +1612,14 @@ article {
   // Scroll WYSIWYG content areas when wide tables exist.
   overflow-x: auto;
   overflow-y: hidden;
+
+  // Enforce right text alignment for right-aligned blocks within user-generated
+  // content.
+  // Otherwise: most do, but some don't (notably: discussion threads)
+  [dir="rtl"] {
+    text-align: right;
+  }
+
 }
 
 /**
