@@ -95,38 +95,56 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     {
         $stack = [];
 
-        /* Find homepage usages
+        /* Find all the textboxes in $folderId and initialise stack
+         *
+         * This is the list of textboxes which exist on this page and
+         * other homepage textbox components might alt-source these;
+         * when that happens, accumulate a list of those homepages
+         */
+        $textboxes = $this->findByColumn('categoryID', $folderId);
+
+        foreach ($textboxes as $textbox) {
+            $stack[$textbox->getId()] = [
+                'textbox' => $textbox,
+                'folders' => [],
+                'dashboards' => [],
+            ];
+        }
+
+        /* Find homepage usages that might have alt-sourced to one or more of the
+         * textboxes that exist in this folder; textboxes in a homepage might not
+         * ever have been alt-sourced at all but should still appear in the list.
          */
         $homepageUsageQuery = "
             SELECT 
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('category', 'f')},
                 COUNT(*) AS numUsages
-            FROM textBox 
-            INNER JOIN folder f ON textBox.categoryID = f.id
-            WHERE textBox.categoryID = :folderId
+            FROM component_definition cd
+            INNER JOIN component_instance ci ON cd.id = ci.component_definition_id
+            INNER JOIN component_config_instance cci ON cci.component_instance_id = ci.id
+            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+            INNER JOIN textBox ON cci.value = textBox.textBoxID
+            INNER JOIN folder f ON ci.identifier = f.id
+            WHERE cd.`class` = :controller
+            AND ccd.`key` = 'textbox'
             AND textBox.deleted IS NULL
             AND f.deleted_at IS NULL
-            GROUP BY f.id, textBox.textBoxID
+            AND textBox.categoryID = :folderId
+            GROUP BY textBox.textBoxID, f.id
+            ORDER BY textBox.textBoxID
         ";
 
         $homepageUsageStatement = $this->database->prepare($homepageUsageQuery);
 
         $homepageUsageStatement->execute([
+            'controller' => Controller::class,
             'folderId' => $folderId,
         ]);
 
         while ($row = $homepageUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
             $textbox = $this->hydrate($row);
             $folder = $this->getJoinMapper('category')->hydrate($row, 'f');
-
-            if (!isset($stack[$textbox->getId()])) {
-                $stack[$textbox->getId()] = [
-                    'textbox' => $textbox,
-                    'folders' => [],
-                    'dashboards' => [],
-                ];
-            }
 
             $stack[$textbox->getId()]['folders'][$folder->getId()] = [
                 'folder' => $folder,
