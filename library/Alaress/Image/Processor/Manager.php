@@ -82,6 +82,13 @@ class Manager
     private array $workerPids = [];
 
     /**
+     * Mutex that contains the process ID of the worker currently processing an animated GIF
+     *
+     * @var int|null
+     */
+    private ?int $workerPidAnimatedGif;
+
+    /**
      * Generate transforms for hashes uploaded during the last N minutes
      *
      * @var int
