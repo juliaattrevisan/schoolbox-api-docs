@@ -536,6 +536,9 @@ class Manager
         foreach ($this->workerPids as $idx => $workerPid) {
             if (!posix_kill($workerPid, SIG_DFL)) {
                 unset($this->workerPids[$idx]);
+                if ($workerPid === $this->workerPidAnimatedGif) {
+                    $this->workerPidAnimatedGif = null;
+                }
             }
         }
     }
