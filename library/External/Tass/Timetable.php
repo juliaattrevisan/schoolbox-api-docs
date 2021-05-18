@@ -365,6 +365,8 @@ class External_Tass_Timetable implements External_TimetableInterface
         if (empty($roomCodes)) {
             return [];
         }
+        // numeric room codes causes conversion error
+        $roomCodes = array_map('strval', $roomCodes);
         $predicate = PredicateBuilder::getArrayBindings($roomCodes, 'roomCodes');
         $query = "
             SELECT
