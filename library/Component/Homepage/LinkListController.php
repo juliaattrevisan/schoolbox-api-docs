@@ -140,8 +140,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->setBlock('has_link', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_link', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'link', 'link_block');
-            $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
-            $this->setBlock('source_folder_exists', "view_all_links", "view_all_links_block");
+            $this->setBlock('source_folder_exists', "component_action", "component_action_block");
+            $this->setBlock('component_action', "submit_link", "submit_link_block");
+            $this->setBlock('component_action', "view_all_links", "view_all_links_block");
             $this->setBlock('link', 'modify_link', 'modify_link_block');
             $this->setBlock('link', 'owner_exists', 'owner_exists_block');
             $this->setBlock('link', 'owner_deleted', 'owner_deleted_block');
@@ -191,17 +192,26 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                     $this->parse("link_block", "link", true);
                 }
 
+                $showComponentAction = false;
                 if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar('submit_link_block', '');
                 } else {
+                    $showComponentAction = true;
                     $this->parse('submit_link_block', 'submit_link');
                 }
 
                 // Show view all links button, only when total available is more than links displayed.
                 if (\count($allLinks) < $linkCount && $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                    $showComponentAction = true;
                     $this->parse('view_all_links_block', 'view_all_links');
                 } else {
                     $this->setVar('view_all_links_block', '');
+                }
+
+                if ($showComponentAction) {
+                    $this->parse('component_action_block', 'component_action');
+                } else {
+                    $this->setVar('component_action', '');
                 }
 
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
