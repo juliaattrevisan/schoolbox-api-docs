@@ -34,7 +34,7 @@ class DatepickerCest
         $i->canSee('Date Picker Test');
         $i->amOnPage('/calendar/full');
         sleep(2);
-        $element = Locator::contains('a.fc-day-grid-event', 'Date Picker Test');
+        $element = Locator::contains('a.fc-daygrid-event', 'Date Picker Test');
         $i->clickWithLeftButton($element);
         $element = Locator::contains('a.button', 'Modify');
         $i->clickWithLeftButton($element);
