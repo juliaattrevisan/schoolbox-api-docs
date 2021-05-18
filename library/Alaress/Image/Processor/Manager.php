@@ -24,7 +24,9 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External as SchoolboxExternal;
+use Schoolbox\Resource\FilesystemFactory;
 use Schoolbox\Resource\Storage\Transform;
 use Symfony\Component\Lock\Exception\LockAcquiringException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
@@ -78,15 +80,18 @@ class Manager
     // How many seconds should CLI have to process a single transformation
     private const IMAGICK_TIME_LIMIT = 3600;
 
+    // If file is GIF and larger than this, only allow 1 simultaneous execution
+    private const MUTEX_FILESIZE_LIMIT_BYTES = 1000000;
+
     /**  @var int[] */
     private array $workerPids = [];
 
     /**
-     * Mutex that contains the process ID of the worker currently processing an animated GIF
+     * Mutex containing the process ID of the worker currently processing an animated GIF
      *
      * @var int|null
      */
-    private ?int $workerPidAnimatedGif;
+    private ?int $workerPidMutex = null;
 
     /**
      * Generate transforms for hashes uploaded during the last N minutes
@@ -149,6 +154,22 @@ class Manager
     private int $managerPid;
 
     /**
+     * Local storage directory. Null if using awsS3 storage. No trailing slash.
+     *
+     * @var string|null
+     */
+    private ?string $localStorageDir;
+
+    /**
+     * Cache of whether a hash's transformation requires a single-process mutex.
+     *
+     * Enables us to avoid hitting the file-system repeatedly
+     *
+     * @var bool[]
+     */
+    private array $requiresMutexCache = [];
+
+    /**
      * @param int             $timeInterval    Time period in minutes to look up images for processing
      * @param int             $imageCountLimit Max number of images to process
      * @param int             $workerCount     Max number of concurrent workers
@@ -196,11 +217,44 @@ class Manager
         $this->startTime = time();
         $pdo             = $this->buildPdo();
         $this->lock = $this->checkOverlappingExecution($pdo);
+        $this->localStorageDir = $this->deriveLocalStorageDir($pdo);
         $transformations = $this->generateTransformations($this->deriveHashList($pdo), $pdo);
         unset($pdo);
         $this->processTransformations($transformations);
         $this->lock->release();
         return $this->isInterrupted;
+    }
+
+
+    /**
+     * Returns the local storage dir, or NULL if not using local storage
+     *
+     * @param PDO $pdo
+     * @return string|null
+     * @throws PDOException
+     */
+    private function deriveLocalStorageDir(PDO $pdo): ?string
+    {
+        if ($this->getConfigValue($pdo, ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
+            return null;
+        }
+        return rtrim($this->getConfigValue($pdo, 'storage_dir'), DIRECTORY_SEPARATOR);
+    }
+
+
+    /**
+     * Returns the specified config value
+     *
+     * @param PDO    $pdo
+     * @param string $configName
+     * @return string|null
+     * @throws PDOException
+     */
+    private function getConfigValue(PDO $pdo, string $configName): ?string
+    {
+        $statement = $pdo->prepare("SELECT value FROM config WHERE name = :name");
+        $statement->execute(['name' => $configName]);
+        return $statement->fetch(PDO::FETCH_COLUMN);
     }
 
 
@@ -312,7 +366,10 @@ class Manager
      * Derive the set of images uploaded in the past interval
      *
      * @param PDO $pdo
-     * @return string[]
+     * @return string[][]
+     * @type  string     $return[]['hash']
+     * @type  string     $return[]['ext']
+     * @type  int        $return[]['filesize']
      */
     private function deriveHashList(PDO $pdo): array
     {
@@ -322,7 +379,7 @@ class Manager
 
         // Retrieve list of images uploaded within the N minutes up to a max of N
         $query = "
-            SELECT `hash` FROM `storage` s
+            SELECT `hash`, s.ext, s.filesize FROM `storage` s
             JOIN allowedFileExtension afe ON s.ext = afe.extension
             JOIN allowedFileTypes aft
                 ON afe.fileTypeID = aft.fileTypeID
@@ -332,7 +389,7 @@ class Manager
             WHERE s.uploaded_on >= (NOW() - INTERVAL {$this->timeInterval} MINUTE)
             ORDER BY s.uploaded_on
             LIMIT 0, {$this->imageCountLimit}";
-        return $pdo->query($query)->fetchAll(PDO::FETCH_COLUMN);
+        return $pdo->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
 
@@ -342,7 +399,10 @@ class Manager
      * Exclude transformations that are already done.
      * Includes transformations that php-fpm timed out on.
      *
-     * @param string[] $hashList
+     * @param string[][] $hashList
+     * @type  string     $hashList[]['hash']
+     * @type  string     $hashList[]['ext']
+     * @type  int        $hashList[]['filesize']
      * @param PDO      $pdo
      * @return Transformation[]
      * @throws InvalidColumnException
@@ -359,10 +419,14 @@ class Manager
         /** @var ITransformFactory[] $transformFactories */
         $transformFactories = [$myImageTransforms, $storageTransforms, $iconTransforms, $portraitTransforms];
 
-        $existingTransforms = $this->getExistingTransformsPerHash($hashList, $pdo);
+        $existingTransforms = $this->getExistingTransformsPerHash(array_column($hashList, 'hash'), $pdo);
 
         $transformations = [];
-        foreach ($hashList as $hash) {
+        foreach ($hashList as $row) {
+            $hash     = $row['hash'];
+            $ext      = $row['ext'];
+            $fileSize = (int)$row['filesize'];
+
             $this->logger->debug($this->prefixLog("Scheduling standard transforms. Hash: '$hash'"));
             // Custom Width x Height transformations
             foreach (self::CUSTOM_TRANSFORMS as $widthAndHeight) {
@@ -377,7 +441,7 @@ class Manager
                 }
                 $this->logger->debug($this->prefixLog("Scheduling standard transform. Hash: '$hash', CacheKey: '$cacheKey'"));
                 $transform                         = $myImageTransforms->retrieve($width, $height);
-                $transformations[$hash][$cacheKey] = new Transformation($hash, $cacheKey, $transform);
+                $transformations[$hash][$cacheKey] = new Transformation($hash, $cacheKey, $transform, $ext, $fileSize);
             }
             // Preset transformations
             foreach (self::STORAGE_TRANSFORMS as $size) {
@@ -391,7 +455,7 @@ class Manager
                 }
                 $this->logger->debug($this->prefixLog("Scheduling standard transform. Hash: '$hash', CacheKey: '$cacheKey'"));
                 $transform                         = $storageTransforms->retrieve($size);
-                $transformations[$hash][$cacheKey] = new Transformation($hash, $cacheKey, $transform);
+                $transformations[$hash][$cacheKey] = new Transformation($hash, $cacheKey, $transform, $ext, $fileSize);
             }
         }
 
@@ -425,13 +489,13 @@ class Manager
                 }
                 $this->logger->debug($this->prefixLog("Scheduling timed-out transform. Hash: '$hash', CacheKey: '$cacheKey'"));
                 $transform                         = $recognised[0]->retrieveForCacheKey($cacheKey);
-                $transformations[$hash][$cacheKey] = new Transformation($hash, $cacheKey, $transform);
+                $transformations[$hash][$cacheKey] = new Transformation($hash, $cacheKey, $transform, null, null);
             }
         }
 
         // Flatten nested transformation array
         $flat = [];
-        foreach ($transformations as $hash => $hashTransformations) {
+        foreach ($transformations as $hashTransformations) {
             foreach ($hashTransformations as $transformation) {
                 $flat[] = $transformation;
             }
@@ -491,7 +555,7 @@ class Manager
     /**
      * Returns the state of existing transforms for the specified hash list, indexed by hash, cacheKey
      *
-     * @param array $hashList
+     * @param string[] $hashList
      * @param PDO   $pdo
      * @return string[][]
      * @throws InvalidColumnException
@@ -536,8 +600,8 @@ class Manager
         foreach ($this->workerPids as $idx => $workerPid) {
             if (!posix_kill($workerPid, SIG_DFL)) {
                 unset($this->workerPids[$idx]);
-                if ($workerPid === $this->workerPidAnimatedGif) {
-                    $this->workerPidAnimatedGif = null;
+                if ($workerPid === $this->workerPidMutex) {
+                    $this->workerPidMutex = null;
                 }
             }
         }
@@ -569,8 +633,15 @@ class Manager
             $this->workerCleanup();
             // Are we less than concurrent worker limit?
             if (count($this->workerPids) < $this->workerCountLimit) {
+                $t             = reset($transformations);
+                $requiresMutex = $this->requiresMutex($t);
+                if ($requiresMutex && $this->workerPidMutex !== null) {
+                    // Don't allow multiple workers that require a mutex to execute simultaneously
+                    sleep(1);
+                    continue;
+                }
                 // Delegate next hash processing to a new worker
-                $t   = array_shift($transformations);
+                array_shift($transformations);
                 $this->renewLockAndMaxExecutionTime();
                 $pid = pcntl_fork();
                 if ($pid === -1) {
@@ -581,6 +652,10 @@ class Manager
                 if ($pid) {
                     $this->logger->info($this->prefixLog("Forked worker w/ PID: $pid"));
                     $this->workerPids[] = $pid;
+                    if ($requiresMutex) {
+                        $this->logger->notice($this->prefixLog("Mutex worker started"));
+                        $this->workerPidMutex = $pid;
+                    }
                 } else {
                     // Worker Process
                     $worker = new Worker(
@@ -604,5 +679,52 @@ class Manager
         }
 
         $this->logger->info($this->prefixLog("Finished"));
+    }
+
+
+    /**
+     * Returns whether the only a single worker should be allowed to run while transforming the specified hash
+     *
+     * Will return true when:
+     * * storage is local and original file is an animated GIF over 1MB in size, or
+     * * storage is aws and original file is a GIF over 1MB in size
+     *
+     * @param Transformation $t
+     * @return bool
+     */
+    private function requiresMutex(Transformation $t): bool
+    {
+        $hash = $t->getHash();
+        if (!array_key_exists($hash, $this->requiresMutexCache)) {
+            $this->logger->debug($this->prefixLog("Checking mutex required: '$hash'"));
+            if ($this->localStorageDir !== null) {
+                // If using local storage
+                $path        = \Schoolbox\Resource\Storage\Manager::getPathFromHash($hash);
+                $cmd         = "/usr/bin/identify -format '%n\\n' {$this->localStorageDir}/$path | head -n 1";
+                $countLayers = (int)exec($cmd, $output, $exitCode);
+                if ($exitCode) {
+                    $this->logger->error("Unable to determine image layer count, assuming multiple layers");
+                    $this->requiresMutexCache[$hash] = true;
+                } else {
+                    // Require mutex if layered and >1MB
+                    $this->logger->debug($this->prefixLog("Count Layers: $countLayers"));
+                    $this->logger->debug($this->prefixLog("FileSize: {$t->getFileSize()}"));
+                    $this->requiresMutexCache[$hash] =
+                        $countLayers > 1 &&
+                        (
+                            $t->getFileSize() === null ||
+                            $t->getFileSize() > self::MUTEX_FILESIZE_LIMIT_BYTES
+                        );
+                }
+            } else {
+                // If awsS3, require mutex if GIF and >1MB
+                $this->logger->debug($this->prefixLog("File ext: {$t->getExt()}"));
+                $this->logger->debug($this->prefixLog("FileSize: {$t->getFileSize()}"));
+                $this->requiresMutexCache[$hash] =
+                    ($t->getExt() === null || strtolower($t->getExt()) === 'gif') &&
+                    ($t->getFileSize() === null || $t->getFileSize() > self::MUTEX_FILESIZE_LIMIT_BYTES);
+            }
+        }
+        return $this->requiresMutexCache[$hash];
     }
 }
