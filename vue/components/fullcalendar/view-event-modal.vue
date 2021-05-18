@@ -200,6 +200,7 @@ export default {
          */
         hasComponentActions() {
             return this.eventExtendedProps.folder.id ||
+                this.eventExtendedProps.links.path ||
                 this.eventExtendedProps.links.view ||
                 this.eventExtendedProps.links.modify ||
                 this.eventExtendedProps.links.delete ||
@@ -781,6 +782,9 @@ export default {
 
                         <div>
                             <!-- Various buttons -->
+                            <span v-if="eventExtendedProps.links.path">
+                                <a class="button" :href="eventExtendedProps.links.path">View more details</a>
+                            </span>
                             <span v-if="eventExtendedProps.folder.id">
                                 <a class="button"
                                    :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
