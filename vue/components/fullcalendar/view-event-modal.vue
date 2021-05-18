@@ -729,19 +729,25 @@ export default {
                     Attendance:
                     <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)">Invite only</template>
                     <template v-else-if="isOpen(eventExtendedProps.attendance.payload.level)">Open</template>
+
+                    <template v-if="this.canRsvp(
+                        eventExtendedProps.attendance.payload.level,
+                        eventExtendedProps.attendance.payload.attendees.guests,
+                        eventExtendedProps.attendance.payload.currentUser.user.id,
+                        eventExtendedProps.attendance.payload.currentUser.status,
+                        eventExtendedProps.attendance.payload.attendees.max,
+                        eventExtendedProps.attendance.payload.attendees.available)
+                        &&
+                        this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)
+                    ">
+                        (<template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
+                        <template v-else>No</template>
+                        available
+                        <template v-if="eventExtendedProps.attendance.payload.attendees.available === 1">place</template>
+                        <template v-else>places</template>
+                        remaining)
+                    </template>
                 </meta-item>
-                <template v-if="this.canRsvp(
-                                eventExtendedProps.attendance.payload.level,
-                                eventExtendedProps.attendance.payload.attendees.guests,
-                                eventExtendedProps.attendance.payload.currentUser.user.id,
-                                eventExtendedProps.attendance.payload.currentUser.status,
-                                eventExtendedProps.attendance.payload.attendees.max,
-                                eventExtendedProps.attendance.payload.attendees.available)">
-                    <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)">
-                        <template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
-                        <template v-else>No</template> available place(s) remaining
-                    </meta-item>
-                </template>
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
