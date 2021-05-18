@@ -219,7 +219,7 @@ class Controller extends BaseController
     private function displayFolderModifyForm(array $breadcrumbs, string $formAction, Model $folder): void
     {
         // Homepage template
-        $homepageTemplates = $this->homepageTemplateMapper->findAll(['order' => ['name' => 'asc']]);
+        $homepageTemplates = $this->homepageTemplateMapper->findWithNoHomepageTemplate(['order' => ['name' => 'asc']]);
         if (!$folder->getId()) {
             $templateId = HomepageTemplate::HOMEPAGE_NONE;
         } else {

@@ -58,12 +58,23 @@ class HomepageTemplateMapper extends Mapper
         return parent::delete($object);
     }
 
-    public function findAll($options = array())
+
+    /**
+     * Find the superset of templates from which a Homepage Template may be administered
+     * and also provide a No Homepage option which normally doesn't exist in administration
+     *
+     * @param array $options
+     * @return \Schoolbox\GenericCollection
+     * @throws Mapper\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function findWithNoHomepageTemplate($options = array())
     {
         $templates = parent::findAll($options);
         $templates->prepend($this->getNoHomepageTemplate());
         return $templates;
     }
+
 
     /**
      * @return HomepageTemplate
