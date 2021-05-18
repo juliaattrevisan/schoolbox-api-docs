@@ -589,10 +589,7 @@ class Manager
                         $this->retryFailed,
                         $this->attemptsPerTransform
                     );
-                    (new CliTool\Kernel(
-                        $worker,
-                        [CliTool\Kernel::OPTION_LEVEL => $this->logLevel]
-                    ))->runApp();
+                    (new CliTool\Kernel($worker, [CliTool\Kernel::OPTION_LEVEL => $this->logLevel]))->runApp();
                     exit;
                 }
             }
