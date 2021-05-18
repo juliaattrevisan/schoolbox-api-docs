@@ -112,8 +112,7 @@ class Javascript extends SubmissionRendererJavascript
             'end'   => '',
 
             // Whether you can edit this event or not
-
-            'editable' => $this->isEditable(),
+            'editable' => false,
 
             // Whether it's an all-day event or not If allDay is true, then you can't resize it
             // Schoolbox usage would be that all events are not allDay events
@@ -150,6 +149,7 @@ class Javascript extends SubmissionRendererJavascript
         $meta['completed']    = $status === 'reviewed';
         $meta['assessmentId'] = $this->getEvent()->getAssessment()->getId();
         $meta['isProject']    = $this->getEvent()->getAssessment() instanceof Project;
+        $meta['editable']     = $this->isEditable();
 
         return $meta;
     }
