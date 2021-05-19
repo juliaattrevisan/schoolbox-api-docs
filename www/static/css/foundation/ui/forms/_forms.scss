@@ -341,6 +341,7 @@ td {
     padding: 0 0 0 ($checkbox-size + $checkbox-margin);
     font-weight: $font-weight-normal;
     margin: 0 0 $checkbox-margin 0;
+    width: max-content;
 
     &:before,
     &:after {
@@ -551,6 +552,7 @@ input[type="checkbox"].plain {
       border-bottom: 1px solid $input-border-color;
       margin: 0;
       padding: 0.5rem 0 0.5rem 2rem;
+      width: 100%;
 
       &:after,
       &:before {
