@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Application\CliTool;
@@ -10,11 +12,14 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Lumberjack;
 use ErrorException;
 use InvalidArgumentException;
+
 use function get_class;
 use function posix_geteuid;
 use function posix_getpwuid;
+
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
+
 use function strpos;
 
 /**
@@ -95,8 +100,6 @@ class Kernel extends CliKernelAbstract
         $this->checkServerApiEnvironment();
         $this->checkSystemUserRootStatus($app);
         $this->outStream = $this->getOutputStream();
-
-
     }
 
 
@@ -200,8 +203,8 @@ class Kernel extends CliKernelAbstract
         if ($runAsRoot && !$isRoot) {
             throw new \UnexpectedValueException(sprintf(
                 "$prefix requires to be run as system 'root' user, current user: '%s'",
-                posix_getpwuid(posix_geteuid())['name'])
-            );
+                posix_getpwuid(posix_geteuid())['name']
+            ));
         }
         if (!$runAsRoot && $isRoot) {
             $this->logger()->warning(
@@ -369,7 +372,7 @@ class Kernel extends CliKernelAbstract
         }
 
         // Does not accept values, and not specified
-        if(!\array_key_exists($name, $this->kernelOpts)){
+        if (!\array_key_exists($name, $this->kernelOpts)) {
             return false;
         }
 

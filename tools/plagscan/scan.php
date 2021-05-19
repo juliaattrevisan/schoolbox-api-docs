@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Plagscan scanner
  *
@@ -65,7 +66,6 @@ HELP;
         $storageMapper = StorageMapper::getInstance();
 
         if (!$mapper->getConnector()) {
-
             /* Plagscan not configured - nothing to do
              */
             $log->warning('Plagscan scan did not run: username, api key and/or access token is not configured correctly');
@@ -77,7 +77,6 @@ HELP;
         $reRetrieveMode = $this->getOpt('re-retrieve');
 
         if ($reRetrieveMode) {
-
             /* Re-scan plagscan records
              */
             $log->info('Scanner running in re-retrieve mode');
@@ -85,9 +84,7 @@ HELP;
             $predicate->equals('status', Plagscan::STATUS_COMPLETE);
             $predicate->greaterThan('plagscan_id', 0);
             $allDocuments = $mapper->findByPredicates($predicate);
-        }
-        else {
-
+        } else {
             /* Scan currently-pending plagscan records
              */
             $log->info('Scanner running in scan mode');
@@ -142,11 +139,10 @@ HELP;
                                 $currentDocument->setUpdatedAt(\Alaress_Date_Format::now());
                                 $mapper->save($currentDocument);
                                 $numUpdated++;
-                            }
-                            catch (FileException $e) {
+                            } catch (FileException $e) {
                                 /* Die critically until the plagscan report can be saved
                                  */
-                                $log->critical("{$prefix}: could not save plagscan report file to storage", ['exception'=>$e]);
+                                $log->critical("{$prefix}: could not save plagscan report file to storage", ['exception' => $e]);
                             }
                         } else {
                             $log->warning("{$prefix}: all report pieces (score, mode 6 and 7 reports) not yet ready");
