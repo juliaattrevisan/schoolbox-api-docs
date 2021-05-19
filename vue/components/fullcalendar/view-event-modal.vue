@@ -798,7 +798,7 @@ export default {
                         <div>
                             <!-- Various buttons -->
                             <span v-if="eventExtendedProps.links.path">
-                                <a class="button" :href="eventExtendedProps.links.path">View more details</a>
+                                <a class="button" :href="eventExtendedProps.links.path">View details</a>
                             </span>
                             <span v-if="eventExtendedProps.folder.id">
                                 <a class="button"
