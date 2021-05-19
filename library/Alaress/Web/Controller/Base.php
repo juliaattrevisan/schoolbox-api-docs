@@ -493,6 +493,8 @@ abstract class Base
     /**
      * Just a raw template render
      *
+     * @deprecated Use `buildHtmlOutput` or `buildUnthemedHtmlOuptut` instead
+     *
      * @param string $namespace
      * @param string $template
      * @param array  $data
@@ -500,10 +502,7 @@ abstract class Base
      */
     protected function tpl($namespace, $template, $data = [], $tab = '')
     {
-        $content = $this->buildContent(
-            "@$namespace/$template.twig",
-            array_merge($data, ['currentUser' => $this->getUser()])
-        );
+        $content = $this->buildContent("@$namespace/$template.twig", $data);
 
         if ($content instanceof Output\ThemedHtml) {
             $content->setTab($tab);
@@ -514,6 +513,9 @@ abstract class Base
 
 
     /**
+     * @deprecated Use one of the `build*Output` methods instead, to build
+     *             exactly the type of content you specify
+     *
      * @param string $template
      * @param array  $data
      * @return \Alaress\Web\Output\Base
