@@ -47,7 +47,7 @@ class ValidScheduleExecution
         }
 
         /* If the frequency is twiceDaily,
-         * Check that the current hour is 4am or 4pm
+         * Check that the current hour is 6am or 6pm
          * If it is, just do it
          * Otherwise, noop
          */
@@ -56,7 +56,7 @@ class ValidScheduleExecution
         }
 
         /* If the frequency is daily,
-         * Check that the current hour is 1am
+         * Check that the current hour is 9pm
          * If it is, just do it
          * Otherwise, noop
          */

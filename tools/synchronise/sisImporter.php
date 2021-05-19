@@ -79,7 +79,11 @@ HELP;
         /* Spawn schedular based on args
          *
          * Use Hourly frequency, taking advantage of the functional equivalence
-         * (Custom hours don't matter for Hourly frequency)
+         *
+         * (Custom Hours don't matter for the on-demand cli script; it should
+         * always run when you execute this manually. The frequency is hardcoded
+         * to Hourly to facilitate this behaviour; check ValidScheduleExecution
+         * for the logic)
          */
         $host = $this->getConfig()->get('schooldata_import_endpoint_host');
         $key = $this->getConfig()->get('schooldata_import_endpoint_key');
@@ -98,7 +102,6 @@ You haven't specified a SUDS Data Source in Admin.
 
 NULLTYPE;
             exit;
-
         }
 
         /* Accept perform param from opts
