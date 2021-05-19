@@ -903,6 +903,10 @@ abstract class Kernel
                     $twig->addGlobal('dateFormats', $dateFormats);
                     $twig->addGlobal('NOW', Alaress_Date_Format::now());
 
+                    // This value is liable to be overridden by the user within
+                    // the controller
+                    $twig->addGlobal('USER', $di->get('user'));
+
                     /** @var PrefixGenerator $cdnPrefixGenerator */
                     $cdnPrefixGenerator = $di->get('cdnPrefixGenerator');
                     $twig->addGlobal('CDN_PREFIX', $cdnPrefixGenerator->generate());
