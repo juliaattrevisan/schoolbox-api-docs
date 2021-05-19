@@ -12,15 +12,8 @@ namespace Schoolbox\Application\CliTool;
 use Alaress\Lumberjack;
 use ErrorException;
 use InvalidArgumentException;
-
-use function get_class;
-use function posix_geteuid;
-use function posix_getpwuid;
-
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
-
-use function strpos;
 
 /**
  * This Kernel is designed for running CLI scripts/tools that are one-offs, for example:
