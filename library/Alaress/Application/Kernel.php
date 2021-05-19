@@ -902,7 +902,6 @@ abstract class Kernel
                     $dateFormats->setConfig($config);
                     $twig->addGlobal('dateFormats', $dateFormats);
                     $twig->addGlobal('NOW', Alaress_Date_Format::now());
-                    $twig->addGlobal('USER', $_SESSION['user']);
 
                     /** @var PrefixGenerator $cdnPrefixGenerator */
                     $cdnPrefixGenerator = $di->get('cdnPrefixGenerator');

@@ -284,7 +284,6 @@ class Kernel extends WebKernelAbstract
                     $dateFormats->setConfig($config);
                     $twig->addGlobal('dateFormats', $dateFormats);
                     $twig->addGlobal('NOW', Alaress_Date_Format::now());
-                    $twig->addGlobal('USER', $_SESSION['user']);
 
                     // CDN_PREFIX
                     /** @var PrefixGenerator $cdnPrefixGenerator */
