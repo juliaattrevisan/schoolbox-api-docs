@@ -3,7 +3,9 @@
 {% block image %}
     {% set msg = row.messages | first %}
     {% if msg.meta.thumb %}
-    <img src="{{ msg.meta.thumb }}" />
+    <a href="{{ msg.href }}">
+        <img src="{{ msg.meta.thumb }}" alt="{{ msg.meta.title }}" />
+    </a>
     {% endif %}
 {% endblock %}
 
