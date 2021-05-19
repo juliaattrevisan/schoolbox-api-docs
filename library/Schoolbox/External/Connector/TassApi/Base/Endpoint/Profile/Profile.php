@@ -853,7 +853,7 @@ class Profile implements IStrategy
              *
              * preferred_name, if it exists
              * first_name, if it exists
-             * given_name, if it exists
+             * given_names, if it exists
              * default to empty string
              */
             if (isset($staff['preferred_name']) && '' !== (string)$staff['preferred_name']) {
