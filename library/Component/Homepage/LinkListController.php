@@ -211,7 +211,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 if ($showComponentAction) {
                     $this->parse('component_action_block', 'component_action');
                 } else {
-                    $this->setVar('component_action', '');
+                    $this->setVar('component_action_block', '');
                 }
 
                 $this->parse('source_folder_exists_block', 'source_folder_exists');
