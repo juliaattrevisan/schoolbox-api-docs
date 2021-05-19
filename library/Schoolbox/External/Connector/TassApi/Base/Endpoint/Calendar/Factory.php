@@ -135,9 +135,28 @@ class Factory
         ];
 
         $api = [];
+        $dsnErrors = [];
 
-        foreach ($modules as $module) {
-            $api[$module] = new Api($this->host, $this->key, $module);
+        try {
+            foreach ($modules as $module) {
+                $api[$module] = new Api($this->host, $this->key, $module);
+            }
+        } catch (\DomainException $e) {
+
+            /* schoolcalendarandnotices might not be enabled for a school who chooses to eschew
+             * this feature; instead of catastrophically dying with a fatal, just exist quietly
+             */
+            $dsnErrors[] = $e->getMessage();
+        }
+
+        /* Get a list of the errors, log 'em, then leave
+         */
+        if (\count($dsnErrors)) {
+            foreach ($dsnErrors as $dsnError) {
+                $this->log->warning($dsnError);
+            }
+
+            exit();
         }
 
         /* A list of all the campuses from which we can chooze
