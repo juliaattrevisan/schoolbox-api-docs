@@ -658,6 +658,7 @@ abstract class Component_ControllerAbstract
         }
 
         // Render the twig template
+        $twigData['USER'] = $this->getUser();
         $content = $this->sitepage->getTwig()->render($twigTemplate, $twigData);
 
         if ($renderInIsland) {
