@@ -411,7 +411,7 @@ abstract class Base
     {
         /** @var Output\Html $output */
         $output = $this->getDi()->get('webOutput:nochrome');
-        return $output->setTemplate($template)->setData($data);
+        return $output->setTemplate($template)->setData($this->injectCurrentUserIntoData($data));
     }
 
 
@@ -428,7 +428,7 @@ abstract class Base
     {
         /** @var Output\Xml $output */
         $output = $this->getDi()->get('webOutput:xml');
-        return $output->setTemplate($template)->setData($data);
+        return $output->setTemplate($template)->setData($this->injectCurrentUserIntoData($data));
     }
 
     /**
@@ -446,7 +446,7 @@ abstract class Base
     {
         /** @var Output\ThemedHtml $output */
         $output = $this->getDi()->get('webOutput:html');
-        $tpl = $output->setTemplate($template)->setData($data);
+        $tpl = $output->setTemplate($template)->setData($this->injectCurrentUserIntoData($data));
 
         if ($title) {
             $tpl->setTitle($title);
@@ -618,5 +618,17 @@ abstract class Base
         }
         $this->sentry->captureException($e);
         return true;
+    }
+
+    /**
+     * Inject the currently authenticated user into Twig data.
+     *
+     * @param array $data Twig data
+     * @return array
+     */
+    private function injectCurrentUserIntoData(array $data): array
+    {
+        $data['USER'] = $this->getUser();
+        return $data;
     }
 }
