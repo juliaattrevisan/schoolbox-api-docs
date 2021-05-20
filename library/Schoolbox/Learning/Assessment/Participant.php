@@ -96,10 +96,23 @@ class Participant
      *
      * Represented as GREY SQUARE
      *
-     * @return bool
+     * @return bool|null
      */
-    public function isResponseRequired()
+    public function isResponseRequired(): ?bool
     {
+        /* Excluded guys don't need to appear in the email list because
+         * they weren't supposed to submit anything anyway. Only accumulate
+         * a list of people who were not excluded
+         */
+        if ($this->isExcluded()) {
+            return false;
+        }
+
+        /* Otherwise, if they haven't been excluded, look inside the plan
+         * to interrogate all their submissions/responses to see whether
+         * they have any that fulfil the Response Required (each assessment
+         * type - task, due work, etc - have their own mechanisms)
+         */
         try {
             return $this->plan->getAssessable()->isResponseRequired($this);
         } catch (DomainException $e) {
