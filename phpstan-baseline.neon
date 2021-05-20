@@ -6586,11 +6586,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/Module.php
 
 		-
-			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Participant\\:\\:isResponseRequired\\(\\) should return bool but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/Participant.php
-
-		-
 			message: "#^Method Schoolbox\\\\Learning\\\\Assessment\\\\Participant\\:\\:isFeedbackRequired\\(\\) should return bool but returns null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/Participant.php
