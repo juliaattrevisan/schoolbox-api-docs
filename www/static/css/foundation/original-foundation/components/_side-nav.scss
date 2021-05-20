@@ -77,7 +77,7 @@ $side-nav-divider-color: scale-color($white, $lightness: -10%) !default;
       display: block;
       margin: $side-nav-link-margin;
       padding: $side-nav-link-padding;
-      @media (min-width: 950px) {
+      @media #{$mediumwide-up} {
         //ensure isn't applied on mobile
         &:hover,
         &:focus {
