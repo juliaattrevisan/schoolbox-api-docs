@@ -229,17 +229,15 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $this->oAuthToken ],
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_SSL_CIPHER_LIST => 'AES256-SHA',
-            CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1
         ]);
 
         $rs = curl_exec($ch);
-
+        $error = curl_error($ch);
         $data = json_decode($rs, true);
 
         if (empty($data)) {
             // timed out
-            throw new AuthenticationTimedOut('Connecting to Office 365 timed out, please try again later.');
+            throw new AuthenticationTimedOut('Connecting to Office 365 timed out, please try again later: ' . $error);
         }
 
         // interpret errors
