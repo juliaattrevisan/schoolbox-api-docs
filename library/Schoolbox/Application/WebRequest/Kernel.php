@@ -34,6 +34,7 @@ use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Throwable;
 use Zend\Uri\Uri;
@@ -262,43 +263,10 @@ class Kernel extends WebKernelAbstract
         // User is from:
         // * Authorization header
         // * Session, if not in auth header
-
-        // Token authentication
-        $user       = null;
-        $session    = null;
-        $authHeader = $server['HTTP_AUTHORIZATION'] ?? null;
-        if (isset($authHeader)) {
-            if (preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
-                [, $token]  = $matches;
-                /** @var Jwt $tokenValidator */
-                $tokenValidator = $this->get('user.tokenBuilder');
-                try {
-                    $claims = $tokenValidator->decode($token);
-                } catch (SignatureInvalidException $e) {
-                    throw new Unauthenticated('Token signature is invalid', 0, $e);
-                } catch (BeforeValidException $e) {
-                    throw new Unauthenticated('Token is not yet valid', 0, $e);
-                } catch (ExpiredException $e) {
-                    throw new Unauthenticated('Token has expired', 0, $e);
-                } catch (Throwable $e) {
-                    throw new Unauthenticated('Token could not be parsed', 0, $e);
-                }
-                if (isset($claims['sub'])) {
-                    /** @var MapperFactory $mapperFactory */
-                    $mapperFactory = $this->di->get('mapperFactory');
-                    /** @var UserMapper $userMapper */
-                    $userMapper = $mapperFactory->get(UserMapper::class);
-                    $user       = $userMapper->findByUsername($claims['sub']);
-                    if (!$user) {
-                        throw new Unauthenticated('User in token not found');
-                    }
-                } else {
-                    throw new Unauthenticated('Token does not contain a "sub" claim');
-                }
-            }
-        }
+        $user = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
 
         // Did token auth fail to find a user?
+        $session = null;
         if (!$user) {
             /** @var \Alaress\Session\Session $session */
             $session = $this->di->get('session');
@@ -610,5 +578,49 @@ class Kernel extends WebKernelAbstract
             $page = $di->get('sitePage');
             $page->error(ErrorMapper::ERROR_FORM_SUBMIT, 'Your request has been blocked as a proactive security measure. Please review your browser plugins and disable any that you do not need, and try again; if you continue to receive this message, please report the issue to ' . $config->get('feedback_text') . '.', 403);
         }
+    }
+
+    /**
+     * Extract a user from the "Authorization" HTTP header, if that header
+     * exists.
+     *
+     * @param string|null $authHeader
+     * @return User|null
+     * @throws Unauthenticated if auth header exists but is invalid
+     * @throws Unauthenticated if auth header is valid, but doesn't point to a
+     *                         valid user
+     */
+    private function extractUserFromAuthHeader(?string $authHeader): ?User
+    {
+        $user = null;
+        if (isset($authHeader) && preg_match('/^Bearer\\s+(.*)$/i', $authHeader, $matches)) {
+            [, $token] = $matches;
+            /** @var Jwt $tokenValidator */
+            $tokenValidator = $this->get('user.tokenBuilder');
+            try {
+                $claims = $tokenValidator->decode($token);
+            } catch (SignatureInvalidException $e) {
+                throw new Unauthenticated('Token signature is invalid', 0, $e);
+            } catch (BeforeValidException $e) {
+                throw new Unauthenticated('Token is not yet valid', 0, $e);
+            } catch (ExpiredException $e) {
+                throw new Unauthenticated('Token has expired', 0, $e);
+            } catch (Throwable $e) {
+                throw new Unauthenticated('Token could not be parsed', 0, $e);
+            }
+            if (isset($claims['sub'])) {
+                /** @var MapperFactory $mapperFactory */
+                $mapperFactory = $this->di->get('mapperFactory');
+                /** @var UserMapper $userMapper */
+                $userMapper = $mapperFactory->get(UserMapper::class);
+                $user       = $userMapper->findByUsername($claims['sub']);
+                if (!$user) {
+                    throw new Unauthenticated('User in token not found');
+                }
+            } else {
+                throw new Unauthenticated('Token does not contain a "sub" claim');
+            }
+        }
+        return $user;
     }
 }
