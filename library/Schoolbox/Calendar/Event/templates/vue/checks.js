@@ -1,10 +1,5 @@
-const ATTENDANCE_STATUS_PENDING = 1;
-const ATTENDANCE_STATUS_ACCEPTED = 2;
-const ATTENDANCE_STATUS_DECLINED = 3;
-
-const ATTENDANCE_LEVELS_NONE = 0;
-const ATTENDANCE_LEVELS_INVITE_ONLY = 1;
-const ATTENDANCE_LEVELS_OPEN = 2;
+import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
+import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
 
 export default {
 
@@ -110,14 +105,14 @@ export default {
 
         /* If the event attendance is Open, show the buttons
          */
-        if (currentAttendanceLevel === ATTENDANCE_LEVELS_OPEN) {
+        if (currentAttendanceLevel === ATTENDANCE_LEVELS.OPEN) {
             return true;
         }
 
         /* If the event attendance is Invite Only, and you are on the list,
          * show the buttons
          */
-        if (currentAttendanceLevel === ATTENDANCE_LEVELS_INVITE_ONLY) {
+        if (currentAttendanceLevel === ATTENDANCE_LEVELS.INVITE_ONLY) {
             for (let i = 0; i < guests.length; i++) {
                 if (guests[i].id === currentUserId) {
                     return true;
@@ -149,7 +144,7 @@ export default {
      * @return boolean
      */
     isPending: function(currentAttendanceStatus) {
-        return currentAttendanceStatus === ATTENDANCE_STATUS_PENDING;
+        return currentAttendanceStatus === ATTENDANCE_STATUS.PENDING;
     },
 
 
@@ -160,7 +155,7 @@ export default {
      * @return boolean
      */
     isAccepted: function(currentAttendanceStatus) {
-        return currentAttendanceStatus === ATTENDANCE_STATUS_ACCEPTED;
+        return currentAttendanceStatus === ATTENDANCE_STATUS.ACCEPTED;
     },
 
 
@@ -171,7 +166,7 @@ export default {
      * @return boolean
      */
     isDeclined: function(currentAttendanceStatus) {
-        return currentAttendanceStatus === ATTENDANCE_STATUS_DECLINED;
+        return currentAttendanceStatus === ATTENDANCE_STATUS.DECLINED;
     },
 
 
@@ -193,7 +188,7 @@ export default {
      * @return {boolean}
      */
     showAttendanceMeta: function (currentAttendanceLevel) {
-        return currentAttendanceLevel === ATTENDANCE_LEVELS_OPEN || currentAttendanceLevel === ATTENDANCE_LEVELS_INVITE_ONLY;
+        return currentAttendanceLevel === ATTENDANCE_LEVELS.OPEN || currentAttendanceLevel === ATTENDANCE_LEVELS.INVITE_ONLY;
     },
 
     /**
@@ -202,7 +197,7 @@ export default {
      * @param currentAttendanceLevel
      * @return {boolean}
      */
-    isOpen: (currentAttendanceLevel) => currentAttendanceLevel === ATTENDANCE_LEVELS_OPEN,
+    isOpen: (currentAttendanceLevel) => currentAttendanceLevel === ATTENDANCE_LEVELS.OPEN,
 
     /**
      * Is this an invite-only event?
@@ -210,5 +205,5 @@ export default {
      * @param currentAttendanceLevel
      * @return {boolean}
      */
-    isInviteOnly: (currentAttendanceLevel) => currentAttendanceLevel === ATTENDANCE_LEVELS_INVITE_ONLY,
+    isInviteOnly: (currentAttendanceLevel) => currentAttendanceLevel === ATTENDANCE_LEVELS.INVITE_ONLY,
 }
