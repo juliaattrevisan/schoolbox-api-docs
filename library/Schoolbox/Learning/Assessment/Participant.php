@@ -104,7 +104,7 @@ class Participant
          * they weren't supposed to submit anything anyway. Only accumulate
          * a list of people who were not excluded
          */
-        if (null !== $this->getExcludedAt()) {
+        if ($this->isExcluded()) {
             return false;
         }
 
