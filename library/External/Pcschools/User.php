@@ -286,8 +286,7 @@ class External_Pcschools_User implements External_UserInterface
      */
     public function getStaff(string $externalUserId): array
     {
-        return $this->getDatabase()->trimRow(
-            $this->getDatabase()->getRow("
+        $row = $this->getDatabase()->getRow("
                 SELECT
                     T.TEACHER_CODE AS SchoolStaffCode,
                     '' AS StaffBuilding,
@@ -303,8 +302,8 @@ class External_Pcschools_User implements External_UserInterface
                 FROM TEACHER T
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
                 WHERE T.TEACHER_CODE = {$this->getDatabase()->legacyQuote($externalUserId)}
-            ")
-        ) ?: [];
+            ");
+        return $row ? $this->database->trimRow($row) : [];
     }
 
     /**
