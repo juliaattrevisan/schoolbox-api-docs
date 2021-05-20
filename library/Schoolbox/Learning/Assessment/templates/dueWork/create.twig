@@ -296,7 +296,17 @@
 {# ----------------------------------------------------------- #}
 {# Rubric Scripts #}
 {# ----------------------------------------------------------- #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/submissions/jquery.rubric-editable.js"></script>
+
+{# This only needs to exist when someone can edit the grid;
+ # if the rubric is Course Managed, then staff get a readonly view
+ #
+ # But, if you're in the readonly view, this javascript was running anyway
+ # and arbitrarily mutating fields that would otherwise have been readonly
+ # in the ui...I guess it wasn't finding any fields in the readonly version
+ # and inadvertently setting things to zero, because this javascript
+ # presumes you're using the grid-editable all the time
+ #}
+{% if not courseManaged.isReadonly %}
 <script>
     $(function () {
         /**
@@ -328,23 +338,13 @@
             function processUseRubricClick($element)
             {
                 if ($element.is(':checked')) {
-
                     disableMaxMark();
                     calculateGridTotal();
                 } else {
+                    enableMaxMark();
 
-                    {# Only enable it if course managed setting allows you
-                     # Otherwise Mark Type can be disabled and this input is enabled,
-                     # a very strange outcome
-                     #}
-                    if (!Boolean('{{ courseManaged.isReadonly }}')) {
-                        enableMaxMark();
-
-                        // Need to validate the max mark
-                        $maxMarkInput.valid();
-                    } else {
-                        $element.prop('disabled', true);
-                    }
+                    // Need to validate the max mark
+                    $maxMarkInput.valid();
                 }
             }
 
@@ -549,3 +549,4 @@
         initRubricGrid();
     });
 </script>
+{% endif %}
