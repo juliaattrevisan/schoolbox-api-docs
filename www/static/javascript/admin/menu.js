@@ -104,7 +104,6 @@
 
                 /* This is the flyout menu which should become available again
                  */
-                $('[data-admin-subnav-flyout]').css({ display: 'none' });
                 $('[data-admin-subnav-flyout]').removeAttr('style');
             }
         }
