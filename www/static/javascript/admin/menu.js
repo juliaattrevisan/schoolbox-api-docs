@@ -51,7 +51,13 @@
          */
         function init(options, element) {
             let defaults = {
-                element: element
+                element: element,
+
+                /* The breakpoint threshold between small viewport menu and regular flyout menu
+                 * Consult www/static/css/foundation/_settings.scss:90 for the var definition
+                 * You'll have to keep these in sync manually, sorry
+                 */
+                threshold: '951px'
             };
 
             return $.extend(defaults, options);
@@ -63,7 +69,7 @@
          * current viewport dimension at the time of execution
          */
         function chooseMenuStrategy() {
-            let mq = window.matchMedia( "(max-width: 950px)" );
+            let mq = window.matchMedia( "(max-width: " + config.threshold + ")" );
 
             /* Clear any event bindings that might have been assigned previously
              */
