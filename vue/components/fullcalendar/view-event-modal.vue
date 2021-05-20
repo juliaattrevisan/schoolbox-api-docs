@@ -9,7 +9,6 @@ import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalend
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
  */
-import {ATTENDANCE_LEVELS} from '@schoolboxCalendarEvent/attendance-levels';
 import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
 import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
 import checks              from '@schoolboxCalendarEvent/checks';
