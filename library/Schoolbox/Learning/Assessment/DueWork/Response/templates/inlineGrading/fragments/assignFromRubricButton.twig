@@ -183,8 +183,24 @@
             }
         });
 
-        // Update the input val when any of these inputs change
-        $rb.on('change', '[data-rubric], [data-rubric-group], [data-group-mark]', updateAll);
+        // Update the input val when a capability mark input changes
+        $rb.on('change', '[data-group-mark]', updateAll);
+
+        // Update input val when changing a descriptor's mark value
+        $rb.on('change', 'select[data-rubric-descriptor]', updateAll);
+
+        // Update input val on:
+        // * checking (but not unchecking) a descriptor,
+        // * changing a descriptor's mark value
+        // but only if it has a value (0 counts as a value)
+        $rb.on('change', ':checkbox[data-rubric-descriptor]', function () {
+            if (this.checked) {
+                let value = $(this).attr('data-value');
+                if (value !== '') {
+                    updateAll();
+                }
+            }
+        });
     });
 </script>
 <p><button id="use-rubric-value" class="full-width">Assign <span class="descriptor-sum" data-rubric-sum></span> from Rubric</button></p>
