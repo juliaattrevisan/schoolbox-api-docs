@@ -8,7 +8,7 @@ import qs                 from 'qs';
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.config.js
-    */
+ */
 import {ATTENDANCE_STATUS} from '@schoolboxCalendarEvent/attendance-status';
 import {ENDPOINTS}         from '@schoolboxCalendarEvent/endpoints';
 import checks              from '@schoolboxCalendarEvent/checks';
@@ -186,6 +186,9 @@ export default {
         this.isAccepted = checks.isAccepted;
         this.isDeclined = checks.isDeclined;
         this.isLimitedAttendance = checks.isLimitedAttendance;
+        this.showAttendanceMeta = checks.showAttendanceMeta;
+        this.isOpen = checks.isOpen;
+        this.isInviteOnly = checks.isInviteOnly;
     },
 
     methods: {
@@ -200,6 +203,7 @@ export default {
          */
         hasComponentActions() {
             return this.eventExtendedProps.folder.id ||
+                this.eventExtendedProps.links.path ||
                 this.eventExtendedProps.links.view ||
                 this.eventExtendedProps.links.modify ||
                 this.eventExtendedProps.links.delete ||
@@ -720,18 +724,29 @@ export default {
                         {{ eventExtendedProps.reviewer.name }}
                     </a>
                 </meta-item>
-                <template v-if="this.canRsvp(
-                                eventExtendedProps.attendance.payload.level,
-                                eventExtendedProps.attendance.payload.attendees.guests,
-                                eventExtendedProps.attendance.payload.currentUser.user.id,
-                                eventExtendedProps.attendance.payload.currentUser.status,
-                                eventExtendedProps.attendance.payload.attendees.max,
-                                eventExtendedProps.attendance.payload.attendees.available)">
-                    <meta-item class="icon-class-list" v-if="this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)">
-                        <template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
-                        <template v-else>No</template> available place(s) remaining
-                    </meta-item>
-                </template>
+                <meta-item class="icon-class-list" v-if="this.showAttendanceMeta(eventExtendedProps.attendance.payload.level)">
+                    Attendance:
+                    <template v-if="isInviteOnly(eventExtendedProps.attendance.payload.level)">Invite only</template>
+                    <template v-else-if="isOpen(eventExtendedProps.attendance.payload.level)">Open</template>
+
+                    <template v-if="this.canRsvp(
+                        eventExtendedProps.attendance.payload.level,
+                        eventExtendedProps.attendance.payload.attendees.guests,
+                        eventExtendedProps.attendance.payload.currentUser.user.id,
+                        eventExtendedProps.attendance.payload.currentUser.status,
+                        eventExtendedProps.attendance.payload.attendees.max,
+                        eventExtendedProps.attendance.payload.attendees.available)
+                        &&
+                        this.isLimitedAttendance(eventExtendedProps.attendance.payload.attendees.max)
+                    ">
+                        (<template v-if="eventExtendedProps.attendance.payload.attendees.available > 0">{{ eventExtendedProps.attendance.payload.attendees.available }}</template>
+                        <template v-else>No</template>
+                        available
+                        <template v-if="eventExtendedProps.attendance.payload.attendees.available === 1">place</template>
+                        <template v-else>places</template>
+                        remaining)
+                    </template>
+                </meta-item>
             </meta-list>
             <article>
                 <span v-html="eventExtendedProps.detail"></span>
@@ -781,6 +796,9 @@ export default {
 
                         <div>
                             <!-- Various buttons -->
+                            <span v-if="eventExtendedProps.links.path">
+                                <a class="button" :href="eventExtendedProps.links.path">View details</a>
+                            </span>
                             <span v-if="eventExtendedProps.folder.id">
                                 <a class="button"
                                    :href="'/homepage/' + String(eventExtendedProps.folder.id)">Go to homepage</a>
