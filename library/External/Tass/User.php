@@ -197,7 +197,11 @@ class External_Tass_User implements External_UserInterface
         LEFT JOIN studvsn ON s.stud_code = studvsn.stud_code
         WHERE s.stud_code = {$this->database->legacyQuote($externalUserId)}
         ";
-        $student = $this->database->trimRow($this->database->getRow($query));
+        $row = $this->database->getRow($query);
+        if(!$row){
+            return [];
+        }
+        $student = $this->database->trimRow($row);
         if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
             $student['StudentBirthDate'] = $birthDate;
         } else {
@@ -457,7 +461,8 @@ class External_Tass_User implements External_UserInterface
 
         $statement = $this->database->query($sql);
         $subjectList = array();
-        while ($subject = $this->database->trimRow($statement->fetch())) {
+        while ($subject = $statement->fetch()) {
+            $subject = $this->database->trimRow($subject);
             if (Config::get('external_tass_year_in_class_code') == '0') {
                 $subject['year_grp'] = '';
             }
