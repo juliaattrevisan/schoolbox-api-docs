@@ -247,6 +247,7 @@ class Profile implements IStrategy
             $lastname = trim((string)$student['general_details']['surname']);
             $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
+            $preferredName = trim((string)$student['general_details']['preferred_name']);
             $specialNeeds = trim($student['other_school_details']['learning_support'] ?? '') === self::SPECIAL_NEEDS;
             $studiesCode = $this->findStudiesCode($student);
             $title = '';
@@ -258,6 +259,12 @@ class Profile implements IStrategy
              */
             $enrolment = $this->findDate(trim((string)$student['general_details']['date_of_entry']));
             $leaving = $this->findDate(trim((string)$student['general_details']['date_of_leaving']));
+
+            /* Preferred Name (if it contains a truthy value) takes precedence over First Name
+             */
+            if ('' !== $preferredName) {
+                $firstname = $preferredName;
+            }
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -823,10 +830,42 @@ class Profile implements IStrategy
              */
             $email = trim((string)(array_values(array_filter([$staff['school_email_address'], $staff['email_address']]))[0] ?? ''));
 
-            /* Preferred Name (if it contains a truthy value) takes precedence over First Name
-             * Both preferred_name and first_name are provided in the unified output of findStaff()
+            /* For some reason, first_name and preferred_name might not actually be in the payload
+                    Array
+                    (
+                        [surname] => Appleton
+                        [active_flag] => Y
+                        [email_address] => JAppleton@tassweb.com.au
+                        [salutation] => Mr
+                        [department] => MAT
+                        [portal_user_code] =>
+                        [school_email_address] => DHogg@tassweb.com.au
+                        [employee_code] => 1000001
+                        [teacher_code] => DJH
+                        [given_names] => John
+                        [category] => teacher
+                    )
+             *
+             * so protect ourselves from this crazy as best we can
+             * I think they did something here and broke things in the process
+             *
+             * Order of precedence:
+             *
+             * preferred_name, if it exists
+             * first_name, if it exists
+             * given_names, if it exists
+             * default to empty string
              */
-            $firstname = trim((string)($staff['preferred_name'] ?: $staff['first_name']));
+            if (isset($staff['preferred_name']) && '' !== (string)$staff['preferred_name']) {
+                $firstname = trim((string)$staff['preferred_name']);
+            } elseif (isset($staff['first_name']) && '' !== (string)$staff['first_name']) {
+                $firstname = trim((string)$staff['first_name']);
+            } elseif (isset($staff['given_names']) && '' !== (string)$staff['given_names']) {
+                $firstname = trim((string)$staff['given_names']);
+            } else {
+                $firstname = '';
+            }
+
             $lastname = trim((string)$staff['surname']);
             $phone = '';
             $position = '';

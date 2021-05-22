@@ -58,4 +58,9 @@ In schoolbox v19.2 you'll see its outcome in an Endpoint Status screen, but you 
 ## 4 Status
 This class exposes data in the Endpoint Status screen in schoolbox v19.2 This determines whether the endpoint was accessible and also generates a more detailed report based on Specification so that Professional Services can do basic diagnostics while they help a school set up their integration.
 
+## vagrant
+You can find some crontab logging in your vagrant when you're testing/debugging.
 
+> vagrant ssh
+>
+> sudo tail /var/lib/schoolbox/cache/logs/sis-scheduler-vagrantx.log -n100 -f
