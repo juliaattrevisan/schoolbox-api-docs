@@ -22,11 +22,27 @@ class Transformation
 
     private ITransform $transform;
 
-    public function __construct(string $hash, string $cacheKey, ITransform $transform)
+    /**
+     * Original file extension. Null if unknown
+     *
+     * @var string|null
+     */
+    private ?string $ext;
+
+    /**
+     * Original file size. Null if unknown
+     *
+     * @var int|null
+     */
+    private ?int $fileSize;
+
+    public function __construct(string $hash, string $cacheKey, ITransform $transform, ?string $ext, ?int $fileSize)
     {
         $this->hash      = $hash;
         $this->cacheKey  = $cacheKey;
         $this->transform = $transform;
+        $this->ext       = $ext;
+        $this->fileSize  = $fileSize;
     }
 
     public function getHash(): string
@@ -42,5 +58,15 @@ class Transformation
     public function getTransform(): ITransform
     {
         return $this->transform;
+    }
+
+    public function getExt(): ?string
+    {
+        return $this->ext;
+    }
+
+    public function getFileSize(): ?int
+    {
+        return $this->fileSize;
     }
 }
