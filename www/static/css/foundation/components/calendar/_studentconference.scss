@@ -59,6 +59,12 @@
     }
   }
 
+  // When the selectize is showing results:
+  // always apply the hover color even if it isn't hovered or focused
+  &.vs--open .vs__dropdown-toggle {
+    background-color: $form-bg-hover-color;
+  }
+
   /* That chevron expanderer thing can still go away
    */
   .vs__open-indicator {
