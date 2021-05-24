@@ -103,18 +103,13 @@ class Controller extends UserAccount\Controller
              * It adds extra hydration that's never used effectively -except- in this one context.
              * Even then we just need it to generate a csv
              */
-            $period->setCycle($cycles[$period->getCycle()->getId()]);
+            $classEntry = $classEntries[$classInvolvement->getClass()->getId()];
+            $classInvolvement->setClass($classEntry);
 
             $row = [
-                $period->getCycle()->getCycleIdentifier(),
-                $period->getCycle()->getTitle(),
-                $period->getCycle()->getStart()->getDatabaseDate(),
-                $period->getCycle()->getFinish()->getDatabaseDate(),
-                $period->getCycle()->getStartDay(),
-                $period->getDay(),
-                $period->getTitle(),
-                $period->getStart()->getDatabaseTime(),
-                $period->getFinish()->getDatabaseTime()
+                $classInvolvement->getClass()->getCode(),
+                $classInvolvement->getClass()->getName(),
+                $classInvolvement->getExternalId()
             ];
 
             fputcsv($fp, $row);
@@ -130,7 +125,7 @@ class Controller extends UserAccount\Controller
         $headers->set('Cache-Control', ' ');
         $headers->set('Content-Type', 'text/csv');
         $headers->set('Content-Length', strlen($contents));
-        $headers->set('Content-Disposition', "attachment; filename=\"timetableStructure.csv\"");
+        $headers->set('Content-Disposition', "attachment; filename=\"timetableEnrolment.csv\"");
 
         $this->getResponse()->content->set([
             'format' => 'file',
