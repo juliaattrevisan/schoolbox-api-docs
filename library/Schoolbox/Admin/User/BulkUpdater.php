@@ -73,6 +73,12 @@ class BulkUpdater
     /**
      * @var int
      */
+    private $house;
+
+
+    /**
+     * @var int
+     */
     private $eportfolioEnabled;
 
 
@@ -133,6 +139,7 @@ class BulkUpdater
      * @param array          $campusIds
      * @param int            $role
      * @param int            $year
+     * @param int            $house
      * @param int            $eportfolioEnabled
      * @param int            $emailFromUsername
      * @param int            $externalMailClient
@@ -150,6 +157,7 @@ class BulkUpdater
         array $campusIds,
         int $role,
         int $year,
+        int $house,
         int $eportfolioEnabled,
         int $emailFromUsername,
         int $externalMailClient,
@@ -177,6 +185,7 @@ class BulkUpdater
          */
         $this->role = $role;
         $this->year = $year;
+        $this->house = $house;
         $this->eportfolioEnabled = $eportfolioEnabled;
         $this->emailFromUsername = $emailFromUsername;
         $this->externalMailClient = $externalMailClient;
@@ -410,6 +419,16 @@ class BulkUpdater
                 $userUpdateParams['year'] = null;
             } else {
                 $userUpdateParams['year'] = $this->year;
+            }
+        }
+
+        if ($this->house !== self::UNCHANGED) {
+            $updatePlaceholder[] = 'house = :house';
+
+            if (0 === $this->house) {
+                $userUpdateParams['house'] = null;
+            } else {
+                $userUpdateParams['house'] = $this->house;
             }
         }
 

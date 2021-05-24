@@ -56,6 +56,7 @@ if (isset($_POST['updateUsers'])) {
         $_POST['apply_campus'],
         (int)$_POST['apply_role'],
         (int)$_POST['apply_year_id'],
+        (int)$_POST['apply_house_id'],
         (int)$_POST['apply_eportfolio'],
         (int)$_POST['apply_emailfromusername'],
         (int)$_POST['apply_externalmailclient'],
