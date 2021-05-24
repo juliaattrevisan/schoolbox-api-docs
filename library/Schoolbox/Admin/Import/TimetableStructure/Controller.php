@@ -88,7 +88,7 @@ class Controller extends UserAccount\Controller
         fputcsv($fp, [
             'Term Identifier',
             'Term Title',
-            'Term STart',
+            'Term Start',
             'Term Finish',
             'Term Start Day Number',
             'Period Day',
@@ -103,12 +103,11 @@ class Controller extends UserAccount\Controller
 
             /* Manually match the periods to their cycles.
              *
-             * I don't really think we need to hydrate cycles normally, because we've never really
+             * I don't really think we need to hydrate these normally, because we've never really
              * needed it outside of this one usage.
              *
              * It adds extra hydration that's never used effectively -except- in this one context.
-             * Even then we just need it to generate a csv; we don't obtain cycle data via a period
-             * in most (if not all) usages thus far
+             * Even then we just need it to generate a csv
              */
             $period->setCycle($cycles[$period->getCycle()->getId()]);
 

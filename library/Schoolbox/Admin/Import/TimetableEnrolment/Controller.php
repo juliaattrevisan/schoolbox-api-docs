@@ -81,7 +81,60 @@ class Controller extends UserAccount\Controller
         $classEntries = $this->classEntryMapper->findAll()->indexBy('id');
         $classInvolvements = $this->classInvolvementMapper->findAll();
 
+        $fp = fopen('php://temp', 'w');
+
+        /* Set up header row
+         */
+        fputcsv($fp, [
+            'Class Code',
+            'Class Title',
+            'Student Code',
+        ]);
+
+        /* Export properties into the same format as the csv
+         */
         foreach ($classInvolvements as $classInvolvement) {
+
+            /* Manually match the class involvements to their classes.
+             *
+             * I don't really think we need to hydrate these normally, because we've never really
+             * needed it outside of this one usage.
+             *
+             * It adds extra hydration that's never used effectively -except- in this one context.
+             * Even then we just need it to generate a csv
+             */
+            $period->setCycle($cycles[$period->getCycle()->getId()]);
+
+            $row = [
+                $period->getCycle()->getCycleIdentifier(),
+                $period->getCycle()->getTitle(),
+                $period->getCycle()->getStart()->getDatabaseDate(),
+                $period->getCycle()->getFinish()->getDatabaseDate(),
+                $period->getCycle()->getStartDay(),
+                $period->getDay(),
+                $period->getTitle(),
+                $period->getStart()->getDatabaseTime(),
+                $period->getFinish()->getDatabaseTime()
+            ];
+
+            fputcsv($fp, $row);
         }
+
+        rewind($fp);
+        $contents = stream_get_contents($fp);
+        fclose($fp);
+
+        $headers  = $this->getResponse()->headers;
+
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', strlen($contents));
+        $headers->set('Content-Disposition', "attachment; filename=\"timetableStructure.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $contents,
+        ]);
     }
 }
