@@ -8,6 +8,7 @@
 namespace Schoolbox\External;
 
 use Schoolbox;
+use Schoolbox\Collection;
 
 /**
  * Class TimetablePeriodMapper
@@ -16,7 +17,7 @@ use Schoolbox;
  *
  * This is only used by the Schoolbox connector.
  *
- * @method TimetablePeriod[] findAll()
+ * @method Collection|TimetablePeriod[] findAll()
  * @package Schoolbox\External
  */
 class TimetablePeriodMapper extends Schoolbox\Mapper
