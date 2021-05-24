@@ -13,6 +13,8 @@ namespace Schoolbox\Admin\Import\TimetableEnrolment;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Import\Navigation\INavigation;
 use Schoolbox\Admin\Import\UserAccount;
+use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Import\ImporterFactory;
 
@@ -31,6 +33,18 @@ class Controller extends UserAccount\Controller
 
 
     /**
+     * @var ClassEntryMapper
+     */
+    protected ClassEntryMapper $classEntryMapper;
+
+
+    /**
+     * @var ClassInvolvementMapper
+     */
+    protected ClassInvolvementMapper $classInvolvementMapper;
+
+
+    /**
      * @var INavigation
      */
     protected $navigation;
@@ -39,13 +53,35 @@ class Controller extends UserAccount\Controller
     /**
      * Controller constructor.
      *
-     * @param ImporterFactory $importerFactory
-     * @param IConfigLoader   $configLoader
+     * @param ImporterFactory        $importerFactory
+     * @param IConfigLoader          $configLoader
+     * @param ClassEntryMapper       $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
      */
-    public function __construct(ImporterFactory $importerFactory, IConfigLoader $configLoader)
-    {
+    public function __construct(
+        ImporterFactory $importerFactory,
+        IConfigLoader $configLoader,
+        ClassEntryMapper $classEntryMapper,
+        ClassInvolvementMapper $classInvolvementMapper
+    ) {
         parent::__construct($importerFactory, $configLoader);
 
+        $this->classEntryMapper = $classEntryMapper;
+        $this->classInvolvementMapper = $classInvolvementMapper;
+
         $this->navigation = new SchoolData();
+    }
+
+
+    /**
+     * Export the Timetable Class Enrolments back into the csv format
+     */
+    public function getExport(): void
+    {
+        $classEntries = $this->classEntryMapper->findAll()->indexBy('id');
+        $classInvolvements = $this->classInvolvementMapper->findAll();
+
+        foreach ($classInvolvements as $classInvolvement) {
+        }
     }
 }
