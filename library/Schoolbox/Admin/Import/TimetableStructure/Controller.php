@@ -33,6 +33,18 @@ class Controller extends UserAccount\Controller
 
 
     /**
+     * @var TimetableCycleMapper
+     */
+    protected TimetableCycleMapper $timetableCycleMapper;
+
+
+    /**
+     * @var TimetablePeriodMapper
+     */
+    protected TimetablePeriodMapper $timetablePeriodMapper;
+
+
+    /**
      * @var INavigation
      */
     protected $navigation;
@@ -41,12 +53,21 @@ class Controller extends UserAccount\Controller
     /**
      * Controller constructor.
      *
-     * @param ImporterFactory $importerFactory
-     * @param IConfigLoader   $configLoader
+     * @param ImporterFactory       $importerFactory
+     * @param IConfigLoader         $configLoader
+     * @param TimetableCycleMapper  $timetableCycleMapper
+     * @param TimetablePeriodMapper $timetablePeriodMapper
      */
-    public function __construct(ImporterFactory $importerFactory, IConfigLoader $configLoader)
-    {
+    public function __construct(
+        ImporterFactory $importerFactory,
+        IConfigLoader $configLoader,
+        TimetableCycleMapper $timetableCycleMapper,
+        TimetablePeriodMapper $timetablePeriodMapper
+    ) {
         parent::__construct($importerFactory, $configLoader);
+
+        $this->timetableCycleMapper = $timetableCycleMapper;
+        $this->timetablePeriodMapper = $timetablePeriodMapper;
 
         $this->navigation = new SchoolData();
     }
@@ -57,14 +78,8 @@ class Controller extends UserAccount\Controller
      */
     public function getExport(): void
     {
-
-        /* TODO Inject these as dependencies
-         */
-        $cycleMapper = TimetableCycleMapper::getInstance();
-        $periodMapper = TimetablePeriodMapper::getInstance();
-
-        $cycles = $cycleMapper->findAll()->indexBy('id');
-        $periods = $periodMapper->findAll();
+        $cycles = $this->timetableCycleMapper->findAll()->indexBy('id');
+        $periods = $this->timetablePeriodMapper->findAll();
 
         $fp = fopen('php://temp', 'w');
 
