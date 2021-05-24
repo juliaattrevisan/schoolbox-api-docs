@@ -742,7 +742,7 @@ class Controller extends Base
         // And save it
         $eventRelations = new EventRelations(
             $event->getAccess(),
-            $event->getFolderCollection()->getPropertyValues('setCategoryId'),
+            $event->getFolderCollection()->getPropertyValues('id'),
             $event->getRoleCollection()->getPropertyValues('roleId'),
             array_column($payload['attendees']['guests'], 'id'),
             false
