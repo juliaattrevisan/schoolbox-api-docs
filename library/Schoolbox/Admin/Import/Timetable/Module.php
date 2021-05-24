@@ -16,8 +16,10 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\TimetableCycleMapper;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Import\ImporterFactory;
 
 /**
@@ -89,7 +91,9 @@ class Module extends BaseModule
             'importerFactory' => $injector->lazyNew(ImporterFactory::class),
             'configLoader' => $injector->lazyGet('config'),
             'timetableCycleMapper' => $this->getMapperFactory()->getLazy(TimetableCycleMapper::class),
+            'timetablePeriodMapper' => $this->getMapperFactory()->getLazy(TimetablePeriodMapper::class),
             'classPeriodMapper' => $this->getMapperFactory()->getLazy(ClassPeriodMapper::class),
+            'classEntryMapper' => $this->getMapperFactory()->getLazy(ClassEntryMapper::class)
         ];
     }
 }

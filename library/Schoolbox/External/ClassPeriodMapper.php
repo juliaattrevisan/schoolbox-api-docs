@@ -8,6 +8,8 @@
 namespace Schoolbox\External;
 
 use Schoolbox;
+use Schoolbox\Collection;
+
 
 /**
  * Class ClassPeriodMapper
@@ -16,7 +18,7 @@ use Schoolbox;
  *
  * This is only used by the Schoolbox connector.
  *
- * @method ClassPeriod[] findAll()
+ * @method Collection|ClassPeriod[] findAll()
  * @package Schoolbox\External
  */
 class ClassPeriodMapper extends Schoolbox\Mapper
