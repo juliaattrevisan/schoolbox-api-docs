@@ -59,8 +59,6 @@ class ValidHasReadMore
          *
          * Note that the presence of comments in discussion_thread determines
          * whether Allow Comments was ticked; comments_allowed does not do anything
-         *
-         * Show the link
          */
         if ($article->getDiscussionThread()) {
             /* But, if the global admin config Enable Comments On News Articles
