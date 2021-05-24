@@ -12,27 +12,6 @@ import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js
 WaveSurfer.microphone = MicrophonePlugin;
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 
-/*
-* set up a recording
-* 
-* @returns { Object }
-*/ 
-export const getRecordOptions = (recordMediaType) => {
-    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-    if (recordMediaType === recordMediaTypes.AUDIO_ONLY) {
-        return getAudioOnlyRecordOptions();
-    } else if (recordMediaType === recordMediaTypes.CAMERA && isSafari) {
-        return getRecordCameraOptionsForSafari();
-    } else if (recordMediaType === recordMediaTypes.CAMERA && !isSafari) {
-        return getRecordCameraOptions();
-    } else if (recordMediaType === recordMediaTypes.SCREEN && isSafari) {
-        return getRecordScreenOptionsForSafari();
-    } else if (recordMediaType === recordMediaTypes.SCREEN && !isSafari) {
-        return getRecordScreenOptions();
-    } else if (recordMediaType === recordMediaTypes.PHOTO) {
-        return getRecordPhotoOptions();
-    }
-}
 
 /*
 * The videojs options all camera/screen setups share
@@ -60,7 +39,7 @@ const getDefaultVideojsRecordOptions = () => {
 * 
 * @returns { Object }
 */ 
-const getAudioOnlyRecordOptions = () => {
+export const getAudioOnlyRecordOptions = () => {
 	const options = getDefaultVideojsRecordOptions();
     options.plugins = {
 		wavesurfer: { // this plugin is only needed when recording audio-only
@@ -87,7 +66,8 @@ const getAudioOnlyRecordOptions = () => {
 		record: {
 			audio: true,
 			video: false,
-			maxLength: 180, //3 minutes
+            maxLength: 180, //3 minutes
+            convertEngine: 'ts-ebml', //to be able to have seekable webm files
 			debug: true,
 		}
 	}
@@ -124,7 +104,7 @@ const applyAudioWorkarounds = (options) => {
 * 
 * @returns { Object }
 */ 
-const getRecordCameraOptions = () => {
+export const getRecordCameraOptions = () => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
         record: {
@@ -139,27 +119,9 @@ const getRecordCameraOptions = () => {
             debug: true,
         }
     }
-    return options;
-}
-
-/*
-* set up a camera recording for safari, which uses mp4 rather than default webm
-* 
-* @returns { Object }
-*/ 
-const getRecordCameraOptionsForSafari = () => {
-    const options = getDefaultVideojsRecordOptions();
-    options.plugins = {
-        record: {
-            audio: true,
-            video: {
-                width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
-                height: { min: 180, ideal: 405, max: 720 }
-            },
-            videoMimeType: 'video/mp4', //ensure mp4 on Safari
-            maxLength: 180, //three minutes
-            debug: true,
-        }
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (isSafari) { //ensure mp4 on Safari
+        options.plugins.record.videoMimeType = 'video/mp4'; 
     }
     return options;
 }
@@ -169,36 +131,21 @@ const getRecordCameraOptionsForSafari = () => {
 * 
 * @returns { Object }
 */ 
-const getRecordScreenOptions = () => {
+export const getRecordScreenOptions = () => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
         record: {
             audio: true,
             screen: true,
             maxLength: 180, //three minutes
-            videoMimeType: 'video/webm;codecs=vp8,opus',
+            videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             debug: true,
         }
     }
-    return options;
-}
-
-/*
-* set up a screen recording for Safari
-* 
-* @returns { Object }
-*/ 
-const getRecordScreenOptionsForSafari = () => {
-    const options = getDefaultVideojsRecordOptions();
-    options.plugins = {
-        record: {
-            audio: true,
-            screen: true,
-            maxLength: 180, //three minutes
-            videoMimeType: 'video/mp4', //all supported excluding Safari use webm
-            debug: true,
-        }
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    if (isSafari) { //ensure mp4 on Safari
+        options.plugins.record.videoMimeType = 'video/mp4'; 
     }
     return options;
 }
@@ -208,7 +155,7 @@ const getRecordScreenOptionsForSafari = () => {
 * 
 * @returns { Object }
 */ 
-const getRecordPhotoOptions = () => {
+export const getRecordPhotoOptions = () => {
     const options = getDefaultVideojsRecordOptions();
     options.width = 720,
     options.height = 540,

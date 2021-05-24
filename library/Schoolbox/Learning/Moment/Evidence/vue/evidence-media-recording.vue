@@ -5,8 +5,9 @@
  *
  */
 
-import BrowserCaptureMedia from '@schoolbox/videojs-record/browser-capture-media';
-import DeviceCaptureMedia from '@schoolbox/inputCapture/device-capture-media';
+import RecordPhoto from '@schoolbox/record/record-photo';
+import RecordCamera from '@schoolbox/record/record-camera';
+import RecordAudioOnly from '@schoolbox/record/record-audio-only';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
@@ -17,9 +18,10 @@ import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
 export default {
 
     components: {
-        BrowserCaptureMedia, //to use the browser when input capture isn't supported
-        DeviceCaptureMedia, //for mobile devices to use instead of browser-media-capture
-        OverMediaModal //for UI notes, processing, errors, confirmations etc
+        RecordPhoto,
+        RecordCamera, 
+        RecordAudioOnly,
+        OverMediaModal
     },
 
     props: {
@@ -55,6 +57,7 @@ export default {
     created () { //these vars are created so they can be accessed within the template
         this.hasDeviceCapture = hasDeviceCapture();
         this.initRatios();
+        this.recordMediaTypes = recordMediaTypes;
         this.recordMediaType = this.getMomentTypeToBrowserMediaCaptureType();
     },
 
@@ -112,13 +115,11 @@ export default {
         /**
          * currently to update the container ratio to match the dimensions of the recording device
          *
-         * @params { MediaStreamTrack }
+         * @params { Number }
+         * @params { Number }
          */
-        onDeviceReady (mediaStreamTrack) {
-            if (this.recordMediaType !== recordMediaTypes.AUDIO_ONLY) { //audio doesn't need to change from 16:9
-                const currentDeviceSettings = mediaStreamTrack.getSettings(); 
-                this.updateCurrentRatio(currentDeviceSettings.width, currentDeviceSettings.height);
-            }
+        onDeviceReady (width, height) {
+            this.updateCurrentRatio(width, height);
         },
 
         /**
@@ -277,17 +278,24 @@ export default {
             
     <div class="capture-media-container" ref="container" :style="{ height: targetHeight }">
 
-        <device-capture-media
-            v-if="hasDeviceCapture"
-            :record-media-type="recordMediaType"
+        <record-photo
+            v-if="recordMediaType === recordMediaTypes.PHOTO"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+            @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
             @on-ratio-ready="onRatioReady"
         />
-        <browser-capture-media
-            v-else
-            :record-media-type="recordMediaType"
+        <record-camera
+            v-else-if="recordMediaType === recordMediaTypes.CAMERA"
+            :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+            @on-device-ready="onDeviceReady"
+            @on-recorded-media-ready="onRecordedMediaReady"
+            @on-recorded-media-deleted="onRecordedMediaDeleted"
+            @on-ratio-ready="onRatioReady"
+        />
+        <record-audio-only
+            v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
