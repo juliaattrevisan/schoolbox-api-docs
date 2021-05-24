@@ -2,7 +2,6 @@
 
 /**
  * To record, playback and upload a screen recording into SB 
- * It currently always sits within a parent, currently sits within #record-media-modal
  *
  */
 

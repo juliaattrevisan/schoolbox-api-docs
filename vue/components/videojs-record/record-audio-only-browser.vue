@@ -1,8 +1,7 @@
 <script>
 
 /**
- * To record, playback and upload a camera/screen recording into SB 
- * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
+ * To record audio only recording into SB 
  *
  */
 
@@ -96,20 +95,6 @@ export default {
         initVideojsRecord () {
             this.player = videojs(this.$refs.recordingVideo, getAudioOnlyRecordOptions(this.recordMediaType), this.onVideojsReady);
         },
-
-        /**
-         * Safari is a little different than all the others...
-         *
-         * @returns { Object }
-         */
-        // getRecordOptions () {
-        //     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-        //     if (isSafari) {
-        //         return getRecordCameraOptionsForSafari();
-        //     } else {
-        //         return getRecordCameraOptions();
-        //     }
-        // },
 
         /**
          * videojs is ready, so set up listeners and animate on

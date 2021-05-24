@@ -1,7 +1,7 @@
 <script>
 
 /**
- * To take and view a photo using the browser or device capture
+ * To take and view a recording using the browser or device capture
  *
  */
 

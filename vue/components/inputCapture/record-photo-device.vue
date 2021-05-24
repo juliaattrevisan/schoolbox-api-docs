@@ -1,9 +1,8 @@
 <script>
 
-/*
- * To use the devices native tools to capture a CAMERA or PHOTO
- * SCREEN capture is currently not supported
- * And neither is AUDIO_ONLY as it's not producing excpected results - ie ios Safari just loads a video, some Androids seem to do nothing
+/** 
+ * To use the devices native tools to capture a PHOTO,
+ * to easier allow toggling between device cameras
  *
  */
 

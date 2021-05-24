@@ -1,8 +1,7 @@
 <script>
 
 /**
- * To record, playback and upload a camera/screen recording into SB 
- * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
+ * To record, view and upload a photo into SB 
  *
  */
 
@@ -17,7 +16,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getRecordPhotoOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
-import { isOfFileType, isOfMimeType, dataURLtoBlob } from '@shared/util/fileUtils';
+import { dataURLtoBlob } from '@shared/util/fileUtils';
 
 
 export default {
