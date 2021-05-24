@@ -226,7 +226,6 @@ class Factory
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
-                $this->campusMapper,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
