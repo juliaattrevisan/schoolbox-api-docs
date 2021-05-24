@@ -26,7 +26,8 @@ class CMS
         $this->database = Database::getInstance();
     }
 
-    public function log(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $object) {
+    public function log(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $object)
+    {
         $query = "
                 SELECT groups.name, COUNT(*) as total FROM cmsLog JOIN `user` ON cmsLog.user = `user`.id JOIN groups ON user.group_id = groups.id
                 WHERE object = :object AND action = :action AND
@@ -71,7 +72,7 @@ class CMS
                 AND `time` >= :start AND `time` <= :end
                 GROUP BY `user`.`group_id`";
 
-        $mimeType = $mimeType.'%';
+        $mimeType = $mimeType . '%';
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
         $statement->bindParam(':end', $end->getDatabaseDate());

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint\Timetable;
@@ -96,7 +98,6 @@ class Definition implements IStrategy
         $ext = 'abc';
 
         foreach ($cycles as $cycle) {
-
             /* TODO Fill in these cycle vars
              */
             $cycleName = '';
@@ -199,7 +200,6 @@ class Definition implements IStrategy
         $days = [];
 
         foreach ($days as $day) {
-
             /* TODO Get a list of periods from endpoint data
              */
             $periods = [];
@@ -236,7 +236,6 @@ class Definition implements IStrategy
              */
             /** @var TimetablePeriod $period */
             foreach ($periods as $period) {
-
                 /* TODO Fill in these period vars
                  */
                 $periodName = '';
@@ -257,7 +256,6 @@ class Definition implements IStrategy
             /* Do a quick analysis in case there might be something amiss
              */
             if (!\count($struct['days'][$dayIndex])) {
-
                 /* TODO Fill in these vars
                  */
                 $cycleId = '';

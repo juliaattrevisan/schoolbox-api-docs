@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Usage: ./gc-storage.php [-p] [-vvv] [-n{limit}]
  *
@@ -35,9 +36,9 @@ new Daemon\Kernel(
 $pdo = Database::getInstance();
 
 $threshold = 0;
-if(isset($opts['v'])) {
+if (isset($opts['v'])) {
     $threshold = 1;
-    if(is_array($opts['v'])) {
+    if (is_array($opts['v'])) {
         $threshold = min(3, count($opts['v']));
     }
 }
@@ -57,7 +58,10 @@ $gc  = new GC\GarbageCollector(
         new GC\Check\HardLinks($pdo),
         new GC\Check\SoftLinks($pdo, SQL_db, $log),
     ],
-    $sm, $log, $limit, $perform
+    $sm,
+    $log,
+    $limit,
+    $perform
 );
 
 $deleted = $gc->purge();

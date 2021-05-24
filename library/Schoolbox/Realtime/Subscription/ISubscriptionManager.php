@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -34,5 +35,4 @@ interface ISubscriptionManager
      * @return bool
      */
     public function removeSubscription($userId);
-
 }

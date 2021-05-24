@@ -10,7 +10,6 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
-
 if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }

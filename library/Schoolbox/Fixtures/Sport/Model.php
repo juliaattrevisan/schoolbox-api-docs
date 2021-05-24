@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model
  *
@@ -34,7 +35,8 @@ class Model implements ISoftDeletable
      * @param string $name
      * @return self
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -42,7 +44,8 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -50,7 +53,8 @@ class Model implements ISoftDeletable
      * @param string $url
      * @return self
      */
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         $this->url = $url;
         return $this;
     }
@@ -58,7 +62,8 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getUrl() {
+    public function getUrl()
+    {
         return $this->url;
     }
 
@@ -81,5 +86,4 @@ class Model implements ISoftDeletable
         $this->positions = $positions;
         return $this;
     }
-
 }

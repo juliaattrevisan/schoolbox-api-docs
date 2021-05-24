@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -21,6 +22,5 @@ class Component_Config_Timing extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_TIMING_SELECTED', $i == $configValue ? ' selected="selected"' : '');
             $page->parse('timings_block', 'timings', true);
         }
-
     }
 }

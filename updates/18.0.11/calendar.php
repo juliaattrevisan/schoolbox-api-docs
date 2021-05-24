@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Repair obsolete Timetable_ExternalConstrained configurations
  *
@@ -50,7 +51,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
          * Update it, encode it, save it again
          */
         if (($configuration->getConnectorClass() == 'External') && ($configuration->getEventType() == 'Timetable')) {
-
             /* Some outdated records may still be of type Calendar_Api_Config_Connector_External
              * This needs to be updated as well
              */

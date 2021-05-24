@@ -272,8 +272,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
 
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
-            if(is_array($allAnswers)){
-
+            if (is_array($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
                     $page->setVar([
                         'ANSWER_LEFT_VALUE'  => Scrub::text($currentAnswer->answerLeft),
@@ -300,7 +299,6 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
         $allAnswers = [];
 
         foreach ($xmlObj->subquestion as $currentAnswer) {
-
             /* Set up data object in accordance with $this->create();
              */
             $answer['answerLeft']  = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);

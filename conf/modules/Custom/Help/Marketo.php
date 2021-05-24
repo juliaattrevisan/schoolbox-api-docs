@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -10,7 +11,6 @@ namespace Config\Modules\Custom\Help;
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Custom\Help\Marketo\Component\Dashboard\Module as MarketoModule;
-
 
 class Marketo extends ModuleLoader
 {

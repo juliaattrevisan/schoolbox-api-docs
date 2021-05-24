@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -79,5 +80,4 @@ class ServiceMapper extends Mapper
     {
         return false;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,7 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
-use \Schoolbox\ImmersiveReader\Module as ImmersiveReaderModule;
+use Schoolbox\ImmersiveReader\Module as ImmersiveReaderModule;
 
 class ImmersiveReader extends ModuleLoader
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -167,9 +168,9 @@ class IndicatorUsage
         $n = \count($temp);
 
         for ($i = 0; $i < $n; $i++) {
-            $nextDescriptor = $temp[$i+1] ?? null;
+            $nextDescriptor = $temp[$i + 1] ?? null;
             $descriptor = $temp[$i];
-            $previousDescriptor = $temp[$i-1] ?? null;
+            $previousDescriptor = $temp[$i - 1] ?? null;
 
             /* If you aren't using mark ranges, min = max and get out of here
              */
@@ -181,7 +182,7 @@ class IndicatorUsage
             /* Useful flags
              */
             $isFirstElement = 0 === $i;
-            $isLastElement = $i === $n-1;
+            $isLastElement = $i === $n - 1;
 
             /* If this was the first element in the list, or the last element in the list,
              * set its min value to be the same as its max (addresses 1-element lists)
@@ -198,7 +199,6 @@ class IndicatorUsage
              */
             if ($nextDescriptor) {
                 if ($nextDescriptor->getMaxValue() > $descriptor->getMaxValue()) {
-
                     /* Since we're ascending we need to recall what we previously saw
                      * But don't let it exceed the current element's maximum
                      *
@@ -213,7 +213,6 @@ class IndicatorUsage
                     $descriptor->setMinValue($nextDescriptor->getMaxValue() + self::MARK_RANGE_INCREMENT);
                 }
             } elseif ($previousDescriptor) {
-
                 /* Last element in the list in ascending order
                  */
                 if ($previousDescriptor->getMinValue() < $descriptor->getMaxValue()) {
@@ -240,7 +239,7 @@ class IndicatorUsage
          */
         if ($useValueRanges && \count($temp)) {
             if ($direction === self::ORDER_DESCENDING) {
-                $specialDescriptor = $temp[\count($temp)-1];
+                $specialDescriptor = $temp[\count($temp) - 1];
             } else {
                 $specialDescriptor = $temp[0];
             }

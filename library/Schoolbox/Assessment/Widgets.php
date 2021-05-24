@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Widgets
  *
@@ -10,9 +11,11 @@
  */
 
 namespace Schoolbox\Assessment;
+
 use Schoolbox\Learning\Assessment\IAssessable;
 
-class Widgets {
+class Widgets
+{
 
     /**
      * Outputs the visibility dropdown for this page.
@@ -20,7 +23,8 @@ class Widgets {
      * @param \SitePage $page
      * @param int $value The value of the dropdown to show.
      */
-    public function outputVisibilityDropdown(\SitePage $page, $value) {
+    public function outputVisibilityDropdown(\SitePage $page, $value)
+    {
         $page->dropDown(
             'mark_visibility_drop',
             $this->getAvailableOptions(),
@@ -38,7 +42,8 @@ class Widgets {
      *
      * @return array
      */
-    public static function getAvailableOptions() {
+    public static function getAvailableOptions()
+    {
         $options = self::getOptions();
         switch (\Config::get('submission_visibility_max')) {
             case IAssessable::MARK_VISIBILITY_PRIVATE:
@@ -63,7 +68,8 @@ class Widgets {
      *
      * @return array
      */
-    static public function getOptions() {
+    public static function getOptions()
+    {
         $options = array(
             array(
                 'id'   => IAssessable::MARK_VISIBILITY_PRIVATE,
@@ -91,7 +97,8 @@ class Widgets {
      * @param int $id
      * @return mixed
      */
-    static public function getCss($id) {
+    public static function getCss($id)
+    {
         $options = self::getOptions();
 
         foreach ($options as $vis) {
@@ -101,11 +108,12 @@ class Widgets {
         }
     }
 
-    static public function getName($id) {
+    public static function getName($id)
+    {
         $options = self::getOptions();
 
-        foreach($options as $vis) {
-            if($vis['id'] == $id) {
+        foreach ($options as $vis) {
+            if ($vis['id'] == $id) {
                 return $vis['name'];
             }
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -116,7 +117,7 @@ class Controller extends Base
                 [
                     'student' => $student,
                 ],
-                'Personalised Learning for '.$student->formatName(),
+                'Personalised Learning for ' . $student->formatName(),
                 'submission'
             )
         );
@@ -151,7 +152,6 @@ class Controller extends Base
         $folders = $classList->getClassList($term, $now)['classList'];
 
         foreach ($folders as $folder) {
-
             // Ignore non-classes
             if (strlen($folder->getCodeString()) === 0) {
                 continue;
@@ -174,7 +174,6 @@ class Controller extends Base
                 }
 
                 $units = $unitMapper->findByPredicates($where);
-
             } catch (\UnderflowException $e) {
                 // no units
                 continue;
@@ -193,7 +192,6 @@ class Controller extends Base
                     $resultSet[] = $this->makeResource($folder, $unit, $project->getId(), $project->getTitle());
                 }
             }
-
         }
 
         $this->getResponse()->content->set($this->buildJsonOutput($resultSet));
@@ -292,7 +290,6 @@ class Controller extends Base
                 $this->buildJsonResponse('This assessment does not have a due date', 403);
                 return;
             }
-
         } catch (MapperException $e) {
             $this->buildJsonResponse('Assessment not found', 404);
             return;
@@ -302,7 +299,6 @@ class Controller extends Base
         // Build and validate open and due date
         try {
             $openDate = new Alaress_Date_Format($post->get('openDate'), Alaress_Date_Format::DATABASE_FORMAT);
-
         } catch (\InvalidArgumentException $e) {
             $this->buildJsonResponse('Invalid format for open date - provide as timestamp', 400);
             return;
@@ -310,7 +306,6 @@ class Controller extends Base
 
         try {
             $dueDate = new Alaress_Date_Format($post->get('dueDate'), Alaress_Date_Format::DATABASE_FORMAT);
-
         } catch (\InvalidArgumentException $e) {
             $this->buildJsonResponse('Invalid format for due date - provide as timestamp', 400);
             return;

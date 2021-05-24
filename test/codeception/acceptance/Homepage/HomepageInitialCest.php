@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2018, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -144,7 +145,6 @@ class HomepageInitialCest
         $element = Locator::contains('div.component-action section button', 'Save');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-
     }
 
     /**

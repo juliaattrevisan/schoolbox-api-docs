@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
@@ -33,7 +35,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
         $this->parseConfig();
 
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailable();
         }
 
@@ -64,7 +66,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         $this->setVar('BREADCRUMB_CATEGORY_NAME', Scrub::text($this->getSource()->getName()));
         $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
         $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
-        $this->parse('source_folder_exists_block','source_folder_exists');
+        $this->parse('source_folder_exists_block', 'source_folder_exists');
 
         return true; // everything went according to plan
     }

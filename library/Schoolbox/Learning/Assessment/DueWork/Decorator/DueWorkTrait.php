@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DueWorkTrait
  *
@@ -13,7 +14,7 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 
 trait DueWorkTrait
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component_Eportfolio_AdvancedList
  *
@@ -6,60 +7,66 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Component\Eportfolio;
 
-class AdvancedList extends ListItem {
+class AdvancedList extends ListItem
+{
 
-	/**
-	 * Title of the list item
-	 *
-	 * @var string
-	 */
-	public $title = '';
+    /**
+     * Title of the list item
+     *
+     * @var string
+     */
+    public $title = '';
 
-	/**
-	 * Storage hash for an arbitrarily uploaded image
-	 *
-	 * @var string
-	 */
-	public $imagehash = '';
+    /**
+     * Storage hash for an arbitrarily uploaded image
+     *
+     * @var string
+     */
+    public $imagehash = '';
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set image hash
-	 *
-	 * @param string $imagehash
-	 */
-	public function setImagehash($imagehash) {
-		$this->imagehash = $imagehash;
-	}
+    /**
+     * Set image hash
+     *
+     * @param string $imagehash
+     */
+    public function setImagehash($imagehash)
+    {
+        $this->imagehash = $imagehash;
+    }
 
-	/**
-	 * Get image hash
-	 *
-	 * @return string
-	 */
-	public function getImagehash() {
-		return $this->imagehash;
-	}
+    /**
+     * Get image hash
+     *
+     * @return string
+     */
+    public function getImagehash()
+    {
+        return $this->imagehash;
+    }
 
-	/**
-	 * Set title
-	 *
-	 * @param string $title
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
-	}
+    /**
+     * Set title
+     *
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
 
-	/**
-	 * Get title
-	 *
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
+    /**
+     * Get title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 }

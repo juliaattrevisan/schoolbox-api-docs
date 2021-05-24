@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage\Test;
@@ -13,7 +15,6 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Assessment\Rubric\DataModel\Indicator\Model as IndicatorModel;
 use Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec;
 use UnexpectedValueException;
-
 
 /**
  * @covers \Schoolbox\Filter\Filters\Assessment\RubricUsage\Codec

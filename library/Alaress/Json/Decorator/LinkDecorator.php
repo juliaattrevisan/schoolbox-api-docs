@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Json\Api\Link;
 use Alaress\Json\Linkable;
 use Aura\Router\Router;
-
 
 /**
  * Decorates a JSON payload with links. The input model MUST implement \Alaress\Json\Linkable, or no decoration will
@@ -74,5 +74,4 @@ class LinkDecorator implements IDecorator
             'auth' => $link->getAuth()
         ];
     }
-
 }

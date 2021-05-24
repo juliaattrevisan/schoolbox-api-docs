@@ -1,9 +1,11 @@
 <?php
+
 /************************************************************
  *                                                           *
  *         Copyright (c) 2002-2003 Lektec Consulting         *
  *                                                           *
  ************************************************************/
+
 //this script opens files for download and send them to the user with correct filename
 //future enhancements could include storing the content type to help browser file recognition
 //rather than just octet stream
@@ -51,7 +53,6 @@ if (is_numeric($_GET['id'])) {
         ];
 
         $file = $fileMapper->findForFolders([$_GET['id']], $config)->first();
-
     } else {
         try {
             $file           = $fileMapper->findById($_GET['id']);

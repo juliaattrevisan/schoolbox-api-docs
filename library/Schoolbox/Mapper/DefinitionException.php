@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception for when a mapper has been defined improperly.
  *
@@ -9,6 +10,7 @@
 
 namespace Schoolbox\Mapper;
 
-class DefinitionException extends \LogicException {
-	protected $message = 'Mapper defined improperly';
+class DefinitionException extends \LogicException
+{
+    protected $message = 'Mapper defined improperly';
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Stk\NCEA;
 
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -24,7 +26,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-
 
 class Module extends BaseModule
 {
@@ -86,7 +87,6 @@ class Module extends BaseModule
                                 }
                             }
                         ),
-
                         /* This student must be in Year 11-13 inclusive
                          */
                         new Rule\IsYearLevel($this->availableForYears)
@@ -102,7 +102,9 @@ class Module extends BaseModule
             );
         });
 
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
+        $preloadUser = function ($params) {
+            return $this->preloadUser($params);
+        };
 
         $this->register('GET', '/report/{userId}/{year}', 'getReport', $getPerms, $preloadUser);
     }
@@ -122,8 +124,7 @@ class Module extends BaseModule
         try {
             /** @var \Schoolbox\User $user */
             $user = $this->getUserMapper()->findById($params['userId']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound('User Not Found');
         }
 
@@ -183,6 +184,3 @@ class Module extends BaseModule
         return $this->getMapperFactory()->get(UserMapper::class);
     }
 }
-
-
-

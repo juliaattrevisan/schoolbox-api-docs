@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eportfolio_Page_Factory
  *
@@ -19,7 +20,8 @@ class Eportfolio_Page_Factory
      * @param int        $permissionValue
      * @return Eportfolio_Page_Abstract|null
      */
-    public function produce($page, $userId, $pageId, $permissionValue) {
+    public function produce($page, $userId, $pageId, $permissionValue)
+    {
         if (is_numeric($pageId)) {
             return new Eportfolio_Page_Instance($page, $userId, $pageId, $permissionValue);
         } else if ($pageId == 'showcase') {

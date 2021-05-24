@@ -1,14 +1,15 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox;
-
 
 use Database;
 use PDO;
@@ -165,7 +166,6 @@ class RoleCloner
                 }
             }
         }
-
     }
 
     /**
@@ -204,13 +204,14 @@ class RoleCloner
         );
 
         // Composite permissions cleanup
-        $this->db->query("
+        $this->db->query(
+            "
                 DELETE FROM comms_news_audience_complex
                 WHERE
                 ( entity_type_1  = 'role' AND entity_value_1 = ? )
                 OR
                 (entity_type_2 = 'role' AND entity_value_2 = ? )",
-                [$destination->getId(), $destination->getId()]
+            [$destination->getId(), $destination->getId()]
         );
 
         // Copy first set of complex audiences

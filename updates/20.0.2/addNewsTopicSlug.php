@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -19,8 +20,7 @@ $app = new class extends CliTool\App {
     {
         $this->getDatabaseInternal()->executeQuery("
                 ALTER TABLE newsTopic ADD COLUMN slug VARCHAR(150) DEFAULT NULL AFTER `name`,
-                ADD UNIQUE INDEX idx_newsTopic_slug (slug)"
-        );
+                ADD UNIQUE INDEX idx_newsTopic_slug (slug)");
 
         $topics = $this->getDatabaseInternal()->executeQuery(
             'SELECT `name`, `newsTopicID` FROM newsTopic WHERE deleted_at IS NULL'
@@ -30,8 +30,9 @@ $app = new class extends CliTool\App {
             try {
                 $slug = $this->generateSlug($topic['name']);
                 $this->getDatabaseInternal()->executeQuery(
-                    'UPDATE newsTopic SET slug = :slug WHERE newsTopicID = :topicId'
-                    , ['slug' => $slug, 'topicId' => $topic['newsTopicID']]);
+                    'UPDATE newsTopic SET slug = :slug WHERE newsTopicID = :topicId',
+                    ['slug' => $slug, 'topicId' => $topic['newsTopicID']]
+                );
             } catch (Exception $e) {
                 $this->getLogger()->warning("Could not set slug for new topic: {$topic['newsTopicID']}: " . $e->getMessage());
             }

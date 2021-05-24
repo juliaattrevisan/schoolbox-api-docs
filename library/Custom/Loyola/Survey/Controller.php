@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -71,7 +72,7 @@ class Controller extends Base
         $userIds = $this->getStudents($folder);
         // And work out what surveys they have completed
         $surveys = null;
-        if(count($userIds) > 0) {
+        if (count($userIds) > 0) {
             $surveys = $this->surveyMapper->findAttemptedSurveysForUsers($userIds, 'backpack');
         }
 
@@ -352,7 +353,7 @@ class Controller extends Base
      * @param Folder $folder
      * @return array
      */
-    private function getStudents(Folder $folder) : array
+    private function getStudents(Folder $folder): array
     {
         $students = [];
 

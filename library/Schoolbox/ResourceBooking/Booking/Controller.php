@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for resource bookings.
  *
@@ -238,7 +239,6 @@ class Controller extends Base
                     $relation->setEventId($event->getId());
                     $relation->setUserId($event->getOwner()->getId());
                     $relationMapper->save($relation);
-
                 }
             }
 
@@ -347,9 +347,11 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if (($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
+                if (
+                    ($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
                     $statusId == Status\Model::STATUS_APPROVED &&
-                    $isTimeChanged) {
+                    $isTimeChanged
+                ) {
                     $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                 }
 
@@ -901,7 +903,8 @@ class Controller extends Base
      */
     protected function getSeriesBookings(Model $booking)
     {
-        if ($this->getRequest()->query['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES
+        if (
+            $this->getRequest()->query['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES
             || $this->getRequest()->post['efficacy'] === EventRecurrenceMapper::EFFICACY_SERIES
         ) {
             if ($seriesId = $booking->getEvent()->getSeriesId()) {
@@ -1100,5 +1103,4 @@ class Controller extends Base
 
         return $this;
     }
-
 }

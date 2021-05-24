@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file provides access to synergetic user info
  *
@@ -20,7 +21,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
             return [];
         }
 
-        if($this->config->get('external_learning_plans')) {
+        if ($this->config->get('external_learning_plans')) {
             $learningPlanQuery = "(
                             SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
@@ -38,7 +39,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 vStudents.StudentGiven1,
                 vStudents.StudentSurname,
                 '' AS StudentGender,
-                CONVERT(nvarchar(30), vStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
+                CONVERT(nvarchar(30), vStudents.StudentBirthDate, " . self::FORMAT_ISO8601 . " ) as StudentBirthDate,
                 vStudents.StudentTutorName,
                 vStudents.StudentHeadOfHouse,
                 House.HeadOfHouseID,
@@ -112,11 +113,9 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
         $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
 
         foreach ($iteratorStudents as $row) {
-
             // There might be multiple records, if this is the first one populate the bulk of the details
 
             if (empty($student)) {
-
                 $student = $row;
 
                 if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
@@ -128,9 +127,7 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                 $student['AlertMessage'] = [
                     $student['AlertMessage']
                 ];
-
             } else {
-
                 // Additional records will only different by their alert message, we just append these to the
                 // existing student record
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Notif\MQ;
-
 
 use Alaress\Async\AMQP\AMQPConnector;
 use Alaress\Async\AMQP\AMQPExchange;
@@ -107,5 +107,4 @@ class Connector extends AMQPConnector
         $bits[] = $message;
         return sha1(implode('.', $bits));
     }
-
 }

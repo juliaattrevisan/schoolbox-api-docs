@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -166,20 +167,17 @@ abstract class Component_FactoryAbstract
         if (!empty($parameterList)) {
             foreach ($parameterList as $i => $parameter) {
                 if ($i >= $offset) {
-
                     try {
                         ///Parses the export of the parameter for the class
                         //$parameterString = (string) new ReflectionClass($parameter);
                         $dependencyClass = preg_replace('/.*?(\w+)\s+\$' . $parameter->name . '.*/', '\\1', (string) $parameter);
 
                         if (!empty($dependencyClass)) {
-                            $dependencyList[] = new $dependencyClass;
+                            $dependencyList[] = new $dependencyClass();
                         }
-
                     } catch (Exception $exception) {
                         return $dependencyList;
                     }
-
                 }
             }
         }

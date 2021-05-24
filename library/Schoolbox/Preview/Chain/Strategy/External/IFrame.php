@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IFrame
  *
@@ -11,14 +12,16 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
-class IFrame extends Base {
+class IFrame extends Base
+{
 
     /**
      * Test the Content-Types
      *
      * @return string
      */
-    public function test() {
+    public function test()
+    {
         foreach ($this->getAllowedURLs() as $allowedURL) {
             if (false !== stripos($this->getUrl(), trim($allowedURL))) {
                 return [

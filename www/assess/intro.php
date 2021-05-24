@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Formerly page for quiz commencement; now redirects to quiz summary.
  *

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
@@ -62,7 +64,6 @@ class External_Synergetic_User implements External_UserInterface
 
         // Check if we found a photo in the SIS
         if ($photo = $queryPhoto->fetch()) {
-
             /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
              * currently have, shank it down and save it into brownhole
              *
@@ -76,7 +77,6 @@ class External_Synergetic_User implements External_UserInterface
                     $user->getPortrait()->getCreatedAt()->lt(Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))
                 )
             ) {
-
                 // Do a query to retrieve the actual photo data from the database
                 unset($queryPhoto);
 
@@ -191,7 +191,6 @@ class External_Synergetic_User implements External_UserInterface
 
         foreach ($externalUserIds as &$id) {
             if (!$this->isExternalIdValid($id)) {
-
                 // This was not a valid ID, remove it from the array
 
                 unset($id);
@@ -246,7 +245,7 @@ class External_Synergetic_User implements External_UserInterface
             return [];
         }
 
-        if($this->config->get('external_learning_plans')) {
+        if ($this->config->get('external_learning_plans')) {
             $learningPlanQuery = "(
                             SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
@@ -264,7 +263,7 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.StudentGiven1,
                         vStudentsAll.StudentSurname,
                         vStudentsAll.StudentGender,
-                        CONVERT(nvarchar(30), vStudentsAll.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
+                        CONVERT(nvarchar(30), vStudentsAll.StudentBirthDate, " . self::FORMAT_ISO8601 . " ) as StudentBirthDate,
                         vStudentsAll.StudentTutorName,
                         vStudentsAll.StudentHeadOfHouse,
                         House.HeadOfHouseID,
@@ -332,11 +331,9 @@ class External_Synergetic_User implements External_UserInterface
         $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
 
         foreach ($iteratorStudents as $row) {
-
             // There might be multiple records, if this is the first one populate the bulk of the details
 
             if (empty($student)) {
-
                 $student = $row;
 
                 if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
@@ -348,9 +345,7 @@ class External_Synergetic_User implements External_UserInterface
                 $student['AlertMessage'] = [
                     $student['AlertMessage']
                 ];
-
             } else {
-
                 // Additional records will only different by their alert message, we just append these to the
                 // existing student record
 
@@ -429,11 +424,9 @@ class External_Synergetic_User implements External_UserInterface
         // Search for a particular year level
 
         if (strlen($yearLevel) > 0) {
-
             $bindings['yearDescription'] = $yearLevel;
 
             if (is_numeric($yearLevel)) {
-
                 $bindings['yearLevel'] = $yearLevel;
 
                 $filters .= " AND (
@@ -441,9 +434,7 @@ class External_Synergetic_User implements External_UserInterface
                     StudentYearLevel = :yearLevel
                     )
                 ";
-
             } else {
-
                 // If the year is not numeric, don't attempt to compare to StudentYearLevel
                 // or the query will bug out
 
@@ -451,14 +442,12 @@ class External_Synergetic_User implements External_UserInterface
             }
         }
 
-        if (strlen($name) > 0 ) {
-
+        if (strlen($name) > 0) {
             $splitNames = explode(' ', $name);
 
             $count = 1;
 
             foreach ($splitNames as $splitName) {
-
                 $keyGiven = "nameGiven{$count}";
                 $bindings[$keyGiven] = "%{$splitName}%";
 
@@ -935,7 +924,6 @@ class External_Synergetic_User implements External_UserInterface
                                   code ASC
             ";
         } else {
-
             // If they're neither staff/student- they have no business being here
 
             return [];
@@ -948,7 +936,6 @@ class External_Synergetic_User implements External_UserInterface
         ])->fetchAll();
 
         if (is_array($subjectList)) {
-
             // Perform natural sort on subjects so they appear in a more logical order
             // (unfortunately no current way to do this is MSSQL query without writing
             // a custom database function or doing a hacky length query)
@@ -1020,8 +1007,7 @@ class External_Synergetic_User implements External_UserInterface
         $filter = '';
         $bindings = [];
 
-        if (is_array($staffCategory) && $staffCategory[0] != '')
-        {
+        if (is_array($staffCategory) && $staffCategory[0] != '') {
             $count = 1;
 
             $filterPlaceholder = "";
@@ -1225,7 +1211,6 @@ class External_Synergetic_User implements External_UserInterface
         // If we are supplied a valid user ID use their current file year/semester values
 
         if ($externalUserId != null) {
-
             if (isset(self::$fileYearSemesterUser[$externalUserId])) {
                 return self::$fileYearSemesterUser[$externalUserId];
             }
@@ -1252,7 +1237,6 @@ class External_Synergetic_User implements External_UserInterface
         // Otherwise, return the current system default values
 
         if (!isset(self::$fileYearSemesterDefault)) {
-
             $querySemester = $this->getConnector()->executeQuery(
                 "SELECT FileSemester, FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1"
             );
@@ -1265,9 +1249,7 @@ class External_Synergetic_User implements External_UserInterface
 
                 // Since we are not fully iterating we need to close the result set
                 $querySemester->close();
-
             } else {
-
                 // Since we are not fully iterating we need to close the result set
                 $querySemester->close();
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@schoolbox.com.au>
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
@@ -7,7 +8,7 @@
 
 namespace Schoolbox\Config\Type;
 
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class Mapper

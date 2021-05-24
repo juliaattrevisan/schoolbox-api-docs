@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Admin\Restore;
 
 use Alaress\Web\Controller\Base;
@@ -49,8 +51,7 @@ class Controller extends Base
     public function __construct(
         FolderMapper $folderMapper,
         AssessmentMapper $assessmentMapper
-    )
-    {
+    ) {
         $this->folderMapper = $folderMapper;
         $this->assessmentMapper = $assessmentMapper;
     }
@@ -68,7 +69,7 @@ class Controller extends Base
 
         $folderpb = $this->folderMapper->getPredicateBuilder();
 
-        $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true,'order'=>['deleted_at'=>'DESC']]);
+        $deletedFolders = $this->folderMapper->findByPredicates($folderpb->betweenDates('deleted_at', $start, $end), ['deleted' => true,'order' => ['deleted_at' => 'DESC']]);
 
         // Filter folders where the parent is deleted, these cannot be restored
         $deletedFolders = $deletedFolders->filter(function (Folder $node) {
@@ -76,7 +77,7 @@ class Controller extends Base
         });
 
         $assessmentpb = $this->assessmentMapper->getPredicateBuilder();
-        $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted'=>true, 'order'=>['deleted_at'=>'DESC']]);
+        $deletedAssessments = $this->assessmentMapper->findByPredicates($assessmentpb->betweenDates('deleted_at', $start, $end), ['deleted' => true, 'order' => ['deleted_at' => 'DESC']]);
 
         // Filter assessments where the context is deleted, these cannot be restored
         $deletedAssessments = $deletedAssessments->filter(function (Assessment $node) {
@@ -110,7 +111,7 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
+        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
     }
 
     /**
@@ -132,6 +133,6 @@ class Controller extends Base
         }
 
         $db->commit();
-        $this->getResponse()->content->set($this->buildJsonOutput(['success'=>true]));
+        $this->getResponse()->content->set($this->buildJsonOutput(['success' => true]));
     }
 }

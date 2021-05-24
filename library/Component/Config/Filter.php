@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -48,9 +49,9 @@ class Component_Config_Filter extends Component_Config_Abstract
         /* filter config */
         foreach ($filter as $option => $value) {
             $page->setVar(array(
-                'COMPONENT_CONFIG_FILTER_VALUE' 	=> $option,
-                'COMPONENT_CONFIG_FILTER_NAME' 		=> ucwords($option),
-                'COMPONENT_CONFIG_FILTER_SELECTED' 	=> $value == 1 ? 'checked="checked"' : '',
+                'COMPONENT_CONFIG_FILTER_VALUE'     => $option,
+                'COMPONENT_CONFIG_FILTER_NAME'      => ucwords($option),
+                'COMPONENT_CONFIG_FILTER_SELECTED'  => $value == 1 ? 'checked="checked"' : '',
             ));
             $page->parse('filters_block', 'filters', true);
         }

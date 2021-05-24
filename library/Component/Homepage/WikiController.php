@@ -59,8 +59,10 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         $userHandler = new User();
 
         $wikiList = $wikiHandler->getByCategory(
-            $this->getSource()->getId(), strtolower($this->getConfig('sort')),
-            $this->getConfig('sortdir'), $this->getConfig('size')
+            $this->getSource()->getId(),
+            strtolower($this->getConfig('sort')),
+            $this->getConfig('sortdir'),
+            $this->getConfig('size')
         );
 
         $this->setVar('WIKI_CATEGORY_ID', $this->getSource()->getId());
@@ -153,7 +155,8 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
                     $this->setVar('modify_wiki_block', '');
 
-                    if (($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
+                    if (
+                        ($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
                         || $this->getContentPermission() >= UserAccess::ACCESS_WRITE
                     ) {
                         $this->parse('modify_wiki_block', 'modify_wiki');

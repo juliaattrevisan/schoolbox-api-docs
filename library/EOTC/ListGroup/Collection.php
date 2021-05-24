@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventListGroup
  *
@@ -13,9 +14,11 @@
  */
 
 namespace EOTC\ListGroup;
+
 use EOTC\Event;
 
-class Collection extends \Schoolbox\Collection {
+class Collection extends \Schoolbox\Collection
+{
 
     /**
      * A list of ids that have already been processed
@@ -34,7 +37,8 @@ class Collection extends \Schoolbox\Collection {
     /**
      * No setup hook in \Schoolbox\Collection?
      */
-    public function setup() {
+    public function setup()
+    {
         $this->setMapping(new Mapping());
 
         foreach ($this->getMapping()->getMapping() as $current) {
@@ -51,7 +55,8 @@ class Collection extends \Schoolbox\Collection {
      *
      * @param Event $event
      */
-    public function assign(Event $event) {
+    public function assign(Event $event)
+    {
         if (is_numeric($event->getSeriesId())) {
             if (!in_array($event->getSeriesId(), $this->getProcessedSeriesIds())) {
                 $this->finish($event->getSeriesId());
@@ -61,19 +66,16 @@ class Collection extends \Schoolbox\Collection {
                     $location = $chain->getResult();
 
                     $this->getOffset($location->getListGroupIndex())->add($event);
-                }
-                catch (\Exception $e) {
+                } catch (\Exception $e) {
                 }
             }
-        }
-        else {
+        } else {
             try {
                 $chain = new PriorityChain($event);
                 $location = $chain->getResult();
 
                 $this->getOffset($location->getListGroupIndex())->add($event);
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
             }
         }
     }
@@ -85,7 +87,8 @@ class Collection extends \Schoolbox\Collection {
      *
      * @return mixed
      */
-    public function getCurrentName($key) {
+    public function getCurrentName($key)
+    {
         return $this->getMapping()->getName($key);
     }
 
@@ -94,7 +97,8 @@ class Collection extends \Schoolbox\Collection {
      *
      * @param int $seriesId
      */
-    private function finish($seriesId) {
+    private function finish($seriesId)
+    {
         $this->processedSeriesIds[] = $seriesId;
     }
 
@@ -104,7 +108,8 @@ class Collection extends \Schoolbox\Collection {
      * Approved and Rejected are reverse chronological
      * Everything else is chronological
      */
-    public function sortEventsByStartDate() {
+    public function sortEventsByStartDate()
+    {
         $reverseOrder = array(
             $this->getMapping()->getApprovedIndex(),
             $this->getMapping()->getRejectedIndex()
@@ -115,8 +120,7 @@ class Collection extends \Schoolbox\Collection {
 
             if (in_array($i, $reverseOrder)) {
                 $currentGroup->sortBy('startDateTime', 'desc');
-            }
-            else {
+            } else {
                 $currentGroup->sortBy('startDateTime', 'asc');
             }
         }
@@ -130,7 +134,8 @@ class Collection extends \Schoolbox\Collection {
      *
      * @param array $processedSeriesIds
      */
-    private function setProcessedSeriesIds($processedSeriesIds) {
+    private function setProcessedSeriesIds($processedSeriesIds)
+    {
         $this->processedSeriesIds = $processedSeriesIds;
     }
 
@@ -139,7 +144,8 @@ class Collection extends \Schoolbox\Collection {
      *
      * @return array
      */
-    private function getProcessedSeriesIds() {
+    private function getProcessedSeriesIds()
+    {
         return $this->processedSeriesIds;
     }
 
@@ -148,7 +154,8 @@ class Collection extends \Schoolbox\Collection {
      *
      * @param Mapping $mapping
      */
-    private function setMapping($mapping) {
+    private function setMapping($mapping)
+    {
         $this->mapping = $mapping;
     }
 
@@ -157,7 +164,8 @@ class Collection extends \Schoolbox\Collection {
      *
      * @return Mapping
      */
-    private function getMapping() {
+    private function getMapping()
+    {
         return $this->mapping;
     }
 }

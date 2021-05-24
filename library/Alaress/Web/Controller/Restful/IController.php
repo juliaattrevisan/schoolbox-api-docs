@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Web\Controller\Restful;
-
 
 use Alaress\Web\Controller\Exception;
 
@@ -94,5 +94,4 @@ interface IController
      * @return void
      */
     public function deleteEntity($entity);
-
 }

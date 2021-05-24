@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au
@@ -101,7 +102,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             }
             $this->extractInstance($instance);
             $idx++;
-
         }
     }
 

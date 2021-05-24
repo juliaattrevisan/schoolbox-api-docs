@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus;
@@ -282,7 +284,6 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
                 return $this->getClassUsersForStaff($externalId);
             } catch (Mapper\Exception\NotFound $e) {
-
                 /* Neither student nor staff record found
                  */
                 return [];
@@ -547,7 +548,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
             if ('' !== (string)$cycle->getCycleIdentifier()) {
                 $luCycles[] = [
                     'key'   => $cycle->getCycleIdentifier(),
-                    'value' => $cycle->getTitle() .' ('.$cycle->getCycleIdentifier().')'
+                    'value' => $cycle->getTitle() . ' (' . $cycle->getCycleIdentifier() . ')'
                 ];
             }
         }

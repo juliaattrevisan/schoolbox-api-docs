@@ -1,10 +1,12 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -159,7 +161,7 @@ HELP;
             'We are in Week Offset %s for Term %s. This equates to being %s week(s) into Term %s',
             $currentWeekOffset,
             $currentTerm,
-            $currentWeekOffset+1,
+            $currentWeekOffset + 1,
             $currentTerm
         ));
 
@@ -207,10 +209,12 @@ HELP;
                                 $teacherSpecified = (bool)$this->getOpt(self::OPT_LONG_TEACHER);
                                 $teacherMatches = $teachers === $this->getOpt(self::OPT_LONG_TEACHER);
 
-                                if (($slotSpecified && $slotMatches && $teacherSpecified && $teacherMatches) ||
+                                if (
+                                    ($slotSpecified && $slotMatches && $teacherSpecified && $teacherMatches) ||
                                     (!$slotSpecified && $teacherSpecified && $teacherMatches) ||
                                     (!$teacherSpecified && $slotSpecified && $slotMatches) ||
-                                    (!$slotSpecified && !$teacherSpecified)) {
+                                    (!$slotSpecified && !$teacherSpecified)
+                                ) {
                                     $message = sprintf(
                                         'Student %s, week @index %s, day @index %s, slot %s: Teachers: %s, Rooms: %s: %s',
                                         $studentId,

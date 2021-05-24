@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Experimental controller for a resource booking category
  *
@@ -16,7 +17,8 @@ use Calendar\Event\Type\EventBase;
 use Schoolbox\ResourceBooking\Item\Mapper as ItemMapper;
 use Schoolbox\ResourceBooking\Report\CalendarApiFactory;
 
-class Controller extends Base {
+class Controller extends Base
+{
 
     /**
      * @var Mapper
@@ -49,7 +51,8 @@ class Controller extends Base {
     /**
      * Browses the list of categories.
      */
-    public function browse() {
+    public function browse()
+    {
 
         $page  = max(intval($this->getRequest()->query['page']), 1);
         $total = $this->mapper->countAll();
@@ -82,7 +85,8 @@ class Controller extends Base {
     /**
      * Display form for adding another category
      */
-    public function add() {
+    public function add()
+    {
         $response = $this->getResponse();
         $response->content->set(
             array(
@@ -97,7 +101,8 @@ class Controller extends Base {
     /**
      * Backend for adding a new category
      */
-    public function create() {
+    public function create()
+    {
         $post  = $this->getRequest()->post;
         $model = new Model();
         $model->setName($post['name']);
@@ -253,7 +258,8 @@ class Controller extends Base {
      * @param  Mapper $mapper
      * @return $this
      */
-    public function setMapper($mapper) {
+    public function setMapper($mapper)
+    {
         $this->mapper = $mapper;
         return $this;
     }
@@ -261,7 +267,8 @@ class Controller extends Base {
     /**
      * @return Mapper
      */
-    public function getMapper() {
+    public function getMapper()
+    {
         return $this->mapper;
     }
 
@@ -269,7 +276,8 @@ class Controller extends Base {
      * @param  IUrlPaginator $paginator
      * @return $this
      */
-    public function setPaginator($paginator) {
+    public function setPaginator($paginator)
+    {
         $this->paginator = $paginator;
         return $this;
     }
@@ -277,8 +285,8 @@ class Controller extends Base {
     /**
      * @return IUrlPaginator
      */
-    public function getPaginator() {
+    public function getPaginator()
+    {
         return $this->paginator;
     }
-
 }

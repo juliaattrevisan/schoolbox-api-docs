@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Edumate implementation of user connector
  *

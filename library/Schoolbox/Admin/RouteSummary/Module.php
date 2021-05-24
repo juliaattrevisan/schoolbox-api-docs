@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -24,7 +25,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $this->register('GET',  "", 'getRouteList', new Rule\IsSuperuser());
+        $this->register('GET', "", 'getRouteList', new Rule\IsSuperuser());
     }
 
     /**
@@ -33,7 +34,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

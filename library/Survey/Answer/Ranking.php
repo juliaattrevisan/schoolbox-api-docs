@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Answer_Ranking
  *
@@ -126,7 +127,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
             $ticks[] = "$i:'{$this->ordinal($i)}'";
         }
 
-        return '{'.implode(', ', $ticks).'}';
+        return '{' . implode(', ', $ticks) . '}';
     }
 
 
@@ -150,7 +151,7 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
             /* Generate a dataset for flot
              */
             for ($j = 0; $j < count($keys); $j++) {
-                $graphIndex = $i+1;
+                $graphIndex = $i + 1;
 
                 /* Note that flot is buggy:
                  * https://code.google.com/p/flot/issues/detail?id=247

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -37,7 +38,8 @@ abstract class AbstractTransaction implements ITransaction
      * @param int $size          - the max size of the cache, or 0 for no limit. If this limit is reached, the
      *                             transaction will execute prematurely
      */
-    function __construct($loop, $cacheInterval = 1, $size = 0) {
+    function __construct($loop, $cacheInterval = 1, $size = 0)
+    {
         $this->loop = $loop;
         $this->cacheInterval = $cacheInterval;
         $this->size = $size;
@@ -50,7 +52,8 @@ abstract class AbstractTransaction implements ITransaction
      * @param int $cacheInterval
      * @return self
      */
-    public function setCacheInterval($cacheInterval) {
+    public function setCacheInterval($cacheInterval)
+    {
         $this->cacheInterval = $cacheInterval;
         return $this;
     }
@@ -61,7 +64,8 @@ abstract class AbstractTransaction implements ITransaction
      *
      * @return int
      */
-    public function getCacheInterval() {
+    public function getCacheInterval()
+    {
         return $this->cacheInterval;
     }
 
@@ -73,8 +77,9 @@ abstract class AbstractTransaction implements ITransaction
      * @param mixed $value
      * @return self
      */
-    public function put($key, $value) {
-        if(!$this->isTicking()) {
+    public function put($key, $value)
+    {
+        if (!$this->isTicking()) {
             $this->resetTimer();
         }
 //        $data = $this->timer->getData() ?: [];
@@ -83,7 +88,7 @@ abstract class AbstractTransaction implements ITransaction
         $this->data[$key] = $value;
 
         // if we've reached our caching limit, fire and reset
-        if($this->size && count($this->data) >= $this->size) {
+        if ($this->size && count($this->data) >= $this->size) {
             $this->flush();
         }
 
@@ -94,8 +99,9 @@ abstract class AbstractTransaction implements ITransaction
     /**
      * Reset the timer, clearing a pre-existing one if it exists
      */
-    private function resetTimer() {
-        if(isset($this->timer)) {
+    private function resetTimer()
+    {
+        if (isset($this->timer)) {
             $this->loop->cancelTimer($this->timer);
         }
         $this->timer = $this->loop->addTimer($this->cacheInterval, function (TimerInterface $timer) {
@@ -111,14 +117,16 @@ abstract class AbstractTransaction implements ITransaction
      *
      * @return bool
      */
-    private function isTicking() {
+    private function isTicking()
+    {
         return isset($this->timer);
     }
 
     /**
      * @return int
      */
-    public function getCount() {
+    public function getCount()
+    {
         return count($this->data);
     }
 
@@ -146,6 +154,5 @@ abstract class AbstractTransaction implements ITransaction
      * @param mixed          $data
      * @return void
      */
-    protected abstract function execute(TimerInterface $timer, $data);
-
+    abstract protected function execute(TimerInterface $timer, $data);
 }

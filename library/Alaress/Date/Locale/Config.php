@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Date_Locale_Config
  *
@@ -16,7 +17,7 @@
  */
 
 use Schoolbox\Config\Loader as ConfigLoader;
-use \Schoolbox\IConfigLoader;
+use Schoolbox\IConfigLoader;
 
 class Alaress_Date_Locale_Config extends Alaress_Date_Locale_Abstract
 {

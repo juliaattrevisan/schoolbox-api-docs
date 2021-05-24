@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A mapper for resource booking categories.
  *
@@ -6,17 +7,19 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
 
 namespace Schoolbox\ResourceBooking\Category;
+
 use Schoolbox\Mapper as BaseMapper;
 
 /**
  * @method Model findOneByColumn($columnName, $columnValue, $order = [], $options = [])
  */
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    public function mapping() {
+    public function mapping()
+    {
         $this->hasTable('resource_category');
         $this->hasModel('Schoolbox\\ResourceBooking\\Category\\Model');
         $this->hasMap(
@@ -59,5 +62,4 @@ class Mapper extends BaseMapper {
         );
         $this->hasSoftDeleteDateField('deleted_at');
     }
-
 }

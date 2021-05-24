@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Mapper\Exception;
@@ -44,7 +46,8 @@ class Internal extends Base
      * @param string $url
      * @throws InvalidArgumentException
      */
-    public function __construct(string $url) {
+    public function __construct(string $url)
+    {
 
         /* Storage item: find the hash, and analyse it to find out
          * how to display it (or redirect, if it can't be displayed)
@@ -59,18 +62,17 @@ class Internal extends Base
             try {
                 $item = Storage\Mapper::getInstance()->findByHash($hash);
                 $this->processStorage($url, $item);
-            } catch (Exception $e ) {
+            } catch (Exception $e) {
                 //noop
             }
         } elseif ($id = $this->isSend($uriObject)) {
             try {
                 $item = File\Mapper::getInstance()->findById($id);
                 $this->processStorage($url, $item);
-            } catch (Exception $e ) {
+            } catch (Exception $e) {
                 //noop
             }
         } else {
-
             /* Just redirect straight there
              */
             $this->start([

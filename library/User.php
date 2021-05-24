@@ -256,7 +256,7 @@ class User extends DeprecatedModel
         //If parent search policy is disabled, only staff will see parents in search results
         //Guests never see parents
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
-            $wherePart .= ' AND '.$searchFilter;
+            $wherePart .= ' AND ' . $searchFilter;
         }
 
         /* Show disabled users only if ticked (hide when unticked)
@@ -306,7 +306,7 @@ class User extends DeprecatedModel
         //Guests never see parents
         $wherePart = ' AND user.deleted_at IS NULL';
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
-            $wherePart .= ' AND '.$searchFilter;
+            $wherePart .= ' AND ' . $searchFilter;
         }
 
         /* Show disabled users only if ticked (hide when unticked)
@@ -407,7 +407,7 @@ class User extends DeprecatedModel
                 . ')';
         }
         if (($searchFilter = $this->getSearchFilter($_SESSION['user']))) {
-            $query .= ' AND '.$searchFilter;
+            $query .= ' AND ' . $searchFilter;
         }
         $query .= "ORDER BY group_id, lyl.sequence, lastname, firstname";
         if (is_numeric($limit)) {
@@ -565,7 +565,7 @@ class User extends DeprecatedModel
             }
         }
         // Filthily notify the binder that user was updated
-        if(isset($_SESSION) && isset($_SESSION['user'])) {
+        if (isset($_SESSION) && isset($_SESSION['user'])) {
             $this->getUserNotifier()->manualNotifyUpdated($user['id'], $_SESSION['user']);
         }
 
@@ -628,7 +628,7 @@ class User extends DeprecatedModel
                 $this->db->insert('superusers', array('id' => $id));
             }
             // Filthily notify the binder that there's a new user
-            if(isset($_SESSION) && isset($_SESSION['user'])) {
+            if (isset($_SESSION) && isset($_SESSION['user'])) {
                 $this->getUserNotifier()->manualNotifyCreated($id, $_SESSION['user']);
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -14,7 +15,6 @@ use Schoolbox\Mapper\Traits\Model\CreateCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
 use Schoolbox\YearLevel;
-
 
 /**
  * Representation of a user-defined school term.
@@ -200,7 +200,7 @@ class Model implements \IComparable, IModel
     public function getDuration($date = null)
     {
         //Return a number of working days until the given date
-        if($date) {
+        if ($date) {
             return $this->getStart()->diffInWeekdays($date);
         }
         //Return a number of working days until the end of term.
@@ -323,31 +323,30 @@ class Model implements \IComparable, IModel
      */
     public function compare($other)
     {
-        if(!$other instanceof Model){
+        if (!$other instanceof Model) {
             throw new \DomainException('Can only compare to other Term objects. Found: ' . get_class($other));
         }
 
         $startCompare = $this->start->compare($other->start);
-        if(0 != $startCompare){
+        if (0 != $startCompare) {
             return $startCompare;
         }
         $displayFinishCompare = $this->displayFinish->compare($other->displayFinish);
-        if(0 != $displayFinishCompare){
+        if (0 != $displayFinishCompare) {
             return $displayFinishCompare;
         }
 
         // Interpret NULL date as infinitely in future
 
-        if($this->actualFinish->isNull() && $other->actualFinish->isNull()){
+        if ($this->actualFinish->isNull() && $other->actualFinish->isNull()) {
             return 0;
         }
-        if($other->actualFinish->isNull()){
+        if ($other->actualFinish->isNull()) {
             return -1;
         }
-        if($this->actualFinish->isNull()){
+        if ($this->actualFinish->isNull()) {
             return 1;
         }
         return $this->actualFinish->compare($other->actualFinish);
-
     }
 }

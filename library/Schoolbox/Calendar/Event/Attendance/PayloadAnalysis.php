@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event\Attendance;
@@ -49,7 +51,7 @@ class PayloadAnalysis
      */
     public function getNumPending(): int
     {
-        return \count(array_filter($this->guests, static function($element) {
+        return \count(array_filter($this->guests, static function ($element) {
             return $element['status'] === Model::STATUS_PENDING;
         }));
     }
@@ -62,7 +64,7 @@ class PayloadAnalysis
      */
     public function getNumAccepted(): int
     {
-        return \count(array_filter($this->guests, static function($element) {
+        return \count(array_filter($this->guests, static function ($element) {
             return $element['status'] === Model::STATUS_ACCEPTED;
         }));
     }
@@ -75,7 +77,7 @@ class PayloadAnalysis
      */
     public function getNumDeclined(): int
     {
-        return \count(array_filter($this->guests, static function($element) {
+        return \count(array_filter($this->guests, static function ($element) {
             return $element['status'] === Model::STATUS_DECLINED;
         }));
     }

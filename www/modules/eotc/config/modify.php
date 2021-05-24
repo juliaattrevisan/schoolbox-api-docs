@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Modify EOTC Configuration settings
  *

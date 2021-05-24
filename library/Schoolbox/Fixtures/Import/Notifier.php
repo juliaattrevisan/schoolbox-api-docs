@@ -41,8 +41,8 @@ class Notifier extends AbstractModuleNotifier
 
         $builder = new Builder();
         $builder->setTitle("A fixture import has " . $import->getStatus())
-            ->setIcon("/images/icon.php?size=32&icon=".NSMapper::NS_SPORTS_FIXTURES_IMPORT)
-            ->setHref("/fixtures/import-progress?id=". $import->getId())
+            ->setIcon("/images/icon.php?size=32&icon=" . NSMapper::NS_SPORTS_FIXTURES_IMPORT)
+            ->setHref("/fixtures/import-progress?id=" . $import->getId())
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::ERROR)
             ->addTopic("sports_fixtures_import." . $model->getId() . ".{$method}");
@@ -62,8 +62,9 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        if (empty($dependencies["importMapper"]))
+        if (empty($dependencies["importMapper"])) {
             $dependencies["importMapper"] = ImportMapper::getInstance();
+        }
 
         parent::loadDependencies($dependencies);
     }
@@ -97,7 +98,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      * @return Envelope
      */
-    public function notifyCreated($model, $userEffected, $diff=[])
+    public function notifyCreated($model, $userEffected, $diff = [])
     {
         return $this->buildMessage($model, self::TRIGGER_CREATED);
     }
@@ -108,7 +109,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      * @return Envelope
      */
-    public function notifyUpdated($model, $userEffected, $diff=[])
+    public function notifyUpdated($model, $userEffected, $diff = [])
     {
         return $this->buildMessage($model, self::TRIGGER_UPDATED);
     }
@@ -129,7 +130,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return ImportMapper
      */
-    public function getImportMapper() {
+    public function getImportMapper()
+    {
         return $this->importMapper;
     }
 

@@ -644,10 +644,11 @@ class Controller extends Base
             // Go back to pastoral record
             $this->getResponse()->redirect->afterPost(
                 $this->getrouter()->generate(
-                    'pastoral.getStudentRecord', [
+                    'pastoral.getStudentRecord',
+                    [
                     'studentId' => $post['student_id'],
                     'recordId'  => $record->getId(),
-                ]
+                    ]
                 ) . $hash
             );
         } catch (MapperException $e) {

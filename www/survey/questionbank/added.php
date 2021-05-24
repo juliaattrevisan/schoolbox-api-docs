@@ -1,4 +1,5 @@
 <?php
+
 $this->setAjax();
 $this->setFile(TEMPLATE_content, 'assess/questionbank/added.html');
 

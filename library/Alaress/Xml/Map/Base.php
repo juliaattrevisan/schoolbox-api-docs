@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base map iterator for Alaress\Xml\Reader
  *

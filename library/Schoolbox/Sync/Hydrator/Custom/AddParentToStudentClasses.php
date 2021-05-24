@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Adds a parent's children's campuses to the parent.
  *
@@ -24,8 +25,8 @@ use Schoolbox\User as InternalUser;
 use Schoolbox\UserMapper;
 use Schoolbox\Permission\Access\UserAccessMapper as UserAccessMapper;
 use Schoolbox\Permission\Access\UserAccess as UserAccessModel;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class AddParentToStudentClasses extends AbstractLoggableHydrator
 {
@@ -82,14 +83,12 @@ class AddParentToStudentClasses extends AbstractLoggableHydrator
         $this->log(Logger::INFO, $message, $input, $previous, []);
 
         if ($input instanceof ExternalParent) {
-
             // Get all of the parents kids
 
             $childIds = $this->externalUserHandler->getEnrolledStudents($input->getId());
 
             if (is_array($childIds)) {
                 foreach ($childIds as $childId) {
-
                     // Get schoolbox user for the child
 
                     try {
@@ -116,9 +115,7 @@ class AddParentToStudentClasses extends AbstractLoggableHydrator
                                 'uid' => $previous->getId(),
                                 'sid' => $folder->getId()
                             ]);
-
                         } catch (MapperException $e) {
-
                             // Parent didn't have access, give them read access
 
                             $userAccess = new UserAccessModel();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A session segmenter that accesses $_SESSION directly, instead of
  * $_SESSION[$this->name].

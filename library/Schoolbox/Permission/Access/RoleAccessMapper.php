@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -176,6 +177,5 @@ class RoleAccessMapper extends Mapper
         }
 
         return $this->getConfigLoader()->get('group_staff_only') ? ($roleType == Role::STAFF) : true;
-
     }
 }

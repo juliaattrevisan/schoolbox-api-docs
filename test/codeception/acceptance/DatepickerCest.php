@@ -41,5 +41,4 @@ class DatepickerCest
         sleep(2);
         $datepickerPage->checkCalendarDate('startDate', '19/06/2017');
     }
-
 }

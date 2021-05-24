@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -11,7 +12,6 @@ namespace Alaress\Async\Notification\Cloud;
 use OutOfBoundsException;
 use Psr\Http\Message\ResponseInterface as HttpResponse;
 use RangeException;
-
 
 interface ResponseInterface
 {
@@ -56,5 +56,4 @@ interface ResponseInterface
      * @return array
      */
     public function getErrors();
-
 }

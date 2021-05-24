@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -177,8 +178,7 @@ class CohortAnalysis
         $this->classFolderCache  = FolderMapper::getInstance()->createCollection();
         $this->unitSpecCache     = UnitSpecificationMapper::getInstance()->createCollection();
 
-        foreach($dueAssessments as $assessmentImpl){
-
+        foreach ($dueAssessments as $assessmentImpl) {
             // User Cache
             foreach ($assessmentImpl->getAllParticipants() as $participant) {
                 $user                            = $participant->getUser();
@@ -188,7 +188,7 @@ class CohortAnalysis
             // Assessment Cache
             $this->assessmentCache[$assessmentImpl->getId()] = $assessmentImpl;
             $assessmentSpec = $assessmentImpl->getSpecificationAssessment();
-            if($assessmentSpec){
+            if ($assessmentSpec) {
                 $this->assessmentCache[$assessmentSpec->getId()] = $assessmentSpec;
             }
 
@@ -230,10 +230,9 @@ class CohortAnalysis
 
         foreach ($this->grades as $unitSpecId => $assessmentGrades) {
             foreach ($assessmentGrades as $assessmentId => $studentGrades) {
-
                 // Should we exclude this assessment from report ?
                 $assessment = $this->assessmentCache[$assessmentId];
-                if($this->isExcludedForGrades($assessment)){
+                if ($this->isExcludedForGrades($assessment)) {
                     continue;
                 }
 
@@ -249,7 +248,7 @@ class CohortAnalysis
         }
 
         // Ensure assessment grades are in same order as assessment cache
-        uksort($this->assessmentGrades, function($assessmentId1, $assessmentId2){
+        uksort($this->assessmentGrades, function ($assessmentId1, $assessmentId2) {
             /** @var IAssessable $assessment1 */
             $assessment1 = $this->assessmentCache[$assessmentId1];
             /** @var IAssessable $assessment1 */
@@ -260,7 +259,6 @@ class CohortAnalysis
         // Calculate student weighted average mark
         /** @var array $assessmentGradePairs */
         foreach ($involvedAssessments as $userId => $assessmentGradePairs) {
-
             $weightedSum = 0;
             $totalWeight = 0;
 
@@ -319,7 +317,6 @@ class CohortAnalysis
         $countCourseAssessmentsComplete = [];
 
         foreach ($this->completions as $unitSpecId => $assessmentCompletions) {
-
             $this->unitProgress[$unitSpecId] = [];
 
             /** @var int[] $countUnitAssessmentsInvolved indexed by user.id */
@@ -403,10 +400,10 @@ class CohortAnalysis
             }
 
             // First time we've encountered this unitSpec ?
-            if(!is_array($this->completions[$unitSpecId])){
+            if (!is_array($this->completions[$unitSpecId])) {
                 $this->completions[$unitSpecId] = [];
             }
-            if(!is_array($this->grades[$unitSpecId])){
+            if (!is_array($this->grades[$unitSpecId])) {
                 $this->grades[$unitSpecId] = [];
             }
 
@@ -414,34 +411,33 @@ class CohortAnalysis
             $assessmentId = null === $this->classFolder ? $assessmentSpec->getId() : $assessmentImpl->getId();
 
             // First time we've encountered this Assessment (or any of its implementations)?
-            if(!is_array($this->completions[$unitSpecId][$assessmentId])){
+            if (!is_array($this->completions[$unitSpecId][$assessmentId])) {
                 $this->completions[$unitSpecId][$assessmentId] = [];
             }
-            if(!is_array($this->grades[$unitSpecId][$assessmentId])){
+            if (!is_array($this->grades[$unitSpecId][$assessmentId])) {
                 $this->grades[$unitSpecId][$assessmentId] = [];
             }
 
 
             foreach ($assessmentImpl->getAllParticipants() as $participant) {
-
                 $userId = $participant->getUser()->getId();
 
                 // First time we've seen this user doing this assessment?
-                if(!isset($this->completions[$unitSpecId][$assessmentId][$userId])){
+                if (!isset($this->completions[$unitSpecId][$assessmentId][$userId])) {
                     $this->completions[$unitSpecId][$assessmentId][$userId] = self::INCOMPLETE;
                 }
-                if(!isset($this->grades[$unitSpecId][$assessmentId][$userId])){
+                if (!isset($this->grades[$unitSpecId][$assessmentId][$userId])) {
                     $this->grades[$unitSpecId][$assessmentId][$userId] = null;
                 }
 
                 // Have we not yet concluded the user has completed the assessment ?
-                if(self::INCOMPLETE === $this->completions[$unitSpecId][$assessmentId][$userId]){
+                if (self::INCOMPLETE === $this->completions[$unitSpecId][$assessmentId][$userId]) {
                     $this->completions[$unitSpecId][$assessmentId][$userId] = $participant->isResponseRequired() ? self::INCOMPLETE : self::COMPLETE;
                 }
 
                 $normMark = $participant->getNormalisedMark(true);
                 // Does user not yet have a mark, or this mark is higher ?
-                if(null === $this->grades[$unitSpecId][$assessmentId][$userId] || $normMark > $this->grades[$unitSpecId][$assessmentId][$userId]){
+                if (null === $this->grades[$unitSpecId][$assessmentId][$userId] || $normMark > $this->grades[$unitSpecId][$assessmentId][$userId]) {
                     $this->grades[$unitSpecId][$assessmentId][$userId] = $normMark;
                 }
             }

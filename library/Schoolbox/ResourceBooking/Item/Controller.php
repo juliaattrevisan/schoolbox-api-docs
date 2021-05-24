@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for resource items.
  *
@@ -317,7 +318,7 @@ class Controller extends Base
      * @param Model        $model The resource to update
      * @param \ArrayObject $post  An array-like object that abstracts $_POST
      */
-    protected function updateItemWithFormValues(Model $model, $post):void
+    protected function updateItemWithFormValues(Model $model, $post): void
     {
         $model
             ->setName($post['name'])
@@ -381,7 +382,6 @@ class Controller extends Base
                 $model->addRole($resourceRole);
             }
         }
-
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_Composite
  *

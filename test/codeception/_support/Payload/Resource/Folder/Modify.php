@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Payload\Resource\Folder;
@@ -41,7 +43,7 @@ abstract class Modify extends Payload\Request
 
     public function setInherit(bool $inherit): void
     {
-        if($inherit){
+        if ($inherit) {
             $this->setFormParam('inherit', '1');
         } else {
             $this->unsetFormParam('inherit');
@@ -55,7 +57,7 @@ abstract class Modify extends Payload\Request
 
     public function setCreateGroup(bool $createGroup): void
     {
-        if($createGroup){
+        if ($createGroup) {
             $this->setFormParam('groupcheck', '1');
         } else {
             $this->unsetFormParam('groupcheck');

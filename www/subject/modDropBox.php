@@ -19,13 +19,11 @@ if (is_numeric($_GET['delete'])) {
         $cid  = $file->getFolder()->getId();
 
         $dropbox->delete($file);
-
     } catch (Schoolbox\Mapper\Exception $e) {
         error(43);
         exit;
     }
     $page->localRedir("/homepage/$cid");
-
 } elseif (is_numeric($_GET['id'])) {
     try {
         $file = $dropbox->findById($_GET['id']);
@@ -40,10 +38,11 @@ if (is_numeric($_GET['delete'])) {
             error(5);
         }
 
-        if (!$file->getStorage()->getMimetype()->getInline() || $_GET['save'])
+        if (!$file->getStorage()->getMimetype()->getInline() || $_GET['save']) {
             $attach = "attachment;";
-        else
+        } else {
             $attach = "";
+        }
 
         //send headers
         header("Cache-control: private");
@@ -54,14 +53,11 @@ if (is_numeric($_GET['delete'])) {
 
         fpassthru($file->getStorage()->readStream());
         exit;
-
     } catch (Schoolbox\Mapper\Exception $e) {
         error(5);
         exit;
     }
-
 } elseif (is_numeric($_POST['category']) && $_POST['description'] && is_array($_POST['attachment'])) {
-
     // TODO replace with UAM once merged with SB-7185
     $g = new Group();
     $access = $g->getPermission($_POST['category']);
@@ -89,7 +85,6 @@ if (is_numeric($_GET['delete'])) {
         $dropbox->create($file);
 
         $_SESSION['dropSuccess'] = 1;
-
     } catch (\Schoolbox\Resource\Exception $e) {
         error(43);
         exit;
@@ -98,9 +93,7 @@ if (is_numeric($_GET['delete'])) {
         exit;
     }
 
-    SitePage::localRedir("/homepage/".$_POST['category']);
-
+    SitePage::localRedir("/homepage/" . $_POST['category']);
 } else {
     error(2);
-
 }

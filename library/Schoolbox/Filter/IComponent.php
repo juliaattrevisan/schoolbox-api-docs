@@ -1,13 +1,12 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Filter;
-
 
 /**
  * A filter panel component knows how to render itself in a filter panel.

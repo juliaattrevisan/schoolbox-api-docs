@@ -1,15 +1,16 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge;
-
 
 /**
  * Class Transactor
@@ -102,13 +103,11 @@ class Transactor
          * in the history
          */
         if ($award->isGoal()) {
-
             /* If the $award is a goal, we need to do a deeper inspection as
              * awarding of goals behaves in a special way with respect to
              * a badge's award history for a particular person
              */
             if ($this->history->first()->isGoal()) {
-
                 /* If the most recent awarding of $badge is a goal,
                  * then you cannot award it as a goal again
                  *
@@ -117,9 +116,7 @@ class Transactor
                  * Just leave
                  */
                 return;
-
             } elseif ($this->history->first()->isAchievement()) {
-
                 /* If the most recent awarding of $badge is an achievement,
                  * then you can award $badge as a goal
                  *
@@ -131,12 +128,10 @@ class Transactor
                 return;
             }
         } elseif ($award->isAchievement()) {
-
             /* If the $award is an achievement, first have a look to see if there
              * is a corresponding goal which we need to touch
              */
             if ($this->history->first()->isGoal()) {
-
                 /* If the most recent awarding of $badge is a goal,
                  * set its award_id field to the current award's id; the goal was reached
                  * since we are giving them the achievement. We need to save that first.
@@ -151,7 +146,6 @@ class Transactor
                 $this->awardMapper->save($this->history->first());
                 return;
             } elseif ($this->history->first()->isAchievement()) {
-
                 /* If the most recent awarding of $badge is an achievement,
                  * I guess it can just go in as a new row; this person gets the achievement
                  * multiple times

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -92,6 +93,4 @@ class AuraLink implements Link
         }
         return $this->auth->isPathAuthorizedForUser($this->name, $this->args, $this->user);
     }
-
-
 }

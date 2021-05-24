@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -183,7 +184,6 @@ class Controller extends Base
         $nothingWrong = true;
 
         if (isset($user)) {
-
             // Load each destination user
 
             $destinationUsers = new Collection();
@@ -229,7 +229,6 @@ class Controller extends Base
 
             /** @var EportfolioPage $page */
             foreach (EportfolioPageMapper::getInstance()->findPagesWithPermissions($user->getId()) as $page) {
-
                 // Don't care about deleted pages
 
                 if ($page->isDeleted()) {
@@ -284,7 +283,6 @@ class Controller extends Base
         // Don't copy into the source user
 
         if ($destUserId != $srcUser->getId()) {
-
             $import = true;
 
             if (!($destUser->getEportfolioEnable())) {
@@ -313,7 +311,6 @@ class Controller extends Base
                     // Check this user doesn't already have this page.
 
                     if ($post['skipDuplicates']) {
-
                         $existingPageList = $this->eportfolioPageMapper->findByColumnList(
                             [
                                 'uid' => $destUserId,
@@ -449,7 +446,6 @@ class Controller extends Base
 
             /** @var EportfolioImportLog $log */
             foreach ($importLogs as $log) {
-
                 if ($skip > 0) {
                     $render = false;
                     $count++;
@@ -475,9 +471,7 @@ class Controller extends Base
                 'format' => 'json',
                 'data' => $this->buildJsonOutput($result)
             ]);
-
         } catch (MapperException $e) {
-
             // Requested import didn't exist,
 
             $this->getResponse()->content->set([

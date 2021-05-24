@@ -1,15 +1,16 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Geosnapshot\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Geosnapshot\Api;
 use Schoolbox\Geosnapshot\ValidGeosnapshotAvailable;
 use Schoolbox\Permission\Access\UserAccess;
-
 
 /**
  * Class Controller
@@ -42,11 +43,12 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         /* If the component has a search term, ask Geosnapshot for an answer
          */
-        if ((new ValidGeosnapshotAvailable())->isConfigured(
-            $this->getConfigLoader()->get('geosnapshot_api_key'),
-            $this->getConfigLoader()->get('geosnapshot_enabled')
-        )) {
-
+        if (
+            (new ValidGeosnapshotAvailable())->isConfigured(
+                $this->getConfigLoader()->get('geosnapshot_api_key'),
+                $this->getConfigLoader()->get('geosnapshot_enabled')
+            )
+        ) {
             /* Set up guzzle with the authentication pieces
              *
              * If it dies, it dies (throw out a generic error screen when that happens)
@@ -55,8 +57,7 @@ class Controller extends Component_Homepage_ControllerAbstract
                 $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
                 $response = $api->retrieveEventPhotos($this->getConfig('eventName'));
-            } catch (\RuntimeException|\DomainException $e) {
-
+            } catch (\RuntimeException | \DomainException $e) {
                 /* DomainException is thrown when json can't be decoded
                  */
                 return false;

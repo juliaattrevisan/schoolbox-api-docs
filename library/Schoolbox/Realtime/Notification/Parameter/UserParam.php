@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,9 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Realtime\Notification\Parameter;
-
 
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\User;
@@ -28,6 +27,4 @@ class UserParam extends Param
         $href = $user->isDeleted() ? null : "/search/user/{$user->getId()}";
         parent::__construct($user->formatName($format), $href, $stacking);
     }
-
-
 }

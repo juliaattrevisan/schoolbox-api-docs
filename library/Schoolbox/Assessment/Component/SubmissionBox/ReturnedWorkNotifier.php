@@ -1,10 +1,12 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
@@ -247,9 +249,11 @@ class ReturnedWorkNotifier extends AbstractModuleNotifier
             || !$this->conf->get(ConfigMapper::NAME_GRADES_ENABLED)
             || !$cat->isGradePageEnabled();
         $requestResubmission = $returnedWork->getResubmissionRequired();
-        if ($this->conf->get('restrict_parent_duework_access')  // hide due work
+        if (
+            $this->conf->get('restrict_parent_duework_access')  // hide due work
             || ($restrictGrades && $this->conf->get('restrict_student_submissions'))
-            || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT))) {
+            || !($assessment->isFeedbackVisibleToRoleType(Role::PARENT))
+        ) {
             return $envelope;
         }
 

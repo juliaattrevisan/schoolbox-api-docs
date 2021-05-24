@@ -27,28 +27,26 @@ $userHandler = new User();
 
 $superuserList = $userHandler->getSuperusers();
 
-if(is_array($superuserList)) {
-    foreach($superuserList as $superuser) {
-
-        $loginLog = $userHandler->getUserLogins($superuser['username'],1);
+if (is_array($superuserList)) {
+    foreach ($superuserList as $superuser) {
+        $loginLog = $userHandler->getUserLogins($superuser['username'], 1);
 
         $output = array(
-			'SUPERUSER_NAME' => $userHandler->formatName($superuser),
-			'SUPERUSER_LOGIN' => date(Config::get('date_short'),strtotime( $loginLog[0]['date'])),
-			'SUPERUSER_ID' => $superuser['uid']
-		);
+            'SUPERUSER_NAME' => $userHandler->formatName($superuser),
+            'SUPERUSER_LOGIN' => date(Config::get('date_short'), strtotime($loginLog[0]['date'])),
+            'SUPERUSER_ID' => $superuser['uid']
+        );
 
         $this->setVar($output);
-        $this->parse('superusers_block','superusers', true);
+        $this->parse('superusers_block', 'superusers', true);
     }
 }
 
 $serviceUserList = (new Permissions(new UserAccessMapper()))->generate();
-foreach($serviceUserList as $service => $serviceUsers) {
+foreach ($serviceUserList as $service => $serviceUsers) {
     $this->setVar(['SERVICE_NAME' => $service,
-                   'SERVICE_COUNT' => count($serviceUsers)]
-    );
-    $this->parse('service_block','service', true);
+                   'SERVICE_COUNT' => count($serviceUsers)]);
+    $this->parse('service_block', 'service', true);
 }
 
 

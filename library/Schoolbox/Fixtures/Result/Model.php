@@ -1,18 +1,19 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Result;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Alaress_Date_Format;
+use Alaress_Date_Format;
 use Schoolbox\Fixtures\Match\Model as Match;
 use Schoolbox\Fixtures\Team\Model as Team;
 use Schoolbox\Fixtures\Status\Model as Status;
-
 
 /**
  * A Result for a particular Match

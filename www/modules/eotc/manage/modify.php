@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Manage Modify
  *
@@ -100,13 +101,13 @@ if (is_numeric($_GET['eventID'])) {
     }
 
     /* Edit rules
-	 */
+     */
     $canAdminister     = $authenticator->isEOTCAdministrator($sessionUser, $event);
     $isAuthor          = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator(
-            $sessionUser
-        ));
+        $sessionUser
+    ));
     $isTeacherInCharge = ($event->getTeacherInCharge() instanceof User) && ($event->getTeacherInCharge()->getId(
-            ) == $sessionUser->getId());
+    ) == $sessionUser->getId());
 
     /* Authors cannot view an event that is in Final Approval
      * Instead redirect to a different place
@@ -118,9 +119,8 @@ if (is_numeric($_GET['eventID'])) {
         $this->localRedir("/modules/eotc/status/modify/{$event->getId()}");
     }
     /* EOTC Administrators and event authors can edit this event
-	 */
+     */
     elseif ($canAdminister || $isAuthor || $isTeacherInCharge) {
-
         /* Do a check for missing metadata
          */
         if (!$event->getMetadata()) {
@@ -183,7 +183,6 @@ if (is_numeric($_GET['eventID'])) {
 
         // RAM in the RAMS
         if ($event->getMetadata()->getRamsRequired()) {
-
             $zone = new Attachzone('ramsZone');
             /** @var Schoolbox\L10n\RosettaStone $l10n */
             $l10n = $page->getDi()->get('l10n');
@@ -361,9 +360,9 @@ if (is_numeric($_GET['eventID'])) {
          */
         $authorSelfPromote          = $isAuthor && $authenticator->canSelfPromote($sessionUser, $event);
         $teacherInChargeSelfPromote = $isTeacherInCharge && $authenticator->canSelfPromote(
-                $event->getTeacherInCharge(),
-                $event
-            );
+            $event->getTeacherInCharge(),
+            $event
+        );
 
         if ($authorSelfPromote || $teacherInChargeSelfPromote) {
             $page->parse('can_promote_in_principle_block', 'can_promote_in_principle');
@@ -380,9 +379,8 @@ if (is_numeric($_GET['eventID'])) {
 } /* Create new event
  */
 elseif ($authenticator->isEOTCCreator($sessionUser)) {
-
     /* Set up default dates
-	 */
+     */
     $event = new Event();
     $event->setupDates($_GET['date']);
 
@@ -390,8 +388,8 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $event->setMetadata($metadata);
 
     /* Miscellaneous setvarring
-	 * Hide advanced options by default
-	 */
+     * Hide advanced options by default
+     */
     $page->setVar(
         [
             'FUNCTION'       => 'Add',
@@ -405,15 +403,15 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $status = EventStatusMapper::getInstance()->findDefaultStatus();
 
     /* You are the default teacher in charge
-	 * Even if you're not a teacher
-	 */
+     * Even if you're not a teacher
+     */
     $teacherInCharge = [
         'id'   => $sessionUser->getId(),
         'name' => $sessionUser->getFullname(),
     ];
 
     /* -_-
-	 */
+     */
     $groupHandler = new Group();
 
     /* Set the default start and end times to the nearest hour and an hour later than that, respectively.
@@ -430,11 +428,11 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $endDate = clone $startDate;
     $endDate->addHours(1);
 
-    $event->getStartDateTime()->setDate($startDate->getYear(),$startDate->getMonth(),$startDate->getDay());
-    $event->getStartDateTime()->setTime($startDate->getHour(),$startDate->getMinute(),$startDate->getSecond());
+    $event->getStartDateTime()->setDate($startDate->getYear(), $startDate->getMonth(), $startDate->getDay());
+    $event->getStartDateTime()->setTime($startDate->getHour(), $startDate->getMinute(), $startDate->getSecond());
 
-    $event->getEndDateTime()->setDate($endDate->getYear(),$endDate->getMonth(),$endDate->getDay());
-    $event->getEndDateTime()->setTime($endDate->getHour(),$endDate->getMinute(),$endDate->getSecond());
+    $event->getEndDateTime()->setDate($endDate->getYear(), $endDate->getMonth(), $endDate->getDay());
+    $event->getEndDateTime()->setTime($endDate->getHour(), $endDate->getMinute(), $endDate->getSecond());
 
     $event->setAllDay(false);
 
@@ -451,8 +449,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
             'EVENT_AUTHOR_ID'                 => $sessionUser->getId(),
             'EVENT_TITLE'                     => '',
             'EVENT_TIMEINPUTS'                => 'hide',
-            'EVENT_START_DATE'                => Scrub::text($event->getStartDateTime()->getLocal()
-            ),
+            'EVENT_START_DATE'                => Scrub::text($event->getStartDateTime()->getLocal()),
             'EVENT_END_DATE'                  => Scrub::text($event->getEndDateTime()->getLocal()),
             'EVENT_LOCATION'                  => '',
             'EVENT_DETAIL'                    => '',
@@ -472,7 +469,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     );
 
     /* Recurrence
-	 */
+     */
     $page->setVar(
         [
             'recurring_reminder_block' => '',
@@ -482,7 +479,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     $page->parse('recurring_dates_block', 'recurring_dates');
 
     /* Activity Logs
-	 */
+     */
     $page->setVar(
         [
             'has_activity_log_block' => '',
@@ -520,7 +517,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     }
 
     /* Cannot add students until an event is created
-	 */
+     */
     $page->setVar(
         [
             'can_add_students_block' => ''
@@ -528,7 +525,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     );
 
     /* Cannot add resources until an event is created
-	 */
+     */
     $page->setVar(
         [
             'can_add_resources_block' => ''
@@ -536,7 +533,7 @@ elseif ($authenticator->isEOTCCreator($sessionUser)) {
     );
 
     /* Cannot self-promote until a status is In Principle
- 	 */
+     */
     $page->setVar(
         [
             'can_promote_in_principle_block' => ''

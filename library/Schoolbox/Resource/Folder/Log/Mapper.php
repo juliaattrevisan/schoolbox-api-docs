@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -108,4 +109,4 @@ class Mapper extends Schoolbox\Mapper
 
         return $collection;
     }
-} 
+}

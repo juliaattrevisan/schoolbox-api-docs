@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outputs a report in CSV format
  *
@@ -6,7 +7,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Report_Exporter {
+class Report_Exporter
+{
 
     private $reportHeadings = array();
     private $reportData = array();
@@ -16,24 +18,29 @@ class Report_Exporter {
     /**
      * @param string $filename
      */
-    public function __construct($filename) {
+    public function __construct($filename)
+    {
         $this->filename = $filename;
     }
 
-    public function setHeadings($headings) {
+    public function setHeadings($headings)
+    {
         $this->reportHeadings = $headings;
     }
 
-    public function setData($data, $callback = null) {
+    public function setData($data, $callback = null)
+    {
         $this->reportData = $data;
         $this->dataManipulatorCallback = $callback;
     }
 
-    protected function getHeadings() {
+    protected function getHeadings()
+    {
         return $this->reportHeadings;
     }
 
-    protected function getData() {
+    protected function getData()
+    {
         return $this->reportData;
     }
 
@@ -41,8 +48,9 @@ class Report_Exporter {
      * Convenience function for output format
      * @param string $format
      */
-    public function export($format) {
-        switch(strtolower($format)) {
+    public function export($format)
+    {
+        switch (strtolower($format)) {
             // output a csv file
             case 'csv':
                 $this->exportCSV();
@@ -61,7 +69,8 @@ class Report_Exporter {
     /**
      * @output csv download object
      */
-    public function exportCSV() {
+    public function exportCSV()
+    {
         // standardise and remove unhealthy characters (ie. spaces) from the name
         $this->filename = str_replace(' ', '_', strtolower($this->filename));
 
@@ -76,7 +85,7 @@ class Report_Exporter {
 
         // use array iteratively
         if (is_array($this->getData()) || $this->getData() instanceof Traversable) {
-            foreach($this->getData() as $row) {
+            foreach ($this->getData() as $row) {
                 $this->parseRow($outstream, $row);
             }
         }
@@ -92,12 +101,13 @@ class Report_Exporter {
      * @param resource $outstream
      * @param array $row
      */
-    protected function parseRow($outstream, $row) {
-        if(is_callable($this->dataManipulatorCallback)) {
+    protected function parseRow($outstream, $row)
+    {
+        if (is_callable($this->dataManipulatorCallback)) {
             $row = call_user_func_array($this->dataManipulatorCallback, array($row));
         }
         $datum = array();
-        foreach($this->getHeadings() as $dbCol => $display) {
+        foreach ($this->getHeadings() as $dbCol => $display) {
             $datum[] = $row[$dbCol];
         }
 

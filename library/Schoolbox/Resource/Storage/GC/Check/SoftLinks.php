@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -88,7 +89,6 @@ class SoftLinks implements Check
         $this->limit  = $limit;
 
         $this->cacheTables($blacklist);
-
     }
 
 
@@ -200,13 +200,12 @@ class SoftLinks implements Check
 
         // cache the list of soft-delete fields to compensate for
         while ([$table, $field, $type] = $this->getSoftDeleteFieldsStatement()->fetch(PDO::FETCH_NUM)) {
-
             // we're only interested in tables we've already seen
             if (!array_key_exists($table, $sources)) {
                 continue;
             }
 
-            switch($type) {
+            switch ($type) {
                 case 'datetime':
                 case 'timestamp':
                     // confirm nullness of datetime-deleted
@@ -309,7 +308,6 @@ class SoftLinks implements Check
         $debug   = $this->log instanceof \Alaress\Lumberjack\Logger && $this->log->getThreshold() <= Logger::DEBUG;
 
         foreach ($this->getTableList() as $table) {
-
             $fields = $this->getTableFields($table);
 
             if (!count($test)) {
@@ -350,13 +348,10 @@ class SoftLinks implements Check
             }
 
             if (count($seen)) {
-                $this->log->info(sprintf("Detected %d hash%s to retain in `%s`", count($seen), count($seen) == 1 ? '' : 'es',  $table), ['char' => '+']);
+                $this->log->info(sprintf("Detected %d hash%s to retain in `%s`", count($seen), count($seen) == 1 ? '' : 'es', $table), ['char' => '+']);
             }
-
-
         }
 
         return array_values($test);
     }
-
 }

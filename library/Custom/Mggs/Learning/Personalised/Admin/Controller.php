@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-
 
 class Controller extends Base
 {

@@ -38,7 +38,8 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
             }
 
             $feedList = $feedHandler->getFeed(
-                $categoryIDs, $this->getConfig('size') ? $this->getConfig('size') : $this->limit
+                $categoryIDs,
+                $this->getConfig('size') ? $this->getConfig('size') : $this->limit
             );
 
             // map the feed for the ActivityList
@@ -71,11 +72,11 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
 
         $this->setBlock($templateHandle, 'activity_item', 'activity_item_block');
 
-        foreach($this->feedList as $item) {
+        foreach ($this->feedList as $item) {
             foreach ($item as $key => $value) {
                 $this->setVar('ACTLIST_' . strtoupper($key), $value);
             }
-            $this->parse('activity_item_block','activity_item',true);
+            $this->parse('activity_item_block', 'activity_item', true);
         }
 
         return true;
@@ -90,5 +91,4 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
     {
         return $this->feedList;
     }
-
 }

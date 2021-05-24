@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assessment completion. Marks when an assessment is finished.
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -58,8 +60,7 @@ if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['c
 try {
     $folderMap = Schoolbox\Resource\Folder\Mapper::getInstance();
     $folder    = $folderMap->findById($survey['category_id']);
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     error(13);
 }
 
@@ -78,8 +79,8 @@ $this->setVar(
     )
 );
 
-if($survey['completion_message']) {
-    $this->parse('completionMessage_block','completionMessage');
+if ($survey['completion_message']) {
+    $this->parse('completionMessage_block', 'completionMessage');
 } else {
     $this->setVar('completionMessage_block', '');
 }
@@ -94,7 +95,7 @@ if (!$attempt['finish']) {
         )
     );
 
-    $this->setVar( 'ATTEMPT_END',$finishDate->getShort());
+    $this->setVar('ATTEMPT_END', $finishDate->getShort());
 
     $this->setVar('alreadyEnded_block', '');
     $this->parse('endAssess_block', 'endAssess');
@@ -105,11 +106,10 @@ if (!$attempt['finish']) {
         $notification = new Survey_Notification($survey, $attempt);
         $notification->send();
     }
-
 } else {
     $finishDate = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
 
-    $this->setVar( 'ATTEMPT_END',$finishDate->getShort());
+    $this->setVar('ATTEMPT_END', $finishDate->getShort());
 
     $this->parse('alreadyEnded_block', 'alreadyEnded');
     $this->setVar('endAssess_block', '');

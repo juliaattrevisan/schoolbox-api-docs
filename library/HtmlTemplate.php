@@ -296,7 +296,6 @@ class HtmlTemplate
 
             $this->_varKeys[$varname] = $this->_varname($varname);
             ($append) ? $this->_varVals[$varname] .= $value : $this->_varVals[$varname] = $value;
-
         } else {
             reset($varname);
 

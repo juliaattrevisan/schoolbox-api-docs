@@ -10,7 +10,8 @@ use Schoolbox\Database\Factory;
  * @link      https://schoolbox.com.au/
  */
 
-class External_Tass_Class implements External_ClassInterface {
+class External_Tass_Class implements External_ClassInterface
+{
     /**
      * @var IConnector
      */
@@ -26,7 +27,8 @@ class External_Tass_Class implements External_ClassInterface {
      */
     private $externalUser;
 
-    function __construct () {
+    function __construct()
+    {
         $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('tass');
     }
@@ -43,17 +45,16 @@ class External_Tass_Class implements External_ClassInterface {
         }
 
         $classQuery = '';
-        if(stristr($classCode, ',')) {
-            $subCodeArray = explode(',',$classCode);
-            foreach($subCodeArray as $code) {
+        if (stristr($classCode, ',')) {
+            $subCodeArray = explode(',', $classCode);
+            foreach ($subCodeArray as $code) {
                 [$year, $code, $class] = self::parseClassCode($code);
                 $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 
                 $classQuery .= " ( $yearQuery studsub.sub_code = '$code' AND studsub.class = '$class' ) OR ";
             }
             $classQuery .= '1=0';
-        }
-        else {
+        } else {
             [$year, $code, $class] = self::parseClassCode($classCode);
             $yearQuery = $year !== '' ?  "student.year_grp = '$year' AND" : '';
 

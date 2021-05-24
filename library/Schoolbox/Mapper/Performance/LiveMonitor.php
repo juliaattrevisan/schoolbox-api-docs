@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Mapper\Performance;
-
 
 use Alaress\Database\Predicate\Builder;
 use Psr\Log\AbstractLogger;
@@ -70,5 +70,4 @@ class LiveMonitor extends AbstractLogger implements IMonitor
     {
         // noop
     }
-
 }

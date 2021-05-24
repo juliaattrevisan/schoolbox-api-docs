@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Join model for resource relations.
  *
@@ -82,5 +83,4 @@ class Model
     {
         return $this->resource;
     }
-
 }

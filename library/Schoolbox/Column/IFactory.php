@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base interface for column factories.
  *
@@ -9,11 +10,12 @@
 
 namespace Schoolbox\Column;
 
-interface IFactory {
-	/**
-	 * @param string $type
-	 *
-	 * @return IColumnType
-	 */
-	public function build($type);
+interface IFactory
+{
+    /**
+     * @param string $type
+     *
+     * @return IColumnType
+     */
+    public function build($type);
 }

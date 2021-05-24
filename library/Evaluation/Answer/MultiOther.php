@@ -360,7 +360,6 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
     public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
     {
         foreach ($xmlObj->answer as $currentAnswer) {
-
             /* Set up data object in accordance with $this->create();
              */
             $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
@@ -399,7 +398,6 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         $data = unserialize($response['response']);
 
         if (is_array($data)) {
-
             /* Answer text to appear in export
              */
             if ($this->getUseLongAnswers()) {
@@ -427,7 +425,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
         }
 
         /* Append commentary
-		 */
+         */
         $data['comment'] = $response['comment'];
 
         /* Append awarded mark
@@ -452,7 +450,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
 
         $other = new StdClass();
         $other->description = 'Other';
-        $other->value = $this->otherLetterIndex($allOptions);;
+        $other->value = $this->otherLetterIndex($allOptions);
+        ;
 
         $allOptions[] = $other;
 
@@ -553,7 +552,6 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
                             ));
                         } else {
                             if (in_array($currentAnswer->value, $existingAnswer)) {
-
                                 /* Render "Other" response
                                  */
                                 if ($currentAnswer->value == $other->value) {

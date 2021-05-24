@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Curriculum code configuration.
  *

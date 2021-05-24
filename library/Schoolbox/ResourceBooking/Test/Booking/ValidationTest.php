@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: nat
@@ -25,7 +26,6 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Calendar\Event;
 use Schoolbox\CampusMapper;
 
-
 class ValidationTest extends TestCase
 {
 
@@ -44,11 +44,10 @@ class ValidationTest extends TestCase
         $statusMapper = null,
         $termMapper = null,
         $campusMapper = null
-    )
-    {
+    ) {
 
-        if(!$user) {
-            $user = new User;
+        if (!$user) {
+            $user = new User();
         }
 
         if (!$bookingMapper) {
@@ -80,7 +79,6 @@ class ValidationTest extends TestCase
                                ->getMock();
 
         return $mockValidation;
-
     }
 
     /**
@@ -88,7 +86,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validateBeforeTime() {
+    public function provider_validateBeforeTime()
+    {
         return [
             'start before end'      => ['2017-01-01T00:00:00','2017-01-01T00:00:10', 0],
             'end before start'      => ['2017-01-01T00:00:10','2017-01-01T00:00:00', 1],
@@ -117,7 +116,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validatePastTime() {
+    public function provider_validatePastTime()
+    {
         return [
             'Date in future'    => ['2027-01-01T00:00:00', 0],
             'Date in past'      => ['2016-01-01T00:00:00', 1],
@@ -146,7 +146,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validateLeadTime() {
+    public function provider_validateLeadTime()
+    {
         return [
             '1h lead time, booked 2h before'    => ['PT1H', 'PT2H', 0],
             '1h lead time, booked 30m before'   => ['PT1H', 'PT30M', 1],
@@ -182,7 +183,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validateTooShort() {
+    public function provider_validateTooShort()
+    {
         return [
             '1h min reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
             '1h min reservation, booked for 1m'             => ['2017-01-01T00:00:00','2017-01-01T00:01:00', 'PT1H', 1],
@@ -218,7 +220,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validateTooLong() {
+    public function provider_validateTooLong()
+    {
         return [
             '1h max reservation, booked for 1h'             => ['2017-01-01T00:00:00','2017-01-01T01:00:00', 'PT1H', 0],
             '1h max reservation, booked for 2h'             => ['2017-01-01T00:00:00','2017-01-01T02:00:00', 'PT1H', 1],
@@ -253,7 +256,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validateCurrentTermRestriction() {
+    public function provider_validateCurrentTermRestriction()
+    {
         return [
             'booked within the term'    => ['2020-12-31T00:00:00', '2020-12-31', 0],
             'booked outside the term'    => ['2020-12-31T00:00:00', '2020-06-30', 1],
@@ -278,7 +282,6 @@ class ValidationTest extends TestCase
 
         $errors = $validation->validateCurrentTermRestriction(new DateTime($endDate), $term);
         $this->assertCount($expected, $errors);
-
     }
 
     /**
@@ -286,7 +289,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_simpleValidateForConflicts() {
+    public function provider_simpleValidateForConflicts()
+    {
 
         $conflictingBookings3 = (new Collection())
             ->add(
@@ -350,7 +354,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_roomValidateForConflicts() {
+    public function provider_roomValidateForConflicts()
+    {
 
         $conflictingBookings3 = (new Collection())
             ->add(
@@ -380,7 +385,7 @@ class ValidationTest extends TestCase
                 ->setId(111)
             )
             ->add(
-                 (new Event())
+                (new Event())
                  ->setId(112)
             )
             ->add(
@@ -467,8 +472,7 @@ class ValidationTest extends TestCase
         $roomCode,
         $roomEvents,
         $expected
-    )
-    {
+    ) {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -494,7 +498,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_seriesValidateForConflicts() {
+    public function provider_seriesValidateForConflicts()
+    {
 
         // Single booking
         $existingBooking = (new Booking\Model())
@@ -523,7 +528,7 @@ class ValidationTest extends TestCase
                             ->setId(102)
                             ->setSeriesId(10)
                     )
-                )
+            )
             ->add(
                 (new Booking\Model())
                     ->setId(3)
@@ -668,8 +673,7 @@ class ValidationTest extends TestCase
         $existingBooking,
         $conflictingBookings,
         $expected
-    )
-    {
+    ) {
         $mockMapper = $this->getMockBuilder(BookingMapper::class)->getMock();
         $mockMapper
             ->method('findForResource')
@@ -685,5 +689,4 @@ class ValidationTest extends TestCase
 
         $this->assertCount($expected, $errors);
     }
-
 }

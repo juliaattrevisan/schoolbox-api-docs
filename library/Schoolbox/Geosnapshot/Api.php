@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot;
@@ -12,7 +14,6 @@ use GuzzleHttp\RequestOptions;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\StudentPhoto;
 use Schoolbox\User;
-
 
 /**
  * Class Api

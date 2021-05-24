@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@schoolbox.com.au>
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
@@ -10,7 +11,6 @@ namespace Schoolbox\Config\Type;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\HasSequence;
 use Schoolbox\Sequential;
-
 
 class Model implements Sequential
 {
@@ -41,8 +41,4 @@ class Model implements Sequential
         $this->type = $type;
         return $this;
     }
-
-
-
-
 }

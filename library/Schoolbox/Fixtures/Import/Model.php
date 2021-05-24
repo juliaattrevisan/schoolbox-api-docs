@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -8,7 +9,8 @@
 
 namespace Schoolbox\Fixtures\Import;
 
-class Model {
+class Model
+{
 
     /** @var int */
     protected $id;
@@ -27,12 +29,13 @@ class Model {
 
     /** @var \Alaress_Date_Format */
     protected $updatedAt;
-    
+
     /**
      * @param string $result
      * @return self
      */
-    public function setResult($result) {
+    public function setResult($result)
+    {
         $this->result = $result;
         return $this;
     }
@@ -40,7 +43,8 @@ class Model {
     /**
      * @return string
      */
-    public function getResult() {
+    public function getResult()
+    {
         return $this->result;
     }
 
@@ -48,7 +52,8 @@ class Model {
      * @param string $status
      * @return self
      */
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $this->status = $status;
         return $this;
     }
@@ -56,7 +61,8 @@ class Model {
     /**
      * @return string
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->status;
     }
 
@@ -64,7 +70,8 @@ class Model {
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -72,7 +79,8 @@ class Model {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -80,7 +88,8 @@ class Model {
      * @param int $ownerId
      * @return self
      */
-    public function setOwnerId($ownerId) {
+    public function setOwnerId($ownerId)
+    {
         $this->ownerId = $ownerId;
         return $this;
     }
@@ -88,15 +97,17 @@ class Model {
     /**
      * @return int
      */
-    public function getOwnerId() {
+    public function getOwnerId()
+    {
         return $this->ownerId;
-    }    
+    }
 
     /**
      * @param \Alaress_Date_Format $createdAt
      * @return self
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -104,7 +115,8 @@ class Model {
     /**
      * @return \Alaress_Date_Format $createdAt
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -112,7 +124,8 @@ class Model {
      * @param \Alaress_Date_Format $updatedAt
      * @return self
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt($updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -120,7 +133,8 @@ class Model {
     /**
      * @return \Alaress_Date_Format $updatedAt
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 }

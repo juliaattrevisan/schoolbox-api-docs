@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Timeline
  *
@@ -14,7 +15,7 @@
 namespace Schoolbox\Learning\Assessment\Timeline;
 
 use Alaress_Date_Format;
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
@@ -130,16 +131,13 @@ class Full
 
         if ($user->isSuperuser() || ($user->getId() == $participant->getId() && $role->isStaff())) {
             return $this->getForAdmin();
-
         }
         if ($role->isStudent()) {
             if ($user->getId() == $participant->getId()) {
                 return $this->getForStudent();
             }
-
         } elseif ($role->isStaff()) {
             return $this->getForTeacher();
-
         } elseif ($role->isParent()) {
             $participant->loadParents();
             if ($participant->isChildOf($user)) {
@@ -232,11 +230,9 @@ class Full
 
         /** @var DueWork\Response\Model $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
-
             /* Only show Submitted submissions (ignore drafts)
              */
             if ($includeDraftResponses || $currentResponse->isSubmitted()) {
-
                 // Exclude feedback which doesn't match the filter
                 /** @var Duework\Feedback\Model[] $includedFeedback */
                 $includedFeedback = $currentResponse->getAllFeedback()->filter($feedbackFilter);
@@ -285,7 +281,8 @@ class Full
          */
         if ($isFeedbackVisible) {
             foreach ($this->getParticipant()->getAllFeedbacks() as $currentFeedback) {
-                if (!\in_array($currentFeedback->getId(), $processedFeedback, true)
+                if (
+                    !\in_array($currentFeedback->getId(), $processedFeedback, true)
                     && $feedbackFilter($currentFeedback)
                 ) {
                     // Adding Kami documents for visibility.
@@ -315,7 +312,7 @@ class Full
          *
          * Since both have different date fields to compare against
          */
-        $this->getRecombined()->sortByCallback(function($a, $b) {
+        $this->getRecombined()->sortByCallback(function ($a, $b) {
             $date1 = null;
             $date2 = null;
 
@@ -345,11 +342,10 @@ class Full
             if (!$interaction->getSubmittedAt()->isNull()) {
                 return $interaction->getSubmittedAt();
             }
-
         } elseif ($interaction instanceof IFeedback) {
             if (!$interaction->getPublishedAt()->isNull()) {
                 return $interaction->getPublishedAt();
-            } elseif (!$interaction->getUpdatedAt()->isNull())  {
+            } elseif (!$interaction->getUpdatedAt()->isNull()) {
                 return $interaction->getUpdatedAt();
             }
         }

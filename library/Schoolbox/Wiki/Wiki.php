@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,141 +9,152 @@
 
 namespace Schoolbox\Wiki;
 
-
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Wiki implements ISoftDeletable
 {
 
-	/** @var int */
-	protected $id;
+    /** @var int */
+    protected $id;
 
-	/** @var Folder */
-	protected $category;
+    /** @var Folder */
+    protected $category;
 
-	/** @var null|Revision */
-	protected $latestRevision;
+    /** @var null|Revision */
+    protected $latestRevision;
 
-	/** @var string */
-	protected $slug;
+    /** @var string */
+    protected $slug;
 
-	/** @var \Alaress_Date_Format */
-	protected $created;
+    /** @var \Alaress_Date_Format */
+    protected $created;
 
-	/** @var bool */
-	protected $deleted;
+    /** @var bool */
+    protected $deleted;
 
-	/** @var bool */
-	protected $locked;
-
-
-	/**
-	 * @param int $id
-	 * @return self
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /** @var bool */
+    protected $locked;
 
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
 
-	/**
-	 * @param Folder $category
-	 * @return self
-	 */
-	public function setCategory($category) {
-		$this->category = $category;
-		return $this;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
 
-	/**
-	 * @return Folder
-	 */
-	public function getCategory() {
-		return $this->category;
-	}
+    /**
+     * @param Folder $category
+     * @return self
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
 
 
-	/**
-	 * @param null|Revision $latestRevision
-	 * @return self
-	 */
-	public function setLatestRevision($latestRevision) {
-		$this->latestRevision = $latestRevision;
-		return $this;
-	}
+    /**
+     * @return Folder
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
 
 
-	/**
-	 * @return null|Revision
-	 */
-	public function getLatestRevision() {
-		return $this->latestRevision;
-	}
+    /**
+     * @param null|Revision $latestRevision
+     * @return self
+     */
+    public function setLatestRevision($latestRevision)
+    {
+        $this->latestRevision = $latestRevision;
+        return $this;
+    }
 
 
-	/**
-	 * @param string $slug
-	 * @return self
-	 */
-	public function setSlug($slug) {
-		$this->slug = $slug;
-		return $this;
-	}
+    /**
+     * @return null|Revision
+     */
+    public function getLatestRevision()
+    {
+        return $this->latestRevision;
+    }
 
 
-	/**
-	 * @return string
-	 */
-	public function getSlug() {
-		return $this->slug;
-	}
+    /**
+     * @param string $slug
+     * @return self
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+        return $this;
+    }
 
 
-	/**
-	 * @param \Alaress_Date_Format $created
-	 * @return self
-	 */
-	public function setCreated($created) {
-		$this->created = $created;
-		return $this;
-	}
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
 
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreated() {
-		return $this->created;
-	}
+    /**
+     * @param \Alaress_Date_Format $created
+     * @return self
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+        return $this;
+    }
 
 
-	/**
-	 * @param bool $deleted
-	 * @return self
-	 */
-	public function setDeleted($deleted) {
-		$this->deleted = $deleted;
-		return $this;
-	}
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
 
 
-	/**
-	 * @return bool
-	 */
-	public function getDeleted() {
-		return $this->deleted;
-	}
+    /**
+     * @param bool $deleted
+     * @return self
+     */
+    public function setDeleted($deleted)
+    {
+        $this->deleted = $deleted;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getDeleted()
+    {
+        return $this->deleted;
+    }
 
 
     /**
@@ -157,21 +169,21 @@ class Wiki implements ISoftDeletable
 
 
     /**
-	 * @param bool $locked
-	 * @return self
-	 */
-	public function setLocked($locked) {
-		$this->locked = $locked;
-		return $this;
-	}
+     * @param bool $locked
+     * @return self
+     */
+    public function setLocked($locked)
+    {
+        $this->locked = $locked;
+        return $this;
+    }
 
 
-	/**
-	 * @return bool
-	 */
-	public function getLocked() {
-		return $this->locked;
-	}
-
-
-} 
+    /**
+     * @return bool
+     */
+    public function getLocked()
+    {
+        return $this->locked;
+    }
+}

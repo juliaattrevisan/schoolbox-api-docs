@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
@@ -85,7 +87,7 @@ class ReQueueErrors
                 $this->reQueueAndPurge($kamiModel, $dryRun);
                 $this->countSuccess++;
                 $skips = 0;
-            } catch (IKamiException|ConnectException $e) {
+            } catch (IKamiException | ConnectException $e) {
                 $this->log->error($e->getMessage());
                 $skips++;
                 if ($skips <= $maxSkips) {
@@ -197,7 +199,7 @@ class ReQueueErrors
                 // Document was already deleted (ensures tool is idempotent)
                 $this->log->warning('Document already deleted in Kami');
                 return true;
-            } catch (Exception\IKamiException|ConnectException $e) {
+            } catch (Exception\IKamiException | ConnectException $e) {
                 // If we recognise the exception, just print the info we need.
                 $this->logAttemptException($e, $kamiModel, ++$countFailedAttempts);
                 throw $e;
@@ -209,7 +211,6 @@ class ReQueueErrors
             }
         };
         return $this->jitter->retry($function);
-
     }
 
 

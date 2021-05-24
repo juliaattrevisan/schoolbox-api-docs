@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Response
  *
@@ -254,8 +255,9 @@ abstract class Evaluation_Response extends DeprecatedModel
      * @param int $question_id
      * @return array
      */
-    public function getResponsesToQuestion($question_id) {
-        $query = "SELECT * FROM assess_response WHERE question_id = " . $this->db->smartQuote($question_id)." AND deleted_at IS NULL";
+    public function getResponsesToQuestion($question_id)
+    {
+        $query = "SELECT * FROM assess_response WHERE question_id = " . $this->db->smartQuote($question_id) . " AND deleted_at IS NULL";
         return $this->db->getAll($query);
     }
 }

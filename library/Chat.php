@@ -71,7 +71,6 @@ class Chat extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
                 $log['type']      = Scrub::text($log['type']);
                 $log['body']      = Scrub::text($log['body']);
             }
-
         }
 
         return $logs;

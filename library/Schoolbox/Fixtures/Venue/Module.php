@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -13,7 +14,6 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
-
 
 class Module extends RestfulModule
 {
@@ -32,7 +32,8 @@ class Module extends RestfulModule
      *
      * @param Authorizer $authorizer
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
 
         /* Permissions requirements for being a Sports Administrator
          */

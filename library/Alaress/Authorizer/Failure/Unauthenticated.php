@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization failure - no user is authenticated.
  *

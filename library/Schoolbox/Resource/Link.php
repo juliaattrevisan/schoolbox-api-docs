@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for links in the resource browser.
  *
@@ -108,10 +109,9 @@ class Link implements ISoftDeletable
      */
     public function getLinkTarget()
     {
-        if ($this->getTarget() != '_blank' ) {
+        if ($this->getTarget() != '_blank') {
             return '';
-        }
-        else {
+        } else {
             return 'external';
         }
     }

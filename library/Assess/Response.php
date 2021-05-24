@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assess_Response
  *
@@ -8,7 +9,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Assess_Response extends Evaluation_Response {
+class Assess_Response extends Evaluation_Response
+{
     public $_table = 'assess_response';
     public $_index = 'response_id';
 

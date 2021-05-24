@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * This is how to delete EVERYTHING in RabbitMQ. Only do this if you're entirely confident that you want to do so,
  * because there is no undoing it. </warning>
@@ -9,10 +10,10 @@
  * @link        https://schoolbox.com.au/
  */
 
-if(posix_getuid() !== 0) {
-	// this method can only succeed if the user is root - don't even try otherwise
-	echo "Make me a sandwich.\n";
-	exit(1);
+if (posix_getuid() !== 0) {
+    // this method can only succeed if the user is root - don't even try otherwise
+    echo "Make me a sandwich.\n";
+    exit(1);
 }
 
 

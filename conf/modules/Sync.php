@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Sync (UPS)
  *
@@ -9,10 +10,10 @@
 
 namespace Config\Modules;
 
-
 use Alaress\Application\Kernel;
 
-class Sync implements ModuleConfigInterface {
+class Sync implements ModuleConfigInterface
+{
 
     /**
      * Run configuration for the given module
@@ -20,7 +21,8 @@ class Sync implements ModuleConfigInterface {
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel) {
+    public function configure($kernel)
+    {
         $di = $kernel->getDependencyInjector();
 
         $ruleset = new \Schoolbox\Sync\Ruleset\Module($di);

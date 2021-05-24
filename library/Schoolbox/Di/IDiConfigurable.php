@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -34,5 +35,4 @@ interface IDiConfigurable
      * @return array
      */
     public static function getSetters(\Aura\Di\ContainerInterface $di): ?array;
-
 }

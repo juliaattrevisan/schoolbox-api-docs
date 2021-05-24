@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
-class DescriptorMetadata {
+class DescriptorMetadata
+{
     /**
      * @var array $prevDescriptor
      */
@@ -45,7 +46,8 @@ class DescriptorMetadata {
      * @param array $nextDescriptor     Can be null
      * @param string $direction
      */
-    public function __construct(array $descriptor, ?array $prevDescriptor, ?array $nextDescriptor, string $direction) {
+    public function __construct(array $descriptor, ?array $prevDescriptor, ?array $nextDescriptor, string $direction)
+    {
         $this->descriptor = $descriptor;
         $this->prevDescriptor = $prevDescriptor;
         $this->nextDescriptor = $nextDescriptor;
@@ -62,7 +64,7 @@ class DescriptorMetadata {
      *
      * @return float|null
      */
-    public function calculateMin() : ?float
+    public function calculateMin(): ?float
     {
         // Assume ascending by default
         $min = ($this->prevDescriptor['value'] !== null ? $this->prevDescriptor['value'] + 1 : $this->descriptor['value']);
@@ -79,7 +81,7 @@ class DescriptorMetadata {
      *
      * @return float|null
      */
-    public function calculateMax() : ?float
+    public function calculateMax(): ?float
     {
         return $this->descriptor['value'];
     }
@@ -89,7 +91,7 @@ class DescriptorMetadata {
      *
      * @return array
      */
-    public function toArray() : ?array
+    public function toArray(): ?array
     {
         $min = $this->calculateMin();
         $max = $this->calculateMax();

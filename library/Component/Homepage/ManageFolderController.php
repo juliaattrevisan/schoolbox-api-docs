@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,7 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ManageFolderController extends Component_Homepage_ControllerAbstract
 {
@@ -112,7 +113,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         }
 
         /* Only write-access people can view statistics
-		 */
+         */
         if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             $this->parse('view_stats_block', 'view_stats');
         } else {

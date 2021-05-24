@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Attempt
  *
@@ -226,13 +227,14 @@ abstract class Evaluation_Attempt extends DeprecatedModel
      * @param int $attempt_id
      * @return bool
      */
-    public function checkAttemptIsValid($assess_id, $user_id, $attempt_id) {
+    public function checkAttemptIsValid($assess_id, $user_id, $attempt_id)
+    {
         $query = "
             SELECT {$this->_table}.*
             FROM {$this->_table}
             WHERE {$this->_table}.assess_id = " . $this->db->smartQuote($assess_id) . "
-            AND {$this->_table}.user_id = " . $this->db->smartQuote($user_id) ."
-            AND {$this->_table}.attempt_id =  " . $this->db->smartQuote($attempt_id) ."
+            AND {$this->_table}.user_id = " . $this->db->smartQuote($user_id) . "
+            AND {$this->_table}.attempt_id =  " . $this->db->smartQuote($attempt_id) . "
             AND {$this->_table}.deleted_at IS NULL
             AND {$this->_table}.finish IS NULL
         ";

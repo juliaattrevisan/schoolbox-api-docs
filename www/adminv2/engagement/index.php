@@ -2,7 +2,6 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
-
 if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }
@@ -24,27 +23,24 @@ $validPages = [
 ];
 
 /* Setup period **/
-if($this->arg[1]) {
+if ($this->arg[1]) {
     $start = \Alaress_Date_Format::newUrlDate($this->arg[1]);
-}
-else {
+} else {
     $start = new Alaress_Date_Format();
     $start = $start->addMonths(-4);
 }
 $start = $start->startOfMonth();
 
-if($this->arg[2]) {
+if ($this->arg[2]) {
     $end = \Alaress_Date_Format::newUrlDate($this->arg[2]);
-}
-else {
+} else {
     $end = new Alaress_Date_Format();
 }
 $end = $end->endOfMonth();
 
-if(in_array($this->arg[0],$validPages)) {
+if (in_array($this->arg[0], $validPages)) {
     $page = $this->arg[0];
-}
-else {
+} else {
     $page = 'collaboration';
 }
 
@@ -61,17 +57,16 @@ $this->setVar(array(
     'SELECTED_FORMATTED_FINISH' => $end->getURLDate(),
 ));
 
-foreach($validPages as $pageNav) {
-    if($pageNav == $page) {
-        $this->setVar('SETTING_TAB_'.$pageNav, 'active');
-    }
-    else {
-        $this->setVar('SETTING_TAB_'.$pageNav, '');
+foreach ($validPages as $pageNav) {
+    if ($pageNav == $page) {
+        $this->setVar('SETTING_TAB_' . $pageNav, 'active');
+    } else {
+        $this->setVar('SETTING_TAB_' . $pageNav, '');
     }
 }
 
 $this->setFile('REPORT_CONTENT', 'adminv2/engagement/' . $page . '.html');
 
-include(dirname ( __FILE__ ) .'/'. $page.'.php');
+include(dirname(__FILE__) . '/' . $page . '.php');
 
 $this->parse('REPORT_DATA', 'REPORT_CONTENT');

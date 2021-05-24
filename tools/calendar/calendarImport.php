@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Calendar CSV import tool.  Use to import calendar CSV files from the command line or via cron
  * Use the source name to continually override existing calendar source sets
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;

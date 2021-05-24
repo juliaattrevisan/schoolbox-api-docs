@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Database\Connector\IConnector;
@@ -114,7 +116,8 @@ abstract class Base
      * @param IConnector  $db
      * @param string|null $year
      */
-    public function __construct(User $user, array $externalUser, IConnector $db, $year) {
+    public function __construct(User $user, array $externalUser, IConnector $db, $year)
+    {
         $this->user = $user;
         $this->externalUser = $externalUser;
         $this->db = $db;
@@ -157,7 +160,8 @@ abstract class Base
      *
      * @return string
      */
-    protected function getExternalUserId() {
+    protected function getExternalUserId()
+    {
         return $this->externalUser['StudentID'];
     }
 
@@ -171,7 +175,7 @@ abstract class Base
      */
     protected function isProgressive($result): bool
     {
-        return preg_match('/\[['.implode('', $this->getLetterRegistry()).']\d*\]/', $result);
+        return preg_match('/\[[' . implode('', $this->getLetterRegistry()) . ']\d*\]/', $result);
     }
 
 

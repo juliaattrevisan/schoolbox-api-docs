@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -7,8 +8,8 @@
 
 namespace Schoolbox\Fixtures\Division\User;
 
-use \Schoolbox\User as User;
-use \Schoolbox\Fixtures\Division\Model as Division;
+use Schoolbox\User as User;
+use Schoolbox\Fixtures\Division\Model as Division;
 
 /**
  * Model for relation between divisions and users.

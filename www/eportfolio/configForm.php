@@ -18,7 +18,6 @@ $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 // Update page, or its stuff
 
 if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
-
     // Check permissions
 
     $eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
@@ -223,7 +222,8 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
-                'component_definition_id', $instance->getDefinitionId()
+                'component_definition_id',
+                $instance->getDefinitionId()
             );
 
             $pageId = $config['page_id'];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HostType
  *
@@ -6,9 +7,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Leave;
 
-class HostType {
+class HostType
+{
 
     /**
      * Host type: mother
@@ -45,62 +48,67 @@ class HostType {
      */
     const TYPE_OTHER    = 5;
 
-	/**
-	 * Identifier
-	 *
-	 * @var int
-	 */
-	private $id = -1;
+    /**
+     * Identifier
+     *
+     * @var int
+     */
+    private $id = -1;
 
-	/**
-	 * Name of the host type
-	 *
-	 * @var string
-	 */
-	private $name = '';
+    /**
+     * Name of the host type
+     *
+     * @var string
+     */
+    private $name = '';
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set name
-	 *
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
+    /**
+     * Set name
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * Get name
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * Set id
-	 *
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * Set id
+     *
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 }

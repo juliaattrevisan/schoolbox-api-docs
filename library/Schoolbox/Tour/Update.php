@@ -72,8 +72,7 @@ HELP
                         'type'      => $tourStepMapper::TYPE_MODAL,
                     ]
                 );
-            }
-            catch (Exception\NotFound $e) {
+            } catch (Exception\NotFound $e) {
                 $this->getLogger()->info('No tour step to update');
                 exit();
             }

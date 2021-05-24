@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -205,8 +206,7 @@ class Mapper extends BaseMapper
         string $parentType,
         string $name,
         bool $cache = true
-    ): ?Model
-    {
+    ): ?Model {
         $capabilities   = $this->findByColumnList(
             [
                 'parent_id'   => $parentId,
@@ -260,8 +260,7 @@ class Mapper extends BaseMapper
         string $name,
         bool $cache = true,
         ?Collection $curriculumNodes = null
-    ): Model
-    {
+    ): Model {
         // Try to find a capability with this name
         $existing = $this->findOneForParentByName($parentId, $parentType, $name, $cache);
         if ($existing) {

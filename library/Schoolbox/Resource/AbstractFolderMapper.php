@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -32,5 +33,4 @@ abstract class AbstractFolderMapper extends Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->joins('parent', static::class, 'id');
     }
-
 }

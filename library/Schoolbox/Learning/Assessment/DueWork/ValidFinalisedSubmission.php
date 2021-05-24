@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidFinalisedSubmission
  *
@@ -11,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
-
 
 class ValidFinalisedSubmission
 {
@@ -35,7 +35,6 @@ class ValidFinalisedSubmission
             $mostRecentResponse = $participant->findMostRecentSubmittedResponse();
 
             if ($mostRecentResponse !== null) {
-
                 $threshold = \Alaress_Date_Format::now();
                 $threshold->addSeconds(-1 * $window);
 
@@ -48,4 +47,3 @@ class ValidFinalisedSubmission
         return true;
     }
 }
-

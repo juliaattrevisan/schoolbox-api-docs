@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
@@ -87,7 +89,7 @@ class External_Isams_User implements External_UserInterface
         $emailList = [];
         $pb = $this->getConnector()->buildPredicateBuilder("V_Parent")->in("StudentID", $externalUserIds);
         $pb->notEquals("PersonalEmail", "");
-        $whereString = implode(" AND " , $pb->getWhere());
+        $whereString = implode(" AND ", $pb->getWhere());
 
         $query =
         "
@@ -116,7 +118,7 @@ class External_Isams_User implements External_UserInterface
                         StudentFirstname        AS StudentGiven1,
                         StudentSurname          AS StudentSurname,
                         ''                      AS StudentGender,
-                        CONVERT(nvarchar(30), DOB, ".self::FORMAT_ISO8601." ) AS StudentBirthDate,
+                        CONVERT(nvarchar(30), DOB, " . self::FORMAT_ISO8601 . " ) AS StudentBirthDate,
                         ''                      AS StudentTutorName,
                         ''                      AS StudentHeadOfHouse,
                         ''                      AS HeadOfHouseID,
@@ -433,7 +435,7 @@ class External_Isams_User implements External_UserInterface
      */
     public function getAllYearLevels(): array
     {
-        $query ="
+        $query = "
             SELECT DISTINCT Grade AS Code, Grade AS Description
             FROM        V_Student
             WHERE ISNULL(Grade, '') != ''

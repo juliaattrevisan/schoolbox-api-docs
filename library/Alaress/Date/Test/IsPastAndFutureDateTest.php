@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for verifying the isPastDate and isFutureDate methods.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -28,196 +29,210 @@ class Builder implements BuilderInterface
     /** @var bool */
     protected $validate;
 
-	/** @var array */
-	protected $context;
+    /** @var array */
+    protected $context;
 
-	/** @var array */
-	protected $topics;
+    /** @var array */
+    protected $topics;
 
-	/** @var int */
-	protected $severity;
+    /** @var int */
+    protected $severity;
 
-	/** @var ParameterInterface[] */
-	protected $params;
+    /** @var ParameterInterface[] */
+    protected $params;
 
-	/** @var string */
-	protected $title;
+    /** @var string */
+    protected $title;
 
-	/** @var array */
-	protected $meta;
+    /** @var array */
+    protected $meta;
 
-	/** @var string */
-	protected $icon;
+    /** @var string */
+    protected $icon;
 
-	/** @var string */
-	protected $href;
+    /** @var string */
+    protected $href;
 
-	/** @var int */
-	protected $time;
+    /** @var int */
+    protected $time;
 
-	/** @var string */
-	protected $namespace;
+    /** @var string */
+    protected $namespace;
 
-	/** @var int */
-	protected $folderId;
+    /** @var int */
+    protected $folderId;
 
-	/**
-	 * Basic construction
+    /**
+     * Basic construction
      *
      * @param bool $validate optionally build without validation (debug only), if validation fails exception thrown
-	 */
-	public function __construct($validate = true) {
+     */
+    public function __construct($validate = true)
+    {
         $this->validate = $validate;
-		$this->clear();
-	}
+        $this->clear();
+    }
 
 
-	/**
-	 * Sets up all vars
-	 * @return self
-	 */
-	public function clear() {
-		$this->context   = array();
-		$this->topics    = array();
-		$this->params    = array();
-		$this->meta      = array();
-		// Twig template requires body
-		$this->setBody('');
+    /**
+     * Sets up all vars
+     * @return self
+     */
+    public function clear()
+    {
+        $this->context   = array();
+        $this->topics    = array();
+        $this->params    = array();
+        $this->meta      = array();
+        // Twig template requires body
+        $this->setBody('');
 
-		$this->namespace = '';
-		$this->title     = '';
-		$this->icon      = '';
-		$this->href      = '';
+        $this->namespace = '';
+        $this->title     = '';
+        $this->icon      = '';
+        $this->href      = '';
 
-		$this->severity  = 0;
-		$this->time      = 0;
-		$this->folderId  = 0;
+        $this->severity  = 0;
+        $this->time      = 0;
+        $this->folderId  = 0;
 
-		return $this;
-	}
-
-
-	/**
-	 * @param string $namespace
-	 * @return self
-	 */
-	public function setNamespace($namespace) {
-		$this->namespace = $namespace;
-		return $this;
-	}
+        return $this;
+    }
 
 
-	/**
-	 * @param string $href
-	 * @return self
-	 */
-	public function setHref($href) {
-		$this->href = $href;
-		return $this;
-	}
+    /**
+     * @param string $namespace
+     * @return self
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
 
-	/**
+
+    /**
+     * @param string $href
+     * @return self
+     */
+    public function setHref($href)
+    {
+        $this->href = $href;
+        return $this;
+    }
+
+    /**
      * Set body, converting to plaintext as you go (we can't support markup in the body)
      *
-	 * @param string $body
-	 * @return self
-	 */
-	public function setBody($body) {
+     * @param string $body
+     * @return self
+     */
+    public function setBody($body)
+    {
         // totally strip links
         $plain = new Html2Text($body, ['do_links' => 'none']);
         return $this->putMeta('body', $plain->getText());
-	}
+    }
 
 
-	/**
-	 * @param string $icon
-	 * @return self
-	 */
-	public function setIcon($icon) {
-		$this->icon = $icon;
-		return $this;
-	}
+    /**
+     * @param string $icon
+     * @return self
+     */
+    public function setIcon($icon)
+    {
+        $this->icon = $icon;
+        return $this;
+    }
 
 
-	/**
-	 * @param int $time
-	 * @return self
-	 */
-	public function setTimestamp($time) {
-		$this->time = $time;
-		return $this;
-	}
+    /**
+     * @param int $time
+     * @return self
+     */
+    public function setTimestamp($time)
+    {
+        $this->time = $time;
+        return $this;
+    }
 
 
-	/**
-	 * @param string $title
-	 * @return self
-	 */
-	public function setTitle($title) {
-		$this->title = $title;
-		return $this;
-	}
+    /**
+     * @param string $title
+     * @return self
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
 
 
-	/**
-	 * @param string $type
-	 * @param array $ids
-	 * @return self
-	 */
-	public function addFilter($type, $ids) {
-		$this->context[$type] = $ids;
-		return $this;
-	}
+    /**
+     * @param string $type
+     * @param array $ids
+     * @return self
+     */
+    public function addFilter($type, $ids)
+    {
+        $this->context[$type] = $ids;
+        return $this;
+    }
 
-	/**
-	 * @param array $filter
-	 * @return self
-	 */
-	public function setFilter($filter) {
-		$this->context = array_merge($this->context, $filter);
-		return $this;
-	}
-
-
-	/**
-	 * @param string $byline
-	 * @return self
-	 */
-	public function setByline($byline) {
-		return $this->putMeta('byline', $byline);
-	}
+    /**
+     * @param array $filter
+     * @return self
+     */
+    public function setFilter($filter)
+    {
+        $this->context = array_merge($this->context, $filter);
+        return $this;
+    }
 
 
-	/**
-	 * @param string $name
-	 * @param string $value
-	 * @return self
-	 */
-	public function putMeta($name, $value) {
-		$this->meta[$name] = $value;
-		return $this;
-	}
+    /**
+     * @param string $byline
+     * @return self
+     */
+    public function setByline($byline)
+    {
+        return $this->putMeta('byline', $byline);
+    }
 
 
-	/**
-	 * @param array $meta
-	 * @return self
-	 */
-	public function setMeta($meta) {
-		$this->meta = $meta;
-		return $this;
-	}
+    /**
+     * @param string $name
+     * @param string $value
+     * @return self
+     */
+    public function putMeta($name, $value)
+    {
+        $this->meta[$name] = $value;
+        return $this;
+    }
 
 
-	/**
-	 * @param string $token
-	 * @param ParameterInterface $param
-	 * @return self
-	 */
-	public function setParam($token, ParameterInterface $param) {
-		$this->params[$token] = $param;
-		return $this;
-	}
+    /**
+     * @param array $meta
+     * @return self
+     */
+    public function setMeta($meta)
+    {
+        $this->meta = $meta;
+        return $this;
+    }
+
+
+    /**
+     * @param string $token
+     * @param ParameterInterface $param
+     * @return self
+     */
+    public function setParam($token, ParameterInterface $param)
+    {
+        $this->params[$token] = $param;
+        return $this;
+    }
 
     /**
      * The opposite of setParam()
@@ -232,47 +247,51 @@ class Builder implements BuilderInterface
         return $this;
     }
 
-	/**
-	 * @param ParameterInterface[] $params
-	 * @return self
-	 */
-	public function setParams($params) {
-		$this->params = array();
-		foreach($params as $t => $p) {
-			$this->setParam($t, $p);
-		}
-		return $this;
-	}
+    /**
+     * @param ParameterInterface[] $params
+     * @return self
+     */
+    public function setParams($params)
+    {
+        $this->params = array();
+        foreach ($params as $t => $p) {
+            $this->setParam($t, $p);
+        }
+        return $this;
+    }
 
 
-	/**
-	 * @param int $severity
-	 * @return self
-	 */
-	public function setSeverity($severity) {
-		$this->severity = $severity;
-		return $this;
-	}
+    /**
+     * @param int $severity
+     * @return self
+     */
+    public function setSeverity($severity)
+    {
+        $this->severity = $severity;
+        return $this;
+    }
 
 
-	/**
-	 * @param string $topic
-	 * @return self
-	 */
-	public function addTopic($topic) {
-		$this->topics[] = $topic;
-		return $this;
-	}
+    /**
+     * @param string $topic
+     * @return self
+     */
+    public function addTopic($topic)
+    {
+        $this->topics[] = $topic;
+        return $this;
+    }
 
 
-	/**
-	 * @param array $topics
-	 * @return self
-	 */
-	public function setTopics($topics) {
-		$this->topics = (array)$topics;
-		return $this;
-	}
+    /**
+     * @param array $topics
+     * @return self
+     */
+    public function setTopics($topics)
+    {
+        $this->topics = (array)$topics;
+        return $this;
+    }
 
     /**
      * This allows the message to bypass the filter that prevents messages being delivered to the user themselves.
@@ -283,7 +302,8 @@ class Builder implements BuilderInterface
      * @param bool $allowSelfSend
      * @return self
      */
-    public function setAllowSelfSend($allowSelfSend) {
+    public function setAllowSelfSend($allowSelfSend)
+    {
         $this->context['allowSelfSend'] = $allowSelfSend;
         return $this;
     }
@@ -310,46 +330,56 @@ class Builder implements BuilderInterface
         return $this;
     }
 
-	/**
-	 * Builds an instance from the construction given
-	 *
-	 * @throws OutOfBoundsException     If severity is not set
-	 * @throws InvalidArgumentException If a required property was not set
-	 * @return Instance
-	 */
-	public function build() {
-		// check things are right
+    /**
+     * Builds an instance from the construction given
+     *
+     * @throws OutOfBoundsException     If severity is not set
+     * @throws InvalidArgumentException If a required property was not set
+     * @return Instance
+     */
+    public function build()
+    {
+        // check things are right
 
-		if($this->validate) {
-			// mandatory strings
-			$check = array('title', 'icon', 'namespace', 'href');
+        if ($this->validate) {
+            // mandatory strings
+            $check = array('title', 'icon', 'namespace', 'href');
 
-			foreach($check as $prop) {
-				if(!(trim($this->$prop ?? ''))) {
-					throw new InvalidArgumentException(ucfirst($prop)." has not been set");
-				}
-			}
+            foreach ($check as $prop) {
+                if (!(trim($this->$prop ?? ''))) {
+                    throw new InvalidArgumentException(ucfirst($prop) . " has not been set");
+                }
+            }
 
-			if($this->severity == 0) {
-				throw new OutOfBoundsException("Severity has not been set");
-			}
+            if ($this->severity == 0) {
+                throw new OutOfBoundsException("Severity has not been set");
+            }
 
-			if(!count($this->topics)) {
-				throw new InvalidArgumentException("Topic has not been set");
-			}
+            if (!count($this->topics)) {
+                throw new InvalidArgumentException("Topic has not been set");
+            }
 
             // if no time was specified, set the time to now
             if (!$this->time) {
                 $this->time = time();
             }
-		}
+        }
 
-		return new Instance(
-			// mandatory args
-			$this->title, $this->namespace, $this->icon, $this->href,
-			$this->params, $this->severity, $this->topics, $this->folderId,
-			// optional args
-			$this->time, $this->meta, $this->context, $this->validate
-		);
-	}
+        return new Instance(
+            // mandatory args
+            $this->title,
+            $this->namespace,
+            $this->icon,
+            $this->href,
+            $this->params,
+            $this->severity,
+            $this->topics,
+            $this->folderId,
+            // optional args
+            $this->time,
+            $this->meta,
+            $this->context,
+            $this->validate
+        );
+    }
 }

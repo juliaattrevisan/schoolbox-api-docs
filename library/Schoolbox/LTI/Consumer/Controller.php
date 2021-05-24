@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LTI v1.2 consumer implementation
  *
@@ -184,7 +185,6 @@ class Controller extends Base
         // Go through each item in the graph
 
         foreach ($contentItemsArray['@graph'] as $item) {
-
             // Grab the title if there is one
 
             if (isset($item['title'])) {
@@ -225,7 +225,8 @@ class Controller extends Base
             if (isset($item['@type']) && isset($item['mediaType'])) {
                 if ($item['@type'] === 'LtiLinkItem' && $item['mediaType'] === self::LTI_MEDIA_TYPE_LINK) {
                     if (isset($item['custom'])) {
-                        if (isset($item['custom']['contentUrl']) &&
+                        if (
+                            isset($item['custom']['contentUrl']) &&
                             isset($item['custom']['activity']) &&
                             isset($item['custom']['module'])
                         ) {

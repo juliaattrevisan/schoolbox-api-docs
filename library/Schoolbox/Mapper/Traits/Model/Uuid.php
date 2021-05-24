@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Trait for model classes - adds a uuid field.
  *

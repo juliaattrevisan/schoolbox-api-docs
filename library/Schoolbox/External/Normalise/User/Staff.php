@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Staff
  *
@@ -17,7 +18,8 @@ use Schoolbox\External\Normalise\User\Staff\Meta;
 use Schoolbox\External\Normalise\User\Staff\Year;
 use Schoolbox\Collection;
 
-class Staff extends Base {
+class Staff extends Base
+{
 
     /* Personal
      */
@@ -56,14 +58,16 @@ class Staff extends Base {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setup();
     }
 
     /**
      * Hook method
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setAccount(new Account());
         $this->setPostalAddress(new Address());
         $this->setHomeAddress(new Address());
@@ -85,10 +89,11 @@ class Staff extends Base {
      * @param string|null $separator
      * @return string
      */
-    public function getAllEmails($separator = "\n") {
+    public function getAllEmails($separator = "\n")
+    {
         $output = array();
 
-        foreach($this->getEmail() as $currentEmail) {
+        foreach ($this->getEmail() as $currentEmail) {
             $output[] = $currentEmail->getAddress();
         }
 
@@ -101,10 +106,11 @@ class Staff extends Base {
      * @param string|null $separator
      * @return string
      */
-    public function getAllCampuses($separator = "\n") {
+    public function getAllCampuses($separator = "\n")
+    {
         $output = array();
 
-        foreach($this->getCampus() as $currentCampus) {
+        foreach ($this->getCampus() as $currentCampus) {
             $output[] = $currentCampus->getCode();
         }
 
@@ -222,5 +228,4 @@ class Staff extends Base {
     {
         return $this->house;
     }
-
 }

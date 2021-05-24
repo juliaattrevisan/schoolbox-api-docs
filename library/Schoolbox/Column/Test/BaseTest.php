@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for base column type - its hydrator and dehydrator don't change
  * anything, besides coercing all values to UTF-8 on dehydrate.
@@ -8,38 +9,42 @@
  * @link      https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Column\Test;
+
 use Schoolbox\Column\Base;
 
-class BaseTest extends TestCase {
+class BaseTest extends TestCase
+{
 
-	/**
-	 * @var Base
-	 */
-	protected $object;
+    /**
+     * @var Base
+     */
+    protected $object;
 
-	public function setupObject() {
-		$this->object = new Base();
-	}
+    public function setupObject()
+    {
+        $this->object = new Base();
+    }
 
-	public function getTestHydrate() {
-		return array(
-			array(true, true),
-			array(false, false),
-			array(null, null),
-			array('Dumb', 'Dumb'),
-		);
-	}
+    public function getTestHydrate()
+    {
+        return array(
+            array(true, true),
+            array(false, false),
+            array(null, null),
+            array('Dumb', 'Dumb'),
+        );
+    }
 
-	public function getTestDehydrate() {
-		return array(
-			array(true, '1'),
-			array(false, ''),
-			array(null, null),
-			array('Dumb', 'Dumb'),
-			// invalid UTF8 sequence - gets replaced with placeholder
-			array('12'.chr(243).'34', '12?34'),
-		);
-	}
+    public function getTestDehydrate()
+    {
+        return array(
+            array(true, '1'),
+            array(false, ''),
+            array(null, null),
+            array('Dumb', 'Dumb'),
+            // invalid UTF8 sequence - gets replaced with placeholder
+            array('12' . chr(243) . '34', '12?34'),
+        );
+    }
 }

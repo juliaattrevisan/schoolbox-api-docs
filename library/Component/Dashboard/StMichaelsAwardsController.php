@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Awards component for St Michaels.
  *

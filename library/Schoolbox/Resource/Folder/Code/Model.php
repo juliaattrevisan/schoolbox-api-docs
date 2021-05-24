@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Folder\Code;
-
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
@@ -94,5 +94,4 @@ class Model implements ISoftDeletable
     {
         return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
-
 }

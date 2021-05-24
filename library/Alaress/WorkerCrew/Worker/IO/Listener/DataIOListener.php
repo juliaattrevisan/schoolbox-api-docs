@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker\IO\Listener;
-
 
 use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\WorkerCrew\Pool;
@@ -66,11 +66,9 @@ class DataIOListener extends AbstractIOStreamListener
 
             $this->log->notice("Worker {{$pid}} datastream closed: ensuring worker terminated");
             $this->pool->releaseWorker($pid, Pool::RELEASE_HARD);
-
-        } catch(UnexpectedValueException $e) {
-            $this->log->critical("Unexpected stream supplied, cannot locate PID",['exception'=>$e]);
+        } catch (UnexpectedValueException $e) {
+            $this->log->critical("Unexpected stream supplied, cannot locate PID", ['exception' => $e]);
         }
-
     }
 
 
@@ -90,9 +88,8 @@ class DataIOListener extends AbstractIOStreamListener
             $pid  = $pool->getProcessIdByResource($e->getStream());
             $task = $pool->getCurrentTaskByProcessId($pid);
             $data = $e->getData();
-
-        } catch(UnexpectedValueException $e) {
-            $this->log->critical("Unexpected stream supplied, cannot locate PID",['exception'=>$e]);
+        } catch (UnexpectedValueException $e) {
+            $this->log->critical("Unexpected stream supplied, cannot locate PID", ['exception' => $e]);
             return;
         }
 
@@ -134,8 +131,7 @@ class DataIOListener extends AbstractIOStreamListener
                     if ($newStatus == Worker::READY) {
                         $this->log->info("Worker {{$pid}} READY for new task");
                     }
-
-                } catch(Exception $e) {
+                } catch (Exception $e) {
                     // your reactor will explode if you don't catch exceptions coming from your response handler
                     $this->strat->handleException($e, $this->log);
                     $this->log->info("Response from worker {{$pid}} failed to parse, still DONE");
@@ -144,14 +140,11 @@ class DataIOListener extends AbstractIOStreamListener
                 // regardless of whether or not the handling of the response succeeded, we need to ditch this message
                 $this->strat->pdequeue($task->getIdentifier());
                 break;
-
         }
 
         // if we can accept, emit READY (to be caught by dispatcher)
         if ($pool->canAccept()) {
             $pool->emit('ready');
         }
-
     }
-
 }

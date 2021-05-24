@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -73,8 +74,9 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class,
-            [
+            $injector->lazyNew(
+                Controller::class,
+                [
                 'mapper'               => $this->getMapperFactory()->getLazy(RubricDataSource::class),
                 'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
                 'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
@@ -83,7 +85,8 @@ class Module extends BaseModule
                 'rosettaStone'         => $injector->lazyGet('l10n'),
                 'markTypeMapper'       => $this->getMapperFactory()->getLazy(MarkTypeMapper::class),
                 'gradeGroupMapper'     => $this->getMapperFactory()->getLazy(GradeGroupMapper::class),
-            ])
+                ]
+            )
         );
     }
 }

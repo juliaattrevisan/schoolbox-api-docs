@@ -1,9 +1,11 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -108,8 +110,7 @@ $app = new class extends App {
             'options'     => serialize([
                     'mapper'                                      => GradeGroupMapper::class,
                     SelectLookup\Renderer::OPTION_KEY_FIND_METHOD => 'findAllForAdminOption',
-                ]
-            ),
+                ]),
             'type_id'     => ConfigMapper::TYPE_LMS_POLICY,
             'editable'    => 'true',
             'hidden'      => 'false',

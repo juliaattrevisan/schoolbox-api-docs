@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Answer
  *
@@ -46,15 +47,15 @@ abstract class Evaluation_Answer extends DeprecatedModel
      */
     protected $useLongAnswers = false;
 
-	/**
-	 * @var Evaluation_Response
-	 */
-	protected $responseHandler;
+    /**
+     * @var Evaluation_Response
+     */
+    protected $responseHandler;
 
-	/**
-	 * @var Evaluation_Question
-	 */
-	protected $questionHandler;
+    /**
+     * @var Evaluation_Question
+     */
+    protected $questionHandler;
 
     /**
      * Javascript plugin for reviewing
@@ -96,14 +97,15 @@ abstract class Evaluation_Answer extends DeprecatedModel
         return $this->legendHTML;
     }
 
-	/**
-	 * Output configuration settings in modify
+    /**
+     * Output configuration settings in modify
      *
      * @param SitePage     $page
      * @param string|false $config
-	 */
-	public function configure(SitePage $page, $config) {
-	}
+     */
+    public function configure(SitePage $page, $config)
+    {
+    }
 
 
     /**
@@ -120,7 +122,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * @param SitePage $page
      * @param string $config
      */
-    public function configureXml(SitePage $page, $config) {
+    public function configureXml(SitePage $page, $config)
+    {
         if (strlen($config)) {
             $options = json_decode($config);
 
@@ -130,7 +133,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
             $keys = array_keys((array)$options);
 
             if (is_array($keys) && count($keys)) {
-                foreach($keys as $currentConfigOption) {
+                foreach ($keys as $currentConfigOption) {
                     $page->setVar(array(
                         'ANSWER_CONFIGURATION_NAME' => $currentConfigOption,
                         'ANSWER_CONFIGURATION_VALUE' => $options->$currentConfigOption
@@ -138,8 +141,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
 
                     $page->parse('answer_configuration_block', 'answer_configuration', true);
                 }
-            }
-            else {
+            } else {
                 $page->setVar(array(
                     'answer_configuration_block' => ''
                 ));
@@ -147,11 +149,12 @@ abstract class Evaluation_Answer extends DeprecatedModel
         }
     }
 
-	/**
-	 * Hook method
-	 */
-	protected function configureResponse($page, $question_id) {
-	}
+    /**
+     * Hook method
+     */
+    protected function configureResponse($page, $question_id)
+    {
+    }
 
     /**
      * Gets the Answer record for a particular Question.
@@ -192,7 +195,7 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * @param array $data
      * @return array
      */
-    public abstract function saveResponse($data);
+    abstract public function saveResponse($data);
 
     /**
      * @param int $attemptId
@@ -284,7 +287,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * @param int $attempt_id
      * @param int $question_id
      */
-    public function exportResponseToCSV($attempt_id, $question_id) {
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
     }
 
     /**
@@ -294,7 +298,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * @param int $questionId
      * @return array
      */
-    public function exportResponseToArray($attemptId, $questionId) {
+    public function exportResponseToArray($attemptId, $questionId)
+    {
         return [];
     }
 
@@ -313,7 +318,8 @@ abstract class Evaluation_Answer extends DeprecatedModel
      * @param int $question_id
      * @return mixed
      */
-    public function resultsForQuestion($attempt_id, $question_id) {
+    public function resultsForQuestion($attempt_id, $question_id)
+    {
         $data = $this->exportResponseToCSV($attempt_id, $question_id);
 
         $data['responses'] = $data['responsesData'] = Scrub::text($data['response']);
@@ -347,51 +353,56 @@ abstract class Evaluation_Answer extends DeprecatedModel
         return '';
     }
 
-	/* Getters/Setters
- 	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Get pluginReview
-	 *
-	 * @return string
-	 */
-	public function getPluginReview() {
-		return $this->pluginReview;
-	}
+    /**
+     * Get pluginReview
+     *
+     * @return string
+     */
+    public function getPluginReview()
+    {
+        return $this->pluginReview;
+    }
 
-	/**
-	 * Set question handler
-	 *
-	 * @param Evaluation_Question $questionHandler
-	 */
-	protected function setQuestionHandler($questionHandler) {
-		$this->questionHandler = $questionHandler;
-	}
+    /**
+     * Set question handler
+     *
+     * @param Evaluation_Question $questionHandler
+     */
+    protected function setQuestionHandler($questionHandler)
+    {
+        $this->questionHandler = $questionHandler;
+    }
 
-	/**
-	 * Get question handler
-	 *
-	 * @return Evaluation_Question
-	 */
-	protected function getQuestionHandler() {
-		return $this->questionHandler;
-	}
+    /**
+     * Get question handler
+     *
+     * @return Evaluation_Question
+     */
+    protected function getQuestionHandler()
+    {
+        return $this->questionHandler;
+    }
 
-	/**
-	 * Set response handler
-	 *
-	 * @param Evaluation_Response $responseHandler
-	 */
-	protected function setResponseHandler($responseHandler) {
-		$this->responseHandler = $responseHandler;
-	}
+    /**
+     * Set response handler
+     *
+     * @param Evaluation_Response $responseHandler
+     */
+    protected function setResponseHandler($responseHandler)
+    {
+        $this->responseHandler = $responseHandler;
+    }
 
-	/**
-	 * Get response handler
-	 *
-	 * @return Evaluation_Response
-	 */
-	protected function getResponseHandler() {
-		return $this->responseHandler;
-	}
+    /**
+     * Get response handler
+     *
+     * @return Evaluation_Response
+     */
+    protected function getResponseHandler()
+    {
+        return $this->responseHandler;
+    }
 }

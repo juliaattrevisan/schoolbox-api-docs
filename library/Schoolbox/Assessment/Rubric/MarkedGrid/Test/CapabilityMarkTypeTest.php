@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CapabilityMarkTypeTest
  *
@@ -87,7 +88,7 @@ class CapabilityMarkTypeTest extends TestCase
      *
      * @return array
      */
-    public function provider_validCapabilityMarkType() : array
+    public function provider_validCapabilityMarkType(): array
     {
         $markTypeNone = (new MarkType())->setId(MarkType::TYPE_NONE)->setSlug(MarkType::SLUG_NONE);
         $markTypeTotal = (new MarkType())->setId(MarkType::TYPE_TOTAL)->setSlug(MarkType::SLUG_TOTAL);

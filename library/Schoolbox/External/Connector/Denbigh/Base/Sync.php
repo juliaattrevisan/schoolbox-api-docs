@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Denbigh implementation of sync connector.
  *

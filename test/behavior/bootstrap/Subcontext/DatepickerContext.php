@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps that relate to datepickers.
  *
@@ -11,7 +12,8 @@
 
 use Behat\Mink\Element;
 
-class Subcontext_DatepickerContext extends BaseContext {
+class Subcontext_DatepickerContext extends BaseContext
+{
 
     /**
      * Helper function for converting a date into a input field.
@@ -19,7 +21,8 @@ class Subcontext_DatepickerContext extends BaseContext {
      * @param  string $value
      * @return string
      */
-    protected function convertValueToDatepicker($value) {
+    protected function convertValueToDatepicker($value)
+    {
         $datetime = new DateTime($value);
         return $datetime->format('d/m/Y');
     }
@@ -32,7 +35,8 @@ class Subcontext_DatepickerContext extends BaseContext {
      * @param string $field The locator for the datepicker field.
      * @param string $value A datetime in any recognised date format.
      */
-    public function assertDatepickerValue($field, $value) {
+    public function assertDatepickerValue($field, $value)
+    {
         $this->getMinkContext()->assertFieldContains($field, $this->convertValueToDatepicker($value));
     }
 
@@ -46,8 +50,8 @@ class Subcontext_DatepickerContext extends BaseContext {
      * @param string $field The locator for the datepicker field.
      * @param string $value A datetime in any recognised date format.
      */
-    public function fillDatepickerField($field, $value) {
+    public function fillDatepickerField($field, $value)
+    {
         $this->getMinkContext()->fillField($field, $this->convertValueToDatepicker($value));
     }
-
 }

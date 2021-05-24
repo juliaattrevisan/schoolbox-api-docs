@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
@@ -12,6 +14,7 @@ use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+
 use function count;
 use function in_array;
 
@@ -70,7 +73,7 @@ class ResHouse extends SimpleStrategy
     {
         $values = [];
         foreach ($users as $user) {
-            if($user->getResidentialHouse() !== null) {
+            if ($user->getResidentialHouse() !== null) {
                 $values[$user->getResidentialHouse()->getId()] = $user->getResidentialHouse()->getId();
             }
         }
@@ -109,19 +112,19 @@ class ResHouse extends SimpleStrategy
      */
     public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
     {
-        switch($relationship){
+        switch ($relationship) {
             case Audience\Model::RELATIONSHIP_SELF:
-                if($user->getResidentialHouse() === null){
+                if ($user->getResidentialHouse() === null) {
                     return self::isValidNullEntityValue() && in_array(null, $entityValues, true);
                 }
                 return in_array($user->getResidentialHouse()->getId(), $entityValues, false);
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if(!$user->getRole()->isParent()){
+                if (!$user->getRole()->isParent()) {
                     return false;
                 }
                 return null;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if(!$user->getRole()->isStaff()){
+                if (!$user->getRole()->isStaff()) {
                     return false;
                 }
                 return null;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -34,6 +35,7 @@ use Schoolbox\ValueLabelInterface;
 use Schoolbox\YearLevel;
 use TypeError;
 use UnexpectedValueException;
+
 use function array_map;
 use function array_merge;
 use function explode;
@@ -182,7 +184,8 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * Returns title of folder, for AssessmentContext interface.
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->getNameWithCodes();
     }
 
@@ -268,7 +271,8 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @param int $maxCodes
      * @return string
      */
-    public function getTruncatedCodeString($maxCodes = 4) {
+    public function getTruncatedCodeString($maxCodes = 4)
+    {
 
         //Get first 4 codes, clone cause its a mutable collection
         if ($this->getCodes()->count() > $maxCodes) {
@@ -283,8 +287,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
             }
 
             $codeString = implode(',', $subCodeString) . '...';
-        }
-        else {
+        } else {
             $codeString = $this->getCodeString();
         }
 
@@ -299,8 +302,8 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function addCode($code)
     {
-        foreach($this->getCodes() as $existing){
-            if($existing->getCode() == $code->getCode()){
+        foreach ($this->getCodes() as $existing) {
+            if ($existing->getCode() == $code->getCode()) {
                 return $this;
             }
         }
@@ -343,7 +346,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
 
             foreach ($codeCollection as $code) {
                 $teacherIds = $DEPRECATED_EXTERNAL_CLASS->getTeachers($code->getCode());
-                if(is_array($teacherIds)) {
+                if (is_array($teacherIds)) {
                     $externalIds = array_merge($externalIds, $teacherIds);
                 }
             }
@@ -368,10 +371,10 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function getNodeType(): string
     {
-        if($this->hasCourseSpecification()){
+        if ($this->hasCourseSpecification()) {
             return NodeInterface::TYPE_COURSE;
         }
-        if($this->hasUnitSpecification()){
+        if ($this->hasUnitSpecification()) {
             return NodeInterface::TYPE_UNIT;
         }
         return $this->hasHomepage() ? NodeInterface::TYPE_HOME : NodeInterface::TYPE_FOLDER;
@@ -494,7 +497,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function isGroup()
     {
         if ($this->getGroup() != null) {
-
             return $this->getGroup()->getType() != null;
         }
 

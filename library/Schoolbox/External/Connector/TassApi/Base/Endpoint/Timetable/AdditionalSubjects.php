@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
@@ -14,7 +16,6 @@ use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
-
 
 /**
  * Class AdditionalSubjects
@@ -247,7 +248,6 @@ class AdditionalSubjects implements IStrategy
         $endpoint = self::ENDPOINT_TEACHERSUBJECTS;
 
         foreach ($users as $externalId => $userData) {
-
             /* Allow continuation even if this dies irrecoverably
              */
             try {
@@ -306,7 +306,6 @@ class AdditionalSubjects implements IStrategy
                 }
 
                 foreach ($classes as $class) {
-
                     /* Find out if there's already an involvement, adding it if necessary
                      */
                     try {
@@ -315,7 +314,6 @@ class AdditionalSubjects implements IStrategy
                             'class_id'    => $class->getId()
                         ]);
                     } catch (\Schoolbox\Mapper\Exception $e) {
-
                         /* Maybe this person is a teacher; check sis_class_period to see
                          * If they are already a teacher, don't need to make an arbitrary involvement
                          */

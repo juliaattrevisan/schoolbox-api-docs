@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
@@ -227,7 +229,7 @@ class Definition implements IStrategy
         $periods = array_values($periodsInDays)[0];
 
         for ($i = 0; $i < self::CYCLE_LENGTH; $i++) {
-            $dayIndex = $i+1;
+            $dayIndex = $i + 1;
 
             $struct['days'][$dayIndex] = [];
 

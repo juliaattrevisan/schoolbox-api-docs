@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Course component for a class.
  * Before a course is selected, it contains a selector for the course - after
@@ -24,12 +25,12 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Learning\Assessment\Redirect;
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\User;
 use SitePage;
-use \Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Alaress\Database\Predicate\InvalidColumnException;
 use DomainException;
 use LogicException;
@@ -183,7 +184,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         // Ensure this CourseBuilder component is being placed on a Folder which has a UnitSpec
         $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
         $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
-        if (($hasUnitSpec || $hasCourseSpec) && !$this->readOnly){
+        if (($hasUnitSpec || $hasCourseSpec) && !$this->readOnly) {
             return $this->renderContextInvalidEmptyState($templateHandle, $hasUnitSpec, $hasCourseSpec);
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Mapper\Performance;
-
 
 use Alaress\Database\Predicate\Builder;
 use DebugBar\DataCollector\TimeDataCollector;
@@ -111,7 +111,6 @@ class DevMonitor extends AbstractLogger implements IMonitor
         $output = '';
 
         foreach ($checks as $table => $columns) {
-
             if (!array_key_exists($table, $this->indexByColumn)) {
                 // this *shouldn't* happen
                 continue;
@@ -138,16 +137,13 @@ class DevMonitor extends AbstractLogger implements IMonitor
 
             // didn't get full / composite match: try for partials
             foreach ($columns as $column) {
-
                 if (array_key_exists($column, $this->indexByColumn[$table])) {
                     $impl = implode(', ', $checks[$table]);
                     $this->getLog()->warning("Partial index match for `$column` within $table($impl)");
                 } else {
                     $this->getLog()->error("Searched on unindexed field: $table.$column");
                 }
-
             }
-
         }
 
         return;
@@ -193,7 +189,9 @@ class DevMonitor extends AbstractLogger implements IMonitor
 
         if (count($params)) {
             $query .= "WHERE " . implode(' AND ', $predicateBuilder->getWhere());
-            $query  = str_replace(array_map(function ($v) { return ":$v"; }, array_keys($params)), $params, $query);
+            $query  = str_replace(array_map(function ($v) {
+                return ":$v";
+            }, array_keys($params)), $params, $query);
         }
 
         return str_replace('`', '', $query);
@@ -230,6 +228,4 @@ class DevMonitor extends AbstractLogger implements IMonitor
     {
         $this->getLog()->log($level, $message, $context);
     }
-
-
 }

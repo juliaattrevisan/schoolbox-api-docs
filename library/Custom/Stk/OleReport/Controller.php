@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -9,10 +10,9 @@ namespace Custom\Stk\OleReport;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
-use \OutOfBoundsException;
+use OutOfBoundsException;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
-
 
 /**
  * Controller for SaintKentigern's OLE Report page.
@@ -53,7 +53,7 @@ class Controller extends Base
     public function reportList(User $student)
     {
         // No student found
-        if(!$student->getId()){
+        if (!$student->getId()) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
@@ -85,7 +85,7 @@ class Controller extends Base
          * @var string $reports[][][]['description'] description
          */
         $reports = [];
-        foreach($resultIterator as $row){
+        foreach ($resultIterator as $row) {
             $reportId    = $row['StudentReportsArchiveLinkSeq'];
             $year        = $row['FileYear'];
             $semester    = $row['FileSemester'];
@@ -116,7 +116,7 @@ class Controller extends Base
     public function sendReport(User $student, $reportId)
     {
         // No student found
-        if(!$student->getId()){
+        if (!$student->getId()) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
@@ -133,7 +133,7 @@ class Controller extends Base
         // Should be a single result
         try {
             $resultIterator->rewind();
-        } catch (OutOfBoundsException $e){
+        } catch (OutOfBoundsException $e) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
         }
         $row      = $resultIterator->current();
@@ -145,10 +145,9 @@ class Controller extends Base
         $headers->set('Cache-Control', ' ');
         $headers->set('Content-Type', 'application/pdf');
         $headers->set('Content-Length', strlen($content));
-        $headers->set('Content-Disposition', 'attachment; filename="'.$fileName.'"');
+        $headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
-        $this->getResponse()->content->set( $this->buildFileOutputFromString($content) );
-
+        $this->getResponse()->content->set($this->buildFileOutputFromString($content));
     }
 
     // Getters / Setters
@@ -156,7 +155,8 @@ class Controller extends Base
     /**
      * @return IConnector
      */
-    protected function getDatabase(){
+    protected function getDatabase()
+    {
         return $this->database;
     }
 
@@ -164,7 +164,8 @@ class Controller extends Base
      * @param IConnector $database
      * @return static
      */
-    protected function setDatabase(IConnector $database){
+    protected function setDatabase(IConnector $database)
+    {
         $this->database = $database;
         return $this;
     }

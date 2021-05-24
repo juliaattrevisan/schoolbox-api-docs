@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Photos;
@@ -83,7 +85,7 @@ class MigrateToStorage
             : "Running in 'dry-run' mode, changes will be simulated";
         $this->logger->info($message);
         $this->logger->info("Configured portrait directory: {$this->portraitPath}");
-        $this->logger->info(sprintf("%d files found in portrait directory", count(scandir($this->portraitPath))-2));
+        $this->logger->info(sprintf("%d files found in portrait directory", count(scandir($this->portraitPath)) - 2));
 
         /* Prepared statements
          */
@@ -136,11 +138,9 @@ class MigrateToStorage
                 $found = true;
 
                 try {
-
                     /* Perform only
                      */
                     if ($this->perform) {
-
                         /* Save it into brownhole
                          */
                         $portrait = $this->storageMapper->acceptStream($externalId . '.jpg', file_get_contents($path));
@@ -158,7 +158,6 @@ class MigrateToStorage
                         $this->logger->info("{$user['firstname']} {$user['lastname']} (id: {$user['id']}, externalId: {$user['synergy_id']}) would have new portrait image {$file}");
                     }
                 } catch (\Schoolbox\Mapper\Exception $e) {
-
                     /* Something died in storage
                      */
                     $this->logger->critical("External id {$externalId} not saved; Storage error");

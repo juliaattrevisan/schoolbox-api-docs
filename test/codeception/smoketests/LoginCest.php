@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 /** @noinspection PhpDocMissingThrowsInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpUnused */
@@ -91,16 +93,16 @@ class LoginCest
         $i->seeHttpHeader('location', '/passwordReset');
     }
 
-    public function ApiLogin(IntegrationTester $i):void
+    public function ApiLogin(IntegrationTester $i): void
     {
         #GIVEN
         $user     = 'alaress';
         $password = 'alaress';
 
         /** @var \Codeception\Module\Db $db */
-        $db=$i->grabDBModule();
-        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
-        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
+        $db = $i->grabDBModule();
+        $db->haveInDatabase('mobile_app', ['id' => 1, 'app_identifier' => 'auto_test', 'provider' => 'GCM', 'key' => 'anAutoTestKey', 'cert_hash' => null]);
+        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id' => '1']));
 
         #WHEN
         $loginPayload = new Payload\Authentication\ApiLogin();
@@ -117,19 +119,18 @@ class LoginCest
         $i->startFollowingRedirects();
         $i->sendRequest($loginPayload);
         $i->seeResponseCodeIs(200);
-
     }
 
-    public function ApiLoginFailBadPass(IntegrationTester $i):void
+    public function ApiLoginFailBadPass(IntegrationTester $i): void
     {
         #GIVEN
         $user     = 'alaress';
         $password = 'alar99';
 
         /** @var \Codeception\Module\Db $db */
-        $db=$i->grabDBModule();
-        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
-        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
+        $db = $i->grabDBModule();
+        $db->haveInDatabase('mobile_app', ['id' => 1, 'app_identifier' => 'auto_test', 'provider' => 'GCM', 'key' => 'anAutoTestKey', 'cert_hash' => null]);
+        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id' => '1']));
 
         #WHEN
         $loginPayload = new Payload\Authentication\ApiLogin();
@@ -142,7 +143,7 @@ class LoginCest
         $i->seeResponseCodeIs(401);
     }
 
-    public function RedirectApiLogin(IntegrationTester $i):void
+    public function RedirectApiLogin(IntegrationTester $i): void
     {
         #GIVEN
         $user     = 'alaress';
@@ -150,9 +151,9 @@ class LoginCest
         $page     = '/course/list';
 
         /** @var \Codeception\Module\Db $db */
-        $db=$i->grabDBModule();
-        $db->haveInDatabase('mobile_app', ['id'=>1, 'app_identifier'=>'auto_test', 'provider'=>'GCM', 'key'=>'anAutoTestKey', 'cert_hash'=>NULL]);
-        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id'=>'1']));
+        $db = $i->grabDBModule();
+        $db->haveInDatabase('mobile_app', ['id' => 1, 'app_identifier' => 'auto_test', 'provider' => 'GCM', 'key' => 'anAutoTestKey', 'cert_hash' => null]);
+        printf("app_identifier set: " . $db->grabFromDatabase('mobile_app', 'app_identifier', ['id' => '1']));
 
         #WHEN
         $loginPayload = new Payload\Authentication\ApiLogin();
@@ -170,6 +171,5 @@ class LoginCest
         $i->startFollowingRedirects();
         $i->sendRequest($loginPayload);
         $i->seeResponseCodeIs(200);
-
     }
 }

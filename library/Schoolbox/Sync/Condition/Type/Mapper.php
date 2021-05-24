@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Condition\Type;
-
 
 use Schoolbox;
 
@@ -32,7 +32,5 @@ class Mapper extends Schoolbox\Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
-
     }
-
 }

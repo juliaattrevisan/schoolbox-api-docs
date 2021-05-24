@@ -18,7 +18,6 @@ class ComparisionTest extends TestCase
     {
         $comparison = $this->getObjectForTrait(Comparison::class);
         $this->assertEquals($expected, $comparison->compareStrings($a, $b));
-
     }
 
     public function dataStrings(): array

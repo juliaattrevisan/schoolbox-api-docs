@@ -248,7 +248,7 @@ class Controller extends Base
                  */
                 $setCreatedByMethod = $mapper->getSetMethodName('createdBy');
 
-                if (method_exists($model, $setCreatedByMethod)){
+                if (method_exists($model, $setCreatedByMethod)) {
                     $model->$setCreatedByMethod($this->getUser());
                 }
 

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Test;
@@ -87,7 +89,6 @@ class MappingCollectionTest extends TestCase
         $this->assertNotNull($mapper->getMap()->getOffsetByColumn($column));
         /** @noinspection UnnecessaryAssertionInspection */
         $this->assertInstanceOf($hydratorClass, $mapper->getColumnScalarHydrator($column));
-
     }
 
     // ==================================== Data Providers ====================================
@@ -233,7 +234,7 @@ class MappingCollectionTest extends TestCase
             }
         };
 
-        $mapper2 = new class($mapper1) extends Mapper
+        $mapper2 = new class ($mapper1) extends Mapper
         {
 
             private $mapper1;
@@ -252,7 +253,7 @@ class MappingCollectionTest extends TestCase
             }
         };
 
-        $mapper3 = new class($mapper2) extends Mapper
+        $mapper3 = new class ($mapper2) extends Mapper
         {
 
             private $mapper2;

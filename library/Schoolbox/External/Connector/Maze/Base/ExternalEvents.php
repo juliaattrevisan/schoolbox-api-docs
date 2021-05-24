@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Maze implementation of external events
  *

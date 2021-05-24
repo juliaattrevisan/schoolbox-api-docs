@@ -20,10 +20,10 @@ class TimezoneFactory
     /**
      * @return TimezoneFactory
      */
-    public static function getInstance() : TimezoneFactory
+    public static function getInstance(): TimezoneFactory
     {
         if (self::$instance === null) {
-            self::$instance = new self;
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -48,8 +48,7 @@ class TimezoneFactory
 
         $options = new Collection();
 
-        foreach($zones as $timezone)
-        {
+        foreach ($zones as $timezone) {
             $dateTimeZone = new DateTimeZone($timezone);
             $date = new \DateTime('now', $dateTimeZone);
 
@@ -67,4 +66,3 @@ class TimezoneFactory
         return $options;
     }
 }
-

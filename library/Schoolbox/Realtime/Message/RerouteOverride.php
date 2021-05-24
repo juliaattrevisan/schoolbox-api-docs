@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,39 +9,41 @@
 
 namespace Schoolbox\Realtime\Message;
 
-
 use Schoolbox\User;
 
-class RerouteOverride {
+class RerouteOverride
+{
 
     const DEFAULT_UNFOLLOW = 0;
     const DEFAULT_FOLLOW   = 1;
     const FORCE_FOLLOW     = 2;
 
 
-	/** @var User */
-	protected $user;
+    /** @var User */
+    protected $user;
 
-	/** @var string */
-	protected $routeKey;
+    /** @var string */
+    protected $routeKey;
 
     /** @var array */
     protected $delivery;
 
 
-	/**
-	 * @param string $msgRouteKey
-	 */
-	public function setRouteKey($msgRouteKey) {
-		$this->routeKey = $msgRouteKey;
-	}
+    /**
+     * @param string $msgRouteKey
+     */
+    public function setRouteKey($msgRouteKey)
+    {
+        $this->routeKey = $msgRouteKey;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getRouteKey() {
-		return $this->routeKey;
-	}
+    /**
+     * @return string
+     */
+    public function getRouteKey()
+    {
+        return $this->routeKey;
+    }
 
     /**
      * @return array
@@ -60,18 +63,19 @@ class RerouteOverride {
         return $this;
     }
 
-	/**
-	 * @param User $user
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-	}
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
 
-	/**
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
-
-} 
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+}

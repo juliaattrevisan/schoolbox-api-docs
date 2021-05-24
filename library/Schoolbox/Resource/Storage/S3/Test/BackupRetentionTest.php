@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3\Test;
@@ -11,6 +13,7 @@ use Alaress_Date_Format;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Resource\Storage\S3\BackupRetention;
+
 use function array_map;
 
 /**

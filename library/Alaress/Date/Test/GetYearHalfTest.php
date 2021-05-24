@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that getting the year half works.
  *

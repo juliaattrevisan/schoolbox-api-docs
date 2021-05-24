@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Match\Notifier;
 
 use Alaress\Async\Notification\Parameter\Param;
@@ -215,7 +217,7 @@ class Helper
      */
     public function postToTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
-        foreach($match->getAllTeams() as $team) {
+        foreach ($match->getAllTeams() as $team) {
             $bob->setMatchHref($match, $team)
                 ->setMatchParam($match, $team, $stacking);
             $this->postToTeam($envelope, $bob, $team);
@@ -236,7 +238,7 @@ class Helper
      */
     public function postToParentsOfTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
-        foreach($match->getAllTeams() as $team) {
+        foreach ($match->getAllTeams() as $team) {
             $bob->setMatchHref($match, $team)
                 ->setMatchParam($match, $team, $stacking);
             $this->postToParentsOfTeam($envelope, $bob, $team);

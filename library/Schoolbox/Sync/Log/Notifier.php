@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Log;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
@@ -93,7 +93,7 @@ class Notifier extends AbstractModuleNotifier
             $log->isDry()
                 ? 'User provisioning dry run has completed'
                 : 'User provisioning live update has completed'
-            )
+        )
             ->setIcon('/images/icon.php?size=' . $this->iconSize . '&icon=' . NSMapper::NS_UPS)
             ->setHref('/adminv2/ups/log/' . $log->getId() . '.html')
             ->setNamespace($this->getSlug())
@@ -107,5 +107,4 @@ class Notifier extends AbstractModuleNotifier
 
         return $envelope;
     }
-
 }

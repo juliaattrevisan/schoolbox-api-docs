@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ResponsesOnly
  *
@@ -9,7 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Timeline;
 
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 
 class ResponsesOnly extends Full
 {
@@ -25,7 +26,6 @@ class ResponsesOnly extends Full
     ) {
         /** @var Submission $currentResponse */
         foreach ($this->getParticipant()->getAllResponses() as $currentResponse) {
-
             /* Only show Submitted submissions (ignore drafts)
              */
             if ($currentResponse->isSubmitted()) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assess_Export_Xml
  *
@@ -29,11 +30,11 @@ class Assess_Export_Xml extends Evaluation_Export_Xml
      * @param AssessmentMapper $assessmentMapper
      */
     public function __construct(
-        array            $assess,
-        Assess_Factory   $factory,
-        Assess_Section   $sectionHandler,
-        Assess_Question  $questionHandler,
-        SitePage         $page,
+        array $assess,
+        Assess_Factory $factory,
+        Assess_Section $sectionHandler,
+        Assess_Question $questionHandler,
+        SitePage $page,
         AssessmentMapper $assessmentMapper
     ) {
         parent::__construct($assess, $factory, $sectionHandler, $questionHandler, $page);

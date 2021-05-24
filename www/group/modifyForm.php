@@ -31,22 +31,22 @@ $categoryId = $_REQUEST['categoryID'];
 $currentUser = $userMapper->findById($_SESSION["id"]);
 
 try {
-	$folder = $catMapper->findById($categoryId);
+    $folder = $catMapper->findById($categoryId);
 } catch (\Schoolbox\Mapper\Exception $e) {
-	error(2);
-	exit;
+    error(2);
+    exit;
 }
 
-if(!is_numeric($categoryId)) {
-	error(2);
+if (!is_numeric($categoryId)) {
+    error(2);
 }
 
 // This variable will updated later; set it to the least permission as a default value
 $currentUserPermission = UserAccess::ACCESS_DENY;
 
 /* Check access */
-if($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
-	error(19);
+if ($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
+    error(19);
 } else {
     // By setting this manually, we're avoiding cache issues
     // that could result from retrieving the permission from the database.
@@ -83,7 +83,6 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
     }
 
     if (isset($_POST['msg'])) {
-
         $oMapper = RerouteOverrideMapper::getInstance();
 
         // prime the global suppressor!
@@ -106,8 +105,7 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
 
             // remove the global suppressor
             $oMapper->deleteByColumnList($search);
-        }
-        else {
+        } else {
             // insert the global suppressor
             $oMapper->save($override);
 
@@ -121,46 +119,46 @@ if (is_numeric($_POST['type']) || is_array($_POST['msg'])) {
 
 /* Change write permission - no longer done via link, always done via form */
 //elseif(is_numeric($_GET['write']) && is_numeric($_GET['userID'])) {
-//	$ua->setServiceIdentifier($_GET['categoryID'])
-//	   ->setUser($userMapper->findById($_GET['userID']))
-//	   ->setAccessLevel($_GET['write']);
-//	$uaMapper->save($ua);
+//  $ua->setServiceIdentifier($_GET['categoryID'])
+//     ->setUser($userMapper->findById($_GET['userID']))
+//     ->setAccessLevel($_GET['write']);
+//  $uaMapper->save($ua);
 //}
 
 /* Delete user */
-if(isset($_REQUEST['delete'])) {
-	if(isset($_REQUEST['service'])) {
-		$groupHandler->setService($_REQUEST['service']);
-	}
+if (isset($_REQUEST['delete'])) {
+    if (isset($_REQUEST['service'])) {
+        $groupHandler->setService($_REQUEST['service']);
+    }
 
-	foreach((array)$_REQUEST['delete'] as $id) {
-		if(is_numeric($id)) {
-			$groupHandler->deleteUser($categoryId, $id);
-		}
-	}
+    foreach ((array)$_REQUEST['delete'] as $id) {
+        if (is_numeric($id)) {
+            $groupHandler->deleteUser($categoryId, $id);
+        }
+    }
 }
 
 /* Accept/reject user */
-if(isset($_REQUEST['accept'])) {
-	foreach((array)$_REQUEST['accept'] as $id) {
-		if (is_numeric($id)) {
-			$ua->setAccessLevel(UserAccess::ACCESS_READ)
-			   ->setUser($userMapper->findById($id))
-			   ->setServiceIdentifier($categoryId);
-			$uaMapper->save($ua);
-		}
-	}
+if (isset($_REQUEST['accept'])) {
+    foreach ((array)$_REQUEST['accept'] as $id) {
+        if (is_numeric($id)) {
+            $ua->setAccessLevel(UserAccess::ACCESS_READ)
+               ->setUser($userMapper->findById($id))
+               ->setServiceIdentifier($categoryId);
+            $uaMapper->save($ua);
+        }
+    }
 }
 if (isset($_REQUEST['reject'])) {
-	foreach ((array)$_REQUEST['reject'] as $id) {
-		if (is_numeric($id)) {
-			$uaMapper->deleteByColumnList([
-				'service' => UserAccess::SERVICE_HOMEPAGE,
-				'uid'     => $id,
-				'sid'     => $categoryId,
-			]);
-		}
-	}
+    foreach ((array)$_REQUEST['reject'] as $id) {
+        if (is_numeric($id)) {
+            $uaMapper->deleteByColumnList([
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'uid'     => $id,
+                'sid'     => $categoryId,
+            ]);
+        }
+    }
 }
 
 /* Add user */
@@ -181,102 +179,95 @@ if (isset($_POST['userID'])) {
 
 // Change membership parameters
 if (!empty($_POST['accessLevel'])) {
-	foreach ($_POST['accessLevel'] as $userId => $accessLevel) {
-		/* Set new owner/administrator */
-		$user = new User();
-		$user->setId($userId);
+    foreach ($_POST['accessLevel'] as $userId => $accessLevel) {
+        /* Set new owner/administrator */
+        $user = new User();
+        $user->setId($userId);
         $ua = new UserAccess();
-		if ($accessLevel == UserAccess::ACCESS_FULL) {
-			//check if member is allowed to become a owner
-			if (!$groupHandler->allowOwner($userId)) {
-				error(30);
-			}
+        if ($accessLevel == UserAccess::ACCESS_FULL) {
+            //check if member is allowed to become a owner
+            if (!$groupHandler->allowOwner($userId)) {
+                error(30);
+            }
 
-			//if we are accessing group for first time create group
-			if (!$groupHandler->groupExists($categoryId)) {
-				$groupHandler->createGroup($categoryId);
-			}
+            //if we are accessing group for first time create group
+            if (!$groupHandler->groupExists($categoryId)) {
+                $groupHandler->createGroup($categoryId);
+            }
 
-			// promote new owner
-			$ua->setAccessLevel($accessLevel)
-				->setUser($user)
+            // promote new owner
+            $ua->setAccessLevel($accessLevel)
+                ->setUser($user)
                 ->setServiceIdentifier($folder->getId())
                 ->setService(UserAccess::SERVICE_HOMEPAGE);
 
-			$uaMapper->save($ua);
-
-		} elseif ($accessLevel == UserAccess::ACCESS_DENY) {
-			$uaMapper->deleteByColumnList([
-				'service' => UserAccess::SERVICE_HOMEPAGE,
-				'uid'     => $userId,
-				'sid'     => $categoryId,
-			]);
-		} else {
-			$ua->setServiceIdentifier($folder->getId())
-				->setAccessLevel($accessLevel)
-				->setUser($user)
+            $uaMapper->save($ua);
+        } elseif ($accessLevel == UserAccess::ACCESS_DENY) {
+            $uaMapper->deleteByColumnList([
+                'service' => UserAccess::SERVICE_HOMEPAGE,
+                'uid'     => $userId,
+                'sid'     => $categoryId,
+            ]);
+        } else {
+            $ua->setServiceIdentifier($folder->getId())
+                ->setAccessLevel($accessLevel)
+                ->setUser($user)
                 ->setService(UserAccess::SERVICE_HOMEPAGE);
 
-			$uaMapper->save($ua);
-		}
+            $uaMapper->save($ua);
+        }
 
-        if($user->getId() == $_SESSION['user']->getId()) {
+        if ($user->getId() == $_SESSION['user']->getId()) {
             $currentUserPermission = $accessLevel;
         }
-	}
+    }
 }
 
 /* Bulk-add users */
-if(isset($_POST['bulkAdd'])) {
-	//get rid of newlines
-	$string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
+if (isset($_POST['bulkAdd'])) {
+    //get rid of newlines
+    $string = preg_replace('/(\r\n|\n|\r)/', ',', $_POST['bulkAdd']);
 
-	//split the list into an array
-	$list = preg_split('/[,;]/', $string);
+    //split the list into an array
+    $list = preg_split('/[,;]/', $string);
 
-	$ua->setServiceIdentifier($categoryId)
-	   ->setAccessLevel(UserAccess::ACCESS_READ);
+    $ua->setServiceIdentifier($categoryId)
+       ->setAccessLevel(UserAccess::ACCESS_READ);
 
-	foreach($list as $key) {
-		$key = trim($key);
+    foreach ($list as $key) {
+        $key = trim($key);
 
-		if(!empty($key)) {
-			try {
-				if(is_numeric($key)) {
-					$user = $userMapper->findByExternalId($key);
-				}
-				elseif(is_string($key)) {
-					// First assume it is non-numeric external id
-					try {
-						$user = $userMapper->findByExternalId($key);
-					}
-					catch(\Schoolbox\Mapper\Exception $e){
-						// Then assume it is a username
-						$user = $userMapper->findOneByColumn('username', $key);
-					}
-				}
-				else {
-					continue;
-				}
-			}
-			catch(Schoolbox\Mapper\Exception $e) {
-				continue;
-			}
+        if (!empty($key)) {
+            try {
+                if (is_numeric($key)) {
+                    $user = $userMapper->findByExternalId($key);
+                } elseif (is_string($key)) {
+                    // First assume it is non-numeric external id
+                    try {
+                        $user = $userMapper->findByExternalId($key);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        // Then assume it is a username
+                        $user = $userMapper->findOneByColumn('username', $key);
+                    }
+                } else {
+                    continue;
+                }
+            } catch (Schoolbox\Mapper\Exception $e) {
+                continue;
+            }
 
-			$ua->setUser($user);
-			$uaMapper->save($ua);
-		}
-	}
+            $ua->setUser($user);
+            $uaMapper->save($ua);
+        }
+    }
 }
 
-if ($currentUserPermission < UserAccess::ACCESS_FULL && !$_SESSION['su'])
-{
+if ($currentUserPermission < UserAccess::ACCESS_FULL && !$_SESSION['su']) {
     // If the user has less then full permission they can no longer stay on the modify group page
 
     // Check if they came here via AJAX
 
-    if (SitePage::detectAjax())
-    {
+    if (SitePage::detectAjax()) {
         // Send a JSON reply with the redirect details
 
         header('Content-type: application/json');
@@ -285,17 +276,13 @@ if ($currentUserPermission < UserAccess::ACCESS_FULL && !$_SESSION['su'])
             "action" => "redirect",
             "url" => "/homepage/{$categoryId}"
         ]);
-    }
-    else
-    {
+    } else {
         // Otherwise, just do a normal redirect
 
         SitePage::localRedir("/homepage/" . $categoryId);
     }
-}
-else
-{
+} else {
     // Reload the modify page so we can update the DOM
 
-	SitePage::localRedir('/group/modify/' . $categoryId);
+    SitePage::localRedir('/group/modify/' . $categoryId);
 }

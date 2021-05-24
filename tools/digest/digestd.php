@@ -23,6 +23,7 @@ use Schoolbox\UserMapper;
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -55,7 +56,7 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
     /** @var Async\Client $asyncRedis */
     $asyncRedis = $di->get('redis.async');
     $strat      = new DefaultDispatchStrategy($flags);
-    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $conf, $log );
+    $notifier   = new MailNotifier(new ListFactory(INSTANCE_ID, $redis), $userMapper, $conf, $log);
     $factory    = new DigestTriggerFactory($notifier, $clock, $debugInterval);
 
     $scheduler  = new DigestScheduler($loop, $strat, $log, $clock, $roleMapper, $conf, $factory);

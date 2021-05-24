@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -32,6 +33,5 @@ class Component_Config_Ltiprovider extends Component_Config_Abstract
 
             $page->parse('config_provider_block', 'config_provider', true);
         }
-
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Maps results for `External_Isams_Batch_Reader_Timetable->parse()`.
  *

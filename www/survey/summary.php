@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Summary page for assessment creation methods to return to.
  *
@@ -6,16 +7,16 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 $groupHandler = new Group();
-
 if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
     $this->pageNotFound();
 }
@@ -23,8 +24,6 @@ if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
 $survey = $surveyHandler->getIntro($this->arg[0]);
 $allSummary = $surveyHandler->getIntroSummary($this->arg[0]);
 $allSections = $sectionHandler->getList($survey['assess_id']);
-
-
 if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
@@ -36,15 +35,13 @@ if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($su
 try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($survey['category_id']);
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     error(13);
     exit;
 }
 
 $assessStartDate = new Alaress_Date_Format(strtotime($survey['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
-
 $this->setVar(array(
     'ASSESS_ASSESS_ID'     => $this->arg[0],
     'ASSESS_KIND_LC'       => 'survey',
@@ -59,10 +56,9 @@ $this->setVar(array(
     'RETURN_URL_NAME'      => Redirect::RETURN_URL,
     'RETURN_URL'           => '',
     'MODIFY_URL'           => "/survey/modify/{$this->arg[0]}",
-    'RETURN_URL_MODIFY'    => "?".Redirect::RETURN_URL.'='.Redirect::encode("/survey/summary/{$this->arg[0]}"),
+    'RETURN_URL_MODIFY'    => "?" . Redirect::RETURN_URL . '=' . Redirect::encode("/survey/summary/{$this->arg[0]}"),
     'RETURN_URL_DECODED'   => "/homepage/{$folder->getId()}",
 ));
-
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
 $this->setFile('assessContentsFragment', 'assess/contents.html');
 $this->setBlock(TEMPLATE_content, 'has_description', 'has_description_block');
@@ -71,9 +67,7 @@ $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'delete_quiz', 'delete_quiz_block');
 $this->setBlock(TEMPLATE_content, 'delete_survey', 'delete_survey_block');
 $this->setTitle('Assessment: ' . Scrub::text($survey['title']));
-
 $survey['description'] = trim($survey['description']);
-
 if (empty($survey['description'])) {
     $this->setVar('has_description_block', '');
 } else {
@@ -81,14 +75,11 @@ if (empty($survey['description'])) {
 }
 $surveyHandler->renderAssessContents($survey['assess_id'], $this);
 $this->parse('allQuestions_block', 'assessContentsFragment', true);
-
 $this->setVar(array(
     'ASSESS_DURATION' => $survey['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
 ));
-
 $this->setVar('delete_quiz_block', '');
 $this->parse('delete_survey_block', 'delete_survey');
-
 /* Render out breadcrumbs
  */
 $trail = new Breadcrumbs();

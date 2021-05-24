@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -23,7 +24,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**

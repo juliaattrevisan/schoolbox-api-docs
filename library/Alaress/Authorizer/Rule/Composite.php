@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -24,7 +25,7 @@ abstract class Composite implements IAuthorizationRule
      *
      * @param IAuthorizationRule ...$subRules
      */
-    public function __construct(IAuthorizationRule...$subRules)
+    public function __construct(IAuthorizationRule ...$subRules)
     {
         foreach ($subRules as $subRule) {
             $this->addRule($subRule);

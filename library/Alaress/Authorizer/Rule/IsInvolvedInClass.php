@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This authorization method checks whether the user is not only involved in a
  * class, but is a teacher for that class.

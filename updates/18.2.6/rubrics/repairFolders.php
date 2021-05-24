@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Run the repair folders script.
  *

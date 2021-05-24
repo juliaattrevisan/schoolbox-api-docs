@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Routing\Test;
-
 
 use Alaress\Routing\Trie;
 use PHPUnit\Framework\TestCase;
@@ -22,7 +22,9 @@ class TrieTest extends TestCase
      */
     private function newTrie($key)
     {
-        return new Trie($key, function () { return 0; });
+        return new Trie($key, function () {
+            return 0;
+        });
     }
 
     /**
@@ -206,5 +208,4 @@ class TrieTest extends TestCase
 
         $trie->fetch([ 4 ]);
     }
-
 }

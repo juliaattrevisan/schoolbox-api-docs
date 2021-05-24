@@ -737,7 +737,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function getImages(): Collection
     {
-        return $this->getAttachedFiles()->filter(static function(File\Model $model) {
+        return $this->getAttachedFiles()->filter(static function (File\Model $model) {
             return $model->getMimetype()->isImage();
         });
     }
@@ -748,7 +748,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      */
     public function getFiles(): Collection
     {
-        return $this->getAttachedFiles()->filter(static function(File\Model $model) {
+        return $this->getAttachedFiles()->filter(static function (File\Model $model) {
             return !$model->getMimetype()->isImage();
         });
     }

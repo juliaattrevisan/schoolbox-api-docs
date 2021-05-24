@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -56,7 +57,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this
-            ->addRoutePreload($matcher, '.*', function($params) {
+            ->addRoutePreload($matcher, '.*', function ($params) {
                 if (array_key_exists('id', $params)) {
                     return ['term' => $this->getTermMapper()->findById($params['id']),];
                 }
@@ -71,7 +72,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
                 [

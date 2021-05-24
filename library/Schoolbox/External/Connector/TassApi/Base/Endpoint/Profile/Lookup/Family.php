@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
@@ -28,7 +30,7 @@ class Family
      *
      * + Assumption: person2 represents the primary parent (typically Father)
      */
-    public CONST FATHER_NODE = 'person2';
+    public const FATHER_NODE = 'person2';
     public const MOTHER_NODE = 'person1';
 
 
@@ -264,7 +266,6 @@ class Family
         foreach ($families['parents'] as $row) {
             foreach ($row as $parentId => $family) {
                 if (isset($family['students'])) {
-
                     /* Nuclear family
                      * person1 and person2 need to be each given an externalId
                      */
@@ -276,7 +277,6 @@ class Family
 
                     $nuclear++;
                 } else {
-
                     /* Split family
                      */
 
@@ -297,7 +297,6 @@ class Family
                      * in particular for each student in $lookup
                      */
                     foreach ($family as $subfamily) {
-
                         /* Note that some schools try to switch primary parents to mother
                          * and secondary parents to father. We aren't doing that here.
                          * Subclass this lookup if you want to do crazy things like that.
@@ -405,7 +404,7 @@ class Family
 
         /* Index each parent by their externalId
          */
-        foreach($person['students'] as $studentExternalId) {
+        foreach ($person['students'] as $studentExternalId) {
             $this->lookup[$studentExternalId][$externalId] = $person;
         }
 
@@ -444,7 +443,7 @@ class Family
 
         /* Index each parent by their externalId
          */
-        foreach($person['students'] as $studentExternalId) {
+        foreach ($person['students'] as $studentExternalId) {
             $this->lookup[$studentExternalId][$externalId] = $person;
         }
 

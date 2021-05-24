@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -89,7 +90,8 @@ abstract class Module extends BaseModule
             '.*',
             new Auth\Rule\Callback(function (array $params) {
                 $comment = $params['comment'];
-                if ($comment instanceof Model
+                if (
+                    $comment instanceof Model
                     && $this->buildContext()->isContextForThread($comment->getThread(), $params['context'])
                 ) {
                     return;
@@ -203,5 +205,4 @@ abstract class Module extends BaseModule
      * @return Auth\Rule\IAuthorizationRule
      */
     abstract protected function buildDeleteCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule;
-
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Greenhouse;
 
 use Alaress\Web\Controller\Base;
@@ -34,6 +36,6 @@ class Controller extends Base
      */
     public function getGreenhouse($templateName)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/'. $templateName . '.twig', []));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@greenhouse/' . $templateName . '.twig', []));
     }
 }

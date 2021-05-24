@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Player;
 
 /**
@@ -19,7 +21,8 @@ class Resource extends Player
      *
      * @return string|null
      */
-    public function fetchThumbnail() {
+    public function fetchThumbnail()
+    {
         $matches = array();
 
         preg_match('#^/send\.php(.*)#', $this->getUrl(), $matches);
@@ -29,7 +32,6 @@ class Resource extends Player
          * via the usual iframe
          */
         if (count($matches)) {
-
             /* Get the hash by snapping the query string into shiny little
              * pieces, ripe for recombination
              */

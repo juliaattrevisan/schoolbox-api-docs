@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\Realtime\Routing\Subscription\Loader;
 
 use Alaress\Routing\IRouter;
 use Traversable;
-
 
 /**
  * Decorator pattern (I *think*)
@@ -38,5 +38,4 @@ interface ILoader
      * @return Traversable
      */
     public function getRedirects();
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -73,7 +74,7 @@ class Mapper extends BaseMapper
         $statement->execute();
 
         /** @var Collection $result */
-        $result = new Collection;
+        $result = new Collection();
 
         foreach ($statement as $row) {
             $result->add([

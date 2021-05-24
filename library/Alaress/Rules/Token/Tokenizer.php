@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Rules\Token;
-
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Lang\Construct;
@@ -142,14 +142,12 @@ abstract class Tokenizer
 
         // search the input string ($fieldValue) for tokens
         if (preg_match_all(self::TOKEN_REGEX, $fieldValue, $tokenMatches)) {
-
             $tokenCount = count($tokenMatches[0]);
 
             $tokenMap = [];
 
             // iterate the tokens found and apply each of them to the input string ($fieldValue)
             for ($i = 0; $i < $tokenCount; ++$i) {
-
                 // replace array[notation] with dot.notation
                 $tokenKey     = preg_replace('`\[(\d+)\]`', '.$1', $tokenMatches[1][$i]);
                 $substitution = $tokenMatches[0][$i];
@@ -186,7 +184,6 @@ abstract class Tokenizer
                 );
             }
             $settings[$field] = array_unique($settings[$field]);
-
         } else {
             // no tokens - just set as-is
             $settings[$field] = [ $fieldValue ];
@@ -331,5 +328,4 @@ abstract class Tokenizer
         }
         return $this->filters[$filter]->apply($input);
     }
-
 }

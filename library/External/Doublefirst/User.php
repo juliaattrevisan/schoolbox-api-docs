@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -68,7 +70,6 @@ class External_Doublefirst_User implements External_UserInterface
         ";
 
         if ($photo = $this->getDatabase()->getRow($query)) {
-
             // TODO: Delete photos on rollover
 
             /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
@@ -100,7 +101,6 @@ class External_Doublefirst_User implements External_UserInterface
              */
             return $user->getPortrait();
         } else {
-
             // Couldn't find student photo, try staff
 
             $query =
@@ -111,7 +111,6 @@ class External_Doublefirst_User implements External_UserInterface
             ";
 
             if ($photo = $this->getDatabase()->getRow($query)) {
-
                 // TODO: Delete photos on rollover
 
                 /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
@@ -340,7 +339,7 @@ class External_Doublefirst_User implements External_UserInterface
                 ForeName                                            AS StudentGiven1,
                 Surname                                             AS StudentSurname,
                 ''                                                  AS StudentGender,
-                CONVERT(nvarchar(30), BirthDate, ".self::FORMAT_ISO8601." )              AS StudentBirthDate,
+                CONVERT(nvarchar(30), BirthDate, " . self::FORMAT_ISO8601 . " )              AS StudentBirthDate,
                 ''                                                  AS StudentTutorName,
                 ''                                                  AS StudentHeadOfHouse,
                 ''                                                  AS HeadOfHouseID,
@@ -399,7 +398,7 @@ class External_Doublefirst_User implements External_UserInterface
 
         $student = [];
 
-        foreach ($this->getDatabase()->getAll($query) ?: array() AS $row) {
+        foreach ($this->getDatabase()->getAll($query) ?: array() as $row) {
             // fill in student record
             $student = $row;
 
@@ -577,7 +576,6 @@ class External_Doublefirst_User implements External_UserInterface
         // Search for a student name
 
         if (strlen($name)) {
-
             $splitNames = explode(' ', $name);
 
             foreach ($splitNames as $splitName) {
@@ -624,7 +622,6 @@ class External_Doublefirst_User implements External_UserInterface
         $contactList = $this->getDatabase()->getAll($query) ?: array();
 
         foreach ($contactList as &$row) {
-
             // Titles get mashed together (eg. 'Mr & Mrs'), split it out based on ampersand
 
             $titleArray = explode("&", $row['StudentContactTitle']);

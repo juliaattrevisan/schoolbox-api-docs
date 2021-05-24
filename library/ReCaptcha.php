@@ -12,7 +12,6 @@
 
 use GuzzleHttp\Client;
 
-
 class ReCaptcha
 {
 

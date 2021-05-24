@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XML reader for finding staff contacts in iSAMS' batch API response.
  *

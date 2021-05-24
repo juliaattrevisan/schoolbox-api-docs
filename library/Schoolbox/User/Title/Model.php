@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for user titles in Schoolbox.
  *
@@ -6,7 +7,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\User\Title;
 
 class Model
@@ -56,5 +57,4 @@ class Model
         $this->title = $title;
         return $this;
     }
-
 }

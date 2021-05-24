@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ItempropImage
  *
@@ -9,21 +10,21 @@
 
 namespace SocialStream\Post\Thumbnail;
 
+class ItempropImage extends Thumbnail
+{
 
-class ItempropImage extends Thumbnail {
+    /**
+     * The xpath query
+     *
+     * @var string
+     */
+    protected $query = "//*[@itemprop='image']";
 
-	/**
-	 * The xpath query
-	 *
-	 * @var string
-	 */
-	protected $query = "//*[@itemprop='image']";
-
-	/**
-	 * These are the attributes that might contain a link
-	 * to an image you want to retrieve
-	 *
-	 * @var array
-	 */
-	protected $contentAttributes = array('src', 'content');
+    /**
+     * These are the attributes that might contain a link
+     * to an image you want to retrieve
+     *
+     * @var array
+     */
+    protected $contentAttributes = array('src', 'content');
 }

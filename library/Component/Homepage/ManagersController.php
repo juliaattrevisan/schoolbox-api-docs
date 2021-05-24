@@ -156,7 +156,6 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             $emailAll = [];
 
             foreach ($managerList as $manager) {
-
                 /* Manager bulk email
                  */
                 if ($manager->getEmail()) {
@@ -166,7 +165,6 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
                 /* Manager cards
                  */
                 if ($i < self::MAX_MANAGERS) {
-
                     $name = $manager->getFullName();
 
                     /* Check if this manager is also an admin
@@ -222,10 +220,11 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
 
                 $i++;
             }
-            
+
             /* Decide whether to show the Email All button
              */
-            if (\count($emailAll)
+            if (
+                \count($emailAll)
                 && $this->getUser()->hasEmail()
                 && $this->getConfigLoader()->get('mail_enable')
                 && $this->getUser()->getRole()->isStaff()

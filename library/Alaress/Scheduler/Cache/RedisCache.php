@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -227,5 +228,4 @@ class RedisCache implements ICache
     {
         return implode($glue, array_filter($array));
     }
-
 }

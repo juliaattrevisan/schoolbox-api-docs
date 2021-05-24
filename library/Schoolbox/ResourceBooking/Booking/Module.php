@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for the booking part of the resource booking module.
  *

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge\Mtc;

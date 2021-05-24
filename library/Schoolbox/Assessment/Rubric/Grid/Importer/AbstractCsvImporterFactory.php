@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -253,5 +254,5 @@ abstract class AbstractCsvImporterFactory
      * @param string|null $slug
      * @return int|null
      */
-    protected abstract function convertMarkTypeSlugToId(?string $slug): ?int;
+    abstract protected function convertMarkTypeSlugToId(?string $slug): ?int;
 }

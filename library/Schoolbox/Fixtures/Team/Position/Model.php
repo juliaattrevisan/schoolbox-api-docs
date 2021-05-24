@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -7,9 +8,9 @@
 
 namespace Schoolbox\Fixtures\Team\Position;
 
-use \Schoolbox\User as User;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Position\Model as Position;
+use Schoolbox\User as User;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Position\Model as Position;
 
 /**
  * Model for relation between teams and users.

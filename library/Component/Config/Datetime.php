@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -43,7 +44,7 @@ class Component_Config_Datetime extends Component_Config_Abstract
                 // otherwise fall back to date and reset missing time fields
                 $date = new Alaress_Date_Format(
                     $configValue,
-                    [Alaress_Date_Format::DATABASE_FORMAT, Alaress_Date_Format::DATABASE_DATE_FORMAT.'|']
+                    [Alaress_Date_Format::DATABASE_FORMAT, Alaress_Date_Format::DATABASE_DATE_FORMAT . '|']
                 );
                 $configValue = $date->getLocal();
             } catch (Exception $e) {

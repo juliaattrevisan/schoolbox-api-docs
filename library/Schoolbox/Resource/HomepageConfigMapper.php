@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Homepage Config mapper, to create HomepageConfig objects
  * It contains things such as which template was initially used to create the
@@ -124,7 +125,6 @@ class HomepageConfigMapper extends Mapper
         }
 
         foreach ($instances as $currentInstance) {
-
             // preserve the config
             /** @var \Component_ConfigDefinition[] $configs */
             $configs = $currentInstance->getConfig();

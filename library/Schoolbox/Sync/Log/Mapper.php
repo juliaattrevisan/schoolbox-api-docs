@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -80,7 +81,6 @@ class Mapper extends Schoolbox\Mapper
         $c = $this->createCollection();
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             // can't set storage if it doesn't exist
             if (!$r['h.hash']) {
                 continue;
@@ -163,7 +163,6 @@ class Mapper extends Schoolbox\Mapper
                     $log->setRoleType($matches[1])
                         ->setDry(strpos($matches[2], 'dry') !== false);
                 }
-
             },
 
             // this should be the last line
@@ -174,7 +173,6 @@ class Mapper extends Schoolbox\Mapper
                         ->setUsersUpdated($matches[2])
                         ->setUsersSkipped($matches[3]);
                 }
-
             }
 
         ];
@@ -194,7 +192,4 @@ class Mapper extends Schoolbox\Mapper
 
         return $log;
     }
-
-
-
 }

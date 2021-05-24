@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for the tile component.
  *
@@ -135,13 +136,11 @@ class Module extends BaseModule
 
         // Callback for extracting homepage from route params
         $getHomepageIdCallback = function ($params) {
-            if($params['layout'] && $params['layout']->getFolder()) {
+            if ($params['layout'] && $params['layout']->getFolder()) {
                 return $params['layout']->getFolder()->getId();
-            }
-            else if ($params['component']->getModule() != 'homepage') {
+            } else if ($params['component']->getModule() != 'homepage') {
                 throw new \Exception('Homepage permission does not apply to dashboard tiles');
-            }
-            else if($params['component']) {
+            } else if ($params['component']) {
                 return $params['component']->getIdentifier();
             }
             return $params['homepage']->getId();

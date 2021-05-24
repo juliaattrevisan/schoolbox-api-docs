@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module
  *
@@ -6,8 +7,8 @@
  * @copyright   Copyright 2017, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-namespace Schoolbox\Weather;
 
+namespace Schoolbox\Weather;
 
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -30,7 +31,6 @@ class Module extends BaseModule
     {
         $perms = new Rule\IsLoggedIn();
         $this->register('GET', '', 'getWeatherDetails', $perms); // Weather details page
-
     }
 
     /**

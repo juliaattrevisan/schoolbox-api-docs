@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization failure - the authenticated user does not have permission
  * to access this resource.

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Database\Connector\IConnector;
@@ -126,7 +128,6 @@ class NavigationSelector
         } elseif (($this->user->getYear()->getName() >= 7) && ($this->user->getYear()->getName() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
         } elseif ($this->user->getYear()->getName() == 11) {
-
             /* NCEA for year 11 specifically
              */
             if ($this->hasNcea()) {
@@ -135,7 +136,6 @@ class NavigationSelector
                 $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
             }
         } elseif (($this->user->getYear()->getName() >= 12) && ($this->user->getYear()->getName() <= 13)) {
-
             /* Need to decide whether this is an IB or an NCEA student
              */
             if ($this->hasIb()) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Composite authorization method - checks whether all of the rules passed at
  * instantiation pass.
@@ -11,19 +12,21 @@
  */
 
 namespace Alaress\Authorizer\Rule;
+
 use Schoolbox\User;
 
-class All extends Composite {
+class All extends Composite
+{
 
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null) {
+    public function authorize(array $params = array(), User $user = null)
+    {
         $lastException = null;
         foreach ($this->subRuleList as $subRule) {
             $subRule->authorize($params, $user);
         }
         return true;
     }
-
 }

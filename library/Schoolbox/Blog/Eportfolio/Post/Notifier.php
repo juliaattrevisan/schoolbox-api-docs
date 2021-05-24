@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Blog\Eportfolio\Post;
@@ -200,7 +202,6 @@ class Notifier extends AbstractModuleNotifier
                 ->setParams($params);
             $envelope->targetToUser($owner->getId(), $bob->build());
             return $envelope;
-
         } catch (Exception $e) {
             // page or owner was invalid.
             return new Envelope();
@@ -401,5 +402,4 @@ class Notifier extends AbstractModuleNotifier
     {
         return self::BASE_URI . "{$post->getPage()->getPageId()}/{$post->getId()}";
     }
-
 }

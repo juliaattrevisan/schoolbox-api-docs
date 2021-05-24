@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -30,7 +31,6 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\User;
-
 
 /**
  * Factory for the Atlas importer.
@@ -143,5 +143,4 @@ class ImporterFactory
                 ]
             );
     }
-
 }

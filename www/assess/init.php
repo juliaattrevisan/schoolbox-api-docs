@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -29,7 +30,7 @@ $quizId = $this->arg[0];
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 
 if (!is_numeric($quizId)) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isValidUrlAccess($quizId)) {
@@ -41,19 +42,18 @@ if (!$assessHandler->isValidUrlAccess($quizId)) {
 $assess = $assessHandler->getIntro($quizId);
 
 if (!$assess) {
-	error(112);
+    error(112);
 }
 
 if ($assessHandler->isDeleted($assess['assess_id'])) {
-	error(112);
+    error(112);
 }
 
 /* Check the folder exists meaningfully
  */
 try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-}
-catch (Mapper\Exception $e) {
+} catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
@@ -96,7 +96,8 @@ if (!$attempt) {
     /* Clear and exit when you attempt to make more than is allowed
      * (Teachers may preview this quiz as many attempts as they want)
      */
-    if ($accessLevel < UserAccess::ACCESS_WRITE
+    if (
+        $accessLevel < UserAccess::ACCESS_WRITE
         && ($assess['max_attempts'] > 0)
         && ($numAttempts + 1 > $assess['max_attempts'])
     ) {
@@ -131,12 +132,12 @@ if (!$attempt) {
                 $randomise
             );
         }
-	}
+    }
 }
 
 /* Redirect to the original destination
  */
 
-$returnUrlSuffix = isset($_GET['returnUrl']) ? "?returnUrl=". $_GET['returnUrl'] : '';
+$returnUrlSuffix = isset($_GET['returnUrl']) ? "?returnUrl=" . $_GET['returnUrl'] : '';
 
 SitePage::localRedir('/assess/attempt/' . $this->arg[0] . '/' . $this->arg[1] . $returnUrlSuffix);

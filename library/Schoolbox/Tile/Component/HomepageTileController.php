@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tile component for homepage
  *

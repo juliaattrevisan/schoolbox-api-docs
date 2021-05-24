@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Condition;
 
 use Alaress\Web\Controller\Base;
@@ -37,7 +39,8 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function add($params) {
+    public function add($params)
+    {
 
         /* Spawn Rule
          */

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew;
-
 
 use Alaress\Async\Listener\Stream\StreamListener;
 use Alaress\Exception\IO\IOException;
@@ -86,8 +86,8 @@ class Pool extends EventEmitter implements PoolInterface
     {
         $this->releaseWorkers();
         unset(
-        $this->ioListeners,
-        $this->workers
+            $this->ioListeners,
+            $this->workers
         );
     }
 
@@ -119,21 +119,18 @@ class Pool extends EventEmitter implements PoolInterface
                     // check for an unexpected finish state
                     $this->log->notice("Worker {{$pid}} has completed task, but not in READY state");
                     $worker->setStatus(Worker::READY);
-
                 } elseif ($elapsed >= $hardLim) {
                     // if it's over the hard limit, terminate it
                     $this->log->error("Worker {{$pid}} has exceeded hard execution timeout of {$hardLim}ms");
                     $this->releaseWorker($pid, self::RELEASE_HARD);
-
                 } elseif ($elapsed >= $softLim) {
                     // if it's over the soft limit, let it down gently
                     $this->log->warning("Worker {{$pid}} has exceeded soft execution timeout of {$softLim}ms");
                     $this->releaseWorker($pid, self::RELEASE_SOFT);
-
                 } else {
                     $this->log->debug("Worker {{$pid}} fine");
                 }
-            } catch(OutOfBoundsException $e) {
+            } catch (OutOfBoundsException $e) {
                 $this->log->warning("Worker {{$pid}} has gone away");
                 $this->detachWorker($pid);
             }
@@ -177,7 +174,7 @@ class Pool extends EventEmitter implements PoolInterface
             // attempt to assign the given task to the worker found
             $this->log->debug("Tasking $pid with $cmd");
             $this->assignTask($pid, $cmd, $args, $identifier);
-        } catch(IOException $e) {
+        } catch (IOException $e) {
             // communication problem with the given worker
             $this->detachWorker($pid);
 
@@ -546,5 +543,4 @@ class Pool extends EventEmitter implements PoolInterface
     {
         return $this->strat->checkState($data);
     }
-
 }

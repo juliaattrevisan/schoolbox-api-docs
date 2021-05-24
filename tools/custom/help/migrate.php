@@ -1,9 +1,11 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -92,7 +94,6 @@ HELP;
 
 
         while ($user = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             /* Select a random image
              */
             $stockFile = $files[random_int(0, \count($files) - 1)];

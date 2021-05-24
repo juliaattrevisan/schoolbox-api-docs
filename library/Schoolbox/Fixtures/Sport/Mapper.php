@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper
  *
@@ -9,14 +10,13 @@
 
 namespace Schoolbox\Fixtures\Sport;
 
-
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
-use Schoolbox\Mapper As BaseMapper;
-use \Schoolbox\Fixtures\Sport\Model as Sport;
-use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\Fixtures\Position\Mapper as PositionMapper;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Fixtures\Sport\Model as Sport;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 
 /**
  * Class Mapper
@@ -50,7 +50,7 @@ class Mapper extends BaseMapper
             'other_key' => 'sport_id',
         ]);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE,       [ $this, 'savePositions' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'savePositions' ]);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteDivisions' ]);
     }
 
@@ -96,7 +96,6 @@ class Mapper extends BaseMapper
         $positionIdCol  = "p.{$positionMapper->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             $sportId = $r['id'];
 
             if (empty($cache[$sportId])) {

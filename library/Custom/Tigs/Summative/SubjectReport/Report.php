@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2018, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport;
@@ -48,7 +50,9 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\UserMapper;
 use UnderflowException;
+
 use function strnatcasecmp;
+
 use UnexpectedValueException;
 use Schoolbox\Filter\Filters;
 use PDO;
@@ -205,7 +209,7 @@ class Report
             $aamData       = $this->buildAcademicAchievementMatrixData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $aasData       = $this->buildAcademicAchievementSummaryData($folder, $attributes, $unitSpecs, $user, $roleTypeOverride);
             $hscTaskMarks  = $this->buildHscTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
-            $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes,$unitSpecs, $courseSpec, $user, $roleTypeOverride);
+            $hscTaskMatrix = $this->buildHscTaskMatrixData($folder, $attributes, $unitSpecs, $courseSpec, $user, $roleTypeOverride);
             $hscRankData   = $this->buildHscAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsTaskMarks = $this->buildMiddleYearsTaskMarksData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
             $middleYearsRankData = $this->buildMiddleYearsAssessmentRankData($folder, $attributes, $courseSpec, $user, $roleTypeOverride);
@@ -295,7 +299,8 @@ class Report
      * @return string|bool    The URL for the route if authorized, false if not.
      * @throws RouteNotFound
      */
-    private function getRouteIfAuthorized($name, array $params, User $user) {
+    private function getRouteIfAuthorized($name, array $params, User $user)
+    {
         if ($this->authorizer->isPathAuthorizedForUser($name, $params, $user)) {
             return $this->router->generate($name, $params);
         }
@@ -647,8 +652,7 @@ class Report
         CourseSpec\Model $courseSpec,
         User $student,
         ?string $roleTypeOverride
-    ): ?array
-    {
+    ): ?array {
         // Only relevant for:
         // * MYP S1       (work-type = NESA)
         // * MYP S2       (work-type = FAL)
@@ -718,7 +722,6 @@ class Report
                     }
                 }
             } else {
-
                 // noop - no NESA graph for HSC students except Year 11 Semester 2 guys
                 return [];
             }
@@ -730,7 +733,6 @@ class Report
              * for at least semester 1 and if you're in semester 2, that as well
              */
             foreach ([1, $semester] as $reportSemester) {
-
                 /* Semester 1 NESA data comes from a different worktype than the
                  * Semester 2 NESA data...have to treat them specially
                  */
@@ -763,7 +765,6 @@ class Report
                 }
             }
         } else {
-
             /* Can't tell if this student is HSC or Middle Years
              * Return empty
              */

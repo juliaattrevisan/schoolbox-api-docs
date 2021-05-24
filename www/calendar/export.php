@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Updated calendar exporter
  *
@@ -292,13 +293,11 @@ try {
             break;
 
         case 'resource':
-
             $api = new Calendar_Api_Composite();
 
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             if ($config->get('resource_booking_enabled')) {
-
                 $item = ItemMapper::getInstance()->findById($resourceId);
                 $roomCode = trim($item->getRoomCode());
 
@@ -335,7 +334,6 @@ try {
             /* Only include this api if Resource Booking is enabled by Feature Flag
              */
             if ($config->get('resource_booking_enabled')) {
-
                 $apiFactory = new CalendarApiFactory($user, $kernel->getDependencyInjector()->get('externalTimetable'));
                 $api = $apiFactory->buildFromResourceCollection(
                     ItemMapper::getInstance()->findByColumn(
@@ -346,7 +344,6 @@ try {
                 );
 
                 $endTimestamp = strtotime("+{$timetable_forward} months", $_SERVER['REQUEST_TIME']);
-
             } else {
                 $api = new Calendar_Api_Composite();
             }
@@ -454,7 +451,7 @@ try {
 }
 
 // Always output here
-switch($_GET['format'] ?? ''){
+switch ($_GET['format'] ?? '') {
     case 'csv':
         $exporter = new CSVExporter();
         break;

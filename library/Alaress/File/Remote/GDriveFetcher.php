@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Yank down Google Drive files to upload into schoolbox
  *
@@ -144,7 +145,8 @@ class GDriveFetcher implements FetcherInterface
         if ($refresh || empty($this->metaCache[$fileId])) {
             $params = [
                 'fields'            => implode(
-                    ',', [
+                    ',',
+                    [
                            'name',
                            'capabilities',
                            self::CONTEXT_EXPORTLINKS,
@@ -261,7 +263,8 @@ class GDriveFetcher implements FetcherInterface
     {
         $params = [
             'fields'            => implode(
-                ',', [
+                ',',
+                [
                        'kind',
                        'nextPageToken',
                        'permissions/role',
@@ -316,7 +319,6 @@ class GDriveFetcher implements FetcherInterface
                     RequestOptions::HEADERS => $this->httpHeaders,
                     RequestOptions::BODY    => json_encode($payload),
                 ]
-
             );
             return json_decode($response->getBody()->getContents(), true);
         } catch (GuzzleException $e) {
@@ -354,7 +356,6 @@ class GDriveFetcher implements FetcherInterface
                     RequestOptions::HEADERS => $this->httpHeaders,
                     RequestOptions::BODY    => json_encode($payload),
                 ]
-
             );
             return json_decode($response->getBody()->getContents(), true);
         } catch (GuzzleException $e) {

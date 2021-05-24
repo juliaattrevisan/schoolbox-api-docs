@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,7 +13,8 @@ use Alaress\ObjectReader;
 use Alaress\Rules\Condition;
 use Schoolbox\User;
 
-class UserCondition extends Condition\In {
+class UserCondition extends Condition\In
+{
 
     /**
      * @param string           $field
@@ -49,5 +51,4 @@ class UserCondition extends Condition\In {
 
         return sprintf($pattern, $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
     }
-
 }

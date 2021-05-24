@@ -1,16 +1,16 @@
 <?php
+
  /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Alaress\Scheduler\Event;
 
-
-interface EventInterface {
+interface EventInterface
+{
 
     /**
      * Returns the principal that caused this event
@@ -40,5 +40,4 @@ interface EventInterface {
      * @return array|null
      */
     public function getDiff();
-
-} 
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tree builder for folders in the Network Drives (WebDAV) section.
  *
@@ -7,7 +8,8 @@
  * @link      https://schoolbox.com.au/
  */
 
-class WebdavTreeBuilder {
+class WebdavTreeBuilder
+{
 
     /**
      * @var PortfolioWebDAV
@@ -17,7 +19,8 @@ class WebdavTreeBuilder {
     /**
      * @param PortfolioWebDAV $connection
      */
-    public function __construct(PortfolioWebDAV $connection) {
+    public function __construct(PortfolioWebDAV $connection)
+    {
         $this->connection = $connection;
     }
 
@@ -27,7 +30,8 @@ class WebdavTreeBuilder {
      * @param  mixed $folderId
      * @return array
      */
-    public function buildChildNodes($folderId) {
+    public function buildChildNodes($folderId)
+    {
         $output = array();
 
         // Did I ask for the root node? get it
@@ -42,8 +46,7 @@ class WebdavTreeBuilder {
                     'data-permission' => 'write',
                 ),
             );
-        }
-        else {
+        } else {
             foreach ($this->connection->getFolderList($folderId) as $folder) {
                 $output[] = array(
                     'id'       => intval($folder['id']),
@@ -69,7 +72,8 @@ class WebdavTreeBuilder {
      * @param  mixed $folderId
      * @return array
      */
-    public function buildPartialTree($folderId) {
+    public function buildPartialTree($folderId)
+    {
 
         // build a list of parentage
         $parentList[] = $parentId = $folderId;
@@ -101,5 +105,4 @@ class WebdavTreeBuilder {
 
         return $partialTree;
     }
-
 }

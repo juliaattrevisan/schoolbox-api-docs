@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CSV Export method for the House Report
  *
@@ -58,7 +59,6 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
         $headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimeStamp(), Alaress_Date_Format::TIMESTAMP);
 
         for ($j = 0; $j < $this->getRange(); $j++, $headerDate->addDays(1)) {
-
             $fieldList[] = $headerDate->getLongDateOnly();
             $fieldList[] = '';
 
@@ -107,7 +107,6 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
 
             if (is_array($allPeople) && count($allPeople)) {
                 foreach ($allPeople as $userId => $currentPerson) {
-
                     /* A user may have multiple, potentially overlapping requests, for the report period.
                      * If so, we print each request on its own row, we do not aggregate as some fields are
                      * should not be aggregated, eg 'host', etc
@@ -115,7 +114,6 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase
                     $countRequests = count($currentPerson['request_id']);
                     /** @noinspection ForeachInvariantsInspection */
                     for ($i = 0; $i < $countRequests; $i++) {
-
                         $fieldList = [];
 
                         // Personal details (but only for first iteration)

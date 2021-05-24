@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Assessment\Course\Import;
 
 use Schoolbox\GenericCollection;
@@ -74,7 +76,7 @@ class AssessmentPair
         $this->specification = $spec;
         $this->implementation = $impl;
         $this->assessmentPairs = $subPairs ?: new GenericCollection(AssessmentPair::class);
-        foreach($this->assessmentPairs as $subPair){
+        foreach ($this->assessmentPairs as $subPair) {
             $subPair->parentPair = $this;
         }
     }
@@ -129,7 +131,7 @@ class AssessmentPair
     public function getAssessmentCount()
     {
         $count = 1;
-        foreach($this->assessmentPairs as $subPair){
+        foreach ($this->assessmentPairs as $subPair) {
             $count += $subPair->getAssessmentCount();
         }
         return $count;
@@ -145,7 +147,7 @@ class AssessmentPair
     public function getAssessmentImplCount()
     {
         $count = $this->implementation ? 1 : 0;
-        foreach($this->assessmentPairs as $subPair){
+        foreach ($this->assessmentPairs as $subPair) {
             $count += $subPair->getAssessmentImplCount();
         }
         return $count;

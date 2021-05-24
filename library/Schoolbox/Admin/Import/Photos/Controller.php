@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Admin\Import\Photos;
 
 use Alaress\Web\Controller\Base;
@@ -93,7 +95,6 @@ class Controller extends Base
 
             $this->userMapper->save($user);
         } catch (\Schoolbox\Mapper\Exception $e) {
-
             /* User doesn't exist; noop
              */
         }
@@ -113,7 +114,6 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         if (\is_array($post['attachment'])) {
-
             /* Remove any bad data SA-8244
              */
             $attachments = array_filter($post['attachment']);
@@ -129,7 +129,6 @@ class Controller extends Base
                             $user->setPortrait($portrait);
                             $this->userMapper->save($user);
                         } catch (\Schoolbox\Mapper\Exception $e) {
-
                             /* User doesn't exist; noop
                              * TODO: Log it somewhere meaningful?
                              */

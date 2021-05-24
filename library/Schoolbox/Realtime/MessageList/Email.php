@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -15,7 +16,6 @@ use Schoolbox\Realtime\Mailer;
 use Schoolbox\User;
 use Swift_RfcComplianceException;
 use UnderflowException;
-
 
 class Email implements QueueInterface
 {

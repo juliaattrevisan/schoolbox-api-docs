@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Gateway for Meriden queries
  *

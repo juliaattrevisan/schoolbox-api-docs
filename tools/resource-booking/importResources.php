@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Script for importing CSV of resource bookings into our resource booking system.
  */
@@ -101,7 +102,7 @@ HELP
             }
 
             // Set its moderators
-            if($row['ManagedBy_SynergeticID']) {
+            if ($row['ManagedBy_SynergeticID']) {
                 $resource->setModeratorList(new Collection());
                 try {
                     $moderator = $userMapper->findByExternalId($row['ManagedBy_SynergeticID']);
@@ -122,7 +123,7 @@ HELP
                         $log->notice("Item saved [id={$resource->getId()}]");
                     }
                 } catch (Exception $e) {
-                    $log->error("Exception while importing: ".$e->getMessage());
+                    $log->error("Exception while importing: " . $e->getMessage());
                 }
             }
         }

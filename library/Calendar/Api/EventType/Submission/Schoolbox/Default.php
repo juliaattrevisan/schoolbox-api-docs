@@ -7,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Submission\Event;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
@@ -139,7 +140,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
             // All assessment events can be populated identically now
             $event->setEventId($assessment->getId());
             $event->setTitle($assessment->getTitle());
-            $event->setDetail($participant? $participant->getDescription() : $assessment->getDescription());
+            $event->setDetail($participant ? $participant->getDescription() : $assessment->getDescription());
             $event->setPublishDate($participant ? $participant->getPublishDate() : $assessment->getPublishAt());
             $event->setResourceId($assessment->getId());
 

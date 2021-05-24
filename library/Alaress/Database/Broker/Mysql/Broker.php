@@ -55,7 +55,8 @@ class Broker extends Base
     /**
      * @inheritdoc
      */
-    public function getDsn() {
+    public function getDsn()
+    {
         $portString = '';
 
         if (!empty($this->connector->getPort())) {
@@ -94,6 +95,4 @@ class Broker extends Base
             ->execute([$timezone])
             ;
     }
-
-
 }

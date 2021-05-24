@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This script opens files for download and send them to the user with correct filename
  *
@@ -31,40 +32,41 @@ if (is_numeric($_GET['id'])) {
         exit;
     }
 
-	/* Check eportfolio permissions
-	 */
-	$fileListMapper = Component\Eportfolio\FileListMapper::getInstance();
+    /* Check eportfolio permissions
+     */
+    $fileListMapper = Component\Eportfolio\FileListMapper::getInstance();
 
-	$allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
+    $allFiles = $fileListMapper->findByColumn('file_id', $file->getId());
 
-	$isViewable = false;
+    $isViewable = false;
 
-	if ($allFiles->count()) {
-		foreach ($allFiles as $currentFile) {
-			$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $file->getOwner()->getId(), $currentFile->getPageId());
+    if ($allFiles->count()) {
+        foreach ($allFiles as $currentFile) {
+            $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $file->getOwner()->getId(), $currentFile->getPageId());
 
-			/* If you can view one of the pages that this file is shared on,
-			 * break out of here
-			 */
-			if ($authenticator->canView()) {
-				$isViewable = true;
+            /* If you can view one of the pages that this file is shared on,
+             * break out of here
+             */
+            if ($authenticator->canView()) {
+                $isViewable = true;
 
-				break;
-			}
-		}
-	}
+                break;
+            }
+        }
+    }
 
-	/* If the file was never viewable on any eportfolio page and you aren't
-	 * the owner, get out
-	 */
-	if (!$isViewable && ($_SESSION['user']->getId() != $file->getOwner()->getId()) && !$_SESSION['user']->isSuperuser()) {
-		error(5);
-	}
+    /* If the file was never viewable on any eportfolio page and you aren't
+     * the owner, get out
+     */
+    if (!$isViewable && ($_SESSION['user']->getId() != $file->getOwner()->getId()) && !$_SESSION['user']->isSuperuser()) {
+        error(5);
+    }
 
-    if (!$file->getMimetype()->getInline() || $_GET['save'])
+    if (!$file->getMimetype()->getInline() || $_GET['save']) {
         $attach = "attachment;";
-    else
+    } else {
         $attach = "";
+    }
 
     //send headers
     header("Content-Type: {$file->getMime()}");
@@ -75,6 +77,6 @@ if (is_numeric($_GET['id'])) {
     header("Content-Length: {$file->getSize()}");
     fpassthru($file->readStream());
     exit;
-} else
+} else {
     error(2);
-
+}

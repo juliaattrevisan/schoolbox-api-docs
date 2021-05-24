@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -114,7 +115,6 @@ class PipeCollection implements Countable
 
             $pipeCount = count($this->pipesBySocketKey);
             $this->log->debug("Unregistered $socketKey [pipes={$pipeCount}]");
-
         } else {
             $pipeCount = count($this->pipesBySocketKey);
             $this->log->debug("Ignoring closure of $socketKey [pipes={$pipeCount}]");

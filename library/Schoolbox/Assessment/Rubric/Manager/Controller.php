@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -113,9 +114,7 @@ class Controller extends BaseController
                         'redirect' => '/homepage/' . $folder->getId()
                     ])
                 );
-
-            }
-            catch (\Exception|\UnexpectedValueException $e) {
+            } catch (\Exception | \UnexpectedValueException $e) {
                 $this->response->status->setCode(400);
                 $this->response->content->set(
                     $this->buildJsonOutput([

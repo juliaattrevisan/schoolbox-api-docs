@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
@@ -11,6 +13,7 @@ use Aura\Router;
 use Schoolbox\Assessment\Rubric\MarkedGrid\MarkedGrid;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Mapper\Exception as MapperException;
+
 use function array_key_exists;
 
 /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * None
  *
@@ -19,23 +20,25 @@
 
 namespace EOTC\ListGroup\Type;
 
-use \EOTC\EventStatusMapper;
+use EOTC\EventStatusMapper;
 
-class None {
+class None
+{
 
-	/**
-	 * Next status id
-	 *
-	 * @var int
-	 */
-	protected $nextStatusId = EventStatusMapper::STATUS_REJECTED;
+    /**
+     * Next status id
+     *
+     * @var int
+     */
+    protected $nextStatusId = EventStatusMapper::STATUS_REJECTED;
 
-	/**
-	 * Determine where to go next
-	 *
-	 * @throws \RuntimeException
-	 */
-	public function determine() {
-		throw new \RuntimeException('Cannot assign event to a list group.');
-	}
-} 
+    /**
+     * Determine where to go next
+     *
+     * @throws \RuntimeException
+     */
+    public function determine()
+    {
+        throw new \RuntimeException('Cannot assign event to a list group.');
+    }
+}

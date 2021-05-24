@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Alaress\Test;
 
 use InvalidArgumentException;
@@ -128,7 +127,6 @@ class RelativeUrlTest extends TestCase
         $siteHost = $this->getLocalSiteHost();
         $urlFormatter = new Url($url, $siteHost);
         $this->assertTrue($urlFormatter->isUrl(), "Failed asserting that '$url' is a Url");
-
     }
 
     /**
@@ -248,7 +246,6 @@ class RelativeUrlTest extends TestCase
         // With protocol
         $urlFormatter->prependScheme();
         $this->assertTrue($urlFormatter->isUrl(), "Failed to generate URL by prepending scheme: '$url'");
-
     }
 
 
@@ -941,5 +938,4 @@ class RelativeUrlTest extends TestCase
     {
         return 'some.non.local.site';
     }
-
 }

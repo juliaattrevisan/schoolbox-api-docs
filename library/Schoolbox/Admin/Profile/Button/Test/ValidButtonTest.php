@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidationTest
  *
@@ -19,7 +20,8 @@ class ValidButtonTest extends TestCase
      *
      * @return array
      */
-    public function provider_validButtonRequirements(): array {
+    public function provider_validButtonRequirements(): array
+    {
 
         return [
             'Valid 1' => [

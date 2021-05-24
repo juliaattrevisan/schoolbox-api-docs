@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Routing\Route;
-
 
 use Alaress\Routing\Trie;
 
@@ -58,7 +58,6 @@ class Route implements IRoute
         if (strpos($path, $this->delimiter) === false) {
             $chunk = $path;
             $remainder = '';
-
         } else {
             list ($chunk, $remainder) = explode($this->delimiter, $path, 2);
         }
@@ -67,7 +66,6 @@ class Route implements IRoute
         // aaaaaaand recursion
         try {
             return $this->locate($remainder, $trie->get($chunk));
-
         } catch (\InvalidArgumentException $e) {
             // ok, we're done now
         }
@@ -83,7 +81,7 @@ class Route implements IRoute
      */
     public function data()
     {
-        $regex = '`' . implode('\\'.$this->delimiter, $this->chunks) . '`';
+        $regex = '`' . implode('\\' . $this->delimiter, $this->chunks) . '`';
 
         if (preg_match($regex, $this->path, $matches)) {
             array_shift($matches);
@@ -95,5 +93,4 @@ class Route implements IRoute
         // it is not possible for the above preg_match to return false
         throw new \InvalidArgumentException('No data match'); // @codeCoverageIgnore
     }
-
 }

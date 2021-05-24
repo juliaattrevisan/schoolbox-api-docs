@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Maze_Loreto_Class
  *
@@ -9,22 +10,23 @@
  * @link        https://schoolbox.com.au/
 */
 
-class External_Maze_Loreto_Class extends External_Maze_Class {
+class External_Maze_Loreto_Class extends External_Maze_Class
+{
 
-	/**
-	 * @inheritdoc
-	 */
-	public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
+    /**
+     * @inheritdoc
+     */
+    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
     {
-		$ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
+        $ttPeriod = $this->getHelper()->getCurrentTTPERIOD();
 
-		/* Assume Schoolbox $classCodes are in the format: '07SCI-1'
-		 * where the 1 represents the Class which could be
-		 * class 1, 2, 3 etc. of a particular subject
-		 */
-		$ingredients = $this->getHelper()->degenerateClassCode($classCode);
+        /* Assume Schoolbox $classCodes are in the format: '07SCI-1'
+         * where the 1 represents the Class which could be
+         * class 1, 2, 3 etc. of a particular subject
+         */
+        $ingredients = $this->getHelper()->degenerateClassCode($classCode);
 
-		$query = "
+        $query = "
 			SELECT
 				T1TEACH,
 				T2TEACH,
@@ -33,24 +35,24 @@ class External_Maze_Loreto_Class extends External_Maze_Class {
 			LEFT JOIN TTTG ON TT.TTKEY = TTTG.GKEY
 			WHERE TT.TTPERIOD = '{$ttPeriod}' AND ";
 
-		/* Accommodate multiple classcodes specifically
-		 */
-		$additional = [];
+        /* Accommodate multiple classcodes specifically
+         */
+        $additional = [];
 
-		for ($i = 0; $i < count($ingredients['ClassCode']); $i++) {
-			$additional[] = "(TTTG.SUBJ = {$ingredients['ClassCode'][$i]} AND CLASS = {$ingredients['ClassNumber'][$i]})";
-		}
+        for ($i = 0; $i < count($ingredients['ClassCode']); $i++) {
+            $additional[] = "(TTTG.SUBJ = {$ingredients['ClassCode'][$i]} AND CLASS = {$ingredients['ClassNumber'][$i]})";
+        }
 
-		$query .= '(' . implode(' OR ', $additional) . ')';
+        $query .= '(' . implode(' OR ', $additional) . ')';
 
-		$part1 = $this->getDb()->getAll($query);
-		$allClassCodes = implode(',', $ingredients['ClassCode']);
+        $part1 = $this->getDb()->getAll($query);
+        $allClassCodes = implode(',', $ingredients['ClassCode']);
 
-		if (!$part1) {
-			$part1 = array();
-		}
+        if (!$part1) {
+            $part1 = array();
+        }
 
-		$query = "
+        $query = "
 			SELECT
 				TEACHER AS T1TEACH,
 				TEACHERB AS T2TEACH,
@@ -59,32 +61,32 @@ class External_Maze_Loreto_Class extends External_Maze_Class {
 			WHERE KGC.ROLL_GROUP IN ({$allClassCodes})
 		";
 
-		$part2 = $this->getDb()->getAll($query);
+        $part2 = $this->getDb()->getAll($query);
 
-		if (!$part2) {
-			$part2 = array();
-		}
+        if (!$part2) {
+            $part2 = array();
+        }
 
-		$allTeachers = array_merge($part1, $part2);
+        $allTeachers = array_merge($part1, $part2);
 
-		/* Uniqueify everything
-		 */
-		$teacherKeys = array();
+        /* Uniqueify everything
+         */
+        $teacherKeys = array();
 
-		if (is_array($allTeachers) && count($allTeachers)) {
-			foreach($allTeachers as $currentTeacher) {
-				$teacherKeys[$currentTeacher['T1TEACH']] = '';
-				$teacherKeys[$currentTeacher['T2TEACH']] = '';
-				$teacherKeys[$currentTeacher['T3TEACH']] = '';
-			}
-		}
+        if (is_array($allTeachers) && count($allTeachers)) {
+            foreach ($allTeachers as $currentTeacher) {
+                $teacherKeys[$currentTeacher['T1TEACH']] = '';
+                $teacherKeys[$currentTeacher['T2TEACH']] = '';
+                $teacherKeys[$currentTeacher['T3TEACH']] = '';
+            }
+        }
 
-		/* Filter out empty values
-		 */
-		$teacherKeys = array_filter(array_keys($teacherKeys));
+        /* Filter out empty values
+         */
+        $teacherKeys = array_filter(array_keys($teacherKeys));
 
-		/* A list of ids
-		 */
-		return $teacherKeys;
-	}
+        /* A list of ids
+         */
+        return $teacherKeys;
+    }
 }

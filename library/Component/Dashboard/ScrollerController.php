@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plag'd from Doctore's component
  *
@@ -8,7 +9,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_ScrollerController extends Component_Dashboard_ControllerAbstract
 {
@@ -20,7 +22,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
      */
     public function execute()
     {
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return false;
         }
 
@@ -112,8 +114,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
                 $this->parse('image_scroller_block', 'image_scroller', true);
             }
-        }
-        else {
+        } else {
             return false;
         }
 

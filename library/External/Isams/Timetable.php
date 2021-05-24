@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Campus as CampusModel;
 
 /**
@@ -69,7 +71,7 @@ class External_Isams_Timetable implements External_TimetableInterface
             WHERE       DayID = :day_id
         ';
 
-        $periods = $this->getConnector()->executeQuery($queryPeriodCount,[
+        $periods = $this->getConnector()->executeQuery($queryPeriodCount, [
             'day_id' => $dayId
         ])->fetch();
 
@@ -128,7 +130,7 @@ class External_Isams_Timetable implements External_TimetableInterface
         // Add one because ISAMS starts days at 1 and PHP starts at 0
 
         if ($date) {
-            $dayOfWeek = date("w",strtotime($date)) + 1;
+            $dayOfWeek = date("w", strtotime($date)) + 1;
         } else {
             $dayOfWeek = date("w") + 1;
         }
@@ -387,7 +389,6 @@ class External_Isams_Timetable implements External_TimetableInterface
         foreach ($iterator as $desc) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber'] && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])) {
-
                     $timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']] =
                         [
                             'description' => $desc['Description'],

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 use Schoolbox\Realtime\Schedule\Trigger\IPropagator;
 use Schoolbox\User;
-
 
 class MockPropagator implements IPropagator
 {
@@ -42,5 +42,4 @@ class MockPropagator implements IPropagator
     {
         return '';
     }
-
 }

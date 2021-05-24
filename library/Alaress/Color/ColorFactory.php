@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class description here
  *
@@ -31,22 +32,26 @@ class ColorFactory
         // rgba(r,g,b,a)
         // Remove all spaces for comparison
         $colorString = preg_replace('/\\s/', '', $colorString);
-        if (preg_match(
-            '/^#?(?P<r>[0-9a-f]{2})(?P<g>[0-9a-f]{2})(?P<b>[0-9a-f]{2})$/i',
-            $colorString,
-            $matches
-        )) {
+        if (
+            preg_match(
+                '/^#?(?P<r>[0-9a-f]{2})(?P<g>[0-9a-f]{2})(?P<b>[0-9a-f]{2})$/i',
+                $colorString,
+                $matches
+            )
+        ) {
             return new Color(
                 hexdec($matches['r']),
                 hexdec($matches['g']),
                 hexdec($matches['b'])
             );
         }
-        if (preg_match(
-            '/^#?(?P<r>[0-9a-f]{2})(?P<g>[0-9a-f]{2})(?P<b>[0-9a-f]{2})(?P<a>[0-9a-f]{2})$/i',
-            $colorString,
-            $matches
-        )) {
+        if (
+            preg_match(
+                '/^#?(?P<r>[0-9a-f]{2})(?P<g>[0-9a-f]{2})(?P<b>[0-9a-f]{2})(?P<a>[0-9a-f]{2})$/i',
+                $colorString,
+                $matches
+            )
+        ) {
             return new Color(
                 hexdec($matches['r']),
                 hexdec($matches['g']),
@@ -54,22 +59,26 @@ class ColorFactory
                 (hexdec($matches['a']) / 0xFF)
             );
         }
-        if (preg_match(
-            '/^rgb\\((?P<r>\\d+),(?P<g>\\d+),(?P<b>\\d+)\\)$/i',
-            $colorString,
-            $matches
-        )) {
+        if (
+            preg_match(
+                '/^rgb\\((?P<r>\\d+),(?P<g>\\d+),(?P<b>\\d+)\\)$/i',
+                $colorString,
+                $matches
+            )
+        ) {
             return new Color(
                 $matches['r'],
                 $matches['g'],
                 $matches['b']
             );
         }
-        if (preg_match(
-            '/^rgba\\((?P<r>\\d+),(?P<g>\\d+),(?P<b>\\d+),(?P<a>[\\d\\.]+)\\)$/i',
-            $colorString,
-            $matches
-        )) {
+        if (
+            preg_match(
+                '/^rgba\\((?P<r>\\d+),(?P<g>\\d+),(?P<b>\\d+),(?P<a>[\\d\\.]+)\\)$/i',
+                $colorString,
+                $matches
+            )
+        ) {
             // Test that alpha channel is a number between 0 and 1 here
             if (is_numeric($matches['a'])) {
                 return new Color(

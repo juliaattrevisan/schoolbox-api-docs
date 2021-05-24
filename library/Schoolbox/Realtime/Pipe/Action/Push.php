@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -25,5 +26,4 @@ class Push extends AbstractAction
             $this->getMessageInstance()
         );
     }
-
 }

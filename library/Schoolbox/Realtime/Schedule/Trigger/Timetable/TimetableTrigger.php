@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
-
 
 use Alaress\Date\Clock;
 use Alaress\Date\IClock;
@@ -129,10 +129,8 @@ abstract class TimetableTrigger extends AbstractTrigger
 
             try {
                 return $this->testPeriod($start, new \Alaress_Date_NullDate(), $now);
-
             } catch (BadMethodCallException $e) {
                 continue;
-
             } catch (OutOfBoundsException $e) {
                 continue;
             }
@@ -159,7 +157,6 @@ abstract class TimetableTrigger extends AbstractTrigger
 
             try {
                 return $this->testPeriod($start, $end, $now);
-
             } catch (OutOfBoundsException $e) {
                 continue;
             }
@@ -243,7 +240,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      * @param ADF   $now
      * @return ADF
      */
-    protected abstract function beforeSchool(array $definition, ADF $now);
+    abstract protected function beforeSchool(array $definition, ADF $now);
 
 
     /**
@@ -253,7 +250,7 @@ abstract class TimetableTrigger extends AbstractTrigger
      * @throws OutOfBoundsException if this period is not relevant
      * @return ADF
      */
-    protected abstract function testPeriod(ADF $start, ADF $end, ADF $now);
+    abstract protected function testPeriod(ADF $start, ADF $end, ADF $now);
 
 
     /**
@@ -267,7 +264,6 @@ abstract class TimetableTrigger extends AbstractTrigger
         $key = $now->getUsingFormat('Y.m.d');
 
         if (empty($this->cache[$key])) {
-
             // only allow a max of 3 different days in cache
             if (count($this->cache) > 2) {
                 krsort($this->cache);
@@ -387,5 +383,4 @@ abstract class TimetableTrigger extends AbstractTrigger
         $this->label = $label;
         return $this;
     }
-
 }

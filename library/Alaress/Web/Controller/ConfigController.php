@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Alaress\Web\Controller;
@@ -74,7 +76,7 @@ abstract class ConfigController extends Base
         $existingConfigs = $this->configMapper->findByPredicates($pb)->indexBy(ConfigMapper::COL_NAME);
 
         foreach ($post as $name => $value) {
-            if(!$existingConfigs->keyExists($name)){
+            if (!$existingConfigs->keyExists($name)) {
                 // Ignore posted config not for this module
                 continue;
             }

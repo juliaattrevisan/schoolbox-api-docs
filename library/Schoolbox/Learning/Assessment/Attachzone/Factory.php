@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -10,8 +11,8 @@ namespace Schoolbox\Learning\Assessment\Attachzone;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Resource\Attachment\Zone;
 
 /**
@@ -110,7 +111,6 @@ class Factory
         $response->getAllFiles()->sortBy('filename', 'asc');
 
         foreach ($response->getAllFiles() as $file) {
-
             /* Ignore accumulation of wizzywig contents
              */
             if (!$file->getEditableInline()) {
@@ -136,7 +136,6 @@ class Factory
             ->setAttachmentsLabel('');
 
         if ($feedback instanceof Feedback) {
-
             /* Sort files alphabetically
              */
             $feedback->getAllFiles()->sortBy('filename', 'asc');

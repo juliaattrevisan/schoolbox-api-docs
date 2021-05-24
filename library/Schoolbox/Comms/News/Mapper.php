@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -29,6 +30,7 @@ use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function implode;
 use function is_array;
 
@@ -184,7 +186,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $collection = $this->createCollection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             /* If the article was put into this stack already, just reuse it
              * Otherwise hydrate and store
              */
@@ -654,6 +655,6 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
         $statement->execute($pb->getParams());
 
-        return (boolean)$statement->fetch(PDO::FETCH_COLUMN);
+        return (bool)$statement->fetch(PDO::FETCH_COLUMN);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Validator_ValidatableInterface
  *
@@ -8,7 +9,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-interface Alaress_Validator_ValidatableInterface {
-//	public function addValidator(Alaress_Validator_ValidatorInterface $validator);
-	public function isValid();
+interface Alaress_Validator_ValidatableInterface
+{
+//  public function addValidator(Alaress_Validator_ValidatorInterface $validator);
+    public function isValid();
 }

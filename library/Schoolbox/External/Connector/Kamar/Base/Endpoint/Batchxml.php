@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
@@ -79,11 +81,10 @@ class Batchxml
             try {
                 $this->nodes = new SimpleXMLElement($xml);
             } catch (\Exception $e) {
-
                 /* Kamar returned some sort of error message, not xml
                  * Display the first 200 chars of the broken data
                  */
-                throw new RuntimeException("{$e->getMessage()}, {$path}\n\n" . substr($xml,0, self::DEBUG_CHARS));
+                throw new RuntimeException("{$e->getMessage()}, {$path}\n\n" . substr($xml, 0, self::DEBUG_CHARS));
             }
         }
 

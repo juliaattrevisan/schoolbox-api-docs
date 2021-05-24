@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CIS canteen SSO
  *
@@ -8,16 +9,15 @@
  * @link      https://schoolbox.com.au/
  */
 
-
 $remoteUrl = 'http://campusonline.cis.edu.sg/signon.asp';
 $mapFile = '/home/cispl/parent_map.csv';
 
-if(!file_exists($mapFile) || !is_readable($mapFile)) {
+if (!file_exists($mapFile) || !is_readable($mapFile)) {
     $this->error(2);
 }
 
-if (($handle = fopen($mapFile, 'r')) !== FALSE) {
-    while (($row = fgetcsv($handle, 1000, ',')) !== FALSE) {
+if (($handle = fopen($mapFile, 'r')) !== false) {
+    while (($row = fgetcsv($handle, 1000, ',')) !== false) {
             $map[$row[0]] = $row[1];
     }
     fclose($handle);
@@ -26,9 +26,9 @@ if (($handle = fopen($mapFile, 'r')) !== FALSE) {
 
 // is this specifying a height for the parent frame?
 $height = '460px';
-if(strpos($remoteUrl, 'zx_h=')) {
+if (strpos($remoteUrl, 'zx_h=')) {
     preg_match("#zx_h=([0-9]*(?:%|px|&))#", $remoteUrl, $matches);
-    if(isset($matches[1])) {
+    if (isset($matches[1])) {
         $height = str_replace('&', '', $matches[1]);
     }
 }
@@ -39,18 +39,18 @@ if(strpos($remoteUrl, 'zx_h=')) {
 
 
 
-$isamsID = str_replace('P-','',$_SESSION['user']->getExternalId());
+$isamsID = str_replace('P-', '', $_SESSION['user']->getExternalId());
 
 $externalUserId = $map[$isamsID];
 $secret         = Config::get('remote_secret');
 $time           = time();
 
 
-if(!$externalUserId) {
+if (!$externalUserId) {
     $this->error(2);
 }
 
-$key = hash('sha256', $externalUserId.$time.$secret);
+$key = hash('sha256', $externalUserId . $time . $secret);
 
 /* Check if the $remoteUrl already has a query string in it. If so,
  * just appened the $key, $time and $id parameters
@@ -68,7 +68,7 @@ $remoteUrl = $remoteUrl . $glue . http_build_query([
 ]);
 
 if ($this->arg[0] == 'window') {
-    header('Location: '.$remoteUrl);
+    header('Location: ' . $remoteUrl);
     exit;
 } else {
     $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
@@ -76,6 +76,4 @@ if ($this->arg[0] == 'window') {
         'REMOTE_URL'   => $remoteUrl,
         'FRAME_HEIGHT' => $height,
     ]);
-
 }
-

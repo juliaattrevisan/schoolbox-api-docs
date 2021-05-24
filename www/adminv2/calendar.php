@@ -87,7 +87,6 @@ $typeList = [
 
 
 foreach ($typeList as $type) {
-
     /* Navigation stuff
      */
     $this->setVar([
@@ -107,9 +106,7 @@ foreach ($typeList as $type) {
      */
     if (($type['type'] == 'Import') && ($selectedType == 'Import')) {
         $this->parse('import_block', 'import');
-    }
-    elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
-
+    } elseif (($type['type'] == 'Subscribe') && ($selectedType == 'Subscribe')) {
         /* Subscribe page
          */
         $moduleChecker = new ModuleChecker(ConfigLoader::getInstance());
@@ -119,7 +116,6 @@ foreach ($typeList as $type) {
         /* All calendar subscription options go here
          */
         foreach ($availableApi as $currentEventType => $allConnectors) {
-
             /* Render titles etc
              * Put a space between 'CamelCase' names so they become 'Camel Case'
              */
@@ -132,7 +128,6 @@ foreach ($typeList as $type) {
              */
             /** @var \Calendar_Api_Config_Connector_Abstract $stubInstance */
             foreach ($allConnectors as $currentConnector => $stubInstance) {
-
                 /* Render titles etc
                  *
                  * Some kind of rendering issue exists where I can't combine it with the other
@@ -212,7 +207,6 @@ foreach ($typeList as $type) {
     } /* Cleanup page
      */
     elseif (($type['type'] == 'Cleanup') && ($selectedType == 'Cleanup')) {
-
         /* If both dates specified, find events between those two dates inclusive
          */
         if (isset($_GET['cleanupFrom']) && isset($_GET['cleanupTo'])) {
@@ -239,7 +233,6 @@ foreach ($typeList as $type) {
 
         /** @var \Schoolbox\Calendar\Event $currentEvent */
         foreach ($allEvents as $currentEvent) {
-
             /* Auxiliary collections
              */
             $allUsers = [];
@@ -306,8 +299,7 @@ foreach ($typeList as $type) {
                 ]);
 
                 $this->parse('has_event_author_block', 'has_event_author');
-            }
-            else {
+            } else {
                 $this->setVar([
                     'CLEANUP_EVENT_AUTHOR_ID' => '',
                     'CLEANUP_EVENT_AUTHOR_NAME' => 'Unknown User',
@@ -343,4 +335,3 @@ foreach ($typeList as $type) {
         $this->parse('cleanup_block', 'cleanup');
     }
 }
-

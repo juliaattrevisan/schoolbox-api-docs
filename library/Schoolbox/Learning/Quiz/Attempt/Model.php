@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for online assessment attempts.
  *
@@ -14,7 +15,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\User;
-use \Alaress_Date_Format;
+use Alaress_Date_Format;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 use Alaress_Date_NullDate;
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PendingInitialReview
  *
@@ -9,37 +10,39 @@
 
 namespace EOTC\ListGroup\Type;
 
-use \EOTC\EventStatusMapper;
-use \EOTC\ListGroup\Response;
+use EOTC\EventStatusMapper;
+use EOTC\ListGroup\Response;
 
-class Rejected extends Base {
+class Rejected extends Base
+{
 
-	/**
-	 * Next status id
-	 *
-	 * @var int
-	 */
-	protected $nextStatusId = EventStatusMapper::STATUS_REJECTED;
+    /**
+     * Next status id
+     *
+     * @var int
+     */
+    protected $nextStatusId = EventStatusMapper::STATUS_REJECTED;
 
-	/**
-	 * Determine where to go next
-	 *
-	 * @return $this|mixed
-	 */
-	public function determine() {
+    /**
+     * Determine where to go next
+     *
+     * @return $this|mixed
+     */
+    public function determine()
+    {
 
-		/* All Rejected events end up in their own feedback cycle
-		 */
-		if (($this->getEvent()->getMetadata()->getStatus()->isRejected())) {
-			return new Response($this->getNextStatusId(), $this->getMapping()->getRejectedIndex());
-		}
+        /* All Rejected events end up in their own feedback cycle
+         */
+        if (($this->getEvent()->getMetadata()->getStatus()->isRejected())) {
+            return new Response($this->getNextStatusId(), $this->getMapping()->getRejectedIndex());
+        }
 
-		/* Otherwise get the next class to deal with it
-		 */
-		if ($this->getNext()) {
-			return $this->getNext()->determine();
-		}
+        /* Otherwise get the next class to deal with it
+         */
+        if ($this->getNext()) {
+            return $this->getNext()->determine();
+        }
 
-		return null;
-	}
-} 
+        return null;
+    }
+}

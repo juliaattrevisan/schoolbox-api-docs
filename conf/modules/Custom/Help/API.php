@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -25,5 +26,4 @@ class API extends ModuleLoader
     {
         $this->loadModule($kernel, CourseParticipation\Module::class, '/api/course-participation');
     }
-
 }

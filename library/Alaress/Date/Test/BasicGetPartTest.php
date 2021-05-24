@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that basic get parts of date methods work as expected.
  *

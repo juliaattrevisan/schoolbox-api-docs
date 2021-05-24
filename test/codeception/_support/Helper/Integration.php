@@ -1,5 +1,7 @@
 <?php
+
 /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
+
 /** @noinspection PhpFullyQualifiedNameUsageInspection */
 declare(strict_types=1);
 
@@ -47,20 +49,21 @@ class Integration extends REST
     /**
      * @param string $sessionID
      */
-    public function setSessionCookie(string $sessionID){
+    public function setSessionCookie(string $sessionID)
+    {
         $this->client->getCookieJar()->set(new Cookie('PHPSESSID', $sessionID));
     }
 
     /**
      * @return string|NULL
      */
-    public function getSessionCookie(){
+    public function getSessionCookie()
+    {
         $sessionCookie = $this->client->getCookieJar()->get('PHPSESSID');
-        if($sessionCookie !== NULL)
-        {
+        if ($sessionCookie !== null) {
             return $this->client->getCookieJar()->get('PHPSESSID')->getValue();
         }
-        return NULL;
+        return null;
     }
 
     /**

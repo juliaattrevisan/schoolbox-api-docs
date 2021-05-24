@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -20,5 +21,4 @@ interface EventListener
      * @return void
      */
     public function handle(IEvent $event);
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -14,7 +15,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-
 
 /**
  * Generator for test data for marked grid tests.
@@ -87,8 +87,7 @@ class Generator
         array $levels,
         array $capabilityUsages,
         array $capabilityMarks
-    ): RubricMarkedGrid\MarkedGrid
-    {
+    ): RubricMarkedGrid\MarkedGrid {
         // Build a grid and row set
         $gridGenerator = new RubricGrid\Test\Generator();
 

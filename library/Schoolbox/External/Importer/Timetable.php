@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\External\Importer;
 
 use Schoolbox\Collection;
@@ -152,7 +154,6 @@ class Timetable extends AbstractImporter
 
                     $timetableCycleCache[$termTitle][$termIdentifier] = $timetableCycle;
                 } catch (Mapper\Exception $e) {
-
                     /* Can't assign ClassEntry instances to Cycles that don't exist
                      * Cycles need to be created with Timetable Structure first
                      */
@@ -185,7 +186,6 @@ class Timetable extends AbstractImporter
 
                     $timetablePeriodCache[$timetableCycle->getId()][$periodTitle][$periodDay] = $timetablePeriod;
                 } catch (Mapper\Exception $e) {
-
                     /* Can't assign ClassEntry instances to Periods that don't exist
                      * Periods need to be created with Timetable Structure first
                      */
@@ -249,7 +249,6 @@ class Timetable extends AbstractImporter
             $class = $row['class'];
             if ($this->performUpdate) {
                 if ($this->classMapper->save($class)) {
-
                 } else {
                     $this->log->error('Could not save class!');
                 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for datetime picker
  *
@@ -70,7 +71,9 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, '.*',
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
             new Rule\All(new Rule\IsLoggedIn())
         );
     }
@@ -80,7 +83,8 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreload($matcher,
+        $this->addRoutePreload(
+            $matcher,
             '(getByDate|getDueByDate)',
             function ($params) {
                 $returnedParams = [];
@@ -98,7 +102,7 @@ class Module extends BaseModule
             if (array_key_exists('folderId', $params)) {
                 // tweak and pass through
                 $params['folder'] = $this->getMapperFactory()->get(FolderMapper::class)->findById($params['folderId']);
-                unset ($params['folderId']);
+                unset($params['folderId']);
             }
             return $params;
         });

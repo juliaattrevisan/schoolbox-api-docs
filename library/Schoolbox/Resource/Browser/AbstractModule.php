@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -53,7 +54,7 @@ abstract class AbstractModule extends BaseModule
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
     {
-        $this->addTemplatePath($templateLoader, __DIR__.'/templates');
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
 
@@ -64,7 +65,7 @@ abstract class AbstractModule extends BaseModule
     {
         // set
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew($this->getControllerClass(), [], $this->getSetterList($injector))
         );
 
@@ -95,12 +96,11 @@ abstract class AbstractModule extends BaseModule
      * @param Container $injector
      * @return void
      */
-    protected abstract function initSetters(Container $injector);
+    abstract protected function initSetters(Container $injector);
 
 
     /**
      * @return string
      */
-    protected abstract function getControllerClass();
-
+    abstract protected function getControllerClass();
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This interface defines how to store markbook data in a remote SIS
  *
@@ -62,4 +63,3 @@ interface External_MarkbookInterface extends External\IConnector
      */
     public function deleteFeedback(IAssessable $assessment, User $student): bool;
 }
-

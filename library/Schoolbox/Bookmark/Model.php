@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,8 @@ namespace Schoolbox\Bookmark;
 
 use Schoolbox\User;
 
-class Model {
+class Model
+{
 
     /** @var int */
     protected $id;
@@ -27,7 +29,8 @@ class Model {
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -35,7 +38,8 @@ class Model {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -43,7 +47,8 @@ class Model {
      * @param int $owner
      * @return self
      */
-    public function setOwner($owner) {
+    public function setOwner($owner)
+    {
         $this->owner = $owner;
         return $this;
     }
@@ -51,7 +56,8 @@ class Model {
     /**
      * @return int
      */
-    public function getOwner() {
+    public function getOwner()
+    {
         return $this->owner;
     }
 
@@ -59,7 +65,8 @@ class Model {
      * @param string $url
      * @return self
      */
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         $this->url = $url;
         return $this;
     }
@@ -67,7 +74,8 @@ class Model {
     /**
      * @return string
      */
-    public function getUrl() {
+    public function getUrl()
+    {
         return $this->url;
     }
 
@@ -75,7 +83,8 @@ class Model {
      * @param string $description
      * @return self
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
         return $this;
     }
@@ -83,7 +92,8 @@ class Model {
     /**
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 }

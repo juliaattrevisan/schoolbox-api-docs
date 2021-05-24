@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides the offline version of the PastoralInterface
  * This is used by all connectors if it is not implemented.  The purpose is just to do nothing, because we have no
@@ -108,5 +109,4 @@ class External_Offline_Pastoral implements External_PastoralInterface, IOfflineC
     {
         return [];
     }
-
 }

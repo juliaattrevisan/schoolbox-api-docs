@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Maze_User
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -132,24 +134,21 @@ class External_Maze_User implements External_UserInterface
              */
             if ($mobilePhone !== '') {
                 $newFamily['MobilePhone'] = $family['MobilePhone'];
-            }
-            elseif ($spouseMobilePhone !== '') {
+            } elseif ($spouseMobilePhone !== '') {
                 $newFamily['SpouseMobilePhone'] = $family['SpouseMobilePhone'];
             }
 
             /* Decide whose home phone to use
              */
             $newFamily['HomePhone'] = $family['HomePhone'];
-        }
-        elseif ($preferred !== '') {
+        } elseif ($preferred !== '') {
             $newFamily['Title']       = $family['Title'];
             $newFamily['Preferred']   = $family['Preferred'];
             $newFamily['Surname']     = $family['Surname'];
             $newFamily['Email']       = $family['Email'];
             $newFamily['HomePhone']   = $family['HomePhone'];
             $newFamily['MobilePhone'] = $family['MobilePhone'];
-        }
-        elseif ($spousePreferred !== '') {
+        } elseif ($spousePreferred !== '') {
             $newFamily['Title'] = $family['SpouseTitle'];
             $newFamily['Preferred'] = $family['SpousePreferred'];
             $newFamily['Surname'] = $family['SpouseSurname'];
@@ -191,7 +190,6 @@ class External_Maze_User implements External_UserInterface
 
         if (is_array($allEmails) && count($allEmails)) {
             foreach ($allEmails as $currentEmail) {
-
                 // Testing that column is not NULL, empty, or just whitespace
                 $relatedID1      = trim($currentEmail['RelatedID1'] ?? '');
                 $relatedID2      = trim($currentEmail['RelatedID2'] ?? '');
@@ -381,8 +379,7 @@ class External_Maze_User implements External_UserInterface
 
         $ids = implode(',', array_map(static function ($val) {
             return sprintf("'%s'", $val);
-            }, $externalUserId)
-        );
+        }, $externalUserId));
 
         $query = "
 			SELECT
@@ -482,7 +479,6 @@ class External_Maze_User implements External_UserInterface
         /* Search for a particular year level
          */
         if (strlen($yearLevel)) {
-
             /* Translate back to Maze-specific
              */
             if (is_numeric($yearLevel)) {
@@ -594,7 +590,6 @@ class External_Maze_User implements External_UserInterface
         }
 
         if ($user->getRole()->isStudent()) {
-
             /* Get roll groups
              */
             $query = "
@@ -639,8 +634,7 @@ class External_Maze_User implements External_UserInterface
             }
 
             $allSubjects = array_merge($part1, $part2);
-        }
-        elseif ($user->getRole()->isStaff()) {
+        } elseif ($user->getRole()->isStaff()) {
             $query = "
                 SELECT
                     KGC.ROLL_GROUP AS ClassCode,
@@ -678,8 +672,7 @@ class External_Maze_User implements External_UserInterface
             }
 
             $allSubjects = array_merge($part1, $part2);
-        }
-        else {
+        } else {
             return [];
         }
 
@@ -694,7 +687,6 @@ class External_Maze_User implements External_UserInterface
          */
         if (is_array($allSubjects) && count($allSubjects)) {
             foreach ($allSubjects as $currentSubject) {
-
                 /* Don't display these timetable items as part of Subject List
                  * (Not Available, Faculty Meetings, Gate Duty, etc)
                  */
@@ -775,7 +767,6 @@ class External_Maze_User implements External_UserInterface
                 WHERE SF.SFKEY = {$externalId}
             ";
         } else {
-
             /* Unknown user roletype: can't definitively fetch picture
              * I guess they get what we last knew
              */
@@ -783,7 +774,6 @@ class External_Maze_User implements External_UserInterface
         }
 
         if ($photo = $this->getDb()->getRow($query)) {
-
             // TODO: delete photos on rollover
 
             /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we

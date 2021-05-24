@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Divisions (eg. Soccer First, Seconds, Thirds) Mapper
  *
@@ -9,11 +10,11 @@
 
 namespace Schoolbox\Fixtures\Division;
 
-use \PDOStatement;
+use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Sport\Model as Sport;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
@@ -113,8 +114,7 @@ class Mapper extends BaseMapper
         $seasons   = new Collection();
 
         $idColumn = $this->getIdentifierColumn();
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC))
-        {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             // Hydrate Division
             $divisions->setOffset($row[$idColumn], $this->hydrate($row));
 

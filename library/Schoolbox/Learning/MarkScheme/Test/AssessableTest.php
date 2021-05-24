@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -1199,7 +1200,7 @@ class AssessableTest extends TestCase
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$quiz, $this->getDummyStudent(1), null],
                 [$quiz, $this->getDummyStudent(2), '1 / 2'],
@@ -1245,7 +1246,7 @@ class AssessableTest extends TestCase
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional());
 
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$quiz, $this->getDummyStudent(1), null],
                 [$quiz, $this->getDummyStudent(2), 50.0],
@@ -1694,7 +1695,7 @@ class AssessableTest extends TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
@@ -1749,7 +1750,7 @@ class AssessableTest extends TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
@@ -1804,7 +1805,7 @@ class AssessableTest extends TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 50.0],
@@ -1974,7 +1975,7 @@ class AssessableTest extends TestCase
         $project->setSummator(new Maximum());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
@@ -2033,7 +2034,7 @@ class AssessableTest extends TestCase
         $project->setSummator(new Maximum());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
@@ -2092,7 +2093,7 @@ class AssessableTest extends TestCase
         $project->setSummator(new Average());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
@@ -2116,7 +2117,7 @@ class AssessableTest extends TestCase
             [$project, $this->getDummyStudent(8), 'Acceptable'],
             [$project, $this->getDummyStudent(9), 'Excellent'],
         ];
-     }
+    }
 
     /**
      * @return array
@@ -2151,7 +2152,7 @@ class AssessableTest extends TestCase
         $project->setSummator(new Average());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],
@@ -2175,7 +2176,7 @@ class AssessableTest extends TestCase
             [$project, $this->getDummyStudent(8), '50 %'],
             [$project, $this->getDummyStudent(9), '100 %'],
         ];
-     }
+    }
 
     /**
      * @return array
@@ -2210,7 +2211,7 @@ class AssessableTest extends TestCase
         $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), 'Acceptable'],
@@ -2269,7 +2270,7 @@ class AssessableTest extends TestCase
         $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::SLUG_PERCENT));
         $project->setMarkScheme(new Percentage());
-        if(self::FAVOR_FLOATING){
+        if (self::FAVOR_FLOATING) {
             return [
                 [$project, $this->getDummyStudent(1), null],
                 [$project, $this->getDummyStudent(2), '50 %'],

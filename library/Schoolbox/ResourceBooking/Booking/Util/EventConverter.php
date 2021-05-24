@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Converter for mapper events into calendar events.
  *

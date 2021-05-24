@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Type
  *
@@ -11,7 +12,8 @@ namespace Schoolbox\External\Normalise\User\Staff;
 
 use Schoolbox\GenericCollection;
 
-class Meta {
+class Meta
+{
 
     /**
      * An instance of Category
@@ -72,14 +74,16 @@ class Meta {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setup();
     }
 
     /**
      * Hook method
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setPosition(new Position());
         $this->setCategory(new Category());
     }

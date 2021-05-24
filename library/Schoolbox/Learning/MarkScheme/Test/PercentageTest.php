@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,7 @@ namespace Schoolbox\Learning\MarkScheme\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\MarkScheme\Percentage;
-use \RangeException;
+use RangeException;
 
 class PercentageTest extends TestCase
 {
@@ -27,7 +28,6 @@ class PercentageTest extends TestCase
         $actual = $markScheme->getHumanReadableMark($normalised);
         $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
         $this->assertEquals($expected, $actual, $message);
-
     }
 
 
@@ -123,5 +123,4 @@ class PercentageTest extends TestCase
             [100.0000001, '100 %'],
         ];
     }
-
 }

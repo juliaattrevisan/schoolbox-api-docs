@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -46,5 +47,4 @@ interface IQueryHelper
      * @return array
      */
     public function getGetEnrolledStudentsQuery($externalUserId): array;
-
 }

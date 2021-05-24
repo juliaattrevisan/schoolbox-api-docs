@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Safe script for determining whether all external dependencies are up and running
  *
@@ -21,9 +22,9 @@ error_reporting(E_ALL);
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $threshold = 0;
-if(isset($opts['v'])) {
+if (isset($opts['v'])) {
     $threshold = 1;
-    if(is_array($opts['v'])) {
+    if (is_array($opts['v'])) {
         $threshold = min(3, count($opts['v']));
     }
 }
@@ -61,7 +62,6 @@ try {
         $r = $kernel->get('redis');
         $r->executeCommand($r->createCommand('get', array('test')));
         $d->notice('Redis is online', array('char' => '+'));
-
     } catch (\Predis\PredisException $e) {
         $d->alert('Redis is offline');
         $errors[] = 'Redis';
@@ -72,12 +72,10 @@ try {
         $amqp = \Schoolbox\Notif\MQ\Connector::getInstance();
         $amqp->publish('Testing AMQP Connection', 'daemon.test');
         $d->notice('RabbitMQ is online', array('char' => '+'));
-
     } catch (Exception $e) {
         $d->alert('RabbitMQ is offline');
         $errors[] = 'RabbitMQ';
     }
-
 } catch (PDOException $e) {
     // Logger might not have been set up if MySQL config failed.
     // In fact, the autoloader might not even have been set up.
@@ -97,7 +95,7 @@ try {
 if (count($errors)) {
     if ($mail) {
         $n = Notifactory::create(Notif::TOPIC_SYSTEM);
-        $n->alert("The following services are offline or uncontactable: ".implode(', ', $errors));
+        $n->alert("The following services are offline or uncontactable: " . implode(', ', $errors));
     }
     exit(1);
 }

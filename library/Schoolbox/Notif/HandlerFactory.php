@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Notif;
-
 
 use InvalidArgumentException;
 use Monolog\Handler\HandlerInterface;
@@ -71,48 +71,39 @@ class HandlerFactory
         $this->swift      = $swift;
         $this->log        = $log;
 
-        $this->handlerGenerators[self::SYS_FATAL_MAIL] = function ()
-        {
+        $this->handlerGenerators[self::SYS_FATAL_MAIL] = function () {
             return $this->createMailHandler('Schoolbox is Down', Logger::EMERGENCY);
         };
-        $this->handlerGenerators[self::SYS_FATAL_LOG] = function ()
-        {
+        $this->handlerGenerators[self::SYS_FATAL_LOG] = function () {
             // If we are in web context, this const will not exist, just insert a placeholder handler
             // that will never consume the record, thus bubbling to the next handler in the stack
             return defined('STDERR')
                 ? new StreamHandler(STDERR, Logger::EMERGENCY, false)
                 : new SkipHandler();
         };
-        $this->handlerGenerators[self::SYS_MAIL] = function ()
-        {
+        $this->handlerGenerators[self::SYS_MAIL] = function () {
             return $this->createMailHandler('Schoolbox Requires Your Attention', Logger::ALERT);
         };
-        $this->handlerGenerators[self::SYS_LOG] = function ()
-        {
+        $this->handlerGenerators[self::SYS_LOG] = function () {
             // If we are in web context, this const will not exist, just insert a placeholder handler
             // that will never consume the record, thus bubbling to the next handler in the stack
             return defined('STDERR')
                 ? new StreamHandler(STDERR, Logger::ALERT, false)
                 : new SkipHandler();
         };
-        $this->handlerGenerators[self::SYS_EXCEPTION_MAIL] = function ()
-        {
+        $this->handlerGenerators[self::SYS_EXCEPTION_MAIL] = function () {
             return new NullHandler(Logger::CRITICAL);
         };
-        $this->handlerGenerators[self::SYS_NULL_DEBUG] = function ()
-        {
+        $this->handlerGenerators[self::SYS_NULL_DEBUG] = function () {
             return new NullHandler(Logger::INFO);
         };
-        $this->handlerGenerators[self::SYS_DEBUG_MAIL] = function ()
-        {
+        $this->handlerGenerators[self::SYS_DEBUG_MAIL] = function () {
             return $this->createMailHandler('Schoolbox Debug', Logger::DEBUG, false);
         };
-        $this->handlerGenerators[self::LOG_AUTH] = function ()
-        {
+        $this->handlerGenerators[self::LOG_AUTH] = function () {
             return $this->createSqlHandler(self::LOG_AUTH, Logger::NOTICE, false);
         };
-        $this->handlerGenerators[self::LOG_CMS] = function ()
-        {
+        $this->handlerGenerators[self::LOG_CMS] = function () {
             return $this->createSqlHandler(self::LOG_CMS, Logger::NOTICE, false);
         };
     }
@@ -138,8 +129,8 @@ class HandlerFactory
      */
     public function getFileLogHandler($topic)
     {
-        if(!is_dir($this->conf->get('logs_dir'))) {
-            if(!mkdir($concurrentDirectory = $this->conf->get('logs_dir'), 0775, true) && !is_dir($concurrentDirectory)) {
+        if (!is_dir($this->conf->get('logs_dir'))) {
+            if (!mkdir($concurrentDirectory = $this->conf->get('logs_dir'), 0775, true) && !is_dir($concurrentDirectory)) {
                 throw new RuntimeException("Cannot create log directory: $concurrentDirectory");
             }
         }
@@ -179,12 +170,11 @@ class HandlerFactory
         $stack = [];
 
         foreach ($tags as $tag) {
-
             if ($suppressFailures) {
                 try {
                     array_push($stack, $this->getHandler($tag));
                 } catch (InvalidArgumentException $e) {
-                    $this->log->alert($e->getMessage(), [ 'exception'=>$e ]);
+                    $this->log->alert($e->getMessage(), [ 'exception' => $e ]);
                 }
             } else {
                 // exceptions not being suppressed
@@ -216,8 +206,7 @@ class HandlerFactory
 
         try {
             $mail->setTo($to);
-        }
-        catch (Swift_RfcComplianceException $e) {
+        } catch (Swift_RfcComplianceException $e) {
             $mail->setTo(self::FALLBACK_EMAIL);
         }
 
@@ -234,7 +223,10 @@ class HandlerFactory
         return new SwiftMailerHandler(
             new Swift_Mailer(
                 $this->swift
-            ), $mail, $severity, $bubble
+            ),
+            $mail,
+            $severity,
+            $bubble
         );
     }
 
@@ -252,13 +244,13 @@ class HandlerFactory
     protected function createSqlHandler($topic, $level, $bubble = true)
     {
         // can't give you an SQL handler if there ain't no SQL
-        if(!extension_loaded('pdo')) {
+        if (!extension_loaded('pdo')) {
             throw new RangeException("PDO is not loaded; cannot initialise database connection");
         }
 
         $sql = new MySQLHandler($level, $bubble);
 
-        switch($topic) {
+        switch ($topic) {
             // when someone logs in, or fails to
             case Notif::TOPIC_AUTH:
                 $sql->setQuery("
@@ -282,5 +274,4 @@ class HandlerFactory
 
         throw new InvalidArgumentException("Cannot handle topic '$topic' with SQL.");
     }
-
 }

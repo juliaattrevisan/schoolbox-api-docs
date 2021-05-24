@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -23,7 +24,7 @@ class IsAssessmentOpen extends AbstractParticipationRule
     {
         $assessment = $this->findAssessable($params);
         $student = $this->findStudent($params);
-        
+
         if (!$assessment->isOpen($student)) {
             throw new Unauthorized(Error\Mapper::ERROR_ASSESSMENT_CLOSED);
         }

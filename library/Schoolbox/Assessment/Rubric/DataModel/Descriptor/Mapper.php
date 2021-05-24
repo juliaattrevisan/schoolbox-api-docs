@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for rubric usage.
  *
@@ -29,9 +30,11 @@ use Schoolbox\GenericCollection;
  * @method Model findOneByColumn($columnName, $columnValue, array $options = [])
  * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
-class Mapper extends Schoolbox\Mapper {
+class Mapper extends Schoolbox\Mapper
+{
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('rubric_descriptor');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
@@ -152,7 +155,6 @@ class Mapper extends Schoolbox\Mapper {
         $capability = null;
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             $levelId      = $r[$levelKey];
             $indicatorId  = $r[$indicatorKey];
             $capabilityId = $r[$capabilityKey];
@@ -207,5 +209,4 @@ class Mapper extends Schoolbox\Mapper {
     {
         return true;
     }
-
 }

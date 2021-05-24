@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -12,7 +13,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use \Schoolbox\ValueLabelInterface;
+use Schoolbox\ValueLabelInterface;
 
 /**
  * Represents a Venue where sports are conducted.
@@ -26,7 +27,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /** @var string */
     private $name;
-    
+
     /** @var float $latitude */
     private $latitude;
 
@@ -56,7 +57,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param string $name
      * @return self
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -64,7 +66,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -72,7 +75,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param float $latitude
      * @return self
      */
-    public function setLatitude($latitude) {
+    public function setLatitude($latitude)
+    {
         $this->latitude = $latitude;
         return $this;
     }
@@ -80,7 +84,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return float
      */
-    public function getLatitude() {
+    public function getLatitude()
+    {
         return $this->latitude;
     }
 
@@ -88,7 +93,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param float $longitude
      * @return self
      */
-    public function setLongitude($longitude) {
+    public function setLongitude($longitude)
+    {
         $this->longitude = $longitude;
         return $this;
     }
@@ -96,7 +102,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return float
      */
-    public function getLongitude() {
+    public function getLongitude()
+    {
         return $this->longitude;
     }
 
@@ -104,7 +111,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param string $address
      * @return self
      */
-    public function setAddress($address) {
+    public function setAddress($address)
+    {
         $this->address = $address;
         return $this;
     }
@@ -112,7 +120,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return string
      */
-    public function getAddress() {
+    public function getAddress()
+    {
         return $this->address;
     }
 }

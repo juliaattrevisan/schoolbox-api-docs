@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -134,41 +135,41 @@ class Worker extends PipeWriter
                         /** @var Worker $worker */
                         $worker->markTaskComplete();
                         return true;
-                    },
+                },
                 self::ERROR => function ($worker) {
                         /** @var Worker $worker */
                         return true;
-                    },
+                },
             ),
             self::DONE  => array(
                 self::READY => function ($worker) {
                         /** @var Worker $worker */
                         $worker->clearTask();
                         return true;
-                    },
+                },
             ),
             self::ERROR => array(
                 self::ENDED => function ($worker) {
                         /** @var Worker $worker */
                         $worker->clearTask();
                         return true;
-                    },
+                },
             ),
             self::READY => array(
                 self::BUSY  => function ($worker) {
                         /** @var Worker $worker */
                         // task must already be set (ie. use self::setTask())
                         return $worker->getTask() instanceof Task;
-                    },
+                },
                 self::ENDED => function ($worker) {
                         /** @var Worker $worker */
                         $worker->clearTask();
                         return true;
-                    },
+                },
                 self::ERROR => function ($worker) {
                         /** @var Worker $worker */
                         return true;
-                    },
+                },
             ),
         );
 
@@ -248,5 +249,4 @@ class Worker extends PipeWriter
         $this->task = null;
         return $this;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
@@ -6,9 +7,10 @@
  * @link        https://schoolbox.com.au/
  *
  */
+
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use \Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Sentry\State\HubInterface;
@@ -33,8 +35,8 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     }
 
     /* If the category wasn't found, try searching for a category code with this
-	 * numerical value i.e. treat the int as if it were a category code string
-	 */
+     * numerical value i.e. treat the int as if it were a category code string
+     */
     try {
         if (!$folder) {
             $folder = $folderMapper->findByCode($this->arg[0]);
@@ -99,7 +101,7 @@ $homepageHandler = new Homepage($folder->getId());
 
 // this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
 if (!$homepageHandler->getTemplate()) {
-    $this->localRedir('/resources/'.$folder->getId());
+    $this->localRedir('/resources/' . $folder->getId());
 }
 
 // Color mangling
@@ -146,7 +148,7 @@ $this->setBlock('page_controls', 'browse_resources', 'browse_resources_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory($this->getDi()->get('session')->get('user'), $this);
-if($_GET['readonly']) {
+if ($_GET['readonly']) {
     $componentFactory->setMaximumPermission($virtualPermission);
 }
 $componentCollection = $componentFactory->buildComponentList($folder->getId());
@@ -175,7 +177,7 @@ if ($virtualPermission >= UserAccess::ACCESS_WRITE) {
 
     $hasCourseSpec = $folder->getCourseSpecification() instanceof CourseSpecification && $folder->getCourseSpecification()->getId();
     $hasUnitSpec = $folder->getUnitSpecification() instanceof UnitSpecification && $folder->getUnitSpecification()->getId();
-    if(!$hasCourseSpec && !$hasUnitSpec){
+    if (!$hasCourseSpec && !$hasUnitSpec) {
         $this->parse('course_actions_block', 'course_actions');
     } else {
         $this->setVar('course_actions_block', '');
@@ -373,8 +375,7 @@ $sessionUser = $this->getDi()->get('session')->get('user');
 
 if ($sessionUser->getRole()->isStaff()) {
     $codeString = Scrub::text($folder->getTruncatedCodeString());
-}
-else {
+} else {
     $codeString = '';
 }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Reroute filter: throws away all messages if messaging is not enabled.
  *

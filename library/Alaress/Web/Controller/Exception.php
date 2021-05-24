@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Web\Controller;
-
 
 use ErrorException;
 
@@ -47,7 +47,8 @@ class Exception extends ErrorException
     /**
      * @return array
      */
-    public function contextualize() {
+    public function contextualize()
+    {
         return [
             'problem' => $this->message,
             'reasons' => $this->reasons

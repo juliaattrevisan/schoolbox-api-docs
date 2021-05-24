@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -57,7 +58,7 @@ class Model extends AbstractCourse
      */
     public function getTitle()
     {
-        if($this->getFolder() != null) {
+        if ($this->getFolder() != null) {
             return $this->getFolder()->getName();
         }
         return '';

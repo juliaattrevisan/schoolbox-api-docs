@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  *
  * This script is solely responsible for calculating the set of bindings FOR A SPECIFIED INSTANCE.
@@ -28,7 +29,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     // If no instance ID is provided, fall back to default if it exists
     $instanceId = $opts['instance'] ?? INSTANCE_ID;
@@ -42,5 +43,4 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
     } else {
         $cache->cacheAllUsers($instanceId);
     }
-
 });

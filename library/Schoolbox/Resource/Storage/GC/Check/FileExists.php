@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -44,5 +45,4 @@ class FileExists implements Check
         }
         return $previous;
     }
-
 }

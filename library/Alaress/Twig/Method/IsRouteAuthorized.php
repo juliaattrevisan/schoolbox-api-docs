@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Twig function for checking whether a route is authorized for a user.
  *
@@ -17,7 +18,8 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Session\Session;
 use Schoolbox\User;
 
-class IsRouteAuthorized {
+class IsRouteAuthorized
+{
 
     /**
      * @var Router
@@ -44,7 +46,8 @@ class IsRouteAuthorized {
      *                        currently logged in user.
      * @return bool
      */
-    public function execute($name, $params = array(), User $user = null) {
+    public function execute($name, $params = array(), User $user = null)
+    {
         if (!($user instanceof User)) {
             $user = $this->getSession()->getAuthUser();
         }
@@ -55,7 +58,8 @@ class IsRouteAuthorized {
      * @param  Router $router
      * @return $this
      */
-    public function setRouter($router) {
+    public function setRouter($router)
+    {
         $this->router = $router;
         return $this;
     }
@@ -63,7 +67,8 @@ class IsRouteAuthorized {
     /**
      * @return Router
      */
-    public function getRouter() {
+    public function getRouter()
+    {
         return $this->router;
     }
 
@@ -71,7 +76,8 @@ class IsRouteAuthorized {
      * @param  Authorizer $authorizer
      * @return $this
      */
-    public function setAuthorizer($authorizer) {
+    public function setAuthorizer($authorizer)
+    {
         $this->authorizer = $authorizer;
         return $this;
     }
@@ -79,7 +85,8 @@ class IsRouteAuthorized {
     /**
      * @return Authorizer
      */
-    public function getAuthorizer() {
+    public function getAuthorizer()
+    {
         return $this->authorizer;
     }
 
@@ -87,7 +94,8 @@ class IsRouteAuthorized {
      * @param  Session $session
      * @return $this
      */
-    public function setSession($session) {
+    public function setSession($session)
+    {
         $this->session = $session;
         return $this;
     }
@@ -95,8 +103,8 @@ class IsRouteAuthorized {
     /**
      * @return Session
      */
-    public function getSession() {
+    public function getSession()
+    {
         return $this->session;
     }
-
 }

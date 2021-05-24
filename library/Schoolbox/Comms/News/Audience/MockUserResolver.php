@@ -1,15 +1,18 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
 
 use Schoolbox\Comms\News;
 use Schoolbox\User;
+
 use function in_array;
 
 class MockUserResolver implements IUserResolver
@@ -70,7 +73,6 @@ class MockUserResolver implements IUserResolver
             return $dataset[$articleId];
         }
         return $dataset[$this->defaultSet];
-
     }
 
 

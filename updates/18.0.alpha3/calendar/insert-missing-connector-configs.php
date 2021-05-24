@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Repair missing Resource Booking Calendar Configuration records
  *

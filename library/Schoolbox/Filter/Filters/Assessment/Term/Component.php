@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
@@ -10,7 +12,6 @@ namespace Schoolbox\Filter\Filters\Assessment\Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Filter;
 use Schoolbox\Assessment\Term;
-
 
 /**
  * @method Definition getDefinition()
@@ -35,7 +36,6 @@ class Component extends Filter\BaseComponent
         // A term will be selected if any matching abstract term descriptions were selected
 
         foreach ($this->getDefinition()->getTerms() as $term) {
-
             if (!$isUserConfigurable || $this->isAvailable($term, $abstractOptions)) {
                 $key                       = (string)$term->getId();
                 $availableSelections[$key] = $this->createSelection($key, $this->isSelected($term, $abstractOptions, $roleType));
@@ -94,37 +94,42 @@ class Component extends Filter\BaseComponent
         $currentTerm  = $this->getDefinition()->getCurrentTerm();
         $previousTerm = $this->getDefinition()->getPreviousTerm();
 
-        if ($abstractOptions->offsetExists(Definition::KEY_ALL)
+        if (
+            $abstractOptions->offsetExists(Definition::KEY_ALL)
             && $abstractOptions[Definition::KEY_ALL]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($abstractOptions->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()
+        if (
+            $abstractOptions->offsetExists(Definition::KEY_FUTURE) && $term->getStart()->isFuture()
             && $abstractOptions[Definition::KEY_FUTURE]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($currentTerm && $abstractOptions->offsetExists(Definition::KEY_CURRENT) && $currentTerm->getId() === $term->getId()
+        if (
+            $currentTerm && $abstractOptions->offsetExists(Definition::KEY_CURRENT) && $currentTerm->getId() === $term->getId()
             && $abstractOptions[Definition::KEY_CURRENT]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($previousTerm && $abstractOptions->offsetExists(Definition::KEY_PREVIOUS) && $previousTerm->getId() === $term->getId()
+        if (
+            $previousTerm && $abstractOptions->offsetExists(Definition::KEY_PREVIOUS) && $previousTerm->getId() === $term->getId()
             && $abstractOptions[Definition::KEY_PREVIOUS]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if (!$termFinish->isNull() && $abstractOptions->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()
+        if (
+            !$termFinish->isNull() && $abstractOptions->offsetExists(Definition::KEY_PAST) && $term->getActualFinish()->isPast()
             && $abstractOptions[Definition::KEY_PAST]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($abstractOptions->offsetExists($term->getId())
+        if (
+            $abstractOptions->offsetExists($term->getId())
             && $abstractOptions[$term->getId()]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
         return false;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Pastoral care access control
  *

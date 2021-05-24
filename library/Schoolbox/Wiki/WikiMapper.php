@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Wiki;
-
 
 use PDO;
 use Schoolbox\Collection;
@@ -20,85 +20,87 @@ use Schoolbox\Mapper;
  * @package Schoolbox\Wiki
  * @method Wiki createModel()
  */
-class WikiMapper extends Mapper implements FeedableMapperInterface {
+class WikiMapper extends Mapper implements FeedableMapperInterface
+{
 
-	/**
-	 * @return void
-	 */
-	protected function mapping() {
-		$this->hasTable('wiki');
-		$this->hasModel(Wiki::class);
+    /**
+     * @return void
+     */
+    protected function mapping()
+    {
+        $this->hasTable('wiki');
+        $this->hasModel(Wiki::class);
 
-		$this->hasMap(array(
-			'column'     => 'wikiID',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
+        $this->hasMap(array(
+            'column'     => 'wikiID',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'categoryID',
-			'property'   => 'category',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'category'
-		));
+        $this->hasMap(array(
+            'column'     => 'categoryID',
+            'property'   => 'category',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'category'
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'latestRevision',
-			'property'   => 'latestRevision',
-			'type'       => self::TYPE_MODEL,
-			'join'       => 'revision'
-		));
+        $this->hasMap(array(
+            'column'     => 'latestRevision',
+            'property'   => 'latestRevision',
+            'type'       => self::TYPE_MODEL,
+            'join'       => 'revision'
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'slug',
-			'property'   => 'slug',
-			'type'       => self::TYPE_STRING
-		));
+        $this->hasMap(array(
+            'column'     => 'slug',
+            'property'   => 'slug',
+            'type'       => self::TYPE_STRING
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'created',
-			'property'   => 'created',
-			'type'       => self::TYPE_DATETIME
-		));
+        $this->hasMap(array(
+            'column'     => 'created',
+            'property'   => 'created',
+            'type'       => self::TYPE_DATETIME
+        ));
 
         $this->uses('deleted', self::TYPE_BOOL_ENUM);
         $this->hasSoftDeleteField('deleted', 'true', 'false');
 
-		$this->hasMap(array(
-			'column'     => 'locked',
-			'property'   => 'locked',
-			'type'       => self::TYPE_BOOL_ENUM
-		));
+        $this->hasMap(array(
+            'column'     => 'locked',
+            'property'   => 'locked',
+            'type'       => self::TYPE_BOOL_ENUM
+        ));
 
-		$this->hasJoin('category', array(
-			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-			'this_key'  => 'categoryID',
-			'other_key' => 'id'
-		));
+        $this->hasJoin('category', array(
+            'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
+            'this_key'  => 'categoryID',
+            'other_key' => 'id'
+        ));
 
-		$this->hasJoin('revision', array(
-			'mapper'    => '\\Schoolbox\\Wiki\\RevisionMapper',
-			'this_key'  => 'latestRevision',
-			'other_key' => 'revisionID'
-		));
+        $this->hasJoin('revision', array(
+            'mapper'    => '\\Schoolbox\\Wiki\\RevisionMapper',
+            'this_key'  => 'latestRevision',
+            'other_key' => 'revisionID'
+        ));
+    }
 
-	}
 
+    /**
+     * @param int $categoryId
+     * @param int $limit
+     * @param int $offset
+     * @param int $time
+     * @return Collection|Wiki[]
+     */
+    public function findForFeed($categoryId, $limit, $offset = 0, $time = 0)
+    {
+        $time = date('Y-m-d H:i:s', $time ?: time());
+        $limit = (int)$limit;
+        $offset = (int)$offset;
 
-	/**
-	 * @param int $categoryId
-	 * @param int $limit
-	 * @param int $offset
-	 * @param int $time
-	 * @return Collection|Wiki[]
-	 */
-	public function findForFeed($categoryId, $limit, $offset = 0, $time = 0) {
-		$time = date('Y-m-d H:i:s', $time ?: time());
-		$limit = (int)$limit;
-		$offset = (int)$offset;
-
-		$stmt = $this->database->prepare("
+        $stmt = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('w')},
 				{$this->getJoinColumnString('category', 'c')},
@@ -117,22 +119,20 @@ class WikiMapper extends Mapper implements FeedableMapperInterface {
 			LIMIT $offset, $limit
 		");
 
-		$stmt->execute(array(
-			'cat_id' => $categoryId,
-			'time'   => $time
-		));
+        $stmt->execute(array(
+            'cat_id' => $categoryId,
+            'time'   => $time
+        ));
 
-		$c = $this->createCollection();
-		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-			/** @var Wiki $wiki */
-			$wiki = $this->hydrate($r, 'w');
-			$wiki->setCategory($this->hydrateJoin($r, 'category', 'c'));
-			$wiki->setLatestRevision($this->hydrateJoin($r, 'revision', 'r'));
-			$wiki->getLatestRevision()->setUser($this->getJoinMapper('revision')->hydrateJoin($r, 'user', 'u'));
-			$c->add($wiki);
-		}
-		return $c;
-	}
-
-
-} 
+        $c = $this->createCollection();
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            /** @var Wiki $wiki */
+            $wiki = $this->hydrate($r, 'w');
+            $wiki->setCategory($this->hydrateJoin($r, 'category', 'c'));
+            $wiki->setLatestRevision($this->hydrateJoin($r, 'revision', 'r'));
+            $wiki->getLatestRevision()->setUser($this->getJoinMapper('revision')->hydrateJoin($r, 'user', 'u'));
+            $c->add($wiki);
+        }
+        return $c;
+    }
+}

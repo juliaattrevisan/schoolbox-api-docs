@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Async\AMQP\Bunny;
-
 
 use ReflectionProperty;
 use RuntimeException;
@@ -22,29 +22,29 @@ use RuntimeException;
 class BunnyControl implements ControlInterface
 {
 
-	const QUEUES                = 'queues';
-	const QUEUE_NAME            = 'name';
-	const QUEUE_DURABLE         = 'durable';
-	const QUEUE_AUTO_DELETE     = 'auto_delete';
-	const QUEUE_MSGS            = 'messages';
-	const QUEUE_MSGS_READY      = 'messages_ready';
-	const QUEUE_MSGS_UNACK      = 'messages_unacknowledged';
-	const QUEUE_CONSUMERS       = 'consumers';
-	const QUEUE_MEMORY          = 'memory';
-	const QUEUE_STATUS          = 'status';
+    const QUEUES                = 'queues';
+    const QUEUE_NAME            = 'name';
+    const QUEUE_DURABLE         = 'durable';
+    const QUEUE_AUTO_DELETE     = 'auto_delete';
+    const QUEUE_MSGS            = 'messages';
+    const QUEUE_MSGS_READY      = 'messages_ready';
+    const QUEUE_MSGS_UNACK      = 'messages_unacknowledged';
+    const QUEUE_CONSUMERS       = 'consumers';
+    const QUEUE_MEMORY          = 'memory';
+    const QUEUE_STATUS          = 'status';
 
-	const EXCHANGES             = 'exchanges';
-	const EXCHANGE_NAME         = 'name';
-	const EXCHANGE_TYPE         = 'type';
-	const EXCHANGE_DURABLE      = 'durable';
-	const EXCHANGE_AUTO_DELETE  = 'auto_delete';
-	const EXCHANGE_INTERNAL     = 'internal';
+    const EXCHANGES             = 'exchanges';
+    const EXCHANGE_NAME         = 'name';
+    const EXCHANGE_TYPE         = 'type';
+    const EXCHANGE_DURABLE      = 'durable';
+    const EXCHANGE_AUTO_DELETE  = 'auto_delete';
+    const EXCHANGE_INTERNAL     = 'internal';
 
-	const BINDINGS              = 'bindings';
-	const BINDING_SRC           = 'source';
-	const BINDING_DEST          = 'destination';
-	const BINDING_DEST_TYPE     = 'destination_type';
-	const BINDING_KEY           = 'routing_key';
+    const BINDINGS              = 'bindings';
+    const BINDING_SRC           = 'source';
+    const BINDING_DEST          = 'destination';
+    const BINDING_DEST_TYPE     = 'destination_type';
+    const BINDING_KEY           = 'routing_key';
 
 
     /** @var string - configuration file [default: ~/.rabbitmqadmin.conf] */
@@ -102,7 +102,6 @@ class BunnyControl implements ControlInterface
     public function __construct(array $config = [])
     {
         foreach ($config as $key => $value) {
-
             $property = score2camel($key, '-');
 
             if (property_exists($this, $property)) {
@@ -126,7 +125,6 @@ class BunnyControl implements ControlInterface
         $args = [];
 
         foreach ($props as $prop) {
-
             $name  = $prop->getName();
             $value = $this->$name;
 
@@ -158,166 +156,175 @@ class BunnyControl implements ControlInterface
 
                 return "--$key=$value";
             },
-            array_keys($args), array_values($args)
+            array_keys($args),
+            array_values($args)
         );
 
         return implode(' ', $mapped);
     }
 
 
-	/**
-	 * @param string $cmd
-	 * @throws RuntimeException
-	 * @return array
-	 */
-	protected function exec($cmd) {
-		// there's a bit of black magic in here
-		if(posix_getuid() !== 0) {
-			// this method can only succeed if the user is root - don't even try otherwise
-			throw new RuntimeException("rabbitmqctl can only be run by root");
-		}
+    /**
+     * @param string $cmd
+     * @throws RuntimeException
+     * @return array
+     */
+    protected function exec($cmd)
+    {
+        // there's a bit of black magic in here
+        if (posix_getuid() !== 0) {
+            // this method can only succeed if the user is root - don't even try otherwise
+            throw new RuntimeException("rabbitmqctl can only be run by root");
+        }
 
         $flags = $this->getFlagString();
 
-		exec("/usr/local/bin/rabbitmqadmin $flags $cmd", $output);
+        exec("/usr/local/bin/rabbitmqadmin $flags $cmd", $output);
 
-		return $output;
-	}
+        return $output;
+    }
 
 
-	/**
-	 * Map the given fields to the output returned from exec()
-	 *
-	 * @param array $output
-	 * @param array $fields
-	 * @return array
-	 */
-	protected function parse($output, $fields) {
-		if(!count($output)) {
-			return array();
-		}
+    /**
+     * Map the given fields to the output returned from exec()
+     *
+     * @param array $output
+     * @param array $fields
+     * @return array
+     */
+    protected function parse($output, $fields)
+    {
+        if (!count($output)) {
+            return array();
+        }
 
         // in the default format (tsv) there is a header row we need to remove
         array_shift($output);
 
-		$fieldCount = count($fields);
+        $fieldCount = count($fields);
 
-		$result = array();
+        $result = array();
 
-		foreach($output as $line) {
-			$xpl = preg_split('/\s+/', $line);
+        foreach ($output as $line) {
+            $xpl = preg_split('/\s+/', $line);
 
-			if(count($xpl) != $fieldCount) {
-				continue;
-			}
+            if (count($xpl) != $fieldCount) {
+                continue;
+            }
 
-			$result[] = array_combine($fields, $xpl);
-		}
+            $result[] = array_combine($fields, $xpl);
+        }
 
-		return $result;
-	}
-
-
-	/**
-	 * Generic implementation of list*() methods
-	 *
-	 * @param string $type
-	 * @param array  $opts
-	 * @param array  $fields
-	 * @return array
-	 */
-	protected function retrieve($type, $opts, $fields) {
-		foreach(array_diff($fields, $opts) as $invalid) {
-			unset($fields[$invalid]);
-		}
-
-		// no fields left?
-		if(!count($fields)) {
-			throw new \OutOfRangeException("You have no valid fields");
-			return array();
-		}
-
-		$cmd = "list $type ";
-		$cmd .= implode(' ', $fields);
-
-		$output = $this->exec($cmd);
-		return $this->parse($output, $fields);
-	}
-
-	/**
-	 * @param array  $fields
-	 * @return array
-	 */
-	public function listQueues($fields) {
-
-		// the core list of things you might need
-		$opts = array(
-			self::QUEUE_NAME, self::QUEUE_DURABLE, self::QUEUE_AUTO_DELETE, self::QUEUE_MSGS, self::QUEUE_MSGS_READY,
-			self::QUEUE_MSGS_UNACK, self::QUEUE_CONSUMERS, self::QUEUE_MEMORY, self::QUEUE_STATUS
-		);
-
-		// these possibly don't have any data in them ever, but perhaps they do. we don't really use them currently
-		$opts = array_merge($opts, [
-			'pid', 'owner_pid','exclusive_consumer_pid', 'exclusive_consumer_tag',
-			'consumer_utilisation', 'slave_pids', 'synchronised_slave_pids'
-		]);
-
-		return $this->retrieve(self::QUEUES, $opts, $fields);
-	}
+        return $result;
+    }
 
 
-	/**
-	 * @param array  $fields
-	 * @return array
-	 */
-	public function listExchanges($fields) {
-		$opts = array(
-			self::EXCHANGE_NAME, self::EXCHANGE_TYPE, self::EXCHANGE_DURABLE, self::EXCHANGE_AUTO_DELETE, self::EXCHANGE_INTERNAL
-		);
+    /**
+     * Generic implementation of list*() methods
+     *
+     * @param string $type
+     * @param array  $opts
+     * @param array  $fields
+     * @return array
+     */
+    protected function retrieve($type, $opts, $fields)
+    {
+        foreach (array_diff($fields, $opts) as $invalid) {
+            unset($fields[$invalid]);
+        }
 
-		return $this->retrieve(self::EXCHANGES, $opts, $fields);
-	}
+        // no fields left?
+        if (!count($fields)) {
+            throw new \OutOfRangeException("You have no valid fields");
+            return array();
+        }
+
+        $cmd = "list $type ";
+        $cmd .= implode(' ', $fields);
+
+        $output = $this->exec($cmd);
+        return $this->parse($output, $fields);
+    }
+
+    /**
+     * @param array  $fields
+     * @return array
+     */
+    public function listQueues($fields)
+    {
+
+        // the core list of things you might need
+        $opts = array(
+            self::QUEUE_NAME, self::QUEUE_DURABLE, self::QUEUE_AUTO_DELETE, self::QUEUE_MSGS, self::QUEUE_MSGS_READY,
+            self::QUEUE_MSGS_UNACK, self::QUEUE_CONSUMERS, self::QUEUE_MEMORY, self::QUEUE_STATUS
+        );
+
+        // these possibly don't have any data in them ever, but perhaps they do. we don't really use them currently
+        $opts = array_merge($opts, [
+            'pid', 'owner_pid','exclusive_consumer_pid', 'exclusive_consumer_tag',
+            'consumer_utilisation', 'slave_pids', 'synchronised_slave_pids'
+        ]);
+
+        return $this->retrieve(self::QUEUES, $opts, $fields);
+    }
 
 
-	/**
-	 * @param array  $fields
-	 * @return array
-	 */
-	public function listBindings($fields) {
-		$opts = array(
-			self::BINDING_SRC, self::BINDING_DEST, self::BINDING_DEST_TYPE, self::BINDING_KEY
-		);
+    /**
+     * @param array  $fields
+     * @return array
+     */
+    public function listExchanges($fields)
+    {
+        $opts = array(
+            self::EXCHANGE_NAME, self::EXCHANGE_TYPE, self::EXCHANGE_DURABLE, self::EXCHANGE_AUTO_DELETE, self::EXCHANGE_INTERNAL
+        );
 
-		return $this->retrieve(self::BINDINGS, $opts, $fields);
-	}
-
-
-	/**
-	 * @param array $fields
-	 * @return array
-	 */
-	public function listConnections($fields) {
-		// not implemented
-		return array();
-	}
+        return $this->retrieve(self::EXCHANGES, $opts, $fields);
+    }
 
 
-	/**
-	 * @param array $fields
-	 * @return array
-	 */
-	public function listChannels($fields) {
-		// not implemented
-		return array();
-	}
+    /**
+     * @param array  $fields
+     * @return array
+     */
+    public function listBindings($fields)
+    {
+        $opts = array(
+            self::BINDING_SRC, self::BINDING_DEST, self::BINDING_DEST_TYPE, self::BINDING_KEY
+        );
+
+        return $this->retrieve(self::BINDINGS, $opts, $fields);
+    }
 
 
-	/**
-	 * @return array
-	 */
-	public function listConsumers() {
-		// not implemented
-		return array();
-	}
+    /**
+     * @param array $fields
+     * @return array
+     */
+    public function listConnections($fields)
+    {
+        // not implemented
+        return array();
+    }
 
+
+    /**
+     * @param array $fields
+     * @return array
+     */
+    public function listChannels($fields)
+    {
+        // not implemented
+        return array();
+    }
+
+
+    /**
+     * @return array
+     */
+    public function listConsumers()
+    {
+        // not implemented
+        return array();
+    }
 }

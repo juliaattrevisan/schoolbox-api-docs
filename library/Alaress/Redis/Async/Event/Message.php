@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -31,5 +32,4 @@ class Message extends AbstractEvent
     {
         return $this->channel;
     }
-
 }

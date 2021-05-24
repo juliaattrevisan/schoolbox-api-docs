@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Grammar\Test;
-
 
 use Alaress\Lumberjack\Logger;
 use External_User;
@@ -38,7 +38,7 @@ class UserRulesetTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->markTestSkipped(Sync\Grammar\Factory::class.' currently relies on database');
+        $this->markTestSkipped(Sync\Grammar\Factory::class . ' currently relies on database');
         $this->logger = new Logger(STDOUT, STDERR, Monologger::DEBUG, [], true);
         $stratFactory = new Sync\Grammar\Factory($this->logger);
         $this->ruleset = $stratFactory->build(Role::STUDENT);

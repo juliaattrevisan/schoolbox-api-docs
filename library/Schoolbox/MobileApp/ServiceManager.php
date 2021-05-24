@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -84,7 +85,6 @@ class ServiceManager implements IServiceManager
         $unreadCount = 1;
 
         foreach ($this->findRegistrationsByUser($userId) as $provider => $appRegistrations) {
-
             foreach ($appRegistrations as $appIdentifier => $reg) {
                 $service = $this->getService($reg['service']);
 
@@ -98,10 +98,9 @@ class ServiceManager implements IServiceManager
 
                 try {
                     $this->pushToService($service, $tokens, $instance, $unreadCount);
-
                 } catch (InvalidArgumentException $e) {
                     // service not available
-                    $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ 'exception'=>$e ]);
+                    $this->log->notice("Failed push to {$service->getProviderName()} provider '{$service->getAppIdentifier()}': {$e->getMessage()}", [ 'exception' => $e ]);
                 }
             }
         }
@@ -122,15 +121,13 @@ class ServiceManager implements IServiceManager
         try {
             $this->log->info(sprintf('Sending data to %d device%s on "%s" (%s)', count($tokens), count($tokens) === 1 ? '' : 's', $appId, $provider));
             $service->send($tokens, $instance, $unreadCount);
-
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use
-            $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ 'exception'=>$e ]);
-
+            $this->log->warning("Service '{$service->getProviderName()}' unusable: {$e->getMessage()}", [ 'exception' => $e ]);
         } catch (RangeException $e) {
             // TODO implement backoff-and-retry.
             // TODO $e->getCode() will contain a Retry-After TTL (in seconds), or 0 if exponential backoff is to be implemented
-            $this->log->info($e->getMessage(), [ 'exception'=>$e ]);
+            $this->log->info($e->getMessage(), [ 'exception' => $e ]);
         }
     }
 
@@ -149,7 +146,7 @@ class ServiceManager implements IServiceManager
             $srv = $registration->getService();
 
             // by-reference for convenience
-            if($srv instanceof Service) {
+            if ($srv instanceof Service) {
                 $p =& $registrations[$srv->getProviderName()][$srv->getAppIdentifier()];
             }
 

@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\File;
-
 
 use Schoolbox\Collection;
 
@@ -36,5 +36,4 @@ interface ILocator
      * @return Collection|IFile[]
      */
     public function findByFolderId($nodeId);
-
-} 
+}

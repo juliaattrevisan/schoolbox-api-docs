@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Notify parents/players of upcoming matches
  *
@@ -10,7 +11,6 @@
 namespace Schoolbox\Fixtures\Match;
 
 use Alaress\Async\Notification\Parameter\Param;
-
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -109,18 +109,17 @@ class Notifier extends AbstractModuleNotifier
                         // if the start time changed, update the upcoming notification time.
                         $bundle->detach(self::TRIGGER_CREATED);
                         $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
-                    } else if (array_key_exists('itineraryStartAt', $diff)
+                    } else if (
+                        array_key_exists('itineraryStartAt', $diff)
                         && (0 < $diff['itineraryStartAt'][0] && $diff['itineraryStartAt'][0] < $dayAhead
-                            || 0 < $diff['itineraryStartAt'][1] && $diff['itineraryStartAt'][1] < $dayAhead)) {
+                            || 0 < $diff['itineraryStartAt'][1] && $diff['itineraryStartAt'][1] < $dayAhead)
+                    ) {
                         $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
-
                     }
                     break;
             }
-        }
-        else {
-            $this->log->warning("Got unknown type as object in fixtures event: ".get_class($match), ['char' => '+']);
-
+        } else {
+            $this->log->warning("Got unknown type as object in fixtures event: " . get_class($match), ['char' => '+']);
         }
     }
 

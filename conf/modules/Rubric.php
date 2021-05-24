@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Config\Modules;
-
 
 use Alaress\Application\Kernel;
 use Schoolbox\Assessment\Rubric\Manager\Module as ManagerModule;
@@ -35,5 +35,4 @@ class Rubric implements ModuleConfigInterface
         $module = new RubricMarkbookModule($di);
         $module->init('/rubricMarkbook');
     }
-
 }

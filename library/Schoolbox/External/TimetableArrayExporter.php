@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exporter for the timetable array
  *
@@ -25,7 +26,8 @@ class TimetableArrayExporter
         $this->timetableHandler = $timetableHandler;
     }
 
-    public function export(User $user) {
+    public function export(User $user)
+    {
         $campusList = [];
         foreach ($user->getCampusCollection() as $campus) {
             /** @var Campus $campus */

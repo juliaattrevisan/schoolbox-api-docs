@@ -1,4 +1,5 @@
 <?php
+
 /**
  * An interface for module loaders.
  *

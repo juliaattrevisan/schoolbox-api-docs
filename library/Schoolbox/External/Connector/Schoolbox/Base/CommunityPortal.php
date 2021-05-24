@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Stub implementation of Community Portal connector
  *

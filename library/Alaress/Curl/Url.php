@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -61,7 +62,8 @@ class Alaress_Curl_Url
      *
      * @param string $url
      */
-    public function __construct(string $url) {
+    public function __construct(string $url)
+    {
         $this->url = $url;
     }
 

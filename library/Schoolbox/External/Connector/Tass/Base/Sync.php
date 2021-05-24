@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TASS implementation of sync connector.
  *
@@ -260,8 +261,7 @@ class Sync extends Base implements ISync
      */
     public function findAllStaff()
     {
-        $iterator = $this->databaseExternal->getQueryIterator
-        (
+        $iterator = $this->databaseExternal->getQueryIterator(
             "
                 SELECT DISTINCT
                     CASE

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
@@ -187,7 +189,6 @@ class SubjectIterator implements Iterator
          *   - The code itself isn't unique enough for class lists etc.
          */
         if (isset($subjectNode->core)) {
-
             /* For subjects classified as 'core'
              *
              * This creates subject names like 11C-11MATH
@@ -202,9 +203,7 @@ class SubjectIterator implements Iterator
                 $name,
                 trim((string)$subjectNode->teachers)
             ]));
-
         } elseif (isset($subjectNode->option)) {
-
             /* For subjects classified as 'optional' :
              *
              * This creates subject names like 5-11GEOG-JAB
@@ -218,7 +217,6 @@ class SubjectIterator implements Iterator
 
             $code = $name;
         } else {
-
             /* No subjects in this slot
              */
             return null;

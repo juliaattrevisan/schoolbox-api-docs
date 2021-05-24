@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This (assessment, user) combination is currently valid for self-grading
  *

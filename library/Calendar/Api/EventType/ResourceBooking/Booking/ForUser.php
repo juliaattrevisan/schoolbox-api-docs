@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event source - displays all bookings for a single user.
  *
@@ -9,7 +10,8 @@
 
 use Calendar\Event\Collection;
 
-class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Base {
+class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Api_EventType_ResourceBooking_Base
+{
 
     /**
      * Get day events from this data source
@@ -19,7 +21,8 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
      *
      * @return Collection
      */
-    public function getEvents($startTimestamp, $endTimestamp) {
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
         // Get all items out of booking mapper that I am the owner of.
         $bookings = $this->getBookingMapper()->findForOwner(
             $this->getUser()->getId(),
@@ -30,7 +33,8 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForUser extends Calendar_Ap
         $collection = new Collection();
         foreach ($bookings as $booking) {
             $calendarEvent = $this->getEventConverter()->convertEventToCalendarEvent(
-                $booking->getEvent(), $booking
+                $booking->getEvent(),
+                $booking
             );
             $calendarEvent->setConnectorId($this->getConnectorId());
             $collection->add($calendarEvent);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -50,7 +51,6 @@ class Acara implements IStrategy
                 'code'  => $code,
                 'title' => $title,
             ];
-
         } else {
             $result = null;
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -122,13 +123,10 @@ class ObjectReader
         $paths = [];
 
         if (is_array($input) || $input instanceof Traversable) {
-
             foreach ($input as $key => $sample) {
                 $paths = $this->flattenPaths($paths, $prefix, $key, $sample, $input, $stack);
             }
-
         } elseif (is_object($input)) {
-
             $ro = new ReflectionObject($input);
 
             foreach ($ro->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
@@ -149,7 +147,6 @@ class ObjectReader
 
                 $paths = $this->flattenPaths($paths, $prefix, $key, $sample, $input, $stack);
             }
-
         } else {
             // we've reached a leaf, append it
             $paths[$prefix] = true;
@@ -234,19 +231,16 @@ class ObjectReader
 
         try {
             foreach ($parts as $get) {
-
                 // this is *so* cheating, but it exposes a unified interface for the functionality below
                 if (is_array($value)) {
                     $value = new ArrayObject($value);
                 }
 
                 if ($value instanceof ArrayAccess) {
-
                     if ($value->offsetExists($get)) {
                         // simple. just get it.
                         $string .= "[$get]";
                         $value = $value->offsetGet($get);
-
                     } else {
                         // so that offset doesn't exist...
                         // BUT! ...maybe it exists in the subordinate objects (and we're getting a collection return)
@@ -258,10 +252,9 @@ class ObjectReader
                         $append = '';
 
                         foreach ($value as $k => $v) {
-
                             try {
                                 if (is_object($v)) {
-                                    $append =  '->get'.ucfirst($get).'()[]';
+                                    $append =  '->get' . ucfirst($get) . '()[]';
                                     $values[] = $this->readObjectProperty($v, $get);
                                 } elseif (is_array($v)) {
                                     $append = "[$get][]";
@@ -270,7 +263,6 @@ class ObjectReader
                             } catch (DomainException $e) {
                                 // do nothing - ignore it and keep going
                             }
-
                         }
 
                         if (count($values) == 0) {
@@ -282,13 +274,10 @@ class ObjectReader
                         $string .= $append;
                         // $values could be an array of arrays - smoosh it into a flat list
                         $value = $this->coerceToFlatList($values);
-
                     }
-
                 } elseif (is_object($value)) {
-                    $string .= '->get'.ucfirst($get).'()';
+                    $string .= '->get' . ucfirst($get) . '()';
                     $value = $this->readObjectProperty($value, $get);
-
                 } else {
                     throw new DomainException("Reading '$get' from $string, but property '$value' is not readable (path was $path)");
                 }
@@ -343,5 +332,4 @@ class ObjectReader
 
         throw new DomainException("Key '$get' not found on array");
     }
-
 }

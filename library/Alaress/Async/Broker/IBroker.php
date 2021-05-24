@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -40,5 +41,4 @@ interface IBroker
      * @return void
      */
     public function publish($serializable, array $context = [], int $ttl = null);
-
 }

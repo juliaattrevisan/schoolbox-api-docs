@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\My\File;
 
 use Component\Eportfolio\FileListMapper;
@@ -115,6 +117,6 @@ class Mapper extends AbstractFileMapper implements ILocator, IFileMapper
     public function deleteEportfolio(Model $file)
     {
         $fileListMapper = FileListMapper::getInstance();
-        $fileListMapper->deleteByColumn('file_id',$file->getId());
+        $fileListMapper->deleteByColumn('file_id', $file->getId());
     }
 }

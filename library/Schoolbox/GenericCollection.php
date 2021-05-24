@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -8,9 +9,13 @@
 namespace Schoolbox;
 
 use TypeError;
+
 use function class_exists;
+
 use DomainException;
+
 use function is_a;
+
 use ReflectionClass;
 use ReflectionException;
 use UnexpectedValueException;
@@ -165,19 +170,19 @@ class GenericCollection extends Collection
         $otherIsClass = class_exists($otherElementType);
 
         // Both classes?
-        if($thisIsClass && $otherIsClass){
+        if ($thisIsClass && $otherIsClass) {
             return is_a($this->elementType, $otherElementType, true);
         }
 
         $thisReflection  = new ReflectionClass($this->elementType);
 
         // Both interfaces?
-        if(!$thisIsClass && !$otherIsClass){
+        if (!$thisIsClass && !$otherIsClass) {
             return $thisReflection->implementsInterface($otherElementType);
         }
 
         // This is class (hence other is interface)
-        if($thisIsClass){
+        if ($thisIsClass) {
             return $thisReflection->implementsInterface($otherElementType);
         }
 

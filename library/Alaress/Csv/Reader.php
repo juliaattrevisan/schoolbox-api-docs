@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Really simple CSV reader
  *
@@ -9,7 +10,8 @@
 
 namespace Alaress\Csv;
 
-class Reader implements \Iterator {
+class Reader implements \Iterator
+{
 
     /**
      * The file name to read from.
@@ -82,7 +84,8 @@ class Reader implements \Iterator {
      *
      * @throws \RuntimeException if file isn't found or readable
      */
-    public function __construct($filename) {
+    public function __construct($filename)
+    {
         if (is_resource($filename)) {
             $this->filename = null;
             $this->fp       = $filename;
@@ -96,14 +99,16 @@ class Reader implements \Iterator {
     /**
      * Cleans up after itself when destroyed
      */
-    public function __destruct() {
+    public function __destruct()
+    {
         $this->cleanup();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function current() {
+    public function current()
+    {
         $parsed_row  = array();
         $column_list = $this->getColumnList();
         if (empty($column_list)) {
@@ -132,7 +137,8 @@ class Reader implements \Iterator {
     /**
      * {@inheritdoc}
      */
-    public function next() {
+    public function next()
+    {
         $this->current_key++;
         $this->current_row = $this->loadRow();
     }
@@ -140,21 +146,24 @@ class Reader implements \Iterator {
     /**
      * {@inheritdoc}
      */
-    public function key() {
+    public function key()
+    {
         return $this->current_key;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function valid() {
+    public function valid()
+    {
         return $this->current_row !== false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rewind() {
+    public function rewind()
+    {
         $this->cleanup();
         if (!is_resource($this->fp)) {
             $this->fp = fopen($this->filename, 'r');
@@ -168,7 +177,8 @@ class Reader implements \Iterator {
         $this->next();
     }
 
-    protected function cleanup() {
+    protected function cleanup()
+    {
         if (is_resource($this->fp) && $this->filename) {
             fclose($this->fp);
             unset($this->fp);
@@ -182,7 +192,8 @@ class Reader implements \Iterator {
      *
      * @return array
      */
-    protected function loadRow() {
+    protected function loadRow()
+    {
         return fgetcsv($this->fp, 0, $this->getDelimiter(), $this->getEnclosure(), $this->getEscape());
     }
 
@@ -191,7 +202,8 @@ class Reader implements \Iterator {
      * @param  array $column_list
      * @return $this
      */
-    public function setColumnList($column_list) {
+    public function setColumnList($column_list)
+    {
         if (empty($this->getExpectedColumnList())) {
             $this->column_list = $column_list;
             return $this;
@@ -218,7 +230,8 @@ class Reader implements \Iterator {
     /**
      * @return array
      */
-    public function getColumnList() {
+    public function getColumnList()
+    {
         return $this->column_list;
     }
 
@@ -226,7 +239,8 @@ class Reader implements \Iterator {
      * @param  array $expected_column_list
      * @return $this
      */
-    public function setExpectedColumnList($expected_column_list) {
+    public function setExpectedColumnList($expected_column_list)
+    {
         $this->expected_column_list = $expected_column_list;
         return $this;
     }
@@ -234,7 +248,8 @@ class Reader implements \Iterator {
     /**
      * @return array
      */
-    public function getExpectedColumnList() {
+    public function getExpectedColumnList()
+    {
         return $this->expected_column_list;
     }
 
@@ -242,7 +257,8 @@ class Reader implements \Iterator {
      * @param  bool  $load_from_first
      * @return $this
      */
-    public function setLoadFromFirst($load_from_first) {
+    public function setLoadFromFirst($load_from_first)
+    {
         $this->load_from_first = $load_from_first;
         return $this;
     }
@@ -250,7 +266,8 @@ class Reader implements \Iterator {
     /**
      * @return bool
      */
-    public function getLoadFromFirst() {
+    public function getLoadFromFirst()
+    {
         return $this->load_from_first;
     }
 
@@ -258,7 +275,8 @@ class Reader implements \Iterator {
      * @param  string $delimiter
      * @return $this
      */
-    public function setDelimiter($delimiter) {
+    public function setDelimiter($delimiter)
+    {
         $this->delimiter = $delimiter;
         return $this;
     }
@@ -266,7 +284,8 @@ class Reader implements \Iterator {
     /**
      * @return string
      */
-    public function getDelimiter() {
+    public function getDelimiter()
+    {
         return $this->delimiter;
     }
 
@@ -274,7 +293,8 @@ class Reader implements \Iterator {
      * @param  string $enclosure
      * @return $this
      */
-    public function setEnclosure($enclosure) {
+    public function setEnclosure($enclosure)
+    {
         $this->enclosure = $enclosure;
         return $this;
     }
@@ -282,7 +302,8 @@ class Reader implements \Iterator {
     /**
      * @return string
      */
-    public function getEnclosure() {
+    public function getEnclosure()
+    {
         return $this->enclosure;
     }
 
@@ -290,7 +311,8 @@ class Reader implements \Iterator {
      * @param  string $escape
      * @return $this
      */
-    public function setEscape($escape) {
+    public function setEscape($escape)
+    {
         $this->escape = $escape;
         return $this;
     }
@@ -298,7 +320,8 @@ class Reader implements \Iterator {
     /**
      * @return string
      */
-    public function getEscape() {
+    public function getEscape()
+    {
         return $this->escape;
     }
 

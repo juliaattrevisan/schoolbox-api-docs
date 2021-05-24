@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Permission\Access;
@@ -20,11 +22,13 @@ use External_UserInterface;
 use External_User;
 use LogicException;
 use UnexpectedValueException;
+
 use function count;
 use function explode;
 use function implode;
 use function in_array;
 use function max;
+
 use const PHP_SAPI;
 
 /**
@@ -76,7 +80,7 @@ class Access
      *
      * @var self
      */
-    static private $instance;
+    private static $instance;
 
     /** @var UserAccessMapper */
     private $userAccessMapper;

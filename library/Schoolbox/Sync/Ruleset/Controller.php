@@ -1,22 +1,24 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Ruleset;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use \Schoolbox\Sync\Condition;
-use \Schoolbox\Sync\Effect;
+use Schoolbox\Sync\Condition;
+use Schoolbox\Sync\Effect;
 use Schoolbox\Sync\Effect\Type\Model as EffectType;
-use \Schoolbox\Sync\Hydrator;
-use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use Schoolbox\Sync\Hydrator;
+use Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 use Schoolbox\Sync\Provisioner\Provisioner;
-use \Schoolbox;
-use \Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
-use \Schoolbox\Sync\Rule\Mapper as RuleMapper;
+use Schoolbox;
+use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
+use Schoolbox\Sync\Rule\Mapper as RuleMapper;
 use OutOfBoundsException;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Storage;
@@ -100,7 +102,8 @@ class Controller extends Base
      * @api GET /adminv2/ups/{rulesetId}
      * @param string $rulesetId
      */
-    public function read($rulesetId) {
+    public function read($rulesetId)
+    {
 
         /* Produce Twig template data based on Role
          */
@@ -243,7 +246,7 @@ class Controller extends Base
         try {
             $model  = Log\Mapper::getInstance()->findById($logId);
 
-            if('stream' === $format) {
+            if ('stream' === $format) {
                 $this->getResponse()->content->set([
                     'header'    => "@upsRuleset/log/stream-header.twig",
                     'template'  => $template,
@@ -290,13 +293,10 @@ class Controller extends Base
                     'data'     => $data
                 ]);
             }
-
-
         } catch (Mapper\Exception $e) {
             // 404 on the log - we have no aura way of doing this!! :(
             $this->getDi()->get('sitePage')->error(41, '', 404);
             exit;
-
         } catch (OutOfBoundsException $e) {
             // 400: requested a page that doesn't exist
             if ($this->getRequest()->isXhr()) {
@@ -306,7 +306,6 @@ class Controller extends Base
                     'format' => 'json',
                     'data'   => $e->getMessage()
                 ]);
-
             } else {
                 $this->getResponse()->redirect->to($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
             }
@@ -327,7 +326,7 @@ class Controller extends Base
     {
         $line = fgets($stream);
 
-        if(!$line){
+        if (!$line) {
             return false;
         }
 
@@ -393,7 +392,6 @@ class Controller extends Base
 
         // read the file, ignoring the first 0 - $firstLine lines
         for ($i = 0; ($line = fgets($inStream)) && $i <= $lastLine; ++$i) {
-
             // ignore the first $n lines
             if ($i < $firstLine) {
                 continue;
@@ -451,7 +449,6 @@ class Controller extends Base
     protected function parseFilterString($filterString)
     {
         if (preg_match_all("`([a-zA-Z_]+)\(([^\)]+)\);?`", $filterString, $matches)) {
-
             // get rid of the first (wholestring match) index
             array_shift($matches);
 
@@ -483,7 +480,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'format' => 'noContent',
             'postOutput' => [
-                function() use ($rulesetId, $provisioner) {
+                function () use ($rulesetId, $provisioner) {
                     $this->syncCallback($rulesetId, $provisioner, false);
                 }
             ],
@@ -512,7 +509,7 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'format' => 'noContent',
             'postOutput' => [
-                function() use ($rulesetId, $provisioner) {
+                function () use ($rulesetId, $provisioner) {
                     $this->syncCallback($rulesetId, $provisioner, true);
                 }
             ],
@@ -565,7 +562,8 @@ class Controller extends Base
      *
      * @api POST /adminv2/ups/ruleset/rule/update
      */
-    public function updateRule(){
+    public function updateRule()
+    {
 
         $response = [];
         $postData = $this->getRequest()->post;
@@ -589,7 +587,8 @@ class Controller extends Base
      * @return bool Whether Rule Sequence was successfully saved
      * @throws \PDOException
      */
-    protected function updateRuleSequence($sequencing) {
+    protected function updateRuleSequence($sequencing)
+    {
 
         // TODO DI some more
         $mapper = RuleMapper::getInstance();
@@ -633,7 +632,6 @@ class Controller extends Base
 
         if (is_array($conditions)) {
             foreach ($conditions as $conditionId => $conditionData) {
-
                 $conditionType = $conditionData['type'];
                 // NOT WORKING
                 $conditionArgs = (array)$conditionData['arguments'];
@@ -647,7 +645,6 @@ class Controller extends Base
                         $conditionArgs[1] = preg_split("`[\r\n]+`", $conditionArgs[1]);
                     }
                     $conditionArgs[2] = (bool)$conditionArgs[2];
-
                 } else {
                     $conditionArgs[0] = (bool)$conditionArgs[0];
                 }
@@ -663,8 +660,7 @@ class Controller extends Base
                     $model = $mapper->hydrate($condition);
                     $mapper->save($model);
                     $results[$conditionId] = $model->getId();
-                }
-                catch (\PDOException $e) {
+                } catch (\PDOException $e) {
                 }
             }
         }
@@ -706,16 +702,15 @@ class Controller extends Base
 
         if (is_array($effects)) {
             foreach ($effects as $effectId => $effectData) {
-
                 // Don't save undefined / invalid effects
 
                 // All effects must have a 'type'
-                if('' == $effectData['type']){
+                if ('' == $effectData['type']) {
                     continue;
                 }
 
                 // All non-'skip' effects must have a 'userProperty'
-                if(EffectTypeMapper::EFFECT_TYPE_SKIP != $effectData['type'] && '' == $effectData['userProperty']){
+                if (EffectTypeMapper::EFFECT_TYPE_SKIP != $effectData['type'] && '' == $effectData['userProperty']) {
                     continue;
                 }
 
@@ -731,7 +726,6 @@ class Controller extends Base
                 /* Forge key/value for Mapped Key/Value Pairs
                  */
                 if ($effectTypeMapper->isMap($effectData['type'])) {
-
                     /* Keep arg[0], that token field
                      * Default the token field to an empty string
                      * (in case it was saved without a token field)
@@ -781,7 +775,6 @@ class Controller extends Base
                 elseif ($fragmentFactory->isCollection($effectData['userProperty'])) {
                     $xpl = explode(',', $effectArgs[0]);
                     $arg = [count($xpl) == 1 ? $xpl[0] : $xpl];
-
                 }
                 /* Otherwise just save it as given
                  */

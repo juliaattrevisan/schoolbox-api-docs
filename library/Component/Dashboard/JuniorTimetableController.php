@@ -125,7 +125,6 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
         $stack = array();
 
         for ($i = 0; $i < count($timetable); $i++) {
-
             /* Make a gigantic assumption
              * formerly: $period = $timetable[$i];
              */
@@ -139,11 +138,9 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
                     continue;
                 }
             } else {
-
                 /* Start restructuring
                  */
                 if (count($timetable[$i]['class'])) {
-
                     /* Fix for SB-7048 prevents you from using first element
                      * in the stack directly, have to array_values first
                      */

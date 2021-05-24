@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Iterator over a XMLReader
  *

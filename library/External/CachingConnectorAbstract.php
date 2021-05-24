@@ -1,17 +1,22 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External;
 
 use Alaress\Redis;
+
 use function call_user_func_array;
 use function get_class;
+
 use InvalidArgumentException;
 use Schoolbox\External;
+
 use function trigger_error;
 
 /**

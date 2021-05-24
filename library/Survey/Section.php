@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Section
  *
@@ -8,7 +9,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Survey_Section extends Evaluation_Section {
+class Survey_Section extends Evaluation_Section
+{
     public $_table = 'assess_section';
     public $_index = 'section_id';
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Position
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External\Normalise\User\Staff;
 
-class Position {
+class Position
+{
 
     /**
      * Job position description
@@ -48,14 +50,16 @@ class Position {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setup();
     }
 
     /**
      * Hook method
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setStartDate(new \Alaress_Date_Format(null, 'U'));
         $this->setEndDate(new \Alaress_Date_Format(null, 'U'));
     }

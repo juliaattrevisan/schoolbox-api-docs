@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -1364,5 +1365,4 @@ class DemoData
         self::$teacherCache[$userChar] = $user;
         return $user;
     }
-
 }

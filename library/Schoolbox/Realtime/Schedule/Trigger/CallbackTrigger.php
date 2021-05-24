@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Schedule\Trigger;
-
 
 use Alaress\Scheduler\Event\EventInterface;
 use Alaress\Scheduler\Trigger\AbstractTrigger;
@@ -54,8 +54,8 @@ class CallbackTrigger extends AbstractTrigger
      *
      * @return callable[]
      */
-    public function getCallbacks() {
+    public function getCallbacks()
+    {
         return $this->notifier->retrieveCallbacks($this->label);
     }
-
-} 
+}

@@ -80,7 +80,8 @@ class Leave_Request
         if (null === $this->getFinish() || $this->getFinish()->isNull()) {
             return false;
         }
-        if ($this->getStart()->getUnixTimeStamp() < $datetimeFinish->getUnixTimeStamp()
+        if (
+            $this->getStart()->getUnixTimeStamp() < $datetimeFinish->getUnixTimeStamp()
             && $this->getFinish()->getUnixTimeStamp() > $datetimeStart->getUnixTimeStamp()
         ) {
             return true;

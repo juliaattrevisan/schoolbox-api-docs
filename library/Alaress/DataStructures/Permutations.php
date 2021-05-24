@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Alaress\DataStructures;
@@ -46,7 +48,7 @@ class Permutations
         $permutations = $this->generateRecursive(count($items), $items);
         $equals       = $equals ?? static function ($a, $b): bool {
                 return $a === $b;
-            };
+        };
 
         foreach ($permutations as $i => $permutation) {
             $limit = count($permutations);
@@ -101,7 +103,6 @@ class Permutations
             $permutations = $this->generateRecursive($k - 1, $array);
 
             for ($i = 0; $i < ($k - 1); $i++) {
-
                 if ($k % 2 === 0) {
                     // If size is even, swap ith and last element
                     $temp          = $array[$i];
@@ -115,7 +116,6 @@ class Permutations
                 }
                 array_push($permutations, ...$this->generateRecursive($k - 1, $array));
             }
-
         }
         return $permutations;
     }

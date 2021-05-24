@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Enable users to send email
  *
@@ -9,6 +10,7 @@
 use Alaress\Mail\AbstractMailer;
 use Alaress\Mail\Codec;
 use Schoolbox\UserMapper;
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -16,12 +18,11 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$groupHandler = new Group;
+$groupHandler = new Group();
 $externalHandler = new External_User();
 $userMapper = UserMapper::getInstance();
 
 if (Config::get('mail_enable') == 1) {
-
     // Parse out list of emails passed
     // The name needs to be included in both the ID and value
     $invalidEmails = [];
@@ -56,7 +57,7 @@ if (Config::get('mail_enable') == 1) {
     foreach ($addressLists as $type => $request) {
         if (null !== $_REQUEST[$type]) {
             $emailAddresses = Mailer::parseAddressString($_REQUEST[$type], false);
-            if(!empty($emailAddresses[AbstractMailer::KEY_VALID])) {
+            if (!empty($emailAddresses[AbstractMailer::KEY_VALID])) {
                 foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $email => $name) {
                     $addressLists[$type][] = Mailer::buildAddress($email, $name);
                 }
@@ -84,7 +85,7 @@ if (Config::get('mail_enable') == 1) {
         $page->setBlock('alert_box', 'invalid_address', 'invalid_address_block');
         foreach ($invalidEmails as $email) {
             $page->setVar([
-                'INVALID_EMAIL' => '"'.Scrub::text($email).'"'
+                'INVALID_EMAIL' => '"' . Scrub::text($email) . '"'
             ]);
             $page->parse('invalid_address_block', 'invalid_address', true);
         }

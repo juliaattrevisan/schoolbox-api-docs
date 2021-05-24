@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Month
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Statistics\Scale;
 
 class Month extends Base
@@ -59,7 +61,7 @@ class Month extends Base
         /* Multiply by 1000 to get milliseconds conversion, because highcharts
          */
         while ($start->getUnixTimeStamp() <= $endTimestamp) {
-            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0, null];
+            $range[$start->getDatabase()] = [1000 * $start->getUnixTimeStamp(), 0, null];
 
             /* Arbitrarily add one month per iteration, rather than calculate based on seconds
              * Months aren't the same length and cannot be incremented uniformly, except like this

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WebDAV configuration
  *
@@ -142,7 +143,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         /** @var WebDav $dav */
         foreach ($davs as $dav) {
             if ($dav->matches($user)) {
-
                 // Only one connection can be created.
                 // (Multiple paths within the same connection may be created, though.)
                 if (!isset($settings)) {
@@ -173,16 +173,15 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $path = str_replace("{:username}", $user->getUsername(), $path);
                 $path = str_replace("{:yearlevel}", $userYear, $path);
                 $path = str_replace("{:calendaryear}", (int) date("Y"), $path);
-                if(is_numeric($userYear)) {
+                if (is_numeric($userYear)) {
                     $path = str_replace("{:graduationyear7}", 7 - (int)$userYear + (int)date("Y"), $path);
                     $path = str_replace("{:graduationyear12}", 12 - (int)$userYear + (int)date("Y"), $path);
                     $path = str_replace("{:graduationyeartwodigit7}", 7 - (int)$userYear + (int)date("y"), $path);
                     $path = str_replace("{:graduationyeartwodigit12}", 12 - (int)$userYear + (int)date("y"), $path);
                     $path = str_replace("{:startyear7}", (int)date("Y") - ((int)$userYear - 7), $path);
                     $path = str_replace("{:startyear12}", (int)date("Y") - ((int)$userYear - 12), $path);
-                }
-                else {
-                    $path = str_replace(["{:graduationyear7}", "{:graduationyear12}", "{:graduationyeartwodigit7}", "{:graduationyeartwodigit12}","{:startyear7}","{:startyear12}"],'', $path);
+                } else {
+                    $path = str_replace(["{:graduationyear7}", "{:graduationyear12}", "{:graduationyeartwodigit7}", "{:graduationyeartwodigit12}","{:startyear7}","{:startyear12}"], '', $path);
                 }
 
                 $paths[] = $path;
@@ -193,7 +192,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         // WebDAV setting from prior to V17.0
 
         if (count($paths) == 0 && $fallbackEnabled) {
-
             // There was no WebDAV configuration applied, fallback to historical method (aka. that big long if-else statement)
             // Now extracted for your convenience
             $config   = LegacyConfigFactory::build($siteLocation, $user, $_SESSION);
@@ -232,12 +230,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         try {
             $response = $this->client->propFind(
-                $path, [
+                $path,
+                [
                     '{DAV:}getcontentlength',
                     '{DAV:}resourcetype',
                     '{DAV:}getlastmodified',
                     '{DAV:}creationdate',
-                ], 1
+                ],
+                1
             );
         } catch (ClientHttpException $e) {
             switch ($e->getResponse()->getStatus()) {
@@ -280,7 +280,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $_SESSION['portfolioIdPathMap'][] = $filepath;
                 end($_SESSION['portfolioIdPathMap']);
                 $index = key($_SESSION['portfolioIdPathMap']);
-
             } else {
                 $temp = array_flip($_SESSION['portfolioIdPathMap']);
                 $index = $temp[$filepath];
@@ -299,7 +298,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             ];
 
             $this->cache[$md5Path][$type][] = $temp;
-
         }
 
         return $this->cache[$md5Path][$filter];
@@ -520,7 +518,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             if ($e->getMessage() == "HTTP error: 401") {
                 SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
             } else {
-                if ($e->getMessage() == "HTTP error: 404" OR $e->getMessage() == "HTTP error: 400") {
+                if ($e->getMessage() == "HTTP error: 404" or $e->getMessage() == "HTTP error: 400") {
                     return false;
                 } else {
                     error(141, $e->getMessage() . " at: " . $_SESSION['portfolioIdPathMap'][$id]);

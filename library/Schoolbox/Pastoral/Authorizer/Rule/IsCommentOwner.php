@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Determine if a pastoral comment is owned by the logged in user
  *

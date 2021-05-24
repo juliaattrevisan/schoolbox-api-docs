@@ -12,7 +12,8 @@ use Schoolbox\Database\Factory;
 
  */
 
-class External_Maze_Class implements External_ClassInterface {
+class External_Maze_Class implements External_ClassInterface
+{
 
     /**
      * An instance of MSSQL
@@ -29,7 +30,8 @@ class External_Maze_Class implements External_ClassInterface {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->db = Factory::getInstanceExternal();
         $this->setHelper(new External_Maze_Helper());
     }
@@ -118,7 +120,7 @@ class External_Maze_Class implements External_ClassInterface {
         $studentList = array();
 
         if (is_array($allStudents) && count($allStudents)) {
-            foreach($allStudents as $currentStudent) {
+            foreach ($allStudents as $currentStudent) {
                 $student = array(
                     'synergy_id' => $currentStudent['ID'],
                     'firstname' => $currentStudent['Firstname'],
@@ -206,7 +208,7 @@ class External_Maze_Class implements External_ClassInterface {
         $teacherKeys = array();
 
         if (is_array($allTeachers) && count($allTeachers)) {
-            foreach($allTeachers as $currentTeacher) {
+            foreach ($allTeachers as $currentTeacher) {
                 $teacherKeys[$currentTeacher['T1TEACH']] = '';
                 $teacherKeys[$currentTeacher['T2TEACH']] = '';
                 $teacherKeys[$currentTeacher['T3TEACH']] = '';
@@ -230,7 +232,8 @@ class External_Maze_Class implements External_ClassInterface {
      *
      * @param IConnector $db
      */
-    protected function setDb($db) {
+    protected function setDb($db)
+    {
         $this->db = $db;
     }
 
@@ -239,7 +242,8 @@ class External_Maze_Class implements External_ClassInterface {
      *
      * @return IConnector
      */
-    protected function getDb() {
+    protected function getDb()
+    {
         return $this->db;
     }
 
@@ -248,7 +252,8 @@ class External_Maze_Class implements External_ClassInterface {
      *
      * @param null $helper
      */
-    protected function setHelper($helper) {
+    protected function setHelper($helper)
+    {
         $this->helper = $helper;
     }
 
@@ -257,7 +262,8 @@ class External_Maze_Class implements External_ClassInterface {
      *
      * @return External_Maze_Helper
      */
-    protected function getHelper() {
+    protected function getHelper()
+    {
         return $this->helper;
     }
 

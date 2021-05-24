@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Test;
@@ -71,10 +73,12 @@ class AccessLevelCensorTest extends TestCase
             $this->assertEmpty($diff, "{$recordType} {$viewer->getUsername()} pastoral record: " . count($diff));
 
             // Compare related records
-            $diffRecords = $expectedFilteredRecord->getRelatedRecords()->diff($actualFilteredRecord->getRelatedRecords(),
+            $diffRecords = $expectedFilteredRecord->getRelatedRecords()->diff(
+                $actualFilteredRecord->getRelatedRecords(),
                 function ($a, $b) {
                     return empty(Pastoral\Mapper::getInstance()->diff($a, $b));
-                });
+                }
+            );
             $this->assertEmpty($diffRecords, "{$recordType} {$viewer->getUsername()} related records: " . $diffRecords->count());
         }
     }
@@ -253,8 +257,7 @@ class AccessLevelCensorTest extends TestCase
             (new PastoralAttachment())->setPrivate(true)->setPastoral($record)
         )->add(
             (new PastoralAttachment())->setPrivate(false)->setPastoral($record)
-        )
-        );
+        ));
 
         // set pastoral access
         if ($pastoralAccess) {
@@ -368,6 +371,5 @@ class AccessLevelCensorTest extends TestCase
                 'privateAccess'  => false,
             ],
         ];
-
     }
 }

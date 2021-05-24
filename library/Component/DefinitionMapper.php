@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -50,8 +51,10 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
 
         $classDefinitionOverride = str_replace('Controller', 'Definition', $row['cd.class']);
 
-        if (class_exists($classDefinitionOverride) &&
-            is_subclass_of($classDefinitionOverride, Component_Definition::class)) {
+        if (
+            class_exists($classDefinitionOverride) &&
+            is_subclass_of($classDefinitionOverride, Component_Definition::class)
+        ) {
             $this->hasModel($classDefinitionOverride);
         } else {
             $this->hasModel(Component_Definition::class);
@@ -293,5 +296,4 @@ class Component_DefinitionMapper extends Schoolbox\Mapper
 
         return $dehydration;
     }
-
 }

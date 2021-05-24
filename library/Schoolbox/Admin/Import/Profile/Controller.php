@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
@@ -172,7 +174,6 @@ class Controller extends Base
         if (!$this->getRequest()->post['file']) {
             $errors[] = 'Please choose a csv type.';
         } else {
-
             /* Process attachment specifically
              */
             if ($this->getRequest()->post['attachment']) {

@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Async\Notification\Cloud;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Psr\Log\LoggerInterface;
@@ -41,5 +41,4 @@ interface ServiceInterface
      * @return self
      */
     public function setLog(LoggerInterface $log);
-
 }

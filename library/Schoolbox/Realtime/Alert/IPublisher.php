@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -21,5 +22,4 @@ interface IPublisher
      * @return int
      */
     public function alertUser($userId, Instance $instance);
-
 }

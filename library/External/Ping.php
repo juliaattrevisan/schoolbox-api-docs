@@ -1,32 +1,34 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-class External_Ping implements External_PingInterface {
+class External_Ping implements External_PingInterface
+{
 
-	/**
-	 * @var External_PingInterface
-	 */
-	private $database;
+    /**
+     * @var External_PingInterface
+     */
+    private $database;
 
-	/**
-	 * Constructor
-	 *
-	 * @throws Exception
-	 * @param String $databaseName
-	 */
-	public function __construct($databaseName = '')
+    /**
+     * Constructor
+     *
+     * @throws Exception
+     * @param String $databaseName
+     */
+    public function __construct($databaseName = '')
     {
-		$this->database = (new External_DatabaseFactory())->buildPingConnector($databaseName);
-	}
+        $this->database = (new External_DatabaseFactory())->buildPingConnector($databaseName);
+    }
 
-	public function isResponsive(): bool
+    public function isResponsive(): bool
     {
-		return $this->database->isResponsive();
-	}
+        return $this->database->isResponsive();
+    }
 
     /**
      * @inheritdoc

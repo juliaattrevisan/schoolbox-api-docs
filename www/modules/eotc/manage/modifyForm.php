@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Persist event data to the dbs
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use EOTC\ActivityLog\Registry as ActivityLogRegistry;
 use EOTC\ActivityLog\Factory as ActivityLogFactory;
 use EOTC\Authenticator;

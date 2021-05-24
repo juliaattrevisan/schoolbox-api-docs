@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -30,7 +31,7 @@ class FieldIgnoreEmpty extends Field
             if ($this->trim) {
                 $row[$this->fieldname] = trim($row[$this->fieldname]);
             }
-            if(strlen($row[$this->fieldname]) > 0) {
+            if (strlen($row[$this->fieldname]) > 0) {
                 return call_user_func([$user, $this->setMethod], $row[$this->fieldname]);
             }
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Answer_Multi
  *
@@ -188,9 +189,9 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         /* Convert from numeric to alpha
          */
         if ($firstLetter) {
-            $string = chr($firstLetter+64) . chr($lastLetter+64);
+            $string = chr($firstLetter + 64) . chr($lastLetter + 64);
         } else {
-            $string = chr($lastLetter+64);
+            $string = chr($lastLetter + 64);
         }
 
         return $string;
@@ -345,7 +346,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
         foreach ($xmlObj->answer as $currentAnswer) {
             /* Set up data object in accordance with $this->create();
              */
-            $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE|ENT_QUOTES);
+            $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
             $answer['value'] = trim((string)$currentAnswer->value);
             $answer['correct'] = 0;
 
@@ -378,7 +379,7 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
     {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
-        if(!$response){
+        if (!$response) {
             return [
                 'response' => '',
                 'comment'  => '',
@@ -502,7 +503,8 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']
+                if (
+                    $existing['response']
                     && is_array($existingAnswer)
                     && in_array($currentAnswer->value, $existingAnswer)
                 ) {
@@ -571,7 +573,6 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 /* This answer is correct
                  */
                 if ($currentAnswer->correct) {
-
                     /* The respondent chose the correct answer
                      */
                     if ($selectedByRespondent) {
@@ -596,7 +597,6 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 /* This answer is not correct
                  */
                 else {
-
                     /* The respondent chose this answer
                      */
                     if ($selectedByRespondent) {

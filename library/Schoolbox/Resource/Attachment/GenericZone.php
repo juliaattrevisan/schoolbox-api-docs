@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,7 +13,8 @@ use Schoolbox\Resource\File\IFile;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 
-class GenericZone extends Zone {
+class GenericZone extends Zone
+{
 
     /** @var string */
     protected $prefix;
@@ -42,8 +44,4 @@ class GenericZone extends Zone {
     {
         return $this->mapper->findById($id);
     }
-
-
-
-
-} 
+}

@@ -39,7 +39,7 @@ class Url
         $this->setUrl(trim($url));
 
         // No override, use config
-        if(null === $siteHost) {
+        if (null === $siteHost) {
             $site_hostname = trim(Config::get('site_hostname'));
             $site_domain = trim(Config::get('site_domain'));
 
@@ -122,20 +122,20 @@ class Url
         $matches = [];
         preg_match($pattern, $this->getUrl(), $matches);
 
-        if(!count($matches)){
+        if (!count($matches)) {
             return false;
         }
 
         // Check for zero-length labels, or labels that start or end with '-'
 
         $labels = explode('.', $matches[1]);
-        foreach($labels as $label){
-            if('' === $label && count($labels)){
+        foreach ($labels as $label) {
+            if ('' === $label && count($labels)) {
                 return false;
             }
             $subLabels = explode('-', $label);
-            foreach($subLabels as $subLabel){
-                if('' === $subLabel && count($subLabels)){
+            foreach ($subLabels as $subLabel) {
+                if ('' === $subLabel && count($subLabels)) {
                     return false;
                 }
             }
@@ -207,7 +207,7 @@ class Url
     public function isLocalUrl()
     {
         // Relative URLs are always local
-        if($this->isRelativeUrl()) {
+        if ($this->isRelativeUrl()) {
             return true;
         }
 
@@ -256,13 +256,13 @@ class Url
      */
     public function getRelativeURL()
     {
-        if($this->isRelativeUrl()) {
+        if ($this->isRelativeUrl()) {
             return $this->getUrl();
         }
 
         // Strip any protocol, hostname and port
         $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?(?:[a-zA-Z0-9.-]*(:[0-9]+)?(?:\/)?)/';
-        return preg_replace($pattern, '/' , $this->getUrl());
+        return preg_replace($pattern, '/', $this->getUrl());
     }
 
     /**

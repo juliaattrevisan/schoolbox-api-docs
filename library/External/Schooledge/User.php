@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -164,7 +166,7 @@ class External_Schooledge_User implements External_UserInterface
                 s.FirstName AS StudentGiven1,
                 s.LastName AS StudentSurname,
                 '' AS StudentGender,
-                CONVERT(nvarchar(30), s.DOB, ".self::FORMAT_ISO8601." )  AS StudentBirthDate,
+                CONVERT(nvarchar(30), s.DOB, " . self::FORMAT_ISO8601 . " )  AS StudentBirthDate,
                 s.House AS StudentHouseDescription,
                 s.House AS StudentHouse,
                 '' AS HeadOfHouseID,

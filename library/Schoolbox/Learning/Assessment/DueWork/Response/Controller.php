@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Web\Controller\Base;
@@ -106,8 +108,7 @@ class Controller extends Base
         DueWork $assessment,
         User $student,
         Model $response
-    ): void
-    {
+    ): void {
         $participant = $assessment->getParticipant($student);
 
         /* Self-Assessment/Self Reflection: the response must be provided from the url param
@@ -135,8 +136,7 @@ class Controller extends Base
 
         if ($selfAssessedWithResponse) {
             $breadcrumbNode = $this->getDi()->get('sitePage')->getLocalisedTerm('selfAssessment', false, true);
-        }
-        elseif ($selfReflectedWithResponse) {
+        } elseif ($selfReflectedWithResponse) {
             $breadcrumbNode = $this->getDi()->get('sitePage')->getLocalisedTerm('selfReflection', false, true);
         }
 
@@ -151,7 +151,7 @@ class Controller extends Base
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary',['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
+                ->add([$assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getSummary', ['assessmentId' => $assessment->getId(), 'studentId' => $participant->getUser()->getId()])])
                 ->add([$breadcrumbNode, '']),
             'response' => $response,
             'feedback' => $latestFeedback,
@@ -192,8 +192,7 @@ class Controller extends Base
         if ($selfAssessedWithResponse) {
             $data['selfAssess'] = true;
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfAssessment.twig', $data));
-        }
-        elseif ($selfReflectedWithResponse) {
+        } elseif ($selfReflectedWithResponse) {
             $data['selfReflect'] = true;
             $this->getResponse()->content->set($this->buildHtmlOutput('@learningDueWorkResponse/inlineGrading/selfReflection.twig', $data));
         }
@@ -318,7 +317,7 @@ class Controller extends Base
         $data = [
             'assessment' => $assessment,
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
-                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus',['assessmentId' => $assessment->getId()]) ])
+                ->add([ $assessment->getTitle(), $this->getRouter()->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) ])
                 ->add(['Inline Grader', '']),
             'response' => $response,
             'isMostRecentResponse' => $isMostRecentResponse,
@@ -440,14 +439,13 @@ class Controller extends Base
         $pollCount = 0;
         $export    = $this->kamiConnector->createAnnotatedExport($kami->getKamiDocumentId());
         while ($export->isStatusPending()) {
-            if($pollCount >= $maxPolls){
+            if ($pollCount >= $maxPolls) {
                 break;
             }
             usleep($sleep);
             $sleep  *= $exponent; // exponential back-off.
             $export = $this->kamiConnector->getExport($export->getId());
             $pollCount++;
-
         }
 
         // Let the browser know that the synchronous request has finished (either success or failure)
@@ -535,7 +533,7 @@ class Controller extends Base
     protected function deriveSchemeName(IMarkScheme $scheme)
     {
         $c = get_class($scheme);
-        return substr($c, strrpos($c, '\\')+1);
+        return substr($c, strrpos($c, '\\') + 1);
     }
 
     /**
@@ -551,7 +549,6 @@ class Controller extends Base
 
         try {
             $this->getResponseDataSource()->delete($response);
-
         } catch (\Schoolbox\Mapper\Exception $e) {
             $code = 400;
             $data = $e->getMessage();

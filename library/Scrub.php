@@ -121,7 +121,6 @@ class Scrub
     public static function getHtmlPurifierInstance(?string $uriBase = null): HTMLPurifier
     {
         if (!(self::$htmlpurifier_instance instanceof HTMLPurifier)) {
-
             $serializerPath = Config::get('purifier_cache_dir');
             if (!is_dir($serializerPath)) {
                 // Don't need to care if this failed,
@@ -200,7 +199,8 @@ class Scrub
             $config->set('Attr.EnableID', true);
 
             $config->set(
-                'Attr.AllowedFrameTargets', array(
+                'Attr.AllowedFrameTargets',
+                array(
                     '_blank',
                     '_self',
                     '_parent',
@@ -212,7 +212,8 @@ class Scrub
             $config->set('Attr.ForbiddenClasses', ['row', 'column', 'island',]);
 
             $config->set(
-                'URI.AllowedSchemes', array(
+                'URI.AllowedSchemes',
+                array(
                     'http'    => true,
                     'https'   => true,
                     'mailto'  => true,
@@ -268,7 +269,10 @@ class Scrub
                 //
                 // Definition of customised elements, copied directly out of modules.
                 $embed = $def->addElement(
-                    'embed', 'Inline', 'Empty', 'Common',
+                    'embed',
+                    'Inline',
+                    'Empty',
+                    'Common',
                     array(
                         'src*'              => 'URI#embedded',
                         'type'              => 'ContentType',
@@ -336,7 +340,10 @@ class Scrub
                 $object->attr_transform_post[] = new Alaress_HTMLPurifier_AttrTransform_SafeObject();
 
                 $param = $def->addElement(
-                    'param', false, 'Empty', false,
+                    'param',
+                    false,
+                    'Empty',
+                    false,
                     array(
                         'id'    => 'ID',
                         'name*' => 'Text',
@@ -351,7 +358,7 @@ class Scrub
 
             /* HTML Purifier hack to prevent authentication information from being stripped out of URL */
             $registry = HTMLPurifier_URISchemeRegistry::instance();
-            $registry->register('http', new Alaress_HTMLPurifier_URIScheme_Http);
+            $registry->register('http', new Alaress_HTMLPurifier_URIScheme_Http());
         }
         return self::$htmlpurifier_instance;
     }
@@ -370,7 +377,7 @@ class Scrub
             // Need to add InlinesOnly, as adding only Autolink causes an error
             $environment->addExtension(new CommonMark\Extension\InlinesOnly\InlinesOnlyExtension());
             $environment->addExtension(new CommonMark\Extension\Autolink\AutolinkExtension());
-            self::$markdownConverter = new CommonMark\CommonMarkConverter(['html_input' => CommonMark\Environment::HTML_INPUT_STRIP, 'allow_unsafe_links'=>false, 'max_nesting_level'=>10 ], $environment);
+            self::$markdownConverter = new CommonMark\CommonMarkConverter(['html_input' => CommonMark\Environment::HTML_INPUT_STRIP, 'allow_unsafe_links' => false, 'max_nesting_level' => 10 ], $environment);
         }
         return self::$markdownConverter;
     }

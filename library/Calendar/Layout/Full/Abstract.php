@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Layout_Full_Abstract
  *
@@ -115,7 +116,8 @@ abstract class Calendar_Layout_Full_Abstract
             } catch (Exception $e) {
                 throw new Exception('User does not exist', 31, $e);
             }
-            if (!$currentUser->getSuperuser() &&
+            if (
+                !$currentUser->getSuperuser() &&
                 !$currentUser->getRole()->isStaff() &&
                 !$groupHandler->isParentOfChild($userId)
             ) {

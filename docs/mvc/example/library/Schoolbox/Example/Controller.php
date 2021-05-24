@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Example;
@@ -62,8 +64,7 @@ class Controller extends Base
     {
         try {
             $user = $this->userMapper->findById($this->getRequest()->post['id']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 

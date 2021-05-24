@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Mastery;
 
 use Alaress\Authorizer\Authorizer;
@@ -106,11 +108,14 @@ class Module extends BaseModule
 
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, ".*",
+        $this->addRoutePermission(
+            $authorizer,
+            ".*",
             new Rule\All(
                 new Rule\IsLoggedIn(),
                 new Rule\HasRole(\Schoolbox\Role::STAFF)
-            ));
+            )
+        );
     }
 
 

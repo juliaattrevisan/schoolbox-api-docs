@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SocialStream_Post_Thumbnail_Abstract
  *

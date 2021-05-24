@@ -1,147 +1,159 @@
 <?php
 
 /**
- * 
+ *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  *
  */
 
-class Component_ConfigDefinition {
+class Component_ConfigDefinition
+{
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+    /**
+     * @var int
+     */
+    protected $id;
 
-	/**
-	 * @var int
-	 */
-	protected $definitionId;
+    /**
+     * @var int
+     */
+    protected $definitionId;
 
-	/**
-	 * @var string
-	 */
-	protected $key;
+    /**
+     * @var string
+     */
+    protected $key;
 
-	/**
-	 * @var string
-	 */
-	protected $defaultValue;
+    /**
+     * @var string
+     */
+    protected $defaultValue;
 
-	/**
-	 * @var string
-	 */
-	protected $label;
+    /**
+     * @var string
+     */
+    protected $label;
 
-	/**
-	 * Current value of this config setting.
-	 *
-	 * @var string
-	 */
-	protected $value;
+    /**
+     * Current value of this config setting.
+     *
+     * @var string
+     */
+    protected $value;
 
-	/**
-	 * @param  string $defaultValue
-	 *
-	 * @return $this
-	 */
-	public function setDefaultValue($defaultValue) {
-		$this->defaultValue = $defaultValue;
-		return $this;
-	}
+    /**
+     * @param  string $defaultValue
+     *
+     * @return $this
+     */
+    public function setDefaultValue($defaultValue)
+    {
+        $this->defaultValue = $defaultValue;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getDefaultValue() {
-		return $this->defaultValue;
-	}
+    /**
+     * @return string
+     */
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
+    }
 
-	/**
-	 * @param  int $definitionId
-	 *
-	 * @return $this
-	 */
-	public function setDefinitionId($definitionId) {
-		$this->definitionId = $definitionId;
-		return $this;
-	}
+    /**
+     * @param  int $definitionId
+     *
+     * @return $this
+     */
+    public function setDefinitionId($definitionId)
+    {
+        $this->definitionId = $definitionId;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getDefinitionId() {
-		return $this->definitionId;
-	}
+    /**
+     * @return int
+     */
+    public function getDefinitionId()
+    {
+        return $this->definitionId;
+    }
 
-	/**
-	 * @param  int $id
-	 *
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param  string $key
-	 *
-	 * @return $this
-	 */
-	public function setKey($key) {
-		$this->key = $key;
-		return $this;
-	}
+    /**
+     * @param  string $key
+     *
+     * @return $this
+     */
+    public function setKey($key)
+    {
+        $this->key = $key;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getKey() {
-		return $this->key;
-	}
+    /**
+     * @return string
+     */
+    public function getKey()
+    {
+        return $this->key;
+    }
 
-	/**
-	 * @param  string $label
-	 *
-	 * @return $this
-	 */
-	public function setLabel($label) {
-		$this->label = $label;
-		return $this;
-	}
+    /**
+     * @param  string $label
+     *
+     * @return $this
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getLabel() {
-		return $this->label;
-	}
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
 
-	/**
-	 * @param  string $value
-	 *
-	 * @return $this
-	 */
-	public function setValue($value) {
-		$this->value = $value;
-		return $this;
-	}
+    /**
+     * @param  string $value
+     *
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getValue() {
-		return $this->value;
-	}
-
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 }

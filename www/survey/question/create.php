@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Question creation and Answer creation. When a QuestionType is selected such
  * as multiple choice, fill gaps etc. the related AnswerType handler is loaded;
@@ -11,10 +12,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
-use \Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $surveyHandler = new Survey_Main();
 $sectionHandler = new Survey_Section();
@@ -32,9 +34,10 @@ if (!empty($_POST)) {
         $this->pageNotFound();
     }
 
-    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
-                $survey['category_id']
-            ) < UserAccess::ACCESS_WRITE)
+    if (
+        !$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
+            $survey['category_id']
+        ) < UserAccess::ACCESS_WRITE)
     ) {
         error(130);
     }
@@ -83,13 +86,11 @@ if (!empty($_POST)) {
     }
 
     // Form is AJAX submitted so redirection is handled by javascript
-    if($this->detectAjax()) {
+    if ($this->detectAjax()) {
         exit;
-    }
-    else {
+    } else {
         SitePage::localRedir('/survey/question/create/' . $_POST['section_id']);
     }
-
 } else {
     if (!is_numeric($this->arg[0])) {
         error(51);
@@ -102,9 +103,10 @@ if (!empty($_POST)) {
         $this->pageNotFound();
     }
 
-    if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
-                $survey['category_id']
-            ) < UserAccess::ACCESS_WRITE)
+    if (
+        !$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
+            $survey['category_id']
+        ) < UserAccess::ACCESS_WRITE)
     ) {
         error(130);
     }
@@ -120,8 +122,7 @@ if (!empty($_POST)) {
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($survey['category_id']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(13);
     }
 
@@ -255,7 +256,6 @@ if (!empty($_POST)) {
         );
 
         $this->parse('type_selected_block', 'type_selected');
-
     } else {
         if ($this->arg[1] == 'import') {
             $this->setVar(

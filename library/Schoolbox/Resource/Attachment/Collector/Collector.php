@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -6,10 +7,8 @@
 
 namespace Schoolbox\Resource\Attachment\Collector;
 
-
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\IStorage;
-
 
 /**
  * Collector for various types of storage handlers.

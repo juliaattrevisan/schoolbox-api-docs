@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for normal (non-eportfolio) images
  *
@@ -18,7 +19,6 @@ use Schoolbox\Resource\Storage\IStorage;
 
 class Model implements IStorage, ISoftDeletable
 {
-
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;

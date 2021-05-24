@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that locale based tests work as expected.
  *

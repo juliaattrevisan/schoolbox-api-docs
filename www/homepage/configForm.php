@@ -145,7 +145,8 @@ if (is_numeric($_REQUEST['cid'])) {
             $folder                          = $folderMapper->findById($config['cid']);
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
-                'component_definition_id', $instance->getDefinitionId()
+                'component_definition_id',
+                $instance->getDefinitionId()
             );
 
             unset($config['cid'], $config['type'], $config['component']);
@@ -198,7 +199,6 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             if (SitePage::detectAjax()) {
-
                 // Just refetch the instance
                 $instance   = $componentInstanceMapper->findByInstanceId($instance->getId());
 

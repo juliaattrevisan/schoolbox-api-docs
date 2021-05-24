@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -17,7 +18,6 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress\Twig\Loader\IChainLoader;
-
 // These mappers are injected into controllers where required
 
 use Schoolbox\UserMapper;
@@ -69,8 +69,7 @@ class Module extends BaseModule
                         new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
                     )
                 );
-            }
-        );
+            });
 
         $this->register(
             'GET',

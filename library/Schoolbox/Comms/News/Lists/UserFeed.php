@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -14,6 +15,7 @@ use Schoolbox\Comms\News\Mapper;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_merge;
 use function array_unique;
 

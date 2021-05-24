@@ -122,16 +122,19 @@ class Report_StaffDepartment extends Report_Abstract
 
             $sort = [];
 
-            foreach ($allStaff as $k=>$v) {
+            foreach ($allStaff as $k => $v) {
                 $sort['StaffDepartment'][$k] = $v['StaffDepartment'];
                 $sort['StaffSurname'][$k] = $v['StaffSurname'];
                 $sort['StaffPreferredName'][$k] = $v['StaffPreferredName'];
             }
 
             array_multisort(
-                $sort['StaffDepartment'], SORT_ASC,
-                $sort['StaffSurname'], SORT_ASC,
-                $sort['StaffPreferredName'], SORT_ASC,
+                $sort['StaffDepartment'],
+                SORT_ASC,
+                $sort['StaffSurname'],
+                SORT_ASC,
+                $sort['StaffPreferredName'],
+                SORT_ASC,
                 $allStaff
             );
 

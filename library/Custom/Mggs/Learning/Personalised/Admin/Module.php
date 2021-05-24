@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -16,7 +17,6 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\RoleMapper;
 use Alaress\Twig\Loader\IChainLoader;
-
 
 class Module extends BaseModule
 {
@@ -61,5 +61,4 @@ class Module extends BaseModule
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
 }

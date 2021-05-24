@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\File;
-
 
 use Alaress_Date_Format;
 use Schoolbox\Resource\AbstractFile;

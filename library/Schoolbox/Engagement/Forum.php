@@ -26,7 +26,8 @@ class Forum
         $this->database = Database::getInstance();
     }
 
-    public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM forumPost
                   WHERE date >= :start AND date <= :end";
 
@@ -37,5 +38,4 @@ class Forum
         $statement->execute();
         return $statement->fetchColumn(0);
     }
-
 }

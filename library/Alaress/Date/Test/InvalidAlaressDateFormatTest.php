@@ -8,7 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class InvalidAlaressDateFormatTest extends TestCase
 {
-
     use MockDateObject;
 
     /**

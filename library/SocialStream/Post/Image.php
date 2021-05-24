@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SocialStream_Post_Url
  *
@@ -7,7 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-class SocialStream_Post_Image extends SocialStream_Post_Abstract {
+class SocialStream_Post_Image extends SocialStream_Post_Abstract
+{
 
     /**
      * @var string
@@ -31,7 +33,8 @@ class SocialStream_Post_Image extends SocialStream_Post_Abstract {
      *
      * @return bool
      */
-    public function hasThumbnail(): bool {
+    public function hasThumbnail(): bool
+    {
         return '' !== $this->getThumbnail();
     }
 
@@ -42,7 +45,8 @@ class SocialStream_Post_Image extends SocialStream_Post_Abstract {
      * @param SitePage $page
      * @return bool
      */
-    public function renderThumbnail(string $context, SitePage $page): bool {
+    public function renderThumbnail(string $context, SitePage $page): bool
+    {
 
         /* Determine which context to render blocks
          * Display a mime icon

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * The intent of this script is to test signal handling based on Redis pubsub.
  *
@@ -58,8 +59,10 @@ if (!isset($opts['d'])) {
 
     $recipientCount = max($recipientCounts);
 
-    $output = sprintf("Sent %s on topic `%s`",
-        $signal, $daemon
+    $output = sprintf(
+        "Sent %s on topic `%s`",
+        $signal,
+        $daemon
     );
 
     if ($loop > 1) {
@@ -69,8 +72,10 @@ if (!isset($opts['d'])) {
     if ($recipientCount == 0) {
         $output .= "... but nobody was listening.";
     } else {
-        $output .= sprintf(", received by %d subscriber%s.",
-            $recipientCount, $recipientCount == 1 ? '' : 's'
+        $output .= sprintf(
+            ", received by %d subscriber%s.",
+            $recipientCount,
+            $recipientCount == 1 ? '' : 's'
         );
     }
 

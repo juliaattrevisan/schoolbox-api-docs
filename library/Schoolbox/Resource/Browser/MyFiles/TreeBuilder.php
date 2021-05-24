@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Browser\MyFiles;
-
 
 use Alaress\Color\Color;
 use Schoolbox\Collection;

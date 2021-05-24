@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for rubric result, these make up results in a result set that can be used to populate a rubric
  *
@@ -76,4 +77,3 @@ class Model
         return $this->value;
     }
 }
-

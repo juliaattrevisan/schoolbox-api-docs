@@ -3,24 +3,28 @@
 class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 {
 
-    function __construct() {
+    function __construct()
+    {
         $this->_table = 'textBox';
         $this->_index = 'textBoxID';
 
         parent::__construct();
     }
 
-    function getAllByCategory($categoryID) {
+    function getAllByCategory($categoryID)
+    {
         $query = "SELECT * FROM " . $this->_table . " WHERE categoryID = $categoryID AND deleted = 'false' ORDER BY heading";
         return $this->db->getAll($query);
     }
 
-    function getCurrent($categoryID) {
+    function getCurrent($categoryID)
+    {
         $textBoxList = $this->getAllByCategory($categoryID);
         return $textBoxList[0];
     }
 
-    function delete($textBoxID) {
+    function delete($textBoxID)
+    {
         $data = array(
             'textBoxID' => $textBoxID,
             'deleted' => 'true',
@@ -37,7 +41,8 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int $cid
      * @return void
      */
-    public function homepageClean($cid) {
+    public function homepageClean($cid)
+    {
         $query = "UPDATE {$this->_table} SET deleted = NOW() WHERE categoryID = '{$cid}'";
 
         $this->db->query($query);
@@ -55,7 +60,8 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param string $sort_dir
      * @return array|bool
      */
-    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC') {
+    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC')
+    {
 
         // TODO add full search capabilities, currently just used by ajax
         $query = "SELECT textBoxID, categoryID, heading, body, folder.name as cname

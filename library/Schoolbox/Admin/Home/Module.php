@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Course builder admin page
  *
@@ -36,11 +37,14 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
 
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
              ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser())
-             ->addRoutePermission($authorizer, 'getDisasterRecovery',
+             ->addRoutePermission(
+                 $authorizer,
+                 'getDisasterRecovery',
                  new Rule\All(
                      new Rule\IsSuperuser(),
                      new Rule\IsConfigOn(DisasterRecovery::CONFIG_DR_VISIBILITY, $this->getConfig())
@@ -71,7 +75,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) {
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }

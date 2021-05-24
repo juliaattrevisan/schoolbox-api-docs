@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Direct
  *
@@ -8,7 +9,6 @@
  */
 
 namespace SocialStream\Post\Thumbnail;
-
 
 class Direct extends Thumbnail
 {

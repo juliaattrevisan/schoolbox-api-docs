@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
@@ -127,9 +129,11 @@ class Model
             return false;
         }
 
-        if ($this->getEntityType() !== $other->getEntityType() ||
+        if (
+            $this->getEntityType() !== $other->getEntityType() ||
             $this->getEntityValue() !== $other->getEntityValue() ||
-            $this->getRelationship() !== $other->getRelationship()) {
+            $this->getRelationship() !== $other->getRelationship()
+        ) {
             return false;
         }
 

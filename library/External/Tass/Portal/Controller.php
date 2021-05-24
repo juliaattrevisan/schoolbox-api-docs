@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TASS portal
  *
@@ -6,14 +7,19 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace External\Tass\Portal;
 
 use Alaress;
+
 use function array_merge;
+
 use Aura\Web\Exception\InvalidStatusCode;
 use Alaress\Session\ImpersonationCheck;
+
 use function json_encode;
 use function rtrim;
+
 use Schoolbox\User;
 use Schoolbox\Error;
 
@@ -105,7 +111,7 @@ class Controller extends Alaress\Web\Controller\Base
         // Send off the SSO token request
         try {
             $token = $this->sso->getUserToken($config, $deepLinkV2, $prodMenu, $deepLinkV1);
-        } catch (SsoTokenGenerationException|\RuntimeException $e) {
+        } catch (SsoTokenGenerationException | \RuntimeException $e) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_TASS_SSO_FAILURE, $e);
         }
 

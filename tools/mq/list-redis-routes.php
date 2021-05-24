@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au
@@ -62,8 +63,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->getLogger()->debug(implode(',', array_keys($userIds)) . "\n");
         }
     }
-
-
 }, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

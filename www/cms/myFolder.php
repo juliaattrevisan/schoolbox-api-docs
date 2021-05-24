@@ -1,13 +1,12 @@
 <?php
 
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 
 $folderHandler = new MyFolder();
 $userMapper = new Schoolbox\UserMapper();
 $folderMapper = new Schoolbox\Resource\My\Folder\Mapper();
 
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
-
     try {
         /** @var Schoolbox\Resource\My\Folder\Model $folder */
         $folder = $folderMapper->findById($this->arg[0]);
@@ -39,9 +38,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     if (Config::get('webdav_enable')) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
-
     } else {
-
         $parentTree = $folderHandler->getFolderTree(0, 0, $folder->getId());
         $parentTree = is_array($parentTree) ? $parentTree : array();
         array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
@@ -61,8 +58,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $folder->getOwner()->formatName()."'s Files",
-            'href' => "/my-files/".$folder->getId(),
+            'text' => $folder->getOwner()->formatName() . "'s Files",
+            'href' => "/my-files/" . $folder->getId(),
             'class' => '',
         ],
         [
@@ -72,7 +69,6 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         ]
     ]);
 } else if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
     $this->setFile(TEMPLATE_content, 'cms/myFolder.html');
     $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
@@ -111,9 +107,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     if (Config::get('webdav_enable')) {
         $this->setBlock(TEMPLATE_content, 'location', 'location_block');
         $this->setVar('location_block', '');
-
     } else {
-
         $parentTree = $folderHandler->getFolderTree();
         $parentTree = is_array($parentTree) ? $parentTree : array();
         array_unshift($parentTree, array('id' => 0, 'name' => 'Top Level', 'depth' => -1));
@@ -133,7 +127,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $owner->formatName()."'s Files",
+            'text' => $owner->formatName() . "'s Files",
             'href' => "/my-files/",
             'class' => '',
         ],

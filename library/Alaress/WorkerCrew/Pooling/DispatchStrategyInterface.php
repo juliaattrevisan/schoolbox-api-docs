@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Pooling;
-
 
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
@@ -254,5 +254,4 @@ interface DispatchStrategyInterface
      * @return int
      */
     public function getWorkerExecutionTimeout($hard = true);
-
 }

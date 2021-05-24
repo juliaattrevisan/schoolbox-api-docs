@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Translator from ASC Timetables XML export to Schoolbox CSV timetable import.
  *
@@ -121,10 +122,10 @@ class External_AscTimetables_Translator_Timetable extends External_AscTimetables
                                     break;
                                 case 'urdu debates':
                                 case 'gym display':
-                                    $classCode = $subject['code'].' '.preg_replace('/\\D/', '', $class['code']);
+                                    $classCode = $subject['code'] . ' ' . preg_replace('/\\D/', '', $class['code']);
                                     break;
                                 default:
-                                    $classCode = $subject['code'].' '.$class['code'];
+                                    $classCode = $subject['code'] . ' ' . $class['code'];
                                     break;
                             }
                             $resultClass = [

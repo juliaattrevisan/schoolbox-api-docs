@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Guardian
  *
@@ -16,7 +17,8 @@ use Schoolbox\External\Normalise\User\Common\Address;
 use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\Collection;
 
-class Guardian extends Base {
+class Guardian extends Base
+{
 
     /* Contact
      */
@@ -52,14 +54,16 @@ class Guardian extends Base {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setup();
     }
 
     /**
      * Hook method
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setAccount(new Account());
         $this->setPostalAddress(new Address());
         $this->setHomeAddress(new Address());
@@ -79,10 +83,11 @@ class Guardian extends Base {
      * @param string $separator
      * @return string
      */
-    public function getYearAsString($separator = "\n") {
+    public function getYearAsString($separator = "\n")
+    {
         $years = array();
 
-        foreach($this->getStudents() as $currentStudent) {
+        foreach ($this->getStudents() as $currentStudent) {
             $years[] = $currentStudent->getYear()->getLevel();
         }
 
@@ -95,10 +100,11 @@ class Guardian extends Base {
      * @param string $separator
      * @return string
      */
-    public function getCampusAsString($separator = "\n") {
+    public function getCampusAsString($separator = "\n")
+    {
         $campuses = array();
 
-        foreach($this->getCampus() as $currentCampus) {
+        foreach ($this->getCampus() as $currentCampus) {
             $campuses[] = $currentCampus->getCode();
         }
 
@@ -112,7 +118,8 @@ class Guardian extends Base {
      * @param Student $student
      * @return $this
      */
-    public function addStudent(Student $student) {
+    public function addStudent(Student $student)
+    {
         $this->getStudents()->add($student);
 
         return $this;

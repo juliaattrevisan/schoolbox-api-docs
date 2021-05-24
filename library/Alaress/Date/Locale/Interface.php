@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Date_Locale_Interface
  *

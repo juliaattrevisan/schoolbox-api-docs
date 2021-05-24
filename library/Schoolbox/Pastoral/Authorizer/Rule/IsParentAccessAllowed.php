@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Determine if parent access is allowed in Schoolbox instances config
  *
@@ -28,4 +29,3 @@ class IsParentAccessAllowed implements IAuthorizationRule
         return true;
     }
 }
-

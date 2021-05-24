@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Reduce function - smooshes results from `External_AscTimetables_Translator_Structure_Map`
  * into a single result.

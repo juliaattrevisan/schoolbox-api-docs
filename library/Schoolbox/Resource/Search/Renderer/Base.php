@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -191,10 +192,10 @@ abstract class Base
         $html = array();
 
         foreach ($allCrumbs as $currentCrumb) {
-            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">". Scrub::text($currentCrumb->getName())."</a>";
+            $html[] = "<a href=\"/homepage/{$currentCrumb->getId()}\">" . Scrub::text($currentCrumb->getName()) . "</a>";
         }
 
-        $html[] = "<a href=\"/homepage/{$folder->getId()}\">". Scrub::text($folder->getName())."</a>";
+        $html[] = "<a href=\"/homepage/{$folder->getId()}\">" . Scrub::text($folder->getName()) . "</a>";
 
         return implode(' > ', $html);
     }

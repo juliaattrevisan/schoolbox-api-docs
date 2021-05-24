@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -21,8 +22,7 @@ $query = $_GET['query'];
 if ($_GET['type'] == 'groups') {
     $mapper = \Schoolbox\Resource\GroupMapper::getInstance();
     $allResults = $mapper->findFolders($query);
-}
-else if ($_GET['type'] == 'campus') {
+} else if ($_GET['type'] == 'campus') {
     $mapper = \Schoolbox\CampusMapper::getInstance();
     $allResults = $mapper->findCampuses($query);
 }

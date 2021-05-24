@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Run a SVG sanitiser over all SVGs in the system
  *

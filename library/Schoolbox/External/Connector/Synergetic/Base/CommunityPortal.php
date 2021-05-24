@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synergetic Community Portal related queries
  *
@@ -92,7 +93,6 @@ class CommunityPortal implements ICommunityPortal
         );
 
         if ($query->fetch()) {
-
             // Existing community login record, just update the password
 
             $query = "
@@ -105,9 +105,7 @@ class CommunityPortal implements ICommunityPortal
                 'password' => $encryptedPassword,
                 'externalId' => $communityId
             ]);
-
         } elseif ($this->allowCreateUser) {
-
             // No existing community login record, need to insert one for this to have any chance of doing something
 
             // This adds the Schools default page permissions to the users
@@ -166,9 +164,7 @@ class CommunityPortal implements ICommunityPortal
                 'externalId' => $communityId,
                 'password' => $encryptedPassword
             ]);
-
         } else {
-
             // There was no community portal password to reset, and automatic creation is disabled- so just return true
             // and exit out of this happily.
 

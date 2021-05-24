@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Account
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External\Normalise\User\Common;
 
-class Account {
+class Account
+{
 
     /**
      * NetworkLogin equivalent
@@ -28,7 +30,8 @@ class Account {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

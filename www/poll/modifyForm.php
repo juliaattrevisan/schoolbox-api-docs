@@ -13,7 +13,6 @@ $pollHandler = new Poll();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST['vote'])) {
-
     /* Check permission
      */
     if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_READ) {
@@ -24,7 +23,6 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
 
     SitePage::localRedir("/homepage/" . $_POST['folder_id']);
 } else if ($_POST['question'] && is_numeric($_POST['folder_id'])) {
-
     /* Check permission
      */
     if ($groupHandler->getPermission($_POST['folder_id']) < UserAccess::ACCESS_WRITE) {
@@ -75,9 +73,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
             'identifier'              => $_POST['folder_id'],
             'component_definition_id' => $cd->getDefinitionId(),
         ]);
-
     } catch (Schoolbox\Mapper\Exception $e) {
-
         /* noop something went wrong; couldn't find config info
          * just goes back to homepage
          */
@@ -85,7 +81,6 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
     }
 
     try {
-
         /* Look for an existing component configuration for this component
          * If one exists, just reuse its stuff
          */
@@ -94,7 +89,6 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
             'component_instance_id' => (int)$_POST['homepageComponentID']
         ]);
     } catch (\Schoolbox\Mapper\Exception $e) {
-
         /* Otherwise, create a new component configuration
          */
         $componentConfigInstance = $componentConfigInstanceMapper->createModel();
@@ -134,8 +128,7 @@ if (is_numeric($_POST['id']) && is_numeric($_POST['folder_id']) && isset($_POST[
                 'component_definition_id' => $cdm->getDefinitionId(),
             )
         );
-    }
-    catch (Schoolbox\Mapper\Exception $e) {
+    } catch (Schoolbox\Mapper\Exception $e) {
         error(19);
         exit;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Browser;
-
 
 use OutOfBoundsException;
 use Schoolbox\Resource\Browser;
@@ -46,7 +46,6 @@ class NodeFactory
         $this->add(self::OFFICE, function ($nodeId, $mimeFilter = null, $tenant = null, $oAuthToken = null) {
             return new Browser\Office365\Node($nodeId, $mimeFilter, $tenant, $oAuthToken);
         });
-
     }
 
 
@@ -88,7 +87,8 @@ class NodeFactory
      * @return NodeInterface
      * @throws OutOfBoundsException
      */
-    public function build($label, $nodeId, $mimeFilter = null) {
+    public function build($label, $nodeId, $mimeFilter = null)
+    {
         return $this->buildNode($label, $nodeId, $mimeFilter);
     }
 
@@ -106,5 +106,4 @@ class NodeFactory
     {
         return $this->buildNode($label, $nodeId, $mimeFilter, $tenant, $oAuth);
     }
-
 }

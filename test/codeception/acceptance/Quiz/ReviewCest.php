@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -59,8 +60,15 @@ class ReviewCest
 
         // As Zane, create a quiz
         $i->impersonate($teacher);
-        $this->createQuiz($i, [$student1, $student2], $classId, $className, $teacher, $quizTitle,
-            AssessmentForm::VISIBILITY_STAFF_AND_STUDENT);
+        $this->createQuiz(
+            $i,
+            [$student1, $student2],
+            $classId,
+            $className,
+            $teacher,
+            $quizTitle,
+            AssessmentForm::VISIBILITY_STAFF_AND_STUDENT
+        );
 
         // As Zane, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
@@ -86,7 +94,7 @@ class ReviewCest
      * @param AcceptanceTester $i
      * @throws Exception
      */
-     public function testQuizReviewHorizontal(AcceptanceTester $i)
+    public function testQuizReviewHorizontal(AcceptanceTester $i)
     {
         $className = Common::CLASS_CHEMISTRY_1_3;
         $classId = Common::CLASS_ID_CHEMISTRY_1_3;
@@ -99,8 +107,15 @@ class ReviewCest
 
         // As Zane, create a quiz
         $i->impersonate($teacher);
-        $this->createQuiz($i, [$student1, $student2], $classId, $className, $teacher, $quizTitle,
-            AssessmentForm::VISIBILITY_STAFF_AND_STUDENT);
+        $this->createQuiz(
+            $i,
+            [$student1, $student2],
+            $classId,
+            $className,
+            $teacher,
+            $quizTitle,
+            AssessmentForm::VISIBILITY_STAFF_AND_STUDENT
+        );
 
         // As Zane, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
@@ -131,7 +146,6 @@ class ReviewCest
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
         $i->cantSee('2021', '#attempts > tbody > tr:nth-child(2) > td:nth-child(4)');
         $i->cantSee('10/10', '#attempts > tbody > tr:nth-child(2) > td:nth-child(5)');
-
     }
 
     /**
@@ -152,8 +166,15 @@ class ReviewCest
 
         // As Zane, create a quiz
         $i->impersonate($teacher);
-        $this->createQuiz($i, [$student1, $student2], $classId, $className, $teacher, $quizTitle,
-            AssessmentForm::VISIBILITY_STAFF_AND_STUDENT);
+        $this->createQuiz(
+            $i,
+            [$student1, $student2],
+            $classId,
+            $className,
+            $teacher,
+            $quizTitle,
+            AssessmentForm::VISIBILITY_STAFF_AND_STUDENT
+        );
 
         // As Zane, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
@@ -169,7 +190,6 @@ class ReviewCest
         // As Rachel, click into the due work
         $i->click($quizTitle, '#content');
         $i->canSee('ATTEMPTS');
-
     }
 
     /**
@@ -190,8 +210,15 @@ class ReviewCest
 
         // As Zane, create a quiz
         $i->impersonate($teacher);
-        $this->createQuiz($i, [$student1, $student2], $classId, $className, $teacher, $quizTitle,
-            AssessmentForm::VISIBILITY_STAFF_ONLY);
+        $this->createQuiz(
+            $i,
+            [$student1, $student2],
+            $classId,
+            $className,
+            $teacher,
+            $quizTitle,
+            AssessmentForm::VISIBILITY_STAFF_ONLY
+        );
 
         // As Zane, review attempt
         $i->canSee('Attempted on time', StatusPage::getStatusSelector($student1Id, ''));
@@ -216,7 +243,7 @@ class ReviewCest
         // Az Zane, change visibility
         $i->impersonate($teacher);
         $i->amOnPage('/homepage/' . $classId);
-        $i->click($quizTitle,'#content');
+        $i->click($quizTitle, '#content');
         $i->waitForText('Begin Quiz');
 
         $quizPage = new AssessmentPage($i);
@@ -238,7 +265,6 @@ class ReviewCest
         // shouldn't see any grades
         $i->canSee('2021', '#attempts > tbody > tr:nth-child(1) > td:nth-child(4)');
         $i->canSee('10/10', '#attempts > tbody > tr:nth-child(1) > td:nth-child(5)');
-
     }
 
 
@@ -252,9 +278,15 @@ class ReviewCest
      * @param int $visibility
      * @throws Exception
      */
-    private function createQuiz(AcceptanceTester $i, array $students, int $classId, string $className,
-                                string $teacher, string $quizTitle, int $visibility)
-    {
+    private function createQuiz(
+        AcceptanceTester $i,
+        array $students,
+        int $classId,
+        string $className,
+        string $teacher,
+        string $quizTitle,
+        int $visibility
+    ) {
         $quizForm = new AssessmentForm($i);
         $i->amOnPage($quizForm->generateRoute($classId));
 
@@ -311,7 +343,5 @@ class ReviewCest
         // As Zane, click into the quiz -> brings to status page
         $i->click($quizTitle, '#content');
         $i->waitForText('Status of ' . $quizTitle);
-
     }
-
 }

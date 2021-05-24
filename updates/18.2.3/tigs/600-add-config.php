@@ -1,9 +1,11 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -15,7 +17,6 @@ use Schoolbox\Application\Daemon\App;
 use Custom\Tigs;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Application\Daemon;
-
 
 $opts = require __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for the timetable component.
  *
@@ -48,7 +49,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
                 ['externalTimetable' => $this->getExternalTimetable()]

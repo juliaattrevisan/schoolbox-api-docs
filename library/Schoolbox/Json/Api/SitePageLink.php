@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -53,5 +54,4 @@ class SitePageLink implements Link
     {
         return $this->auth;
     }
-
 }

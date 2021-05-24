@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Professional Development
  *
@@ -12,7 +13,8 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Schoolbox\ProfessionalDevelopment\Module;
 
-class ProfessionalDevelopment implements ModuleConfigInterface {
+class ProfessionalDevelopment implements ModuleConfigInterface
+{
 
     /**
      * Run configuration for the given module
@@ -20,7 +22,8 @@ class ProfessionalDevelopment implements ModuleConfigInterface {
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel) {
+    public function configure($kernel)
+    {
         $namespace = 'professionaldevelopment';
 
         $module = new Module($kernel->getDependencyInjector());

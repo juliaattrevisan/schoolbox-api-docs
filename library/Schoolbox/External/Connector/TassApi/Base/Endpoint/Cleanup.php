@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
@@ -105,7 +107,6 @@ class Cleanup implements IStrategy
         /* Only remove profiles if we're performing
          */
         if ($this->perform) {
-
             /* Remove everything that wasn't touched
              */
             $this->studentProfileMapper->getDatabase()->query("DELETE FROM {$this->studentProfileMapper->getTable()} WHERE updated_at = '0000-00-00 00:00:00' OR updated_at IS NULL");

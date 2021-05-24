@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Factory
  *
@@ -14,7 +15,6 @@ class Survey_Factory extends Evaluation_Factory
     private $responseHandler;
     private $questionHandler;
     private $sectionHandler;
-
     public function __construct()
     {
         parent::__construct();
@@ -26,7 +26,7 @@ class Survey_Factory extends Evaluation_Factory
     /**
      * @return string
      */
-	protected function getFactoryName()
+    protected function getFactoryName()
     {
         return 'Survey';
     }

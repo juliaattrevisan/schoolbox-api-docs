@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Sync\Provisioner;
@@ -10,7 +12,6 @@ namespace Schoolbox\Sync\Provisioner;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder;
-
 
 /**
  * Class FinalUserAccess
@@ -103,8 +104,7 @@ class FinalUserAccess
         /* Mutate initial conditions chronologically
          */
         foreach (array_merge($initialGroups, $user->getUserAccessMutations()) as $mutation) {
-            foreach($mutation['instance'] as $folderId) {
-
+            foreach ($mutation['instance'] as $folderId) {
                 /* Maybe this folder doesn't actually exist at runtime
                  */
                 try {
@@ -137,7 +137,6 @@ class FinalUserAccess
 
                     $mutationGroups[$folderId] = $mutation['level'];
                 } elseif (self::STATUS_REMOVE === $mutation['status']) {
-
                     /* Did we retain this because of FULL_ACCESS preservation?
                      * If so, log the intended mutation anyway, but note that we're
                      * disregarding the intended mutation
@@ -168,7 +167,6 @@ class FinalUserAccess
         $this->log('Computing groups final list');
 
         foreach ($mutationGroups as $serviceIdentifier => $accessLevel) {
-
             /* If this person had ACCESS_FULL before, they still have it now
              * Don't mutate them
              */

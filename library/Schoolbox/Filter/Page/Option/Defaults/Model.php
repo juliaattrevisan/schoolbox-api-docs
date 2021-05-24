@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -12,7 +13,6 @@ use Schoolbox\Filter\Page\Option\Model as FilterOption;
 
 class Model
 {
-
     use Id;
 
     /** @var FilterOption */

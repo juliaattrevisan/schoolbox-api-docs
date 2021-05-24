@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Schedule\Trigger\Test;
-
 
 use Alaress\Date\IClock;
 use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
@@ -59,5 +59,4 @@ class MockDigestTrigger extends DigestTrigger
         // fire the first iteration immediately
         return $this->clock->time();
     }
-
-} 
+}

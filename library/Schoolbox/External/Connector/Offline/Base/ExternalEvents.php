@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Offline implementation of external events
  *

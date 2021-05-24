@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Answer
  *
@@ -50,4 +51,3 @@ class Survey_Answer extends Evaluation_Answer
         throw new BadMethodCallException('You need to call this on a concrete Answer type');
     }
 }
-

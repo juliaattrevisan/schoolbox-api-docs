@@ -7,9 +7,7 @@
 
 declare(strict_types=1);
 
-
 namespace Schoolbox\Learning\Moment\Feed;
-
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
@@ -21,7 +19,6 @@ use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory as EvidenceTranslatorFactory;
 use Schoolbox\Learning\Moment\Feed\Translator\ModelToArray;
 use Schoolbox\User;
-
 
 /**
  * Controller for the learning moment feed.
@@ -79,10 +76,10 @@ class Controller extends Base
      * @param IConnector       $database
      */
     public function __construct(
-         EvidenceMapper $evidenceMapper,
-         BadgeAwardMapper $badgeAwardMapper,
-         CommentMapper $commentMapper,
-         IConnector $database
+        EvidenceMapper $evidenceMapper,
+        BadgeAwardMapper $badgeAwardMapper,
+        CommentMapper $commentMapper,
+        IConnector $database
     ) {
         $this->evidenceMapper   = $evidenceMapper;
         $this->badgeAwardMapper = $badgeAwardMapper;
@@ -141,4 +138,3 @@ class Controller extends Base
         );
     }
 }
-

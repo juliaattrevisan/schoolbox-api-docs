@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Calendar;
 
 use Alaress_Date_Format;
@@ -27,7 +29,6 @@ use Schoolbox\ISoftDeletable;
  */
 class Event implements ISoftDeletable
 {
-
     /**
      * Implement soft delete traits
      */
@@ -361,11 +362,12 @@ class Event implements ISoftDeletable
      */
     public function setupDates($date): void
     {
-        if (preg_match(
-            '/^(?P<d>\\d+)-(?P<m>\\d+)-(?P<y>\\d+)\\s+(?P<h>\\d+):(?P<i>\\d+)/',
-            $date,
-            $matches
-        )
+        if (
+            preg_match(
+                '/^(?P<d>\\d+)-(?P<m>\\d+)-(?P<y>\\d+)\\s+(?P<h>\\d+):(?P<i>\\d+)/',
+                $date,
+                $matches
+            )
         ) {
             $year = $matches['y'];
             $month = $matches['m'];
@@ -826,8 +828,8 @@ class Event implements ISoftDeletable
     public function setEndDate(string $endDate): self
     {
         // preserve time if already set
-        [$year, $month, $day] = explode('-',$endDate);
-        $this->getEndDateTime()->setDate($year,$month,$day);
+        [$year, $month, $day] = explode('-', $endDate);
+        $this->getEndDateTime()->setDate($year, $month, $day);
 
         return $this;
     }
@@ -842,8 +844,8 @@ class Event implements ISoftDeletable
     public function setEndTime(string $endTime): self
     {
         // preserve date if already set
-        [$hour, $min, $sec] = explode(':',$endTime);
-        $this->getEndDateTime()->setTime($hour,$min,$sec);
+        [$hour, $min, $sec] = explode(':', $endTime);
+        $this->getEndDateTime()->setTime($hour, $min, $sec);
 
         return $this;
     }
@@ -858,8 +860,8 @@ class Event implements ISoftDeletable
     public function setStartDate(string $startDate): self
     {
         // preserve time if set
-        [$year, $month, $day] = explode('-',$startDate);
-        $this->getStartDateTime()->setDate($year,$month,$day);
+        [$year, $month, $day] = explode('-', $startDate);
+        $this->getStartDateTime()->setDate($year, $month, $day);
         return $this;
     }
 
@@ -871,8 +873,8 @@ class Event implements ISoftDeletable
      */
     public function setStartTime(string $startTime): self
     {
-        [$hour, $min, $sec] = explode(':',$startTime);
-        $this->getStartDateTime()->setTime($hour,$min,$sec);
+        [$hour, $min, $sec] = explode(':', $startTime);
+        $this->getStartDateTime()->setTime($hour, $min, $sec);
         return $this;
     }
 
@@ -969,7 +971,8 @@ class Event implements ISoftDeletable
      *
      * @param Collection $folderCollection
      * @return $this
-     */    public function setFolderCollection(Collection $folderCollection): self
+     */
+    public function setFolderCollection(Collection $folderCollection): self
     {
         $this->folderCollection = $folderCollection;
         return $this;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Listener;
-
 
 interface Listenable
 {
@@ -24,5 +24,4 @@ interface Listenable
      * @return void
      */
     public function detachListener(EventListener $listener);
-
-} 
+}

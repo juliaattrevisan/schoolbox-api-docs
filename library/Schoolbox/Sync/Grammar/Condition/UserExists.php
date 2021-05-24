@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -37,5 +38,4 @@ class UserExists extends Condition
 
         return "user {$not}EXISTS";
     }
-
-} 
+}

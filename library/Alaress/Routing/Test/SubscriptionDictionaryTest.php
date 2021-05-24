@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -113,5 +114,4 @@ class SubscriptionDictionaryTest extends TestCase
 
         $this->assertEquals($expected, $dic->translateWhole($whole));
     }
-
 }

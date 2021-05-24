@@ -1,9 +1,11 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
@@ -13,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidCapabilityMaxTest extends TestCase
 {
-    public function getTestIsSatisfiedByData() : iterable
+    public function getTestIsSatisfiedByData(): iterable
     {
         $hasMarkPerCap = true;
         $noMarkPerCap = false;

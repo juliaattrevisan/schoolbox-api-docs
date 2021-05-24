@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Migrate portraits on the local filesystem into Storage
  *

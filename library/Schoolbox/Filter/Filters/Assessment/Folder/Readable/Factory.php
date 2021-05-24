@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\Readable;
@@ -14,7 +16,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
-
 
 /**
  * A factory for building 'Readable' filter objects.

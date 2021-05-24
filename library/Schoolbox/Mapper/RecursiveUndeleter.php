@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -76,11 +77,11 @@ use Schoolbox\Resource\My\File as MyFile;
 use Schoolbox\ResourceBooking;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+
 use function count;
 use function get_class;
 use function method_exists;
 use function sprintf;
-
 
 class RecursiveUndeleter
 {
@@ -347,7 +348,6 @@ class RecursiveUndeleter
         // Use the specified root table to find the root mapper
         /** @var IMapper $mapperClass */
         foreach (self::$softDeleteRegistry as $mapperClass => $children) {
-
             // A bit of house keeping to try to keep things in order
             if (!class_exists($mapperClass)) {
                 $this->logger->warning("Registry corruption detected. Mapper class does not exist: {$mapperClass}");
@@ -515,7 +515,8 @@ class RecursiveUndeleter
         if ($this->explicitDeletionDate || method_exists($model, 'getDeletedAt')) {
             $deletedAt = $this->explicitDeletionDate ?: $model->getDeletedAt();
             $this->logger->info(
-                sprintf("Restoring soft-deleted models deleted within %d seconds before and after '%s'...",
+                sprintf(
+                    "Restoring soft-deleted models deleted within %d seconds before and after '%s'...",
                     $this->deletedAtWindow / 2,
                     $deletedAt->getDatabase()
                 )
@@ -543,17 +544,21 @@ class RecursiveUndeleter
             $countModels = $models->count();
             if (0 === $countModels) {
                 $this->logger->debug(
-                    sprintf("No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
+                    sprintf(
+                        "No soft-deleted models found for table '%s' (mapper '%s'), skipping...",
                         $mapper->getTable(),
-                        $mapperClass)
+                        $mapperClass
+                    )
                 );
                 continue;
             }
             $this->logger->info(
-                sprintf("Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
+                sprintf(
+                    "Restoring %d soft-deleted models for table '%s' (mapper '%s')...",
                     $models->count(),
                     $mapper->getTable(),
-                    $mapperClass)
+                    $mapperClass
+                )
             );
             $mapper->restoreSoftDeleted($models);
         }
@@ -641,7 +646,7 @@ class RecursiveUndeleter
 
         // Do we yet have results for this mapper ?
         if (!array_key_exists($mapperClass, $this->softDeletedModels)) {
-            $this->softDeletedModels[$mapperClass] = new Collection;
+            $this->softDeletedModels[$mapperClass] = new Collection();
         }
 
         $this->softDeletedModels[$mapperClass] = $this->softDeletedModels[$mapperClass]->merge($deletedModels);
@@ -670,4 +675,3 @@ class RecursiveUndeleter
         return $string;
     }
 }
-

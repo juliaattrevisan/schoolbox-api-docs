@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew;
-
 
 use Alaress\Exception\IO\IOException;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
@@ -198,9 +198,9 @@ class Dispatcher implements DispatcherInterface
                 $this->q->dequeue();
                 $this->log->info("Internally handling '$cmd'");
                 $this->msgHandler->handleResponse($identifier, $cmd, (array)$data);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 // we need to catch (almost) any and all exception here, lest we explode our reactor
-                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ 'exception'=>$e ]);
+                $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), [ 'exception' => $e ]);
             }
             // regardless of whether or not we succeeded, we've finished handling this message, so dequeue it
             $this->strat->pdequeue($identifier);
@@ -225,15 +225,14 @@ class Dispatcher implements DispatcherInterface
             $this->q->dequeue();
             $pid = $this->pool->accept($identifier, $cmd, $data, $this->q->count());
             $this->log->info("Command '$cmd' pushed to worker {{$pid}}", [ 'char' => '>' ]);
-        } catch(IOException $e) {
+        } catch (IOException $e) {
             $this->log->warning("Could not communicate with worker: " . $e->getMessage());
-        } catch(RuntimeException $e) {
-            $this->log->critical("Failed to spawn worker: " . $e->getMessage(), ['exception'=>$e]);
-        } catch(Exception $e) {
+        } catch (RuntimeException $e) {
+            $this->log->critical("Failed to spawn worker: " . $e->getMessage(), ['exception' => $e]);
+        } catch (Exception $e) {
             // we need to catch any and all exception here, lest we explode our reactor
-            $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), ['exception'=>$e]);
+            $this->log->warning(get_class($e) . " suppressed: " . $e->getMessage(), ['exception' => $e]);
         }
-
     }
 
 
@@ -256,5 +255,4 @@ class Dispatcher implements DispatcherInterface
     {
         $this->pool->releaseWorkers($hard);
     }
-
 }

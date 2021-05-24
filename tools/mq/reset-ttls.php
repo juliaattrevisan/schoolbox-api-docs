@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -54,15 +55,17 @@ $app = new class extends CliTool\App{
                      * Class extending DateInterval
                      * @courtesy-of http://php.net/manual/en/dateinterval.format.php#113204
                      */
-                    $exp = (new class(sprintf(self::P_INTERVAL, $ttl)) extends DateInterval{
+                    $exp = (new class (sprintf(self::P_INTERVAL, $ttl)) extends DateInterval{
 
                         public function recalculate()
                         {
-                            $from = new DateTime;
+                            $from = new DateTime();
                             $to = clone $from;
                             $to = $to->add($this);
                             $diff = $from->diff($to);
-                            foreach ($diff as $k => $v) $this->$k = $v;
+                            foreach ($diff as $k => $v) {
+                                $this->$k = $v;
+                            }
                             return $this;
                         }
                     })->recalculate()->format(self::P_TIME);
@@ -87,7 +90,6 @@ $app = new class extends CliTool\App{
 
                 $this->getLogger()->notice(sprintf('%s NEW EXPIRY: %s', $key, $expireTime->getDatabase()), ['char' => '+']);
             }
-
         }
 
         $this->getLogger()->debug('Search complete');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -47,5 +48,4 @@ class IsSchoolboxAdmin implements IAuthorizationRule
             throw new Forbidden();
         }
     }
-
 }

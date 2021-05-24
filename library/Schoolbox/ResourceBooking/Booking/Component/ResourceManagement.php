@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Resource management component
  *
@@ -123,6 +124,5 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             false
         );
         return true;
-
     }
 }

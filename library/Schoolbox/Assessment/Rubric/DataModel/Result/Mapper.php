@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for rubric results.  Rubric results are a defined set of results that can be used to prepopulate a
  * rubrics descriptors.  Results come in sets defined by the resultset_id.
@@ -16,7 +17,8 @@ use Schoolbox\Mapper as BaseMapper;
 /**
  * @method Model[]|GenericCollection findAll($options = array())
  */
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
     protected function mapping()
     {
@@ -40,5 +42,4 @@ class Mapper extends BaseMapper {
     {
         return true;
     }
-
 }

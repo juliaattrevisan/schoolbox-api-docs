@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -125,7 +126,7 @@ class Markbook
         $this->assessments       = $assessments;
         $this->defaultMarkScheme = $defaultMarkScheme;
         $this->viewingUser       = $viewingUser;
-        $this->topLevelAssessments = $assessments->filter(function(IAssessable $assessment) {
+        $this->topLevelAssessments = $assessments->filter(function (IAssessable $assessment) {
             return !$assessment->getContext() instanceof Project;
         });
 
@@ -225,13 +226,12 @@ class Markbook
 
         // Not all assessables are used in stats:
         // only ones for which feedback is visible, and are not project sub-assessments, are usable.
-        $visibleAssessments = $this->topLevelAssessments->filter(function(IAssessable $assessable) {
+        $visibleAssessments = $this->topLevelAssessments->filter(function (IAssessable $assessable) {
             return $assessable->isFeedbackVisibleToUser($this->viewingUser);
         });
 
         $visibleAssessmentIds = $visibleAssessments->getPropertyValues('id');
         foreach ($this->getStudents() as $student) {
-
             // Check whether latest feedback is draft
             $statsHasDraft = false;
             foreach ($this->assessments as $assessment) {
@@ -281,7 +281,6 @@ class Markbook
             new Average()
         );
         $this->weightedMean = $this->defaultMarkScheme->getHumanReadableMark($this->normalisedMean);
-
     }
 
     /**
@@ -356,7 +355,6 @@ class Markbook
             $statistics['weightInProject'] = $assessment->getWeight();
         } else {
             $statistics['weight'] = $assessment->getWeight();
-
         }
 
         // mean and SD are only meaningful for quantitative marks
@@ -397,7 +395,6 @@ class Markbook
     public function getAssessmentsWithProjectContents()
     {
         foreach ($this->getTopLevelAssessments() as $assessment) {
-
             yield $assessment;
 
             // If this is a project - loop through assessments inside it

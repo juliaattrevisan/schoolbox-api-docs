@@ -24,7 +24,8 @@ class Timezone
      * @param string $timezone
      * @param int $offset
      */
-    public function __construct($timezone, $offset) {
+    public function __construct($timezone, $offset)
+    {
         $this->timezone = $timezone;
         $this->offset = str_replace(':', '', $offset);
 
@@ -41,7 +42,7 @@ class Timezone
      *
      * @return string
      */
-    public function getId() : string
+    public function getId(): string
     {
         return $this->timezone;
     }
@@ -51,7 +52,7 @@ class Timezone
      *
      * @return string
      */
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
@@ -61,9 +62,8 @@ class Timezone
      *
      * @return int
      */
-    public function getOffset() : int
+    public function getOffset(): int
     {
         return $this->offset;
     }
 }
-

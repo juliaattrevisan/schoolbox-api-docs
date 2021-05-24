@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Destinations
  *
@@ -15,7 +16,6 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
-
 
 class Destinations
 {

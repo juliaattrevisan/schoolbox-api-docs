@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -117,7 +118,6 @@ else {
         try {
             /** @var $comment Comment */
             $comment = checkOwnership($sessionUser->getId(), $_REQUEST['commentId']);
-
         } catch (\Schoolbox\Mapper\Exception $e) {
             respond(400, $e->getMessage());
         }
@@ -163,10 +163,8 @@ else {
             if ($cMap->save($comment)) {
                 // success
                 respond(204, null);
-
             }
             respond(409, 'Something went wrong updating the comment.');
-
         } elseif (isset($_GET['commentId'])) {
             // request for comment as it exists in the db
             if (isset($comment)) {

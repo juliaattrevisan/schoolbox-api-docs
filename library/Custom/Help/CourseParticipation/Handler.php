@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -22,7 +23,6 @@ use Schoolbox\Admin\SHAPS\Auth\Digest;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
-
 
 class Handler
 {
@@ -86,7 +86,7 @@ class Handler
      * @return array
      * @throws Mapper\Exception      If schoolCode does not have a course area on help
      */
-    public function getFolderAccessBySchool(string $schoolCode) : array
+    public function getFolderAccessBySchool(string $schoolCode): array
     {
         // ok, if you're here, you can see the thing.
         $courses = $this->getCoursesBySchool($schoolCode);
@@ -97,7 +97,7 @@ class Handler
             $participants = $this->userAccessMapper->findUsersInCategory($course);
             $users = [];
 
-            foreach($participants as $user) {
+            foreach ($participants as $user) {
                 $users[] = [
                     "id" => $user->getExternalId(),
                     "firstname" => $user->getFirstname(),
@@ -155,7 +155,7 @@ class Handler
      * @throws Mapper\DefinitionException
      * @throws ParticipantRolesNotFoundException If the expected roles are not found on this server
      */
-    public function getUsersBySchool(string $schoolCode, bool $fuzzy = false) : array
+    public function getUsersBySchool(string $schoolCode, bool $fuzzy = false): array
     {
         $roleIds = $this->getRoleMapper()->findIdsByColumn("name", self::PARTICIPANT_ROLE_NAMES);
 
@@ -194,7 +194,6 @@ class Handler
             }
 
             $predicate ->in('year', $map[$schoolCode]);
-
         } else {
             // "normal" behaviour is to look up by external IDs
             $predicate->like('synergy_id', "{$schoolCode}.%");
@@ -223,7 +222,7 @@ class Handler
      * @throws Mapper\Exception
      * @throws Mapper\Exception\Deleted
      */
-    public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post) : array
+    public function postUserRegistrations(string $schoolCode, bool $byUsername, iterable $post): array
     {
         $participantRole     = $this->getRoleMapper()->findOneByColumn('name', self::DEFAULT_PARTICIPANT_ROLE_NAME);
         $participantCampuses = $this->getCampusMapper()->findByColumn('id', self::PARTICIPANT_CAMPUS);
@@ -251,14 +250,12 @@ class Handler
 
                 // cache the old values
                 $oldUsername   = $user->getUsername();
-
             } catch (Mapper\Exception\Deleted $e) {
                 // user exists, but is deleted; consider this a fail case
                 $failedUsers[] = [
                     'User is deleted', $userData
                 ];
                 continue;
-
             } catch (Mapper\Exception $e) {
                 // user does not exist; create the model
                 $user = $this->getUserMapper()->createModel()
@@ -299,13 +296,11 @@ class Handler
                     // new user: send new-user email ("welcome and here's how to set your password")
                     $this->passwordMailService->sendWelcomeEmailToUser($user);
                 }
-
             } catch (Mapper\Exception $e) {
                 // the user failed to save; is fail case
                 $failedUsers[] = [
                     'Failed to save', $userData
                 ];
-
             } catch (UnexpectedValueException $e) {
                 // duplicate username
                 $failedUsers[] = [
@@ -327,7 +322,7 @@ class Handler
      * @param string              $accessToken
      * @return string
      */
-    public function computeAuthDigest(int $timestamp, string $schoolCode, string $accessToken) : string
+    public function computeAuthDigest(int $timestamp, string $schoolCode, string $accessToken): string
     {
         return (new Digest($schoolCode, $accessToken))->generate($timestamp);
     }
@@ -338,7 +333,7 @@ class Handler
      * @return Collection|IFolder[]
      * @throws Mapper\Exception      If there are no courses for the specified schoolCode
      */
-    private function getCoursesBySchool(string $schoolCode) : Collection
+    private function getCoursesBySchool(string $schoolCode): Collection
     {
         // ok, if you're here, you can see the thing.
         $code   = $this->codeMapper->findOneByColumn('code', $schoolCode);
@@ -354,7 +349,7 @@ class Handler
      * @param array $userData
      * @return bool
      */
-    private function userPayloadIsValid(array $userData) : bool
+    private function userPayloadIsValid(array $userData): bool
     {
         // check all the necessary data is present
         foreach (self::REQUIRED_USER_FIELDS as $required) {
@@ -371,7 +366,7 @@ class Handler
      * @return UserMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getUserMapper() : UserMapper
+    private function getUserMapper(): UserMapper
     {
         return $this->userAccessMapper->getJoinMapper('user');
     }
@@ -381,7 +376,7 @@ class Handler
      * @return RoleMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getRoleMapper() : RoleMapper
+    private function getRoleMapper(): RoleMapper
     {
         return $this->getUserMapper()->getJoinMapper('role');
     }
@@ -391,7 +386,7 @@ class Handler
      * @return CampusMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getCampusMapper() : CampusMapper
+    private function getCampusMapper(): CampusMapper
     {
         return $this->getUserMapper()->getJoinMapper('userCampus');
     }

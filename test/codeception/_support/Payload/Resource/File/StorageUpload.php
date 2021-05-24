@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Payload\Resource\File;
-
 
 use Payload\PostTrait;
 use Payload\Request;

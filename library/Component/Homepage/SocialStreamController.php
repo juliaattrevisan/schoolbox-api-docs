@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -26,7 +27,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
         $this->setBlock('source_folder_exists', 'socialstream_has_newpost', 'socialstream_has_newpost_block');
 
-        if(!$this->isSourceRenderable()) {
+        if (!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailable();
         } else {
             $this->setVar('source_folder_deleted_block', '');
@@ -83,7 +84,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                     'SOCIALSTREAM_NUM_POSTS' => $numPosts
                 )
             );
-            $this->parse('source_folder_exists_block','source_folder_exists');
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
 
         return true;

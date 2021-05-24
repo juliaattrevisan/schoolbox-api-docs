@@ -8,7 +8,8 @@
  *
  */
 
-class Component_Dashboard_PrimaryController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_PrimaryController extends Component_Dashboard_ControllerAbstract
+{
 
     protected $homeroom;
 
@@ -17,31 +18,32 @@ class Component_Dashboard_PrimaryController extends Component_Dashboard_Controll
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute () {
-        if ( is_array($_SESSION['subjects']) ) {
-            foreach ( $_SESSION['subjects'] as $subject ) {
-                if ( stristr($subject['code'], 'HR') || stristr($subject['code'], 'EN') ) {
+    public function execute()
+    {
+        if (is_array($_SESSION['subjects'])) {
+            foreach ($_SESSION['subjects'] as $subject) {
+                if (stristr($subject['code'], 'HR') || stristr($subject['code'], 'EN')) {
                     $this->homeroom = $subject['code'];
                     break;
                 }
             }
         }
 
-        if ( empty( $this->homeroom ) ) {
+        if (empty($this->homeroom)) {
             $this->homeroom = $_SESSION['subjects'][0]['code'];
         }
 
         return true;
     }
 
-    public function renderTemplate ($templateHandle) {
-		if ( !$this->loadTemplate($templateHandle, 'primary') ) {
-			return false;
-		}
+    public function renderTemplate($templateHandle)
+    {
+        if (!$this->loadTemplate($templateHandle, 'primary')) {
+            return false;
+        }
 
         $this->setVar('MY_CLASS', $this->homeroom);
 
         return true;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidationTest
  *
@@ -46,7 +47,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validChangeRequest() : array {
+    public function provider_validChangeRequest(): array
+    {
         return [
 
             /* Add other cases that you expect to be valid

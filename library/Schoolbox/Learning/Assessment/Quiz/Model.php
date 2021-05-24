@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Quiz
  *
@@ -14,7 +15,7 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use InvalidArgumentException;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
@@ -81,7 +82,7 @@ class Model extends AbstractAssessment
      */
     public function setGradeGroup(GradeGroup $gradeGroup = null)
     {
-        if(!is_null($gradeGroup)){
+        if (!is_null($gradeGroup)) {
             throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
         }
         return $this;
@@ -146,7 +147,6 @@ class Model extends AbstractAssessment
         /** @var Attempt\Model $latestAttempt */
         $latestAttempt = null;
         foreach ($participant->getAllResponses() as $attempt) {
-
             // Skip responses that are not submitted yet (ie still in progress)
             if (!$attempt->isSubmitted()) {
                 continue;
@@ -159,7 +159,8 @@ class Model extends AbstractAssessment
 
             // Submitted later? Or submitted at same time but created later?
             // (the latter test handles the case where cron auto-finished a bunch of attempts)
-            if (!$latestAttempt
+            if (
+                !$latestAttempt
                 || $attempt->getSubmittedAt()->gt($latestAttempt->getSubmittedAt())
                 || ($attempt->getSubmittedAt()->eq($latestAttempt->getSubmittedAt()) && $attempt->getCreatedAt()->gt($latestAttempt->getCreatedAt()))
             ) {
@@ -224,7 +225,6 @@ class Model extends AbstractAssessment
             'due'     => $this->getDueAt(),
             'late'    => $this->getCloseAt()
         ]);
-
     }
 
     /**
@@ -233,14 +233,14 @@ class Model extends AbstractAssessment
     public function canLearnerCreateResponse(User $learner)
     {
         // Not open ?
-        if(!$this->isOpen($learner)){
+        if (!$this->isOpen($learner)) {
             return false;
         }
 
         $participant = $this->getParticipantIfExtant($learner);
 
         // Not a participant ?
-        if(!$participant){
+        if (!$participant) {
             return false;
         }
 

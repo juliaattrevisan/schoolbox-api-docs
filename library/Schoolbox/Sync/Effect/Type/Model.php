@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,9 +9,10 @@
 
 namespace Schoolbox\Sync\Effect\Type;
 
-use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
-class Model {
+class Model
+{
 
     /** @var int */
     protected $id;
@@ -36,7 +38,8 @@ class Model {
      *
      * @return string
      */
-    public function getTemplate() {
+    public function getTemplate()
+    {
         if ($this->isSkip()) {
             return $this->getEffectSkipTemplate();
         }
@@ -49,7 +52,8 @@ class Model {
      *
      * @return bool
      */
-    public function isMap() {
+    public function isMap()
+    {
         if ($this->getId() == EffectTypeMapper::EFFECT_TYPE_MAP) {
             return true;
         }
@@ -62,7 +66,8 @@ class Model {
      *
      * @return bool
      */
-    public function isSkip() {
+    public function isSkip()
+    {
         if ($this->getId() == EffectTypeMapper::EFFECT_TYPE_SKIP) {
             return true;
         }
@@ -147,6 +152,4 @@ class Model {
     {
         return $this->effectTemplate;
     }
-
-
 }

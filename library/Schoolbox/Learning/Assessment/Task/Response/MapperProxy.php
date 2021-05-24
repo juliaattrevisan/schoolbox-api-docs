@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -15,7 +16,6 @@ use Schoolbox\Assessment\Course\Task\CompletionMapper;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as DomainObject;
 use Schoolbox\Mapper;
-
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback
@@ -97,7 +97,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     {
         $taskResponses = new GenericCollection(DomainObject::class);
 
-        foreach($mapperModels as $completion){
+        foreach ($mapperModels as $completion) {
             $response = (new DomainObject())
                 ->setId($completion->getId())
                 ->setAssessable((new Task())->setId($completion->getTask()->getAssessmentModel()->getId()))

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
 use Schoolbox\Preview\Chain\Strategy\Base as StrategyBase;
@@ -41,7 +43,8 @@ abstract class Base extends StrategyBase
      * @param string $url
      * @param Storage\Model|File\Model $item
      */
-    public function __construct($url, $item) {
+    public function __construct($url, $item)
+    {
         $this->setUrl($url);
         $this->setItem($item);
     }

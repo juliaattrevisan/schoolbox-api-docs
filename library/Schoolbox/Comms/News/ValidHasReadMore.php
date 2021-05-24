@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
@@ -61,7 +63,6 @@ class ValidHasReadMore
          * Show the link
          */
         if ($article->getDiscussionThread()) {
-
             /* But, if the global admin config Enable Comments On News Articles
              * is currently set to Off, you aren't meant to have access to comments
              * anyway, and the entire comment thread will be hidden; nothing to see

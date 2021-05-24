@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Campus;
 
 /**
@@ -71,7 +73,6 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $definition['dayCount'] = $this->getCycleLength($campus);
 
         return $definition;
-
     }
 
 
@@ -293,7 +294,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         // Add classes for each day into it
         while ($desc = $stmt->fetch(PDO::FETCH_ASSOC)) {
             foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PERIOD_NUMBER'] == $timetablePeriod['periodNumber']
+                if (
+                    $desc['PERIOD_NUMBER'] == $timetablePeriod['periodNumber']
                     && !isset($timetable[$x]['class'][$desc['CODE']])
                 ) {
                     $timetable[$x]['class'][$desc['CODE']] = [
@@ -317,8 +319,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getTimetableForDate(string $externalUserId, $userId, Campus $campus, Alaress_Date_Format $date): array
     {
-        return $this->getDayTimetable($externalUserId, $userId, $campus,
-            $this->getDayNumber($campus, $date->getUnixTimeStamp()));
+        return $this->getDayTimetable(
+            $externalUserId,
+            $userId,
+            $campus,
+            $this->getDayNumber($campus, $date->getUnixTimeStamp())
+        );
     }
 
 
@@ -395,7 +401,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         // Add classes for each day into it
         while ($desc = $stmt->fetch(PDO::FETCH_ASSOC)) {
             foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PERIOD_NUMBER'] == $timetablePeriod['periodNumber']
+                if (
+                    $desc['PERIOD_NUMBER'] == $timetablePeriod['periodNumber']
                     && !isset($timetable[$x]['day'][$desc['DAY_NUMBER']][$desc['CODE']])
                 ) {
                     $timetable[$x]['day'][$desc['DAY_NUMBER']][$desc['CODE']] = [
@@ -470,7 +477,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $statement->execute(array('room' => $roomCode));
 
         // Join with Edumate's (currently hardcoded and campusless) timetable.
-        $campus = new Campus;
+        $campus = new Campus();
         $campusTimetable = $this->getTimetableDefinition(null, $campus);
         $result = array();
         foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {

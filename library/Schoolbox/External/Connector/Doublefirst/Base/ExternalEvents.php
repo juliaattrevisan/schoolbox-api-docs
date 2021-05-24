@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Doublefirst implementation of external events
  *

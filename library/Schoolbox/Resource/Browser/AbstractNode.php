@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Node
  *
@@ -160,12 +161,11 @@ abstract class AbstractNode implements NodeInterface
 
                 $breadcrumbs[] = $crumb;
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             // we'll let this go, and just return whatever we got up to
         }
 
         return array_reverse($breadcrumbs);
-
     }
 
 
@@ -235,7 +235,6 @@ abstract class AbstractNode implements NodeInterface
         }
 
         foreach ($allFiles as $currentFile) {
-
             /* Use a generic default icon for unknown filetypes that
               * could accumulate in the schoolbox
               */
@@ -246,7 +245,6 @@ abstract class AbstractNode implements NodeInterface
                 if (!$mimetype instanceof Mimetype) {
                     $mimetype = MimetypeMapper::getInstance()->getByFilename($currentFile->getBasename());
                 }
-
             } catch (\Exception $e) {
                 $mimetype = $mimetypeMapper->getUnknownMime();
             }
@@ -390,6 +388,5 @@ abstract class AbstractNode implements NodeInterface
      * @param int $minimumLevel
      * @return bool
      */
-    protected abstract function hasPermission($nodeId, $minimumLevel);
-
+    abstract protected function hasPermission($nodeId, $minimumLevel);
 }

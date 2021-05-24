@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by
  * User: jleckie
@@ -14,7 +15,6 @@
  * User Id + Timestamp + Shared Secret hashed.
  */
 
-
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -28,7 +28,7 @@ define('EBL_SHARED_SECRET', 'bG45902501c3');
 $userID = $_SESSION['username'];
 $time = time();
 
-$secret = sha1($userID.$time.EBL_SHARED_SECRET);
+$secret = sha1($userID . $time . EBL_SHARED_SECRET);
 
 
-header('Location: ' .$_GET['url'].'&userid='.$userID.'&tstamp='.$time.'&id='.$secret);
+header('Location: ' . $_GET['url'] . '&userid=' . $userID . '&tstamp=' . $time . '&id=' . $secret);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -108,7 +109,6 @@ class Mapper extends BaseMapper
         $assessment = $participant->getPlan()->getAssessment();
 
         if ($assessment->getDueWork() instanceof SubmissionBox) {
-
             // delete submission return
             $returnMapper = SubmissionBox\ReturnedWorkMapper::getInstance();
             $returnMapper->suppressNotification();
@@ -126,29 +126,23 @@ class Mapper extends BaseMapper
                 'owner'  => $participant->getUser()->getId(),
             ]);
             $submissionMapper->restoreNotification();
-
         } elseif ($assessment->getTask() instanceof Task) {
-
             // delete completion
             $taskCompletionMapper = CompletionMapper::getInstance();
             $taskCompletionMapper->suppressNotification();
             $taskCompletionMapper->deleteByColumnList([
                     'task_id'    => $assessment->getTask()->getId(),
                     'student_id' => $participant->getUser()->getId(),
-                ]
-            );
+                ]);
             $taskCompletionMapper->restoreNotification();
-
         } elseif ($assessment->getQuiz() instanceof Quiz) {
-
             // delete attempt
             $attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
             $attemptMapper->suppressNotification();
             $attemptMapper->deleteByColumnList([
                     'assess_id' => $assessment->getQuiz()->getId(),
                     'user_id'   => $participant->getUser()->getId(),
-                ]
-            );
+                ]);
             $attemptMapper->restoreNotification();
         }
     }
@@ -165,7 +159,6 @@ class Mapper extends BaseMapper
         $excludedAt = $participant->getExcludedAt() instanceof Alaress_Date_NullDate ? null : $participant->getExcludedAt();
 
         if ($assessment->getDueWork() instanceof SubmissionBox) {
-
             // restore submission
             $submissionMapper = SubmissionBox\Submission\SubmissionMapper::getInstance();
             $submissionMapper->suppressNotification();
@@ -188,9 +181,7 @@ class Mapper extends BaseMapper
             $returnMapper->restoreNotification();
 
             return $submissions->count() + $returns->count();
-
         } elseif ($assessment->getTask() instanceof Task) {
-
             // restore completion
             $taskCompletionMapper = CompletionMapper::getInstance();
             $taskCompletionMapper->suppressNotification();
@@ -206,7 +197,6 @@ class Mapper extends BaseMapper
             $taskCompletionMapper->restoreNotification();
 
             return $completion->count();
-
         } elseif ($assessment->getQuiz() instanceof Quiz) {
             $attemptMapper = \Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance();
             $attemptMapper->suppressNotification();

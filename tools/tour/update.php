@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CLI Tool for updating tour YAML files into Schoolbox DB
  *
@@ -12,5 +13,5 @@ use Schoolbox\Tour\Update;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new CliTool\Kernel(new Update(),[CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
+$kernel = new CliTool\Kernel(new Update(), [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $kernel->runApp();

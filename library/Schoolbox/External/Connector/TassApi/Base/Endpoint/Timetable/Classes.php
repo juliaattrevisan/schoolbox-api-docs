@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
@@ -179,7 +181,6 @@ class Classes implements IStrategy
         }
 
         foreach ($timetables as $externalId => $timetable) {
-
             /* External Timetable Code (Cycle Identifier)
              */
             $ext = (string)$timetable['TT_ID'];
@@ -194,11 +195,9 @@ class Classes implements IStrategy
             /* For each Day in $timetable
              */
             foreach ($timetable['DAYS'] as $dayIndex => $day) {
-
                 /* For each Period in Day
                  */
                 foreach ($day['PERIODS'] as $periodIndex => $period) {
-
                     /* Take the 0th element of the Period's Subject's node
                      * (Presume a student can only be in one class on a given (day, period)
                      */
@@ -309,7 +308,6 @@ class Classes implements IStrategy
                     /* Process students
                      */
                     foreach ($class['students'] as $student) {
-
                         /* Throw warning, but assign them anyway
                          */
                         if (!isset($users[$student['externalId']])) {
@@ -427,7 +425,6 @@ class Classes implements IStrategy
         /* If this class had teachers, process them
          */
         if (\count($class['teachers'])) {
-
             /* Throw warning, but assign them anyway
              */
             if (!isset($users[$class['teachers']['externalId']])) {

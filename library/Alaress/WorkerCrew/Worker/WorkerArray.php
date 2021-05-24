@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker;
-
 
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use OutOfBoundsException;
@@ -323,5 +323,4 @@ class WorkerArray implements WorkerBundleInterface
             $this->signalProcess($pid, $signal);
         }
     }
-
 }

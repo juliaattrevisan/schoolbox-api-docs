@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Team\Player;
 
 use Alaress\Async\Notification\Instance\Builder;
@@ -181,7 +183,8 @@ class Notifier extends AbstractModuleNotifier
      * @return Builder
      * @throws \OutOfBoundsException
      */
-    private function notifyRemovedFromTeam(User $effector, TeamPlayer $teamPlayer, Team $team, $title, array $params) {
+    private function notifyRemovedFromTeam(User $effector, TeamPlayer $teamPlayer, Team $team, $title, array $params)
+    {
         $match = $this->getMatchMapper()->findNextMatch($team);
 
         $bob = new Builder();

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import;
@@ -136,7 +138,7 @@ class Controller extends ConfigController
                 if ($status) {
                     $isReachable = $status->isReachable();
                 }
-            } catch (\DomainException|\InvalidArgumentException $e) {
+            } catch (\DomainException | \InvalidArgumentException $e) {
                 // noop
             }
         }
@@ -166,7 +168,7 @@ class Controller extends ConfigController
                 if ($status) {
                     $report = $status->getReport();
                 }
-            } catch (\DomainException|\InvalidArgumentException $e) {
+            } catch (\DomainException | \InvalidArgumentException $e) {
                 $message = $e->getMessage();
             }
         }

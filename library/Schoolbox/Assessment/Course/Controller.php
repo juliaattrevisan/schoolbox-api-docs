@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Web\Controller as Base;
@@ -187,13 +189,13 @@ class Controller extends Base\Base
             $courseFolderAccess = $this->access->getFolderAccess($this->getUser(), $courseFolder->getId());
 
             if ($courseFolderAccess < UserAccess::ACCESS_WRITE) {
-                $errors[] = 'Course Folder permission error: '.$courseFolder->getId();
+                $errors[] = 'Course Folder permission error: ' . $courseFolder->getId();
             }
 
             // Does the proposed Course Folder already have a Unit
             $courseFolderUnit = $courseFolder->getUnitSpecification();
 
-            if ($courseFolderUnit instanceof UnitSpecification && $courseFolderUnit->getId()){
+            if ($courseFolderUnit instanceof UnitSpecification && $courseFolderUnit->getId()) {
                 $errors[] = 'Proposed Course folder already has a Unit: ' . $courseFolderUnit->getId();
             }
         }
@@ -204,7 +206,7 @@ class Controller extends Base\Base
             $unitFolderAccess = $this->access->getFolderAccess($this->getUser(), $unitFolder->getId());
 
             if ($unitFolderAccess < UserAccess::ACCESS_WRITE) {
-                $errors[] = 'Unit Folder permission error: '.$unitFolder->getId();
+                $errors[] = 'Unit Folder permission error: ' . $unitFolder->getId();
             }
 
             // Does the proposed Unit Folder already have a Course ?
@@ -230,9 +232,11 @@ class Controller extends Base\Base
              */
             try {
                 $course = $this->courseSpecificationMapper->findOneByColumn(
-                    'folder_id', $courseFolder->getId(), [
+                    'folder_id',
+                    $courseFolder->getId(),
+                    [
                     'deleted' => true,
-                ]
+                    ]
                 );
             } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 /** @var CourseSpecification $deletedCourse */
@@ -247,7 +251,6 @@ class Controller extends Base\Base
 
         // Create Unit if required
         if (!$unitExists) {
-
             /* Unit folder might have been deleted at some point in the past
              * See if there's a deleted row we can recycle since foreign keys
              * will stop us from inserting a tuple that already exists
@@ -301,7 +304,7 @@ class Controller extends Base\Base
     {
         $this->getResponse()->status->set($code);
 
-        if ($this->getRequest()->isXhr()){
+        if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput($message));
         } else {
             die(json_encode($message));
@@ -405,7 +408,7 @@ class Controller extends Base\Base
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'folderAccess'      => $folderAccess,
             'encodedReturnUrls' => $encodedReturnUrls,
-            'isValidFacultyRoot'=> $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+            'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
     }
 
@@ -424,7 +427,7 @@ class Controller extends Base\Base
             'courseSpec'        => null,
             'courseName'        => $name,
             'curriculumEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
-            'isValidFacultyRoot'=> $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
+            'isValidFacultyRoot' => $this->courseSpecificationMapper->isConfiguredFacultyRootValid(),
         ]);
     }
 
@@ -502,7 +505,6 @@ class Controller extends Base\Base
                 'urlModifyCourse' => $this->getRouter()->generate('course.updateCourse', ['id' => $courseSpec->getId()]),
                 'urlNewUnit'      => $this->getRouter()->generate('course.newUnit', ['id' => $courseSpec->getId()]),
             ]));
-
         } else {
             // respond to synchronous POST with redirect
             $this->getResponse()->redirect->afterPost($this->getRouteIfAuthorized('course.courseList'));
@@ -544,7 +546,7 @@ class Controller extends Base\Base
             } else {
                 try {
                     $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
-                } catch (MapperException $e){
+                } catch (MapperException $e) {
                     $errors[] = "You need to select an existing faculty or class for {$folderName} to live in";
                 }
             }
@@ -629,7 +631,7 @@ class Controller extends Base\Base
                 $parentFolder = $this->folderMapper->findCheaplyById($parentFolderId);
                 $courseSpec->getFolder()->setParent($parentFolder);
             }
-        } catch (Base\Exception $e){
+        } catch (Base\Exception $e) {
             $this->sendError($e);
             return;
         }
@@ -787,11 +789,9 @@ class Controller extends Base\Base
                 'toastSelector'    => '[data-relation="ajax-response"]',
             ];
             $this->courseTpl('unit', $data);
-
         } catch (ServiceNotFound $e) {
             // quite simple not able to find things we need. bye bye.
             $this->sendError('Could not save because of an internal error.', [], 500);
-
         } catch (\Exception $e) {
             // whatever the exception, recover from it as best you can
             $this->sendError("Could not save because {$e->getMessage()}");
@@ -1009,7 +1009,6 @@ class Controller extends Base\Base
         $data = [];
 
         foreach ($allCourses as $currentCourse) {
-
             // general search ignores Courses outside Faculty
             if (null === $searchParam) {
                 try {
@@ -1146,7 +1145,7 @@ class Controller extends Base\Base
     {
         // TODO: make delete of folder and course atomic
 
-        if ($courseSpec->isDeleted()){
+        if ($courseSpec->isDeleted()) {
             $this->getResponse()->status->set(410);
         }
 
@@ -1183,12 +1182,12 @@ class Controller extends Base\Base
     public function deleteUnitSpecification(UnitSpecification $unitSpec)
     {
         // Does this Course exist ?
-        if (!$unitSpec->getId()){
+        if (!$unitSpec->getId()) {
             $this->sendError('Unit not found');
             return;
         }
 
-        if ($unitSpec->isDeleted()){
+        if ($unitSpec->isDeleted()) {
             $this->getResponse()->status->set(410);
         }
 
@@ -1217,12 +1216,12 @@ class Controller extends Base\Base
     public function deleteUnitImplementation(UnitImplementation $unitImpl)
     {
         // Does this Course exist ?
-        if (!$unitImpl->getId()){
+        if (!$unitImpl->getId()) {
             $this->sendError('Unit not found');
             return;
         }
 
-        if ($unitImpl->isDeleted()){
+        if ($unitImpl->isDeleted()) {
             $this->getResponse()->status->set(410);
         }
 

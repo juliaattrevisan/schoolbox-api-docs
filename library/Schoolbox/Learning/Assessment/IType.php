@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Learning\Assessment;
-
 
 interface IType
 {
@@ -29,5 +29,4 @@ interface IType
      * @return string
      */
     public static function getStringValuesAsRegex(callable $map = null);
-
 }

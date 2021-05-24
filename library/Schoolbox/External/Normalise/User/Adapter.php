@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Adapter
  *
@@ -13,6 +14,7 @@
  */
 
 namespace Schoolbox\External\Normalise\User;
+
 use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User\Staff\Position;
 use Schoolbox\Resource\Storage;
@@ -21,7 +23,8 @@ use Schoolbox\User;
 /* Interface usage disabled while the repopulation takes place
  * because it'll bleat at me until I implement all methods
  */
-class Adapter {
+class Adapter
+{
 
     /**
      * Crappy alex handler
@@ -35,7 +38,8 @@ class Adapter {
      *
      * @param \External_UserInterface $handler
      */
-    public function __construct(\External_UserInterface $handler) {
+    public function __construct(\External_UserInterface $handler)
+    {
         $this->handler = $handler;
     }
 
@@ -285,7 +289,6 @@ class Adapter {
 
         if (\is_array($allResults) && \count($allResults)) {
             foreach ($allResults as $currentResult) {
-
                 /* Guardian 1
                  */
                 $guardian1Email = new Common\Email();
@@ -381,7 +384,7 @@ class Adapter {
 
                 /* Parents/Guardians
                  */
-                foreach(array($guardian1, $guardian2) as $currentGuardian) {
+                foreach (array($guardian1, $guardian2) as $currentGuardian) {
                     if (strlen($currentGuardian->getPreferredName())) {
                         $student->getGuardians()->add($currentGuardian);
                     }
@@ -410,8 +413,7 @@ class Adapter {
         $allResults = $this->handler->getStudentBoarderContactListExtended();
 
         if (\is_array($allResults) && \count($allResults)) {
-            foreach($allResults as $currentResult) {
-
+            foreach ($allResults as $currentResult) {
                 /* Guardian 1
                  */
                 $guardian1Email = new Common\Email();
@@ -555,7 +557,7 @@ class Adapter {
 
                 /* Parents/Guardians
                  */
-                foreach(array($guardian1, $guardian2) as $currentGuardian) {
+                foreach (array($guardian1, $guardian2) as $currentGuardian) {
                     if (strlen($currentGuardian->getPreferredName())) {
                         $student->getGuardians()->add($currentGuardian);
                     }
@@ -594,8 +596,7 @@ class Adapter {
         $allResults = $this->handler->getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form);
 
         if (\is_array($allResults) && \count($allResults)) {
-            foreach($allResults as $currentResult) {
-
+            foreach ($allResults as $currentResult) {
                 /* Guardian 1
                  */
                 $guardian1Email = new Common\Email();
@@ -751,7 +752,7 @@ class Adapter {
 
                 /* Parents/Guardians
                  */
-                foreach(array($guardian1, $guardian2) as $currentGuardian) {
+                foreach (array($guardian1, $guardian2) as $currentGuardian) {
                     if (strlen($currentGuardian->getPreferredName())) {
                         $student->getGuardians()->add($currentGuardian);
                     }
@@ -851,7 +852,7 @@ class Adapter {
                             ->setDescription($currentResult['JobPositionDescription'])
                             ->setStartDate(new \Alaress_Date_Format($currentResult['StaffJobPositionStartDate'], 'Y-m-d H:i:s'))
                             ->setEndDate(new \Alaress_Date_Format($currentResult['StaffJobPositionEndDate'], 'Y-m-d H:i:s'))
-               ;
+                ;
 
                 $staff
                     ->getMeta()
@@ -1031,5 +1032,3 @@ class Adapter {
         return [];
     }
 }
-
-

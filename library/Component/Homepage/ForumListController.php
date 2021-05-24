@@ -1,11 +1,13 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ForumListController extends Component_Homepage_ControllerAbstract
 {
@@ -68,7 +70,6 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         }
 
         if (empty($threadList)) {
-
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
 
@@ -87,9 +88,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setBlock('has_posts', 'source_folder_deleted', 'source_folder_deleted_block');
             $this->setBlock('has_posts', 'source_folder_exists', 'source_folder_exists_block');
             $this->setBlock('source_folder_exists', 'forum', 'forum_block');
@@ -108,7 +107,6 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             if (!$this->isSourceRenderable()) {
                 return $this->renderSourceUnavailable();
             } else {
-
                 $this->setVar([
                     'source_folder_deleted_block' => '',
                     'forum_post_block'            => '',

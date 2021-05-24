@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is the vcal renderer for day events
  * it provides support functions for determining how to render a day event

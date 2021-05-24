@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for the base of the curriculum module.
  *

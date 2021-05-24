@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Decorator
  *
@@ -6,11 +7,12 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Quiz\Decorator;
 
 use Assess_Main;
-use \Schoolbox\Learning\Assessment\DecoratorInterface;
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\DecoratorInterface;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 
 class Decorator implements DecoratorInterface
 {

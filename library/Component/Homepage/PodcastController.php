@@ -9,7 +9,6 @@
 
 use Schoolbox\Permission\Access\UserAccess;
 
-
 class Component_Homepage_PodcastController extends Component_Homepage_ControllerAbstract
 {
     /**

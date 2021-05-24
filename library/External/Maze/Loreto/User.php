@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Maze_Loreto_User
  *
@@ -8,28 +9,30 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
 */
+
 declare(strict_types=1);
 
-class External_Maze_Loreto_User extends External_Maze_User {
+class External_Maze_Loreto_User extends External_Maze_User
+{
 
-	/**
-	 * @inheritDoc
-	 */
+    /**
+     * @inheritDoc
+     */
     public function getStudent(string $externalUserId): array
     {
 
-		/* The School Year is never represented as just an int, it's always a
-		 * string of some sort like "Y04" or "Year 2" or "Students In Year 3"
-		 * so you have to replace chars
-		 *
-		 * Student Tutor, Name and Description are Initials, Formal Name and
-		 * Full Name respectively.
-		 *
-		 * Student Head Of House is also their full name.
-		 *
-		 * StudentForm is an identifier; StudentFormStaffName is their full name.
-		 */
-		$query = "
+        /* The School Year is never represented as just an int, it's always a
+         * string of some sort like "Y04" or "Year 2" or "Students In Year 3"
+         * so you have to replace chars
+         *
+         * Student Tutor, Name and Description are Initials, Formal Name and
+         * Full Name respectively.
+         *
+         * Student Head Of House is also their full name.
+         *
+         * StudentForm is an identifier; StudentFormStaffName is their full name.
+         */
+        $query = "
 			SELECT
 				ST.STKEY AS StudentID,
 				ST.FIRST_NAME AS StudentGiven1,
@@ -88,16 +91,16 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			WHERE STKEY = '{$externalUserId}'
 		";
 
-		$student = $this->getDb()->getRow($query);
+        $student = $this->getDb()->getRow($query);
 
-		/* Assign birthday
-		 */
-		$birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'Y-m-d');
-		$student['StudentBirthDate'] = $birthday->getUnixTimeStamp();
+        /* Assign birthday
+         */
+        $birthday = new \Alaress_Date_Format($student['StudentBirthDate'], 'Y-m-d');
+        $student['StudentBirthDate'] = $birthday->getUnixTimeStamp();
 
-		/* Find one or more homeroom teachers and condense them
-		 */
-		$query = "
+        /* Find one or more homeroom teachers and condense them
+         */
+        $query = "
 			SELECT
 				SF.FIRST_NAME AS FIRSTNAME,
 				SF.SURNAME
@@ -107,28 +110,28 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			WHERE KGC.ROLL_GROUP = '{$student['ROLL_GROUP']}'
 		";
 
-		$allHomeroomTeachers = $this->getDb()->getAll($query);
+        $allHomeroomTeachers = $this->getDb()->getAll($query);
 
-		if (is_array($allHomeroomTeachers) && count($allHomeroomTeachers)) {
-			$processed = array();
+        if (is_array($allHomeroomTeachers) && count($allHomeroomTeachers)) {
+            $processed = array();
 
-			foreach ($allHomeroomTeachers as $currentHomeroomTeacher) {
-				$processed[] = $currentHomeroomTeacher['FIRSTNAME'] . ' ' . $currentHomeroomTeacher['SURNAME'];
-			}
+            foreach ($allHomeroomTeachers as $currentHomeroomTeacher) {
+                $processed[] = $currentHomeroomTeacher['FIRSTNAME'] . ' ' . $currentHomeroomTeacher['SURNAME'];
+            }
 
-			/* Uniques only
-			 */
-			$processed = array_values(array_unique($processed));
+            /* Uniques only
+             */
+            $processed = array_values(array_unique($processed));
 
-			$student['StudentFormStaffName'] = implode(', ', $processed);
-		}
+            $student['StudentFormStaffName'] = implode(', ', $processed);
+        }
 
-		return $student;
-	}
+        return $student;
+    }
 
-	/**
-	 * @inheritDoc
-	 */
+    /**
+     * @inheritDoc
+     */
     public function getStudentContactList(array $externalUserId): array
     {
         if (empty($externalUserId)) {
@@ -137,10 +140,9 @@ class External_Maze_Loreto_User extends External_Maze_User {
 
         $ids = implode(',', array_map(static function ($val) {
             return sprintf("'%s'", $val);
-            }, $externalUserId)
-        );
+        }, $externalUserId));
 
-		$query = "
+        $query = "
 			SELECT
 				DFKEY AS StudentContactID,
 				MTITLE AS StudentContactTitle,
@@ -174,18 +176,18 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			ORDER BY primaryFamily DESC
 		";
 
-		return $this->getDb()->getAll($query);
-	}
+        return $this->getDb()->getAll($query);
+    }
 
-	/**
-	 * @inheritDoc
-	 */
+    /**
+     * @inheritDoc
+     */
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
 
-		/* Mega select
-		 */
-		$query = "
+        /* Mega select
+         */
+        $query = "
 			SELECT
 				ST.STKEY AS StudentID,
 				ST.FIRST_NAME AS StudentPreferred,
@@ -241,31 +243,29 @@ class External_Maze_Loreto_User extends External_Maze_User {
 			WHERE 1 = 1
 		";
 
-		/* Search for a particular year level
-		 */
-		if (strlen($yearLevel)) {
+        /* Search for a particular year level
+         */
+        if (strlen($yearLevel)) {
+            /* Translate back to Maze-specific
+             */
+            if (is_numeric($yearLevel)) {
+                $mazeYearLevel = $yearLevel;
 
-			/* Translate back to Maze-specific
-			 */
-			if (is_numeric($yearLevel)) {
-				$mazeYearLevel = $yearLevel;
+                if ($yearLevel < 10) {
+                    $mazeYearLevel = '0' . $yearLevel;
+                }
 
-				if ($yearLevel < 10) {
-					$mazeYearLevel = '0' . $yearLevel;
-				}
+                $mazeYearLevel = 'Y' . $mazeYearLevel;
 
-				$mazeYearLevel = 'Y' . $mazeYearLevel;
-
-				$query .= "
+                $query .= "
 					AND (ST.SCHOOL_YEAR = '{$mazeYearLevel}')
 				";
-			}
-		}
+            }
+        }
 
-		/* Search for a student name
-		 */
-		if (strlen($name)) {
-
+        /* Search for a student name
+         */
+        if (strlen($name)) {
             $splitNames = explode(' ', $name);
 
             foreach ($splitNames as $splitName) {
@@ -278,40 +278,37 @@ class External_Maze_Loreto_User extends External_Maze_User {
                     )
                 ";
             }
-		}
+        }
 
-		/* Search for a particular boarding status
-		 */
-		if ($boardingStatus == '') {
-
-			/* No restrictions on result set
-			 */
-		}
-		else if ($boardingStatus == 'yes') {
-			$query .= "
+        /* Search for a particular boarding status
+         */
+        if ($boardingStatus == '') {
+            /* No restrictions on result set
+             */
+        } else if ($boardingStatus == 'yes') {
+            $query .= "
 				AND ST.BOARDER = 'Y'
 			";
-		}
-		else {
-			$query .= "
+        } else {
+            $query .= "
 				AND ST.BOARDER != 'Y'
 			";
-		}
+        }
 
-		/* Search for a particular form
-		 */
-		if ($form) {
-			$form = $this->getDb()->legacyQuote($form);
+        /* Search for a particular form
+         */
+        if ($form) {
+            $form = $this->getDb()->legacyQuote($form);
 
-			$query .= "
+            $query .= "
 				AND KGC.DESCRIPTION = {$form}
 			";
-		}
+        }
 
-		$query .= "
+        $query .= "
 			ORDER BY StudentSurname, StudentID, StudentContactType
 		";
 
-		return $this->getDb()->getAll($query);
-	}
+        return $this->getDb()->getAll($query);
+    }
 }

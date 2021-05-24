@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Category
  *
@@ -19,7 +20,8 @@
 
 namespace Schoolbox\External\Normalise\User\Staff;
 
-class Category {
+class Category
+{
 
     /**
      * Staff category code
@@ -48,7 +50,8 @@ class Category {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

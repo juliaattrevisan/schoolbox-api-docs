@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,12 +10,12 @@ namespace Schoolbox\Fixtures\Position;
 
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Sport\Model as Sport;
-use \Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\Fixtures\Position\Model as Position;
-use \Schoolbox\Fixtures\Position\Mapper as PositionMapper;
+use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
+use Schoolbox\Fixtures\Position\Model as Position;
+use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 
 class Controller extends AbstractController
 {

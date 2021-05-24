@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -11,7 +12,6 @@ namespace Schoolbox\Realtime\Schedule\Trigger;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 use Schoolbox\User;
-
 
 interface IPropagator
 {
@@ -34,5 +34,4 @@ interface IPropagator
      * @return string
      */
     public function propagateEvent(CrudEventInterface $event);
-
 }

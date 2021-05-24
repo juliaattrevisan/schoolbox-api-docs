@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -10,7 +11,7 @@ namespace Schoolbox\User\Log;
 
 use Schoolbox\User;
 
-class Model 
+class Model
 {
     /** @var int */
     protected $id;

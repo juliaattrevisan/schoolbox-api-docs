@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -54,5 +55,4 @@ class FileSystemHandler implements TypeHandlerInterface
 
         return $storage;
     }
-
 }

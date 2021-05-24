@@ -154,4 +154,3 @@ class External_Isams_Class implements External_ClassInterface
         return [];
     }
 }
-

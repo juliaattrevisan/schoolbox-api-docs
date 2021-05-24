@@ -1,16 +1,17 @@
 <?php
+
 /**
  *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
+
 namespace Schoolbox\Comms\News;
 
 use Alaress\Json\Decorator\IDecorator;
 use Schoolbox\Comms\News\Lookup\ReadMore;
 use TextFormatter;
 use Scrub;
-
 
 /**
  * Class BlurbDecorator

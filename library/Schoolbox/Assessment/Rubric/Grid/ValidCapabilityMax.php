@@ -1,13 +1,14 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
-
 
 /**
  * Spec pattern for validating capability max marks.
@@ -39,7 +40,7 @@ class ValidCapabilityMax extends \Alaress\Specification\Base
      * @param mixed $capabilityMax
      * @return bool
      */
-    public function isSatisfiedBy($capabilityMax) : bool
+    public function isSatisfiedBy($capabilityMax): bool
     {
         if ($this->markPerCap) {
             return is_numeric($capabilityMax) && $capabilityMax >= 0;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventConnector
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace EOTC;
 
 use Calendar\Event\Collection;
@@ -366,7 +368,6 @@ class EventConnector extends EventMapper
             $isInStaffCampus = $user->getRole()->isStaff() && $inCampus && $eventItem->getMetadata()->getStatus()->between(EventStatusMapper::STATUS_INPRINCIPLE, EventStatusMapper::STATUS_APPROVED);
 
             if ($isEOTCAdministrator || $isSuperuser || $isCreator || $isTIC || $isStaffAttendee || $isInStaffCampus || ($isApproved && ($isStudentAttendee || $inCampusAndRole))) {
-
                 /* Translate an \EOTC\Event type into a EventInterface descendant
                  * Note that this "new Event();" does not have a mapper, so spawn concretely
                  */

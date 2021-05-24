@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synergetic implementation of sync connector
  *
@@ -117,8 +118,9 @@ class Sync extends Base implements ISync
         $relationshipBindings1 = $this->databaseExternal->prepareInBindings($relationships);
         $relationshipBindings2 = $this->databaseExternal->prepareInBindings($relationships);
 
-        $guardianIterator = $this->databaseExternal->getQueryIterator("
-            SELECT DISTINCT cp.NetworkLogin                               AS student_contact_network_login,
+        $guardianIterator = $this->databaseExternal->getQueryIterator(
+            "SELECT DISTINCT
+                            cp.NetworkLogin                               AS student_contact_network_login,
                             s.StudentContactID                            AS student_contact_id,
                             s.StudentContactTitle                         AS student_contact_title,
                             s.StudentContactPreferredFormal               AS student_contact_given_name,
@@ -170,9 +172,8 @@ class Sync extends Base implements ISync
                             FileSemester = (SELECT FileSemester FROM FileSemesters WHERE SystemCurrentFlag = 1) AND
                             FileYear = (SELECT FileYear FROM FileSemesters WHERE SystemCurrentFlag = 1)
 
-            ORDER BY        student_contact_id ASC
-
-        ", array_merge(
+            ORDER BY        student_contact_id ASC",
+            array_merge(
                 $contactTypeBindings1['bindings'],
                 $contactTypeBindings2['bindings'],
                 $relationshipBindings1['bindings'],

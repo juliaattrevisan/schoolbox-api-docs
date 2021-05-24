@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Help\Hero;
 
 use Alaress\Authorizer\Rule;
@@ -16,8 +18,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificat
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
-use \Alaress\Twig\Loader\IChainLoader;
-
+use Alaress\Twig\Loader\IChainLoader;
 
 class Module extends BaseModule
 {

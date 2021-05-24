@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implementation of our standard day event in Schoolbox.
  * Note this events can be campus, group or personal events.
@@ -121,7 +122,8 @@ class Event extends EventBase
      *
      * @return bool
      */
-    public function canAttend() {
+    public function canAttend()
+    {
         return $this->getAttendance();
     }
 
@@ -131,7 +133,8 @@ class Event extends EventBase
      *
      * @return string
      */
-    public function getFilterClasses() {
+    public function getFilterClasses()
+    {
         $eventLevel = '';
 
         if ($this->isCampusAccess()) {
@@ -144,11 +147,11 @@ class Event extends EventBase
             }
         } else {
             if ($this->isGroupAccess()) {
-				$allLevels = array();
+                $allLevels = array();
 
-				foreach ($this->getCategoryCollection() as $currentCategory) {
-					$allLevels[] = 'group' . $currentCategory->getCategoryId();
-				}
+                foreach ($this->getCategoryCollection() as $currentCategory) {
+                    $allLevels[] = 'group' . $currentCategory->getCategoryId();
+                }
 
                 $eventLevel = implode(' ', $allLevels);
             } else {
@@ -167,7 +170,8 @@ class Event extends EventBase
      *
      * @param bool $attendance
      */
-    public function setAttendance($attendance) {
+    public function setAttendance($attendance)
+    {
         $this->attendance = $attendance;
     }
 
@@ -176,7 +180,8 @@ class Event extends EventBase
      *
      * @return bool
      */
-    public function getAttendance() {
+    public function getAttendance()
+    {
         return $this->attendance;
     }
 

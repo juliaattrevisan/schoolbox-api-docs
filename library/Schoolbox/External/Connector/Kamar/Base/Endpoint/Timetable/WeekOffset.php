@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
@@ -72,7 +74,7 @@ class WeekOffset
         $n = \count($cycles);
 
         for ($i = 1; $i <= $n; $i++) {
-            $currentCycle = $cycles[$i-1];
+            $currentCycle = $cycles[$i - 1];
 
             if ($this->log) {
                 $this->log->debug(sprintf(

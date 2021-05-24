@@ -198,7 +198,7 @@ class External_Tass_User implements External_UserInterface
         WHERE s.stud_code = {$this->database->legacyQuote($externalUserId)}
         ";
         $row = $this->database->getRow($query);
-        if(!$row){
+        if (!$row) {
             return [];
         }
         $student = $this->database->trimRow($row);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface that defines a model class as able to be soft-deletable.
  *

@@ -1,21 +1,27 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Role;
+
 use function array_filter;
 use function array_map;
 use function array_merge;
 use function count;
+
 use Custom\Tigs\Summative\StudentAttributes;
+
 use function explode;
 use function preg_match;
+
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 use External_UserInterface;

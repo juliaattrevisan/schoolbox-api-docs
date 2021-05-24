@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,6 @@ namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Learning\Assessment;
-
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Learning\Quiz;

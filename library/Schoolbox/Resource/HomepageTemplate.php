@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains a homepage template, made up really of only a name.
  * This is just a lookup table, new ones can be created in the admin system
@@ -9,13 +10,12 @@
  * @link      https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Resource;
-
 
 use Schoolbox\Mapper\Traits\Model\Id;
 
-class HomepageTemplate {
+class HomepageTemplate
+{
 
     public const HOMEPAGE_NONE          = -1;
     public const HOMEPAGE_KEEP_EXISTING = 0;
@@ -102,5 +102,4 @@ class HomepageTemplate {
     {
         return $this->right_column_width;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Section deletion. Any Questions contained within the section, along with
  * those Questions' Answers, are softdeleted when the section is softdeleted.
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -17,16 +19,14 @@ $sectionHandler = new Assess_Section();
 $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
 $groupHandler = new Group();
-
 $questionList = $questionHandler->getList($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[0]);
-
 if ($section) {
-	$assess = $assessHandler->getByID($section['assess_id']);
+    $assess = $assessHandler->getByID($section['assess_id']);
 }
 
 if (!$assess) {
-	error(112);
+    error(112);
 }
 
 if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
@@ -38,23 +38,21 @@ if (!$assessHandler->isOwner($section['assess_id']) && ($groupHandler->getPermis
 }
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
-	error(112);
+    error(112);
 }
 
 if ($questionList) {
-    foreach($questionList as $currentQuestion) {
+    foreach ($questionList as $currentQuestion) {
         $question = $questionHandler->getByID($currentQuestion['question_id']);
         $answer = $answerHandler->getForQuestion($currentQuestion['question_id']);
-
-        /* Perform soft delete
+    /* Perform soft delete
          */
         $questionHandler->update(array(
             'question_id' => $currentQuestion['question_id'],
             'deleted_at' => 'NOW()',
         ));
-
         $answerHandler->update(array(
-			'question_id' => $currentQuestion['question_id'],
+            'question_id' => $currentQuestion['question_id'],
             'answer_id' => $answer['answer_id'],
             'deleted_at' => 'NOW()',
         ));
@@ -65,10 +63,6 @@ if ($questionList) {
  */
 $section['deleted_at'] = 'NOW()';
 $sectionHandler->update($section);
-
 $sectionHandler->resequenceSectionsAfterDelete($section['assess_id']);
-
-$returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
-
+$returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
 SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $returnUrl);
-

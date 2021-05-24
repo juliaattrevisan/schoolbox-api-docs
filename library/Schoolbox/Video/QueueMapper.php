@@ -84,7 +84,6 @@ class QueueMapper extends Mapper
                     $error = false;
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 // noop: hash not found
                 // This file was never in the queue, so I guess we don't load it
             }

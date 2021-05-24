@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\Realtime\Pipe\PipeManager;
-
 
 class Unread extends AbstractList
 {
@@ -35,10 +35,8 @@ class Unread extends AbstractList
 
         // in addition to whatever our parent is doing, we also want to advise the relevant user
         // that this message has been published, so it can be pushed to them
-        $topic = "{$this->getNamespace()}:{$this->getUserId()}:".PipeManager::PIPE_METHOD_PUSH;
+        $topic = "{$this->getNamespace()}:{$this->getUserId()}:" . PipeManager::PIPE_METHOD_PUSH;
 
         $this->redis->publish($topic, "$instance");
     }
-
-
 }

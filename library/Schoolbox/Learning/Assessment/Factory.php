@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
@@ -16,27 +18,21 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Exception as ResourceException;
-use \Schoolbox\User;
-
-use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-
-use \Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
-use \Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
-use \Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
-
-use \Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
-use \Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
-
-use \Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
-use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
-
-use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
-use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
+use Schoolbox\User;
+use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
+use Schoolbox\Learning\Assessment\DueWork\Decorator\CourseManagedDecorator as DueWorkCourseManagedDecorator;
+use Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait;
+use Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
+use Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait;
+use Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
+use Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait;
+use Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use UnexpectedValueException;
 
@@ -189,7 +185,7 @@ class Factory
             // MaxMark is the maximum available marks for the entire assessment.
             // It is permitted to be null for all mark types except Total Mark.
             // Unfortunately, the due work create form uses these deprecated values, not the new "slug" ones.
-            switch($markType) {
+            switch ($markType) {
                 case MarkType::TYPE_PERCENT:
                 case MarkType::TYPE_LETTER:
                 case MarkType::TYPE_NONE:
@@ -275,7 +271,7 @@ class Factory
         // Instantiate empty Assessment model
         $assessment = AssessmentType::stringToObject($this->getAssessmentType(), $this->context);
 
-        if ($assessment instanceof Project){
+        if ($assessment instanceof Project) {
             $assessment->setSummator((new SummatorFactory($this->getSummator()))->produce());
         }
 
@@ -381,7 +377,6 @@ class Factory
         /* Start manufacturing
          */
         if ($courseManagedFields->isReadonly()) {
-
             /* Only these fields can be updated by regular guys editing implementations
              */
             $assessment
@@ -411,7 +406,7 @@ class Factory
                 ->setCreatedAt(Alaress_Date_Format::now())
                 ->setUpdatedAt(Alaress_Date_Format::now());
 
-            if ($this->workType){
+            if ($this->workType) {
                 $assessment->setWorkType((new WorkType\Model())->setId($this->workType));
             } else {
                 $assessment->setWorkType(null);
@@ -454,7 +449,6 @@ class Factory
         try {
             // attempt to parse the date
             return Alaress_Date_Format::newLocal($dateString);
-
         } catch (InvalidArgumentException $e) {
             // unparseable - safely return null
             return new Alaress_Date_NullDate();

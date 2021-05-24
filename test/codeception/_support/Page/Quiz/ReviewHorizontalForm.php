@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -49,9 +50,8 @@ class ReviewHorizontalForm
     public function finalise()
     {
         $i = $this->tester;
-        $i->waitForElementVisible('a.button.submit',2);
+        $i->waitForElementVisible('a.button.submit', 2);
         $i->click('a.button.submit');
         $i->waitForText('Status of ' . $this->quizTitle);
     }
-
 }

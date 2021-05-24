@@ -1,17 +1,19 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile;
 use Schoolbox\Learning\Assessment\DueWork\Feedback;
-use \Schoolbox\Learning\Assessment\AbstractResponse;
+use Schoolbox\Learning\Assessment\AbstractResponse;
 
 /**
  * Class Model

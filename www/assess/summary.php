@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Summary page for assessment creation methods to return to.
  *
@@ -10,7 +11,7 @@
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Assessment\Redirect;
 
 $assessHandler = new Assess_Main();
 $sectionHandler = new Assess_Section();
@@ -36,8 +37,7 @@ $folder = null;
 try {
     $folderMapper = new FolderMapper();
     $folder = $folderMapper->findById($assess['category_id']);
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     error(117);
 }
 
@@ -55,22 +55,19 @@ if (!$authorizer->isPathAuthorizedForUser('learningQuiz.getQuizSummary', $params
     error(Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW);
 }
 
-if($assess['start']) {
+if ($assess['start']) {
     $assessStartDate = new Alaress_Date_Format(strtotime($assess['start']), 'U');
-}
-else {
+} else {
     $assessStartDate = new Alaress_Date_NullDate();
 }
-if($assess['finish']) {
+if ($assess['finish']) {
     $assessFinishDate = new Alaress_Date_Format(strtotime($assess['finish']), 'U');
-}
-else {
+} else {
     $assessFinishDate = new Alaress_Date_NullDate();
-
 }
 
 $returnUrl = $_GET[Redirect::RETURN_URL]
-    ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}"
+    ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}"
     : '';
 
 $modifyRouteArgs = [ 'assessmentId' => $assess['assessment_id']];
@@ -91,7 +88,7 @@ $this->setVar(array(
     'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
     'ASSESSMENT_ID'        => $assess['assessment_id'],
     'MODIFY_URL'           => $modifyUrl,
-    'RETURN_URL_MODIFY'    => $returnUrl ?: '?'.Redirect::RETURN_URL.'='.Redirect::encode('/assess/summary/'.$assess['assess_id']),
+    'RETURN_URL_MODIFY'    => $returnUrl ?: '?' . Redirect::RETURN_URL . '=' . Redirect::encode('/assess/summary/' . $assess['assess_id']),
 ));
 
 

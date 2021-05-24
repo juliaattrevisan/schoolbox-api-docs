@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for email notifications.
  *
@@ -7,14 +8,16 @@
  * @link       https://schoolbox.com.au/
  * @copiedfrom Steve Chan <steve.chan@alaress.com.au>
  */
-abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_Notice {
+abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_Notice
+{
     protected $email = null;
     protected $emailTemplateFile = 'modules/leave/adminNoticeEmail.html';
 
     /**
      * Setup
      */
-    public function setup() {
+    public function setup()
+    {
         $subject = '(Admin) Leave Request Status Update for ' . $this->getRequest()->getUser()->formatName();
 
         $email = new Mailer(
@@ -46,7 +49,8 @@ abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_No
      * Send it - by default, sends nothing (because most people don't have admin
      * messages set up
      */
-    public function send() {
+    public function send()
+    {
         return;
     }
 
@@ -58,7 +62,8 @@ abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_No
      *
      * @param Mailer $email
      */
-    protected function setEmail($email) {
+    protected function setEmail($email)
+    {
         $this->email = $email;
     }
 
@@ -67,7 +72,8 @@ abstract class Leave_Core_Notice_Admin_Abstract extends Leave_Notice_Abstract_No
      *
      * @return Mailer
      */
-    protected function getEmail() {
+    protected function getEmail()
+    {
         return $this->email;
     }
 }

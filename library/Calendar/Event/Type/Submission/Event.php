@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Event_Type_Submission
  *

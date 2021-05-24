@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Direct
  *
@@ -9,31 +10,30 @@
 
 namespace SocialStream\Post\Thumbnail;
 
+class ArbitraryFile extends Thumbnail
+{
 
-class ArbitraryFile extends Thumbnail {
+    /**
+     * Some kind of resource that is not an image
+     * such as a pdf, a docx, etc.
+     *
+     * @return mixed
+     */
+    public function fetchThumbnail()
+    {
 
-	/**
-	 * Some kind of resource that is not an image
-	 * such as a pdf, a docx, etc.
-	 *
-	 * @return mixed
-	 */
-	public function fetchThumbnail() {
+        /* If it has at least the right extension, download it directly
+         */
+        $mapper = new \Schoolbox\File\MimetypeMapper();
 
-		/* If it has at least the right extension, download it directly
-		 */
-		$mapper = new \Schoolbox\File\MimetypeMapper();
+        try {
+            $icon = $mapper->getByFilename($this->getUrl())->getIconFile();
+        } catch (\Schoolbox\File\Exception $e) {
+            return '';
+        }
 
-		try {
-			$icon = $mapper->getByFilename($this->getUrl())->getIconFile();
-
-		}
-		catch(\Schoolbox\File\Exception $e) {
-			return '';
-		}
-
-		/* Return a particular formatted string for templating reasons
-		 */
-		return "icon:$icon";
-	}
+        /* Return a particular formatted string for templating reasons
+         */
+        return "icon:$icon";
+    }
 }

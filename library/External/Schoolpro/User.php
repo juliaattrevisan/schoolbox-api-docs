@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Schoolpro_User
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
 */
+
 declare(strict_types=1);
 
 use Schoolbox\External\Normalise\TupleStack;
@@ -72,7 +74,6 @@ class External_Schoolpro_User implements External_UserInterface
 
         if (\count($externalUserIds)) {
             foreach ($externalUserIds as $studentId) {
-
                 /* Get the contacts for $studentId
                  */
                 $vars = [
@@ -87,7 +88,6 @@ class External_Schoolpro_User implements External_UserInterface
                 $currentStudentContact = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
                 if ($currentStudentContact) {
-
                     /* Get this contact's email
                      */
                     $emails[] = $currentStudentContact['email'];
@@ -143,7 +143,6 @@ class External_Schoolpro_User implements External_UserInterface
         $currentStudent = $this->getConnector()->executeStoredProcedure($vars[0], $vars[1])->fetch();
 
         if ($currentStudent) {
-
             /* Get the medical data for him too
              */
             $medicalVars = [
@@ -160,7 +159,6 @@ class External_Schoolpro_User implements External_UserInterface
             /* These arrive in a variety of formats
              */
             foreach ($medicalResult as $currentCondition) {
-
                 /* Only include medical issues that are Applicable == 1
                  * Just use a basic message to hide the sensitive data,
                  * and bust out of the loop after the first positive result
@@ -225,7 +223,6 @@ class External_Schoolpro_User implements External_UserInterface
         $studentContactList = [];
 
         foreach ($externalUserId as $userId) {
-
             $vars = [
                 'sbGetStudentContact',
                 [
@@ -389,7 +386,6 @@ class External_Schoolpro_User implements External_UserInterface
         }
 
         return $allStudents;
-
     }
 
     /**
@@ -422,7 +418,6 @@ class External_Schoolpro_User implements External_UserInterface
         /* Find the last updated datetime
          */
         if ($photo) {
-
             // TODO: delete photos on rollover
 
             /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
@@ -445,7 +440,6 @@ class External_Schoolpro_User implements External_UserInterface
                 /* Get the binary data and dump it into a file
                  */
                 if ($photo) {
-
                     /* Save it into brownhole
                      */
                     $portrait = Storage\Mapper::getInstance()->acceptStream($user->getExternalId() . '.jpg', $photo['RawData']);

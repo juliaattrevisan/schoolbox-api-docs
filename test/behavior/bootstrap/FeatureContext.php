@@ -6,7 +6,8 @@ use Behat\Mink\Element;
 /**
  * Features context.
  */
-class FeatureContext extends BaseContext {
+class FeatureContext extends BaseContext
+{
 
     /**
      * Initializes context.
@@ -14,7 +15,8 @@ class FeatureContext extends BaseContext {
      *
      * @param array $parameters context parameters (set them up through behat.yml)
      */
-    public function __construct(array $parameters) {
+    public function __construct(array $parameters)
+    {
         $this->useContext('mink', new MinkContext($parameters));
         $this->useContext('core', new Subcontext_CoreContext($parameters));
         $this->useContext('component', new Subcontext_ComponentContext($parameters));
@@ -32,12 +34,13 @@ class FeatureContext extends BaseContext {
      *
      * @BeforeScenario
      */
-    public function logout(Behat\Behat\Event\ScenarioEvent $event) {
+    public function logout(Behat\Behat\Event\ScenarioEvent $event)
+    {
         // Session may not be initialised yet, so silently swallow
         try {
             $this->getSession()->visit('/logout.php');
+        } catch (Exception $e) {
         }
-        catch (Exception $e) {}
     }
 
     /**
@@ -45,7 +48,8 @@ class FeatureContext extends BaseContext {
      *
      * @AfterScenario
      */
-    public function resetBrowser(Behat\Behat\Event\ScenarioEvent $event) {
+    public function resetBrowser(Behat\Behat\Event\ScenarioEvent $event)
+    {
         $this->getSession()->reset();
     }
 
@@ -54,11 +58,11 @@ class FeatureContext extends BaseContext {
      *
      * @beforeStep
      */
-    public function disableAnimationBeforeStep(Behat\Behat\Event\StepEvent $event) {
+    public function disableAnimationBeforeStep(Behat\Behat\Event\StepEvent $event)
+    {
         try {
             $this->disableAnimation();
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             // jQuery wasn't present, most likely. Forget I ever saw anything.
         }
     }
@@ -71,15 +75,18 @@ class FeatureContext extends BaseContext {
      *
      * @AfterStep
      */
-    public function takeScreenshotOnFailure(Behat\Behat\Event\StepEvent $event) {
+    public function takeScreenshotOnFailure(Behat\Behat\Event\StepEvent $event)
+    {
         if ($event->hasException()) {
-            if (!in_array(
-                get_class($event->getException()),
-                array(
+            if (
+                !in_array(
+                    get_class($event->getException()),
+                    array(
                     'Behat\Behat\Exception\UndefinedException',
                     'Behat\Behat\Exception\PendingException',
+                    )
                 )
-            )) {
+            ) {
                 $baseName = sprintf(
                     '%s/screenshots/%s-%s',
                     dirname(__DIR__),
@@ -88,11 +95,11 @@ class FeatureContext extends BaseContext {
                 );
                 // Assume screenshot is a PNG
                 file_put_contents(
-                    $baseName.'.png',
+                    $baseName . '.png',
                     $this->getSession()->getDriver()->getScreenshot()
                 );
                 file_put_contents(
-                    $baseName.'.html',
+                    $baseName . '.html',
                     $this->getSession()->getDriver()->getContent()
                 );
             }

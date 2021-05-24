@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Test;
-
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use Psr\Log\LoggerInterface;
@@ -33,7 +33,7 @@ abstract class AbstractTest extends BaseTestCase implements TestCase
     {
         $this->loop = $loop;
     }
-    
+
     /**
      * @param LoggerInterface $log
      * @return void
@@ -79,5 +79,4 @@ abstract class AbstractTest extends BaseTestCase implements TestCase
             call_user_func($this->buffy);
         }
     }
-
 }

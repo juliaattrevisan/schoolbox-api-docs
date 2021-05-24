@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
@@ -99,7 +101,6 @@ class Factory extends FolderFilter\Factory
         // Course-markbook is only interested in units specs that were previously imported to folders,
         // not the current courseSpec's unitSpecs
         if (Filter\Page\Model::PAGE_COURSE_MARK_BOOK === $pageFilter->getPage()) {
-
             // Remove any folders that were added via override, only populate with relevant folders
             // But don't modify the folder overrides, they will continue to affect selection of available folder options
             // This ensures a user can't inject a random folder and unit-spec and see assessments that were not imported from the courseSpec

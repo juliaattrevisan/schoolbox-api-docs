@@ -9,7 +9,7 @@ $kernel = new Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
-$wikiHandler  = new Wiki;
+$wikiHandler  = new Wiki();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
 
 if (isset($_GET['wikiID'])) {
@@ -70,4 +70,3 @@ if (isset($_GET['wikiID'])) {
 } else {
     error(2);
 }
-

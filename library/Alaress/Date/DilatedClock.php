@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Date;
-
 
 class DilatedClock implements IClock
 {
@@ -53,7 +53,5 @@ class DilatedClock implements IClock
         $dilatedElapsed = $trueElapsed / $this->dilation;
 
         return (int)($this->start + $dilatedElapsed + $this->offset);
-
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -11,7 +12,6 @@ namespace Alaress\Web\Request;
 use Alaress\Specification;
 use Aura\Web\Request;
 use TypeError;
-
 
 /**
  * Is the given request XHR?

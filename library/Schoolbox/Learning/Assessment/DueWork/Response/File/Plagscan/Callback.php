@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Schoolbox\Mapper\Exception as MapperException;
@@ -75,13 +77,11 @@ class Callback
 
             $this->mapper->save($currentDocument);
         } catch (\DomainException $e) {
-
             /* Some kind of plagscan error occurred - perhaps log it?
              * noop
              */
             return false;
         } catch (MapperException $e) {
-
             /* Plagscan record not found - perhaps log it?
              * noop
              */

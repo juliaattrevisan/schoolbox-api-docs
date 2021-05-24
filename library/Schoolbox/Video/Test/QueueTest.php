@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
+
 namespace Schoolbox\Video\Test;
 
 use Schoolbox\Video\Queue;

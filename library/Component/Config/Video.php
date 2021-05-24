@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      James Leckie <jleckie@alaress.com.au>
@@ -10,7 +11,7 @@ class Component_Config_Video extends Component_Config_Abstract
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
         /* Sort order
-		 */
+         */
         if ($component instanceof Component_ControllerAbstract) {
             $sortConfig = array(
                 'sort' => $component->getConfig('sort'),
@@ -22,7 +23,7 @@ class Component_Config_Video extends Component_Config_Abstract
             $sourceId = $this->getContext()->getId();
         }
 
-        if($sourceId){
+        if ($sourceId) {
             $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
             $vidList = $videoMapper->findByCategory($sourceId, $sortConfig);
         } else {
@@ -36,7 +37,7 @@ class Component_Config_Video extends Component_Config_Abstract
             foreach ($vidList as $video) {
                 $page->setVar(array(
                     'COMPONENT_CONFIG_VIDSELECT_NAME'       => Scrub::text($video->getFile()->getTitle()),
-                    'COMPONENT_CONFIG_VIDSELECT_VALUE' 	    => $video->getFile()->getId(),
+                    'COMPONENT_CONFIG_VIDSELECT_VALUE'      => $video->getFile()->getId(),
                     'COMPONENT_CONFIG_VIDSELECT_SELECTED'   => $video->getFile()->getId() == $configValue ? 'selected="selected"' : '',
                 ));
 

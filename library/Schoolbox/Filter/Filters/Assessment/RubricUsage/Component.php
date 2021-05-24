@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
@@ -13,6 +15,7 @@ use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
+
 use function array_merge;
 
 /**
@@ -109,7 +112,7 @@ class Component extends Filter\BaseComponent
         $selectCapabilities = $this->showCapabilities && $abstractOptions[Definition::KEY_CAPABILITIES]->getDefaults()[$roleType]->getSelected();
         $selectIndicators   = $this->showIndicators && $abstractOptions[Definition::KEY_INDICATORS]->getDefaults()[$roleType]->getSelected();
 
-        if(isset($abstractOptions[Definition::KEY_NONE])){
+        if (isset($abstractOptions[Definition::KEY_NONE])) {
             $noneSelected                         = $abstractOptions[Definition::KEY_NONE]->getDefaults()[$roleType]->getSelected();
             $roleSelections[Definition::KEY_NONE] = $this->createSelection(Definition::KEY_NONE, $noneSelected);
         }

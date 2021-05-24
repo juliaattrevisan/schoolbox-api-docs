@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -10,9 +11,9 @@ namespace Calendar\Event\Render;
 use Calendar\Event\Type\EventInterface;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
-use \DateTime;
-use \DateInterval;
-use \DateTimeZone;
+use DateTime;
+use DateInterval;
+use DateTimeZone;
 use Alaress\Html;
 
 /**

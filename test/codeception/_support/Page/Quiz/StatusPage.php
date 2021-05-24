@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -54,7 +55,7 @@ class StatusPage
      * @param String $fieldSelector
      * @return string
      */
-    public static function getStatusSelector(int $studentId, String $fieldSelector)
+    public static function getStatusSelector(int $studentId, string $fieldSelector)
     {
         return '#assessment-status li[data-participant="' . $studentId . '"] ' . $fieldSelector;
     }
@@ -110,5 +111,4 @@ class StatusPage
         $i->click('Mark All as Reviewed');
         $i->waitForText('Status of ' . $quizTitle);
     }
-
 }

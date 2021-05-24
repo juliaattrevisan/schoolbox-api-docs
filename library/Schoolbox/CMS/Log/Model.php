@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -16,7 +17,7 @@ use Schoolbox\Resource\My\Folder\Model as myFolder;
 use Schoolbox\Resource\Link;
 use Schoolbox\User;
 
-class Model 
+class Model
 {
     /** @var int */
     protected $id;

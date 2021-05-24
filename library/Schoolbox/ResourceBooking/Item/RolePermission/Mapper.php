@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for resource role permissions.
  *
@@ -8,11 +9,14 @@
  */
 
 namespace Schoolbox\ResourceBooking\Item\RolePermission;
+
 use Schoolbox\Mapper as BaseMapper;
 
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    public function mapping() {
+    public function mapping()
+    {
         $this->hasTable('resource_role_permission');
         $this->hasModel('Schoolbox\\ResourceBooking\\Item\\RolePermission\\Model');
         $this->hasMap(
@@ -55,5 +59,4 @@ class Mapper extends BaseMapper {
             )
         );
     }
-
 }

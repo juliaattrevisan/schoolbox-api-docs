@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * This is the main controller for e-portfolio blogs that handles all the CRUD operations
@@ -7,6 +8,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Blog\Eportfolio\Post;
 
 use Alaress\Web\Controller\Base;
@@ -177,7 +179,6 @@ class Controller extends Base
                 // The attachment was found in the database, remove it
                 $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                 $this->getEportfolioBlogImageMapper()->delete($attachment);
-
             } else {
                 // We are keeping this attachment
                 $retainedAttachments[] = $attachment->getHash();
@@ -214,16 +215,13 @@ class Controller extends Base
      */
     public function getItem(EportfolioPageModel $page, EportfolioBlogModel $blog)
     {
-        try
-        {
+        try {
             // Load any comments and hydrate their owners
             $comments = $this->getEportfolioBlogCommentMapper()->findByColumn("blog_id", $blog->getId());
 
             // Load any images
             $images = $this->getEportfolioBlogImageMapper()->findByColumn("blog_id", $blog->getId());
-        }
-        catch (MapperException $e)
-        {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
@@ -348,7 +346,8 @@ class Controller extends Base
      * Gets blog archive for the current calendar month
      * @param EportfolioPageModel $page
      */
-    public function getArchiveCurrent(EportfolioPageModel $page) {
+    public function getArchiveCurrent(EportfolioPageModel $page)
+    {
         $this->getArchive($page, date("Y"), date("n"));
     }
 
@@ -379,7 +378,6 @@ class Controller extends Base
             $dateSelectorArray[$blog->getCreatedAt()->getYear() . "-" . $blog->getCreatedAt()->getMonth(true)] = $blog->getCreatedAt();
 
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
-
                 $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
                 $blogImages[$blog->getId()] = $this->getEportfolioBlogImageMapper()->findByColumn('blog_id', $blog->getId());
 
@@ -411,126 +409,144 @@ class Controller extends Base
     /**
      * @param UserAccessMapper $userAccessMapper
      */
-    public function setUserAccessMapper($userAccessMapper) {
+    public function setUserAccessMapper($userAccessMapper)
+    {
         $this->userAccessMapper = $userAccessMapper;
     }
 
     /**
      * @return UserAccessMapper
      */
-    public function getUserAccessMapper() {
+    public function getUserAccessMapper()
+    {
         return $this->userAccessMapper;
     }
 
     /**
      * @param RoleMapper $roleMapper
      */
-    public function setRoleMapper($roleMapper) {
+    public function setRoleMapper($roleMapper)
+    {
         $this->roleMapper = $roleMapper;
     }
 
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
     /**
      * @param UserMapper $userMapper
      */
-    public function setUserMapper($userMapper) {
+    public function setUserMapper($userMapper)
+    {
         $this->userMapper = $userMapper;
     }
 
     /**
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
     /**
      * @param ErrorMapper $errorMapper
      */
-    public function setErrorMapper($errorMapper) {
+    public function setErrorMapper($errorMapper)
+    {
         $this->errorMapper = $errorMapper;
     }
 
     /**
      * @return ErrorMapper
      */
-    public function getErrorMapper() {
+    public function getErrorMapper()
+    {
         return $this->errorMapper;
     }
 
     /**
      * @param EportfolioBlogMapper $blogMapper
      */
-    public function setEportfolioBlogMapper($blogMapper) {
+    public function setEportfolioBlogMapper($blogMapper)
+    {
         $this->blogMapper = $blogMapper;
     }
 
     /**
      * @return EportfolioBlogMapper
      */
-    public function getEportfolioBlogMapper() {
+    public function getEportfolioBlogMapper()
+    {
         return $this->blogMapper;
     }
 
     /**
      * @param EportfolioBlogImageMapper $blogImageMapper
      */
-    public function setEportfolioBlogImageMapper($blogImageMapper) {
+    public function setEportfolioBlogImageMapper($blogImageMapper)
+    {
         $this->blogImageMapper = $blogImageMapper;
     }
 
     /**
      * @return EportfolioBlogImageMapper
      */
-    public function getEportfolioBlogImageMapper() {
+    public function getEportfolioBlogImageMapper()
+    {
         return $this->blogImageMapper;
     }
 
     /**
      * @param EportfolioBlogCommentMapper $blogCommentMapper
      */
-    public function setEportfolioBlogCommentMapper($blogCommentMapper) {
+    public function setEportfolioBlogCommentMapper($blogCommentMapper)
+    {
         $this->blogCommentMapper = $blogCommentMapper;
     }
 
     /**
      * @return EportfolioBlogCommentMapper
      */
-    public function getEportfolioBlogCommentMapper() {
+    public function getEportfolioBlogCommentMapper()
+    {
         return $this->blogCommentMapper;
     }
 
     /**
      * @param EportfolioPageMapper $eportfolioPageMapper
      */
-    public function setEportfolioPageMapper($eportfolioPageMapper) {
+    public function setEportfolioPageMapper($eportfolioPageMapper)
+    {
         $this->eportfolioPageMapper = $eportfolioPageMapper;
     }
 
     /**
      * @return EportfolioPageMapper
      */
-    public function getEportfolioPageMapper() {
+    public function getEportfolioPageMapper()
+    {
         return $this->eportfolioPageMapper;
     }
 
     /**
      * @param FileMapper $fileMapper
      */
-    public function setFileMapper($fileMapper) {
+    public function setFileMapper($fileMapper)
+    {
         $this->fileMapper = $fileMapper;
     }
 
     /**
      * @return FileMapper
      */
-    public function getFileMapper() {
+    public function getFileMapper()
+    {
         return $this->fileMapper;
     }
 }

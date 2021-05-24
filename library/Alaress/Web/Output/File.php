@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Output handling class that outputs a file, either from the contents of a
  * variable or directly from the filesystem.

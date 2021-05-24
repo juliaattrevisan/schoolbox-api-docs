@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Output handling class - accepts a web response object, and figures out how
  * to output it.
@@ -166,7 +167,6 @@ class Base implements OutputInterface
         $callbacks = $this->getPostOutputCallbacks();
 
         if (!empty($callbacks)) {
-
             header('Content-Encoding: none');
             header("Content-Length: " . strlen($output));
             header('Connection: close');

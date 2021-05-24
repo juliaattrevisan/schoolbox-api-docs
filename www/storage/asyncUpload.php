@@ -34,7 +34,6 @@ $result = array(
 if (!$_SESSION['id']) {
     $result['message'] = 'Unauthorized';
     $result['error']   = 403;
-
 } elseif (isset($_FILES['upload'])) {
     $meta = $_FILES['upload'];
 
@@ -46,20 +45,18 @@ if (!$_SESSION['id']) {
                 $result = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator);
                 $hashes[] = $result['hash'];
                 $metas[]  = $result['meta'];
-
             } catch (Exception $e) {
-                $hashes[] = 'exception:'.$e->getMessage();
+                $hashes[] = 'exception:' . $e->getMessage();
                 $metas[]  = array();
             }
         }
         $result['hash'] = $hashes;
         $result['meta'] = $metas;
-
     } else {
         try {
             $result = attemptStorage($meta, $prefixGenerator);
         } catch (Exception $e) {
-            $result['hash'] = 'exception:'.$e->getMessage();
+            $result['hash'] = 'exception:' . $e->getMessage();
             $result['meta'] = array();
         }
     }
@@ -79,7 +76,7 @@ die(json_encode($result));
 function getFileAtIndex($meta, $i)
 {
     $rtn = array();
-    foreach(array_keys($meta) as $field) {
+    foreach (array_keys($meta) as $field) {
         $rtn[$field] = $meta[$field][$i];
     }
     return $rtn;

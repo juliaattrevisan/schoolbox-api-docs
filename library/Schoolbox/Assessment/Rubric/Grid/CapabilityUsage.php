@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -178,9 +179,11 @@ class CapabilityUsage
         // Now we know the indicators in use are the same.
         // Check each usage is compatible with the usage in the other.
         foreach ($this->indicatorUsages as $thisIndicatorUsage) {
-            if (!$thisIndicatorUsage->isCompatibleWith(
-                $other->retrieveIndicatorUsage($thisIndicatorUsage->getIndicator())
-            )) {
+            if (
+                !$thisIndicatorUsage->isCompatibleWith(
+                    $other->retrieveIndicatorUsage($thisIndicatorUsage->getIndicator())
+                )
+            ) {
                 return false;
             }
         }

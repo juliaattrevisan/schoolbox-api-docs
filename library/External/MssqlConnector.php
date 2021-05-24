@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Setups up an external MSSQL database connection. This is a temporary clutch until these old externals are
  * deprecated in favor of NDS which can get a connection using dependency injection.
@@ -33,7 +34,8 @@ trait External_MssqlConnector
     /**
      * @return IConnector
      */
-    protected function getConnector() {
+    protected function getConnector()
+    {
         return $this->connector;
     }
 

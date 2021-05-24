@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Visibility
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Assess;
 
 use Schoolbox\Learning\Assessment\AbstractAssessment;
@@ -16,138 +18,145 @@ use Schoolbox\Learning\Assessment\IAssessable;
  *
  * @deprecated use `\Schoolbox\Learning\Assessment\IAssessable::isFeedbackVisibleToUser` instead
  */
-class Visibility {
+class Visibility
+{
 
-	/**
-	 * Identifier
-	 *
-	 * @var null
-	 */
-	private $id = null;
+    /**
+     * Identifier
+     *
+     * @var null
+     */
+    private $id = null;
 
-	/**
-	 * Name of the visibility status
-	 *
-	 * @var string
-	 */
-	private $name = '';
+    /**
+     * Name of the visibility status
+     *
+     * @var string
+     */
+    private $name = '';
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/**
-	 * Get a list of visibility consts
-	 *
-	 * This can prevent Quiz marks from appearing in Report Cards, from being
-	 * shown to the participant at the end, etc
-	 *
-	 * Note that the assess_visibility table has been made synonymous with the
-	 * consts defined in SubmissionBox (zero-based) and thus won't autoincrement
-	 *
-	 * @param \Schoolbox\User $student     The student whose visibility we're checking
-	 * @param \Schoolbox\User $currentUser The user who's viewing the student
-	 * @return array
-	 */
-	public function getVisibilityArray(\Schoolbox\User $student, \Schoolbox\User $currentUser)
-	{
-		$visibilities = array();
-		if ($currentUser->isSuperuser() || $currentUser->getRole()->isStaff()) {
-			$visibilities[] = IAssessable::MARK_VISIBILITY_PRIVATE;
-			$visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
-			$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-		}
-		else if ($currentUser->getRole()->isStudent()) {
-			$visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
-			$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-		}
-		else {
-			$student->loadParents();
-			if ($currentUser->isParentOf($student)) {
-				$visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
-			}
-		}
+    /**
+     * Get a list of visibility consts
+     *
+     * This can prevent Quiz marks from appearing in Report Cards, from being
+     * shown to the participant at the end, etc
+     *
+     * Note that the assess_visibility table has been made synonymous with the
+     * consts defined in SubmissionBox (zero-based) and thus won't autoincrement
+     *
+     * @param \Schoolbox\User $student     The student whose visibility we're checking
+     * @param \Schoolbox\User $currentUser The user who's viewing the student
+     * @return array
+     */
+    public function getVisibilityArray(\Schoolbox\User $student, \Schoolbox\User $currentUser)
+    {
+        $visibilities = array();
+        if ($currentUser->isSuperuser() || $currentUser->getRole()->isStaff()) {
+            $visibilities[] = IAssessable::MARK_VISIBILITY_PRIVATE;
+            $visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
+            $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+        } else if ($currentUser->getRole()->isStudent()) {
+            $visibilities[] = IAssessable::MARK_VISIBILITY_STUDENT;
+            $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+        } else {
+            $student->loadParents();
+            if ($currentUser->isParentOf($student)) {
+                $visibilities[] = IAssessable::MARK_VISIBILITY_PARENT_STUDENT;
+            }
+        }
 
-		return $visibilities;
-	}
+        return $visibilities;
+    }
 
-	/**
-	 * Is this Quiz mark visible to staff only
-	 *
-	 * @return bool
-	 */
-	public function isStaff() {
-		if ($this->getId() == IAssessable::MARK_VISIBILITY_PRIVATE) {
-			return true;
-		}
+    /**
+     * Is this Quiz mark visible to staff only
+     *
+     * @return bool
+     */
+    public function isStaff()
+    {
+        if ($this->getId() == IAssessable::MARK_VISIBILITY_PRIVATE) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Is this Quiz mark visible to staff and students
-	 *
-	 * @return bool
-	 */
-	public function isStaffStudent() {
-		if ($this->getId() == IAssessable::MARK_VISIBILITY_STUDENT) {
-			return true;
-		}
+    /**
+     * Is this Quiz mark visible to staff and students
+     *
+     * @return bool
+     */
+    public function isStaffStudent()
+    {
+        if ($this->getId() == IAssessable::MARK_VISIBILITY_STUDENT) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Is this Quiz mark visible to staff and students
-	 *
-	 * @return bool
-	 */
-	public function isStaffStudentParent() {
-		if ($this->getId() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
-			return true;
-		}
+    /**
+     * Is this Quiz mark visible to staff and students
+     *
+     * @return bool
+     */
+    public function isStaffStudentParent()
+    {
+        if ($this->getId() == IAssessable::MARK_VISIBILITY_PARENT_STUDENT) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/* Getters/Setters
-	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set id
-	 *
-	 * @param null $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * Set id
+     *
+     * @param null $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return null
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Get id
+     *
+     * @return null
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Set name
-	 *
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
+    /**
+     * Set name
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * Get name
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 }

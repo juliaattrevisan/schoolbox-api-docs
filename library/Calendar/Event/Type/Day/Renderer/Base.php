@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is the base renderer for day events,
  * it provides support functions for determining how to render a day event
@@ -12,7 +13,7 @@ namespace Calendar\Event\Type\Day\Renderer;
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
 use Calendar\Event\Type\Day;
-use \Calendar\Event\Type\RendererBase;
+use Calendar\Event\Type\RendererBase;
 use Schoolbox\Calendar\Event;
 use Schoolbox\User;
 

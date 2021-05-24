@@ -6,7 +6,6 @@ use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 
-
 if (!$_SESSION['user']->isSuperuser()) {
     error(19, "", 401);
 }
@@ -31,7 +30,6 @@ $placeholder  = "$default_size (default)";
 
 if ($mimes->count()) {
     foreach ($mimes as $mime) {
-
         $this->setVar('file_extension_block', '');
 
         $extensions   = ExtensionMapper::getInstance()->findByColumn('fileTypeID', $mime->getId());
@@ -70,7 +68,7 @@ if ($mimes->count()) {
             'FILE_EXTERN_CHECKED'      => $mime->getInline() ? '' : 'selected="selected"',
         );
         $this->setVar($output);
-        $this->parse('file_block','file',true);
+        $this->parse('file_block', 'file', true);
     }
 }
 
@@ -79,8 +77,8 @@ $allowedFile = new AllowedFile();
 $iconList = $allowedFile->getIconList();
 
 if (is_array($iconList)) {
-    foreach($iconList as $icon) {
+    foreach ($iconList as $icon) {
         $this->setVar('IMAGE_FILE', $icon);
-        $this->parse('image_block','image',true);
+        $this->parse('image_block', 'image', true);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -71,10 +72,12 @@ class Module extends BaseModule
                 new Rule\LazyCallback(
                     function () {
                         return new Rule\Callback(function (array $params): bool {
-                            if (isset($params['subject'])
+                            if (
+                                isset($params['subject'])
                                 && $params['subject'] instanceof Folder\Model
                                 && $params['subject']->getYearLevels() !== null
-                                && $params['subject']->isGradePageEnabled()) {
+                                && $params['subject']->isGradePageEnabled()
+                            ) {
                                 return true;
                             }
                             // when year level collection is null, it may have not been hydrated.

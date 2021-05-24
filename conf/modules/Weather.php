@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Config\Modules;
@@ -22,6 +24,5 @@ class Weather extends ModuleLoader
     {
         $this->loadModule($kernel, \Schoolbox\Weather\Component\Dashboard\Module::class, "/weather/component/dashboard");
         $this->loadModule($kernel, \Schoolbox\Weather\Module::class, "/weather");
-
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IsCoachOfTeam
  *
@@ -12,12 +13,11 @@ namespace Schoolbox\Fixtures\Authorizer\Rule;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
-use \Schoolbox\Fixtures\Coach\Model as Coach;
-use \Schoolbox\Fixtures\Match\Model as Match;
-use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use \Schoolbox\Fixtures\Result\Model as Result;
-use \Schoolbox\Fixtures\Team\Metadata\Factory;
-
+use Schoolbox\Fixtures\Coach\Model as Coach;
+use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Result\Model as Result;
+use Schoolbox\Fixtures\Team\Metadata\Factory;
 
 class IsCoachOfTeam implements IAuthorizationRule
 {
@@ -64,8 +64,7 @@ class IsCoachOfTeam implements IAuthorizationRule
             /** @var Match $match */
             $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
             $teamId = $result->getTeam()->getId();
-        }
-        else {
+        } else {
             throw new Unauthorized();
         }
 

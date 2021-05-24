@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DueWork
  *
@@ -17,9 +18,9 @@ use Schoolbox\Learning\Assessment\ISelfAssessable;
 use UnexpectedValueException;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use \Schoolbox\Collection;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Collection;
+use Schoolbox\User;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Participant;
@@ -359,7 +360,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
                 'publish' => $this->getPublishAt(),
                 'due'     => $this->getDueAt()
             ]);
-
         } else {
             $this->assertDateSequence([
                 'publish' => $this->getPublishAt(),
@@ -482,7 +482,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
         // ok, rules for self-assess
 
         // not allowed if the DW isn't open for the user yet (or ever)
-        if(!$this->isOpen($learner)){
+        if (!$this->isOpen($learner)) {
             return false;
         }
 
@@ -530,7 +530,6 @@ class Model extends AbstractAssessment implements ISelfAssessable
         }
 
         return false;
-
     }
 
     /* Getters/Setters
@@ -738,7 +737,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @return MarkType|null
      */
-    public function getCapabilityMarkType() : ?MarkType
+    public function getCapabilityMarkType(): ?MarkType
     {
         return $this->capabilityMarkType;
     }
@@ -756,7 +755,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
     /**
      * @return boolean
      */
-    public function getUseMarkRange() : bool
+    public function getUseMarkRange(): bool
     {
         return $this->useMarkRange;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Config
  *
@@ -9,90 +10,97 @@
 
 namespace EOTC;
 
+class Config
+{
 
-class Config {
+    /**
+     * Identifier
+     *
+     * @var int
+     */
+    private $id = -1;
 
-	/**
-	 * Identifier
-	 *
-	 * @var int
-	 */
-	private $id = -1;
+    /**
+     * Name of the config
+     *
+     * @var string
+     */
+    private $name = '';
 
-	/**
-	 * Name of the config
-	 *
-	 * @var string
-	 */
-	private $name = '';
+    /**
+     * Config value
+     *
+     * @var string
+     */
+    private $value = '';
 
-	/**
-	 * Config value
-	 *
-	 * @var string
-	 */
-	private $value = '';
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+    }
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-	}
+    /* Getters/Setters
+     */
 
-	/* Getters/Setters
- 	 */
+    /**
+     * Set id
+     *
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Set id
-	 *
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Set name
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * Set name
-	 *
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * Get name
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Set value
+     *
+     * @param string $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	/**
-	 * Set value
-	 *
-	 * @param string $value
-	 */
-	public function setValue($value) {
-		$this->value = $value;
-	}
-
-	/**
-	 * Get value
-	 *
-	 * @return string
-	 */
-	public function getValue() {
-		return $this->value;
-	}
+    /**
+     * Get value
+     *
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 }

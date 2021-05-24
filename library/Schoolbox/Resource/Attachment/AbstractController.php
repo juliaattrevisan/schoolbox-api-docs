@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Attachment;
-
 
 use SitePage;
 
@@ -70,12 +70,10 @@ abstract class AbstractController implements ControllerInterface
         if (null === $this->mimeFilter) {
             // noop
         } elseif (false === $this->mimeFilter) {
-
             /* mimeFilter was false; just show folders
              */
             $args['mime'] = '';
         } else {
-
             /* mimeFilter was set to some string so urlencode it then supply it
              */
             $args['mime'] = urlencode($this->mimeFilter);
@@ -126,6 +124,5 @@ abstract class AbstractController implements ControllerInterface
      * @param SitePage $page
      * @return void
      */
-    protected abstract function pparse(SitePage $page);
-
+    abstract protected function pparse(SitePage $page);
 }

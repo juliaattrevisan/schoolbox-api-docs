@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,7 @@ namespace Assess\Import\Parser;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use \Evaluation\Import\Parser\Base as EvaluationParser;
+use Evaluation\Import\Parser\Base as EvaluationParser;
 
 /**
  * Quiz-specific implementation.
@@ -98,7 +99,7 @@ class V160 extends EvaluationParser implements IParser
      */
     protected function createDateFromString($dateString, $format = Alaress_Date_Format::DATABASE_FORMAT)
     {
-        if(empty($dateString)){
+        if (empty($dateString)) {
             return new Alaress_Date_NullDate();
         }
         return new Alaress_Date_Format($dateString, $format);

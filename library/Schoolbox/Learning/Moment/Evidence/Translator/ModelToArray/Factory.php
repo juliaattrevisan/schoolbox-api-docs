@@ -7,9 +7,7 @@
 
 declare(strict_types=1);
 
-
 namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
-
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
@@ -21,7 +19,6 @@ use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
-
 
 /**
  * Factory for building a standard translator

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Put a whole heap of junk keys into Redis. The keys all have a similar name
  * to notifications

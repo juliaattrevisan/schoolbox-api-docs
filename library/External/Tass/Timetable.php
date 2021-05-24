@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 use Schoolbox\Campus;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 
@@ -40,7 +42,7 @@ class External_Tass_Timetable implements External_TimetableInterface
     public function __construct()
     {
         $this->setupDatabase();
-        $this->groupHandler = new Group;
+        $this->groupHandler = new Group();
         $this->externalUser = new External_User('tass');
     }
 
@@ -83,7 +85,6 @@ class External_Tass_Timetable implements External_TimetableInterface
         $statement = $this->getConnector()->executeQuery($query);
         $periodCount = 0;
         while ($period = $statement->fetch()) {
-
             $timetableDef['desc'][]   = $period['prd_desc'];
             $timetableDef['start'][]  = date("g:ia", strtotime($period['prd_start']));
             $timetableDef['end'][]    = date("g:ia", strtotime($period['prd_end']));
@@ -216,7 +217,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                             AND tch_code = :externalId
                             AND day_code = :dayNumber
                          ORDER BY prd_code';
-
         }
 
         $statement = $this->getConnector()->executeQuery($query, $params);
@@ -225,7 +225,7 @@ class External_Tass_Timetable implements External_TimetableInterface
         $useYearInCode = $this->config->get('external_tass_year_in_class_code');
 
         // Build the timetable
-        if(is_array($timetabledef['desc'])) {
+        if (is_array($timetabledef['desc'])) {
             foreach ($timetabledef['desc'] as $x => $name) {
                 $timetable[$x]['periodName'] = $timetabledef['desc'][$x];
                 $timetable[$x]['periodStart'] = $timetabledef['start'][$x];
@@ -242,7 +242,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                 }
                 $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
                 foreach ($timetable as $x => $timetablePeriod) {
-                    if ($desc['prd_code'] == $timetablePeriod['periodNumber']
+                    if (
+                        $desc['prd_code'] == $timetablePeriod['periodNumber']
                         && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['class'][$code])
                     ) {
@@ -259,7 +260,6 @@ class External_Tass_Timetable implements External_TimetableInterface
             }
         }
         return $timetable;
-
     }
 
 
@@ -301,7 +301,6 @@ class External_Tass_Timetable implements External_TimetableInterface
                                     AND (studsub.from_date <= getdate() OR studsub.from_date IS NULL)
                                     AND (studsub.to_date >= getdate() OR studsub.to_date IS NULL)
                             ORDER BY prd_code, day_code';
-
         } else {
             $query = 'SELECT room_code, tch_code, day_code, ttmast.sub_code, ISNULL(ttmast.year_grp,subtab.year_grp) as year_grp, class, prd_code, sub_desc
                         FROM ttmast
@@ -337,7 +336,8 @@ class External_Tass_Timetable implements External_TimetableInterface
                 }
                 $code = trim($desc['year_grp']) . '-' . trim($desc['sub_code']) . '-' . trim($desc['class']);
                 foreach ($timetable as $x => $timetablePeriod) {
-                    if ($desc['prd_code'] == $timetablePeriod['periodNumber']
+                    if (
+                        $desc['prd_code'] == $timetablePeriod['periodNumber']
                         && $timetablePeriod['periodSequence'] != 2
                         && !isset($timetable[$x]['day'][$desc['day_code']][$code])
                     ) {

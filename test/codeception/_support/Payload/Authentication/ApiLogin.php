@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Payload\Authentication;
@@ -38,18 +40,13 @@ class ApiLogin extends Request
 
     public function setRedirectPageQueryParam(string $page): void
     {
-        if ($page != '' && isset($page))
-        {
+        if ($page != '' && isset($page)) {
             $this->setQueryParam('redirect', $page);
-        }
-        else
-        {
-            if ($this->getQueryParam('redirect') != null)
-            {
+        } else {
+            if ($this->getQueryParam('redirect') != null) {
                 $this->unsetQueryParam('redirect');
             }
         }
-
     }
 
     public function getUrl(): string

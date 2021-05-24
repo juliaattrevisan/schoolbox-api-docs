@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Weather;
@@ -150,7 +152,7 @@ class WeatherstackClient
     private function calculateLastUpdated(string $localtime, string $utcOffset): int
     {
         $locationTimestamp = strtotime($localtime);
-        $locationUTCOffset = $utcOffset*3600;
+        $locationUTCOffset = $utcOffset * 3600;
         $localUTCOffset = date('Z');
 
         return (int)($locationTimestamp - $locationUTCOffset + $localUTCOffset);

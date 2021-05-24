@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -16,6 +17,7 @@ use Aura\Router\Router;
 use Schoolbox\Video\QueueMapper;
 use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\Mapper\Exception as MapperException;
+
 /**
  * The module for managing school terms through the admin section.
  *
@@ -90,7 +92,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**
@@ -107,7 +109,5 @@ class Module extends BaseModule
     public function getQueueMapper()
     {
         return $this->getMapperFactory()->get(QueueMapper::class);
-
     }
-
 }

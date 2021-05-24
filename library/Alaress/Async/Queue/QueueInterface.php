@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Queue;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;

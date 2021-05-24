@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Review assessment. The marks for each submitted question can be modified here
  * but the actual answers cannot be changed, only seen. Structurally, this is
@@ -81,8 +82,7 @@ if (is_numeric($this->arg[2])) {
 
 try {
     $user = UserMapper::getInstance()->findById($attempt['user_id']);
-}
-catch (Mapper\Exception $e) {
+} catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_USER_NOT_FOUND);
 }
 
@@ -93,8 +93,7 @@ catch (Mapper\Exception $e) {
  */
 try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-}
-catch (Mapper\Exception $e) {
+} catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
@@ -218,9 +217,7 @@ if ($allQuestions) {
     $randomQuestionNumber = 1;
 
     foreach ($allQuestions as $currentQuestion) {
-
         if ($currentQuestion["type_id"] != null) {
-
             $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
             /* Load answer template into answerOption block

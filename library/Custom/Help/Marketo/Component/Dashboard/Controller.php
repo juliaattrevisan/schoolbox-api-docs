@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Marketo callback for Schoolbox Help
  *

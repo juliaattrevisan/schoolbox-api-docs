@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Template
  *
@@ -9,109 +10,117 @@
 
 namespace Eportfolio;
 
+class Template
+{
 
-class Template {
+    /**
+     * The primary key
+     *
+     * @var int
+     */
+    private $id;
 
-	/**
-	 * The primary key
-	 *
-	 * @var int
-	 */
-	private $id;
+    /**
+     * The name of the template
+     *
+     * @var string
+     */
+    private $name;
 
-	/**
-	 * The name of the template
-	 *
-	 * @var string
-	 */
-	private $name;
+    /**
+     * Left column width
+     *
+     * @var float
+     */
+    private $leftColumnWidth;
 
-	/**
-	 * Left column width
-	 *
-	 * @var float
-	 */
-	private $leftColumnWidth;
+    /**
+     * Right column width
+     *
+     * @var float
+     */
+    private $rightColumnWidth;
 
-	/**
-	 * Right column width
-	 *
-	 * @var float
-	 */
-	private $rightColumnWidth;
+    /* Getters/Setters
+     */
 
-	/* Getters/Setters
-	 */
+    /**
+     * Set id
+     *
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Set id
-	 *
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Set left column width
+     *
+     * @param float $leftColumnWidth
+     */
+    public function setLeftColumnWidth($leftColumnWidth)
+    {
+        $this->leftColumnWidth = $leftColumnWidth;
+    }
 
-	/**
-	 * Set left column width
-	 *
-	 * @param float $leftColumnWidth
-	 */
-	public function setLeftColumnWidth($leftColumnWidth) {
-		$this->leftColumnWidth = $leftColumnWidth;
-	}
+    /**
+     * Get left column width
+     *
+     * @return float
+     */
+    public function getLeftColumnWidth()
+    {
+        return $this->leftColumnWidth;
+    }
 
-	/**
-	 * Get left column width
-	 *
-	 * @return float
-	 */
-	public function getLeftColumnWidth() {
-		return $this->leftColumnWidth;
-	}
+    /**
+     * Set name
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * Set name
-	 *
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * Get name
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Set right column width
+     *
+     * @param string $rightColumnWidth
+     */
+    public function setRightColumnWidth($rightColumnWidth)
+    {
+        $this->rightColumnWidth = $rightColumnWidth;
+    }
 
-	/**
-	 * Set right column width
-	 *
-	 * @param string $rightColumnWidth
-	 */
-	public function setRightColumnWidth($rightColumnWidth) {
-		$this->rightColumnWidth = $rightColumnWidth;
-	}
-
-	/**
-	 * Get right column width
-	 *
-	 * @return float
-	 */
-	public function getRightColumnWidth() {
-		return $this->rightColumnWidth;
-	}
+    /**
+     * Get right column width
+     *
+     * @return float
+     */
+    public function getRightColumnWidth()
+    {
+        return $this->rightColumnWidth;
+    }
 }

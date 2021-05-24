@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,9 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Application\CliTool;
 
 use Aura\Di;
+
 use function count;
 use function get_class;
 use function implode;
+
 use UnexpectedValueException;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -34,7 +37,7 @@ class Composite extends App
      *
      * @param App ...$subApps
      */
-    public function __construct(App... $subApps)
+    public function __construct(App ...$subApps)
     {
         $this->subApps = $subApps;
     }

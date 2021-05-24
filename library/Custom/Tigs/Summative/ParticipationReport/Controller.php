@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
@@ -16,7 +18,9 @@ use Custom\Tigs\Summative\Config;
 use Custom\Tigs\Summative\StudentAttributes;
 use DomainException;
 use External_ClassInterface;
+
 use function implode;
+
 use LogicException;
 use Schoolbox\Assessment\Rubric\DataModel as RubricDataModel;
 use Schoolbox\GenericCollection;
@@ -301,7 +305,7 @@ class Controller extends Web\Controller\Base
         $query = $this->externalDatabase->executeQuery($sql, $params);
 
         /** @noinspection PhpAssignmentInConditionInspection */
-        while($row = $query->fetch()){
+        while ($row = $query->fetch()) {
             $awards->add(new Award($row['Award'], $row['Detail']));
         }
 
@@ -392,7 +396,6 @@ class Controller extends Web\Controller\Base
         }
 
         return $absenceCounts;
-
     }
 
 
@@ -483,7 +486,7 @@ class Controller extends Web\Controller\Base
 
         // initialise
         $deansComment = [];
-        foreach ($semesters as  $semester) {
+        foreach ($semesters as $semester) {
             $deansComment[$semester->getOrdinal()] = '';
         }
 

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge\Staloy;
@@ -12,7 +14,6 @@ use function count;
 use function max;
 use function preg_match;
 use function preg_replace;
-
 
 /**
  * Responsible for the logical link between a Canvas CourseSection.SisSourceId and a Schoolbox Folder.FolderCode
@@ -68,7 +69,6 @@ class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
         $reMappedFolderCodes = [];
         $years               = array_keys($this->yearAndFolderCodeToFolderMap);
         if (count($years)) {
-
             $latestYear = max($years);
             $this->log->notice("Examining $latestYear folder codes to determine if we are in T3-T4 period");
             $latestFolderCodes = $this->yearAndFolderCodeToFolderMap[$latestYear];
@@ -156,5 +156,4 @@ class CourseSection extends \External\Canvas\Sync\Bridge\CourseSection
         }
         return null;
     }
-
 }

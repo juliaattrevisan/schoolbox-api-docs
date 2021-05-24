@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Rules;
-
 
 use Alaress\Rules\Lang\Construct;
 use SplObjectStorage;
@@ -72,7 +72,7 @@ abstract class Ruleset
      * @param mixed $input
      * @return mixed
      */
-    public abstract function applyTo($input);
+    abstract public function applyTo($input);
 
 
     /**
@@ -80,6 +80,5 @@ abstract class Ruleset
      * @param bool     $negate
      * @return Rule
      */
-    protected abstract function createRule($effect, $negate = false);
-
+    abstract protected function createRule($effect, $negate = false);
 }

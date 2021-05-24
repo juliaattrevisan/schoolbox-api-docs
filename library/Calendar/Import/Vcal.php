@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Vcal
  *
@@ -9,16 +10,16 @@
 
 namespace Calendar\Import;
 
-use \Sabre\VObject;
-use \Sabre\VObject\Component\VEvent;
-use \Schoolbox\Calendar\Event;
-use \Schoolbox\Calendar\EventMapper;
-use \Schoolbox\Calendar\Relation\Category;
-use \Schoolbox\Calendar\Relation\CategoryMapper;
-use \Schoolbox\Calendar\Relation\Role;
-use \Schoolbox\Calendar\Relation\RoleMapper;
-use \Schoolbox\CampusMapper;
-use \Alaress_Date_Format;
+use Sabre\VObject;
+use Sabre\VObject\Component\VEvent;
+use Schoolbox\Calendar\Event;
+use Schoolbox\Calendar\EventMapper;
+use Schoolbox\Calendar\Relation\Category;
+use Schoolbox\Calendar\Relation\CategoryMapper;
+use Schoolbox\Calendar\Relation\Role;
+use Schoolbox\Calendar\Relation\RoleMapper;
+use Schoolbox\CampusMapper;
+use Alaress_Date_Format;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 
 class Vcal extends Base
@@ -95,7 +96,6 @@ class Vcal extends Base
             $allEvents = $allEvents->expand(new \DateTime($now->getDatabaseDate()), new \DateTime($later->getDatabaseDate()));
 
             foreach ($allEvents->getComponents() as $currentEvent) {
-
                 /* Skip non-VEvent instances
                  */
                 if (!$currentEvent instanceof VEvent) {

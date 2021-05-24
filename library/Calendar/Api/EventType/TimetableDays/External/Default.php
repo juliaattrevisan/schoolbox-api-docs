@@ -70,30 +70,27 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
             // noop
         }
 
-        $campusTitles = Array();
+        $campusTitles = array();
         $userCampuses = $this->getUser()->getCampusCollection();
 
         foreach ($userCampuses as $campus) {
             $campusName = $campus->getName();
             $campusCode = $campus->getExtTimetableCode();
-            $campusTitles[$campusCode] = $campusTitles[$campusCode].'/'.$campusName;
+            $campusTitles[$campusCode] = $campusTitles[$campusCode] . '/' . $campusName;
         }
 
         // Scan through each day from $startTimestamp to $endTimestamp, figuring
         // out that day's timetable day number for each of the user's campuses.
         while ($currentTimestamp < $endTimestamp) {
-
             //Combine titles of campuses with the same code (if any)
 
-            $campusMerged = Array();
+            $campusMerged = array();
 
             //Now build the stack
             foreach ($userCampuses as $campus) {
-
                 $campusCode = $campus->getExtTimetableCode();
                 //Check if a campus with the same timetable code hasn't already been added to the stack. Skip if yes.
-                if(!array_key_exists($campusCode, $campusMerged)) {
-
+                if (!array_key_exists($campusCode, $campusMerged)) {
                     $campusId  = $campus->getId();
                     $campusName = $campus->getName();
                     $dayNumber = $this->externalTimetable->getDayNumber($campus, $currentTimestamp);
@@ -110,7 +107,7 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
                     $event->setEndTime(
                         new Alaress_Date_Format(strtotime('00:00:00', $currentTimestamp), 'U')
                     );
-                    $event->setEventId(md5($campusId.$event->getStartTime()->getDatabaseDate()));
+                    $event->setEventId(md5($campusId . $event->getStartTime()->getDatabaseDate()));
                     $event->setPublishDate(null);
                     $event->setTitle(sprintf("%s: %s", trim($campusTitles[$campusCode], '/'), $dayName));
                     $event->setCampusList($campusId);
@@ -127,7 +124,6 @@ class Calendar_Api_EventType_TimetableDays_External_Default extends Calendar_Api
             $currentTimestamp = strtotime('+1 day', $currentTimestamp);
         }
         return $stack;
-
     }
 
     /**

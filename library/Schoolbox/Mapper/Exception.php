@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception for mapper related exceptions.
  *
@@ -9,6 +10,7 @@
 
 namespace Schoolbox\Mapper;
 
-class Exception extends \Exception {
-	protected $message = 'Instance of object not found';
+class Exception extends \Exception
+{
+    protected $message = 'Instance of object not found';
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization method - verifies whether a user has a given role.
  *
@@ -6,6 +7,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Alaress\Authorizer\Rule;
 
 use Schoolbox\User;

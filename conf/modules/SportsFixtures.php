@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -6,7 +7,6 @@
  */
 
 namespace Config\Modules;
-
 
 use Alaress\Application\Kernel;
 use Schoolbox\Fixtures\Landing\Module as LandingModule;
@@ -44,7 +44,6 @@ class SportsFixtures implements ModuleConfigInterface
         $homepageModule->init("/$namespace");
 
         if ($di->get('config')->get('fixtures_enabled')) {
-
             $dashboardModule = new DashboardModule($di);
             $dashboardModule->init("/$namespace");
 

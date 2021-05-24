@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Notif;
-
 
 use Alaress\Lumberjack\CompositeLoggerInterface;
 use Alaress_Date_Format as Date;
@@ -251,5 +251,4 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
             $log->log($level, $message, $context);
         }
     }
-
 }

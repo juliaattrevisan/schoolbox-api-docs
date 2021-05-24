@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NotAuthenticated
  *
@@ -8,7 +9,6 @@
  */
 
 namespace Schoolbox\Application\Exception;
-
 
 class NotAuthenticated extends Exception
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LTI homepage component
  *
@@ -75,7 +76,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             try {
                 $provider = $this->providerMapper->findById($providerId);
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 // noop
             }
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A Date variant of Field
  *
@@ -15,6 +16,7 @@ namespace Schoolbox\External\Importer\UserProfile\Hydrator;
 use Schoolbox\External\UserProfile as UserProfileModel;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+
 use function trim;
 
 /**
@@ -50,7 +52,6 @@ class Date implements HydratorInterface
     {
         $this->fieldname = $fieldname;
         $this->setMethod = $setMethod;
-
     }
 
     /**
@@ -75,9 +76,7 @@ class Date implements HydratorInterface
                 $row[$this->fieldname],
                 [Alaress_Date_Format::DATABASE_DATE_FORMAT]
             );
-
         } catch (\InvalidArgumentException $e) {
-
         }
 
         if (!($date instanceof Alaress_Date_Format && $date->isValid())) {

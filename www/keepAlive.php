@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Keeps the current user's session alive.
  *

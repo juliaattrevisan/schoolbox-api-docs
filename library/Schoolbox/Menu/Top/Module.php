@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Share navigation element for admin pages
  *

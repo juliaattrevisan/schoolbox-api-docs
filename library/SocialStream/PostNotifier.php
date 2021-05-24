@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -303,7 +304,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         $posts = $this->mapper->findForFeed($context, $limit, $offset);
 
         foreach ($posts as $post) {
-            $owner= $post->getOwner();
+            $owner = $post->getOwner();
             $c = $c->merge(new Collection($this->notifyPosted($user->getRole()->getType(), $post, $owner)->getAll($post->getCreatedAt()->getUnixTimestamp())));
         }
         return $c;

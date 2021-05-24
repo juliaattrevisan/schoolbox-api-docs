@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,14 +9,12 @@
 
 namespace Schoolbox\Resource\Browser\WebDav;
 
-
 use Aura\Di\Container;
 use PortfolioWebDAV;
 use Schoolbox\Resource\Browser\AbstractModule;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-
 
 class Module extends AbstractModule
 {
@@ -75,5 +74,4 @@ class Module extends AbstractModule
     {
         return Controller::class;
     }
-
 }

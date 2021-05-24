@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -62,7 +63,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
      */
     public function findByColumnList(array $columnList, $options = [])
     {
-        if($this->isColumnTranslationRequired($columnList)){
+        if ($this->isColumnTranslationRequired($columnList)) {
             $columnList = $this->translateColumnList($columnList);
         }
 

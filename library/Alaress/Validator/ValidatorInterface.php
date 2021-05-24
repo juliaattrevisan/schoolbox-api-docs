@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Validator_ValidatorInterface
  *
@@ -8,13 +9,14 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-interface Alaress_Validator_ValidatorInterface {
-	/**
-	 * Validates $value.
-	 *
-	 * @param mixed $value
-	 *
-	 * @return bool
-	 */
-	public function isValid($value);
+interface Alaress_Validator_ValidatorInterface
+{
+    /**
+     * Validates $value.
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function isValid($value);
 }

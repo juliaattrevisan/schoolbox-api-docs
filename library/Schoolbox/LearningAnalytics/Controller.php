@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller
  *
@@ -10,7 +11,6 @@
 namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Web\Controller\Base;
-
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\GenericCollection;
@@ -27,7 +27,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Application\Exception\Exception as ApplicationException;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\WorkType;
-use \Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
+use Schoolbox\Resource\Folder\Code\Mapper as FolderCodeMapper;
 
 class Controller extends Base
 {
@@ -303,7 +303,6 @@ class Controller extends Base
 
             foreach ($courseImpl->getUnits() as $unitImpl) {
                 foreach ($unitImpl->getAssessables() as $a) {
-
                     // Is Assessment a Task or has MarkType of 'None' ?
                     if ($a instanceof Task || MarkType::SLUG_NONE === $a->getMarkType()->getSlug()) {
                         continue;
@@ -366,7 +365,6 @@ class Controller extends Base
         Collection $courseImplementationFolders,
         Folder $classFolder = null,
         WorkType\Model $submissionType = null
-
     ) {
         $analysis = new CohortAnalysis($dueAssessments, $classFolder, $submissionType);
 

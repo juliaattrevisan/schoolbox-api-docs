@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that setting 12 hour dates works as expected.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -132,5 +133,4 @@ class Model
         $this->selected = $selected;
         return $this;
     }
-
 }

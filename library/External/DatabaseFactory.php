@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for creating an external database class.
  *
@@ -59,7 +60,7 @@ class External_DatabaseFactory
             } catch (ReflectionException $e) {
                 // Class doesn't exist: try the next one
                 continue;
-            } catch (Schoolbox\External\Exception|Alaress\Database\Exception $e) {
+            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
                 // Something went wrong, probably could not connect. Try the next one
                 continue;
             }
@@ -69,7 +70,7 @@ class External_DatabaseFactory
         // If even that doesn't exist, error out.
         try {
             return $this->buildClassInstance($offlineClass, $extraParams);
-        } catch (ReflectionException|Schoolbox\External\Exception|Alaress\Database\Exception $e) {
+        } catch (ReflectionException | Schoolbox\External\Exception | Alaress\Database\Exception $e) {
             throw new LogicException("Class \"$offlineClass\" does not exist");
         }
     }
@@ -113,7 +114,7 @@ class External_DatabaseFactory
                     // No param value was provided, and there's no default:
                     // this is almost certainly an error
                     throw new BadFunctionCallException(
-                        sprintf('Class "%s" constructor is missing argument %d (%s)', $databaseClass, $i+1, $paramName)
+                        sprintf('Class "%s" constructor is missing argument %d (%s)', $databaseClass, $i + 1, $paramName)
                     );
                 }
             }
@@ -227,7 +228,7 @@ class External_DatabaseFactory
         $extraParams = [
             'markType' => Config::get('synergetic_mark_sync_value'),
         ];
-        if(Config::get('external_markbook')) {
+        if (Config::get('external_markbook')) {
             return $this->buildConnector('Markbook', $databaseName, $extraParams);
         }
 
@@ -243,7 +244,7 @@ class External_DatabaseFactory
      */
     public function buildPastoralConnector(string $databaseName = ''): External_PastoralInterface
     {
-        if(Config::get('external_pastoral')) {
+        if (Config::get('external_pastoral')) {
             return $this->buildConnector('Pastoral', $databaseName);
         }
 

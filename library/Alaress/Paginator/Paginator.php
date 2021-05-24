@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implementation of a simple paginator.
  *
@@ -11,7 +12,8 @@ namespace Alaress\Paginator;
 
 use OutOfRangeException;
 
-class Paginator implements IPaginator {
+class Paginator implements IPaginator
+{
 
     /**
      * @var int
@@ -29,7 +31,8 @@ class Paginator implements IPaginator {
      * @param  int $pageNumber
      * @throws OutOfRangeException if not $this->getFirstPage() > $pageNumber > $this->getLastPage()
      */
-    protected function assertPageNumberWithinRange($pageNumber) {
+    protected function assertPageNumberWithinRange($pageNumber)
+    {
         $pageCount = $this->getPageCount();
         $firstPage = min($pageCount, 1);
         if ($pageNumber < $firstPage) {
@@ -51,7 +54,8 @@ class Paginator implements IPaginator {
      * @return int
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
-    public function getOffset($pageNumber) {
+    public function getOffset($pageNumber)
+    {
         $this->assertPageNumberWithinRange($pageNumber);
         return (($pageNumber - 1) * $this->pageSize);
     }
@@ -63,7 +67,8 @@ class Paginator implements IPaginator {
      * @return int
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
-    public function getFirstOnPage($pageNumber) {
+    public function getFirstOnPage($pageNumber)
+    {
         return $this->getOffset($pageNumber) + 1;
     }
 
@@ -74,7 +79,8 @@ class Paginator implements IPaginator {
      * @return int
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
-    public function getLastOnPage($pageNumber) {
+    public function getLastOnPage($pageNumber)
+    {
         $this->assertPageNumberWithinRange($pageNumber);
         return min($this->total, $pageNumber * $this->pageSize);
     }
@@ -84,14 +90,16 @@ class Paginator implements IPaginator {
      *
      * @return int
      */
-    public function getPageCount() {
+    public function getPageCount()
+    {
         return intval(ceil($this->total / $this->pageSize));
     }
 
     /**
      * @return int
      */
-    public function getPageSize() {
+    public function getPageSize()
+    {
         return $this->pageSize;
     }
 
@@ -100,7 +108,8 @@ class Paginator implements IPaginator {
      * @return $this
      * @throws OutOfRangeException if $pageSize <= 0
      */
-    public function setPageSize($pageSize) {
+    public function setPageSize($pageSize)
+    {
         $pageSize = intval($pageSize);
         if ($pageSize <= 0) {
             throw new OutOfRangeException('Page size must be at least 1');
@@ -114,7 +123,8 @@ class Paginator implements IPaginator {
      * @return $this
      * @throws OutOfRangeException if $total <= 0
      */
-    public function setTotal($total) {
+    public function setTotal($total)
+    {
         $total = intval($total);
         if ($total < 0) {
             throw new OutOfRangeException('Total must be at least 0');
@@ -122,5 +132,4 @@ class Paginator implements IPaginator {
         $this->total = $total;
         return $this;
     }
-
 }

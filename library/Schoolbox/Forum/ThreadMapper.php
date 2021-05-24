@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for forum threads.  Forum is structured with a thread attached to a folder,
  * with posts below the thread
@@ -9,6 +10,7 @@
  */
 
 namespace Schoolbox\Forum;
+
 use Alaress\Async\Notification\Instance\Instance;
 use PDO;
 use Schoolbox\Collection;
@@ -16,9 +18,11 @@ use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 use Schoolbox\User;
 
-class ThreadMapper extends Mapper implements FeedableMapperInterface {
+class ThreadMapper extends Mapper implements FeedableMapperInterface
+{
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('forumThread');
         $this->hasModel(Thread::class);
         $this->hasMap(array(
@@ -61,7 +65,7 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
                 'property'   => 'deleted',
                 'type'       => self::TYPE_STRING
             ));
-        $this->hasSoftDeleteField('deleted', 'true','false');
+        $this->hasSoftDeleteField('deleted', 'true', 'false');
 
         $this->hasMap(array(
                 'column'     => 'locked',
@@ -138,11 +142,12 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
      * @return Thread
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function findById($id) {
+    public function findById($id)
+    {
 
         $post_mapper = $this->getJoinMapper('post');
 
-        $query=
+        $query =
             "SELECT
                 {$this->getColumnString('thread')},
                 {$post_mapper->getColumnString('firstPost')}
@@ -158,15 +163,13 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
             $thread = $this->hydrate($row, 'thread');
             $this->throwIfDeleted($thread);
 
-            $thread->setFirstPost($post_mapper->hydrate($row,'firstPost'));
+            $thread->setFirstPost($post_mapper->hydrate($row, 'firstPost'));
             $thread->setPosts($post_mapper->findByColumn('threadID', $thread->getId()));
 
             return $thread;
-        }
-        else {
+        } else {
             throw new Mapper\Exception\NotFound();
         }
-
     }
 
 
@@ -242,5 +245,4 @@ class ThreadMapper extends Mapper implements FeedableMapperInterface {
 
         return $c;
     }
-
 }

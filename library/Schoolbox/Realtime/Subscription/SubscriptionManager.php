@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -60,7 +61,6 @@ class SubscriptionManager implements ISubscriptionManager
 
         try {
             $this->putSubscription($userId, $this->factory->build($this->instanceId, $userId));
-
         } catch (\RuntimeException $e) {
             return false;
         }

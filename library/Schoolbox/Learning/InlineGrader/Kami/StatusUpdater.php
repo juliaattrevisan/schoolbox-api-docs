@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
@@ -180,7 +182,7 @@ class StatusUpdater
         $function            = function () use ($kamiModel, &$countFailedAttempts) {
             try {
                 return $this->connector->getDocument($kamiModel->getKamiDocumentId());
-            } catch (Exception\IKamiException|ConnectException $e) {
+            } catch (Exception\IKamiException | ConnectException $e) {
                 // If we recognise the exception, just print the info we need.
                 $this->logAttemptException($e, $kamiModel, ++$countFailedAttempts);
                 throw $e;

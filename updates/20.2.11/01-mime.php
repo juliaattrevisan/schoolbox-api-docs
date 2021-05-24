@@ -1,15 +1,16 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\File\MimetypeMapper;
-
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -67,11 +68,11 @@ HELP;
         $this->getLogger()->info('Trying to update text/richtext mimetype to application/rtf');
 
         $this->updateByMimeType(
-                $mapper,
-                'text/richtext',
+            $mapper,
+            'text/richtext',
             'application/rtf',
             'Rich Text',
-        'application-text.svg',
+            'application-text.svg',
             true
         );
 
@@ -80,7 +81,7 @@ HELP;
         $this->getLogger()->info('Trying to update video/avi mimetype to video/x-msvideo');
 
         $this->updateByMimeType(
-                $mapper,
+            $mapper,
             'video/avi',
             'video/x-msvideo',
             'AVI Video',
@@ -119,7 +120,6 @@ HELP;
                 'deleted' => true
             ]);
         } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
-
             // noop
             $this->getLogger()->info(sprintf(
                 'Mimetype %s not found; continuing to look for %s to see if we can update it.',
@@ -152,14 +152,12 @@ HELP;
                 'deleted' => true
             ]);
         } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
-
             // noop
             $this->getLogger()->info(sprintf(
                 'Mimetype %s also not found; will need to make a new row.',
                 $oldType
             ));
         } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-
             // noop; row was softdeleted, but we should update that anyway
 
             $this->getLogger()->info(sprintf(

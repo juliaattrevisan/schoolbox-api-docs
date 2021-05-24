@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Integer column type.
  *
@@ -9,29 +10,33 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Column;
 
-class Integer implements IColumnType {
-	protected function convert($value) {
-		if (is_numeric($value)) {
-			//
-			// Is this a
-			if (preg_match('/\\./', $value)) {
-				return intval(floatval($value));
-			}
-			return intval($value);
-		}
-		return null;
-	}
+class Integer implements IColumnType
+{
+    protected function convert($value)
+    {
+        if (is_numeric($value)) {
+            //
+            // Is this a
+            if (preg_match('/\\./', $value)) {
+                return intval(floatval($value));
+            }
+            return intval($value);
+        }
+        return null;
+    }
 
-	public function hydrate($value, $mapper = null) {
-		return $this->convert($value);
-	}
+    public function hydrate($value, $mapper = null)
+    {
+        return $this->convert($value);
+    }
 
-	public function dehydrate($value, $mapper = null) {
-		return $this->convert($value);
-	}
+    public function dehydrate($value, $mapper = null)
+    {
+        return $this->convert($value);
+    }
 
 
     /**

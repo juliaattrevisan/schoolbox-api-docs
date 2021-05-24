@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EOTC event report
  *
@@ -135,8 +136,12 @@ foreach ($allListGroups as $key => $currentListGroup) {
 
         /** @var \EOTC\Event $currentEvent */
         foreach ($currentListGroup as $currentEvent) {
-            if ($authenticator->isEOTCAdministratorForCampus($sessionUser,
-                    $currentEvent) || $sessionUser->isSuperuser()) {
+            if (
+                $authenticator->isEOTCAdministratorForCampus(
+                    $sessionUser,
+                    $currentEvent
+                ) || $sessionUser->isSuperuser()
+            ) {
                 $this->setVar([
                     'EVENT_ID'                         => $currentEvent->getId(),
                     'EVENT_STATUS_NAME'                => $currentEvent->getMetadata()->getStatus()->getName(),
@@ -149,7 +154,7 @@ foreach ($allListGroups as $key => $currentListGroup) {
                     'EVENT_RAMS_REQUIRED'              => $currentEvent->getMetadata()->getRamsRequired() ? 'Y' : 'N',
                 ]);
 
-                if($currentEvent->getTeacherInCharge()->isDeleted()) {
+                if ($currentEvent->getTeacherInCharge()->isDeleted()) {
                     $this->setVar('link_start_block', '');
                     $this->setVar('link_end_block', '');
                 } else {

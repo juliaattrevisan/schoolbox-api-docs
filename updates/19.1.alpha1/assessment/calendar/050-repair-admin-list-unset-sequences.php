@@ -1,9 +1,11 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database;
@@ -167,7 +169,3 @@ $app = new class extends CliTool\App
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]))->runApp();
-
-
-
-

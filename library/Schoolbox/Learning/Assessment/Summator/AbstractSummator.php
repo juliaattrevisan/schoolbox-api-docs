@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AbstractSummator
  *
@@ -72,7 +73,6 @@ abstract class AbstractSummator implements ISummator
     {
         $this->reset();
         foreach ($assessable->getAllParticipants() as $participant) {
-
             $normMark = $participant->getNormalisedMark($publishedOnly);
 
             if (null !== $normMark) {
@@ -105,24 +105,24 @@ abstract class AbstractSummator implements ISummator
      * @param Collection $allAssessables
      * @return int
      */
-    protected abstract function calculateTotalWeight(Collection $allAssessables);
+    abstract protected function calculateTotalWeight(Collection $allAssessables);
 
     /**
      * @param float $val
      * @param float $assessableWeight
      * @return void
      */
-    protected abstract function aggregate($val, $assessableWeight);
+    abstract protected function aggregate($val, $assessableWeight);
 
     /**
      * @return void
      */
-    protected abstract function reset();
+    abstract protected function reset();
 
     /**
      * @return float|null
      */
-    protected abstract function finalise();
+    abstract protected function finalise();
 
     /**
      * @inheritDoc

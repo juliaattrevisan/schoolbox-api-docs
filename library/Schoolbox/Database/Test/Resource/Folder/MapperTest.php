@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -15,7 +16,6 @@ use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Mapper;
 use PHPUnit\Framework\TestCase;
-
 
 /**
  * Class MapperTest
@@ -120,7 +120,6 @@ class MapperTest extends TestCase
     private static function iterate(IDatabase $db, $parent, array $folders)
     {
         foreach ($folders as $id => $sub) {
-
             $params = [
                 'id' => $id,
                 'nm' => "Folder #$id",
@@ -208,7 +207,7 @@ class MapperTest extends TestCase
 
         $allIds = $this->getSortedIds($everything);
 
-        $this->assertEquals(range(1,35), $allIds);
+        $this->assertEquals(range(1, 35), $allIds);
     }
 
 
@@ -304,5 +303,4 @@ class MapperTest extends TestCase
         // no sorting
         $this->assertEquals($expected, $lineage->getColumnValues('id'));
     }
-
 }

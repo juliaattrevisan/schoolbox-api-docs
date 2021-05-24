@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Question_Ranking
  *
@@ -7,6 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-class Survey_Question_Ranking extends Evaluation_Question_Ranking {
+class Survey_Question_Ranking extends Evaluation_Question_Ranking
+{
 
-} 
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for student's completion of a task.
  *
@@ -145,4 +146,3 @@ class Completion implements ISoftDeletable
         return $this;
     }
 }
-

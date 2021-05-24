@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schoolpro implementation of external events
  *

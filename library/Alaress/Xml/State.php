@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Current iterated state of the XmlReader.
  *
@@ -70,7 +71,7 @@ class State
      */
     public function getPath()
     {
-        return '/'.implode('/', $this->getElementStack());
+        return '/' . implode('/', $this->getElementStack());
     }
 
     /**

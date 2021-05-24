@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Folder;
 
 use OverflowException;
@@ -183,7 +185,6 @@ class Ancestry
          * can occur before arbitrarily ending
          */
         while ($count++ < self::RECURSION_LIMIT) {
-
             /* Cycle through the parent of the current node until
              * it is no longer a node at which point we can stop
              */
@@ -204,7 +205,7 @@ class Ancestry
             // This category is its own parent somehow. That shouldn't happen.
             if (array_key_exists($parent_id, $ancestry)) {
                 throw new OverflowException(
-                    'Folder "'.$folder->getId().'" is its own parent somehow'
+                    'Folder "' . $folder->getId() . '" is its own parent somehow'
                 );
             }
 

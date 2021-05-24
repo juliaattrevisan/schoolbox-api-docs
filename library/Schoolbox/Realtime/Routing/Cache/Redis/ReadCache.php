@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,7 +14,6 @@ use InvalidArgumentException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Routing\Cache\ReadableCache;
-
 
 class ReadCache implements ReadableCache
 {
@@ -96,5 +96,4 @@ class ReadCache implements ReadableCache
     {
         return sprintf(self::CACHE_PATTERN, $instanceId);
     }
-
 }

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Sequence document classifications by name.
  *

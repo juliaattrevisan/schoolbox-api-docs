@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -86,8 +87,7 @@ HELP;
             $folders = $folderMapper->findAll();
 
             /** @var FolderModel $folder */
-            foreach ($folders as $folder)
-            {
+            foreach ($folders as $folder) {
                 // Keep track of nodes we have traversed so we don't end up in a loop
 
                 $folderCurrent = $folder;
@@ -103,8 +103,12 @@ HELP;
                         if ($folderCurrent->getParent()->getId() == null) {
                             // Node has no parent set
 
-                            $logger->info(sprintf("Orphaned Folder '%s' (%d) moved to {$folderName} (%d)", $folder->getName(),
-                                $folder->getId(), $parent_id));
+                            $logger->info(sprintf(
+                                "Orphaned Folder '%s' (%d) moved to {$folderName} (%d)",
+                                $folder->getName(),
+                                $folder->getId(),
+                                $parent_id
+                            ));
 
                             $moveQuery->execute([
                                 'parent_id' => $parent_id,
@@ -126,7 +130,8 @@ HELP;
                             $loopString .= $folderCurrent->getId();
 
                             $logger->info(sprintf(
-                                "Looping Folder '%s' (%s) moved to {$folderName} (%d)", $folder->getName(),
+                                "Looping Folder '%s' (%s) moved to {$folderName} (%d)",
+                                $folder->getName(),
                                 $loopString,
                                 $parent_id
                             ));
@@ -143,7 +148,8 @@ HELP;
                     }
                 } catch (\Exception $e) {
                     $logger->info(sprintf(
-                        "Folder '%s' (%d) missing Parent (%d) moved to {$folderName} (%d)", $folder->getName(),
+                        "Folder '%s' (%d) missing Parent (%d) moved to {$folderName} (%d)",
+                        $folder->getName(),
                         $folder->getId(),
                         $folder->getParent()->getId(),
                         $parent_id

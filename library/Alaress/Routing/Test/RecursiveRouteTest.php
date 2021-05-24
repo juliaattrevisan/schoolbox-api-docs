@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -26,7 +27,9 @@ class RecursiveRouteTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         // this can be static, since the tests will not mutate it
-        self::$root = new Trie('', function () { return 0; });
+        self::$root = new Trie('', function () {
+            return 0;
+        });
 
         // manual construction of the tree foo/(:int)/{bar,baz}
         $foo = self::$root->put('foo');
@@ -83,7 +86,7 @@ class RecursiveRouteTest extends TestCase
 
         // flesh out the "compressed" expectation array
         foreach ($expected as $e) {
-            $exp[$e.'K'] = $e.'V';
+            $exp[$e . 'K'] = $e . 'V';
         }
 
         $this->assertEquals($exp, $this->route($path, ':')->data());

@@ -156,9 +156,11 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             try {
                 $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
 
-                if ($video->isComplete()
+                if (
+                    $video->isComplete()
                     && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()
-                    && $this->isVisibleToCurrentUser($video)) {
+                    && $this->isVisibleToCurrentUser($video)
+                ) {
                     $this->defaultVideo = $video;
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This interface defines how to store documents in a remote SIS.
  *

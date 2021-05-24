@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Thumbnail;
 
 /**
@@ -106,14 +108,16 @@ class Chain
      *
      * @param string $result
      */
-    private function setResult($result) {
+    private function setResult($result)
+    {
         $this->result = $result;
     }
 
     /**
      * @return string
      */
-    public function getResult() {
+    public function getResult()
+    {
         return $this->result;
     }
 }

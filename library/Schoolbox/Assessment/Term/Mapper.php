@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -282,7 +283,7 @@ class Mapper extends BaseMapper
      */
     public function findAllNonExtraordinary(): GenericCollection
     {
-        return $this->findAll()->filter(static function(Model $model) {
+        return $this->findAll()->filter(static function (Model $model) {
             return !$model->getExtraordinary();
         })->sortBy('start', 'desc');
     }
@@ -326,7 +327,7 @@ class Mapper extends BaseMapper
          */
         $term = $this->findByPredicates($pb, [
             'order' => ['start' => 'DESC']
-        ])->filter(static function(Model $model) {
+        ])->filter(static function (Model $model) {
             return !$model->getExtraordinary();
         })->first();
 
@@ -526,7 +527,7 @@ class Mapper extends BaseMapper
         /* Set the last ordinary term's actual_finish to null, for enforced continuity
          */
         $updateTermQuery->execute([
-            'id'            => $ids[\count($ids)-1],
+            'id'            => $ids[\count($ids) - 1],
             'actual_finish' => null,
         ]);
     }

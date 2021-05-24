@@ -9,13 +9,15 @@
  */
 
 namespace Schoolbox\Forum;
+
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
-class Thread implements ISoftDeletable {
+class Thread implements ISoftDeletable
+{
 
     /** @var int */
     protected $id;
@@ -61,7 +63,8 @@ class Thread implements ISoftDeletable {
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -70,7 +73,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -79,7 +83,8 @@ class Thread implements ISoftDeletable {
      * @param Folder $category
      * @return self
      */
-    public function setCategory($category) {
+    public function setCategory($category)
+    {
         $this->category = $category;
         return $this;
     }
@@ -88,7 +93,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return Folder
      */
-    public function getCategory() {
+    public function getCategory()
+    {
         return $this->category;
     }
 
@@ -97,7 +103,8 @@ class Thread implements ISoftDeletable {
      * @param User $user
      * @return self
      */
-    public function setUser($user) {
+    public function setUser($user)
+    {
         $this->user = $user;
         return $this;
     }
@@ -106,7 +113,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
@@ -115,7 +123,8 @@ class Thread implements ISoftDeletable {
      * @param string $title
      * @return self
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
         return $this;
     }
@@ -124,7 +133,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -133,7 +143,8 @@ class Thread implements ISoftDeletable {
      * @param Alaress_Date_Format $date
      * @return self
      */
-    public function setDate($date) {
+    public function setDate($date)
+    {
         $this->date = $date;
         return $this;
     }
@@ -142,7 +153,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getDate() {
+    public function getDate()
+    {
         return $this->date;
     }
 
@@ -151,7 +163,8 @@ class Thread implements ISoftDeletable {
      * @param string $deleted
      * @return self
      */
-    public function setDeleted($deleted) {
+    public function setDeleted($deleted)
+    {
         $this->deleted = $deleted;
         return $this;
     }
@@ -160,7 +173,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getDeleted() {
+    public function getDeleted()
+    {
         return $this->deleted;
     }
 
@@ -169,7 +183,8 @@ class Thread implements ISoftDeletable {
      * @param string $locked
      * @return self
      */
-    public function setLocked($locked) {
+    public function setLocked($locked)
+    {
         $this->locked = $locked;
         return $this;
     }
@@ -178,7 +193,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getLocked() {
+    public function getLocked()
+    {
         return $this->locked;
     }
 
@@ -187,7 +203,8 @@ class Thread implements ISoftDeletable {
      * @param int $views
      * @return self
      */
-    public function setViews($views) {
+    public function setViews($views)
+    {
         $this->views = $views;
         return $this;
     }
@@ -196,7 +213,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getViews() {
+    public function getViews()
+    {
         return $this->views;
     }
 
@@ -225,7 +243,8 @@ class Thread implements ISoftDeletable {
      * @param Post $lastPost
      * @return self
      */
-    public function setLastPost($lastPost) {
+    public function setLastPost($lastPost)
+    {
         $this->lastPost = $lastPost;
         return $this;
     }
@@ -234,7 +253,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return Post
      */
-    public function getLastPost() {
+    public function getLastPost()
+    {
         return $this->lastPost;
     }
 
@@ -263,7 +283,8 @@ class Thread implements ISoftDeletable {
      * @param Alaress_Date_Format $lastPostDate
      * @return self
      */
-    public function setLastPostDate($lastPostDate) {
+    public function setLastPostDate($lastPostDate)
+    {
         $this->lastPostDate = $lastPostDate;
         return $this;
     }
@@ -272,7 +293,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getLastPostDate() {
+    public function getLastPostDate()
+    {
         return $this->lastPostDate;
     }
 
@@ -281,7 +303,8 @@ class Thread implements ISoftDeletable {
      * @param object $lastPostUser
      * @return self
      */
-    public function setLastPostUser($lastPostUser) {
+    public function setLastPostUser($lastPostUser)
+    {
         $this->lastPostUser = $lastPostUser;
         return $this;
     }
@@ -290,7 +313,8 @@ class Thread implements ISoftDeletable {
     /**
      * @return object
      */
-    public function getLastPostUser() {
+    public function getLastPostUser()
+    {
         return $this->lastPostUser;
     }
 
@@ -298,7 +322,8 @@ class Thread implements ISoftDeletable {
      * Is this object deleted?
      * @return bool
      */
-    public function isDeleted(){
+    public function isDeleted()
+    {
         return ($this->getDeleted() == 'true');
     }
 
@@ -306,8 +331,8 @@ class Thread implements ISoftDeletable {
      * Is this object locked?
      * @return bool
      */
-    public function isLocked(){
+    public function isLocked()
+    {
         return ($this->getLocked() == 'true');
     }
-
 }

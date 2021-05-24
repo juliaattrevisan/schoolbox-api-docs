@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\WorkerCrew\Transaction;
-
 
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
@@ -43,5 +43,4 @@ class Transaction extends AbstractTransaction
     {
         call_user_func($this->callback, $data);
     }
-
 }

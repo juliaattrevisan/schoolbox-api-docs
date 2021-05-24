@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -47,7 +48,7 @@ class Completion extends AbstractMarkScheme
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
-        if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())){
+        if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())) {
             return self::NORMALISED_MARK_MIN;
         }
         return self::NORMALISED_MARK_MAX;

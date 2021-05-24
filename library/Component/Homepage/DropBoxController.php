@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -66,11 +67,9 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                 foreach ($fileList as $file) {
                     if (!$file->getOwner() instanceof \Schoolbox\User) {
                         $link = 'Unknown User';
-                    }
-                    else if($file->getOwner()->isDeleted()) {
+                    } else if ($file->getOwner()->isDeleted()) {
                         $link = $file->getOwner()->formatName();
-                    }
-                    else {
+                    } else {
                         $link = "<a href='/search/user/{$file->getOwner()->getId()}'>{$file->getOwner()->formatName()}</a>";
                     }
 
@@ -95,4 +94,3 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         return true;
     }
 }
-

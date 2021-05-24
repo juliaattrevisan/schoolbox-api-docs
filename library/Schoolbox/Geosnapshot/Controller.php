@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot;
@@ -11,7 +13,6 @@ namespace Schoolbox\Geosnapshot;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\User;
-
 
 /**
  * Class Controller
@@ -60,8 +61,7 @@ class Controller extends Base
             $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
             $response = $api->retrieveStudentPhotos($viewee);
-        } catch (\RuntimeException|\DomainException $e) {
-
+        } catch (\RuntimeException | \DomainException $e) {
             /* RuntimeException is thrown when student doesn't have a profile pic
              * DomainException is thrown when json can't be decoded
              */
@@ -71,7 +71,8 @@ class Controller extends Base
         /* Otherwise show the gallery
          */
         $this->getResponse()->content->set($this->buildHtmlOutput(
-            '@geosnapshotApi/studentPhotos.twig', [
+            '@geosnapshotApi/studentPhotos.twig',
+            [
                 'allBreadcrumbs' => [
                     [$viewee->getFullName(), '/search/user/' . $viewee->getId()],
                     ['Photos', null]

@@ -1,9 +1,11 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -277,7 +279,6 @@ HELP;
             $user = $userMapper->findByExternalId($externalId, $roleType);
 
             if (!isset($usersAdded[$user->getId()])) {
-
                 // Give student access to the class
                 if ($this->perform()) {
                     $userAccess = $userAccessMapper->createModel();

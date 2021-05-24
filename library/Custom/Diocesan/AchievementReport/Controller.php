@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport;
 
 use Alaress\Database\Connector\IConnector;
@@ -698,7 +700,6 @@ class Controller extends Base
         $allYears = $navigation->findData();
 
         if (\count($allYears)) {
-
             /* Course Credit Summary year selectors
              */
             $output['data']['courseCreditSummaryNavigation'] = [

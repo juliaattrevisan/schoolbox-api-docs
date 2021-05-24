@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Authorizer\Rule;
@@ -17,7 +19,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Admin\SHAPS\Auth\Parameters;
 use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
-
 
 class Module extends BaseModule
 {
@@ -114,8 +115,4 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(UserMapper::class);
     }
-
 }
-
-
-

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ParticipantModel
  *
@@ -6,13 +7,14 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Team\Player\Participant;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use \Schoolbox\User;
-use \Schoolbox\Fixtures\Match\Model as Match;
-use \Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\User;
+use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Team\Model as Team;
 
 /**
  * Snapshot of Team Players

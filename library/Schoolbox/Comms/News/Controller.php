@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News;
@@ -49,9 +51,9 @@ use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+
 use function array_keys;
 use function array_merge;
-
 
 /**
  * Class Controller
@@ -255,8 +257,9 @@ class Controller extends Base
             $folderStrategy = $this->strategyFactory->makeSimpleStrategy($entityType);
 
             // Ensure the user is permitted to target this entity type and has the permissions to audience into the folder
-            if ($folderStrategy->canAudienceToEntityType($this->getUser()) &&
-                (Access::getInstance()->getFolderAccess($this->getUser(),(int)$folderId) >= UserAccess::ACCESS_WRITE ||
+            if (
+                $folderStrategy->canAudienceToEntityType($this->getUser()) &&
+                (Access::getInstance()->getFolderAccess($this->getUser(), (int)$folderId) >= UserAccess::ACCESS_WRITE ||
                     $folderStrategy->canAudienceToAnyClassOrGroup($this->getUser()))
             ) {
                 $codec = new Audience\Segment\Codec();
@@ -435,9 +438,9 @@ class Controller extends Base
 
         // Validate proposed article + audience
         // (This protects against DOM manipulation + logic bugs, it should not be shown on normal work-flows)
-        try{
+        try {
             $this->validateArticleAndAudience($article);
-        } catch (UnsatisfiedException $e){
+        } catch (UnsatisfiedException $e) {
             $this->getResponse()->status->set(400);
             $this->getResponse()->content->set($this->buildJsonOutput([
                 'success' => false,
@@ -470,7 +473,6 @@ class Controller extends Base
          * Update the form action accordingly
          */
         if ($this->getRequest()->isXhr()) {
-
             // Send the update page route, JS will update the window state to this
             $url = $this->getRouter()->generate('commsNews.getUpdate', $routeParams);
             if (isset($data[Querystring::RETURN_URL])) {
@@ -495,7 +497,6 @@ class Controller extends Base
                 'approveRoute' => $approveRoute
             ]));
         } else {
-
             /* Otherwise, you're the creator and you're editing this thing normally
              * Go to the detail screen to see the outcome of your changes
              * and also use that screen to advance to the next step
@@ -563,8 +564,7 @@ class Controller extends Base
             } else {
                 $this->getResponse()->redirect->to($nextStep);
             }
-
-        } catch (MapperException|RouteNotFound|\Alaress\Database\Predicate\InvalidColumnException|PDOException|DefinitionException|UnexpectedValueException|Exception $e) {
+        } catch (MapperException | RouteNotFound | \Alaress\Database\Predicate\InvalidColumnException | PDOException | DefinitionException | UnexpectedValueException | Exception $e) {
             if ($this->getRequest()->isXhr()) {
                 $this->getResponse()->status->set(400);
                 $this->getResponse()->content->set($this->buildJsonOutput([
@@ -661,7 +661,6 @@ class Controller extends Base
 
             // wish this were easier to do...
             unset($data['article']['featureImage']['_links']['fetch']);
-
         } else {
             $segment = $this->getSession()->getSegment('Schoolbox\Comms\News\Controller');
             $data = [
@@ -705,7 +704,7 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws UnderflowException
      */
-    public function getListForHomepage() :void
+    public function getListForHomepage(): void
     {
         $params = new Querystring($this->getRequest()->query);
 
@@ -888,7 +887,6 @@ class Controller extends Base
             /* Attachment counts for each article in this set
              */
             $attachmentCounts = $this->fileMapper->findCounts($articleIds);
-
         } else {
             $articles = $this->newsMapper->createCollection();
         }
@@ -985,7 +983,7 @@ class Controller extends Base
 
         $params->setReferrer(Statistics\Mapper::REFERRER_ARCHIVE);
 
-        $topics = $this->topicMapper->findAll(['order'=>['sequence'=>'ASC']]);
+        $topics = $this->topicMapper->findAll(['order' => ['sequence' => 'ASC']]);
 
         /* The initial data set to load, given the params provided
          * Compact Mode is hardcoded to be disabled from this context
@@ -1212,7 +1210,8 @@ class Controller extends Base
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@commsNews/authored.twig', $data)
                 ->setTab('news')
-                ->setTitle('My News'));
+            ->setTitle('My News')
+        );
     }
 
 
@@ -1269,7 +1268,8 @@ class Controller extends Base
                     $this->getConfigLoader()->get(ConfigMapper::_READ_MORE),
                     $this->getConfigLoader()->get(ConfigMapper::COMMS_COMMENTS_ENABLED),
                     $attachmentCounts
-                ))
+                )
+            )
         );
 
         $this->getResponse()->content->set($this->buildJsonOutput($articles));
@@ -1289,7 +1289,7 @@ class Controller extends Base
      * @throws UnexpectedValueException
      * @throws UnknownEntityTypeException
      */
-    private function getAudienceSegments(Model $article, $hideIndividualUsers = false) :array
+    private function getAudienceSegments(Model $article, $hideIndividualUsers = false): array
     {
         $audienceSegments = [];
 
@@ -1302,10 +1302,10 @@ class Controller extends Base
         $translator->buildCache($article);
 
         foreach ($article->getAudience() as $segment) {
-
-            if (($hideIndividualUsers && $segment->getEntityType() === Audience\Segment\Strategy\User::getEntityType())
-                || !$this->isAudienceVisibleToUser($segment, $this->getUser())) {
-
+            if (
+                ($hideIndividualUsers && $segment->getEntityType() === Audience\Segment\Strategy\User::getEntityType())
+                || !$this->isAudienceVisibleToUser($segment, $this->getUser())
+            ) {
                 continue;
             }
 
@@ -1507,7 +1507,6 @@ class Controller extends Base
         $newList = new Collection();
 
         if (\is_array($postData['attachedFiles']) && \count($postData['attachedFiles'])) {
-
             /* These are the task_file relations we already know about
              */
             $existing = $article->getAttachedFiles()->indexBy('hash')->getAll();
@@ -1518,7 +1517,6 @@ class Controller extends Base
             /* Exclude any hashes that are no longer in the set
              */
             foreach ($attachedFiles as $attachedFile) {
-
                 /* If this was already in the $article model:
                  *
                  * Reuse the id in the comms_news_article_file table so we don't keep accumulating relations
@@ -1655,8 +1653,10 @@ class Controller extends Base
 
         // If the url of the previous pages matches any of the comms list pages above or homepage, return the url
         // null otherwise.
-        if (\in_array($previousUrl, $commsListUrls, false)
-            || \strpos($previousUrl, '/homepage') !== false) {
+        if (
+            \in_array($previousUrl, $commsListUrls, false)
+            || \strpos($previousUrl, '/homepage') !== false
+        ) {
             return Querystring::encode($previousUrl);
         }
         return null;
@@ -1666,7 +1666,7 @@ class Controller extends Base
     /**
      * @return \Alaress\Specification\ISpecification
      */
-    private function generateValidSubmittedArticleSpec() :\Alaress\Specification\ISpecification
+    private function generateValidSubmittedArticleSpec(): \Alaress\Specification\ISpecification
     {
         return (new Factory($this->strategyFactory))->buildSpecCanBeSubmitted($this->getUser());
     }
@@ -1706,7 +1706,7 @@ class Controller extends Base
      */
     private function assertValidTopic(?string $topic): void
     {
-        if(!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)){
+        if (!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topic)) {
             throw new NotFound("No topic found with name '$topic'");
         }
     }

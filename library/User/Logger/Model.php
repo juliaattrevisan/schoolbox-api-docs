@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace User\Logger;
@@ -13,7 +15,6 @@ use Alaress_Date_Format;
 
 class Model
 {
-
     use Id;
 
     /**

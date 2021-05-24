@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Add a question to the Question Bank
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Learning\Assessment\Redirect;
 
 $groupHandler = new Group();
@@ -15,7 +17,6 @@ if (!$groupHandler->isStaff()) {
 }
 
 if (!empty($_POST)) {
-
     /* Don't add it if you haven't chozen a category
      */
     if (!is_numeric($_POST['question_category'])) {
@@ -31,14 +32,12 @@ if (!empty($_POST)) {
     );
 
     if ($success) {
-
-        $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
+        $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
         SitePage::localRedir('/assess/questionbank/added/' . $_POST['question_id'] . $returnUrl);
     } else {
         error(8);
     }
-
 } elseif (isset($this) && count($this->arg) > 0) {
 
     /** @var SitePage $this */
@@ -58,7 +57,6 @@ if (!empty($_POST)) {
     $questionCategoryList->render();
     $this->injectGlobalVars();
     $this->template->pparse('finaloutput', TEMPLATE_content);
-
 } else {
     error(2);
 }

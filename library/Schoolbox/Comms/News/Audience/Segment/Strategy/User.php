@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -14,6 +15,7 @@ use Schoolbox\Comms\News\Audience\Segment\TranslateSql;
 use Schoolbox\Comms\News\Audience\Segment\UserResolutionSql;
 use Schoolbox\GenericCollection;
 use Schoolbox\Role;
+
 use function implode;
 
 class User extends SimpleStrategy
@@ -54,7 +56,7 @@ class User extends SimpleStrategy
      */
     public function getValidRelationshipModifiers(string $entityMeta = null): array
     {
-        if($entityMeta === null || $entityMeta === Role::STUDENT) {
+        if ($entityMeta === null || $entityMeta === Role::STUDENT) {
             return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
         } else {
             return [Model::RELATIONSHIP_SELF];

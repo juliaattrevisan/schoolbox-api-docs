@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -225,8 +226,7 @@ class Bulk_Folder
                 $file = $this->storageMapper->findByHash($folderImageHash);
                 if ($file->getMimetype()->isImage()) {
                     $newFolder->setCoverImage($file);
-                }
-                else {
+                } else {
                     $warnings[] = "Provided hash is not an image: {$folderImageHash}.";
                 }
             } catch (MapperException $e) {

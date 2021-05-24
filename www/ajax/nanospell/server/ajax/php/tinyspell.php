@@ -49,7 +49,6 @@ if ($post->method == 'spellcheck') {
         if (!$correctInAnyLanguage) {
             $structure['result'][$word] = $corrections;
         }
-
     }
     echo json_encode($structure);
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Grammar;
 
 use Alaress\Rules\TokenizedRuleset;
@@ -75,7 +77,9 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
             $diff = $this->mapper->dehydrate($result);
         }
 
-        $diff = array_filter($diff, function ($value) { return !is_null($value); });
+        $diff = array_filter($diff, function ($value) {
+            return !is_null($value);
+        });
 
         if (count($diff)) {
             $this->log->info("New values set", array_merge($context, [ 'diff' => $diff ]));
@@ -148,7 +152,6 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
                      */
                     if (in_array($property, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
                         if ($value) {
-
                             // wrap value in an array if not already one
                             $value = (array)$value;
 
@@ -200,12 +203,9 @@ class Ruleset extends TokenizedRuleset implements HydratorInterface
 
                 // TODO log that the rule applied [SB-10514], and provide the new set of values [SB-10515]
                 $this->log->debug("Rule matched and applied", $context);
-
             } else {
-
                 // TODO log that the rule did not apply [SB-10514]
                 $this->log->debug("Rule did not match", $context);
-
             }
         }
 

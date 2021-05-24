@@ -2,7 +2,7 @@
 
 namespace Schoolbox\Admin\FeatureTours;
 
-use \Alaress\Module\Module as BaseModule;
+use Alaress\Module\Module as BaseModule;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;

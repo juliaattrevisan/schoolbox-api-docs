@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\AudienceBrowser;
@@ -46,7 +48,6 @@ class Controller extends Base
         Audience\Mapper $audienceMapper,
         Folder\Mapper $folderMapper,
         StrategyFactory $strategyFactory
-
     ) {
         $this->db              = $db;
         $this->audienceMapper  = $audienceMapper;
@@ -88,7 +89,6 @@ class Controller extends Base
         $options = [];
         /** @noinspection PhpAssignmentInConditionInspection */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             $entityType   = $row['entity_type'];
             $value        = $row['id'];
             $name         = $row['name'];
@@ -114,9 +114,9 @@ class Controller extends Base
      */
     public function getList(string $entityType): void
     {
-        try{
+        try {
             $strategy = $this->strategyFactory->makeSimpleStrategy($entityType);
-        } catch (UnknownEntityTypeException $e){
+        } catch (UnknownEntityTypeException $e) {
             $this->sendError('Unrecognised entity type', [], 404);
             return;
         }

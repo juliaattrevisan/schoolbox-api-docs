@@ -1,17 +1,19 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Video\Factory;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\File\Model;
-use \Schoolbox\Video\QueueMapper;
+use Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
-use \Schoolbox\Video\ResourceVideoMapper;
+use Schoolbox\Video\ResourceVideoMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
 
@@ -55,7 +57,8 @@ abstract class Base
      * @param int $id
      * @param string $type
      */
-    public function __construct($id, $type) {
+    public function __construct($id, $type)
+    {
         $this->setAccess(Access::getInstance());
         $this->setType($type);
         $this->setId($id);
@@ -68,15 +71,15 @@ abstract class Base
      * @return ResourceVideo
      * @throws MapperException
      */
-    public function produce() {
+    public function produce()
+    {
         $videoMapper = new ResourceVideoMapper();
 
-        switch($this->getType()) {
+        switch ($this->getType()) {
             case QueueMapper::FILE_TYPE_STORAGE:
                 return $videoMapper->findByStorageHash($this->getId());
 
             case QueueMapper::FILE_TYPE_SBFS:
-
                 // For SBFS we must first load file, then resolve the hash
                 $file = FileMapper::getInstance()->findById($this->getId());
                 $this->permissionCheck($file);
@@ -87,7 +90,6 @@ abstract class Base
                 return $videoMapper->findByStorageHash($this->getId());
 
             case QueueMapper::FILE_TYPE_MYFILE:
-
                 // For my files we must first load myfile, then resolve the hash
                 $file = MyFileMapper::getInstance()->findById($this->getId());
 
@@ -129,7 +131,8 @@ abstract class Base
      *
      * @param string $id
      */
-    protected function setId($id) {
+    protected function setId($id)
+    {
         $this->id = $id;
     }
 
@@ -139,7 +142,8 @@ abstract class Base
      *
      * @return string
      */
-    protected function getId() {
+    protected function getId()
+    {
         return $this->id;
     }
 
@@ -149,7 +153,8 @@ abstract class Base
      *
      * @param string $type
      */
-    protected function setType($type) {
+    protected function setType($type)
+    {
         $this->type = $type;
     }
 
@@ -159,7 +164,8 @@ abstract class Base
      *
      * @return string
      */
-    protected function getType() {
+    protected function getType()
+    {
         return $this->type;
     }
 }

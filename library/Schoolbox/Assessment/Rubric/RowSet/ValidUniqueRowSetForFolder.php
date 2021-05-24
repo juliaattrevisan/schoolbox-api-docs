@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
@@ -49,10 +51,10 @@ class ValidUniqueRowSetForFolder extends Base
      * @throws TypeError                if $candidate isn't a RowSet
      * @throws UnexpectedValueException if it isn't satisfied
      */
-    public function isSatisfiedBy($candidate) : bool
+    public function isSatisfiedBy($candidate): bool
     {
         if (!$candidate instanceof RowSet) {
-            throw new TypeError('$candidate must be a '.RowSet::class);
+            throw new TypeError('$candidate must be a ' . RowSet::class);
         }
 
 
@@ -61,7 +63,8 @@ class ValidUniqueRowSetForFolder extends Base
             $normalizedCapabilityName = $this->normalizeForComparison($capability->getName());
             if (isset($capabilityNamesInUse[$normalizedCapabilityName])) {
                 // error
-                $errorMessage = sprintf("%s '%s' cannot be saved because %s %s with the same name already exists in",
+                $errorMessage = sprintf(
+                    "%s '%s' cannot be saved because %s %s with the same name already exists in",
                     $this->translator->translate('rubricGroup', false, true),
                     $capability->getName(),
                     $this->translator->indefiniteArticle('rubricGroup'),
@@ -85,7 +88,8 @@ class ValidUniqueRowSetForFolder extends Base
                 $normalizedIndicatorName = $this->normalizeForComparison($indicator->getName());
                 if (isset($indicatorNamesInUse[$normalizedIndicatorName])) {
                     // error
-                    $errorMessage = sprintf("%s '%s' cannot be saved because %s %s with the same name already exists in the %s '%s'",
+                    $errorMessage = sprintf(
+                        "%s '%s' cannot be saved because %s %s with the same name already exists in the %s '%s'",
                         $this->translator->translate('rubricCriterion', false, true),
                         $indicator->getName(),
                         $this->translator->indefiniteArticle('rubricCriterion'),

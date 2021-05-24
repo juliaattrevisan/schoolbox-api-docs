@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -160,18 +161,16 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         try {
             $this->log->info(sprintf('Received socket connection from %s', $pipe->getRemoteAddress()));
             $this->pipes->registerPipe($pipe);
-
         } catch (CommunicationException $e) {
             // couldn't talk to redis, send a retry back to the client
-            $this->log->error('Communication Exception: ' . $e->getMessage(), [ 'exception'=>$e ]);
+            $this->log->error('Communication Exception: ' . $e->getMessage(), [ 'exception' => $e ]);
 
             $this->sendHeader($pipe, 503, true);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
             $pipe->close();
-
         } catch (SessionException $e) {
             // user not found, not logged in: signal authentication required
-            $this->log->notice('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception'=>$e ]);
+            $this->log->notice('Failed to fully register pipe: ' . $e->getMessage(), [ 'exception' => $e ]);
 
             $this->sendHeader($pipe, 401);
             $this->pipes->unregisterPipe($pipe->getSocketKey());
@@ -188,7 +187,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
     {
         // handle the connection raw
         $conn->send(
-            json_encode( [
+            json_encode([
                 'error' => self::$headerMap[$code],
                 'code'  => [$code],
                 'retry' => false,
@@ -213,7 +212,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         $socketKeyForConnection = Pipe::getSocketKeyForConnection($conn);
         $pipe                   = $this->pipes->getPipeBySocketKey($socketKeyForConnection);
         $this->pipes->unregisterPipe($socketKeyForConnection);
-        if(null !== $pipe) {
+        if (null !== $pipe) {
             $pipe->close();
         }
     }
@@ -240,7 +239,7 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         } else {
             $this->log->critical(
                 sprintf('%s: "%s" occurred in %s on line %s', get_class($e), $e->getMessage(), $e->getFile(), $e->getLine()),
-                ['exception'=>$e]
+                ['exception' => $e]
             );
         }
 
@@ -315,9 +314,8 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
         try {
             // don't flatly spawn a new worker: add the request to a queue
             $this->enqueue($pipe, $command, $arguments);
-
         } catch (QueueingException $e) {
-            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage(), ['exception'=>$e]);
+            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage(), ['exception' => $e]);
             // since a full queue constitutes service unavailable, probably best to kick this pipe
             $this->sendHeader($pipe, 503, true);
 
@@ -343,11 +341,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
 
         try {
             $action = $this->convertMessageToAction($event);
-
         } catch (InvalidArgumentException $e) {
             $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
             return;
-
         } catch (ErrorException $e) {
             $this->log->warning("Malformed broadcast from Redis: {$e->getMessage()}");
             return;
@@ -466,11 +462,10 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
                     try {
                         // enqueue to be dispatched
                         $this->enqueueInstances($pipe, $data);
-
                     } catch (QueueingException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception' => $e]);
                     } catch (InvalidArgumentException $e) {
-                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception'=>$e]);
+                        $this->log->critical('Failed to enqueue, task lost: ' . $e->getMessage(), ['exception' => $e]);
                     }
                 }
             );
@@ -492,7 +487,9 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             return;
         }
 
-        $this->enqueue($pipe, self::PIPE_METHOD_PUSH,
+        $this->enqueue(
+            $pipe,
+            self::PIPE_METHOD_PUSH,
             // run the instances through a decorator
             (new Decorator())->appendInstances($instances)->renderAsSocketArray(true)
         );
@@ -729,5 +726,4 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             $pipe->close();
         }
     }
-
 }

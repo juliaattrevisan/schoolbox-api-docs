@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox;
-
 
 use DomainException;
 use Exception;
@@ -140,12 +140,9 @@ class UserNotifier extends AbstractModuleNotifier
                     ->setUser($user)
             );
 
-            \Alaress\Redis::getClientInstance()->publish('routed.'.INSTANCE_ID.'.reload', $user->getId());
-
+            \Alaress\Redis::getClientInstance()->publish('routed.' . INSTANCE_ID . '.reload', $user->getId());
         } catch (DefinitionException $e) {
             // ur access mapper be broked, homeslice.
         }
     }
-
-
 }

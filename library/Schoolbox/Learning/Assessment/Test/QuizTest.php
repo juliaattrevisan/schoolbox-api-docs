@@ -11,11 +11,11 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use \Schoolbox\Collection;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+use Schoolbox\Collection;
+use Schoolbox\User;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class QuizTest extends TestCase
 {
@@ -375,7 +375,7 @@ class QuizTest extends TestCase
             ]
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }
@@ -496,7 +496,7 @@ class QuizTest extends TestCase
             ]
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }
@@ -536,7 +536,7 @@ class QuizTest extends TestCase
             ]
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }
@@ -575,7 +575,7 @@ class QuizTest extends TestCase
             ]
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }
@@ -616,7 +616,7 @@ class QuizTest extends TestCase
             ]
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }

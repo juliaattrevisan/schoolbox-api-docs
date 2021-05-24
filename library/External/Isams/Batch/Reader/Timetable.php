@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XML reader for finding timetables in iSAMS' batch API response.
  *

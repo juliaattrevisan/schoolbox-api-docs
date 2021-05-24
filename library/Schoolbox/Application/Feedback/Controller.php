@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -10,7 +11,6 @@ namespace Schoolbox\Application\Feedback;
 use Alaress\Web\Controller\Base;
 use Schoolbox\User;
 use ReCaptcha;
-
 
 class Controller extends Base
 {

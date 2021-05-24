@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for datetime picker
  *
@@ -104,7 +105,6 @@ class Controller extends Base
 
         try {
             $date = new Alaress_Date_Format($value, 'Y-m-d H:i:s');
-
         } catch (InvalidArgumentException $e) {
             // if parsing the given date failed we still have to respond with a picker, so falling back
             // to the current date is the only recourse. We do, however, log the failure if possible.
@@ -116,7 +116,6 @@ class Controller extends Base
         // Don't bother calculating if the timetable is offline, we'll only display the calendar
 
         if (is_array($timetable)) {
-
             // Current term
             $term = $this->termMapper->findForDate($date);
 
@@ -142,7 +141,6 @@ class Controller extends Base
                 $cycles = [];
 
                 foreach ($terms as $cycleTerm) {
-
                     $cycleTermActualStart = $this->getFirstTimetableDayForTerm($campus, $cycleTerm);
 
                     $cycleTermStartDate = $cycleTermActualStart['date'];
@@ -157,7 +155,6 @@ class Controller extends Base
                     $currentCycle = 1;
 
                     while ($tempDate->compareDateOnly($cycleTermEndDate) <= 0) {
-
                         $cycles[$cycleTerm->getId()][$currentCycle][$tempDay] = $tempDate->toIso8601String();
 
                         if ($tempDay == $cycleDays) {
@@ -170,7 +167,6 @@ class Controller extends Base
                         do {
                             $tempDate->addDays(1);
                         } while ($tempDate->isWeekend());
-
                     }
                 }
 
@@ -227,7 +223,9 @@ class Controller extends Base
             }
         }
 
-        $heat = array_map(function ($v) { return min(count($v), 5) * 20; }, $heat);
+        $heat = array_map(function ($v) {
+            return min(count($v), 5) * 20;
+        }, $heat);
 
         $this->getResponse()->content->set($this->buildJsonOutput($heat));
     }
@@ -259,7 +257,6 @@ class Controller extends Base
             'i' => 'i', // minutes leading zero
             's' => 'S', // 00 - 59 seconds
         ]);
-
     }
 
     /**
@@ -275,7 +272,6 @@ class Controller extends Base
         $user = $this->getUser();
 
         foreach ($user->getCampusCollection() as $campus) {
-
             $campusTimetable = $this->timetableHandler->getTimetableDefinition(null, $campus);
 
             if ($campusTimetable) {
@@ -285,7 +281,6 @@ class Controller extends Base
 
                 //Return campus and it's timetable in one array
                 $timetable[$campus->getId()] = array_merge($campusInfo, $campusTimetable);
-
             } else {
                 $timetable = false;
             }

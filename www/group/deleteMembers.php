@@ -25,7 +25,7 @@ if ($groupHandler->getPermission($categoryId) < UserAccess::ACCESS_FULL) {
 
 // Delete the selected members from the group
 
-foreach($_POST["deleteIds"] as $memberId) {
+foreach ($_POST["deleteIds"] as $memberId) {
     $uaMapper->deleteByColumnList(array(
         "sid" => $categoryId,
         "uid"     => $memberId,

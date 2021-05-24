@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\IHomepageCleanable;
 
 define('FORUM_THREADS_PER_PAGE', 30);
@@ -232,7 +233,6 @@ class Forum extends DeprecatedModel implements IHomepageCleanable
         ];
 
         return preg_replace($find, $replace, html_entity_decode($text));
-
     }
 
 

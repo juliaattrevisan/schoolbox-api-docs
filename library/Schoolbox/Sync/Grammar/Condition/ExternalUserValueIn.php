@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -56,12 +57,10 @@ class ExternalUserValueIn extends Condition\In
     {
         if (count($this->validValues) == 1 && is_null($this->validValues[0])) {
             $pattern = "$this->entityLabel.%s %sBLANK";
-
         } else {
             $pattern = count($this->validValues) == 1 ? "$this->entityLabel.%s %s= %s" : "$this->entityLabel.%s %sIN (%s)";
         }
 
         return sprintf($pattern, $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
     }
-
 }

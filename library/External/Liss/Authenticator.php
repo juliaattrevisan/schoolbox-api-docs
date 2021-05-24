@@ -1,7 +1,6 @@
 <?php
 
 use Alaress\Lumberjack\Logger;
-
 use Schoolbox\IConfigLoader;
 
 /**

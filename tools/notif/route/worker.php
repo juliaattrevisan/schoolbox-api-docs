@@ -47,7 +47,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 
     (new Routing\WorkerFactory($config, $log, $client, $registryMapper, $userMapper, $routePermMapper, $instance))
         ->build($loop, INSTANCE_ID);
-
 });
 
 // yup. that's all you need to do.

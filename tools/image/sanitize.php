@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -24,7 +25,7 @@ $app = new class extends CliTool\App {
         } else {
             $this->getLogger()->info('Running in dry-run mode: use -p to write changes to filesystem');
         }
-        $storageMapper = new StorageMapper;
+        $storageMapper = new StorageMapper();
         $mountManager  = $storageMapper->getManager();
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
         /** @var Storage $svgFile */

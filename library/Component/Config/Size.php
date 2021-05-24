@@ -54,6 +54,5 @@ class Component_Config_Size extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_SIZE_SELECTED', (string)$i === $configValue ? ' selected="selected"' : '');
             $page->parse('sizes_block', 'sizes', true);
         }
-
     }
 }

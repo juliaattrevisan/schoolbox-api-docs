@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Flush the route cache users queue.
  *
@@ -31,7 +32,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
     // If no instance ID is provided, fall back to default if it exists
     $instanceId = $opts['instance'] ?? INSTANCE_ID;
 

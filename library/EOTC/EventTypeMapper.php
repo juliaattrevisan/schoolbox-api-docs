@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventTypeMapper
  *
@@ -8,8 +9,9 @@
  */
 
 namespace EOTC;
+
 use Schoolbox\Calendar;
 
-
-class EventTypeMapper extends Calendar\EventTypeMapper {
+class EventTypeMapper extends Calendar\EventTypeMapper
+{
 }

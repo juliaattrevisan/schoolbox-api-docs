@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -39,7 +40,6 @@ class Rule extends Super
                 /** @var Condition $condition */
                 return $condition->getSummary();
             }, $conditions));
-
         } else {
             $pattern   = $this->negate ? "NEVER %s%s" : "ALWAYS %s%s";
             $condition = '';
@@ -52,7 +52,6 @@ class Rule extends Super
             if ($v instanceof Construct) {
                 // apply the construct
                 return $k . $v->getSummary();
-
             } else {
                 $v = $this->getObjectOutput($v);
 
@@ -66,7 +65,6 @@ class Rule extends Super
                     return "$k = " . (is_array($v) ? "[\n  " . implode(",\n  ", $v) . "\n]" : $v);
                 }
             }
-
         }, array_keys($effect), $effect);
 
         $filtered = array_filter($mapped);
@@ -116,11 +114,10 @@ class Rule extends Super
 
             // give a visual indication that this is an object
             return "<cite>$obj</cite>";
-
         } elseif (is_string($obj)) {
             return "'$obj'";
         }
 
         return $obj;
     }
-} 
+}

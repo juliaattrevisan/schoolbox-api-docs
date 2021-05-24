@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * When the user visits this URL, the browser will be redirected to the SSO

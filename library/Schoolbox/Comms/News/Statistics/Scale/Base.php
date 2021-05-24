@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base
  *
@@ -23,7 +24,7 @@ abstract class Base implements IScale
 
         $now = \Alaress_Date_Format::now();
 
-        $range[$now->getDatabase()] = [1000*$now->getUnixTimeStamp(), 0, null];
+        $range[$now->getDatabase()] = [1000 * $now->getUnixTimeStamp(), 0, null];
 
         return $range;
     }
@@ -53,7 +54,7 @@ abstract class Base implements IScale
         /* Multiply by 1000 to get milliseconds conversion, because highcharts
          */
         while ($start->getUnixTimeStamp() <= $endTimestamp) {
-            $range[$start->getDatabase()] = [1000*$start->getUnixTimeStamp(), 0, null];
+            $range[$start->getDatabase()] = [1000 * $start->getUnixTimeStamp(), 0, null];
 
             $start->addMinutes($this->getInterval());
         }

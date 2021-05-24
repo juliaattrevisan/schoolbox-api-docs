@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -50,7 +51,8 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
     /**
      * @return void
      */
-    public function setup() {
+    public function setup()
+    {
         // TODO this should be injectable
         $this->setStorageMapper(Resource\Storage\Mapper::getInstance());
     }
@@ -60,7 +62,8 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
      * @param  Resource\Storage\Mapper $storageMapper
      * @return $this
      */
-    public function setStorageMapper($storageMapper) {
+    public function setStorageMapper($storageMapper)
+    {
         $this->storageMapper = $storageMapper;
         return $this;
     }
@@ -69,7 +72,8 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
     /**
      * @return Resource\Storage\Mapper
      */
-    public function getStorageMapper() {
+    public function getStorageMapper()
+    {
         return $this->storageMapper;
     }
 
@@ -135,7 +139,6 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
         $c = $this->createCollection();
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             // can't set storage if it doesn't exist
             if (!$r['h.hash']) {
                 continue;
@@ -157,7 +160,6 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
                 $file->setModifiedBy($this->hydrateJoin($r, 'modified_by', 'um'));
             }
             if ($file->getFolder() && (int)$file->getFolder()->getId() === 0) {
-
                 // root folder
                 $folder = $this->getJoinMapper($this->getFolderFieldname())->findById(0);
             } else {
@@ -210,7 +212,7 @@ abstract class AbstractFileMapper extends Schoolbox\Mapper
     /**
      * @return string
      */
-    protected abstract function getFolderFieldname();
+    abstract protected function getFolderFieldname();
 
 
     /**

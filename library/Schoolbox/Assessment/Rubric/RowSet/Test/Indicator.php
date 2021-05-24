@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -91,8 +92,7 @@ class Indicator extends TestCase
         RubricIndicator $indicator,
         IAssessable $assessment,
         bool $expected
-    ): void
-    {
+    ): void {
         $this->assertEquals($expected, $indicator->isInUseExcluding($assessment));
     }
 }

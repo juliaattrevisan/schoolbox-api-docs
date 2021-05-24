@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -102,7 +103,6 @@ class FeedbackCest
         // As Rachel, click into the due work
         $i->click($dueworkTitle1, '#content');
         $i->canSee('GRADING');
-
     }
 
     /**
@@ -171,7 +171,5 @@ class FeedbackCest
         // As Rachel, click into the due work
         $i->click($dueworkTitle2, '#content');
         $i->canSee('GRADING');
-
     }
-
 }

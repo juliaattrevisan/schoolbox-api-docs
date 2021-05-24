@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tass implementation of timetable connector
  *

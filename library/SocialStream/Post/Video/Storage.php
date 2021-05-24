@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Video;
 
 use Schoolbox\Mapper;
@@ -17,7 +19,8 @@ use SocialStream\Post\Player\Player;
  *
  * @package SocialStream\Post\Video
  */
-class Storage extends Player {
+class Storage extends Player
+{
 
     /**
      * Fetch thumbnail
@@ -26,7 +29,8 @@ class Storage extends Player {
      * @throws Mapper\DefinitionException
      * @throws \PDOException
      */
-    public function fetchThumbnail() {
+    public function fetchThumbnail()
+    {
         $matches = array();
 
         preg_match('#^/cms/sendVideo\.php(.*)#', $this->getUrl(), $matches);
@@ -36,7 +40,6 @@ class Storage extends Player {
          * via the usual iframe
          */
         if (count($matches)) {
-
             /* Get the hash by snapping the query string into shiny little
              * pieces, ripe for recombination
              */
@@ -48,8 +51,7 @@ class Storage extends Player {
             if (isset($bits['id'])) {
                 $key  = 'id';
                 $hash = $bits['id'];
-            }
-            else {
+            } else {
                 $key  = 'hash';
                 $hash = $bits['hash'];
             }
@@ -64,8 +66,8 @@ class Storage extends Player {
                 $video   = ResourceVideoMapper::getInstance()->findByStorageHash($storage->getHash());
 
                 $status  = $video->getStatus();
+            } catch (Mapper\Exception $e) {
             }
-            catch (Mapper\Exception $e) {}
             return array(
                 'poster' => "/cms/videoThumb.php?{$key}={$hash}&type=storage&size=poster",
                 'src'    => "/cms/sendVideo.php?{$key}={$hash}&type=storage",

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
@@ -157,7 +159,6 @@ class Api implements IApi
         /* Check for error payload instead of data payload
          */
         if (array_key_exists('errors', $decoded)) {
-
             /* Error Handling - sometimes their messages are unhelpful, but at least they return
              * it in a synonymous data structure. There might be multiple errors (I haven't seen how)
              * so we'll just return the first one in the list for starters

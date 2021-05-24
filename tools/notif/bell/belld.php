@@ -21,6 +21,7 @@ use Schoolbox\Realtime\Timetable\TimetableScheduler;
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Bell');
@@ -43,7 +44,6 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
         $strat      = new DefaultDispatchStrategy($flags);
 
         new TimetableScheduler($loop, $strat, $log, $campusList, $factory, $conf, $clock);
-
     } catch (AMQPRuntimeException $e) {
         $log->alert('Unable to connect to RabbitMQ: server is offline.');
         $n = Notifactory::create(Notif::TOPIC_NOTIFICATION);

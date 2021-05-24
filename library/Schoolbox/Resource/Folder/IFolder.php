@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,10 +9,10 @@
 
 namespace Schoolbox\Resource\Folder;
 
-
 use Alaress\Color\Color;
 
-interface IFolder {
+interface IFolder
+{
 
     // Any child of a node with this ID will be considered a root node
     // @see https://www.jstree.com/docs/json/

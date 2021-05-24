@@ -1,9 +1,11 @@
 <?php
+
 /**
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
+
 use Alaress\DebugBar\Instance as DebugBar;
 
 /**
@@ -22,16 +24,16 @@ class Alaress_Probe
      * @param null $_
      * @throws \DebugBar\DebugBarException
      */
-    public function __construct($_ = null) {
+    public function __construct($_ = null)
+    {
         $numArgs = func_num_args();
 
         if (DebugBar::isEnabled()) {
             for ($i = 0; $i < $numArgs; $i++) {
                 DebugBar::getInstance()->getCollector('messages')->addMessage(func_get_arg($i));
             }
-        }
-        else {
-            $width = floor(100/$numArgs);
+        } else {
+            $width = floor(100 / $numArgs);
 
             echo "<div style='width:100%;height:0px;clear:both;'></div>";
 

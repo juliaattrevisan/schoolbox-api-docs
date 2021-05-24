@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Email
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External\Normalise\User\Common;
 
-class Email {
+class Email
+{
 
     /**
      * Email address
@@ -21,7 +23,8 @@ class Email {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

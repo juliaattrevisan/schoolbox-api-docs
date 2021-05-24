@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps that relate to the fullCalendar jQuery plugin.
  *
@@ -9,7 +10,8 @@
 
 use Behat\Mink\Element;
 
-class Subcontext_CalendarContext extends BaseContext {
+class Subcontext_CalendarContext extends BaseContext
+{
 
     /**
      * Visits a date on the given calendar.
@@ -19,7 +21,8 @@ class Subcontext_CalendarContext extends BaseContext {
      * @param string $locator
      * @param string $timeString
      */
-    public function goToDate($locator, $timeString) {
+    public function goToDate($locator, $timeString)
+    {
         $date   = new DateTime($timeString);
         $format = $date->format('Y-m-d');
         // Find this day on the full calendar
@@ -41,7 +44,8 @@ class Subcontext_CalendarContext extends BaseContext {
      * @return Element\NodeElement
      * @throws Exception
      */
-    public function getCalendar($locator) {
+    public function getCalendar($locator)
+    {
         $calendar = $this->getSession()->getPage()->find('css', $locator);
         if (!($calendar instanceof Element\NodeElement)) {
             throw new Exception("Calendar \"$locator\" not found");
@@ -58,7 +62,8 @@ class Subcontext_CalendarContext extends BaseContext {
      * @return Element\NodeElement
      * @throws Exception if either calendar or date cannot be found.
      */
-    public function getDateElement($locator, $timeString) {
+    public function getDateElement($locator, $timeString)
+    {
         $this->goToDate($locator, $timeString);
         $date   = new DateTime($timeString);
         $format = $date->format('Y-m-d');
@@ -78,7 +83,8 @@ class Subcontext_CalendarContext extends BaseContext {
      * @param string $locator
      * @param string $timeString
      */
-    public function clickDate($locator, $timeString) {
+    public function clickDate($locator, $timeString)
+    {
         $this->getDateElement($locator, $timeString)->click();
     }
 
@@ -91,13 +97,14 @@ class Subcontext_CalendarContext extends BaseContext {
      * @return Element\NodeElement
      * @throws Exception if either calendar or date cannot be found.
      */
-    public function getEventsStartingAtTime($locator, $timeString) {
+    public function getEventsStartingAtTime($locator, $timeString)
+    {
         $time      = new DateTime($timeString);
         $timestamp = $time->getTimestamp();
         $calendar  = $this->getCalendar($locator);
         return array_filter(
             $calendar->findAll('css', '.fc-event'),
-            function($event) use($timestamp) {
+            function ($event) use ($timestamp) {
                 /** @var Element\NodeElement $event */
                 $startTime = new DateTime($event->getAttribute('data-start'));
                 return $startTime->getTimestamp() === $timestamp;

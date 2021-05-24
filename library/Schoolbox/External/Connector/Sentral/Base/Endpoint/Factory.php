@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
@@ -148,17 +150,13 @@ class Factory
         bool $perform,
         string $host,
         string $key,
-
-        /* Profile pieces
-         */
+        /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-
-        /* Timetable pieces
-         */
+        /* Timetable pieces */
         CampusMapper $campusMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
@@ -258,7 +256,7 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
-             ))
+            ))
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,

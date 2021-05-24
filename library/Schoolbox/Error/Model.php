@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Error messages
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\Error;
 
-class Model {
+class Model
+{
 
     /**
      * @var int
@@ -26,7 +28,8 @@ class Model {
      * @param  string $message
      * @return $this
      */
-    public function setMessage($message) {
+    public function setMessage($message)
+    {
         $this->message = $message;
         return $this;
     }
@@ -34,7 +37,8 @@ class Model {
     /**
      * @return string
      */
-    public function getMessage() {
+    public function getMessage()
+    {
         return $this->message;
     }
 
@@ -42,7 +46,8 @@ class Model {
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -50,7 +55,8 @@ class Model {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 }

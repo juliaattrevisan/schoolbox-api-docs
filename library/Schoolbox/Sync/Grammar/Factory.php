@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Grammar;
-
 
 use Alaress\Rules\Lang\Map;
 use OutOfBoundsException;
@@ -98,8 +98,8 @@ class Factory
         $map = array_combine(
             array_map(function ($k) {
                 return str_replace("[]", "", $k);
-            }, array_keys($map))
-            , array_values($map)
+            }, array_keys($map)),
+            array_values($map)
         );
 
         $set = new UserRuleset($this->userMapper, $context, $map, $this->log);

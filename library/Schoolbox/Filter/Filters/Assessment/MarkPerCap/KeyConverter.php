@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\MarkPerCap;
@@ -10,6 +12,7 @@ namespace Schoolbox\Filter\Filters\Assessment\MarkPerCap;
 use InvalidArgumentException;
 use Schoolbox\Filter\AbstractKeyConverter;
 use Schoolbox\User;
+
 use function in_array;
 
 class KeyConverter extends AbstractKeyConverter

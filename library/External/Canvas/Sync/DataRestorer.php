@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync;
@@ -12,6 +14,7 @@ use Alaress\Database;
 use PDO;
 use Psr\Log\LoggerInterface;
 use UnexpectedValueException;
+
 use function count;
 use function implode;
 use function md5;
@@ -154,8 +157,8 @@ class DataRestorer
                  'sis_source_id',
              ],
         ];
-        foreach($extra as $tableName => $columnNames){
-            foreach($columnNames as $columnName) {
+        foreach ($extra as $tableName => $columnNames) {
+            foreach ($columnNames as $columnName) {
                 $this->addIndex($tableName, $columnName);
             }
         }

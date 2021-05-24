@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plagscan Report in OTFS
  *
@@ -9,12 +10,12 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use Schoolbox\File\Exception as StorageException;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Resource\Storage\Model as StorageModel;
-
 
 class ReportTransactor
 {

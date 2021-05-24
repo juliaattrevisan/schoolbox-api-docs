@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Admin\API;
 
 use Alaress\Module\Module as BaseModule;
@@ -30,7 +32,7 @@ class Module extends BaseModule
     {
         // no explicit auth; all done via tokens
 
-        $this->register('POST', '/csv',     'postUploadCsv');
+        $this->register('POST', '/csv', 'postUploadCsv');
         $this->register('POST', '/process', 'postProcess');
     }
 
@@ -40,7 +42,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
 

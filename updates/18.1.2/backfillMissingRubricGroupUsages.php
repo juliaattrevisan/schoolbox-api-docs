@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Backfill missing `rubric_group_usage` rows.
  *

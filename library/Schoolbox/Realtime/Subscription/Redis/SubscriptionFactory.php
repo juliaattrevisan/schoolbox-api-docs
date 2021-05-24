@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -66,5 +67,4 @@ class SubscriptionFactory implements ISubscriptionFactory
             new UnreadRetriever($this->syncClient)
         );
     }
-
 }

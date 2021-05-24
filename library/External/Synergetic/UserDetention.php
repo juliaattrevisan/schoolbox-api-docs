@@ -20,7 +20,8 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
      */
     protected $database;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->database = Factory::getInstanceExternal();
     }
 
@@ -62,7 +63,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         // Slam the where part in
         $wherePart = '';
         if (!empty($whereParts)) {
-            $wherePart = 'WHERE '.implode(' AND ', $whereParts);
+            $wherePart = 'WHERE ' . implode(' AND ', $whereParts);
         }
 
         return array($wherePart, $params,);
@@ -123,7 +124,10 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             ORDER BY DetentionDate DESC
         ";
         [$wherePart, $params] = $this->buildWherePart(
-            $externalId, 'DetentionDate', $fromDate, $toDate
+            $externalId,
+            'DetentionDate',
+            $fromDate,
+            $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);
 
@@ -157,11 +161,13 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
             ORDER BY EventDateTime DESC
         ";
         [$wherePart, $params] = $this->buildWherePart(
-            $externalId, 'EventDateTime', $fromDate, $toDate
+            $externalId,
+            'EventDateTime',
+            $fromDate,
+            $toDate
         );
         $query = strtr(sprintf($query, $wherePart), $params);
 
         return $this->database->getAll($query);
     }
-
 }

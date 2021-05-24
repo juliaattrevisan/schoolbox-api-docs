@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,11 +9,11 @@
 
 namespace Schoolbox\MobileApp;
 
-
 use Alaress_Date_Format;
 use Schoolbox\User;
 
-class Registry {
+class Registry
+{
 
     const PROVIDER_GOOGLE    = 'GCM';
     const PROVIDER_APPLE     = 'APNS';
@@ -156,7 +157,4 @@ class Registry {
         $this->createdAt = $createdAt;
         return $this;
     }
-
-
-
 }

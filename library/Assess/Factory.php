@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Quiz Factory
  *
@@ -13,13 +14,10 @@ class Assess_Factory extends Evaluation_Factory
 {
     /** @var Assess_Response  */
     private $responseHandler;
-
-    /** @var Assess_Question  */
+/** @var Assess_Question  */
     private $questionHandler;
-
-    /** @var Assess_Section  */
+/** @var Assess_Section  */
     private $sectionHandler;
-
     public function __construct()
     {
         parent::__construct();
@@ -31,7 +29,7 @@ class Assess_Factory extends Evaluation_Factory
     /**
      * @return string
      */
-	protected function getFactoryName()
+    protected function getFactoryName()
     {
         return 'Assess';
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -7,36 +8,34 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
 /* Check that you have write permissions
  */
 $authenticator = new \Etherpad\Authenticator();
 
 try {
-	$etherpadMapper = new \Etherpad\PadMapper();
-	$etherpad = $etherpadMapper->findById($this->arg[0]);
+    $etherpadMapper = new \Etherpad\PadMapper();
+    $etherpad = $etherpadMapper->findById($this->arg[0]);
 
-	$folder = FolderMapper::getInstance()->findById($etherpad->getHomepageId());
-
-}
-catch (\Exception $e) {
-	error(164);
+    $folder = FolderMapper::getInstance()->findById($etherpad->getHomepageId());
+} catch (\Exception $e) {
+    error(164);
 }
 
 if ($authenticator->canCreate($etherpad->getHomepageId())) {
-	$this->setFile(TEMPLATE_content, 'etherpad/modify.html');
-	$this->setBlock(TEMPLATE_content, 'etherpad_delete', 'etherpad_delete_block');
+    $this->setFile(TEMPLATE_content, 'etherpad/modify.html');
+    $this->setBlock(TEMPLATE_content, 'etherpad_delete', 'etherpad_delete_block');
 
-	$this->setVar(array(
-		'HOMEPAGE_ID' => $etherpad->getHomepageId(),
-		'FOLDER_NAME' => Scrub::text($folder->getName()),
-		'ETHERPAD_PAD_ID' => $etherpad->getId(),
-		'ETHERPAD_PAD_NAME' => $etherpad->getName()
-	));
+    $this->setVar(array(
+        'HOMEPAGE_ID' => $etherpad->getHomepageId(),
+        'FOLDER_NAME' => Scrub::text($folder->getName()),
+        'ETHERPAD_PAD_ID' => $etherpad->getId(),
+        'ETHERPAD_PAD_NAME' => $etherpad->getName()
+    ));
 
-	$this->parse('etherpad_delete_block', 'etherpad_delete');
+    $this->parse('etherpad_delete_block', 'etherpad_delete');
 
     /* Render out breadcrumbs
      */
@@ -53,9 +52,6 @@ if ($authenticator->canCreate($etherpad->getHomepageId())) {
             'class' => 'active',
         ]
     ]);
+} else {
+    error(19);
 }
-else {
-	error(19);
-}
-
-

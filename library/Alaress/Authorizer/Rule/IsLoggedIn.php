@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This authorization method checks whether a user is passed.
  *

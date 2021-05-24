@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,7 +14,6 @@ use Predis\ClientInterface;
 use Schoolbox\MobileApp;
 use Schoolbox\Realtime\Mailer;
 use Schoolbox\UserMapper;
-
 
 class PublicationFactory extends ListFactory implements IPublicationFactory
 {
@@ -66,5 +66,4 @@ class PublicationFactory extends ListFactory implements IPublicationFactory
     {
         return new Email($this->userMapper->findById($userId), $this->mailer);
     }
-
 }

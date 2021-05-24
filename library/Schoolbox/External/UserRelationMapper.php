@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for user relation objects - this refers to the relation between a
  * student and their parents/guardians.
@@ -11,15 +12,18 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox;
 use Schoolbox\User;
 
-class UserRelationMapper extends Schoolbox\Mapper {
+class UserRelationMapper extends Schoolbox\Mapper
+{
 
     /**
      * {@inheritdoc}
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('user_relation');
         $this->hasModel(UserRelation::class);
         $this->hasMap(array(
@@ -64,7 +68,8 @@ class UserRelationMapper extends Schoolbox\Mapper {
      *
      * @return int
      */
-    public function deleteForUser(User $user) {
+    public function deleteForUser(User $user)
+    {
         $query = "
             DELETE FROM `{$this->getTable()}`
             WHERE `user_id` = :id OR `relation_id` = :id

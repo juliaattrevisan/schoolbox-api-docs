@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Renderer
  *
@@ -16,7 +17,6 @@ use Alaress_Date_Format;
 use Alaress_Byte_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-
 
 class Renderer extends Handler
 {
@@ -55,8 +55,6 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $file) {
-
-
                 try {
                     $folder = $folderMapper->findCheaplyById($file['category']);
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Permission Modify
  *
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use EOTC\Authenticator;
 use EOTC\EventPermissionMapper;
 use EOTC\EventStatusMapper;
@@ -147,12 +149,11 @@ foreach ($statusMapper->findAll() as $currentStatus) {
  */
 $availableUsers = [];
 $allUserIds = $eventPermissionMapper->findUserIds();
-if(count($allUserIds)) {
+if (count($allUserIds)) {
     $availableUsers = $userMapper->findByColumn('id', $allUserIds)->indexBy('id');
 }
 
 foreach ($availableUsers as $user) {
-
     $allPermissions = $eventPermissionMapper->findByUser($user);
     $allSubscriptions = $eventPermissionMapper->findSubscriptionsByUser($user);
 

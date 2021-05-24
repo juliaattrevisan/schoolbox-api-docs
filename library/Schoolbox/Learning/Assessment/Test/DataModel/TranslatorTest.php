@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -22,12 +23,9 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
-
-
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\UserMapper;
 
@@ -97,7 +95,7 @@ class TranslatorTest extends TestCase
                     ->setCreatedAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                     ->setUpdatedAt(new Alaress_Date_Format('2016-10-15 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                     ->setDeletedAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-        );
+            );
 
         /** @var IAssessable $assessment */
         $assessment = $this->translator->translateToDomainModel($dataModel);
@@ -621,7 +619,7 @@ class TranslatorTest extends TestCase
     public function providerDomainObjects(): array
     {
         $data = [];
-        foreach($this->getDomainModels() as $domainModel){
+        foreach ($this->getDomainModels() as $domainModel) {
             $data[] = [$domainModel];
         }
         return $data;
@@ -635,7 +633,7 @@ class TranslatorTest extends TestCase
     public function providerDataModels(): array
     {
         $data = [];
-        foreach($this->getDataModels() as $dataModel){
+        foreach ($this->getDataModels() as $dataModel) {
             $data[] = [$dataModel];
         }
         return $data;

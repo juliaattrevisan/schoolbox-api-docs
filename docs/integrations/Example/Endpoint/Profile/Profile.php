@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint\Profile;
@@ -141,7 +143,6 @@ class Profile implements IStrategy
         $students = [];
 
         foreach ($students as $student) {
-
             /* TODO Fill in these basic student vars
              */
             $externalId = '';
@@ -403,7 +404,6 @@ class Profile implements IStrategy
 
         foreach ($emergencyContacts as $emergencyContact) {
             if ($n < self::MAX_EMERGENCY_CONTACTS) {
-
                 /* TODO Fill in these emergency contact vars
                  */
                 $fullname = '';
@@ -556,7 +556,6 @@ class Profile implements IStrategy
          * Otherwise make a new one for the given id
          */
         foreach ($parents as $parent) {
-
             /* TODO Fill in these basic parent vars
              */
             $externalId = '';
@@ -653,7 +652,6 @@ class Profile implements IStrategy
         $staffs = [];
 
         foreach ($staffs as $staff) {
-
             /* TODO Fill in basic staff vars
              */
             $externalId = '';

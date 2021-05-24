@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -23,7 +24,7 @@ class Component_Config_Textbox extends Component_Config_Abstract
         // has an internal block for the select element
 
         /* Select a textbox from some other homepage
-		 */
+         */
         $altSource = $component instanceof Component_ControllerAbstract ? $component->getConfig('src') : null;
 
         if (is_numeric($altSource) && $altSource) {

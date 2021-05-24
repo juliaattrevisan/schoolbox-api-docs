@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -160,10 +161,9 @@ class Model extends File implements IStorage, \Alaress\Json\Serializable, Linkab
             return parent::getMimetype();
         }
 
-        if($this->getMimetype() instanceof Mimetype) {
+        if ($this->getMimetype() instanceof Mimetype) {
             return $this->getMimetype()->getMime();
-        }
-        else {
+        } else {
             return '';
         }
     }

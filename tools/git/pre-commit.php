@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Hook for pre-commit
  *
@@ -12,20 +13,19 @@
 $filename = $argv[1];
 
 // we're only interested in php files
-if(substr($filename, strrpos($filename, '.')) != '.php') {
+if (substr($filename, strrpos($filename, '.')) != '.php') {
     exit(0);
 }
 
 // if the file has been deleted, we're not interested
-if(!file_exists($filename)) {
+if (!file_exists($filename)) {
     exit(0);
 }
 
 $path = explode('/', $filename);
 
 // if a library or include file, attempt to run unit tests
-if(in_array($path[0], array('library', 'include'))) {
-
+if (in_array($path[0], array('library', 'include'))) {
     // 'library/Schoolbox/{Module}[/Namespacing]/Class.php' becomes
     // 'library/Schoolbox/{Module}/Test[/Namespacing]/ClassTest.php'
 
@@ -40,7 +40,7 @@ if(in_array($path[0], array('library', 'include'))) {
     $testpath = implode('/', str_replace('.php', 'Test.php', $path));
 
     // if unit test is found, run it
-    if(file_exists($testpath)) {
+    if (file_exists($testpath)) {
         // get the autoloading for unit tests
         require_once __DIR__ . '/../../test/bootstrap/unit.php';
 
@@ -50,9 +50,9 @@ if(in_array($path[0], array('library', 'include'))) {
         exec("$phpunit $testpath", $output, $return);
 
         // baulk if the tests failed, be silent otherwise
-        if($return != 0) {
+        if ($return != 0) {
             echo "$filename: Failed unit tests\n";
-            echo implode("\n", $output)."\n";
+            echo implode("\n", $output) . "\n";
             exit($return);
         }
     }
@@ -61,7 +61,7 @@ if(in_array($path[0], array('library', 'include'))) {
 // run coding standards filter; this will modify the non-indexed version of this file if it doesn't conform (doesn't touch index)
 exec("git show :$filename | php-cs-fixer fix - | cut -b7-", $output, $return);
 
-if(count($output) && $output[0] != 'stdin.php') {
+if (count($output) && $output[0] != 'stdin.php') {
     echo "$filename: Non-conformance to PSR-2\n";
     exec("php-cs-fixer fix $filename", $output, $return);
     exit(1);

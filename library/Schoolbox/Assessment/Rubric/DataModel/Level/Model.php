@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Level;
-
 
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;

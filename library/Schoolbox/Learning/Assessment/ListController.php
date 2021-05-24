@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Database\Predicate\InvalidColumnException;
@@ -94,7 +96,13 @@ class ListController extends Web\Controller\Base
      * @param UnitSpecificationMapper $unitSpecificationMapper
      */
     public function __construct(
-        UserMapper $userMapper, Error\Mapper $errorMapper, MapperProxy $assessmentMapper, Access $access, Transactor $transactor, Participant\DataSource $participantDataSource, UnitSpecificationMapper $unitSpecificationMapper
+        UserMapper $userMapper,
+        Error\Mapper $errorMapper,
+        MapperProxy $assessmentMapper,
+        Access $access,
+        Transactor $transactor,
+        Participant\DataSource $participantDataSource,
+        UnitSpecificationMapper $unitSpecificationMapper
     ) {
         $this->setUserMapper($userMapper);
         $this->setErrorMapper($errorMapper);
@@ -198,8 +206,8 @@ class ListController extends Web\Controller\Base
                 $assessmentInfo['assessment'],
                 $explicitReturnUrl,
                 $assessmentInfo[Redirect::RETURN_URL],
-                $assessmentInfo['relocated'])
-            );
+                $assessmentInfo['relocated']
+            ));
         } catch (DomainException $e) {
             $this->sendError('Could not save assessment. ', [$e->getMessage()], 400, $e->getCode());
             return;
@@ -254,31 +262,26 @@ class ListController extends Web\Controller\Base
         $encodedReturnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
         if ($encodedReturnUrl) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
-
         } else {
             if ($context instanceof Folder) {
                 // Folder homepage
-                $returnUrl = '/homepage/'.$context->getId();
-
+                $returnUrl = '/homepage/' . $context->getId();
             } elseif ($context instanceof Project) {
                 // Project status page
                 $returnUrl = $this->getRouter()->generate(
                     'learningAssessment.getStatus',
                     ['assessmentId' => $context->getId()]
                 );
-
             } elseif ($context instanceof UnitSpecification) {
                 // Course modify page for this unit
                 $returnUrl = $this->getRouter()->generate(
                     'course.modifyCourse',
                     ['id' => $context->getCourse()->getId()]
                 );
-                $returnUrl .= '#'.$context->getId();
-
+                $returnUrl .= '#' . $context->getId();
             } elseif ($context instanceof UnitImplementation) {
                 // Folder that this course is on
-                $returnUrl = '/homepage/'.$context->getCourse()->getFolder()->getId();
-
+                $returnUrl = '/homepage/' . $context->getCourse()->getFolder()->getId();
             } else {
                 // Back to base?
                 $returnUrl = '/';
@@ -321,7 +324,7 @@ class ListController extends Web\Controller\Base
         }
         $assessment->setWeight($weight);
         $this->getAssessmentMapper()->save($assessment, $this->getUser());
-        $this->getResponse()->content->set($this->buildJsonOutput(['message'=>'Loaded successfully']));
+        $this->getResponse()->content->set($this->buildJsonOutput(['message' => 'Loaded successfully']));
     }
 
     /**
@@ -392,15 +395,15 @@ class ListController extends Web\Controller\Base
         // show the generic first-half of the form
         $data['types'] = [
             ['id' => 'due-work', 'value' => AssessmentType::TYPE_DUE_WORK, 'label' => 'Due Work',   'title' => 'Create an assessable item for students that can accept submissions'],
-            ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task',       'title'=> 'A simple activity that will track student completion'],
-            ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz',       'title'=> 'Ask a series of questions with automatic marking'],
+            ['id' => 'task',     'value' => AssessmentType::TYPE_TASK,     'label' => 'Task',       'title' => 'A simple activity that will track student completion'],
+            ['id' => 'quiz',     'value' => AssessmentType::TYPE_QUIZ,     'label' => 'Quiz',       'title' => 'Ask a series of questions with automatic marking'],
         ];
         // TODO, 'types' should just be the 3 objects, and twig should do the rest
         // TODO (see icon macro for 'id', assessment.typeName for 'label', types.objectToString($assessment) for 'value')
 
         // Ensure we don't provide an option to spawn a Project inside a Project context
         if (!$context instanceof Project) {
-            $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project', 'title'=>'Setup a container for multiple assessments that are related'];
+            $item = ['id' => 'project',  'value' => AssessmentType::TYPE_PROJECT,  'label' => 'Project', 'title' => 'Setup a container for multiple assessments that are related'];
             array_unshift($data['types'], $item);
         }
 
@@ -662,7 +665,6 @@ class ListController extends Web\Controller\Base
                     ->setOpenDate(Alaress_Date_Format::newLocal($planData['open_date']))
                     ->setDueDate(Alaress_Date_Format::newLocal($planData['due_date']))
                     ->setCloseDate(Alaress_Date_Format::newLocal($planData['close_date']));
-
             } elseif ($planId < 0) {
                 // new plan
                 unset($planData['id']);
@@ -706,9 +708,11 @@ class ListController extends Web\Controller\Base
      */
     public function getRelocatedContext(IAssessable $assessment, ?string $locationId): ?AssessmentContext
     {
-        if ($assessment && $locationId
+        if (
+            $assessment && $locationId
             && $assessment->isSpecification()
-            && ($assessment->getContext()->getLocationId() !== $locationId)) {
+            && ($assessment->getContext()->getLocationId() !== $locationId)
+        ) {
             preg_match('/(unit|project)-([0-9]+)/', $locationId, $match);
             try {
                 if (isset($match[1]) && $match[1] === 'unit') {
@@ -735,7 +739,6 @@ class ListController extends Web\Controller\Base
     {
         if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput([ Redirect::RETURN_URL => $url ]));
-
         } else {
             $this->getResponse()->redirect->afterPost($url);
         }

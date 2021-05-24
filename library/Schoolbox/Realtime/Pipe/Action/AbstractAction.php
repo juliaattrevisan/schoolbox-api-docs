@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -43,5 +44,4 @@ abstract class AbstractAction implements IAction
     {
         return $this->messageInstance;
     }
-
 }

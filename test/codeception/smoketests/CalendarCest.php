@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 /** @noinspection PhpDocMissingThrowsInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpUnused */
@@ -211,7 +213,7 @@ class CalendarCest
 
         #WHEN
         $event        = $i->grabCalendarEventByTitle($title);
-        $RSVP_Payload = new Payload\Base('POST', '/calendar/week/', '/calendar/event/attendance/'.$event->getId().'/accept');
+        $RSVP_Payload = new Payload\Base('POST', '/calendar/week/', '/calendar/event/attendance/' . $event->getId() . '/accept');
 
 
         $i->amGoingTo('Send request to RSVP to campus calendar event.');
@@ -251,14 +253,14 @@ class CalendarCest
         $i->sendRequest($createEventRequest);
 
         $event        = $i->grabCalendarEventByTitle($title);
-        $RSVP_Payload = new Payload\Base('POST', '/calendar/week/', '/calendar/event/attendance/'.$event->getId().'/accept');
+        $RSVP_Payload = new Payload\Base('POST', '/calendar/week/', '/calendar/event/attendance/' . $event->getId() . '/accept');
         $i->amGoingTo('Send request to RSVP to campus calendar event.');
         $i->sendRequest($RSVP_Payload);
 
         #WHEN
         $attendanceList       = $i->grabCalendarEventAttendanceList($event->getId());
-        $RSVP_Remove_Payload = new Payload\Base('POST', '/calendar/event/'.$event->getId(), '/calendar/event/attendance/'.$event->getId().'/delete');
-        $RSVP_Remove_Payload->setFormParam('userId',$admin->getId());
+        $RSVP_Remove_Payload = new Payload\Base('POST', '/calendar/event/' . $event->getId(), '/calendar/event/attendance/' . $event->getId() . '/delete');
+        $RSVP_Remove_Payload->setFormParam('userId', $admin->getId());
 
         $i->amGoingTo('Send request to Remove an attendee from the calendar event.');
         $i->sendRequest($RSVP_Remove_Payload);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -10,7 +11,6 @@ namespace Schoolbox\External\Importer\User\Hydrator;
 use Schoolbox\CampusMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User as UserModel;
-
 
 /**
  * Sets campuses for a user based on a lookup.

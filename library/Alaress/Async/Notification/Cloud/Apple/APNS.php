@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,7 +10,6 @@
 namespace Alaress\Async\Notification\Cloud\Apple;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
-
 use InvalidArgumentException;
 use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
@@ -18,7 +18,6 @@ use ZendService\Apple\Apns\Client\Message as Client;
 use ZendService\Apple\Apns\Response\Message as Response;
 use ZendService\Apple\Apns\Message;
 use ZendService\Apple\Exception\RuntimeException;
-
 
 /**
  * Apple Push Notification Service
@@ -92,7 +91,6 @@ class APNS extends AbstractService
         foreach ($tokens as $token) {
             try {
                 $message->setToken($token);
-
             } catch (InvalidArgumentException $e) {
                 // your token is not a hex string
                 $this->getLog()->debug("Invalid token: '$token': removing from registry");
@@ -153,17 +151,14 @@ class APNS extends AbstractService
                         $this->report($prefix, "No idea what went wrong", Logger::NOTICE, '?');
                         break;
                 }
-
             } catch (InvalidArgumentException $e) {
                 // unable to connect to APNS, abort mission
-                $this->getLog()->error("Connection to APNS failed: {$e->getMessage()}", [ 'exception'=>$e ]);
+                $this->getLog()->error("Connection to APNS failed: {$e->getMessage()}", [ 'exception' => $e ]);
                 return false;
-
             } catch (RuntimeException $e) {
                 // connected, but server became unavailable
-                $this->getLog()->error("APNS server stopped responding: {$e->getMessage()}", [ 'exception'=>$e ]);
+                $this->getLog()->error("APNS server stopped responding: {$e->getMessage()}", [ 'exception' => $e ]);
                 return false;
-
             }
         }
 
@@ -183,5 +178,4 @@ class APNS extends AbstractService
             $this->client->open($this->environment, $this->certPath, $this->passPhrase);
         }
     }
-
-} 
+}

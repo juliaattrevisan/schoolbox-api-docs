@@ -1,14 +1,15 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer;
 
 use Schoolbox\External\Connector\TassApi\Base\Endpoint;
-
 
 /**
  * Class ConflictingExternalIds
@@ -134,6 +135,5 @@ class ConflictingExternalIds
          */
         new \Alaress_Probe('Students', 'Teachers', 'Employees');
         new \Alaress_Probe($payload['students'], $payload['teachers'], $payload['employees']);
-
     }
 }

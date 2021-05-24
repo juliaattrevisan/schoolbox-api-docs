@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Average
  *
@@ -10,9 +11,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Summator;
 
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 
 class Average extends AbstractSummator
 {
@@ -27,7 +29,8 @@ class Average extends AbstractSummator
      *
      * Not used in plain ol' Average
      */
-    protected function calculateTotalWeight(Collection $allAssessables) {
+    protected function calculateTotalWeight(Collection $allAssessables)
+    {
         return null;
     }
 

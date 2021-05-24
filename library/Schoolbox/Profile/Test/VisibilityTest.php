@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Profile\Test;
@@ -758,7 +760,7 @@ class VisibilityTest extends TestCase
      */
     private function getMockExternalUser(): External_UserInterface
     {
-        return new Class() extends \External_User
+        return new Class () extends \External_User
         {
             public function __construct($databaseName = '')
             {
@@ -784,7 +786,7 @@ class VisibilityTest extends TestCase
      */
     private function getMockConfigLoader(): IConfigLoader
     {
-        return new Class() implements IConfigLoader
+        return new Class () implements IConfigLoader
         {
 
             /** @var bool */

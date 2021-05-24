@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -14,7 +15,8 @@ use Swift_IoException;
  *
  * Enables large (~100MB+) attachments without OOM errors.
  */
-class AttachmentStream implements \Swift_OutputByteStream{
+class AttachmentStream implements \Swift_OutputByteStream
+{
 
     /** @var  resource file stream $storageStream */
     protected $storageStream;
@@ -24,7 +26,8 @@ class AttachmentStream implements \Swift_OutputByteStream{
      *
      * @param resource $storageStream
      */
-    public function __construct($storageStream){
+    public function __construct($storageStream)
+    {
         $this->storageStream = $storageStream;
     }
 
@@ -46,7 +49,7 @@ class AttachmentStream implements \Swift_OutputByteStream{
     {
         $string = fread($this->storageStream, $length);
 
-        if(false === $string){
+        if (false === $string) {
             throw new Swift_IoException('Unable to read from stream');
         }
 
@@ -62,6 +65,6 @@ class AttachmentStream implements \Swift_OutputByteStream{
      */
     public function setReadPointer($byteOffset)
     {
-        return 0 === fseek($this->storageStream,$byteOffset);
+        return 0 === fseek($this->storageStream, $byteOffset);
     }
 }

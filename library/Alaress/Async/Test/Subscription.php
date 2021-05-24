@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Test;
-
 
 use PHPUnit_Framework_AssertionFailedError;
 use ReflectionMethod;
@@ -80,7 +80,6 @@ class Subscription
         $allCaptures = [];
 
         foreach ($hooks as $pattern => $captures) {
-
             $count = count($captures);
 
             foreach ($captures as $capture) {

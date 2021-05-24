@@ -1250,10 +1250,12 @@ class DataSource
             $averageStatement->execute($pb->getParams());
 
             while ($row = $averageStatement->fetch(\PDO::FETCH_ASSOC)) {
-                if (!isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']])
+                if (
+                    !isset($longitude[$row['capability_id']]['mark'][$row['assessment_id']])
                     && $longitude[$row['capability_id']]['max_value'][$row['assessment_id']] > 0
                     && $row['capability_value'] !== null
-                    && isset($dueWorks[$row['assessment_id']])) {
+                    && isset($dueWorks[$row['assessment_id']])
+                ) {
                     $longitude[$row['capability_id']]['mark'][$row['assessment_id']] = $markSchemeFactory->spawnForCapability(
                         $dueWorks[$row['assessment_id']],
                         $longitude[$row['capability_id']]['max_value'][$row['assessment_id']]

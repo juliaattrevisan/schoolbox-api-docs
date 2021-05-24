@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,9 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Alaress\Twig\Method;
-
 
 use Schoolbox\User;
 
@@ -50,5 +49,4 @@ class RouteLookupIfAuthorized
         }
         return '';
     }
-
 }

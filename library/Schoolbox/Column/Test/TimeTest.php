@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class description here
  *
@@ -10,8 +11,8 @@
 namespace Schoolbox\Column\Test;
 
 use Schoolbox\Column\Time;
-use \DateTime as DateObject;
-use \Alaress_Date_Format as DateWrapper;
+use DateTime as DateObject;
+use Alaress_Date_Format as DateWrapper;
 
 class TimeTest extends DatetimeTest
 {

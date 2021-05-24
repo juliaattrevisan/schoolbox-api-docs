@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -70,7 +71,7 @@ class Model implements ISoftDeletable
     public function getChildren()
     {
         return $this->children;
-    }    
+    }
 
     /**
      * @return int

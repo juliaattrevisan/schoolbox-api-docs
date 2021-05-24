@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Rules\Token\Test;
-
 
 use Alaress\ObjectReader;
 use Alaress\Rules\Token\Filter;
@@ -23,7 +23,6 @@ class MockTokenizer extends Tokenizer
     public function __construct($tokens)
     {
         foreach ($tokens as $key => $label) {
-
             $this->addToken(new Token($key, $label, function ($entity, $settings) {
                 $reader = new ObjectReader();
                 return $reader->read($entity, $settings[0]);
@@ -33,7 +32,9 @@ class MockTokenizer extends Tokenizer
         $this->addFilter(new Filter('first', 'Return the first character', function ($value) {
             return strlen($value) ? $value[0] : '';
         }));
-        $this->addFilter(new Filter('uc', 'Converts to uppercase', function ($input) { return strtoupper($input); }));
+        $this->addFilter(new Filter('uc', 'Converts to uppercase', function ($input) {
+            return strtoupper($input);
+        }));
     }
 
 
@@ -49,5 +50,4 @@ class MockTokenizer extends Tokenizer
     {
         return parent::applyToken($token, $dataset, [ $token ]);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,7 +14,6 @@ use Alaress\Async\Queue\QueueInterface;
 use Alaress\Redis;
 use Predis\ClientInterface;
 use Serializable;
-
 
 class ListFactory implements IListFactory, Serializable
 {

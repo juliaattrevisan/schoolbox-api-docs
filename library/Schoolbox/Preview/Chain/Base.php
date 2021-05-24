@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base
  *
@@ -9,8 +10,8 @@
 
 namespace Schoolbox\Preview\Chain;
 
-
-abstract class Base {
+abstract class Base
+{
 
     /**
      * Result data
@@ -27,10 +28,11 @@ abstract class Base {
      * @param  Strategy\Internal\Base[] $responsibilities
      * @return mixed
      */
-    protected function start($responsibilities) {
+    protected function start($responsibilities)
+    {
         if (count($responsibilities)) {
             for ($i = 0; $i < count($responsibilities); $i++) {
-                $responsibilities[$i]->setNext($responsibilities[$i+1]);
+                $responsibilities[$i]->setNext($responsibilities[$i + 1]);
             }
 
             $this->setResult($responsibilities[0]->test());

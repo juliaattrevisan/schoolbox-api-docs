@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event\Attendance;
@@ -66,7 +68,10 @@ class Controller extends Base
      * @param EventRecurrenceMapper $eventRecurrenceMapper
      */
     public function __construct(
-        Error\Mapper $errorMapper, Mapper $attendanceMapper, UserMapper $userMapper, EventRecurrenceMapper $eventRecurrenceMapper
+        Error\Mapper $errorMapper,
+        Mapper $attendanceMapper,
+        UserMapper $userMapper,
+        EventRecurrenceMapper $eventRecurrenceMapper
     ) {
         $this->errorMapper           = $errorMapper;
         $this->attendanceMapper      = $attendanceMapper;
@@ -255,7 +260,6 @@ class Controller extends Base
 
             $this->attendanceMapper->save($attendance);
         } catch (MapperException $e) {
-
             // noop
         }
 

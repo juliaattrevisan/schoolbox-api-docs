@@ -13,7 +13,8 @@ use Schoolbox\User;
  * @link      https://schoolbox.com.au/
  */
 
-class Calendar_Api_EventType_Event_Schoolbox_Type extends Calendar_Api_EventType_Event_Schoolbox_Default {
+class Calendar_Api_EventType_Event_Schoolbox_Type extends Calendar_Api_EventType_Event_Schoolbox_Default
+{
 
     /**
      * Event Type to fetch.
@@ -47,7 +48,8 @@ class Calendar_Api_EventType_Event_Schoolbox_Type extends Calendar_Api_EventType
      *
      * @return \Calendar\Event\Collection
      */
-    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
+    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp)
+    {
         return $this->getCalendarHandler()->getDayEvents(
             $this->getUser(),
             $this->getViewer(),

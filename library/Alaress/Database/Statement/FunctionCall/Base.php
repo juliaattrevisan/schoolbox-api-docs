@@ -82,7 +82,8 @@ class Base extends BaseQuery implements IFunctionCall
     /**
      * @inheritdoc
      */
-    protected function bindStatement() {
+    protected function bindStatement()
+    {
 
         /** @var PDOStatement $statement */
         $statement = $this->statement;

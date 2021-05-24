@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Example;
@@ -49,7 +51,9 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
+        $preloadUser = function ($params) {
+            return $this->preloadUser($params);
+        };
 
         $this->register('GET', '/user/{id}', 'getExample', $getPerms, $preloadUser);
         $this->register('POST', '/user', 'postExample', $postPerms, null);
@@ -68,8 +72,7 @@ class Module extends BaseModule
     {
         try {
             $user = $this->getUserMapper()->findById($params['id']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound();
         }
 

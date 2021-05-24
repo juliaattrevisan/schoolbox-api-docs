@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * This script searches for all docs with status of 'error' and error_message of 'Conversion failed',
  * and puts them back into the queue for re-uploading.

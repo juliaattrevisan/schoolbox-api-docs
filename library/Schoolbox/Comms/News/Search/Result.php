@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Result
  *
@@ -6,7 +7,9 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Search;
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
@@ -61,16 +64,17 @@ class Result extends Base
         $i = 0;
 
         foreach ($deps['resultSet'] as $row) {
-            if ($this->isVisible(
-                $user,
-                $deps['hasServicePermission'],
-                (int)$row['n.id'],
-                $deps['articleIds'],
-                (int)$row['n.author_id'],
-                $deps['articlesWithRoleBasedPermissions'],
-                false)
+            if (
+                $this->isVisible(
+                    $user,
+                    $deps['hasServicePermission'],
+                    (int)$row['n.id'],
+                    $deps['articleIds'],
+                    (int)$row['n.author_id'],
+                    $deps['articlesWithRoleBasedPermissions'],
+                    false
+                )
             ) {
-
                 /* Skip to the offset
                  */
                 if ($i < $sanitiser->getOffset()) {
@@ -126,14 +130,16 @@ class Result extends Base
         $i = 0;
 
         foreach ($deps['resultSet'] as $row) {
-            if ($this->isVisible(
-                $user,
-                $deps['hasServicePermission'],
-                (int)$row['n.id'],
-                $deps['articleIds'],
-                (int)$row['n.author_id'],
-                $deps['articlesWithRoleBasedPermissions'],
-                false)
+            if (
+                $this->isVisible(
+                    $user,
+                    $deps['hasServicePermission'],
+                    (int)$row['n.id'],
+                    $deps['articleIds'],
+                    (int)$row['n.author_id'],
+                    $deps['articlesWithRoleBasedPermissions'],
+                    false
+                )
             ) {
                 $i++;
             }
@@ -318,8 +324,7 @@ class Result extends Base
         int $authorId,
         array $articlesWithRoleBasedPermissions,
         bool $isShareable
-    ): bool
-    {
+    ): bool {
         /* If $user is a superuser
          */
         if ($user->isSuperuser()) {

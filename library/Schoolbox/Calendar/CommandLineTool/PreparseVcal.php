@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -90,7 +91,7 @@ class PreparseVcal extends CliTool\App
         );
         try {
             $this->cache->write($decodedConfig);
-        } catch (InvalidArgumentException|ParseException|InvalidDataException $e) {
+        } catch (InvalidArgumentException | ParseException | InvalidDataException $e) {
             // There was a failure when writing the cache,
             // or reading from the URL in the config.
             // Whatever the case, log and continue.

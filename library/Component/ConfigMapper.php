@@ -117,7 +117,8 @@ class Component_ConfigMapper extends \Schoolbox\Mapper
     {
         $collection                 = $this->createCollection();
         $componentConfigDefinitions = \Component_ConfigDefinitionMapper::getInstance()->findByColumn(
-            'component_definition_id', $definitionId
+            'component_definition_id',
+            $definitionId
         );
 
         // Apply config

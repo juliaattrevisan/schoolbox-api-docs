@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Date period iterator for events based on a timetable.
  *
@@ -10,9 +11,10 @@
  * @link      https://schoolbox.com.au/
  */
 
-use \Schoolbox\Campus;
+use Schoolbox\Campus;
 
-class External_TimetableDatePeriod implements Iterator {
+class External_TimetableDatePeriod implements Iterator
+{
 
     /**
      * @var DateTime
@@ -70,7 +72,8 @@ class External_TimetableDatePeriod implements Iterator {
      * @throws InvalidArgumentException if $campus is not a valid campus
      * @throws InvalidArgumentException if $start does not have a timetable day
      */
-    public function __construct(DateTime $start, DateTime $end, External_Timetable $externalTimetable, Campus $campus) {
+    public function __construct(DateTime $start, DateTime $end, External_Timetable $externalTimetable, Campus $campus)
+    {
 
         $this->start             = clone $start;
         $this->end               = clone $end;
@@ -78,8 +81,8 @@ class External_TimetableDatePeriod implements Iterator {
         $this->campus            = $campus;
 
         // Deal exclusively in dates
-        $this->start->setTime(0,0,0);
-        $this->end->setTime(0,0,0);
+        $this->start->setTime(0, 0, 0);
+        $this->end->setTime(0, 0, 0);
 
         // Figure out the day that $start starts at
         $dayNumber = $externalTimetable->getDayNumber($campus, $this->start->getTimestamp());
@@ -98,7 +101,8 @@ class External_TimetableDatePeriod implements Iterator {
      * @link http://php.net/manual/en/iterator.current.php
      * @return DateTime
      */
-    public function current() {
+    public function current()
+    {
         return $this->current;
     }
 
@@ -108,7 +112,8 @@ class External_TimetableDatePeriod implements Iterator {
      * @link http://php.net/manual/en/iterator.next.php
      * @return void
      */
-    public function next() {
+    public function next()
+    {
         $this->index++;
         try {
             if ($this->invert) {
@@ -117,8 +122,7 @@ class External_TimetableDatePeriod implements Iterator {
                     $this->dayNumber,
                     $this->current->getTimestamp()
                 );
-            }
-            else {
+            } else {
                 $this->current = $this->externalTimetable->getNextDateForDayNumber(
                     $this->campus,
                     $this->dayNumber,
@@ -136,7 +140,8 @@ class External_TimetableDatePeriod implements Iterator {
      * @link http://php.net/manual/en/iterator.key.php
      * @return int
      */
-    public function key() {
+    public function key()
+    {
         return $this->index;
     }
 
@@ -146,13 +151,14 @@ class External_TimetableDatePeriod implements Iterator {
      * @link http://php.net/manual/en/iterator.valid.php
      * @return bool
      */
-    public function valid() {
+    public function valid()
+    {
         if (!$this->isValid) {
             return false;
         }
         $comparison = strcmp($this->current->format('Ymd'), $this->end->format('Ymd'));
         return $this->invert ?
-            $comparison > 0:
+            $comparison > 0 :
             $comparison < 0;
     }
 
@@ -162,7 +168,8 @@ class External_TimetableDatePeriod implements Iterator {
      * @link http://php.net/manual/en/iterator.rewind.php
      * @return void
      */
-    public function rewind() {
+    public function rewind()
+    {
         $this->isValid = true;
         $this->index   = 0;
         $this->current = $this->start;

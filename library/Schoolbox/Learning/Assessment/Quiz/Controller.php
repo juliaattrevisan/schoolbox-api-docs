@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -119,7 +120,8 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
-            $replicator);
+            $replicator
+        );
         $this->quizMapper        = $quizMapper;
         $this->quizSectionMapper = $quizSectionMapper;
         $this->quizAttemptMapper = $quizAttemptMapper;
@@ -156,7 +158,9 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/quiz/status.twig',
-                $twigData, "Status of {$assessment->getTitle()}", 'submission'
+                $twigData,
+                "Status of {$assessment->getTitle()}",
+                'submission'
             )
         );
     }
@@ -296,7 +300,7 @@ class Controller extends Assessment\Controller
      */
     protected function getAssessmentTwigData(IAssessable $assessment): array
     {
-        $data['acceptingResponses']= true;
+        $data['acceptingResponses'] = true;
         return $data;
     }
 

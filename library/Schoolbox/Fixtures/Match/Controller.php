@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -11,24 +12,24 @@ use Alaress_Date_Format;
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Collection;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\Fixtures\Season\Model as Season;
-use \Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
-use \Schoolbox\Fixtures\Division\Model as Division;
-use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\Fixtures\Match\Model as Match;
-use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use \Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
-use \Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
-use \Schoolbox\Fixtures\Venue\Model as Venue;
-use \Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
-use \Schoolbox\Fixtures\School\Model as School;
-use \Schoolbox\Fixtures\School\Mapper as SchoolMapper;
-use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
+use Schoolbox\Fixtures\Season\Model as Season;
+use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
+use Schoolbox\Fixtures\Division\Model as Division;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
+use Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
+use Schoolbox\Fixtures\Venue\Model as Venue;
+use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
+use Schoolbox\Fixtures\School\Model as School;
+use Schoolbox\Fixtures\School\Mapper as SchoolMapper;
+use Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 class Controller extends AbstractController
 {
@@ -125,7 +126,6 @@ class Controller extends AbstractController
          */
         /** @var Match $currentMatch */
         foreach ($allMatches as $currentMatch) {
-
             if ($currentMatch->getSeason()->getId() == $division->getSeason()->getId()) {
                 $isMatchesInCurrentSeason = true;
             }
@@ -337,7 +337,6 @@ class Controller extends AbstractController
         try {
             list ($homeTeam, $homeSchool) = $this->calculateTeam($this->getRequest()->post['homeTeamId']);
             list ($awayTeam, $awaySchool) = $this->calculateTeam($this->getRequest()->post['awayTeamId']);
-
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
@@ -369,7 +368,6 @@ class Controller extends AbstractController
         $itCount = count($itPost['matchId']);
 
         for ($i = 0; $i < $itCount; ++$i) {
-
             if (empty($itPost['description'][$i])) {
                 continue;
             }
@@ -407,7 +405,6 @@ class Controller extends AbstractController
         } else {
             return [$this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel()];
         }
-
     }
 
     /**

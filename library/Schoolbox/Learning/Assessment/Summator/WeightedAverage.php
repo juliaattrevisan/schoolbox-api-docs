@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WeightedAverage
  *
@@ -16,8 +17,8 @@
 
 namespace Schoolbox\Learning\Assessment\Summator;
 
-use \Schoolbox\Collection;
-use \Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IAssessable;
 
 class WeightedAverage extends AbstractSummator
 {

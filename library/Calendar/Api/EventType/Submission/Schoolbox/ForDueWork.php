@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event source for the due work screen (/learning/due/{student.id})
  *
@@ -29,7 +30,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_ForDueWork extends Calendar_Ap
         User $user,
         User $viewer,
         Assessment\MapperProxy $assessmentDataSource,
-        Visibility             $visibility,
+        Visibility $visibility,
         Timetable_ColourManager $colourManager
     ) {
         parent::__construct($connectorId, $user, $viewer, $assessmentDataSource, $visibility);

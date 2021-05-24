@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Attachment\Context;
 
 use Schoolbox\Resource\Attachment\Filesystem;
@@ -132,7 +134,8 @@ class Factory
      *
      * @param string $context
      */
-    public function __construct(string $context) {
+    public function __construct(string $context)
+    {
         $this->context = $context;
     }
 

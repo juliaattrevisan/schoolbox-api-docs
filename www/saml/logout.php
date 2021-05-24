@@ -31,9 +31,9 @@ if (isset($_SESSION['samlNameIdFormat'])) {
     $nameIdFormat = $_SESSION['samlNameIdFormat'];
 }
 try {
-    SAMLDebugLog("Attempting SLO: ".json_encode(array('nameId'=>$nameId, 'sessionIndex'=>$sessionIndex, 'nameIdFormat'=>$nameIdFormat)));
+    SAMLDebugLog("Attempting SLO: " . json_encode(array('nameId' => $nameId, 'sessionIndex' => $sessionIndex, 'nameIdFormat' => $nameIdFormat)));
     $auth->logout(null, [], $nameId, $sessionIndex, false, $nameIdFormat);
 } catch (OneLogin\Saml2\Error $e) {
-    SAMLDebugLog("SLO Error: ".$e->getMessage());
+    SAMLDebugLog("SLO Error: " . $e->getMessage());
     error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
 }

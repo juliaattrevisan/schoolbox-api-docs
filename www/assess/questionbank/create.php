@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Create
  *
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 

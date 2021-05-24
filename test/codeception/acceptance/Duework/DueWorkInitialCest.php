@@ -12,18 +12,18 @@ class DueWorkInitialCest
      */
     public function create2Assessments(AcceptanceTester $i)
     {
-        $teacher='Jack Coles';
-        $student='Eden Reed';
+        $teacher = 'Jack Coles';
+        $student = 'Eden Reed';
         $i->login('alaress', 'alaress');
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resource/folder/0/create");
         $i->selectOption("template", "Blank");
-        $i->fillField(['name'=>'name'], 'Test Class Homepage');
-        $i->click(['css'=>'label[class=radio-label][for=groupWrite1]']);
-        $i->click(['css'=>'label[class=radio-label][for=groupWrite2]']);
-        $i->click(['css'=>'label[class=radio-label][for=groupRead3]']);
-        $i->click(['css'=>'label[class=radio-label][for=groupRead4]']);
-        $i->click(['css'=>'label[class=radio-label][for=groupRead5]']);
-        $i->click(['css'=>'input[type=submit]']);
+        $i->fillField(['name' => 'name'], 'Test Class Homepage');
+        $i->click(['css' => 'label[class=radio-label][for=groupWrite1]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupWrite2]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead3]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead4]']);
+        $i->click(['css' => 'label[class=radio-label][for=groupRead5]']);
+        $i->click(['css' => 'input[type=submit]']);
 
         // Navigate to the new folder, store its location for later tests
         $i->amOnUrl("https://vagrant.dev.schoolbox.cloud/resources/");
@@ -31,7 +31,7 @@ class DueWorkInitialCest
         $i->click("Test Class Homepage");
         $i->waitForText("Homepage", 5);
         $i->click("Homepage");
-        $this->home_page_url= $i->getCurrentUrl();
+        $this->home_page_url = $i->getCurrentUrl();
 
         $i->click('a#all-actions.icon-more');
         $i->clickWithLeftButton('#tab-control > div > div > ul > li a.icon-group');
@@ -49,20 +49,20 @@ class DueWorkInitialCest
         $i->click('label.input-toggle[for=accessLevel-22-3]');
         sleep(5);
         $i->amOnUrl($this->home_page_url);
-        $i->click(['css'=>'label[for=component-lock-toggle]']);
-        $i->canSeeElement(['css'=>'span[class=icon-unlocked]']);
-        $i->click(['css'=>'a#add-component']);
+        $i->click(['css' => 'label[for=component-lock-toggle]']);
+        $i->canSeeElement(['css' => 'span[class=icon-unlocked]']);
+        $i->click(['css' => 'a#add-component']);
         sleep(1);
-        $i->canSeeElement(['css'=>'div#tabs-1']);
-        $i->click(['css'=>'a[href=\#tabs-sub-3]']);
-        $i->canSeeElement(['css'=>'ul#tabs-sub-3']);
+        $i->canSeeElement(['css' => 'div#tabs-1']);
+        $i->click(['css' => 'a[href=\#tabs-sub-3]']);
+        $i->canSeeElement(['css' => 'ul#tabs-sub-3']);
         //add due work component into the homepage
-        $i->dragAndDrop("//*[@id='tabs-sub-3']/li[7]","//div[@data-position='top']");
+        $i->dragAndDrop("//*[@id='tabs-sub-3']/li[7]", "//div[@data-position='top']");
         sleep(5);
-        $i->canSeeElement(['css'=>'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]']);
+        $i->canSeeElement(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]']);
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
-        $i->waitForElementVisible(['css'=>'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
+        $i->waitForElementVisible(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
         $i->click('Create due work');
         $i->waitForText("Create Due Work", 5);
         $i->fillField("title", "Test Due Work");
@@ -70,11 +70,11 @@ class DueWorkInitialCest
         $i->selectOption('acceptOnline', '1');
         $i->fillField('weight', '5');
         $i->click('select#markType');
-        $i->selectOption('select[name=markType]','Percentage');
+        $i->selectOption('select[name=markType]', 'Percentage');
         $i->click('input[type=submit][value=Create]');
-        $i->waitForElementVisible(['css'=>'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
+        $i->waitForElementVisible(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
         $i->canSee('Test Due Work');
-        $i->waitForElementVisible(['css'=>'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
+        $i->waitForElementVisible(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
         $createButton = Locator::contains('section a.button', 'Create Due Work');
         $i->click($createButton);
         $i->waitForText("Create Due Work", 5);
@@ -83,29 +83,29 @@ class DueWorkInitialCest
         $i->selectOption('acceptOnline', '1');
         $i->fillField('weight', '5');
         $i->click('input[type=submit][value=Create]');
-        $i->waitForElementVisible(['css'=>'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
+        $i->waitForElementVisible(['css' => 'div[class=component-container\ Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller]'], 5);
         $i->canSee('Test Due Work2');
     }
 
     public function deleteAssessment(AcceptanceTester $i)
     {
-        $teacher='Jack Coles';
+        $teacher = 'Jack Coles';
         $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work2');
-        $currentURL=$i->getCurrentUrl();
-        $assessmentID=substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
+        $currentURL = $i->getCurrentUrl();
+        $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
         $i->amOnUrl($this->home_page_url);
-        $i->click('#component-assessment-'.$assessmentID.' > nav:nth-child(2) > a:nth-child(1)');
-        $i->click('#component-assessment-'.$assessmentID.' a.icon-delete');
+        $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
+        $i->click('#component-assessment-' . $assessmentID . ' a.icon-delete');
         $i->click('div.reveal-modal.open a.button.submit');
     }
 
 
     public function viewClassWork(AcceptanceTester $i)
     {
-        $student='Eden Reed';
+        $student = 'Eden Reed';
         $i->login('alaress', 'alaress');
         $i->impersonate($student);
         $i->amOnUrl($this->home_page_url);
@@ -116,7 +116,7 @@ class DueWorkInitialCest
 
     public function submitWork(AcceptanceTester $i)
     {
-        $student='Eden Reed';
+        $student = 'Eden Reed';
         $i->login('alaress', 'alaress');
         $i->impersonate($student);
         $i->amOnUrl($this->home_page_url);
@@ -130,18 +130,18 @@ class DueWorkInitialCest
         $i->canSee('Submitted in person by Ms Eden Reed');
     }
 
-     public function viewSubmission(AcceptanceTester $i)
+    public function viewSubmission(AcceptanceTester $i)
     {
-        $teacher='Jack Coles';
+        $teacher = 'Jack Coles';
         $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work');
-        $currentURL=$i->getCurrentUrl();
-        $assessmentID=substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
+        $currentURL = $i->getCurrentUrl();
+        $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
         $i->amOnUrl($this->home_page_url);
-        $i->click('#component-assessment-'.$assessmentID.' > nav:nth-child(2) > a:nth-child(1)');
-        $i->click('#component-assessment-'.$assessmentID.' a.icon-progress');
+        $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
+        $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         sleep(1);
         $i->click('ul.information-list li div.small-12.column div.row.actions-small-2 nav a.icon-more');
         $i->click('a.icon-task');
@@ -150,22 +150,22 @@ class DueWorkInitialCest
 
     public function markSubmission(AcceptanceTester $i)
     {
-        $teacher='Jack Coles';
+        $teacher = 'Jack Coles';
         $i->login('alaress', 'alaress');
         $i->impersonate($teacher);
         $i->amOnUrl($this->home_page_url);
         $i->click('Test Due Work');
-        $currentURL=$i->getCurrentUrl();
-        $assessmentID=substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
+        $currentURL = $i->getCurrentUrl();
+        $assessmentID = substr(strrchr(substr($currentURL, 0, strrpos($currentURL, '/')), '/'), 1);
         $i->amOnUrl($this->home_page_url);
-        $i->click('#component-assessment-'.$assessmentID.' > nav:nth-child(2) > a:nth-child(1)');
-        $i->click('#component-assessment-'.$assessmentID.' a.icon-progress');
+        $i->click('#component-assessment-' . $assessmentID . ' > nav:nth-child(2) > a:nth-child(1)');
+        $i->click('#component-assessment-' . $assessmentID . ' a.icon-progress');
         $i->click('ul.information-list li div.small-12.column div.row.actions-small-2 nav a.icon-more');
         $i->click('a.icon-task');
         $i->fillField('textarea[name=comment]', 'Not bad, but you should work on your spelling.');
         $i->fillField('input[name=mark]', '65');
         sleep(1);
-        $this->studentWeAreMarkingUrl= $i->getCurrentUrl();
+        $this->studentWeAreMarkingUrl = $i->getCurrentUrl();
         $i->click('a.button[data-draft=publish]');
         $i->amOnUrl($this->studentWeAreMarkingUrl);
         $i->canSee('Reviewed');
@@ -173,7 +173,7 @@ class DueWorkInitialCest
 
     public function viewMarkedSubmission(AcceptanceTester $i)
     {
-        $student='Eden Reed';
+        $student = 'Eden Reed';
         $i->login('alaress', 'alaress');
         $i->impersonate($student);
         $i->amOnPage('learning/grades/6');
@@ -190,5 +190,4 @@ class DueWorkInitialCest
         $i->canSee('Submitted in person by Ms Eden Reed');
         $i->canSee('65 %');
     }
-
 }

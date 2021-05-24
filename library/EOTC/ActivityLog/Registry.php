@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory
  *
@@ -8,60 +9,67 @@
  */
 
 namespace EOTC\ActivityLog;
-use \Schoolbox\Collection;
 
-class Registry {
+use Schoolbox\Collection;
 
-	/**
-	 * A Collection of observers
-	 *
-	 * @var Collection
-	 */
-	private $registry = null;
+class Registry
+{
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setRegistry(new Collection());
-	}
+    /**
+     * A Collection of observers
+     *
+     * @var Collection
+     */
+    private $registry = null;
 
-	/**
-	 * Delegation method
-	 *
-	 * @param Log $item
-	 */
-	public function add($item) {
-		$this->getRegistry()->add($item);
-	}
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->setRegistry(new Collection());
+    }
 
-	/**
-	 * All observers - notify!
-	 */
-	public function notify() {
-		foreach($this->getRegistry() as $current) {
-			$current->notify();
-		}
-	}
+    /**
+     * Delegation method
+     *
+     * @param Log $item
+     */
+    public function add($item)
+    {
+        $this->getRegistry()->add($item);
+    }
 
-	/* Getters/Setters
-	 */
+    /**
+     * All observers - notify!
+     */
+    public function notify()
+    {
+        foreach ($this->getRegistry() as $current) {
+            $current->notify();
+        }
+    }
 
-	/**
-	 * Set registry
-	 *
-	 * @param Collection $registry
-	 */
-	private function setRegistry($registry) {
-		$this->registry = $registry;
-	}
+    /* Getters/Setters
+     */
 
-	/**
-	 * Get registry
-	 *
-	 * @return Collection
-	 */
-	private function getRegistry() {
-		return $this->registry;
-	}
+    /**
+     * Set registry
+     *
+     * @param Collection $registry
+     */
+    private function setRegistry($registry)
+    {
+        $this->registry = $registry;
+    }
+
+    /**
+     * Get registry
+     *
+     * @return Collection
+     */
+    private function getRegistry()
+    {
+        return $this->registry;
+    }
 }

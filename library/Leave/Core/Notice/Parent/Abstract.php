@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Leave_Core_Notice_Parent_Abstract
  *
@@ -73,15 +74,15 @@ abstract class Leave_Core_Notice_Parent_Abstract extends Leave_Notice_Abstract_N
         $allParents = $this->getExternalUser()->getStudentContactList([$this->getRequest()->getUser()->getExternalId()]);
 
         if (is_array($allParents)) {
-            $emailList = Array();
+            $emailList = array();
 
             foreach ($allParents as $parent) {
                 $email1 = $parent['StudentContactDefaultEmail'];
-                if (!in_array($email1, $emailList, true)){
+                if (!in_array($email1, $emailList, true)) {
                     $emailList[] = $email1;
                 }
                 $email2 = $parent['StudentContactSpouseDefaultEmail'];
-                if (!in_array($email2, $emailList)){
+                if (!in_array($email2, $emailList)) {
                     $emailList[] = $email2;
                 }
             }

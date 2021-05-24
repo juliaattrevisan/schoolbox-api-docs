@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Response
  *
@@ -8,11 +9,13 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Survey_Response extends Evaluation_Response {
+class Survey_Response extends Evaluation_Response
+{
+
+
     public $_table = 'assess_response';
     public $_index = 'response_id';
-
-    /* A const to determine whether to randomise questions
+/* A const to determine whether to randomise questions
      */
     const RANDOMISE_QUESTIONS = 1;
     const ORDERED_QUESTIONS = 2;

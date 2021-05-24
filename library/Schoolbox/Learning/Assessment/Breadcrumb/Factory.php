@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory
  *
@@ -14,10 +15,8 @@ namespace Schoolbox\Learning\Assessment\Breadcrumb;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
-use \Schoolbox\Collection;
-
-use \Schoolbox\Learning\Assessment\Project;
-
+use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
@@ -78,7 +77,7 @@ class Factory
      */
     public function produceFromAssessment(IAssessable $assessment, User $user)
     {
-        $trail = new Collection;
+        $trail = new Collection();
         $trail->add(['Learning', $this->router->generate('learning.getClasses')]);
 
         $context = $assessment->getContext();
@@ -97,10 +96,8 @@ class Factory
             }
 
             $trail = $this->produceFromAssessment($context, $user);
-
         } elseif ($context instanceof UnitSpecification) {
-            $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]).'#'.$context->getId();
-
+            $path = $this->router->generate('course.modifyCourse', ['id' => $context->getCourse()->getId()]) . '#' . $context->getId();
         } elseif ($context instanceof UnitImplementation) {
             $routeName   = 'learningMarkbook.getMarkbookForClass';
             $routeParams = [
@@ -109,16 +106,13 @@ class Factory
             ];
             if ($this->authorizer->isPathAuthorizedForUser($routeName, $routeParams, $user)) {
                 $path = $this->router->generate($routeName, $routeParams);
-
             } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
                 $path = "/homepage/{$context->getFolder()->getId()}";
-
             } else {
                 $path = '';
             }
 
             $trail->add([$context->getFolder()->getTitle(), $path]);
-
         } elseif ($this->access->getFolderAccess($user, $context->getFolder()->getId())) {
             $path = "/homepage/{$context->getFolder()->getId()}";
         }
@@ -159,5 +153,3 @@ class Factory
         return $trail;
     }
 }
-
-

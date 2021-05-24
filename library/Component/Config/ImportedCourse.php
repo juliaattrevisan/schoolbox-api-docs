@@ -1,10 +1,11 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
 
-use \Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 
 class Component_Config_ImportedCourse extends Component_Config_Abstract
 {
@@ -28,7 +29,8 @@ class Component_Config_ImportedCourse extends Component_Config_Abstract
 
         $allCourseImpls = $this->getContext() ?
             $courseImplementationMapper->findByFolderId($this->getContext()->getId(), $options) :
-            new \Schoolbox\Collection();;
+            new \Schoolbox\Collection();
+        ;
 
 
         $page->setBlock($keyblock, 'course_select', 'course_select_block');
@@ -53,20 +55,20 @@ class Component_Config_ImportedCourse extends Component_Config_Abstract
          * @var int[] $courseSpecCounts
          */
         $courseSpecCounts = [];
-        foreach($allCourseImpls as $currentCourse){
+        foreach ($allCourseImpls as $currentCourse) {
             $courseSpecCounts[$currentCourse->getSpecification()->getId()]++;
         }
 
         foreach ($allCourseImpls as $currentCourse) {
             $courseName = Scrub::text($currentCourse->getSpecification()->getFolder()->getName());
-            if($courseSpecCounts[$currentCourse->getSpecification()->getId()] >= 2){
+            if ($courseSpecCounts[$currentCourse->getSpecification()->getId()] >= 2) {
                 $courseName .= " - Imported " . $currentCourse->getCreatedAt()->getShort();
             }
 
             $page->setVar(
                 array(
                     'COMPONENT_CONFIG_COURSESELECT_NAME'       => $courseName,
-                    'COMPONENT_CONFIG_COURSESELECT_VALUE' 	   => $currentCourse->getId(),
+                    'COMPONENT_CONFIG_COURSESELECT_VALUE'      => $currentCourse->getId(),
                     'COMPONENT_CONFIG_COURSESELECT_SELECTED'   => $currentCourse->getId() == $configValue ? 'selected="selected"' : '',
                 )
             );

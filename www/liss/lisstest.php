@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -13,10 +14,9 @@ $message = new xmlrpcmsg("liss.hello");
 $resp = $client->send($message);
 
 if ($resp->faultCode()) {
-	echo 'KO. Error: '.$resp->faultString();
-}
-else {
-	echo 'OK: got '.$resp->value();
+    echo 'KO. Error: ' . $resp->faultString();
+} else {
+    echo 'OK: got ' . $resp->value();
 }
 
 var_dump($resp);

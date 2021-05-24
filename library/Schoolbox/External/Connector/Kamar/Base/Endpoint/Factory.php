@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
@@ -157,17 +159,13 @@ class Factory
         bool $perform,
         string $host,
         string $streamDir,
-
-        /* Profile pieces
-         */
+        /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-
-        /* Timetable pieces
-         */
+        /* Timetable pieces */
         UserMapper $userMapper,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
@@ -313,8 +311,8 @@ class Factory
          */
         $this->log->debug(sprintf(
             'Loading timetables using Week Offset %s, Term %s',
-                $currentWeekOffset,
-                $currentTerm
+            $currentWeekOffset,
+            $currentTerm
         ));
 
         /* Load all the Student Timetable xmls

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synergetic Scheduler Events related queries
  *
@@ -82,4 +83,4 @@ class ExternalEvents extends Base implements IExternalEvents
 
         return $this->databaseExternal->getQueryIterator($query);
     }
- }
+}

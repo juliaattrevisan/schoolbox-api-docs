@@ -1,16 +1,18 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Effect;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Sync\Rule;
 use Schoolbox\Sync\Effect;
 use Schoolbox\Sync\Effect\Fragment\Factory as FragmentFactory;
-use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
 
 /**
  * Class Controller
@@ -37,7 +39,8 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function add($params) {
+    public function add($params)
+    {
 
         /* Spawn Rule
          */
@@ -121,7 +124,8 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function addSkip($params) {
+    public function addSkip($params)
+    {
 
         /* Spawn Rule
          */
@@ -177,7 +181,8 @@ class Controller extends Base
      * a lookup select,
      * or a freeform text input
      */
-    public function change() {
+    public function change()
+    {
         $queryData = $this->getRequest()->query;
 
         $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);
@@ -242,7 +247,8 @@ class Controller extends Base
     /**
      * Spawn a new mapped row fragment
      */
-    public function newMappedRow() {
+    public function newMappedRow()
+    {
         $queryData = $this->getRequest()->query;
 
         $rule = Rule\Mapper::getInstance()->findById($queryData['ruleId']);

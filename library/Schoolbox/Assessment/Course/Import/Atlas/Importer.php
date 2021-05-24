@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -279,7 +280,6 @@ class Importer
                         // TODO implement assessment deletion
                     }
                 }
-
             } else {
                 // This unit wasn't selected; delete it
                 // TODO implement unit deletion
@@ -382,8 +382,7 @@ class Importer
         UnitSpec $unitSpec,
         Node $unitSpecNode,
         Node $standardsNode
-    ): IAssessable
-    {
+    ): IAssessable {
         $spec = new AssessmentSpecification();
         if (!$spec->isSatisfiedBy($assessment)) {
             // This will do as a generic error
@@ -412,7 +411,6 @@ class Importer
 
         // Build a rubric for this due work, if it has standards
         if (\count($assessment->getStandards())) {
-
             // Pass 1: build the rowset, adding capabilities+indicators as required
             foreach ($assessment->getStandards() as $standard) {
                 $capabilityName = $standard->getTitle();
@@ -633,7 +631,6 @@ class Importer
         try {
             // Does the base node exist? Anywhere?
             return $this->nodeMapper->findOneByColumn('code', $code);
-
         } catch (MapperException $e) {
             // It was not found: create it
             // Consider soft-deletion the same as hard deletion
@@ -719,7 +716,7 @@ class Importer
      */
     private function findOrCreateCurriculumNodeFromStandard(Api\Standard $standard, Node $parent): ?Node
     {
-        if ('' !== $standard->getCode() AND null !== $standard->getCode() ) {
+        if ('' !== $standard->getCode() and null !== $standard->getCode()) {
             return $this->findOrCreateCurriculumNode(
                 $standard->getTitle(),
                 $standard->getCode(),

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Offline stub for External_UserDetentionInterface
  *

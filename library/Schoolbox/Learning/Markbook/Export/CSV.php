@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Markbook\Export;
@@ -176,7 +178,8 @@ class CSV extends AbstractCSV
      */
     private function addParticipant(array $row, GenericCollection $participants, IAssessable $assessment, $userId): array
     {
-        if ($participants[$assessment->getId()] instanceof Collection
+        if (
+            $participants[$assessment->getId()] instanceof Collection
             && $participants[$assessment->getId()][$userId] instanceof Participant
             && !$participants[$assessment->getId()][$userId]->isExcluded()
         ) {

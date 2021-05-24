@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,8 +10,8 @@ namespace Schoolbox\Fixtures\School;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
-use \Schoolbox\TagCloud\Model as TagCloud;
+use Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use Schoolbox\TagCloud\Model as TagCloud;
 
 class Controller extends Base
 {
@@ -42,7 +43,8 @@ class Controller extends Base
     /**
      * Add external school to tag cloud
      */
-    public function postAddSchool() {
+    public function postAddSchool()
+    {
         $entityId = $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
 
         if ($this->getRequest()->isXhr()) {
@@ -72,7 +74,8 @@ class Controller extends Base
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function postEditSchool($entityId) {
+    public function postEditSchool($entityId)
+    {
 
         /** @var TagCloud $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($entityId);
@@ -104,7 +107,8 @@ class Controller extends Base
      * @throws MapperException
      * @throws MapperException\Deleted
      */
-    public function postDeleteSchool($entityId) {
+    public function postDeleteSchool($entityId)
+    {
         /** @var TagCloud $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($entityId);
         $this->getSchoolTagCloudMapper()->delete($tag);

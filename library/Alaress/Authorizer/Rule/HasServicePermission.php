@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization method - checks whether the user has certain permissions on a
  * given service.
@@ -80,7 +81,8 @@ class HasServicePermission extends All
             $accessList = $user->getAccessList();
             if (!empty($accessList)) {
                 foreach ($accessList as $access) {
-                    if ($access->getService() == $this->service
+                    if (
+                        $access->getService() == $this->service
                         && $access->getAccessLevel() >= $this->accessLevel
                     ) {
                         if (!isset($this->serviceIdentifier)) {

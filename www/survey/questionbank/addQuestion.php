@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Add a question to the Question Bank
  *
@@ -16,7 +17,6 @@ if (!$groupHandler->isStaff()) {
 $questionBankHandler = new Survey_Question_Bank();
 
 if (!empty($_POST)) {
-
     /* Don't add it if you haven't chozen a category
      */
     if (!is_numeric($_POST['question_category'])) {
@@ -24,7 +24,7 @@ if (!empty($_POST)) {
     }
 
     $success = $questionBankHandler->addQuestion(
-		new Survey_Question(),
+        new Survey_Question(),
         $_POST['question_category'],
         $_POST['question_id']
     );
@@ -34,7 +34,6 @@ if (!empty($_POST)) {
     } else {
         error(8);
     }
-
 } elseif (isset($this) && count($this->arg) > 0) {
 
     /** @var SitePage $this */
@@ -54,7 +53,6 @@ if (!empty($_POST)) {
     $questionCategoryList->render();
     $this->injectGlobalVars();
     $this->template->pparse('finaloutput', TEMPLATE_content);
-
 } else {
     error(2);
 }

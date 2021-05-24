@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schoolbox implementation of timetable connector
  *
@@ -22,7 +23,6 @@ class Timetable extends Base implements ITimetable
     public function getCurrentSemester($externalId = null)
     {
         if (!empty($externalId)) {
-
             // Get user specific file semester
 
             $semesterStatement = $this->databaseExternal->executeStoredProcedure(
@@ -56,7 +56,6 @@ class Timetable extends Base implements ITimetable
     public function getCurrentYear($externalId = null)
     {
         if (!empty($externalId)) {
-
             // Get user specific file year
 
             $semesterStatement = $this->databaseExternal->executeStoredProcedure(
@@ -141,8 +140,7 @@ class Timetable extends Base implements ITimetable
                 ORDER BY        luFileType.Description ASC,
                                 c2.Description ASC
             ",
-            array_merge
-            (
+            array_merge(
                 $externalIdBindings1['bindings'],
                 $externalIdBindings2['bindings']
             )

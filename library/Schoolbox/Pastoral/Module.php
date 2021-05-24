@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -324,7 +325,6 @@ class Module extends BaseModule
                 // Pastoral data source has already filtered out attachments I can't view
 
                 if (array_key_exists('attachmentId', $params)) {
-
                     $attachment = $injectedValues['record']->getAttachments()->getBy('id', $params['attachmentId']);
                     if ($attachment instanceof PastoralAttachment) {
                         $injectedValues['attachment'] = $attachment;

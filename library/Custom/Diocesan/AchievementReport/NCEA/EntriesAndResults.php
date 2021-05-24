@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
 /**
@@ -46,7 +48,7 @@ class EntriesAndResults extends Base
             /* Teachers
              * Trim empty teachers out for course teachers
              */
-            foreach([1, 2, 3] as $currentTeacherIndex) {
+            foreach ([1, 2, 3] as $currentTeacherIndex) {
                 $key = "ClassTeacher{$currentTeacherIndex}";
                 $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 
@@ -67,8 +69,7 @@ class EntriesAndResults extends Base
                 if (strlen($result) && ($internalExternal === 'EX') && ($studentYear == $this->getCurrentYear())) {
                     $result = "[{$strippedResult}]";
                 }
-            }
-            else {
+            } else {
                 $result = '';
                 $strippedResult = '';
             }
@@ -125,25 +126,21 @@ class EntriesAndResults extends Base
              */
             if ($studentYear == $this->getCurrentYear()) {
                 if (!$this->isProgressive($current['Result'])) {
-
                     /* Exclude N/A/M/E values for current year/external items
                      */
                     if ($internalExternal !== 'EX') {
                         if ($letter === 'N') {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
-                        }
-                        elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
+                        } elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                             $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 if ($letter === 'N') {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
-                }
-                elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
+                } elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                     $finalStack[$courseName]['summary']['type'][$internalExternal]['availableCredits'] += $current['EnteredCredits'] - $current['ResultCredits'];
                 }

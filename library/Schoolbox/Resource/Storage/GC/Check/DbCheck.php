@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -31,7 +32,7 @@ abstract class DbCheck implements Check
      *
      * @return string
      */
-    protected abstract function getStaleCondition();
+    abstract protected function getStaleCondition();
 
 
     /**
@@ -51,5 +52,4 @@ abstract class DbCheck implements Check
 
         return $retain;
     }
-
 }

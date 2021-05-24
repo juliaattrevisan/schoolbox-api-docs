@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -14,7 +15,6 @@ use Alaress\Json\Serializable;
 use Alaress\Json\SerializeTrait;
 use PHPUnit\Framework\TestCase;
 
-
 class PropertyDecoratorTest extends TestCase
 {
     /** @var Serializable */
@@ -27,7 +27,7 @@ class PropertyDecoratorTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->model = new class(2) implements Serializable {
+        $this->model = new class (2) implements Serializable {
             use SerializeTrait;
 
             /** @var int */
@@ -81,7 +81,6 @@ class PropertyDecoratorTest extends TestCase
             {
                 return new static((int)($this->x * 2));
             }
-
         };
     }
 
@@ -145,7 +144,6 @@ class PropertyDecoratorTest extends TestCase
 
                 return $json;
             }
-
         };
 
         $pd = new PropertyDecorator([ 'primitive' ], $nested);

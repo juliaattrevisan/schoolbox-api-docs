@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
@@ -10,7 +12,6 @@ namespace Schoolbox\Filter\Filters\Assessment\TemporalState;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\AbstractKeyConverter;
-
 
 /**
  * Converts between TemporalState concrete keys and TemporalState strings
@@ -67,5 +68,4 @@ class KeyConverter extends AbstractKeyConverter
             throw new \InvalidArgumentException('TemporalState Key is invalid: ' . $key);
         }
     }
-
 }

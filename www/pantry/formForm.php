@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -34,7 +35,6 @@ if (isset($_POST['part-1'])) {
     // execute the section 1 submit - just make them wait a bit
     usleep(1200000);
     die($key);
-
 } elseif (isset($_POST['part-2'])) {
     // execute the section 2 submit
 
@@ -53,16 +53,13 @@ if (isset($_POST['part-1'])) {
 
     // just send it straight back...
     die($data['part2result']);
-
 } elseif (isset($_POST['part-3'])) {
     // execute the section 3 submit
     $data['hashUsed'] = true;
     die("Part 3 submitted");
-
 } elseif (isset($_POST['part-4'])) {
     // execute the section 4 submit
     die("Part 4 submitted");
-
 } else {
     // this is it: the final submit. ALL the formdata should be available here.
     echo "<div class='row'><div class='small-12 island'><h1>Progressive Form</h1><h2 class='subheader'>Final Submission Successful!</h2><p>Your data:</p>";
@@ -80,7 +77,6 @@ if (isset($_POST['part-1'])) {
     echo "</section></div></div>";
 
     exit;
-
 }
 
 

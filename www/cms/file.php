@@ -3,11 +3,11 @@
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\GenericZone;
-use \Schoolbox\Resource\File\Mapper as FileMapper;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
-$groupHandler = new Group;
+$groupHandler = new Group();
 $file = $folder = null;
 
 $zone = new GenericZone('cms', FileMapper::getInstance());
@@ -19,7 +19,6 @@ $zone->setAttachmentsLabel('')
     ->setModalTitle('Select file');
 
 if (is_numeric($this->arg[0])) {
-
     /* Modify existing file */
     try {
         $file = FileMapper::getInstance()->findById($this->arg[0]);
@@ -76,7 +75,6 @@ if (is_numeric($this->arg[0])) {
         ]
     ]);
 } elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
     // Prevent files attached to root
     if (0 == $this->arg[1]) {
         error(6);
@@ -175,7 +173,6 @@ if (is_numeric($this->arg[0])) {
 //    } else {
 //        error(154);
 //    }
-
 } else {
     error(2);
 }

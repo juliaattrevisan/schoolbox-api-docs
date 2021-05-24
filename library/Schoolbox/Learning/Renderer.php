@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -39,21 +40,39 @@ class Renderer extends AbstractExtension
      *
      * @return array|TwigTest[]
      */
-    public function getTests ()
+    public function getTests()
     {
         // Intentionally no type declaration functions to avoid fatal errors in twig if wrong type passed in.
         return [
-            new TwigTest('folder', function ($context) { return $context instanceof Folder; }),
-            new TwigTest('unitImplementation', function ($context) { return $context instanceof UnitImplementation; }),
-            new TwigTest('unitSpecification', function ($context) { return $context instanceof UnitSpecification; }),
-            new TwigTest('project', function ($context) { return $context instanceof Project; }),
+            new TwigTest('folder', function ($context) {
+                return $context instanceof Folder;
+            }),
+            new TwigTest('unitImplementation', function ($context) {
+                return $context instanceof UnitImplementation;
+            }),
+            new TwigTest('unitSpecification', function ($context) {
+                return $context instanceof UnitSpecification;
+            }),
+            new TwigTest('project', function ($context) {
+                return $context instanceof Project;
+            }),
 
-            new TwigTest('quiz', function ($assessable) { return $assessable instanceof Quiz; }),
-            new TwigTest('dueWork', function ($assessable) { return $assessable instanceof DueWork; }),
-            new TwigTest('task', function ($assessable) { return $assessable instanceof Task; }),
+            new TwigTest('quiz', function ($assessable) {
+                return $assessable instanceof Quiz;
+            }),
+            new TwigTest('dueWork', function ($assessable) {
+                return $assessable instanceof DueWork;
+            }),
+            new TwigTest('task', function ($assessable) {
+                return $assessable instanceof Task;
+            }),
 
-            new TwigTest('response', function ($interaction) { return $interaction instanceof IResponse; }),
-            new TwigTest('feedback', function ($interaction) { return $interaction instanceof IFeedback; })
+            new TwigTest('response', function ($interaction) {
+                return $interaction instanceof IResponse;
+            }),
+            new TwigTest('feedback', function ($interaction) {
+                return $interaction instanceof IFeedback;
+            })
         ];
     }
 

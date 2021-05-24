@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -47,6 +48,7 @@ use UnexpectedValueException;
 use Schoolbox\Resource\Folder;
 use Timetable_ColourMapper;
 use Schoolbox\Collection;
+
 use function in_array;
 use function strnatcasecmp;
 
@@ -328,7 +330,7 @@ class Controller extends BaseController
      */
     public function putMoveFolder(Model $folder, Model $newParent): void
     {
-        if($folder->getId() === $newParent->getId()){
+        if ($folder->getId() === $newParent->getId()) {
             // Doesn't make sense, source and destination folders the same
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
@@ -419,11 +421,9 @@ class Controller extends BaseController
         } catch (RangeException $e) {
             // not enough info submitted to the form
             throw $errorMapper->generateException(ErrorMapper::ERROR_INFORMATION_MISSING, $e);
-
         } catch (OutOfBoundsException $e) {
             // you lack permission to do the things
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE, $e);
-
         } catch (UnexpectedValueException $e) {
             // you lack permission to do the other things
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_CREATE, $e);
@@ -793,7 +793,6 @@ class Controller extends BaseController
 
         // is 'Create Group' set true?
         if ($postData['groupcheck']) {
-
             // Prevent students with write access from being able to create folders
             if ($this->roleAccessMapper->roleMayOwnFolders($user->getRole())) {
                 // Setup group and forward to group management page
@@ -801,7 +800,6 @@ class Controller extends BaseController
                 try {
                     // confirm the group exists
                     $this->groupMapper->findOneByColumn('cid', $model->getId());
-
                 } catch (MapperException $e) {
                     // doesn't exist
                     $group = (new Group())
@@ -823,8 +821,7 @@ class Controller extends BaseController
                 $this->userAccessMapper->save($uA);
 
                 // TODO replace with routeLookup once it exists
-                return '/group/modify/'.$model->getId();
-
+                return '/group/modify/' . $model->getId();
             } else {
                 throw new UnexpectedValueException("I find your lack of access disturbing.");
             }
@@ -852,7 +849,7 @@ class Controller extends BaseController
 
         try {
             $folder = $folderMapper->findById($id);
-        } catch (\Exception $e ) {
+        } catch (\Exception $e) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
         }
 
@@ -921,11 +918,13 @@ class Controller extends BaseController
         $colourCache = new GenericCollection(Color::class);
 
         /** @var \Schoolbox\Resource\Folder\Model $folder */
-        foreach ($this->folderMapper->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true)
-                     ->sortBy('name', 'asc') as $folder) {
+        foreach (
+            $this->folderMapper->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true)
+                     ->sortBy('name', 'asc') as $folder
+        ) {
             if (!$folder->getColour()) {
                 $hexColour = $colourList[$colourIndex]->getHexColour();
-                if(!$colourCache->offsetExists($hexColour)){
+                if (!$colourCache->offsetExists($hexColour)) {
                     $colourCache->setOffset($hexColour, $colourFactory->build($hexColour));
                 }
                 /* Apply colour from list if no colour exists */

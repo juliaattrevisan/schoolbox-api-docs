@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for user titles in Schoolbox.
  *

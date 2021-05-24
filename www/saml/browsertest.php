@@ -1,4 +1,5 @@
 <?php
+
 use Wolfcast\BrowserDetection;
 use Symfony\Component\HttpFoundation\IpUtils;
 
@@ -13,10 +14,10 @@ echo "\nBrowser: " . $browser->getName() ;
 echo "\nPlatform: " . $browser->getPlatform() ;
 echo "\nMobile: " . ($browser->isMobile() ? 'Yes' : 'No');
 
-echo "\nAttempt to use Kerberos/WIA with SAML for this browser? " . '' ."\n";
+echo "\nAttempt to use Kerberos/WIA with SAML for this browser? " . '' . "\n";
 var_dump(useSAMLKerberos());
 
-if (trim(Config::get('saml_krb_whitelist'))=='') {
+if (trim(Config::get('saml_krb_whitelist')) == '') {
     echo "\nIs this IP address (" . Session::getIP() . ") within the Kerberos/WIA whitelist?\n";
     var_dump(IpUtils::checkIp(Session::getIP(), explode(',', Config::get('saml_krb_whitelist'))));
 }

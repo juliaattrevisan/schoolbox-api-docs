@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
@@ -13,6 +15,7 @@ use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\Collection;
+
 use function spl_object_hash;
 
 /**

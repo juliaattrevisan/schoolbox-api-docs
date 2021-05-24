@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
@@ -6,9 +7,9 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
-use \Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\Access;
 
 /**
  * @method null getContext()
@@ -41,8 +42,8 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
 
         $this->setContextPermission(UserAccess::ACCESS_FULL);
 
-        if($this->isUsingAltSource()){
-            $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(),$this->getSource()->getId()), $this->getMaximumPermission()));
+        if ($this->isUsingAltSource()) {
+            $this->setContentPermission(min($this->access->getFolderAccess($this->getUser(), $this->getSource()->getId()), $this->getMaximumPermission()));
         } else {
             $this->setContentPermission(UserAccess::ACCESS_FULL);
         }

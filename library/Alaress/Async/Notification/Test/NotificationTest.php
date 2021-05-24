@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -39,8 +40,19 @@ class NotificationTest extends TestCase
         $meta = [],
         $context = []
     ) {
-        return new \Alaress\Async\Notification\Instance\Instance($title, $ns, $icon, $href, $params, $level, $topics,
-            0, $time, $meta, $context);
+        return new \Alaress\Async\Notification\Instance\Instance(
+            $title,
+            $ns,
+            $icon,
+            $href,
+            $params,
+            $level,
+            $topics,
+            0,
+            $time,
+            $meta,
+            $context
+        );
     }
 
     public function testConstructSingleInstance()
@@ -158,7 +170,9 @@ class NotificationTest extends TestCase
     {
         $n = new \Alaress\Async\Notification\Notification([
             $this->newInstance(':foobar', [
-                'foobar' => new \Alaress\Async\Notification\Parameter\Param('bazbin', '#',
+                'foobar' => new \Alaress\Async\Notification\Parameter\Param(
+                    'bazbin',
+                    '#',
                     \Alaress\Async\Notification\Parameter\ParameterInterface::STACKING_REPLACE
                 ),
             ]),

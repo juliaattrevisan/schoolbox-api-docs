@@ -1,13 +1,14 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid;
-
 
 use Schoolbox\Learning\MarkScheme\TotalMarkAbstract;
 
@@ -24,7 +25,7 @@ class ValidCapabilityMark extends \Alaress\Specification\Base
 
     // Marks are intentionally validated in their scaled form here; it's easiest to compare the exact value the user typed in
     // with the capability max to ensure it's within the range.
-    public function isSatisfiedBy($capabilityMark) : bool
+    public function isSatisfiedBy($capabilityMark): bool
     {
         if (null === $capabilityMark) {
             // This is a self reflection, so null cap mark is expected

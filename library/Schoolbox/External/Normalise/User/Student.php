@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Student
  *
@@ -17,7 +18,8 @@ use Schoolbox\External\Normalise\User\Student\Year;
 use Schoolbox\External\Normalise\User\Student\Form;
 use Schoolbox\External\Normalise\User\Common\House;
 
-class Student extends Base {
+class Student extends Base
+{
 
     /* Personal
      */
@@ -104,14 +106,16 @@ class Student extends Base {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setup();
     }
 
     /**
      * Hook method
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setYear(new Year());
         $this->setForm(new Form());
         $this->setTutor(new Tutor());
@@ -134,10 +138,11 @@ class Student extends Base {
      * @param string|null $separator
      * @return string
      */
-    public function getAllCampuses($separator = "\n") {
+    public function getAllCampuses($separator = "\n")
+    {
         $output = array();
 
-        foreach($this->getCampus() as $currentCampus) {
+        foreach ($this->getCampus() as $currentCampus) {
             $output[] = $currentCampus->getCode();
         }
 

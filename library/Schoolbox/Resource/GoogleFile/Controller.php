@@ -167,7 +167,9 @@ class Controller extends Base
                 // provide access to google doc via api
                 foreach ($email2accessRoleMap as $email => $accessRole) {
                     $gDriveFetcher->setPermission(
-                        $selectedFile['id'], $accessRole, $email
+                        $selectedFile['id'],
+                        $accessRole,
+                        $email
                     );
                 }
                 $meta = $gDriveFetcher->fetchMetaData($selectedFile['id']);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component_Eportfolio_Textbox
  *
@@ -6,8 +7,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Component\Eportfolio;
 
-class Textbox extends ListItem {
+class Textbox extends ListItem
+{
 
 }

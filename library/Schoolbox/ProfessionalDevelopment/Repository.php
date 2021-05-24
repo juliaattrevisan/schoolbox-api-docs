@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Repository
  *
@@ -48,8 +49,7 @@ class Repository
         /** @var Model $pd */
         try {
             $pd = $this->pdMapper->findOneByColumn('user_id', $user->getId());
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             $pd = $this->pdMapper->createModel();
             $pd->setUser($user);
         }
@@ -67,11 +67,9 @@ class Repository
         if ($validation->isSatisfiedBy($pd)) {
             try {
                 Mapper::getInstance()->save($pd);
-            }
-            catch (\PDOException $e) {
+            } catch (\PDOException $e) {
                 return false;
-            }
-            catch (\UnexpectedValueException $e) {
+            } catch (\UnexpectedValueException $e) {
                 return false;
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -13,7 +14,6 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Browser\Resources;
 use Schoolbox\User;
-
 
 class TreeBuilder extends Resources\TreeBuilder
 {
@@ -89,7 +89,8 @@ class TreeBuilder extends Resources\TreeBuilder
     protected function getDataType(IFolder $folder, string $type): string
     {
         // Not selectable if a course or unit (but do permit current invalid parent to be retained)
-        if ($folder->getId() !== $this->currentParentId &&
+        if (
+            $folder->getId() !== $this->currentParentId &&
             \in_array($folder->getNodeType(), [NodeInterface::TYPE_COURSE, NodeInterface::TYPE_UNIT], true)
         ) {
             return NodeInterface::TYPE_NO_ACCESS;
@@ -135,4 +136,3 @@ class TreeBuilder extends Resources\TreeBuilder
         return true;
     }
 }
-

@@ -115,6 +115,4 @@ class Datepicker
         // Wrong, can't get the element this way
 //      $i->seeOptionIsSelected('select.adtp-tt-period', 'AllDay');
     }
-
-
 }

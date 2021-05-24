@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for rubric indicator usage.
  *
@@ -88,5 +89,4 @@ class Model
         $this->sequence = $sequence;
         return $this;
     }
-
 }

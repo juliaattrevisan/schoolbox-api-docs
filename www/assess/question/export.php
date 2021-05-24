@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assessment export. Uses the handlers to export their question types into a
  * Moodle format.
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 
 $factory         = new Assess_Factory();
@@ -27,7 +29,8 @@ if (!$currentQuestion) {
     error(119);
 }
 
-if (!$assessHandler->isOwner($assess['assess_id'])
+if (
+    !$assessHandler->isOwner($assess['assess_id'])
     && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)
 ) {
     error(125);

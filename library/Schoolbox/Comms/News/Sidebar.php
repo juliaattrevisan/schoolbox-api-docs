@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Sidebar
  *
@@ -38,7 +39,8 @@ class Sidebar
      * @param User        $user
      * @param string|null $page
      */
-    public function __construct(Mapper $newsMapper, User $user, ?string $page) {
+    public function __construct(Mapper $newsMapper, User $user, ?string $page)
+    {
         $this->newsMapper = $newsMapper;
         $this->user = $user;
         $this->page = $page;

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\ImportStage;
@@ -26,6 +28,7 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+
 use function array_key_exists;
 use function array_map;
 use function array_merge;
@@ -223,8 +226,10 @@ class SectionAssignment extends SectionAssessmentAbstract
         string $openDate,
         string $dueDate
     ): bool {
-        if (!$assessableImpl instanceof SubmissionBox
-            || !$assessableSpec instanceof SubmissionBox) {
+        if (
+            !$assessableImpl instanceof SubmissionBox
+            || !$assessableSpec instanceof SubmissionBox
+        ) {
             return false;
         }
         if (

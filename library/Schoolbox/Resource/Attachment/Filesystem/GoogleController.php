@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
@@ -100,7 +102,7 @@ class GoogleController extends AbstractController
         }
 
         // ensure we have *some* kind of view
-        if(empty($this->views)) {
+        if (empty($this->views)) {
             $this->addView('DOCS');
         }
     }
@@ -119,8 +121,8 @@ class GoogleController extends AbstractController
             'API_KEY'   => $this->gAppsApiKey,
             'CLIENT_ID' => $this->gAppsClientId,
             'SCOPES'    => implode("','", array_keys($this->scopes)),
-            'VIEWS'     => implode(',',   array_keys($this->views)),
-            'FEATURES'  => implode(',',   array_keys($this->features)),
+            'VIEWS'     => implode(',', array_keys($this->views)),
+            'FEATURES'  => implode(',', array_keys($this->features)),
         ));
     }
 
@@ -212,5 +214,4 @@ class GoogleController extends AbstractController
     {
         return 'google-drive';
     }
-
 }

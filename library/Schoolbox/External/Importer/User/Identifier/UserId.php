@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -9,6 +10,7 @@ namespace Schoolbox\External\Importer\User\Identifier;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
+
 use function trim;
 
 /**

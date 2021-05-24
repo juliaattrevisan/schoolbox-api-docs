@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Calendar;
 
 use Alaress\Database\Predicate\Builder;
@@ -221,7 +223,6 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
         $allEvents = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             /* Assemble event pieces
              */
             if (!isset($allEvents[$row['id']])) {
@@ -474,18 +475,15 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
     private function createCampus($event)
     {
         foreach ($event->getCampusCollection() as $campus) {
-
             if ($campus instanceof Campus) {
                 // CampusCollection is a collection of Schoolbox\Campus instances
                 // when importing events from csv or vcal
                 $campusId = $campus->getId();
-            }
-            elseif ($campus instanceof RelationCampus) {
+            } elseif ($campus instanceof RelationCampus) {
                 // CampusCollection is a collection of Calendar\Relation\Campus instances
                 // when modifying a series of events
                 $campusId = $campus->getCampusId();
-            }
-            else {
+            } else {
                 // CampusCollection is a collection of campus ID's
                 // when editing a single event
                 $campusId = $campus;
@@ -514,7 +512,7 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
      */
     private function createSource($event)
     {
-        if ($event->getSource() != null && $event->getSource() != ""){
+        if ($event->getSource() != null && $event->getSource() != "") {
             $sourceMapper = EventSourceMapper::getInstance();
 
             $source = $sourceMapper->createModel();

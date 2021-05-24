@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Status;
 
 use Alaress\Authorizer\Authorizer;
@@ -12,7 +14,7 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Module extends RestfulModule
 {
@@ -32,7 +34,8 @@ class Module extends RestfulModule
      * @param Authorizer $authorizer
      * @throws \InvalidArgumentException
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
 
         /* Permissions requirements for being a Sports Administrator
          */

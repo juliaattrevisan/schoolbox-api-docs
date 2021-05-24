@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Pooling;
-
 
 class ConfiguredDispatchStrategyBuilder
 {
@@ -272,5 +272,4 @@ class ConfiguredDispatchStrategyBuilder
     {
         return $this->workerTimeoutSoft;
     }
-
 }

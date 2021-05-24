@@ -1,21 +1,23 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
 
 use Schoolbox\Assessment\Rubric\Grid\ValidMonotonicDescriptorRow;
-use \Schoolbox\Assessment\Rubric\Grid\Descriptor;
-use \Schoolbox\Collection;
+use Schoolbox\Assessment\Rubric\Grid\Descriptor;
+use Schoolbox\Collection;
 use PHPUnit\Framework\TestCase;
 
 class ValidMonotonicDescriptorRowTest extends TestCase
 {
-    public function getTestIsSatisfiedByData() : iterable
+    public function getTestIsSatisfiedByData(): iterable
     {
         $hasMarkRange = true;
         $noMarkRange = false;
@@ -26,7 +28,7 @@ class ValidMonotonicDescriptorRowTest extends TestCase
         $descriptor0 = (new Descriptor())->setMaxValue(0.0);
         $descriptor1 = (new Descriptor())->setMaxValue(1.0);
         $descriptor2point75 = (new Descriptor())->setMaxValue(2.75);
-        $descriptor3= (new Descriptor())->setMaxValue(3.0);
+        $descriptor3 = (new Descriptor())->setMaxValue(3.0);
         $descriptor4point5 = (new Descriptor())->setMaxValue(4.5);
         $descriptor5 = (new Descriptor())->setMaxValue(5.0);
         $descriptor6 = (new Descriptor())->setMaxValue(6.0);

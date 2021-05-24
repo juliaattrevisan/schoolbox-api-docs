@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for e-portfolio blog posts
  *

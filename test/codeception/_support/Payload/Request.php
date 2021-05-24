@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Payload;
@@ -74,7 +76,8 @@ abstract class Request
      * Set the 'Content-Type' header of the request
      * @param string $type
      */
-    public function setContentType(string $type) {
+    public function setContentType(string $type)
+    {
         $this->setHeader('Content-Type', $type);
     }
 
@@ -82,7 +85,8 @@ abstract class Request
      * Set the 'Accept' header of the request
      * @param string $type
      */
-    public function setAccepts(string $type) {
+    public function setAccepts(string $type)
+    {
         $this->setHeader('Accept', $type);
     }
 

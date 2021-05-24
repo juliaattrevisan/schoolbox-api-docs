@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Application\WebRequest\Restful;
-
 
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Mapper;

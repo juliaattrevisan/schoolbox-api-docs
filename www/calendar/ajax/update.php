@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -40,7 +41,6 @@ if (isset($_POST['resize']) && $_POST['resize']) {
         $startTime = $startTime->startOfDay();
         $endTime   = $endTime->addDays(-1)->startOfDay();
     }
-
 } else {
     /* Otherwise you are moving an event on the Month view, which makes
      * the new datetime transfer as a difference value -_-
@@ -75,8 +75,8 @@ if (isset($_POST['allDay'])) {
     $updatedEvent['allday'] = $event['allday'];
 }
 if ($updatedEvent['allday']) {
-    $updatedEvent['start_datetime'] = $startTime->getDatabaseDate().' 00:00:00';
-    $updatedEvent['end_datetime']   = $endTime->getDatabaseDate().' 00:00:00';
+    $updatedEvent['start_datetime'] = $startTime->getDatabaseDate() . ' 00:00:00';
+    $updatedEvent['end_datetime']   = $endTime->getDatabaseDate() . ' 00:00:00';
 }
 
 if (isset($_POST['title']) && isset($_POST['detail'])) {

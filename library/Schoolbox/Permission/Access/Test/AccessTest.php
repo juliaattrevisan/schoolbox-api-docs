@@ -1,5 +1,7 @@
 <?php
+
 /** @noinspection DuplicatedCode */
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -1263,11 +1265,11 @@ class AccessTest extends TestCase
                              $serviceId          = $params['sid_0'];
                              $type               = $params['type_0'];
                              $matchingUserAccess = $allUserAccess[$userId][$serviceType][$serviceId] ?? [];
-                             foreach ($matchingUserAccess as $idx => $userAccess) {
-                                 if ($userAccess->getAccessLevel() === $type) {
-                                     unset($matchingUserAccess[$idx]);
-                                 }
-                             }
+                            foreach ($matchingUserAccess as $idx => $userAccess) {
+                                if ($userAccess->getAccessLevel() === $type) {
+                                    unset($matchingUserAccess[$idx]);
+                                }
+                            }
                              return new GenericCollection(UserAccess::class, $matchingUserAccess);
                          });
 

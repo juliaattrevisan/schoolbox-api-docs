@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Alaress\Database\Iterator\IIterator;
 use Schoolbox\Campus;
 
@@ -260,7 +262,6 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
          */
         for ($x = 0; $x < count($timetable); $x++) {
             foreach ($classList as $currentClass) {
-
                 /* If this class occurs in this period, append its details
                  */
                 if ($timetable[$x]['periodNumber'] == $currentClass['Identifier']) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Question
  *
@@ -9,29 +10,32 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Survey_Question extends Evaluation_Question {
+class Survey_Question extends Evaluation_Question
+{
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
+
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-		parent::__construct();
-		$this->setSectionHandler(new Survey_Section());
-	}
+        parent::__construct();
+        $this->setSectionHandler(new Survey_Section());
+    }
 
-	/**
-	 * Get all available question types.
-	 *
-	 * @return array|bool
-	 */
-    public function getAllQuestionTypes() {
+    /**
+     * Get all available question types.
+     *
+     * @return array|bool
+     */
+    public function getAllQuestionTypes()
+    {
         $query = "SELECT *
                   FROM assess_luQuestionType
                   WHERE availability = 'all'
                   OR availability = 'survey'
                   ORDER BY type_id";
-
         return $this->db->getAll($query);
     }
 }

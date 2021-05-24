@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami;
@@ -410,7 +412,7 @@ class Connector implements IConnector
         ];
         $request  = new Request('POST', self::BASE_URI . 'embed/exports');
         $response = $this->client->send($request, $this->getOptions($options));
-        if ($this->isValidNotFound($response)){
+        if ($this->isValidNotFound($response)) {
             throw new Exception\NotFound("Kami Document not found. Id: $documentId", $request, $response);
         }
         return $this->buildExport($this->decodeResponseContent($response->getBody()));

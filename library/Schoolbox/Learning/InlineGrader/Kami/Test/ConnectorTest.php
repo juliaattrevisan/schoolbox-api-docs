@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\Kami\Test;
@@ -440,8 +442,7 @@ class ConnectorTest extends TestCase
         string $viewSessionKey,
         ?Alaress_Date_Format $sessionExpiry,
         ResponseInterface $response
-    ): void
-    {
+    ): void {
         $connector = new MockConnector($this->getMockClient($response));
         $session   = $connector->viewSession('2kmcksmndlkansdlk', new User());
 
@@ -509,8 +510,7 @@ class ConnectorTest extends TestCase
         ?string $fileUrl,
         ?string $errorType,
         ResponseInterface $response
-    ): void
-    {
+    ): void {
         $connector = new MockConnector($this->getMockClient($response));
         $export    = $connector->getExport($documentIdentifier);
 
@@ -538,8 +538,7 @@ class ConnectorTest extends TestCase
         ?string $fileUrl,
         ?string $errorType,
         ResponseInterface $response
-    ): void
-    {
+    ): void {
         $connector = new MockConnector($this->getMockClient($response));
         $export    = $connector->createInlineExport($documentIdentifier);
 
@@ -585,8 +584,7 @@ class ConnectorTest extends TestCase
         ?string $fileUrl,
         ?string $errorType,
         ResponseInterface $response
-    ): void
-    {
+    ): void {
         $connector = new MockConnector($this->getMockClient($response));
         $export    = $connector->createAnnotatedExport($documentIdentifier);
 

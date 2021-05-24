@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder\Test;
@@ -237,7 +239,7 @@ class NNIANTest extends TestCase
         Folder\NNIAN $nnian,
         Folder\Model $notInheritingFolder
     ): void {
-        $stub = (new Folder\Model)->setId($notInheritingFolder->getId());
+        $stub = (new Folder\Model())->setId($notInheritingFolder->getId());
         $this->assertEquals(
             $stub->getId(),
             $nnian->findNearestNonInheritingAncestralNode($stub)->getId()

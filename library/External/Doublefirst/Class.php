@@ -171,4 +171,3 @@ class External_Doublefirst_Class implements External_ClassInterface
         return [];
     }
 }
-

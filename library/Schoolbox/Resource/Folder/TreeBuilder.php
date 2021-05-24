@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
@@ -15,6 +17,7 @@ use Schoolbox\Mapper;
 use Schoolbox\Resource\Folder;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_keys;
 use function count;
 use function implode;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Notification\Cloud;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
@@ -122,8 +122,6 @@ abstract class AbstractService implements ServiceInterface
         }
 
         $this->getLog()->log($severity, "$class response for $token: $status", $context);
-
-
     }
 
 
@@ -143,6 +141,5 @@ abstract class AbstractService implements ServiceInterface
      * @param int    $unreadCount
      * @return bool
      */
-    protected abstract function propagate(array $tokens, $id, $title, $unreadCount = 0);
-
+    abstract protected function propagate(array $tokens, $id, $title, $unreadCount = 0);
 }

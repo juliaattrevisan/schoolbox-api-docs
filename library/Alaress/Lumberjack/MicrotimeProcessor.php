@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,8 +9,8 @@
 
 namespace Alaress\Lumberjack;
 
-
-class MicrotimeProcessor {
+class MicrotimeProcessor
+{
 
     /**
      * @param array $record
@@ -28,5 +29,4 @@ class MicrotimeProcessor {
 
         return $record;
     }
-
 }

@@ -48,7 +48,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int $revisionID
      * @return array|bool
      */
-    public function getByID($wikiID, $revisionID = 0) {
+    public function getByID($wikiID, $revisionID = 0)
+    {
         $query = "SELECT r.*, w.categoryID, w.locked, w.slug, UNIX_TIMESTAMP(w.created) created, UNIX_TIMESTAMP(r.created) modified, latestRevision,
                   u.title, u.firstname, u.lastname, r.userID authorID
                   FROM " . $this->_revisionTable . " r
@@ -92,17 +93,17 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param bool   $limit
      * @return array|bool
      */
-    public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false) {
+    public function getByCategory($categoryID, $orderBy = 'created', $sortDir = 'Desc', $limit = false)
+    {
 
         /* Adjust the table in which to sort -_-
          */
         if (($orderBy == 'created') || !strlen($orderBy)) {
             $orderBySQL = 'ORDER BY w.created';
-        }
-        else if($orderBy  == 'modified') {
+        } else if ($orderBy  == 'modified') {
             $orderBySQL = 'ORDER BY r.created' ;
-        }else{
-            $orderBySQL = 'ORDER BY '.$orderBy;
+        } else {
+            $orderBySQL = 'ORDER BY ' . $orderBy;
         }
 
         $query = "SELECT r.*, UNIX_TIMESTAMP(r.created) modified, u.title, u.firstname, u.lastname,
@@ -153,7 +154,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param array $data
      * @return void
      */
-    public function update($data) {
+    public function update($data)
+    {
         $coreFields = array('categoryID', 'locked', 'slug');
 
         foreach ($coreFields as $field) {
@@ -285,7 +287,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param string $body
      * @return mixed
      */
-    public function activateStubLinks($body) {
+    public function activateStubLinks($body)
+    {
         $allMatches = array();
 
         $pattern = "/<a\ href=['\"]+\/wiki\/(\d+)\/([a-zA-Z0-9\-_]+)['\"]+>/";
@@ -320,7 +323,8 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
      * @param int $revisionID
      * @return array|bool
      */
-    public function getByCategoryAndSlug($categoryID, $slug, $revisionID = 0) {
+    public function getByCategoryAndSlug($categoryID, $slug, $revisionID = 0)
+    {
         $query = "SELECT r.*,
                     w.categoryID, w.locked, UNIX_TIMESTAMP(w.created) created, w.slug,
                     UNIX_TIMESTAMP(r.created) modified, latestRevision, r.userID authorID,

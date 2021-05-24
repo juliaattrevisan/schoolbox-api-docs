@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
@@ -65,7 +67,6 @@ class Phone
          */
         foreach ($addresses['commrules'] as $commRule) {
             foreach ($commRule['addresses'] as $address) {
-
                 /* Phone numbers could exist in one or more of the following fields
                  * mobile_phone_1, mobile_phone_2, business_phone, home_phone
                  *
@@ -107,5 +108,3 @@ class Phone
         return $stack;
     }
 }
-
-

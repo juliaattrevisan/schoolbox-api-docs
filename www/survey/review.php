@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Review assessment. The marks for each submitted question can be modified here
  * but the actual answers cannot be changed, only seen. Structurally, this is
@@ -12,6 +13,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 
 $factory         = new Survey_Factory();
@@ -20,7 +22,7 @@ $attemptHandler  = new Survey_Attempt();
 $responseHandler = new Survey_Response();
 $sectionHandler  = new Survey_Section();
 $groupHandler    = new Group();
-$userHandler     = new User;
+$userHandler     = new User();
 
 if (!is_numeric($this->arg[0])) {
     error(112);
@@ -54,9 +56,10 @@ if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
-    $survey['category_id']
-) < UserAccess::ACCESS_WRITE)
+if (
+    !$surveyHandler->isOwner($survey['assess_id']) && ($groupHandler->getPermission(
+        $survey['category_id']
+    ) < UserAccess::ACCESS_WRITE)
 ) {
     error(127);
 }
@@ -136,12 +139,10 @@ if (!isset($attempt['finish'])) {
     $close = new DateTime($survey['finish']);
     if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
         $this->parse('attemptUnfinished_block', 'attemptUnfinished');
-    }
-    else {
+    } else {
         $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
     }
-}
-else {
+} else {
     $this->parse('attemptFinished_block', 'attemptFinished');
 }
 

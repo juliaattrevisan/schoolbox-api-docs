@@ -1,10 +1,11 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 
 /* This page generates a photo gallery of the provided folder.
@@ -17,7 +18,7 @@ use Schoolbox\Permission\Access\UserAccess;
 /** @var SitePage $this */
 
 if (is_numeric($this->arg[0])) {
-    $groupHandler    = new Group;
+    $groupHandler    = new Group();
     $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
     try {
@@ -93,7 +94,6 @@ if (is_numeric($this->arg[0])) {
             'class' => 'active',
         ]
     ]);
-}
-else {
+} else {
     error(2);
 }

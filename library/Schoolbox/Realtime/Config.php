@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -206,7 +207,6 @@ class Config
         $config = [];
 
         while ($r = $stmt->fetch(\PDO::FETCH_NUM)) {
-
             list($namespaceId, $sourceId, $sDescription, $roleId, $mask, $default) = $r;
 
             $config[$namespaceId]['id']                           = $namespaceId;
@@ -217,7 +217,6 @@ class Config
                 'mask'    => explode(',', $mask),
                 'default' => explode(',', $default)
             ];
-
         }
 
         return $config;
@@ -249,7 +248,6 @@ class Config
                 'msg_source_id' => $src->getId(),
                 'role_id'       => $roleId
             ]);
-
         } catch (Mapper\Exception $e) {
             /** @var RoutePermission $routePermission */
             $routePermission = $this->getRoutePermissionMapper()->createModel();
@@ -261,13 +259,11 @@ class Config
             // change mask
             $mask    = $settings['mask'];
             $default = $settings['perm'];
-
         } elseif (isset($settings['perm'])) {
             // grab existing mask if exists, or turn everything on
             $existing = $routePermission->getMask();
             $mask     = $existing ? $this->removeMap($existing) : [ 0, 1, 2, 4, 8 ];
             $default  = $settings['perm'];
-
         } else {
             // turn off
             $mask    = [ 0 ];
@@ -370,7 +366,8 @@ class Config
      * @param int $v
      * @return string
      */
-    protected function castToRoutingKey($v) {
+    protected function castToRoutingKey($v)
+    {
         return 'service.' . UserAccess::SERVICE_HOMEPAGE . ".$v";
     }
 
@@ -427,7 +424,9 @@ class Config
         $result = [];
         $map = [];
 
-        array_walk($this->getPermissionList(), function ($v, $k) use (&$map) { $map[strtoupper(substr($v[1], 0, 2))] = $k; });
+        array_walk($this->getPermissionList(), function ($v, $k) use (&$map) {
+            $map[strtoupper(substr($v[1], 0, 2))] = $k;
+        });
 
         foreach ((array)$array as $i) {
             $result[] = $map[$i];

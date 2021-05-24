@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This page streams a video to the browser
  *
@@ -48,7 +49,7 @@ if (isset($type) && isset($id)) {
     /** @var SitePage $page */
     $page = $kernel->get('sitePage');
     $page->initSession();
-    $groupHandler = new Group;
+    $groupHandler = new Group();
 
     // ----------------------------------------------------------------------------------------------------------------
     // Grab mappers
@@ -253,7 +254,7 @@ function setResponseOptions()
  */
 function getLocalFilesystemPath(ResourceVideo $video, IConfigLoader $config)
 {
-    $filename = $config->get("storage_dir") . '/'.$video->getTranscodePath();
+    $filename = $config->get("storage_dir") . '/' . $video->getTranscodePath();
 
     if (is_readable($filename)) {
         return $filename;

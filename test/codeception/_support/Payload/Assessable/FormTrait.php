@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Payload\Assessable;
@@ -94,7 +96,7 @@ trait FormTrait
         $this->setFormParam("rb[$assessmentId][criterion][$indicatorId][groupId]", $capabilityId);
         $this->setFormParam("rb[$assessmentId][criterion][$indicatorId][name]", $name);
 
-        if($enabled){
+        if ($enabled) {
             $this->setFormParam("rb[$assessmentId][criterion][$indicatorId][on]", 1);
         } else {
             $this->unsetFormParam("rb[$assessmentId][criterion][$indicatorId][on]");

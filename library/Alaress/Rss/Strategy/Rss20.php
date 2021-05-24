@@ -64,7 +64,6 @@ class Alaress_Rss_Strategy_Rss20 implements Alaress_Rss_Strategy_Interface
             }
 
             $data[] = $article;
-
         }
 
         return $data;

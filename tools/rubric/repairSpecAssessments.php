@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Repair script for repairing conflicting rubric capabilities between a unit
  * specification and its course.
@@ -657,7 +658,6 @@ $kernel->run(new class extends App {
                     )
                 );
                 $this->repairIndicator($matchingCourseIndicatorId, $unitIndicatorId, $matchingCourseIndicatorName, $unitIndicatorName);
-
             } else {
                 // Indicator exists in unit, but not course.
                 // Can just move the unit indicator into the course.
@@ -805,9 +805,11 @@ $kernel->run(new class extends App {
                 continue;
             }
             $this->log->info(
-                sprintf(self::indent(1) . 'capability %s (%d) does not have any indicators: deleting',
+                sprintf(
+                    self::indent(1) . 'capability %s (%d) does not have any indicators: deleting',
                     trim($capabilityName),
-                    $capabilityId)
+                    $capabilityId
+                )
             );
             // no indicators for this capability
             $this->deleteRubricCapabilityQuery

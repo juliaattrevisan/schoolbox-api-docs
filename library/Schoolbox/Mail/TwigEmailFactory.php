@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -6,8 +7,8 @@
  */
 
 namespace Schoolbox\Mail;
-use Psr\Log\LoggerInterface;
 
+use Psr\Log\LoggerInterface;
 
 /**
  * Builder for Twig email objects.

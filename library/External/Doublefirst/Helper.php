@@ -29,7 +29,8 @@ class External_Doublefirst_Helper
      * Returns array of student boarding statuses
      * @return array
      */
-    public function getBoardingStatuses() {
+    public function getBoardingStatuses()
+    {
         return ['B', 'FB', 'WB'];
     }
 
@@ -78,7 +79,7 @@ class External_Doublefirst_Helper
     public function getDayNumber($date)
     {
         // Work out what day of the week the term started on
-        if($date->isWeekend()) {
+        if ($date->isWeekend()) {
             return 0;
         }
 
@@ -103,7 +104,6 @@ class External_Doublefirst_Helper
         // If we couldn't find a matching term in Doublefirst, just bomb out here.
 
         if (!$term) {
-
             // TODO: Remove hack, this just picks the last term that was open for testing purposes during the holidays.
             $query =
                 "

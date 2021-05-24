@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -167,13 +168,13 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
                 }
             }
             if (!empty($otherMimeParts)) {
-                $mimeParts[] = 'NOT('.implode(' OR ', $otherMimeParts).')';
+                $mimeParts[] = 'NOT(' . implode(' OR ', $otherMimeParts) . ')';
             }
             if (!empty($mimeParts)) {
                 $whereParts[] = implode(' OR ', $mimeParts);
             }
         }
-        $baseQuery .= ' WHERE '.$table.'.deleted_at IS NULL AND ('.implode(') AND (', $whereParts).')';
+        $baseQuery .= ' WHERE ' . $table . '.deleted_at IS NULL AND (' . implode(') AND (', $whereParts) . ')';
 
         // Put together sort parts
         $sortFields = array(
@@ -269,7 +270,8 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      * @param int $cid
      * @return void
      */
-    public function homepageClean($cid){
-        $this->deleteByColumn('category',$cid);
+    public function homepageClean($cid)
+    {
+        $this->deleteByColumn('category', $cid);
     }
 }

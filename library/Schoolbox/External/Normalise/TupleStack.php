@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Normalise;
@@ -38,7 +40,6 @@ class TupleStack
             $processed = [];
 
             foreach ($stack as $value) {
-
                 /* Skip some bad data
                  */
                 if (is_scalar($value)) {
@@ -54,7 +55,7 @@ class TupleStack
          *
          * Return the cleansed and indexed stack of value
          */
-        return array_map('trim', array_values(array_unique(array_filter($processed, static function($value) {
+        return array_map('trim', array_values(array_unique(array_filter($processed, static function ($value) {
             return is_scalar($value) && '' !== trim((string)$value);
         }))));
     }
@@ -83,20 +84,17 @@ class TupleStack
         $processed = [];
 
         foreach ($stack as $key => $values) {
-
             /* If $values is an array we can cleanse its contents en-masse with
              * existing in-built array functions; trim/filter/unique/reset indexes
              */
             if (is_array($values)) {
                 $processed[$key] = array_values(array_unique(array_filter(array_map('trim', $values))));
             } elseif (is_scalar($values)) {
-
                 /* Scalars get shoved into their own array
                  * (Alternatively you can omit the scalar; it may be wrong entirely)
                  */
                 $processed[$key] = array_filter([trim((string)$values)]);
             } else {
-
                 /* Nulls and other unknown types just get an empty stack
                  * (Alternatively you can omit the key entirely; it has no intrinsic meaning)
                  */

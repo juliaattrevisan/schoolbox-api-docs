@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Test;
-
 
 use Alaress\ObjectReader;
 use DomainException;
@@ -54,8 +54,6 @@ class ObjectReaderTest extends TestCase
 
         $this->dummyUser->setYear(new Student\Year());
         $this->dummyUser->getYear()->setLevel(7);
-
-
     }
 
 

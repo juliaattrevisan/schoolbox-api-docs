@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Assessment\Course;
 
 use Alaress\Authorizer\Authorizer;
@@ -88,31 +90,31 @@ class Module extends BaseModule
         };
 
         $preloadCourseSpec = function (array $params) {
-            try{
+            try {
                 return ['courseSpec' => $this->getCourseSpecificationMapper()->findById($params['id'])];
             } catch (MapperException\Deleted $e) {
                 return ['courseSpec' => $e->getDeletedObject()];
-            } catch (MapperException $e){
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
             }
         };
 
         $preloadUnitSpec = function (array $params) {
-            try{
+            try {
                 return ['unitSpec' => $this->getUnitSpecificationMapper()->findById($params['id'])];
             } catch (MapperException\Deleted $e) {
                 return ['unitSpec' => $e->getDeletedObject()];
-            } catch (MapperException $e){
+            } catch (MapperException $e) {
                 return ['unitSpec' => $this->getUnitSpecificationMapper()->createModel()];
             }
         };
 
         $preloadUnitImpl = function (array $params) {
-            try{
+            try {
                 return ['unitImpl' => $this->getUnitImplementationMapper()->findById($params['id'])];
             } catch (MapperException\Deleted $e) {
                 return ['unitImpl' => $e->getDeletedObject()];
-            } catch (MapperException $e){
+            } catch (MapperException $e) {
                 return ['unitImpl' => $this->getUnitImplementationMapper()->createModel()];
             }
         };
@@ -131,7 +133,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -161,7 +164,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector): void
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'assessmentMapperProxy'      => $injector->lazyGet('assessmentDataSource'),
                 'courseSpecificationMapper'  => $this->getMapperFactory()->getLazy(CourseSpecificationMapper::class),

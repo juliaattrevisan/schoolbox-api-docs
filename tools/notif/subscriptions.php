@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -87,8 +88,8 @@ try {
                 }
 
                 $log->notice($count . ' results returned');
-            } catch (InvalidArgumentException|OverflowException $e) {
-                $log->alert($e->getMessage(), [ 'exception'=>$e ]);
+            } catch (InvalidArgumentException | OverflowException $e) {
+                $log->alert($e->getMessage(), [ 'exception' => $e ]);
             }
         }
 

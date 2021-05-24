@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
@@ -141,8 +141,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $mapper = $this->getMapper();
 
         switch ($method) {
-            case Mapper::METHOD_CREATE: // new submission created
-
+            case Mapper::METHOD_CREATE:
                 // is this in draft mode? if so, do nothing
                 if ($submission->isDraft()) {
                     break;
@@ -352,6 +351,4 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         return $this->retractEventObject($envelope, $submission);
     }
-
-
 }

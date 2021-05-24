@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Trait for loading date objects with a mock locale that does not attempt to
  * access the database.

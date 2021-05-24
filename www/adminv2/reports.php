@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 use Schoolbox\Admin\Navigation\Subnav;
-
 
 $userHandler = new User();
 
@@ -28,7 +28,7 @@ $this->setBlock(TEMPLATE_content, 'download_report', 'download_report_block');
 $this->setVar('filter_block', '');
 $this->setTitle('Admin - Reports');
 
-if(count($this->arg) < 2) {
+if (count($this->arg) < 2) {
     error(2);
 }
 
@@ -39,13 +39,13 @@ $reportVar = urldecode($this->arg[1]);
 $exportToCSV = false;
 
 // default sorting
-if($this->arg[2] == "exportToCSV") {
+if ($this->arg[2] == "exportToCSV") {
     $page = 0; //export, so no pagination
     $orderBy = "";
     $exportToCSV = true;
 }
 // page number
-elseif(is_numeric($this->arg[2])) {
+elseif (is_numeric($this->arg[2])) {
     $page = $this->arg[2];
     $orderBy = "";
 }
@@ -55,7 +55,7 @@ else {
     $orderBy = $this->arg[2];
 
     // if direction is unspecified, leave it to the report itself to decide its preference
-    switch(strtolower($this->arg[3])) {
+    switch (strtolower($this->arg[3])) {
         case 'desc':
             $orderDir = "DESC";
             break;
@@ -67,12 +67,12 @@ else {
             break;
     }
 
-    if($this->arg[4] == "exportToCSV") {
+    if ($this->arg[4] == "exportToCSV") {
         $page = 0; //export, so no pagination
         $exportToCSV = true;
     }
     // page number
-    elseif(is_numeric($this->arg[4])) {
+    elseif (is_numeric($this->arg[4])) {
         $page = $this->arg[4];
     }
 }
@@ -88,32 +88,31 @@ else {
 if (!$exportToCSV) {
     $limit = Config::get('search_type_limit') * 2;
     $offset = ($page - 1) * $limit;
-}
-else {
+} else {
     $limit = $offset = 0;
 }
 
 $report = Report_Factory::build($reportType, $this);
 
-if(!$report)
+if (!$report) {
     error(19);
+}
 
 $report->setIndexID($reportVar);
 
 $slugDir = $orderDir ? $orderDir : 'ASC';
 
-$pageSlug = strtolower("$reportType/$reportVar/" . ( $orderBy ? "$orderBy/$slugDir/" : '' ) );
+$pageSlug = strtolower("$reportType/$reportVar/" . ( $orderBy ? "$orderBy/$slugDir/" : '' ));
 $this->setVar('REPORT_FILTER', $pageSlug);
 $this->setVar('RETURN', $reportType);
 
 // if there are results
-if(($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir)) > 0) {
-
+if (($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir)) > 0) {
     // display the download button
     $this->parse('download_report_block', 'download_report', false);
 
     // handle group export
-    if($exportToCSV) {
+    if ($exportToCSV) {
         // export to csv
         $report->export(new Report_Exporter($report->getReportTitle()), 'CSV');
     } else {
@@ -122,20 +121,19 @@ if(($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir))
         // iterate across the headers specified and set visual sorting
         $headers = array_keys($report->getFields());
 
-        foreach($headers as $header) {
+        foreach ($headers as $header) {
             $ref = strtoupper($header);
 
-            if($header == $orderBy) {
+            if ($header == $orderBy) {
                 $this->setVar("SORT_{$ref}", 'orderby');
 
-                if($orderDir == "DESC") {
+                if ($orderDir == "DESC") {
                     $this->setVar("SORT_{$ref}_DIR", "asc");
                     $this->setVar('DIR', '\0025BE');
                 } else {
                     $this->setVar("SORT_{$ref}_DIR", "desc");
                     $this->setVar('DIR', '\0025B4');
                 }
-
             } else {
                 $this->setVar("SORT_{$ref}", '');
                 $this->setVar("SORT_{$ref}_DIR", 'asc');
@@ -145,19 +143,20 @@ if(($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir))
         // figure out which pagination buttons should be displayed
         $pageCount = ceil($totalRows / $limit);
 
-        if($page < 2)
+        if ($page < 2) {
             $this->setVar('previous_button_block', '');
-        else
+        } else {
             $this->parse('previous_button_block', 'previous_button');
+        }
 
-        if($page >= $pageCount)
+        if ($page >= $pageCount) {
             $this->setVar('next_button_block', '');
-        else
+        } else {
             $this->parse('next_button_block', 'next_button');
+        }
 
 
-        if($pageCount > 1) {
-
+        if ($pageCount > 1) {
             // show this many pages either side of the currently selected page
             $eitherSide = 5;
 
@@ -165,47 +164,44 @@ if(($totalRows = $report->populateDataset($offset, $limit, $orderBy, $orderDir))
             $end   = ($page + $eitherSide < $pageCount) ? $page + $eitherSide : $pageCount;
 
             // if needed, add the start button
-            if($start != 1) {
+            if ($start != 1) {
                 $this->setVar('PAGE_INDEX', 1);
                 $this->setVar('PAGE_INDEX_REF', $pageSlug . '1');
-                $this->parse('first_page_block','first_page', true);
-            }
-            else {
+                $this->parse('first_page_block', 'first_page', true);
+            } else {
                 $this->setVar('first_page_block', '');
             }
 
             // if needed, add the end button
-            if($end != $pageCount) {
+            if ($end != $pageCount) {
                 $this->setVar('PAGE_INDEX', $pageCount);
                 $this->setVar('PAGE_INDEX_REF', $pageSlug . $pageCount);
-                $this->parse('last_page_block','last_page', true);
-            }
-            else {
+                $this->parse('last_page_block', 'last_page', true);
+            } else {
                 $this->setVar('last_page_block', '');
             }
 
-            for($j = $start; $j <= $end; $j++) {
-                if($page == $j)
+            for ($j = $start; $j <= $end; $j++) {
+                if ($page == $j) {
                     $this->setVar('CURRENT', ' current');
-                else
+                } else {
                     $this->setVar('CURRENT', '');
+                }
 
                 $this->setVar('PAGE_INDEX', $j);
                 $this->setVar('PAGE_INDEX_REF', $pageSlug . $j);
 
-                $this->parse('page_number_block','page_number', true);
+                $this->parse('page_number_block', 'page_number', true);
             }
-        }
-        else {
+        } else {
             $this->setVar('page_number_block', '');
             $this->setVar('last_page_block', '');
             $this->setVar('first_page_block', '');
-
         }
         $outputPagination = array(
             'PREVIOUS_PAGE' => $pageSlug . ($page - 1),
-            'NEXT_PAGE'		=> $pageSlug . ($page + 1),
-            'LAST_PAGE'		=> $pageSlug . $pageCount,
+            'NEXT_PAGE'     => $pageSlug . ($page + 1),
+            'LAST_PAGE'     => $pageSlug . $pageCount,
         );
 
         $this->setVar($outputPagination);
@@ -233,5 +229,3 @@ else {
     // if there is a filter block, output it despite having no results
     $report->displayFilterBlock();
 }
-
-

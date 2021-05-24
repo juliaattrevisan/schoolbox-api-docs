@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TASS portal module
  *
@@ -69,7 +70,7 @@ class Module extends \Alaress\Module\Module
             )
         );
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
                 [

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Determine if a pastoral report is owned by the logged in user
  *

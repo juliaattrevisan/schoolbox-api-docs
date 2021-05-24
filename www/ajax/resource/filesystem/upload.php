@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -21,7 +22,7 @@ $this->setAjax();
 
 $this->setFile(TEMPLATE_content, '/resources/filesystem/upload.html');
 
-switch(strtolower($this->arg[0])) {
+switch (strtolower($this->arg[0])) {
     case 'single':
         $maxFiles = '1';
         break;
@@ -32,7 +33,7 @@ switch(strtolower($this->arg[0])) {
         error(2);
 }
 
-switch(count($this->arg)) {
+switch (count($this->arg)) {
     case 1:
         $allowedFiles = 'null';
         break;

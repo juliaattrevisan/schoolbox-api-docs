@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for editing the tile component
  *
@@ -218,7 +219,6 @@ class Controller extends Base
                     ['layoutId' => $layout->getId()]
                 ) . $this->buildReturnUrl()
             );
-
         } catch (MapperException $e) {
             $layout = $this->buildLayoutForComponent($component);
             $this->response->redirect->found(
@@ -228,7 +228,6 @@ class Controller extends Base
                 ) . $this->buildReturnUrl()
             );
         }
-
     }
 
     /**
@@ -393,7 +392,6 @@ class Controller extends Base
             }
         } else {
             $item->setBackgroundImage(null);
-
         }
     }
 

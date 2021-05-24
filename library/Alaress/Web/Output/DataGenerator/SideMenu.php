@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -105,7 +106,7 @@ class SideMenu implements IDataGenerator
         $subjects = $this->session->get('subjects');
         if (\is_iterable($subjects)) {
             foreach ($subjects as $subject) {
-                if($subject['perm'] >= UserAccess::ACCESS_READ) {
+                if ($subject['perm'] >= UserAccess::ACCESS_READ) {
                     if (!isset($subjectGroups[$subject['classType']])) {
                         $subjectGroups[$subject['classType']] = [];
                     }
@@ -119,7 +120,6 @@ class SideMenu implements IDataGenerator
 
         // Sort the subjects within each subjectGroup
         foreach ($subjectGroups as $subjectGroup => $subjects) {
-
             // Each value is an array, so sort each array
             usort($subjects, function ($a, $b) {
                 return strnatcmp($a['name'] . $a['code'], $b['name'] . $b['code']);

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * The Schedule Daemon.
  *
@@ -36,7 +37,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 $sched = null;
 
-$kernel->registerCustomShutdown(function() use (&$sched) {
+$kernel->registerCustomShutdown(function () use (&$sched) {
     if (!$sched instanceof Scheduler) {
         return;
     }
@@ -90,20 +91,17 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
             $scheduleBroker->registerConsumer($scheduler);
             $log->debug('Consuming amqp://' . Schedule\Broker::QUEUE);
 
-            $topic = 'scheduled.'.INSTANCE_ID.'.*';
+            $topic = 'scheduled.' . INSTANCE_ID . '.*';
 
             $asyncRedis->psubscribe($topic, $scheduler);
             $log->info("Listening on redis://$topic");
         });
-
     } catch (ConnectionException $e) {
-        $log->alert('AMQP server is offline or STOMP misconfigured: '. $e->getMessage(), [ 'exception'=>$e ]);
-
+        $log->alert('AMQP server is offline or STOMP misconfigured: ' . $e->getMessage(), [ 'exception' => $e ]);
     } catch (AMQPRuntimeException $e) {
         $log->alert('Unable to connect to AMQP server: server is offline.');
         $notif->setTopic(Notif::TOPIC_NOTIFICATION)->alert('RabbitMQ is offline');
 
         throw $e;
     }
-
 });

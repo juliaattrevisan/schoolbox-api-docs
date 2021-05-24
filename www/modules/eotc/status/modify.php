@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Status Modify
  *
@@ -10,6 +11,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use EOTC\Authenticator;
 use EOTC\ConfigMapper;
 use EOTC\EventMapper;
@@ -67,8 +69,7 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
      */
     try {
         $syncConfig = ConfigMapper::getInstance()->findOneByColumn('name', 'external_db_sync')->getValue();
-    }
-    catch (MapperException $e) {
+    } catch (MapperException $e) {
         $syncConfig = false;
     }
 
@@ -166,7 +167,6 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     );
 
     if ($event->getMetadata()->getRamsRequired()) {
-
         /* Sometimes event/file relations get recorded with a storage_id of 0
          * so we need to check whether one actually legitimately saved properly
          */
@@ -302,7 +302,6 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $i = 0;
 
     foreach ($event->getMetadata()->getActivityLog() as $currentLog) {
-
         /* If there are no activityLog items, mappers will spawn a single
          * object where every property is null
          *
@@ -362,11 +361,9 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
      * modify it (provided you've the appropriate permissions)
      */
     if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
-
         /* noop
          */
     } else {
-
         /* Status Comment
          */
         $this->setVar(

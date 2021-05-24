@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport;
@@ -23,10 +25,10 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnderflowException;
+
 use function array_merge;
 use function count;
 use function implode;
-
 
 /**
  * Responsible for consistently deriving the set of teachers who teach/taught a subject.

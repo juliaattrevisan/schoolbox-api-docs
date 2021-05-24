@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Navigator
  *
@@ -8,11 +9,13 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Navigator;
 
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 
-class Navigator {
+class Navigator
+{
 
     /**
      * A collection of Nodes

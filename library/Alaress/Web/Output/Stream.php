@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Output handling class that streams a file, either from the contents of a
  * variable or directly from the filesystem.
@@ -10,7 +11,8 @@
 
 namespace Alaress\Web\Output;
 
-class Stream extends Base {
+class Stream extends Base
+{
 
     /**
      * @var \Twig\Environment
@@ -38,26 +40,25 @@ class Stream extends Base {
         $param_arr['counter'] = 0;
 
         // Render Heading
-        if(isset($response['header'])) {
+        if (isset($response['header'])) {
             echo $this->getTemplateEngine()->render($response['header'], $response['data']);
         }
 
         // Render content
-        while($data = call_user_func_array($callback, $param_arr)){
-
+        while ($data = call_user_func_array($callback, $param_arr)) {
             // Should we increment counter?
-            if(!isset($data['increment_counter']) || !$data['increment_counter']){
+            if (!isset($data['increment_counter']) || !$data['increment_counter']) {
                 $param_arr['counter']++;
             }
 
             // Should we render this item?
-            if(!isset($data['render_item']) || $data['render_item']) {
+            if (!isset($data['render_item']) || $data['render_item']) {
                 echo $this->getTemplateEngine()->render($response['template'], $data);
             }
         }
 
         // Render Footer
-        if(isset($response['footer'])) {
+        if (isset($response['footer'])) {
             echo $this->getTemplateEngine()->render($response['footer'], $response['data']);
         }
     }
@@ -66,7 +67,8 @@ class Stream extends Base {
      * @param  \Twig\Environment $templateEngine
      * @return $this
      */
-    public function setTemplateEngine($templateEngine) {
+    public function setTemplateEngine($templateEngine)
+    {
         $this->templateEngine = $templateEngine;
         return $this;
     }
@@ -74,7 +76,8 @@ class Stream extends Base {
     /**
      * @return \Twig\Environment
      */
-    public function getTemplateEngine() {
+    public function getTemplateEngine()
+    {
         return $this->templateEngine;
     }
 }

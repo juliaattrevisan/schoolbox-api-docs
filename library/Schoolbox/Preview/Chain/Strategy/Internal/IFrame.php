@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IFrame
  *
@@ -11,7 +12,8 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
-class IFrame extends Base {
+class IFrame extends Base
+{
 
     /**
      * Content Types for this strategy
@@ -27,7 +29,8 @@ class IFrame extends Base {
      *
      * @return string
      */
-    public function test() {
+    public function test()
+    {
         if (in_array($this->getItem()->getExtension(), $this->getContentTypes())) {
             return [
                 'type' => 'iframe',

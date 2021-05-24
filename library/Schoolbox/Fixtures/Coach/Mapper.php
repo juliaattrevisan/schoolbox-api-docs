@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -60,7 +61,7 @@ class Mapper extends BaseMapper
         $collection = $this->createCollection();
         foreach ($statement as $row) {
             $model = $this->hydrate($row);
-            if($model == null) {
+            if ($model == null) {
                 // This is because of a weird optional bi-directional join in TagCloud::findForTag
                 $model = $this->createModel();
             }

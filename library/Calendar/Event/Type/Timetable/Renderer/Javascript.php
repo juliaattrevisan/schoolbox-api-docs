@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Renders out a JSON blob for day event objects, this is used by full calendar
  *
@@ -90,6 +91,4 @@ class Javascript extends Base
 
         return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
-
-
 }

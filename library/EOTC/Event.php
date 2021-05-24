@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace EOTC;
 
 use Alaress_Date_Format;
@@ -48,7 +50,8 @@ class Event extends Calendar\Event
      *
      * Initialise collections all over the place
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setMetadata(new EventMetadata());
     }
 
@@ -90,7 +93,7 @@ class Event extends Calendar\Event
             }
         }
         //Assuming the complete url has been passed over
-        if(strlen(urldecode($returnView)) > 0){
+        if (strlen(urldecode($returnView)) > 0) {
             return urldecode($returnView);
         }
         // Otherwise - guess using Back to the future!
@@ -106,7 +109,8 @@ class Event extends Calendar\Event
      * @param EventMetadata $metadata
      * @return self
      */
-    public function setMetadata($metadata) {
+    public function setMetadata($metadata)
+    {
         $this->metadata = $metadata;
         return $this;
     }
@@ -116,7 +120,8 @@ class Event extends Calendar\Event
      *
      * @return EventMetadata
      */
-    public function getMetadata() {
+    public function getMetadata()
+    {
         return $this->metadata;
     }
 
@@ -126,7 +131,8 @@ class Event extends Calendar\Event
      * @param User $teacherInCharge
      * @return self
      */
-    public function setTeacherInCharge($teacherInCharge) {
+    public function setTeacherInCharge($teacherInCharge)
+    {
         $this->teacherInCharge = $teacherInCharge;
         return $this;
     }
@@ -136,7 +142,8 @@ class Event extends Calendar\Event
      *
      * @return User
      */
-    public function getTeacherInCharge() {
+    public function getTeacherInCharge()
+    {
         return $this->teacherInCharge;
     }
 

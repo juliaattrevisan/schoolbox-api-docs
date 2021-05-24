@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -77,7 +78,7 @@ class Quiz implements IAssessmentTypeTranslator
      * @param IAssessable|QuizObject         $domainObject
      * @param IAssessableDataModel|QuizModel $dataModel
      */
-    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel):void
+    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
     {
         // convert to quiz's model
         $dataModel

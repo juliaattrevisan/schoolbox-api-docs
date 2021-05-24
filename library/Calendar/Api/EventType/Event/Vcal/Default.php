@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Calendar\Event\Collection;
 use Calendar\Event\Type\Day\Event;
 use Sabre\VObject\Component\VCalendar;
@@ -162,7 +164,8 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
          * settings then accumulate the events. Otherwise ignore them.
          * (Superusers can view all events, so skip permissions on those)
          */
-        if ($this->getUser()->isSuperuser()
+        if (
+            $this->getUser()->isSuperuser()
             || $decodedConfig->hasPermissions(
                 $this->getUser()->getCampusCollection()->getColumnValues('id'),
                 $this->getUser()->getRole()->getId()
@@ -177,7 +180,7 @@ class Calendar_Api_EventType_Event_Vcal_Default extends Calendar_Api_EventType_A
             if (!$cache->keyExists($decodedConfig)) {
                 try {
                     $cache->write($decodedConfig);
-                } catch (InvalidDataException|ParseException $e) {
+                } catch (InvalidDataException | ParseException $e) {
                     trigger_error('Failed to write calendar cache: ' . $e->getMessage() . $e->getTraceAsString(), E_USER_WARNING);
                 }
             }

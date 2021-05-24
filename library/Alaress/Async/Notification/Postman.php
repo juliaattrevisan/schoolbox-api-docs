@@ -1,20 +1,18 @@
 <?php
+
  /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Alaress\Async\Notification;
-
 
 use Alaress\Async\Broker\IBroker;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Psr\Log\LoggerInterface;
-
 
 class Postman
 {
@@ -30,7 +28,7 @@ class Postman
      * @param IBroker         $broker
      * @param LoggerInterface $log
      */
-	public function __construct(IBroker $broker, LoggerInterface $log)
+    public function __construct(IBroker $broker, LoggerInterface $log)
     {
         $this->broker = $broker;
         $this->log    = $log;
@@ -87,5 +85,4 @@ class Postman
 
         return $i;
     }
-
 }

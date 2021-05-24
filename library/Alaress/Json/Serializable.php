@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 namespace Alaress\Json;
 
 use Alaress\Json\Decorator\IDecorator;
-
 
 /**
  * Interface that extends the core JsonSerializable interface so that decoration strategies can be specified
@@ -28,5 +28,5 @@ interface Serializable extends \JsonSerializable
      * @param IDecorator ...$decorators
      * @return mixed
      */
-    public function jsonSerialize(IDecorator... $decorators);
+    public function jsonSerialize(IDecorator ...$decorators);
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker;
-
 
 use Psr\Log\LoggerInterface;
 
@@ -133,10 +133,12 @@ class Task
 
         $duration = ($this->finish - $this->start) * 1000;
 
-        $log->debug(sprintf("cmd=%s|args=%s|time=%10.04f|data=%s",
-            $this->command, json_encode($this->args), $duration, $this->data
+        $log->debug(sprintf(
+            "cmd=%s|args=%s|time=%10.04f|data=%s",
+            $this->command,
+            json_encode($this->args),
+            $duration,
+            $this->data
         ));
-
     }
-
 }

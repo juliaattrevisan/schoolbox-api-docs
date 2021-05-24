@@ -10,7 +10,8 @@ use Schoolbox\User;
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventType_Event_Schoolbox_Default {
+class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventType_Event_Schoolbox_Default
+{
 
     /**
      * The group to get events for. Does not filter by group if NULL
@@ -34,20 +35,21 @@ class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventTyp
 
 
     /**
-	 * Overridden to get events only for this group.
-	 *
-	 * @param int $startTimestamp
-	 * @param int $endTimestamp
-	 *
-	 * @return \Calendar\Event\Collection
-	 */
-	protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp) {
-		return $this->getCalendarHandler()->getDayEvents(
-			$this->getUser(),
+     * Overridden to get events only for this group.
+     *
+     * @param int $startTimestamp
+     * @param int $endTimestamp
+     *
+     * @return \Calendar\Event\Collection
+     */
+    protected function getEventsFromCalendarHandler($startTimestamp, $endTimestamp)
+    {
+        return $this->getCalendarHandler()->getDayEvents(
+            $this->getUser(),
             $this->getViewer(),
-			$startTimestamp,
-			$endTimestamp,
+            $startTimestamp,
+            $endTimestamp,
             ['group' => $this->group_id]
         );
-	}
+    }
 }

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Home;
@@ -10,6 +12,7 @@ namespace Schoolbox\Admin\Home;
 use Alaress_Date_Format;
 use Aws\Api\DateTimeResult;
 use Aws\CloudWatch\CloudWatchClient;
+
 use function end;
 
 /**

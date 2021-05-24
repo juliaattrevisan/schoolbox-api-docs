@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for submission boxes.
  *
@@ -26,7 +27,6 @@ use Schoolbox\Permission\Access\Access;
 
 class SubmissionBox implements IAssessableDataModel, ISoftDeletable
 {
-
     use HasCurriculumNodes;
     use AssessmentModelTrait;
 
@@ -260,8 +260,9 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
      *
      * @return string
      */
-    public function getMarkVisibilityDescription() {
-        switch($this->getMarkVisibility()) {
+    public function getMarkVisibilityDescription()
+    {
+        switch ($this->getMarkVisibility()) {
             case IAssessable::MARK_VISIBILITY_PRIVATE:
                 return 'Staff Only';
             case IAssessable::MARK_VISIBILITY_STUDENT:
@@ -287,7 +288,6 @@ class SubmissionBox implements IAssessableDataModel, ISoftDeletable
     function __clone()
     {
         $this->id = null;
-
     }
 
     /* Getters/Setters

@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,8 +9,8 @@
 
 namespace Alaress\Rules\Token;
 
-
-class Token {
+class Token
+{
 
     /** @var string */
     protected $token;
@@ -59,5 +60,4 @@ class Token {
     {
         return call_user_func($this->callback, $input, $settings);
     }
-
 }

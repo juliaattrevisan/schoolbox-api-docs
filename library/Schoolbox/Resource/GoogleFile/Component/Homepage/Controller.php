@@ -78,9 +78,9 @@ class Controller extends Component_Homepage_ControllerAbstract
                                                   static function ($a, $b) {
                                                       /** @var Model $a */
                                                       /** @var Model $b */
-                                                      if ($a->getCreatedAt()->isSameDay($b->getCreatedAt())) {
-                                                          return strnatcasecmp($a->getName(), $b->getName());
-                                                      }
+                                                    if ($a->getCreatedAt()->isSameDay($b->getCreatedAt())) {
+                                                        return strnatcasecmp($a->getName(), $b->getName());
+                                                    }
                                                       // get newer first
                                                       return $b->getCreatedAt()->compareDateOnly($a->getCreatedAt());
                                                   }

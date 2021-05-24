@@ -7,8 +7,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
+
 namespace EOTC\Excursion;
+
 use Alaress\Database\Connector\IConnector;
 use EOTC\Event as EOTCEvent;
 use Schoolbox\User;
@@ -80,7 +83,6 @@ class Connector
         /* If the external db isn't supported, do nothing
          */
         if ($this->db) {
-
             /* Set up base excursion details
              */
             $eventsSeq = $this->insertExcursion($event);

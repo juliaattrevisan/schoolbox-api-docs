@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Tass\Api;
@@ -16,7 +18,9 @@ use External\Tass\Api\Exception\Unauthorised;
 use GuzzleHttp;
 use GuzzleHttp\ClientInterface;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token as TokenCodec;
+
 use function in_array;
+
 use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Alaress_Date_Format;
@@ -538,7 +542,6 @@ class Connector
         $this->assertValidResponse($decoded);
 
         return $this->kSortRecursive($decoded);
-
     }
 
 
@@ -597,7 +600,7 @@ class Connector
     {
         // TODO inspect flags __invalid etc to determine if the method call failed for some reason
         // TODO check we can call this across all methods, rather than implemented per method
-        if(false){
+        if (false) {
             throw new InvalidArg();
         }
     }

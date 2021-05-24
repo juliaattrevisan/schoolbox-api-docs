@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Run three redis clean up scripts.
  * @copyright Copyright 2019, Schoolbox Pty Ltd

@@ -1,9 +1,9 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 
 /**
  * Class SubmissionHistoryCest
@@ -57,7 +57,7 @@ class CreateAndVerifyCest
         $blurb     = "<p>Blurb</p>";
         $image     = __DIR__ . '/upload/test.jpg';
         $topic     = 'General';
-        $topicSlug = (new \Url($topic,''))->getSlug();
+        $topicSlug = (new \Url($topic, ''))->getSlug();
         $roles     = ['Teachers'];
         $campi     = ['Senior', 'Junior'];
         $users     = ['David Rhodes', 'Rachel Rhodes'];

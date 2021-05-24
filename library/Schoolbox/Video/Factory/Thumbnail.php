@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Video\Factory;
 
 use Schoolbox\Permission\Access\UserAccess;
@@ -23,7 +25,8 @@ class Thumbnail extends Base
      * @param Model $file
      * @throws \Exception
      */
-    protected function permissionCheck($file) {
+    protected function permissionCheck($file)
+    {
         if ($this->getAccess()->getFolderAccess($_SESSION['user'], $file->getFolder()->getId()) < UserAccess::ACCESS_READ) {
             \SitePage::redirectToBrokenImageOfSize(64, 64, 403);
         }

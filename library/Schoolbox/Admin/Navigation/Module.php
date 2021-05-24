@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Share navigation element for admin pages
  *
@@ -21,7 +22,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) {
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }

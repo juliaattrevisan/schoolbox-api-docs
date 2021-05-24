@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A notifier for bookings.
  *

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Delete unused duplicate rubric capabilities.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Configuration for the Meriden-specific pastoral system.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory
  *
@@ -9,18 +10,16 @@
 
 namespace Schoolbox\Fixtures\Team\Metadata;
 
-use \Schoolbox\Fixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
-use \Schoolbox\Fixtures\Team\Metadata\Strategy\Historic as HistoricStrategy;
-use \Schoolbox\Fixtures\Match\Model as Match;
-
-use \Schoolbox\UserMapper;
-use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
-use \Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
-
-use \Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
-use \Schoolbox\Fixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
-use \Schoolbox\Fixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
+use Schoolbox\Fixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
+use Schoolbox\Fixtures\Team\Metadata\Strategy\Historic as HistoricStrategy;
+use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\UserMapper;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
+use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
+use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
+use Schoolbox\Fixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
+use Schoolbox\Fixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
 
 class Factory
 {
@@ -51,8 +50,7 @@ class Factory
 
         if ($diff > 0) {
             $metadata = $this->produceCurrent();
-        }
-        else {
+        } else {
             $metadata = $this->produceHistoric();
         }
 

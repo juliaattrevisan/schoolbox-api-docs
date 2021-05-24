@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Rule;
 
 use PDOStatement;
@@ -54,7 +56,6 @@ class Mapper extends Schoolbox\Mapper
             'other_key' => 'rule_id',
             'multiple'  => true
         ]);
-
     }
 
 
@@ -110,7 +111,7 @@ class Mapper extends Schoolbox\Mapper
 
         for ($i = 1; $i <= count($sequencing); $i++) {
             $statement->bindValue(':sequence', $i);
-            $statement->bindValue(':identifierValue', $sequencing[$i-1]);
+            $statement->bindValue(':identifierValue', $sequencing[$i - 1]);
 
             $statement->execute();
         }

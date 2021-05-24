@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for forum posts.  Forum is structured with a thread attached to a folder,
  * with posts below the thread.  The users post into a thread using this mapper.
@@ -9,15 +10,18 @@
  */
 
 namespace Schoolbox\Forum;
+
 use Alaress\Async\Notification\Instance\Instance;
 use PDO;
 use Schoolbox\Collection;
 use Schoolbox\Feed\FeedableMapperInterface;
 use Schoolbox\Mapper;
 
-class PostMapper extends Mapper implements FeedableMapperInterface {
+class PostMapper extends Mapper implements FeedableMapperInterface
+{
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('forumPost');
         $this->hasModel(Post::class);
         $this->hasMap(array(
@@ -66,13 +70,13 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
                 'property'   => 'deleted',
                 'type'       => self::TYPE_STRING
             ));
-        $this->hasSoftDeleteField('deleted', 'true','false');
+        $this->hasSoftDeleteField('deleted', 'true', 'false');
 
         $this->hasMap(array(
                 'column'     => 'modified',
                 'property'   => 'modified',
                 'type'       => self::TYPE_DATETIME,
-                'updated_timestamp'=> true
+                'updated_timestamp' => true
             ));
 
         $this->hasMap(array(
@@ -98,7 +102,6 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
             'this_key'  => 'threadID',
             'other_key' => 'threadID',
         ));
-
     }
 
 
@@ -107,8 +110,9 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
      * @return Post
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function findById($id) {
-        $query=
+    public function findById($id)
+    {
+        $query =
             "SELECT
                 {$this->getColumnString('post')},
                 {$this->getJoinColumnString('owner', 'owner')}
@@ -124,11 +128,9 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
             $post->setOwner($this->hydrateJoin($row, 'owner', 'owner'));
             $this->throwIfDeleted($post);
             return $post;
-        }
-        else {
+        } else {
             throw new Mapper\Exception\NotFound();
         }
-
     }
 
 
@@ -197,7 +199,7 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
     public function findFirstPost($threadID)
     {
 
-        $query=
+        $query =
             "SELECT
                 {$this->getColumnString('post')},
                 {$this->getJoinColumnString('owner', 'owner')}
@@ -214,11 +216,8 @@ class PostMapper extends Mapper implements FeedableMapperInterface {
             $post->setOwner($this->hydrateJoin($row, 'owner', 'owner'));
             $this->throwIfDeleted($post);
             return $post;
-        }
-        else {
+        } else {
             throw new Mapper\Exception\NotFound();
         }
-
     }
-
 }

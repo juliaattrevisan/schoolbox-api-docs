@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -16,67 +17,70 @@ use Schoolbox\Role;
 /**
  * @method static GenericCollection|self[] createCollection()
  */
-class RoleAccess {
-
+class RoleAccess
+{
     use CreateCollection;
 
-	/** @var Folder */
-	protected $category;
+    /** @var Folder */
+    protected $category;
 
-	/** @var Role */
-	protected $role;
+    /** @var Role */
+    protected $role;
 
-	/** @var int */
-	protected $type;
+    /** @var int */
+    protected $type;
 
-	/**
-	 * @param Folder $category
-	 * @return self
-	 */
-	public function setCategory($category) {
-		$this->category = $category;
-		return $this;
-	}
+    /**
+     * @param Folder $category
+     * @return self
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
 
-	/**
-	 * @return Folder
-	 */
-	public function getCategory() {
-		return $this->category;
-	}
+    /**
+     * @return Folder
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
 
-	/**
-	 * @param \Schoolbox\Role $role
-	 * @return self
-	 */
-	public function setRole($role) {
-		$this->role = $role;
-		return $this;
-	}
+    /**
+     * @param \Schoolbox\Role $role
+     * @return self
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
+        return $this;
+    }
 
-	/**
-	 * @return \Schoolbox\Role
-	 */
-	public function getRole() {
-		return $this->role;
-	}
+    /**
+     * @return \Schoolbox\Role
+     */
+    public function getRole()
+    {
+        return $this->role;
+    }
 
-	/**
-	 * @param int $type
-	 * @return self
-	 */
-	public function setType($type) {
-		$this->type = $type;
-		return $this;
-	}
+    /**
+     * @param int $type
+     * @return self
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getType() {
-		return $this->type;
-	}
-
-
-
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 }

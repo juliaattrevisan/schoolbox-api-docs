@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Renderer
  *
@@ -15,7 +16,6 @@ use Scrub;
 use TextFormatter;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-
 
 class Renderer extends Handler
 {
@@ -53,7 +53,6 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $blog) {
-
                 try {
                     $folder = $folderMapper->findCheaplyById($blog['folder_id']);
 

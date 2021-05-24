@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Realtime\Digest;
 
 use Alaress\Date\IClock;
@@ -97,10 +99,8 @@ class DigestScheduler extends CronScheduler
 
             try {
                 $triggers[$role->getId()] = $this->factory->build($schedule, $role);
-
             } catch (InvalidArgumentException $e) {
                 $this->logException($e);
-
             } catch (RuntimeException $e) {
                 $this->logException($e);
             }

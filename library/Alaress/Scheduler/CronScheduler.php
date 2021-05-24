@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Scheduler;
-
 
 use Alaress\Date\IClock;
 use Alaress\Redis\Async\Event\IEvent;
@@ -19,7 +19,6 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use RuntimeException;
-
 
 /**
  * A scheduler for recurring tasks; handling of a response is simply to reschedule it.
@@ -60,18 +59,19 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
         // and reschedule the trigger to go again
         $this->report($data);
 
-	    $this->log->info(
-	        sprintf("Rescheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
+        $this->log->info(
+            sprintf("Rescheduling trigger '%s' for %s", $trigger->getIdString(), date('Y-m-d H:i:s', $trigger->getTimestamp())),
             [ 'char' => '+' ]
         );
 
-	    $this->scheduleNotification($trigger);
+        $this->scheduleNotification($trigger);
     }
 
     /**
      * Callback executed when SIGHUP received by process
      */
-    public function onReload() {
+    public function onReload()
+    {
         $this->dropCache();
         $this->reload();
     }
@@ -111,7 +111,7 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
             get_class($e),
             substr(static::class, strrpos(static::class, '\\')),
             $e->getMessage()
-        ), [ 'exception'=>$e ]);
+        ), [ 'exception' => $e ]);
     }
 
 
@@ -135,25 +135,22 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
         foreach ($this->triggers as $id => $trigger) {
             try {
                 $this->scheduleNotification($trigger);
-
             } catch (InvalidArgumentException $e) {
                 $this->logException($e);
-
             } catch (RuntimeException $e) {
                 $this->logException($e);
             }
         }
-
     }
 
 
     /**
-	 * Report in an appropriate way, based on the data returned by the worker
-	 *
-	 * @param array $data
-	 * @return mixed
-	 */
-	protected abstract function report($data);
+     * Report in an appropriate way, based on the data returned by the worker
+     *
+     * @param array $data
+     * @return mixed
+     */
+    abstract protected function report($data);
 
 
     /**
@@ -161,12 +158,11 @@ abstract class CronScheduler extends AbstractScheduler implements EventListener
      *
      * @return TriggerInterface[]
      */
-	protected abstract function computeTriggers();
+    abstract protected function computeTriggers();
 
 
     /**
      * @return void
      */
-    protected abstract function dropCache();
-
+    abstract protected function dropCache();
 }

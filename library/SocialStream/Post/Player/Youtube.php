@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Player;
 
 /**
@@ -19,7 +21,8 @@ class Youtube extends Player
      *
      * @return string|null
      */
-    public function fetchThumbnail() {
+    public function fetchThumbnail()
+    {
         $matches = array();
 
         preg_match('/v=([a-zA-Z0-9_\-]+)&?/', $this->getUrl(), $matches);

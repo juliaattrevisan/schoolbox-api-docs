@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Assessment\Rubric\DataModel\Indicator;
+
 use PDOStatement;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Mapper as CapabilityMapper;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
@@ -26,9 +28,11 @@ use Schoolbox\Mapper\Exception as MapperException;
  * @method Model[] findByColumnList($columnList, $options = array())
  * @method Model findOneByColumnList($columnList, $order = [], $options = [])
  */
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('rubric_indicator');
         $this->hasModel(Model::class);
 
@@ -305,8 +309,10 @@ class Mapper extends BaseMapper {
         $normalizedIndicatorName  = Util::normalizeName($name);
         foreach ($indicators as $indicator) {
             /** @var Model $indicator */
-            if ($normalizedIndicatorName === Util::normalizeName($indicator->getName())
-                && $normalizedCapabilityName === Util::normalizeName($indicator->getCapability()->getName())) {
+            if (
+                $normalizedIndicatorName === Util::normalizeName($indicator->getName())
+                && $normalizedCapabilityName === Util::normalizeName($indicator->getCapability()->getName())
+            ) {
                 return $indicator;
             }
         }
@@ -359,8 +365,7 @@ class Mapper extends BaseMapper {
         bool $cache = true,
         ?Collection $capabilityCurriculumNodes = null,
         ?Collection $indicatorCurriculumNodes = null
-    ): Model
-    {
+    ): Model {
         // Try to find an indicator with the "same" name and capability name
         $existing = $this->findOneForParentByKey($parentId, $parentType, $name, $capabilityName, $cache);
         if ($existing) {
@@ -411,8 +416,7 @@ class Mapper extends BaseMapper {
         bool $cache = true,
         ?Collection $capabilityCurriculumNodes = null,
         ?Collection $indicatorCurriculumNodes = null
-    ): Model
-    {
+    ): Model {
         return $this->findOrCreateOneForParentByKey(
             $folderId,
             CapabilityModel::PARENT_TYPE_CATEGORY,
@@ -437,5 +441,4 @@ class Mapper extends BaseMapper {
     {
         return true;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -17,7 +18,6 @@ $groupHandler = new Group();
 $sessionUser = $_SESSION['user'];
 
 if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
-
     $url = new Url($_POST['url']);
     try {
         $url->normalise();
@@ -51,7 +51,6 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         if (!$owner || null === $owner->getId() || $owner->isDeleted()) {
             $link->setOwner($sessionUser->getId());
         }
-
     } else {
         /** @var Link $link */
         $link = LinkMapper::getInstance()->createModel();

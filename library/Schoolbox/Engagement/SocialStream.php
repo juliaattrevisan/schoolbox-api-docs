@@ -26,7 +26,8 @@ class SocialStream
         $this->database = Database::getInstance();
     }
 
-    public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM socialstream_post
                   WHERE created_at >= :start AND created_at <= :end";
 
@@ -37,5 +38,4 @@ class SocialStream
         $statement->execute();
         return $statement->fetchColumn(0);
     }
-
 }

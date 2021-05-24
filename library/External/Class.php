@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: aetworowsky
@@ -10,7 +11,8 @@
 use Alaress\Redis;
 use External\CachingConnectorAbstract;
 
-class External_Class extends CachingConnectorAbstract implements External_ClassInterface{
+class External_Class extends CachingConnectorAbstract implements External_ClassInterface
+{
 
 
     /**
@@ -19,7 +21,8 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
      * @throws Exception
      * @param String $databaseName
      */
-    public function __construct($databaseName = '') {
+    public function __construct($databaseName = '')
+    {
         parent::__construct(
             (new External_DatabaseFactory())->buildClassConnector($databaseName),
             new External_Offline_Class(),

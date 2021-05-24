@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EOTC Policy
  *
@@ -17,5 +18,5 @@ $config = $configMapper->findByColumn('name', 'policy')->first();
 $this->setFile(TEMPLATE_content, 'modules/eotc/policy.html');
 
 $this->setVar(array(
-	'EOTC_POLICY' => $config->getValue()
+    'EOTC_POLICY' => $config->getValue()
 ));

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
 
@@ -70,7 +72,8 @@ trait External_Schoolbox_TimetableDefinitionTrait
      */
     public function getTimetableDefinitionFromDatabase(IConnector $database, Campus $campus): array
     {
-        $timetableQuery = $database->executeQuery('
+        $timetableQuery = $database->executeQuery(
+            '
                 SELECT
                     start,
                     finish,

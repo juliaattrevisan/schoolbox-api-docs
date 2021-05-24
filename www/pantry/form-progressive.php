@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -18,7 +19,6 @@ if (count($this->arg) == 0) {
     $_SESSION["pantry-$key"] = [
         'key' => $key
     ];
-
 } else {
     $key = substr($this->arg[0], 0, 6);
 

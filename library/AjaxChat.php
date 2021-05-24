@@ -11,7 +11,8 @@ use Schoolbox\Role;
  * @link      https://schoolbox.com.au/
  */
 
-class AjaxChat {
+class AjaxChat
+{
 
     private $groupHandler;
     private $chatHandler;
@@ -40,7 +41,8 @@ class AjaxChat {
      *                         * category_id: The category the chat is in
      *                         * component_id: The ID of the chat component
      */
-    public function __construct($user_id, $post_vars) {
+    public function __construct($user_id, $post_vars)
+    {
 
         $this->method      = $post_vars['method'];
         $this->catID       = $post_vars['category_id'];
@@ -53,7 +55,7 @@ class AjaxChat {
 
         $this->output = [];
 
-        if($this->componentID) {
+        if ($this->componentID) {
             $instance = Component_InstanceMapper::getInstance()->findByInstanceId($this->componentID);
             if ($instance instanceof Component_Instance) {
                 foreach ($instance->getConfig() as $conf) {
@@ -73,7 +75,8 @@ class AjaxChat {
      *                           (method=receive only)
      *                         * user_id: user to mute (method=mute only)
      */
-    public function prepare($post_vars) {
+    public function prepare($post_vars)
+    {
 
         $time = new DateTime();
         $this->output = array(
@@ -81,11 +84,11 @@ class AjaxChat {
         );
 
         $validMethods = array('send','receive','poll','mute','config');
-        if(!(in_array($this->method, $validMethods) && $this->componentID)) {
+        if (!(in_array($this->method, $validMethods) && $this->componentID)) {
             return;
         }
 
-        switch($this->method) {
+        switch ($this->method) {
             case 'send':
                 $this->send($post_vars['body']);
                 break;
@@ -101,15 +104,14 @@ class AjaxChat {
             default:
                 $m = $this->method;
                 $this->$m();
-
         }
-
     }
 
 
-    private function send($body) {
+    private function send($body)
+    {
 
-        if(!is_array($mutedUsers = unserialize($this->getConfig('muted_users')))) {
+        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users')))) {
             $mutedUsers = array();
         }
 
@@ -119,11 +121,11 @@ class AjaxChat {
     }
 
 
-    private function receive($lastPoll) {
+    private function receive($lastPoll)
+    {
         if (empty($lastPoll) || $lastPoll == 'null') {
             $log = $this->chatHandler->get_logs($this->catID, new DateTime('-30 minutes'));
-        }
-        else {
+        } else {
             $log = $this->chatHandler->get_logs($this->catID, new DateTime($lastPoll), $this->userID);
         }
 
@@ -131,11 +133,11 @@ class AjaxChat {
             $log = array();
         }
         $this->output['log'] = $log;
-
     }
 
 
-    private function poll() {
+    private function poll()
+    {
         $this->chatHandler->update_poll($this->catID, $this->userID);
 
         // Do not prune users anymore: get_users only gets new users
@@ -146,7 +148,6 @@ class AjaxChat {
 
         if (empty($users)) {
             $users = array();
-
         } else {
             $staffPresent = false;
 
@@ -156,7 +157,6 @@ class AjaxChat {
                 // iterate and find out if any of the users are
                 foreach ($users as &$user) {
                     if ($user['group_type'] === Role::STAFF) {
-
                         $msg[] = $user['group_type'];
 
                         $staffPresent = true;
@@ -175,12 +175,12 @@ class AjaxChat {
 
         $this->output['users']  = $users;
         $this->output['config'] = $this->getConfig();
-
     }
 
 
-    private function mute($userID) {
-        if(!is_array($mutedUsers = unserialize($this->getConfig('muted_users')))) {
+    private function mute($userID)
+    {
+        if (!is_array($mutedUsers = unserialize($this->getConfig('muted_users')))) {
             $mutedUsers = array();
         }
 
@@ -200,8 +200,8 @@ class AjaxChat {
     }
 
 
-    private function config() {
-
+    private function config()
+    {
     }
 
 
@@ -210,16 +210,16 @@ class AjaxChat {
      * @param string $key
      * @return array|bool
      */
-    protected function getConfig($key = '') {
-        if($key) {
+    protected function getConfig($key = '')
+    {
+        if ($key) {
             return isset($this->config[$key]) ? $this->config[$key]->getValue() : false;
         }
         $return = array();
-        foreach($this->config as $key => $config) {
-            if($key == 'muted_users') {
+        foreach ($this->config as $key => $config) {
+            if ($key == 'muted_users') {
                 $return[$key] = unserialize($config->getValue());
-            }
-            else {
+            } else {
                 $return[$key] = $config->getValue();
             }
         }
@@ -227,7 +227,8 @@ class AjaxChat {
     }
 
 
-    protected function saveConfig() {
+    protected function saveConfig()
+    {
         /** @var Component_ConfigDefinition $definition */
         foreach ($this->config as $definition) {
             // this should be 1:1 relation, so return only the first instance of this definition
@@ -252,10 +253,10 @@ class AjaxChat {
     /**
      * Output whatever prepare() loaded into the output variable, and prevent further output.
      */
-    public function respond() {
+    public function respond()
+    {
         //header("Content-type: application/json; charset=UTF-8");
         header("Content-type: text/plain; charset=UTF-8");
         die(json_encode($this->output));
     }
-
 }

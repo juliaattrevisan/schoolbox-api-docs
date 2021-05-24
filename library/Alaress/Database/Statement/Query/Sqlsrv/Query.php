@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MSSQL Query
  *
@@ -35,7 +36,7 @@ class Query extends Base
                         $statement->bindValue($name, $input['value'], $input['type']);
                     }
                 } else {
-                    $statement->bindValue($name, $input['value'] );
+                    $statement->bindValue($name, $input['value']);
                 }
             }
         }

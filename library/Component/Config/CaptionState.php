@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -25,6 +26,5 @@ class Component_Config_CaptionState extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_CAPTION_STATE_SELECTED', $v == $configValue ? ' selected="selected"' : '');
             $page->parse('caption_state_block', 'caption_state', true);
         }
-
     }
 }

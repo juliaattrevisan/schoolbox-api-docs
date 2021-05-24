@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidationTest
  *
@@ -23,74 +24,75 @@ class ValidationTest extends TestCase
      * @param mixed $input
      * @param int   $expected
      */
-    public function testValidExample($input, $expected)
-    {
-        /* Substitute this with a spec pattern or other conditional
-         */
-        $outcome = false;
+public function testValidExample($input, $expected)
+{
+    /* Substitute this with a spec pattern or other conditional
+     */
+    $outcome = false;
 
-        if (is_numeric($input)) {
-            $outcome = true;
-        }
-
-        /* There are other assertions that you can try (ctrl-click to follow)
-         */
-        $this->assertEquals($expected, $outcome);
+    if (is_numeric($input)) {
+        $outcome = true;
     }
+
+    /* There are other assertions that you can try (ctrl-click to follow)
+     */
+    $this->assertEquals($expected, $outcome);
+}
 
     /**
      * Data provider for testValidExample
      *
      * @return array
      */
-    public function provider_validExample() : array {
-        return [
+public function provider_validExample(): array
+{
+    return [
 
-            /* Add other cases that you expect to be valid
-             */
-            'Valid Example 1' => [
-                0,    // goes into testValidExample() as $input
-                true  // goes into testValidExample() as $expected
-            ],
+        /* Add other cases that you expect to be valid
+         */
+        'Valid Example 1' => [
+            0,    // goes into testValidExample() as $input
+            true  // goes into testValidExample() as $expected
+        ],
 
-            'Valid Example 2' => [
-                1,
-                true
-            ],
+        'Valid Example 2' => [
+            1,
+            true
+        ],
 
-            'Valid Example 3' => [
-                123456789,
-                true
-            ],
+        'Valid Example 3' => [
+            123456789,
+            true
+        ],
 
-            'Valid Example 4' => [
-                '1e4',
-                true
-            ],
+        'Valid Example 4' => [
+            '1e4',
+            true
+        ],
 
-            /* Add other cases that you expect to be invalid
-             */
-            'Invalid Example 1' => [
-                false,
-                false
-            ],
+        /* Add other cases that you expect to be invalid
+         */
+        'Invalid Example 1' => [
+            false,
+            false
+        ],
 
-            'Invalid Example 2' => [
-                'a',
-                false
-            ],
+        'Invalid Example 2' => [
+            'a',
+            false
+        ],
 
-            'Invalid Example 3' => [
-                null,
-                false
-            ],
+        'Invalid Example 3' => [
+            null,
+            false
+        ],
 
-            'Invalid Example 4' => [
-                '',
-                false
-            ],
-        ];
-    }
+        'Invalid Example 4' => [
+            '',
+            false
+        ],
+    ];
+}
 
 
     /**
@@ -101,7 +103,7 @@ class ValidationTest extends TestCase
      * @dataProvider getTestErrorRaisedData
      *
      */
-    public function testErrorRaised($input): void
+public function testErrorRaised($input): void
     {
         $this->expectException(\TypeError::class);
         $this->expectException(`::class);//  annotation to verify which exception class

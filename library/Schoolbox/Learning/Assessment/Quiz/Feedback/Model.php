@@ -7,9 +7,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
-use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 
@@ -51,5 +52,4 @@ class Model extends AbstractFeedback
 
     /* Getters/Setters
      */
-
 }

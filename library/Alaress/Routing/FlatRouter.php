@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -96,5 +97,4 @@ class FlatRouter implements IRouter
         $this->paths = [];
         return $this;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Finds out if the given config name equates to (bool)true
  *

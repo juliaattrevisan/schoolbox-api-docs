@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -117,7 +118,7 @@ class Mapper extends BaseMapper
      */
     protected function getFromString()
     {
-        return parent::getFromString()."
+        return parent::getFromString() . "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('folder', '', 'fo')} AND object = 'folder'
             LEFT JOIN {$this->getJoinSql('file', '', 'fi')} AND object = 'file'
@@ -146,7 +147,6 @@ class Mapper extends BaseMapper
                 /** @var File $file */
                 $file = $this->hydrateJoin($row, 'file', 'fi');
                 $record->setFile($file);
-
             }
 
             if (!empty($row['fo.id'])) {
@@ -181,5 +181,4 @@ class Mapper extends BaseMapper
 
         return $records;
     }
-
 }

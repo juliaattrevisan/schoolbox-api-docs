@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -26,7 +27,7 @@ class Composite implements QueueInterface
      *
      * @param QueueInterface ...$queues
      */
-    public function __construct(QueueInterface... $queues)
+    public function __construct(QueueInterface ...$queues)
     {
         $this->queues = $queues;
     }

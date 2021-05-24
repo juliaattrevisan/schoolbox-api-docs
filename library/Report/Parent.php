@@ -120,7 +120,6 @@ class Report_Parent extends Report_Abstract
             if ($this->getAllRecords() === false) {
                 error(Error\Mapper::ERROR_PERM_PARENT_DIRECTORY_YEAR_LEVEL);
             }
-
         }
     }
 
@@ -135,7 +134,6 @@ class Report_Parent extends Report_Abstract
         if ($this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff()) {
             return true;
         } else if ($this->getGroupHandler()->isParent()) {
-
             /* If Restrict Parent Directory is on, the following conditions apply:
              * If you are a parent, ensure that you have a child in the selected year level.
              * If you don't have a child in this year level, you can't view it.
@@ -364,7 +362,6 @@ class Report_Parent extends Report_Abstract
         $showContact = false;
 
         if (is_array($allContacts) && count($allContacts)) {
-
             // Show search options
             if (!strlen($this->getYearLevel()) && !$this->getSearchName() && !$this->getSearchForm() && !$this->getSearchBoardingStatus()) {
                 $this->getPage()->parse('show_filter_options_block', 'show_filter_options');
@@ -546,7 +543,6 @@ class Report_Parent extends Report_Abstract
                 }
 
                 if ((($currentContact['StudentContactSpousePreferred'] != '') || ($currentContact['StudentContactSpouseLegalFullName'] != '')) && ($currentContact['SpouseDirectoryIncludeFlag'] == 1)) {
-
                     /* Figure out whether to use the Preferred or the Given (LegalFullName) field
                      * for this contact
                      */
@@ -609,8 +605,7 @@ class Report_Parent extends Report_Abstract
             $this->getPage()->parse('student_block', 'student', true);
             $this->getPage()->setVar('EMAIL_ALL_PARENTS', implode(AbstractMailer::implodeGlue(), $filteredEmails));
             $this->getPage()->setVar('empty_block', '');
-        }
-        else {
+        } else {
             $this->getPage()->parse('show_filter_options_block', 'show_filter_options');
             if (isset($_GET["searchName"])) {
                 $this->getPage()->parse('empty_block', 'empty', true);
@@ -729,4 +724,3 @@ class Report_Parent extends Report_Abstract
         return null;
     }
 }
-

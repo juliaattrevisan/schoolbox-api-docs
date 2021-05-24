@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Date
  *
@@ -12,12 +13,12 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
-use \Schoolbox\Learning\Assessment\Project;
-use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use \Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 class DateTest extends TestCase
 {

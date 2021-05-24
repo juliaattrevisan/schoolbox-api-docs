@@ -1,11 +1,11 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -45,7 +45,6 @@ try {
     if (Access::getInstance()->getFolderAccess($_SESSION['user'], $folder->getId()) < UserAccess::ACCESS_READ) {
         error(6);
     }
-
 } catch (\Exception $e) {
     error(19);
 }
@@ -241,7 +240,6 @@ if (is_array($items)) {
                     $lastDate = new Alaress_Date_Format($chat['time'], Alaress_Date_Format::DATABASE_FORMAT);
                     $this->setVar('CHAT_DATE', $lastDate->getLongDateOnly());
                     $this->parse('chat_date_block', 'chat_date', true);
-
                 }
             } else {
                 if ($total == $i) {

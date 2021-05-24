@@ -1,21 +1,23 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\ItineraryItem;
 
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Match\Model as Match;
-use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use \Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
-use \Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
+use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\ItineraryItem\Model as ItineraryItem;
+use Schoolbox\Fixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 
 /**
  * Class Controller
@@ -198,8 +200,7 @@ class Controller extends AbstractController
         if (strlen($this->getRequest()->post['startAtDate'])) {
             $date    = $this->getRequest()->post['startAtDate'];
             $startAt = \Alaress_Date_Format::newLocal($date);
-        }
-        else {
+        } else {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 

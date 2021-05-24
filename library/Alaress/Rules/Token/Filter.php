@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,8 +9,7 @@
 
 namespace Alaress\Rules\Token;
 
-
-class Filter 
+class Filter
 {
 
     /** @var string */
@@ -61,4 +61,4 @@ class Filter
     {
         return call_user_func($this->effect, $input);
     }
-} 
+}

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Renderer
  *
@@ -15,7 +16,6 @@ use TextFormatter;
 use Alaress_Date_Format;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-
 
 class Renderer extends Handler
 {
@@ -39,7 +39,7 @@ class Renderer extends Handler
      */
     public function setup()
     {
-        $this->setTabName('Homepage '.$this->getPage()->getLocalisedTerm('news', false, true));
+        $this->setTabName('Homepage ' . $this->getPage()->getLocalisedTerm('news', false, true));
     }
 
     /**

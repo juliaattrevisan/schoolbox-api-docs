@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Queue;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
@@ -127,7 +127,6 @@ abstract class RedisQueue implements QueueInterface
 
             try {
                 $instances[] = $this->inflate($data);
-
             } catch (InvalidArgumentException $e) {
                 // the thing we're pointing at doesn't exist or payload invalid? remove the reference
                 $this->redis->srem($this->getRedisSetKey(), $key);
@@ -239,7 +238,7 @@ abstract class RedisQueue implements QueueInterface
      *
      * @return string
      */
-    protected abstract function getNamespace();
+    abstract protected function getNamespace();
 
 
     /**
@@ -247,7 +246,7 @@ abstract class RedisQueue implements QueueInterface
      *
      * @return string
      */
-    protected abstract function getSetKeyPattern();
+    abstract protected function getSetKeyPattern();
 
 
     /**
@@ -255,7 +254,5 @@ abstract class RedisQueue implements QueueInterface
      *
      * @return string
      */
-    protected abstract function getMessageKeyPattern();
-
-
+    abstract protected function getMessageKeyPattern();
 }

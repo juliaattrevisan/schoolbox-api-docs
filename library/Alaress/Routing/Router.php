@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Routing;
-
 
 use Alaress\Routing\Dictionary\IDictionary;
 use Alaress\Routing\Route\RouteFactory;
@@ -43,7 +43,9 @@ class Router implements IRouter
     public function __construct(IDictionary $dictionary, $isRecursive = true)
     {
         $this->dictionary = $dictionary;
-        $this->root       = new Trie('', function ($keyA, $keyB) { return $this->dictionary->sort($keyA, $keyB); });
+        $this->root       = new Trie('', function ($keyA, $keyB) {
+            return $this->dictionary->sort($keyA, $keyB);
+        });
         $this->factory    = new RouteFactory($this->root, $dictionary->getDelimiter(), $isRecursive);
     }
 
@@ -70,12 +72,10 @@ class Router implements IRouter
 
         // let's not do work we don't have to, eh?
         if (empty($this->cache[$fullRegex])) {
-
             $trie = $this->root;
 
             // perform Trie construction
             foreach (explode($this->dictionary->getDelimiter(), $path) as $shard) {
-
                 // translate the shard to regex according to our dictionary
                 $pattern = $this->dictionary->translateShard($shard);
 
@@ -139,7 +139,7 @@ class Router implements IRouter
      */
     public function dropAll()
     {
-        unset ($this->cache);
+        unset($this->cache);
         $this->root->reset();
         return $this;
     }

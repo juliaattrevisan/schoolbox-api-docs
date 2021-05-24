@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Metadata - Historic
  *
@@ -15,12 +16,12 @@
 
 namespace Schoolbox\Fixtures\Team\Metadata\Strategy;
 
-use \Schoolbox\Collection;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
-use \Schoolbox\Fixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
-use \Schoolbox\Fixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
-use \Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Collection;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
+use Schoolbox\Fixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
+use Schoolbox\Fixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
+use Schoolbox\Fixtures\Match\Model as Match;
 
 class Historic implements IMetadataStrategy
 {

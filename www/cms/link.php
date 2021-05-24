@@ -1,10 +1,11 @@
 <?php
-use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Resource\LinkMapper;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Breadcrumbs;
 
-$groupHandler = new Group;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\LinkMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
+
+$groupHandler = new Group();
 
 if (is_numeric($this->arg[0])) {
     try {
@@ -17,7 +18,6 @@ if (is_numeric($this->arg[0])) {
         if ($groupHandler->getPermission($link->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
-
     } catch (Exception $e) {
         error(41);
     }
@@ -56,8 +56,7 @@ if (is_numeric($this->arg[0])) {
             'class' => 'active',
         ]
     ]);
-}
-elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
+} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     try {
         $folder = FolderMapper::getInstance()->findById($this->arg[1]);
 
@@ -65,7 +64,6 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
         if ($groupHandler->getPermission($folder->getId()) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
-
     } catch (Exception $e) {
         error(13);
     }

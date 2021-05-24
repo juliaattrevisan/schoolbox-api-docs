@@ -1,14 +1,16 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Result;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use Schoolbox\Fixtures\Team\Model as Team;

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ProfessionalDevelopment;
 
 use Alaress\Authorizer\Rule;
@@ -17,7 +19,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-
 
 class Module extends BaseModule
 {
@@ -44,8 +45,12 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $preloadUser = function ($params) { return $this->preloadUser($params); };
-        $preloadProfessionalDevelopment = function ($params) { return $this->preloadProfessionalDevelopment($params); };
+        $preloadUser = function ($params) {
+            return $this->preloadUser($params);
+        };
+        $preloadProfessionalDevelopment = function ($params) {
+            return $this->preloadProfessionalDevelopment($params);
+        };
 
         $this->register('POST', '/update/{userId}', 'postUpdate', $updatePD, $preloadUser);
         $this->register('POST', '/accredit/{userId}', 'postAccredit', $nesa, $preloadProfessionalDevelopment);
@@ -59,12 +64,11 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadUser(array $params) :array
+    private function preloadUser(array $params): array
     {
         try {
             $user = $this->getUserMapper()->findById($params['userId']);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
@@ -81,14 +85,13 @@ class Module extends BaseModule
      * @throws InvalidArgumentException
      * @throws NotFound
      */
-    private function preloadProfessionalDevelopment(array $params) :array
+    private function preloadProfessionalDevelopment(array $params): array
     {
         try {
             $pd = $this->getProfessionalDevelopmentMapper()->findOneByColumn('user_id', $params['userId']);
 
             $user = $this->getUserMapper()->findById($pd->getUser()->getId());
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw new NotFound(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 

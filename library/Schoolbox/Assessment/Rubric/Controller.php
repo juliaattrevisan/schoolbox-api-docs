@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -137,7 +138,7 @@ class Controller extends BaseController
 
         // Don't use just folder ID
         $folderId = $post->get('folderId');
-        if (!$folderId){
+        if (!$folderId) {
             $this->sendJSONError('Must supply a folder Id');
             return;
         }
@@ -162,7 +163,7 @@ class Controller extends BaseController
             $groupIndex = $post->get('groupIndex');
             $groupName  = $post->get('groupName');
             $critName   = $post->get('name');
-            if(!$groupName){
+            if (!$groupName) {
                 $this->sendJSONError(
                     $this->rosettaStone->translateSentence(
                         'Must supply {:rubricGroup|indef} {:rubricGroup} for new {:rubricCriterion}'
@@ -195,7 +196,7 @@ class Controller extends BaseController
             foreach ($criterionModels as $criterionModel) {
                 $normGroup = Util::normalizeName($criterionModel->getCapability()->getName());
                 $normName  = Util::normalizeName($criterionModel->getName());
-                if ($normGroup === $proposedGroup && $normName === $proposedName){
+                if ($normGroup === $proposedGroup && $normName === $proposedName) {
                     $this->sendJSONError(
                         $this->rosettaStone->translateSentence(
                             '{:rubricCriterion|c} already exists in this {:rubricGroup}'
@@ -227,10 +228,7 @@ class Controller extends BaseController
             $context['groupIndex'] = $groupIndex;
 
             $template = 'group-row-editable';
-        }
-
-        elseif ($post->get('type') === 'group') {
-
+        } elseif ($post->get('type') === 'group') {
             // Does the list of crits/groups really need to be saved now?
             // For some reason, groups aren't saved whilst criteria are?
             // Probably because groups literally couldn't exist w/o criteria
@@ -261,7 +259,6 @@ class Controller extends BaseController
             $context['groupIndex'] = $post->get('groupIndex');
 
             $template = 'group-editable';
-
         } else {
             return;
         }
@@ -272,7 +269,6 @@ class Controller extends BaseController
             'format'   => 'nochrome',
             'template' => "@rubric/$template.twig"
         ]);
-
     }
 
     /**
@@ -332,9 +328,7 @@ class Controller extends BaseController
             // attempt to build the grid
             $maxLevels = (int)$this->getDi()->get('config')->get('rubric_max_levels');
             $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
-
         } catch (\Exception $e) {
-
             $this->getResponse()->status->setCode(400);
             $this->getResponse()->content->set([
                 'format' => 'json',

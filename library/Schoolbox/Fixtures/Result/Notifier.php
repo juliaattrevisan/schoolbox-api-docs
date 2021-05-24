@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Notify parents/players of upcoming matches
  *
@@ -11,7 +12,6 @@ namespace Schoolbox\Fixtures\Result;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
@@ -118,7 +118,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentResultcreated(Result $result, User $effector, array $diff = null) {
+    public function notifyStudentResultcreated(Result $result, User $effector, array $diff = null)
+    {
         return $this->notifyStudents($result, $effector);
     }
 
@@ -130,7 +131,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentResultupdated(Result $result, User $effector, array $diff = null) {
+    public function notifyStudentResultupdated(Result $result, User $effector, array $diff = null)
+    {
         return $this->notifyStudents($result, $effector);
     }
 
@@ -142,7 +144,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentResultcreated(Result $result, User $effector, array $diff = null) {
+    public function notifyParentResultcreated(Result $result, User $effector, array $diff = null)
+    {
         return $this->notifyParents($result, $effector);
     }
 
@@ -154,7 +157,8 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentResultupdated(Result $result, User $effector, array $diff = null) {
+    public function notifyParentResultupdated(Result $result, User $effector, array $diff = null)
+    {
         return $this->notifyParents($result, $effector);
     }
 
@@ -188,7 +192,7 @@ class Notifier extends AbstractModuleNotifier
         ;
 
         //Target parents of all teams
-        foreach($match->getAllTeams() as $team) {
+        foreach ($match->getAllTeams() as $team) {
             $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
 
             /** @var TeamPlayer $teamPlayer */
@@ -235,8 +239,7 @@ class Notifier extends AbstractModuleNotifier
         ;
 
         // Target players of all teams
-        foreach($match->getAllTeams() as $team) {
-
+        foreach ($match->getAllTeams() as $team) {
             $this->log->info("ID: " . $team->getId());
             $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
 

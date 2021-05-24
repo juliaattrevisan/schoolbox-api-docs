@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
@@ -14,6 +16,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use UnexpectedValueException;
+
 use function array_key_exists;
 
 /**
@@ -134,7 +137,6 @@ class NNIAN
         $interimNodes = (Model::createCollection())->setOffset($folder->getId(), $folder);
         $node         = $folder;
         while ($node->getInherit()) {
-
             // Check we don't have a cyclic inheritance tree (where cycle composed of 3+ nodes)
             if (array_key_exists($node->getId(), array_slice($interimNodes->keys(), 1))) {
                 throw new MapperException("Circular dependency detected");

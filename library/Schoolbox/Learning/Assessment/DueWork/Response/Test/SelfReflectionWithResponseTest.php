@@ -7,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Response\Test;
@@ -39,7 +40,8 @@ class SelfReflectionWithResponseTest extends TestCase
      *
      * @return array
      */
-    public function provider_validSelfReflectable() :array {
+    public function provider_validSelfReflectable(): array
+    {
         $student = (new User())->setId(230);
 
         $correctAssessment = (new DueWork\Model())

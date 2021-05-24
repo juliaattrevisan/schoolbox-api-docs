@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey export. Uses the handlers to export their question types into a
  * Moodle format.
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -30,7 +32,8 @@ if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
 
-if (!$surveyHandler->isOwner($survey['assess_id'])
+if (
+    !$surveyHandler->isOwner($survey['assess_id'])
     && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)
 ) {
     error(125);
@@ -41,8 +44,7 @@ try {
 
     /** @var \Schoolbox\Resource\Folder\Model $folder */
     $folder = $folderMapper->findById($survey['category_id']);
-}
-catch (\Exception $e) {
+} catch (\Exception $e) {
     error(13);
 }
 
@@ -173,4 +175,3 @@ function cmp($a, $b)
     }
     return ($a < $b) ? -1 : 1;
 }
-

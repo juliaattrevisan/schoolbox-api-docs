@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model
  *
@@ -9,16 +10,17 @@
 
 namespace Schoolbox\Fixtures\Division;
 
-use \Alaress_Date_Format;
+use Alaress_Date_Format;
 use Schoolbox\Collection;
-use \Schoolbox\ISoftDeletable;
-use \Schoolbox\User;
-use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Schoolbox\Fixtures\Sport\Model as Sport;
-use \Schoolbox\Fixtures\Season\Model as Season;
-use \Schoolbox\Fixtures\Team;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Fixtures\Sport\Model as Sport;
+use Schoolbox\Fixtures\Season\Model as Season;
+use Schoolbox\Fixtures\Team;
 
-class Model implements ISoftDeletable {
+class Model implements ISoftDeletable
+{
     use DeletedAtDate;
 
     /** @var int */
@@ -121,7 +123,8 @@ class Model implements ISoftDeletable {
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -129,7 +132,8 @@ class Model implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -137,7 +141,8 @@ class Model implements ISoftDeletable {
      * @param string $name
      * @return self
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -145,7 +150,8 @@ class Model implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -153,7 +159,8 @@ class Model implements ISoftDeletable {
      * @param string $url
      * @return self
      */
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         $this->url = $url;
         return $this;
     }
@@ -161,7 +168,8 @@ class Model implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getUrl() {
+    public function getUrl()
+    {
         return $this->url;
     }
 
@@ -169,7 +177,8 @@ class Model implements ISoftDeletable {
      * @param Sport $sport
      * @return self
      */
-    public function setSport(Sport $sport) {
+    public function setSport(Sport $sport)
+    {
         $this->sport = $sport;
         return $this;
     }
@@ -177,7 +186,8 @@ class Model implements ISoftDeletable {
     /**
      * @return Sport
      */
-    public function getSport() {
+    public function getSport()
+    {
         return $this->sport;
     }
 
@@ -185,7 +195,8 @@ class Model implements ISoftDeletable {
      * @param Season $season
      * @return self
      */
-    public function setSeason(Season $season) {
+    public function setSeason(Season $season)
+    {
         $this->season = $season;
         return $this;
     }
@@ -193,7 +204,8 @@ class Model implements ISoftDeletable {
     /**
      * @return Season
      */
-    public function getSeason() {
+    public function getSeason()
+    {
         return $this->season;
     }
 
@@ -201,7 +213,8 @@ class Model implements ISoftDeletable {
      * @param Alaress_Date_Format $createdAt
      * @return self
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt) {
+    public function setCreatedAt(Alaress_Date_Format $createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -209,7 +222,8 @@ class Model implements ISoftDeletable {
     /**
      * @return Alaress_Date_Format $createdAt
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -217,7 +231,8 @@ class Model implements ISoftDeletable {
      * @param Alaress_Date_Format $updatedAt
      * @return self
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt) {
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -225,7 +240,8 @@ class Model implements ISoftDeletable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 

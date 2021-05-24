@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Web\Controller\Base;
@@ -122,7 +124,8 @@ class Controller extends Base
             // Try to process a rubric.
             // If there was none, copy it from the last feedback
             if (!$this->processRubric($participant, $post, $feedback)) {
-                if ($feedback instanceof DueWork\Feedback\Model
+                if (
+                    $feedback instanceof DueWork\Feedback\Model
                     && $mostRecentFeedback instanceof DueWork\Feedback\Model
                     && $assessment instanceof DueWork\Model
                     && $assessment->getUseRubric()
@@ -131,16 +134,13 @@ class Controller extends Base
                     $this->rubricMapper->copySelections($mostRecentFeedback->getId(), $feedback->getId());
                 }
             }
-        }
-        catch (RangeException $e) {
+        } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
             return;
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             $this->sendError('Invalid mark provided');
             return;
-        }
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             $this->sendError('Unable to save results');
         }
     }
@@ -171,13 +171,12 @@ class Controller extends Base
             if ($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId() === $assessment->getId()) {
                 $submissionReturn->setPublishedAt($now);
 
-                try{
+                try {
                     $this->returnedWorkMapper->save($submissionReturn);
                     $publishSuccess = true;
-                } catch (PDOException $e){
+                } catch (PDOException $e) {
                     $publishSuccess = false;
                 }
-
             }
 
             $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
@@ -200,7 +199,7 @@ class Controller extends Base
      */
     protected function processRubric(Participant $participant, array $post, IFeedback $feedback): bool
     {
-        if (!$participant->getAssessable() instanceof DueWork\Model){
+        if (!$participant->getAssessable() instanceof DueWork\Model) {
             return false;
         }
 
@@ -218,7 +217,8 @@ class Controller extends Base
             return true;
         }
         // If from inline grader, save empty marks
-        if (array_key_exists('fromInlineGrader', $post) &&
+        if (
+            array_key_exists('fromInlineGrader', $post) &&
             $post['fromInlineGrader'] &&
             $feedback->getAssessable()->getUseRubric()
         ) {
@@ -296,16 +296,13 @@ class Controller extends Base
                     ],
                 ]);
             }
-        }
-        catch (RangeException $e) {
+        } catch (RangeException $e) {
             $this->sendError('Invalid mark provided');
             return;
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             $this->sendError('Invalid mark provided');
             return;
-        }
-        catch (PDOException $e) {
+        } catch (PDOException $e) {
             $this->sendError('Unable to save results');
         }
     }
@@ -332,13 +329,14 @@ class Controller extends Base
         string $reviewRoute,
         IFeedback $mostRecentFeedback = null,
         IResponse $response = null
-    ):Model {
+    ): Model {
 
         // Check whether new rubric data and/or attachments are being passed through
         $fromInlineGrader = array_key_exists('fromInlineGrader', $postVars);
         $hasRubric        = array_key_exists('rubric', $postVars);
         // Check whether the latest feedback actually has rubric data set.
-        if ($mostRecentFeedback !== null
+        if (
+            $mostRecentFeedback !== null
             && $mostRecentFeedback->getAssessable() instanceof DueWork\Model
             && $mostRecentFeedback->getAssessable()->getUseRubric()
         ) {
@@ -390,7 +388,6 @@ class Controller extends Base
 
         try {
             $this->getFeedbackDataSource()->delete($feedback);
-
         } catch (MapperException $e) {
             $code = 400;
             $data = $e->getMessage();

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -91,20 +92,17 @@ class ProjectTest extends TestCase
                 ->add((new Task())
                     ->setId(1)
                     ->setTitle('Sub-task')
-                    ->setSequence(1)
-                )
+                    ->setSequence(1))
                 ->add((new Quiz())
                     ->setId(2)
                     ->setTitle('Sub-quiz')
-                    ->setSequence(2)
-                )
+                    ->setSequence(2))
                 ->add((new DueWork())
                     ->setId(3)
                     ->setTitle('Sub-work')
                     ->setSequence(3)
                     ->setWorkType(new WorkType())
-                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
-                );
+                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL));
 
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($project);
@@ -170,8 +168,7 @@ class ProjectTest extends TestCase
             ->setId(12)
             ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
             ->setCreator($this->teacher1);
-        $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1)->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
-        );
+        $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1)->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT));
         $this->translator->translateToDataModel($project);
     }
 
@@ -403,8 +400,7 @@ class ProjectTest extends TestCase
             ->add((new ProjectModel())
                 ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
                 ->setAssessmentModel((new AssessmentModel())->setId(1))
-                ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT)
-            );
+                ->setMarkVisibility(IAssessable::MARK_VISIBILITY_PARENT_STUDENT));
 
         $this->translator->translateToDomainModel($projectModel);
     }

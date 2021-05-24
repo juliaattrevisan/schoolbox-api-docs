@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\MarkScheme;
 
 use DomainException;
@@ -198,7 +200,7 @@ class Factory
      * @throws DomainException
      * @throws RangeException
      */
-    public function spawnForCapability(IAssessable $assessable, ?float $maxMark = null) : IMarkScheme
+    public function spawnForCapability(IAssessable $assessable, ?float $maxMark = null): IMarkScheme
     {
         if (null !== $maxMark && $maxMark <= 0) {
             return new None();
@@ -208,7 +210,6 @@ class Factory
          * instead of switching it to DueWork $assessable, even though only DueWork gets rubric grids
          */
         if ($assessable instanceof DueWork) {
-
             /* Mark type never specified; equivalent to TotalMarkFractional,
              * which is to exhibit original behaviour
              */

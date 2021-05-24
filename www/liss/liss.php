@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -17,7 +18,6 @@ $log = $liss->log();
 
 try {
     $liss->start();
-}
-catch (Throwable $e) {
+} catch (Throwable $e) {
     $log->critical("Internal Error: {$e->getMessage()}");
 }

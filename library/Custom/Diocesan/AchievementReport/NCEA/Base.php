@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
 use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
@@ -13,12 +15,14 @@ use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
  *
  * @package Custom\Diocesan\AchievementReport\NCEA
  */
-abstract class Base extends AchievementReportBase {
+abstract class Base extends AchievementReportBase
+{
 
     /**
      * Explorer, reporting!
      */
-    protected function explorerReporting() {
+    protected function explorerReporting()
+    {
         $explorer = $this->db->executeQuery("
             SELECT TOP 10 *
             FROM dbo.uvSchoolBoxNCEAResults

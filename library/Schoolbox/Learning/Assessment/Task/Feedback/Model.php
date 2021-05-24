@@ -7,10 +7,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
-use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\AbstractFeedback;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
@@ -230,7 +231,7 @@ class Model extends AbstractFeedback
      */
     public function setResponse(IResponse $response = null)
     {
-        if(is_null($response)){
+        if (is_null($response)) {
             throw new \InvalidArgumentException('TaskFeedbacks must always link to a TaskResponse');
         }
         parent::setResponse($response);

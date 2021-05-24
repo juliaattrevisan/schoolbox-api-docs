@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LinkIconApplePrecomposed
  *
@@ -11,21 +12,21 @@
 
 namespace SocialStream\Post\Thumbnail;
 
+class LinkIconApplePrecomposed extends Thumbnail
+{
 
-class LinkIconApplePrecomposed extends Thumbnail {
+    /**
+     * The xpath query
+     *
+     * @var string
+     */
+    protected $query = "//link[@rel='apple-touch-icon-precomposed']";
 
-	/**
-	 * The xpath query
-	 *
-	 * @var string
-	 */
-	protected $query = "//link[@rel='apple-touch-icon-precomposed']";
-
-	/**
-	 * These are the attributes that might contain a link
-	 * to an image you want to retrieve
-	 *
-	 * @var array
-	 */
-	protected $contentAttributes = array('href');
+    /**
+     * These are the attributes that might contain a link
+     * to an image you want to retrieve
+     *
+     * @var array
+     */
+    protected $contentAttributes = array('href');
 }

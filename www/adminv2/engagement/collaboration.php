@@ -1,15 +1,16 @@
 <?php
+
 /**
  * Display due work
  */
 
-$this->setBlock('REPORT_CONTENT', 'month_head', 'month_head_block' );
-$this->setBlock('REPORT_CONTENT', 'social_month_body', 'social_month_body_block' );
-$this->setBlock('REPORT_CONTENT', 'forum_month_body', 'forum_month_body_block' );
-$this->setBlock('REPORT_CONTENT', 'blog_month_body', 'blog_month_body_block' );
-$this->setBlock('REPORT_CONTENT', 'comment_month_body', 'comment_month_body_block' );
-$this->setBlock('REPORT_CONTENT', 'wiki_month_body', 'wiki_month_body_block' );
-$this->setBlock('REPORT_CONTENT', 'poll_month_body', 'poll_month_body_block' );
+$this->setBlock('REPORT_CONTENT', 'month_head', 'month_head_block');
+$this->setBlock('REPORT_CONTENT', 'social_month_body', 'social_month_body_block');
+$this->setBlock('REPORT_CONTENT', 'forum_month_body', 'forum_month_body_block');
+$this->setBlock('REPORT_CONTENT', 'blog_month_body', 'blog_month_body_block');
+$this->setBlock('REPORT_CONTENT', 'comment_month_body', 'comment_month_body_block');
+$this->setBlock('REPORT_CONTENT', 'wiki_month_body', 'wiki_month_body_block');
+$this->setBlock('REPORT_CONTENT', 'poll_month_body', 'poll_month_body_block');
 
 
 
@@ -26,8 +27,7 @@ $wikiReport = new Schoolbox\Engagement\Wiki();
 $pollReport = new Schoolbox\Engagement\Poll();
 
 
-for($i=0; $i < $months; $i++) {
-
+for ($i = 0; $i < $months; $i++) {
     $this->setVar('MONTH', $currentMonth->getUsingFormat('F Y'));
     $this->parse('month_head_block', 'month_head', true);
 

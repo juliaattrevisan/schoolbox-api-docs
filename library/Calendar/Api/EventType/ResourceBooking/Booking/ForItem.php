@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event source - represents all bookings for a single item.
  *
@@ -10,7 +11,8 @@
 use Calendar\Event\Collection;
 use Schoolbox\User;
 
-class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Api_EventType_ResourceBooking_Base {
+class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Api_EventType_ResourceBooking_Base
+{
 
     /**
      * The IDs of the resource to fetch. Does not filter by resourceId if NULL.
@@ -42,7 +44,8 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Ap
      *
      * @return Collection
      */
-    public function getEvents($startTimestamp, $endTimestamp) {
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
         // Get all items out of booking mapper for this resource.
         $bookings = $this->getBookingMapper()->findForResource(
             $this->resourceIds,
@@ -53,7 +56,8 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Ap
         $collection = new Collection();
         foreach ($bookings as $booking) {
             $calendarEvent = $this->getEventConverter()->convertEventToCalendarEvent(
-                $booking->getEvent(), $booking
+                $booking->getEvent(),
+                $booking
             );
             $calendarEvent->setConnectorId($this->getConnectorId());
             $collection->add($calendarEvent);

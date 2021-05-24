@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collection_Renderer
  *

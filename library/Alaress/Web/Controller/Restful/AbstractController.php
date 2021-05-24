@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Web\Controller\Restful;
-
 
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Controller\Exception;
@@ -51,7 +51,7 @@ abstract class AbstractController extends Base implements IController
      * @param object $context
      * @return void
      */
-    protected abstract function getForm($entity, $context = null);
+    abstract protected function getForm($entity, $context = null);
 
     /**
      * Persist the given entity. If the persistence...
@@ -91,6 +91,5 @@ abstract class AbstractController extends Base implements IController
      * @param object $entity
      * @return void
      */
-    protected abstract function persistEntity($entity);
-
+    abstract protected function persistEntity($entity);
 }

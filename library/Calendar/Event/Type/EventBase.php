@@ -246,11 +246,11 @@ abstract class EventBase implements EventInterface
 
         $formattedTime = '';
 
-        if(!$this->getStartTime()->isAtStartOfDay()) {
+        if (!$this->getStartTime()->isAtStartOfDay()) {
             $formattedTime = $this->getStartTime()->getTimeOnly();
 
-            if(!$this->getEndTime()->isAtStartOfDay()) {
-                $formattedTime .= "&ndash;". $this->getEndTime()->getTimeOnly();
+            if (!$this->getEndTime()->isAtStartOfDay()) {
+                $formattedTime .= "&ndash;" . $this->getEndTime()->getTimeOnly();
             }
         }
 
@@ -269,7 +269,7 @@ abstract class EventBase implements EventInterface
         );
         $type = $this->getType();
         if ($type > 0) {
-            $selectors[] = 'type'.$type;
+            $selectors[] = 'type' . $type;
         }
 
         /* Merge levels
@@ -294,7 +294,8 @@ abstract class EventBase implements EventInterface
      *
      * @return string
      */
-    public function getFilterClasses() {
+    public function getFilterClasses()
+    {
         return '';
     }
 
@@ -651,7 +652,8 @@ abstract class EventBase implements EventInterface
     /**
      * Cloning magic, when expanding multiday events we use clone, this ensures they have independent dates
      */
-    public function __clone() {
+    public function __clone()
+    {
         if (is_object($this->startTime)) {
             $this->startTime = clone $this->startTime;
         }

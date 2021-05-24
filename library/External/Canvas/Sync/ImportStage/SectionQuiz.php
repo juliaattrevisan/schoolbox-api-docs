@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\ImportStage;
@@ -32,6 +34,7 @@ use Schoolbox\Mapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+
 use function array_key_exists;
 use function array_map;
 use function array_merge;
@@ -312,10 +315,12 @@ class SectionQuiz extends SectionAssessmentAbstract
         }
         if (!$different) {
             foreach ($implSectionsBySequence->keys() as $sequence) {
-                if (!$this->areQuizSectionsEqual(
-                    $implSectionsBySequence->getOffset($sequence),
-                    $specSectionsBySequence->getOffset($sequence)
-                )) {
+                if (
+                    !$this->areQuizSectionsEqual(
+                        $implSectionsBySequence->getOffset($sequence),
+                        $specSectionsBySequence->getOffset($sequence)
+                    )
+                ) {
                     $different = true;
                     break;
                 }

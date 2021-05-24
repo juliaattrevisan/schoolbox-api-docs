@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implementation of Edumate Class connector
  * For schema information, see http://wiki.schoolbox.com.au/index.php/Interface_Calls
@@ -8,7 +9,8 @@
  * @link        https://schoolbox.com.au/
 
  */
-class External_Edumate_Class extends External_Edumate_Connection implements External_ClassInterface {
+class External_Edumate_Class extends External_Edumate_Connection implements External_ClassInterface
+{
 
     /**
      * @inheritdoc
@@ -39,7 +41,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
                 '' AS StudentTutorDescription
             FROM  SCHOOLBOX_STUDENTCLASS
             LEFT JOIN SCHOOLBOX_STUDENTS ON SCHOOLBOX_STUDENTCLASS.STUDENT_NUMBER = SCHOOLBOX_STUDENTS.STUDENT_NUMBER
-            WHERE SCHOOLBOX_STUDENTCLASS.CLASS_CODE IN (".implode(',',$codes).")
+            WHERE SCHOOLBOX_STUDENTCLASS.CLASS_CODE IN (" . implode(',', $codes) . ")
             ORDER BY SURNAME ASC
         ");
 
@@ -67,8 +69,8 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
             return [];
         }
         $db = $this->getConnection();
-        array_walk($codes, function(&$n) use($db) {
-            $n = "'".$this->quote($n)."'";
+        array_walk($codes, function (&$n) use ($db) {
+            $n = "'" . $this->quote($n) . "'";
         });
 
 
@@ -76,7 +78,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
         $stmt = $this->getConnection()->prepareQuery("
             SELECT STAFF_NUMBER AS STAFFID
                 FROM SCHOOLBOX_TEACHERCLASS
-                WHERE CLASS_CODE IN (".implode(',',$codes).")
+                WHERE CLASS_CODE IN (" . implode(',', $codes) . ")
         ");
 
         // retrieve
@@ -84,7 +86,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
 
         // manipulate
         $teachers = array();
-        while($teacher = $stmt->fetchColumn()) {
+        while ($teacher = $stmt->fetchColumn()) {
             $teachers[] = $teacher;
         }
 

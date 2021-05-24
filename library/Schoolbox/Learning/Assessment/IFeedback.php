@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IReview
  *
@@ -9,7 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use \Schoolbox\User;
+use Schoolbox\User;
 
 interface IFeedback
 {

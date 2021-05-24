@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -63,7 +64,6 @@ class Controller extends Base
                 $this->l10nMapper->save($localisation);
             }
         } catch (MapperException $e) {
-
             // noop, I guess? skip unknown terminologies
         }
 

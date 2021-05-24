@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -142,5 +143,4 @@ class SessionValidator
 
         return $redisResponse;
     }
-
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 
 class Component_Config_TextboxSearch extends Component_Config_Abstract
@@ -49,18 +51,15 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
                 $firstUsageComponentId = $allUsages->first()->getId();
             }
         } catch (\Schoolbox\Mapper\Exception $e) {
-
             /* noop
              */
         }
 
         if ($firstUsageComponentId && $textbox->getCategory()->getId()) {
-
             /* Construct urls if there is a component instance which displays this textbox
              */
             $viewUrl = "/homepage/{$textbox->getCategory()->getId()}#component{$firstUsageComponentId}";
         } else {
-
             /* Otherwise, you've linked to a textbox which no longer gets used in any components
              * and you don't have an explicit means to view or edit its contents
              */

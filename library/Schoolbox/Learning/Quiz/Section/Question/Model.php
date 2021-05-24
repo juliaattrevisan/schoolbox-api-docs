@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -16,7 +17,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Model as QuizAnswer;
 use Schoolbox\Learning\Quiz\Section\Question\Solution\Model as QuizSolution;
-use \DomainException;
+use DomainException;
 
 class Model implements ISoftDeletable
 {
@@ -86,7 +87,7 @@ class Model implements ISoftDeletable
         $this->setAnswers(new GenericCollection(QuizAnswer::class));
 
         // Clone Solution to clear its IDs, so subsequent save is INSERT instead of UPDATE
-        if($this->solution instanceof QuizSolution){
+        if ($this->solution instanceof QuizSolution) {
             $cloneSolution = clone $this->solution;
             $cloneSolution->setQuestion($this);
             $this->setSolution($cloneSolution);

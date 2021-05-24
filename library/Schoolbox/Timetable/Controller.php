@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for timetable related stuff. Currently only contains the AJAX
  * target for getting the date for a timetable day.

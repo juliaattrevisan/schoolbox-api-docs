@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -89,14 +90,13 @@ class DifferTest extends TestCase
             'flat with array and scalar value' => [
                 ['a' => 1, '1234567890' => 2],
                 ['a' => 1, '1234567890' => ['c' => 3]],
-                ['1234567890'=>[2,['c'=>3]]],
+                ['1234567890' => [2,['c' => 3]]],
             ],
             'recursive with array and scalar value' => [
                 ['a' => 1, '1234567890' => ['0987654321' => 2,]],
                 ['a' => 1, '1234567890' => ['0987654321' => ['d' => 3]]],
-                ['1234567890'=>['0987654321'=>[2,['d'=>3]]]],
+                ['1234567890' => ['0987654321' => [2,['d' => 3]]]],
             ],
         ];
     }
-
 }

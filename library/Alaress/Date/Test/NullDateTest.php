@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that null dates work as expected.
  *

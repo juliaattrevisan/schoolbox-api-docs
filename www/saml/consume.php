@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SAMPLE Code to demonstrate how to handle a SAML assertion response.
  *
@@ -8,6 +9,7 @@
  */
 
 use Schoolbox\Error\Mapper as ErrorMapper;
+
 require 'saml-setup.php';
 
 $auth = new OneLogin\Saml2\Auth($settingsInfo);
@@ -16,40 +18,37 @@ $auth = new OneLogin\Saml2\Auth($settingsInfo);
 /* Handle Single Logout commands */
 if (isset($_GET['sls'])) {
     if (isset($_GET['SAMLRequest'])) {
-        SAMLDebugLog('SLS Request:'.base64_decode($_GET['SAMLRequest']));
+        SAMLDebugLog('SLS Request:' . base64_decode($_GET['SAMLRequest']));
     }
     try {
         SAMLDebugLog("Attempting SLS");
         $auth->processSLO(false, null, true);
     } catch (OneLogin\Saml2\Error $e) {
-        SAMLDebugLog("SLS Error: ".$e->getMessage());
+        SAMLDebugLog("SLS Error: " . $e->getMessage());
         error(ErrorMapper::ERROR_PROCESSING, $e->getMessage());
     }
 
     $errors = $auth->getErrors();
     if (!empty($errors)) {
         $errorReason = $auth->getLastErrorReason() ?? end($errors);
-        SAMLDebugLog("SLS Error(s): ".json_encode($errors));
-        SAMLDebugLog("SLS Error: ".$errorReason);
+        SAMLDebugLog("SLS Error(s): " . json_encode($errors));
+        SAMLDebugLog("SLS Error: " . $errorReason);
         error(ErrorMapper::ERROR_PROCESSING, $errorReason);
     }
 
     $samlLogoutUrl = trim(Config::get('saml_logout_url'));
 
     // Replace some dynamic variables in the logout URL if set
-    $samlLogoutUrl = str_replace('{SCHOOLBOX_ADDRESS}',$_SERVER['SERVER_NAME'],$samlLogoutUrl);
+    $samlLogoutUrl = str_replace('{SCHOOLBOX_ADDRESS}', $_SERVER['SERVER_NAME'], $samlLogoutUrl);
 
     if (strlen($samlLogoutUrl) > 0) {
         // Redirect to logout location
         header('Location: ' . $samlLogoutUrl);
         exit;
-    }
-    else {
+    } else {
         SitePage::localRedir("/login/");
     }
-}
-
-else if(isset($_POST['SAMLResponse'])) {
+} else if (isset($_POST['SAMLResponse'])) {
     SAMLDebugLog(base64_decode($_POST['SAMLResponse']));
 
     if (isset($_SESSION) && isset($_SESSION['AuthNRequestID'])) {
@@ -84,14 +83,12 @@ else if(isset($_POST['SAMLResponse'])) {
 
         SAMLDebugLog("SAML auth successful");
         SitePage::localRedir($page);
-
     } else {
         $msg = 'Invalid SAML user.';
         $errorTracker[] = $msg;
         SAMLDebugLog($msg);
         error(ErrorMapper::ERROR_USER_NOT_FOUND);
     }
-}
-else {
+} else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }

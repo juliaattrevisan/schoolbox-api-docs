@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $groupHandler = new Group();
@@ -18,32 +20,29 @@ $type = Scrub::text($_GET['type']);
 $destinationID = Scrub::text($_GET['destinationID']);
 
 if ($type == 'system' && !empty($_POST['systemGroupID'])) {
+    /* Add from this group...
+     */
+    $groupID = Scrub::text($_POST['systemGroupID']);
 
-	/* Add from this group...
-	 */
-	$groupID = Scrub::text($_POST['systemGroupID']);
+    $allUsers = $userHandler->getByGroup($groupID);
 
-	$allUsers = $userHandler->getByGroup($groupID);
+    if (is_array($allUsers) && count($allUsers)) {
+        foreach ($allUsers as $currentUser) {
+            $groupHandler->addUser($destinationID, $currentUser['id']);
+        }
+    }
+} elseif ($type == 'individual' && !empty($_POST['individualGroupID'])) {
+    /* Add from this group...
+     */
+    $groupID = Scrub::text($_POST['individualGroupID']);
 
-	if (is_array($allUsers) && count($allUsers)) {
-		foreach($allUsers as $currentUser) {
-			$groupHandler->addUser($destinationID, $currentUser['id']);
-		}
-	}
-}
-elseif ($type == 'individual' && !empty($_POST['individualGroupID'])) {
-	/* Add from this group...
-	 */
-	$groupID = Scrub::text($_POST['individualGroupID']);
+    $allUsers = $userHandler->getAllInCategory($groupID);
 
-	$allUsers = $userHandler->getAllInCategory($groupID);
-
-	if (is_array($allUsers) && count($allUsers)) {
-		foreach($allUsers as $currentUser) {
-			$groupHandler->addUser($destinationID, $currentUser['uid']);
-		}
-	}
+    if (is_array($allUsers) && count($allUsers)) {
+        foreach ($allUsers as $currentUser) {
+            $groupHandler->addUser($destinationID, $currentUser['uid']);
+        }
+    }
 }
 
 SitePage::localRedir('/group/modify/' . $_GET['destinationID']);
-

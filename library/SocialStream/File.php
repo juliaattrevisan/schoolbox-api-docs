@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream;
 
 use Schoolbox\Resource\Storage\Model;
@@ -44,7 +46,8 @@ class File
      * @param string $url
      * @param int $ownerId
      */
-    public function __construct($url, $ownerId) {
+    public function __construct($url, $ownerId)
+    {
         $this->setUrl($url);
         $this->setOwnerId($ownerId);
     }
@@ -53,7 +56,8 @@ class File
     /**
      * Save image
      */
-    public function saveImage() {
+    public function saveImage()
+    {
         $brownhole = tmpfile();
 
         $curl = new \Alaress_Curl_Url($this->getUrl());
@@ -83,7 +87,8 @@ class File
      *
      * @param int $ownerId
      */
-    public function setOwnerId($ownerId) {
+    public function setOwnerId($ownerId)
+    {
         $this->ownerId = $ownerId;
     }
 
@@ -92,7 +97,8 @@ class File
      *
      * @return int
      */
-    public function getOwnerId() {
+    public function getOwnerId()
+    {
         return $this->ownerId;
     }
 
@@ -101,7 +107,8 @@ class File
      *
      * @param string $url
      */
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         $this->url = $url;
     }
 
@@ -110,7 +117,8 @@ class File
      *
      * @return string
      */
-    public function getUrl() {
+    public function getUrl()
+    {
         return $this->url;
     }
 
@@ -119,7 +127,8 @@ class File
      *
      * @param Model $savedFile
      */
-    public function setSavedFile($savedFile) {
+    public function setSavedFile($savedFile)
+    {
         $this->savedFile = $savedFile;
     }
 
@@ -128,7 +137,8 @@ class File
      *
      * @return Model
      */
-    public function getSavedFile() {
+    public function getSavedFile()
+    {
         return $this->savedFile;
     }
 }

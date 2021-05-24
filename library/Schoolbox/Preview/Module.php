@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -50,7 +51,7 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '(?:index|preview)',
-            function($params) {
+            function ($params) {
                 return array(
                     'params' => $params
                 );
@@ -72,7 +73,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

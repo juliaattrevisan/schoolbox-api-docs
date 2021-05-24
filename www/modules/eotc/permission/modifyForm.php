@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Permission ModifyForm
  *
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use EOTC\Authenticator;
 use EOTC\EventPermission;
 use EOTC\EventPermissionMapper;
@@ -33,15 +35,14 @@ new Authenticator($page);
 $sessionUser = $_SESSION['user'];
 
 if (!$sessionUser->isSuperuser()) {
-	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 try {
-	/** @var User $user */
-	$user = UserMapper::getInstance()->findById($_POST['staff']);
-}
-catch (MapperException $e) {
-	error(ErrorMapper::ERROR_USER_NOT_FOUND);
+    /** @var User $user */
+    $user = UserMapper::getInstance()->findById($_POST['staff']);
+} catch (MapperException $e) {
+    error(ErrorMapper::ERROR_USER_NOT_FOUND);
 }
 
 /* Delete all perms for this user, and re-add new ones
@@ -50,11 +51,10 @@ $permissionMapper = EventPermissionMapper::getInstance();
 $permissionMapper->deleteForUser($user);
 
 if (is_array($_POST['campus']) && count($_POST['campus'])) {
-	foreach ($_POST['campus'] as $currentCampus) {
-
-		/* Apply the same perms for each campus
-		 */
-		if (is_array($_POST['status']) && count($_POST['status'])) {
+    foreach ($_POST['campus'] as $currentCampus) {
+        /* Apply the same perms for each campus
+         */
+        if (is_array($_POST['status']) && count($_POST['status'])) {
             foreach ($_POST['status'] as $currentStatus => $settings) {
                 try {
                     /** @var Campus $campus */
@@ -72,16 +72,14 @@ if (is_array($_POST['campus']) && count($_POST['campus'])) {
                     $permission->setSubscribed($settings['subscribed']);
 
                     $permissionMapper->save($permission);
-                }
-                catch (MapperException $e) {
-
+                } catch (MapperException $e) {
                     /* noop
                      * could not save at least one permission due to missing campus and/or status
                      */
                 }
-			}
-		}
-	}
+            }
+        }
+    }
 }
 
 $page->localRedir('/modules/eotc/permission/modify');

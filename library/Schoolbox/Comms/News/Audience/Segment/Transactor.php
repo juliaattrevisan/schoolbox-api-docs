@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -13,7 +14,9 @@ use Schoolbox\Comms\News\Audience;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use UnexpectedValueException;
+
 use function trigger_error;
+
 use const E_USER_WARNING;
 
 /**

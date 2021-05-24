@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Homepage blog component controller. Is responsible for rendering the TWIG into component
  * on homepage pages

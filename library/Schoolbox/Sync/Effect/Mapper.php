@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Effect;
-
 
 use PDO;
 use PDOStatement;
@@ -83,6 +83,4 @@ class Mapper extends Schoolbox\Mapper
 
         return $collection;
     }
-
-
 }

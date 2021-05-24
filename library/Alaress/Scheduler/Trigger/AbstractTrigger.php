@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,14 +9,14 @@
 
 namespace Alaress\Scheduler\Trigger;
 
-
 use Alaress\Scheduler\Event\EventInterface;
 use Schoolbox\Realtime\Schedule\Event\CrudEventInterface;
 
-abstract class AbstractTrigger implements TriggerInterface {
+abstract class AbstractTrigger implements TriggerInterface
+{
 
     /** @var string */
-	protected $label;
+    protected $label;
 
     /** @var EventInterface */
     protected $event;
@@ -26,7 +27,8 @@ abstract class AbstractTrigger implements TriggerInterface {
      *
      * @return string
      */
-    public function getLabel() {
+    public function getLabel()
+    {
         return $this->label;
     }
 
@@ -36,7 +38,8 @@ abstract class AbstractTrigger implements TriggerInterface {
      *
      * @return EventInterface
      */
-    public function getEvent() {
+    public function getEvent()
+    {
         return $this->event;
     }
 

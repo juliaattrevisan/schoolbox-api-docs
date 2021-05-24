@@ -1,11 +1,13 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-interface Report_IReport {
+interface Report_IReport
+{
     function setIndexID($groupID);
     function getIndexID();
     function getReportTitle();

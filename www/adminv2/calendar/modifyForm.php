@@ -8,7 +8,7 @@ use Schoolbox\Collection;
 
 /** @var SitePage $this */
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
 }
 
 /* Use $_POST['action'] to separate screens
@@ -132,7 +132,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'subscribe') {
             if ($decodedConfig instanceof Calendar_Api_Config_Connector_Vcal && $decodedConfig->getUrl()) {
                 try {
                     $cache->write($decodedConfig);
-                } catch (InvalidArgumentException|ParseException|InvalidDataException $e) {
+                } catch (InvalidArgumentException | ParseException | InvalidDataException $e) {
                     // There was a failure when writing the cache,
                     // or reading from the URL in the config.
                     // Whatever the case, continue

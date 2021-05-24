@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for resource moderation types.
  *
@@ -11,11 +12,14 @@
  */
 
 namespace Schoolbox\ResourceBooking\Item\RelatedResource;
+
 use Schoolbox\Mapper as BaseMapper;
 
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    public function mapping() {
+    public function mapping()
+    {
         $this->hasTable('resource_relation');
         $this->hasModel('Schoolbox\\ResourceBooking\\Item\\RelatedResource\\Model');
         $this->hasMap(
@@ -59,7 +63,7 @@ class Mapper extends BaseMapper {
             )
         );
 
-        $this->registerCallback('postSave',   array($this, 'postSave'));
+        $this->registerCallback('postSave', array($this, 'postSave'));
         $this->registerCallback('postDelete', array($this, 'postDelete'));
     }
 
@@ -69,7 +73,8 @@ class Mapper extends BaseMapper {
      *
      * @param Model $object
      */
-    public function postSave(Model $object) {
+    public function postSave(Model $object)
+    {
         // I'm not sure if this covers the case where a relation's resource ID
         // is changed or not.
         // Oh well, links are only ever added or removed, never updated.
@@ -99,7 +104,8 @@ class Mapper extends BaseMapper {
      *
      * @param Model $object
      */
-    public function postDelete(Model $object) {
+    public function postDelete(Model $object)
+    {
         $query = "
             DELETE FROM {$this->getTable()}
             WHERE resource_id=:resourceId AND extra_resource_id=:extraResourceId
@@ -117,5 +123,4 @@ class Mapper extends BaseMapper {
         );
         $statement->execute();
     }
-
 }

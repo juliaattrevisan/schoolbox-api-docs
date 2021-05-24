@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Scheduler;
-
 
 use Alaress\Async\SignalEmitter;
 use Alaress\Date\IClock;
@@ -22,7 +22,6 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\TimerInterface;
-
 
 abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHandlerInterface
 {
@@ -192,8 +191,13 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         $this->putTimer($model, $label, $timer);
 
         $this->log->info(
-            sprintf("[AbstractScheduler] Scheduling trigger '%s:%s' for %s in %s seconds",
-                $trigger->getEventObjectId(), $trigger->getLabel(), date('Y-m-d H:i:s', $trigger->getTimestamp()), $interval),
+            sprintf(
+                "[AbstractScheduler] Scheduling trigger '%s:%s' for %s in %s seconds",
+                $trigger->getEventObjectId(),
+                $trigger->getLabel(),
+                date('Y-m-d H:i:s', $trigger->getTimestamp()),
+                $interval
+            ),
             ['char' => '+']
         );
 
@@ -294,7 +298,6 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
         // something like "instanceof {Trait}" would be amazing, buuuuut this is PHP...
         if (method_exists($object, 'getId')) {
             $string = get_class($object) . ':' . $object->getId();
-
         } else {
             // fall back to using the SPL hash if there's no available ID
             $string = spl_object_hash($object);
@@ -346,6 +349,5 @@ abstract class AbstractScheduler extends SignalEmitter implements TaskResponseHa
     /**
      * @return string
      */
-    protected abstract function getMethod();
-
+    abstract protected function getMethod();
 }

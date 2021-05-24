@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -22,8 +23,8 @@ class CommentMapper extends Mapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('body', self::TYPE_STRING);
-        $this->uses('student_visibility',self::TYPE_BOOLEAN );
-        $this->uses('parent_visibility',self::TYPE_BOOLEAN );
+        $this->uses('student_visibility', self::TYPE_BOOLEAN);
+        $this->uses('parent_visibility', self::TYPE_BOOLEAN);
         $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP, 'createdAt');
         $this->uses('modified', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'updatedAt');
         $this->uses('deleted', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deletedAt');
@@ -103,6 +104,5 @@ class CommentMapper extends Mapper
         }
 
         return $commentCollection;
-
     }
 }

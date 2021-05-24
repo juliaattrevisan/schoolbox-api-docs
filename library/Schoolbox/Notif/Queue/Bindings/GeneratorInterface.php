@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Notif\Queue\Bindings;
-
 
 use Schoolbox\User;
 
@@ -19,5 +19,4 @@ interface GeneratorInterface
      * @return string[][]
      */
     public function generateBindingsForUser(User $user);
-
-} 
+}

@@ -2,12 +2,12 @@
 
 /* This form used to be for generic emails, now only used for the feedback form
    It requires the following variables;
-			template - template filename to be used
-			email - email address of sender
+            template - template filename to be used
+            email - email address of sender
    The following are optional but recommended variables
-			subject - subject of email to be sent
-			name - name of sender
-			confirmation - location to redirect user to after submission, ie a confirmation page
+            subject - subject of email to be sent
+            name - name of sender
+            confirmation - location to redirect user to after submission, ie a confirmation page
 */
 
 use Alaress\Mail\AbstractMailer;
@@ -24,7 +24,7 @@ if (!isset($_SESSION['id']) && !$recaptcha->verify($_POST['g-recaptcha-response'
     error(105, "The Human Checker (reCAPTCHA) failed.");
 }
 
-if(isset($_SESSION['user'])) {
+if (isset($_SESSION['user'])) {
     /** @var \Schoolbox\User $user */
     $user = $_SESSION['user'];
     $name = $user->getFullName();
@@ -59,12 +59,12 @@ if (validateEmailAddress($_POST['email']) && preg_match("/^[a-zA-Z0-9\/\-\_]+\.h
                         'email' => Config::get('mail_support_address')
                 ));
 
-/*	if($_POST['receipt']) {
+/*  if($_POST['receipt']) {
         $receiptHandler = new Mailer($_POST['receipt'], $_POST['receipt_subject'], $_POST['email']);
-		$receiptHandler->setVar($output);
-		$receiptHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
-		$receiptHandler->send();
-	}
+        $receiptHandler->setVar($output);
+        $receiptHandler->setVar('SITE_DOMAIN', $_SERVER['HTTP_HOST']);
+        $receiptHandler->send();
+    }
 */
 }
 
@@ -102,7 +102,7 @@ function validateEmailAddress($email)
     list($alias, $domain) = explode('@', $email);
 
     //this prevents appending of localhost to lookup
-    $domain = $domain.'.';
+    $domain = $domain . '.';
 
     //check for mx records or that it resolves
     if (getmxrr($domain, $temp)) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contents
  *
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Browser\Tree;
 
 use Schoolbox\Permission\Access\Access;
@@ -138,8 +140,7 @@ class Contents
         $this->setAllNodes($this->getAllNodes()
             ->merge($this->getLinkNodes())
             ->merge($this->getFileNodes())
-            ->sortBy('name', 'asc')
-        );
+            ->sortBy('name', 'asc'));
 
         return $this->getAllNodes();
     }
@@ -188,7 +189,6 @@ class Contents
         /* Process files
          */
         foreach ($allFileNodes as $currentFileNode) {
-
             /* css for the node
              */
             $class = array();

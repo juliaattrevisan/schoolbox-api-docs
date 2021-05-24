@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Exporter;
@@ -128,9 +130,9 @@ class Controller extends BaseController
             [$assessment->getBaseContext()->getTitle(), '/homepage/' . $assessment->getBaseContext()->getFolder()->getId()],
         ];
         if ($assessment->getContext() instanceof Project) {
-            $breadcrumbs[] = [$assessment->getContext()->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId'=>$assessment->getContext()->getId()])];
+            $breadcrumbs[] = [$assessment->getContext()->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId' => $assessment->getContext()->getId()])];
         }
-        $breadcrumbs[] = [$assessment->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId'=>$assessment->getId()])];
+        $breadcrumbs[] = [$assessment->getTitle(), $this->getRouteIfAuthorized('learningAssessment.getAssessment', ['assessmentId' => $assessment->getId()])];
         $breadcrumbs[] = ['Export', '#'];
 
         $data = [
@@ -269,9 +271,9 @@ class Controller extends BaseController
             /** @var UnitSpecification\Model $unitSpec */
             $unitSpec  = $assessment->getBaseContext();
             $returnUrl = $this->getRouter()->generate(
-                    'course.modifyCourse',
-                    ['id' => $unitSpec->getCourse()->getId(),]
-                ) . "#{$unitSpec->getId()}";
+                'course.modifyCourse',
+                ['id' => $unitSpec->getCourse()->getId(),]
+            ) . "#{$unitSpec->getId()}";
         }
 
         // Redir back to the return URL (if set) or the course page if not
@@ -387,7 +389,6 @@ class Controller extends BaseController
 
         $assessmentImpls = $this->assessmentDataSource->createCollection();
         foreach ($unitImplementations as $unitImplementation) {
-
             // Closed already? don't allow export
             if ($unitImplementation->getDueDate()->isPastDate()) {
                 continue;

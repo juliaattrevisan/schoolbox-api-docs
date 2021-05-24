@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Component\Eportfolio;
@@ -24,7 +26,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
 
         if ($records->count() > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $fileListItemMapper->getTable(), ['char' => '-']);
+                $this->logger->notice('Will delete [' . $records->count() . '] record(s) in: ' . $fileListItemMapper->getTable(), ['char' => '-']);
             } else {
                 foreach ($records as $record) {
                     $file = $fileListItemMapper->findByColumn('file_id', $record->getId(), ['deleted' => true]);
@@ -34,7 +36,7 @@ class RelationalDelete extends Deletable implements IRelationalDelete
                         throw new Exception($exception->getMessage());
                     }
                 }
-                $this->logger->notice('['. $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
+                $this->logger->notice('[' . $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
             }
         }
     }

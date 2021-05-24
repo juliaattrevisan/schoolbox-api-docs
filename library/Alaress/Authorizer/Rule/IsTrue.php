@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validates whether the attribute provided is true
  * This is generally used to check if a config variable is true

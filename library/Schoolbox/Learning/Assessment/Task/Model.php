@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Task
  *
@@ -20,8 +21,8 @@ use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\User;
+use Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
@@ -235,17 +236,17 @@ class Model extends AbstractAssessment
     public function canLearnerCreateResponse(User $learner)
     {
         // Not a participant ?
-        if(!$this->isParticipant($learner)){
+        if (!$this->isParticipant($learner)) {
             return false;
         }
 
         // Not open ?
-        if(!$this->isOpen($learner)){
+        if (!$this->isOpen($learner)) {
             return false;
         }
 
         // Must be self-assessable
-        if(!$this->isSelfAssessable()){
+        if (!$this->isSelfAssessable()) {
             return false;
         }
 
@@ -355,7 +356,7 @@ class Model extends AbstractAssessment
      */
     public function isSelfAssessable(): bool
     {
-        if(null === $this->isSelfAssessable){
+        if (null === $this->isSelfAssessable) {
             throw new InsufficientHydrationException('Property not set');
         }
         return $this->isSelfAssessable;
@@ -450,7 +451,7 @@ class Model extends AbstractAssessment
      * @param \Alaress_Date_Format $closeAt
      * @return static
      */
-    public function setCloseAt(\Alaress_Date_Format  $closeAt)
+    public function setCloseAt(\Alaress_Date_Format $closeAt)
     {
         // noop
         return $this;

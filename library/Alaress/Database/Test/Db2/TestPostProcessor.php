@@ -98,4 +98,3 @@ class TestPostProcessor extends TestCase
         $this->assertSame(9, $count);
     }
 }
-

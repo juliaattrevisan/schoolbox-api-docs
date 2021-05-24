@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Learning\Analytics\BoxPlot\Test\Unit;
 
 use PHPUnit\Framework\TestCase;

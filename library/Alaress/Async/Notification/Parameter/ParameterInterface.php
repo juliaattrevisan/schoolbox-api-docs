@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Parameter;
-
 
 use JsonSerializable;
 

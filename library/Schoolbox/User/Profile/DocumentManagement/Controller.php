@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -87,7 +88,7 @@ class Controller extends Base
                     'icons'   => $icons,
                     'wysiwyg_content' => $wysiwyg_value
                 ],
-                $l10n->translate('reports',true, true).' for '.$student->formatName()
+                $l10n->translate('reports', true, true) . ' for ' . $student->formatName()
             )
         );
     }

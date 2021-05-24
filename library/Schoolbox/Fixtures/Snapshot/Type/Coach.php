@@ -1,17 +1,19 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Snapshot\Type;
 
-use \Schoolbox\Fixtures\Snapshot\ISnapshot;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Coach\Model as CurrentCoach;
-use \Schoolbox\Fixtures\Coach\Participant\Model as ParticipantCoach;
-use \Schoolbox\Fixtures\Coach\Participant\Mapper as ParticipantCoachMapper;
-use \Schoolbox\Fixtures\Team\Metadata\Metadata;
+use Schoolbox\Fixtures\Snapshot\ISnapshot;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Coach\Model as CurrentCoach;
+use Schoolbox\Fixtures\Coach\Participant\Model as ParticipantCoach;
+use Schoolbox\Fixtures\Coach\Participant\Mapper as ParticipantCoachMapper;
+use Schoolbox\Fixtures\Team\Metadata\Metadata;
 
 /**
  * Class Coach
@@ -55,7 +57,6 @@ class Coach implements ISnapshot
         /** @var Team $currentTeam */
         foreach ($match->getAllTeams() as $currentTeam) {
             if (is_numeric($currentTeam->getId())) {
-
                 /* Delete all the existing Coaches for the Team
                  * then re-add them, in case the snapshot already
                  * existed and you need to refresh with a new one

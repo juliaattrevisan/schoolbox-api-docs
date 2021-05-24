@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -20,5 +21,4 @@ interface IRoute
      * @throws InvalidArgumentException   if there is no data to retrieve
      */
     public function data();
-
 }

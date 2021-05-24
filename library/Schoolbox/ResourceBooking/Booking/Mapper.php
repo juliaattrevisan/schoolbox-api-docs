@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Schoolbox\Calendar\Event;
@@ -246,15 +248,15 @@ class Mapper extends BaseMapper
         // Hydration:
         // progress through each join that was passed.
         return $this->hydrateList(
-            $statement, 'b',
-
+            $statement,
+            'b',
             /**
              * @param self $mapper
              * @param Model $model
              * @param array $row
              * @return Model
              */
-            function($mapper, $model, $row) {
+            function ($mapper, $model, $row) {
                 /** @var Event $event */
                 $event = $mapper->hydrateJoin($row, 'event', 'e');
                 $event->setOwner($mapper->hydrateJoin($row, 'event.owner', 'eo'));
@@ -402,7 +404,7 @@ class Mapper extends BaseMapper
         $statement->bindValue('bookingId', $id);
         $statement->execute();
         foreach ($statement as $row) {
-            $model = $this->hydrate($row, 'b', function($mapper, $model, $row) {
+            $model = $this->hydrate($row, 'b', function ($mapper, $model, $row) {
                 /** @var self  $mapper */
                 /** @var Model $model */
                 return $model
@@ -446,7 +448,7 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('bookingId', $id);
         $statement->execute();
-        return $this->hydrateList($statement, 'b', function($mapper, $model, $row) {
+        return $this->hydrateList($statement, 'b', function ($mapper, $model, $row) {
             /** @var self  $mapper */
             /** @var Model $model */
             return $model
@@ -499,7 +501,7 @@ class Mapper extends BaseMapper
         $statement->bindValue('seriesId', $seriesId);
         $statement->bindValue('resourceId', $resourceId);
         $statement->execute();
-        $list = $this->hydrateList($statement, 'b', function($mapper, $model, $row) {
+        $list = $this->hydrateList($statement, 'b', function ($mapper, $model, $row) {
             /** @var self  $mapper */
             /** @var Model $model */
             return $model

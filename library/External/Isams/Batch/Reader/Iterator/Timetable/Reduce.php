@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Reduces results for `External_Isams_Batch_Reader_Timetable->parse()`.
  *
@@ -28,7 +29,6 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Reduce
                     $item['TimetableDays']
                 );
             }
-
         }
         return $carry;
     }

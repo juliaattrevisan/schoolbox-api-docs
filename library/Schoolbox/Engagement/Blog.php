@@ -26,7 +26,8 @@ class Blog
         $this->database = Database::getInstance();
     }
 
-    public function createdPost(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function createdPost(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM blog
                   WHERE created_at >= :start AND created_at <= :end";
 
@@ -38,7 +39,8 @@ class Blog
         return $statement->fetchColumn(0);
     }
 
-    public function createdComment(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function createdComment(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM blog_comment
                   WHERE created_at >= :start AND created_at <= :end";
 

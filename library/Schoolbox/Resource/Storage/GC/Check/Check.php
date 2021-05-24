@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,8 +9,7 @@
 
 namespace Schoolbox\Resource\Storage\GC\Check;
 
-
-interface Check 
+interface Check
 {
 
     /**
@@ -18,5 +18,4 @@ interface Check
      * @return array
      */
     public function getStale(array $previous);
-
 }

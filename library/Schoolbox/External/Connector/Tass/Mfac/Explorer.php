@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Explorer
  *
@@ -152,14 +153,12 @@ class Explorer
 
         while ($row = $statement->fetch()) {
             if (!$row['sfa_num']) {
-
                 /* Nuclear family
                  */
                 $type      = self::NUCLEAR;
                 $rawId     = $row['student_contact_network_login'];
                 $studentId = "{$row['student_preferred']} {$row['student_surname']}";
             } else {
-
                 /* Split family
                  */
                 $type      = self::SPLIT;

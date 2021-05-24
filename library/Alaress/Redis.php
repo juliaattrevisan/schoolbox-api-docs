@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A singleton wrapper around a Predis instance.
  *
@@ -163,5 +164,4 @@ class Redis
         }
         return $result;
     }
-
 }

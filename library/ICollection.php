@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defined interface for both Alex's mapper Collection class and my
  * Schoolbox\Collection class.
@@ -7,20 +8,21 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-interface ICollection extends IteratorAggregate, Countable {
-	/**
-	 * Add item to end of this collection
-	 *
-	 * @param mixed $value
-	 */
-	public function add($value);
+interface ICollection extends IteratorAggregate, Countable
+{
+    /**
+     * Add item to end of this collection
+     *
+     * @param mixed $value
+     */
+    public function add($value);
 
-	/**
-	 * Returns entire collection as an array.
-	 *
-	 * @return array
-	 */
-	public function getAll();
+    /**
+     * Returns entire collection as an array.
+     *
+     * @return array
+     */
+    public function getAll();
 
 
     /**

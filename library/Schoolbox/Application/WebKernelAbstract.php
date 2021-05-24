@@ -1,15 +1,17 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
 use Alaress\Session\Session;
-use \Database;
+use Database;
 use Schoolbox\Application\WebRequest\ShutdownHandler;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -86,9 +88,9 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
         // it's almost a guarantee that some kind of minor error will have occurred at some point
         if ($error !== null) {
-
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
-            if ($isException
+            if (
+                $isException
                 || ((int)$error['type'] & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
             ) {
                 // RedisException extends RuntimeException: occurs when Redis
@@ -182,7 +184,8 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     /**
      * @inheritdoc
      */
-    protected function registerShutdownHandling(): void {
+    protected function registerShutdownHandling(): void
+    {
         register_shutdown_function(array(ShutdownHandler::instance(), 'onShutdown'));
     }
 
@@ -285,8 +288,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                         ->setData($args)
                         ->setTemplate($code === 404 || $code === 410
                             ? 'common/error/404.twig'
-                            : 'common/error/general.twig'
-                        );
+                            : 'common/error/general.twig');
                 }
 
                 // Finagle a response?
@@ -294,7 +296,6 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 $response->status->setCode($code);
                 $output->output($response);
                 return;
-
             } catch (Di\Exception\ServiceNotFound $e) {
                 // noop: fall thru to outputRawHtmlError
             }

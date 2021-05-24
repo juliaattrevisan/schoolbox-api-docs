@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,13 +8,11 @@
 
 namespace Schoolbox\Fixtures\Season;
 
-
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
 use Schoolbox\Fixtures\Season\Model as Season;
 use Schoolbox\Mapper as BaseMapper;
-
 
 /**
  * Class Mapper
@@ -154,6 +153,4 @@ class Mapper extends BaseMapper
 
         return $seasonMatchCounts;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,7 +8,7 @@
 
 namespace Schoolbox\Fixtures\School;
 
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Fixtures\School\Model as School;
 use Schoolbox\Mapper\Exception as MapperException;
 

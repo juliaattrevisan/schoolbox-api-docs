@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -27,6 +28,5 @@ class Component_Config_Align extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_SELECTED', $value == $configValue ? ' selected="selected"' : '');
             $page->parse('aligns_block', 'aligns', true);
         }
-
     }
 }

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge;
@@ -18,12 +20,12 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\TreeBuilder;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_keys;
 use function count;
 use function implode;
 use function preg_match;
 use function preg_replace;
-
 
 /**
  * Responsible for the logical link between a Canvas CourseSection.SisSourceId and a Schoolbox Folder.FolderCode
@@ -364,7 +366,6 @@ class CourseSection
                 return $matches[1];
             }
             $parent = $folderTree->getParent($parent);
-
         }
         return null;
     }

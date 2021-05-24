@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 /** @noinspection PhpDocMissingThrowsInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 /** @noinspection PhpUnused */
@@ -171,7 +173,7 @@ class HomePageCest
         $folder_title = 'Testing Folder - Resource File Uploads using file upload form' . $timestamp;
         $image_name = "fileFormUploadTest{$timestamp}.png";
         $image_location = '/UploadTestFiles/fish2.png';
-        $image_description= 'Automated uploaded file';
+        $image_description = 'Automated uploaded file';
 
         $folderPayload = new Payload\Resource\Folder\Create();
         $folderPayload->setName($folder_title);
@@ -186,7 +188,7 @@ class HomePageCest
         $i->amGoingTo('Upload image to storage');
         $i->sendRequest($storageUpload);
         $i->seeResponseCodeIs(200);
-        $json_reply=json_decode($i->grabResponse(), true);
+        $json_reply = json_decode($i->grabResponse(), true);
 
         #WHEN
         $uploadFile = new Payload\Resource\File\FileUploadForm($folder->getId(), $image_name, $image_description, $json_reply['hash']);
@@ -252,7 +254,7 @@ class HomePageCest
      * Set up text component on homepage using curl requests. Sets up a text component, creates text in it, deletes it.
      *
      * Fires off create homepage.
-     * 
+     *
      * ** Needs a complete rework.
      *  Text box creation has changed to a completely different path, it uses a POST request to initialise the component
      *  It uses then a get request to push the component change for the title when adding the initial title

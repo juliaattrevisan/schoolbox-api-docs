@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Test;
-
 
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
@@ -54,5 +54,4 @@ interface TestCase
      * @return void
      */
     public function setBuffy(callable $daemonSlayer);
-
 }

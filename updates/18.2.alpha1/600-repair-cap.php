@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -86,13 +87,11 @@ $capRepair = new class extends Daemon\App
     {
         $this->insertPlanStatement = $this->db->prepareQuery("
             INSERT INTO participant_plan(assessment_id, is_dynamic, created_at, updated_at)
-            VALUES (:a_id, TRUE, :created_at, :updated_at)"
-        );
+            VALUES (:a_id, TRUE, :created_at, :updated_at)");
 
         $this->insertParticipantStatement = $this->db->prepareQuery("
             INSERT INTO participant(participant_plan_id, user_id, created_at, updated_at)
-            VALUES (:plan_id, :user_id, :created_at, :updated_at)"
-        );
+            VALUES (:plan_id, :user_id, :created_at, :updated_at)");
     }
 
 
@@ -423,4 +422,3 @@ $capRepair = new class extends Daemon\App
 
 /** @noinspection PhpUnhandledExceptionInspection */
 $kernel->run($capRepair);
-

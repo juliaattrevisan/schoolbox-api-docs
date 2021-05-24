@@ -5,6 +5,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -78,8 +79,10 @@ $app = new class extends CliTool\App {
             $effectTypeId = (int)$effect['effect_type_id'];
 
             // each of decoded arguments should have 1 or 2 depending on its effect type id
-            if (($effectTypeId === self::EQUALS && count($row) !== 1)
-                || ($effectTypeId === self::MAPS && count($row) !== 2)) {
+            if (
+                ($effectTypeId === self::EQUALS && count($row) !== 1)
+                || ($effectTypeId === self::MAPS && count($row) !== 2)
+            ) {
                 $this->getLogger()->warning("Effect {$effect['id']} has unexpected arguments. Skipping.");
                 continue;
             }

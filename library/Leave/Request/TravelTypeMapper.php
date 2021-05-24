@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for the travel type lookup table.
  *
@@ -6,11 +7,13 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-class Leave_Request_TravelTypeMapper extends Schoolbox\Mapper {
+class Leave_Request_TravelTypeMapper extends Schoolbox\Mapper
+{
     /**
      * {@inheritdoc}
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('lu_leave_request_travel_type');
         $this->hasModel(Leave_Request_TravelType::class);
         $this->hasMap(
@@ -29,10 +32,10 @@ class Leave_Request_TravelTypeMapper extends Schoolbox\Mapper {
             )
         );
 
-		$this->hasMap(array(
-			'column' => 'sequence',
-			'property' => 'sequence',
-			'type' => self::TYPE_INTEGER,
-		));
+        $this->hasMap(array(
+            'column' => 'sequence',
+            'property' => 'sequence',
+            'type' => self::TYPE_INTEGER,
+        ));
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,7 @@
  */
 
 use Schoolbox\Config\ConfigMapper;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
@@ -116,7 +117,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Show markbook link to staff on class or group pages
         $this->setVar('markbook_link_block');
-        if ($isStaffOrSuper
+        if (
+            $isStaffOrSuper
             && ($isGroupPage || $isClassPage || $wasClassPage)
             && $this->getConfigLoader()->get('class_markbook_enable')
         ) {
@@ -138,7 +140,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Show rubric markbook link on class or group pages to those who are authorized
         // All of these permissions should be baked into the authorizer check
-        if (($isGroupPage || $isClassPage || $wasClassPage)
+        if (
+            ($isGroupPage || $isClassPage || $wasClassPage)
             && $this->getConfigLoader()->get('rubric_markbook_enable')
             && $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
         ) {
@@ -151,7 +154,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         // Show course markbook link to staff on unit or course pages (if feature enabled)
         $this->setVar('course_markbook_link_block');
-        if ($isStaffOrSuper
+        if (
+            $isStaffOrSuper
             && ($isUnitPage || $isCoursePage)
             && $this->getConfigLoader()->get('course_markbook_enable')
         ) {
@@ -168,7 +172,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $route = 'learningAssessmentCalendar.getReport';
         $params = [];
 
-        if ($authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
+        if (
+            $authorizer->isPathAuthorizedForUser($route, $params, $this->getUser())
             && $this->getConfigLoader()->get('assessment_calendar_enabled')
         ) {
             $assessmentCalendarUrl = $this->getRouter()->generate('learningAssessmentCalendar.getReport');
@@ -188,17 +193,18 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
         $involvedInGroup = $isGroupPage && $this->getAccess()->involvedInGroup(
-                $this->getUser(),
-                $this->getContext()->getId()
-            );
+            $this->getUser(),
+            $this->getContext()->getId()
+        );
 
         $involvedInClass = $isClassPage && $this->getAccess()->involvedInSubject(
-                $this->getUser(),
-                $this->getContext()->getCodeString()
-            );
+            $this->getUser(),
+            $this->getContext()->getCodeString()
+        );
 
         /* Output student grades link to students (other users with READ access may be able to see this page) */
-        if (($involvedInGroup || $involvedInClass)
+        if (
+            ($involvedInGroup || $involvedInClass)
             && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
             && UserAccess::ACCESS_READ === $this->getContentPermission()
             && $this->getContext()->isGradePageEnabled()
@@ -230,8 +236,10 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
          * - user is staff, and
          * - has WRITE+ perm
          */
-        if (($isClassPage || $isGroupPage || $isUnitPage || $isCoursePage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
-            && $this->getUser()->getRole()->isStaff()) {
+        if (
+            ($isClassPage || $isGroupPage || $isUnitPage || $isCoursePage) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE
+            && $this->getUser()->getRole()->isStaff()
+        ) {
             $this->parse('manage_criteria_block', 'manage_criteria');
             $hasClassActions = true;
         } else {

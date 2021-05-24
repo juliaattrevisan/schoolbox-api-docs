@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for class objects.
  *
@@ -10,14 +11,17 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox;
 
-class ClassEntryMapper extends Schoolbox\Mapper {
+class ClassEntryMapper extends Schoolbox\Mapper
+{
 
     /**
      * {@inheritdoc}
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('sis_class');
         $this->hasModel(ClassEntry::class);
         $this->hasMap(array(

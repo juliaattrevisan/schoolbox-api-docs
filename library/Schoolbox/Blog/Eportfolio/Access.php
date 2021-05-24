@@ -1,10 +1,12 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Blog\Eportfolio;
@@ -149,5 +151,4 @@ class Access
         // TODO remove explicit type-coercion once model hydration is fixed SA-4539
         return (int)$post->getPage()->getOwner()->getId() === (int)$user->getId();
     }
-
 }

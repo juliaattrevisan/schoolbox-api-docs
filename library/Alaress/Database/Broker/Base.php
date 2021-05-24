@@ -60,7 +60,8 @@ abstract class Base implements IBroker
     /**
      * @inheritdoc
      */
-    public function setConnector($connector) {
+    public function setConnector($connector)
+    {
         $this->connector = $connector;
     }
 
@@ -110,7 +111,6 @@ abstract class Base implements IBroker
         ini_set('default_socket_timeout', self::LOGIN_TIMEOUT);
 
         try {
-
             // Create a new PDO instance using the DSN string and supplied username/password parameters
 
             $this->pdo = new PDO(
@@ -119,9 +119,7 @@ abstract class Base implements IBroker
                 $this->connector->getPassword(),
                 $connectOptions
             );
-
         } catch (PDOException $e) {
-
             // Need to restore timeout both here and in normal control flow
 
             ini_set('default_socket_timeout', $defaultSocketTimeout);
@@ -224,14 +222,16 @@ abstract class Base implements IBroker
     /**
      * @inheritdoc
      */
-    public function getHostname() {
+    public function getHostname()
+    {
         return $this->connector->getHostname();
     }
 
     /**
      * @inheritdoc
      */
-    public function getDatabase() {
+    public function getDatabase()
+    {
         return $this->connector->getDatabase();
     }
 

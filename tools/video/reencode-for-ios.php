@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * This script can be used to force videos to be rencoded using modern ffmpeg encoding settings that work better
  * with IOS devices on 3g/4g networks.
@@ -82,5 +83,5 @@ HELP;
 };
 
 
-$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL=>Monolog\Logger::INFO]);
+$kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $kernel->runApp();

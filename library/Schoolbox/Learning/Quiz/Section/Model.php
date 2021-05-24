@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -13,7 +14,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Section\Question\Model as QuizQuestion;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
-use \DomainException;
+use DomainException;
 
 /**
  * Represents a set of Questions in a Quiz
@@ -77,7 +78,7 @@ class Model implements ISoftDeletable
 
         // Clone Questions to clear their IDs, so subsequent save is INSERT instead of UPDATE
         $clonedQuestions = new GenericCollection(QuizQuestion::class);
-        foreach($this->questions as $question){
+        foreach ($this->questions as $question) {
             $cloneQuestion = clone $question;
             $cloneQuestion->setSection($this);
             $clonedQuestions->add($cloneQuestion);

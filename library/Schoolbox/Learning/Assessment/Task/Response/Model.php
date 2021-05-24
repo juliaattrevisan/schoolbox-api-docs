@@ -7,10 +7,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Task\Response;
 
 use Schoolbox\Assessment\Course\Task\Completion;
-use \Schoolbox\Learning\Assessment\AbstractResponse;
+use Schoolbox\Learning\Assessment\AbstractResponse;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
 /**
@@ -56,7 +57,7 @@ class Model extends AbstractResponse
      */
     public function getCompletionStatus()
     {
-        if(!$this->getMarkedComplete()){
+        if (!$this->getMarkedComplete()) {
             return Completion::STATUS_INCOMPLETE;
         }
 
@@ -108,5 +109,4 @@ class Model extends AbstractResponse
     {
         return $this->getCreatedAt();
     }
-
 }

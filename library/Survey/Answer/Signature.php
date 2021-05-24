@@ -53,7 +53,8 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
      * @param int $question_id
      * @return array
      */
-    public function resultsForQuestion($attempt_id, $question_id) {
+    public function resultsForQuestion($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         // Instead of using a SitePage instance to render the signature:

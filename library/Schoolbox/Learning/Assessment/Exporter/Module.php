@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Exporter;
 
 use Alaress\Module\Module as BaseModule;
@@ -32,7 +34,6 @@ use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Assessment\Replicator;
 use Alaress\Authorizer\Rule;
 
-
 /**
  * Module for assessment export options.
  */
@@ -54,7 +55,9 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         // preloaders to use
-        $preloadAssessment = function ($params) { return $this->preloadAssessment($params); };
+        $preloadAssessment = function ($params) {
+            return $this->preloadAssessment($params);
+        };
 
         // rules in use
         $isStaff = $this->getAuthRule('isStaffOrSuper');
@@ -89,7 +92,7 @@ class Module extends BaseModule
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
-        } catch (MapperException\Deleted $e){
+        } catch (MapperException\Deleted $e) {
             $assessment = $e->getDeletedObject();
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
@@ -242,5 +245,4 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
     }
-
 }

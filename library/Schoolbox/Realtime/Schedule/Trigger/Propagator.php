@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -114,5 +115,4 @@ class Propagator implements IPropagator
 
         return $key;
     }
-
 }

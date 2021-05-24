@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
@@ -19,7 +21,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
-
 
 /**
  * Class Factory
@@ -142,7 +143,6 @@ class Factory
                 $api[$module] = new Api($this->host, $this->key, $module);
             }
         } catch (\DomainException $e) {
-
             /* schoolcalendarandnotices might not be enabled for a school who chooses to eschew
              * this feature; instead of catastrophically dying with a fatal, just exist quietly
              */

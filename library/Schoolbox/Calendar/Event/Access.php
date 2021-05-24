@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar Event Access
  * TODO: Roll this into Event/Controller once it exists
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Calendar\Event;
 
 use InvalidArgumentException;
@@ -178,7 +180,6 @@ class Access
          * check if this user is a calendar moderator for one of the campuses selected
          */
         if ($accessLevel === Event::ACCESS_CAMPUS) {
-
             // Get list of calendar permissions the effector has
             $accessList = $effector->getAccessList()->filterBy('service', UserAccess::SERVICE_CALENDAR);
 

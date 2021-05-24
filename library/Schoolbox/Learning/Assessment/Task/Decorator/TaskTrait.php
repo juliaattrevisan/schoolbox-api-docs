@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TaskTrait
  *
@@ -8,7 +9,6 @@
  */
 
 namespace Schoolbox\Learning\Assessment\Task\Decorator;
-
 
 trait TaskTrait
 {

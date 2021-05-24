@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Routing\Subscription;
-
 
 use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IConsumer;
@@ -22,7 +22,6 @@ use InvalidArgumentException;
 use OverflowException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Routing\Cache\ReadableCache;
-
 
 class Handler implements IConsumer, EventListener
 {
@@ -82,12 +81,10 @@ class Handler implements IConsumer, EventListener
             $this->handleMessage($instance, $context);
             $resolver->acknowledge();
             return;
-
         } catch (InvalidArgumentException $e) {
             $this->log->warning($e->getMessage());
             $resolver->acknowledge();
             return;
-
         } catch (\Exception $e) {
             $this->log->error($e->getMessage());
         }
@@ -124,7 +121,6 @@ class Handler implements IConsumer, EventListener
                 $this->cache->readIntoRouter($instanceId, $this->resolver->getRouter());
                 break;
         }
-
     }
 
 
@@ -146,13 +142,11 @@ class Handler implements IConsumer, EventListener
                     $msgType = 'targeted retraction';
                     $suffix  = 'nobody in particular';
                     $userIds = [];
-
                 } elseif ($instance->isActionRetractAll()) {
                     // Retract actions route to nobody in particular
                     $msgType = 'full retraction';
                     $suffix  = 'nobody in particular';
                     $userIds = [];
-
                 } else {
                     $msgType   = 'send';
                     $userIds   = $this->resolver->getSubscribedUserIds($topic);
@@ -171,7 +165,6 @@ class Handler implements IConsumer, EventListener
 
                 $this->log->info("Routing message $msgType via '$topic' to $suffix");
                 $this->txrx->send($instance, $this->transaction, $userIds);
-
             } catch (OverflowException $e) {
                 // recursion detected
                 $this->log->error($e->getMessage());
@@ -190,5 +183,4 @@ class Handler implements IConsumer, EventListener
     {
         $this->log->error(get_class($e) . ': ' . $e->getMessage());
     }
-
 }

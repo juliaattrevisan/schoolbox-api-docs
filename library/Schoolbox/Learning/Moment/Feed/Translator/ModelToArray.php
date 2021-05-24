@@ -8,7 +8,6 @@ use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Learning\Badge\Award\Translator\ModelToArray as BadgeAwardTranslator;
 use Schoolbox\Learning\Moment\Feed\Cursor;
 
-
 /**
  * Class ModelToArray
  */

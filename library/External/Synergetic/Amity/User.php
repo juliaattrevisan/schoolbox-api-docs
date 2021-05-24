@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 class External_Synergetic_Amity_User extends External_Synergetic_User

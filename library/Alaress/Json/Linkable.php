@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -27,5 +28,4 @@ interface Linkable
      * @return Api\Link[]
      */
     public function getJsonApiLinks(): array;
-
 }

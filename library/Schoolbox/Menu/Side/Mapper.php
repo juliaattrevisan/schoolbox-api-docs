@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -50,8 +51,7 @@ class Mapper extends BaseMapper
                 AND (menu_side.parent_id IN (SELECT id FROM menu_side) OR menu_side.parent_id = 0)
                 ORDER BY sort_order ASC
             ";
-        }
-        else {
+        } else {
             if (!$user->getCampusCollection()) {
                 throw new MapperException('User has no campus, and therefore has no menu');
             }
@@ -92,7 +92,7 @@ class Mapper extends BaseMapper
      * @param \Schoolbox\User $user
      * @return array
      */
-    public function findGroupsForUser($user) :array
+    public function findGroupsForUser($user): array
     {
 
         $query = "

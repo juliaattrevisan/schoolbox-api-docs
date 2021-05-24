@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Moderation;
@@ -19,6 +21,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use PDO;
 use UnderflowException;
+
 use function array_intersect;
 use function array_map;
 use function array_merge;

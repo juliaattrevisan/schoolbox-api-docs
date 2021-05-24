@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Lumberjack\Logger;
@@ -27,7 +29,6 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-
 
 /**
  * Class External_Liss_Server
@@ -284,7 +285,7 @@ class External_Liss_Server
                 $struct = $currentData->me['struct'];
                 $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
                 $external_id = trim((string)$struct['StudentId']->me['string']);
-                $queryItems[] = "(NULL, '".$class->getId()."', '".$external_id."')";
+                $queryItems[] = "(NULL, '" . $class->getId() . "', '" . $external_id . "')";
             }
 
             if (count($queryItems) > 0) {
@@ -461,7 +462,6 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
-
             $this->log()->info('publishClasses: processing request');
 
             /* Truncate everything before re-adding
@@ -515,7 +515,6 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $this->config);
 
         if ($authenticator->isAuthenticated()) {
-
             $this->log()->info('publishTimetable: processing request');
 
             $timetablePeriodMapper = new TimetablePeriodMapper();
@@ -553,7 +552,6 @@ class External_Liss_Server
                     $classPeriod->setRoom(trim((string)$struct['RoomCode']->me['string']));
                     $classPeriodMapper->save($classPeriod);
                 } else {
-
                     /* These ones are broken */
                     if ($allPeriods->count() === 0) {
                         $this->log()->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
@@ -694,7 +692,6 @@ class External_Liss_Server
          */
         try {
             $author = $userMapper->findById($configLoader->get('external_liss_calendar_owner'));
-
         } catch (MapperException $e) {
             $this->log()->critical(self::MISSING_CALENDAR_OWNER);
             return $this->generateResponse(self::MISSING_CALENDAR_OWNER);
@@ -705,7 +702,6 @@ class External_Liss_Server
         $authenticator = new External_Liss_Authenticator($message->params[0], $this->log, $configLoader);
 
         if ($authenticator->isAuthenticated()) {
-
             /* Delete all previous versions of events using the same source
              */
             $helper->deleteEventsFromSource();
@@ -719,7 +715,6 @@ class External_Liss_Server
 
             if ($allEventTypes->count()) {
                 $eventType = $allEventTypes->first();
-
             } else {
                 $this->log()->critical(self::NO_EVENT_TYPES);
                 return $this->generateResponse(self::NO_EVENT_TYPES);
@@ -826,7 +821,6 @@ class External_Liss_Server
                 $folder = $folderMapper->findForCampusAndClass('', $currentEvent['classCode']);
 
                 if ($folder instanceof Folder) {
-
                     /* Homepage event
                      */
                     $event->setAccess(Event::ACCESS_GROUP);
@@ -838,7 +832,6 @@ class External_Liss_Server
 
                     $instancesHomepageCreated++;
                 } else {
-
                     /* Personal event
                      */
                     $event->setAccess(Event::ACCESS_PERSONAL);
@@ -861,8 +854,12 @@ class External_Liss_Server
 
                             $instancesPersonalCreated++;
                         } catch (MapperException $e) {
-                            $this->log()->warning(sprintf('Skipping event "%s" with guid "%s" for user "%s": no Schoolbox account found for external id "%s"',
-                                $event->getTitle(), $currentEvent['guid'], $currentExternalId, $currentExternalId
+                            $this->log()->warning(sprintf(
+                                'Skipping event "%s" with guid "%s" for user "%s": no Schoolbox account found for external id "%s"',
+                                $event->getTitle(),
+                                $currentEvent['guid'],
+                                $currentExternalId,
+                                $currentExternalId
                             ));
 
                             if ($includePayloadInLogging) {
@@ -885,7 +882,7 @@ class External_Liss_Server
 
             /* Log diagnostics
              */
-            $processed = $total-$skipCount['total'];
+            $processed = $total - $skipCount['total'];
 
             $this->log()->info("Total Processed: {$processed}/{$total}");
             $this->log()->info("Total Skipped: {$skipCount['total']}/{$total}");

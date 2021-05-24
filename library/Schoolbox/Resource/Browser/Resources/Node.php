@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Node
  *
@@ -9,6 +10,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Browser\Resources;
 
 use Schoolbox\Permission\Access\Access;
@@ -103,5 +105,4 @@ class Node extends AbstractNode
             'folderType' => $folder->getNodeType(),
         );
     }
-
 }

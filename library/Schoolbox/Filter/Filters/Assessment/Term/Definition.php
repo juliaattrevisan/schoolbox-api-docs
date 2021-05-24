@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Term;
@@ -10,9 +12,9 @@ namespace Schoolbox\Filter\Filters\Assessment\Term;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Assessment\Term;
+
 use function array_map;
 use function array_merge;
-
 
 /**
  * Available Term options:

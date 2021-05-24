@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\Realtime\Routing;
 
 use Alaress\WorkerCrew\TaskResponseHandlerInterface;
 use Psr\Log\LoggerInterface;
-
 
 class DispatchResponder implements TaskResponseHandlerInterface
 {
@@ -55,5 +55,4 @@ class DispatchResponder implements TaskResponseHandlerInterface
     {
         $this->log->notice("Received worker error for '$command': $data");
     }
-
 }

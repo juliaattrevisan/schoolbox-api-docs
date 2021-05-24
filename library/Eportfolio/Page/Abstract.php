@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eportfolio_Page_Abstract
  *
@@ -174,7 +175,6 @@ abstract class Eportfolio_Page_Abstract
         } else {
             $this->getPage()->setVar('showcase_page_block', '');
         }
-
     }
 
     /**

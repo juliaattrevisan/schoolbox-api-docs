@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\InlineGrader\StudentCarousel;
 
 use Aura\Router\Router;
@@ -85,7 +87,7 @@ class Standard
 
         /* Always disregard Excluded user
          */
-        return $this->assessment->getAllParticipants()->filter(function(Participant $currentParticipant) {
+        return $this->assessment->getAllParticipants()->filter(function (Participant $currentParticipant) {
             return !$currentParticipant->isExcluded();
         });
     }
@@ -100,7 +102,6 @@ class Standard
         $allParticipants = $this->prefilterParticipants();
 
         foreach ($allParticipants as $currentParticipant) {
-
             // CSS/label rules
             // TODO move CSS/label generation to participant class, and dedupe usages
             if ($currentParticipant->isResubmissionRequired()) {
@@ -126,7 +127,6 @@ class Standard
                         $label = $multipleResponses ? 'Resubmitted ' . $inPerson . 'late' : 'Submitted ' . $inPerson . 'late';
                     }
                 } else {
-
                     /* No submission exists
                      */
                     $css   = 'unsubmitted';

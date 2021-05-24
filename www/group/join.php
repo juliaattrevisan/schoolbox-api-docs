@@ -25,12 +25,12 @@ $user = $_SESSION["user"];
 // Fetch the logged in user's write access groups to exclude from the lists.
 $userWriteGroupIds = [];
 $userGroups = $accessMapper->findAllForUser($user);
-$userWriteGroups = $userGroups->filter(function(UserAccess $element) {
+$userWriteGroups = $userGroups->filter(function (UserAccess $element) {
     return $element->getAccessLevel() >= UserAccess::ACCESS_WRITE;
 });
 /** @var $userWriteGroups UserAccess[] */
 foreach ($userWriteGroups as $userGroup) {
-   $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
+    $userWriteGroupIds[] = $userGroup->getServiceIdentifier();
 }
 
 // Get the perms for user - including DENY (semantically PENDING) access
@@ -41,7 +41,7 @@ $userPerms = $accessMapper->findByColumnList([
 ])->indexBy('serviceIdentifier');
 
 
-$natStrSort = function(Group $a, Group $b) {
+$natStrSort = function (Group $a, Group $b) {
     return strnatcasecmp($a->getFolder()->getName(), $b->getFolder()->getName());
 };
 
@@ -94,4 +94,3 @@ if ($moderatedGroupList->count()) {
         }
     }
 }
-

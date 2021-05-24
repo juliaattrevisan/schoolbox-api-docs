@@ -1,8 +1,10 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Teacher username saver - internal use only
  */
+
 use Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../../../conf/core/require.php';

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Question creation and Answer creation. When a QuestionType is selected such
  * as multiple choice, fill gaps etc. the related AnswerType handler is loaded;
@@ -11,6 +12,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Assessment\Redirect;
@@ -24,8 +26,7 @@ $groupHandler = new Group();
 /* If a question was submitted
  */
 if (!empty($_POST)) {
-
-    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
     $section = $sectionHandler->getByID($_POST['section_id']);
     $assess = $assessHandler->getByID($section['assess_id']);
@@ -49,26 +50,26 @@ if (!empty($_POST)) {
     $questionHandler = $factory->createQuestionModel($_POST['type_id']);
     $answerHandler = $factory->createAnswerModel($_POST['type_id']);
 
-	/* If configuration was provided
-	 */
-	$config = null;
+    /* If configuration was provided
+     */
+    $config = null;
 
-	if (isset($_POST['configuration'])) {
-		$allConfiguration = json_decode($_POST['configuration']);
+    if (isset($_POST['configuration'])) {
+        $allConfiguration = json_decode($_POST['configuration']);
 
-		$config = array();
+        $config = array();
 
-		/* Compress checkboxes
-		 */
-		foreach($allConfiguration as $currentConfiguration) {
-			$config[$currentConfiguration->name] = $currentConfiguration->value;
-		}
-	}
+        /* Compress checkboxes
+         */
+        foreach ($allConfiguration as $currentConfiguration) {
+            $config[$currentConfiguration->name] = $currentConfiguration->value;
+        }
+    }
 
-	/* Put that data in the question
-	 */
-	$data = $_POST;
-	$data['config'] = json_encode($config);
+    /* Put that data in the question
+     */
+    $data = $_POST;
+    $data['config'] = json_encode($config);
 
     $question_id = $questionHandler->create($data);
     $answer_id = $answerHandler->create($_POST, $question_id);
@@ -82,16 +83,13 @@ if (!empty($_POST)) {
     }
 
     // Form is AJAX submitted so redirection is handled by javascript
-    if($this->detectAjax()) {
+    if ($this->detectAjax()) {
         exit;
-    }
-    else {
+    } else {
         SitePage::localRedir('/assess/question/create/' . $section['section_id'] . $returnUrl);
     }
-
 } else {
-
-    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
+    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
 
     if (!is_numeric($this->arg[0])) {
         error(51);
@@ -120,8 +118,7 @@ if (!empty($_POST)) {
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($assess['category_id']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(117);
     }
 
@@ -132,17 +129,17 @@ if (!empty($_POST)) {
     $this->setBlock(TEMPLATE_content, 'type_selected', 'type_selected_block');
     $this->setBlock('type_selected', 'answerInputs', 'answerInputs_block');
     $this->setBlock(TEMPLATE_content, 'questionType', 'questionType_block');
-	$this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
+    $this->setBlock('type_selected', 'has_answer_configuration', 'has_answer_configuration_block');
     $this->setBlock('type_selected', 'has_marks', 'has_marks_block');
-	$this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
+    $this->setBlock('has_answer_configuration', 'answer_configuration', 'answer_configuration_block');
 
-	$this->setTitle('Create Question');
+    $this->setTitle('Create Question');
 
     $this->setVar(array(
-		'question_block' => '',
-		'has_answer_configuration_block' => '',
+        'question_block' => '',
+        'has_answer_configuration_block' => '',
         'type_selected_block' => '',
-	));
+    ));
 
     $this->setVar(array(
         'ASSESS_TITLE'          => Scrub::text($assess['title']),
@@ -189,25 +186,24 @@ if (!empty($_POST)) {
 
             $this->parse('answerInputs_block', 'answerFormFragment', true);
 
-			/* Question-specific answer configuration
-			 *
-			 * Load answer configurations template into answer_configuration_form_fragment
-			 * block if there are configuration options available
-			 */
-			if ($currentQuestionType['has_config'] == 'true') {
-				$this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($this->arg[1]) . '/configuration.html');
-				$this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
+            /* Question-specific answer configuration
+             *
+             * Load answer configurations template into answer_configuration_form_fragment
+             * block if there are configuration options available
+             */
+            if ($currentQuestionType['has_config'] == 'true') {
+                $this->setFile('answer_configuration_fragment', 'assess/answer/' . $factory->getQuestionType($this->arg[1]) . '/configuration.html');
+                $this->setBlock('answer_configuration_fragment', 'answer_configuration_form_fragment', 'answer_configuration_form_fragment_block');
 
-				$answerHandler->configure($this, json_encode(array()));
+                $answerHandler->configure($this, json_encode(array()));
 
-				$this->parse('answer_configuration_block', 'answer_configuration_fragment');
-				$this->parse('has_answer_configuration_block', 'has_answer_configuration');
-			}
-			else {
-				$this->setVar(array(
-					'has_answer_configuration_block' => ''
-				));
-			}
+                $this->parse('answer_configuration_block', 'answer_configuration_fragment');
+                $this->parse('has_answer_configuration_block', 'has_answer_configuration');
+            } else {
+                $this->setVar(array(
+                    'has_answer_configuration_block' => ''
+                ));
+            }
 
             /* We've set the template, so remember this
              */
@@ -234,7 +230,6 @@ if (!empty($_POST)) {
         ));
 
         $this->parse('type_selected_block', 'type_selected');
-
     } else if ($this->arg[1] == 'import') {
         $this->setVar(array(
             'IMPORT_SELECTED' => 'selected=\'selected\'',
@@ -297,4 +292,3 @@ if (!empty($_POST)) {
     // bake in a moderate oven for 40 minutes
     $trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);
 }
-

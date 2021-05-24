@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -62,7 +63,7 @@ class Validator
     public function checkPassword($username, $password)
     {
         $user = $this->userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
-        if(!$user instanceof User){
+        if (!$user instanceof User) {
             return false;
         }
 

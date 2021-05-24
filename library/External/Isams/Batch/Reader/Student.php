@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XML reader for finding current students in iSAMS' batch API response.
  *

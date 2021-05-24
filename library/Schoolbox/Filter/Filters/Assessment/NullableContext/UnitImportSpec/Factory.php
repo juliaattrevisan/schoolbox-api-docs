@@ -1,14 +1,18 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec;
 
 use Schoolbox\Mapper\DefinitionException;
+
 use function count;
+
 use InvalidArgumentException;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
@@ -222,7 +226,7 @@ class Factory extends NullableContext\Factory
                                              ->groupByCallback(static function (Folder\Code\Model $code) {
                                                  return $code->getFolder()->getId();
                                              });
-        foreach($indexedFolders as $folderId => $folder){
+        foreach ($indexedFolders as $folderId => $folder) {
             $folder->setCodes($codesPerFolderId[$folderId] ?? $folderCodeMapper->createCollection());
         }
     }

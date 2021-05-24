@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Add Question to Quiz via Questionbank.
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper;

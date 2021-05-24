@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -166,7 +167,6 @@ class CollectionMethodsTest extends TestCase
         foreach ($inputs as $input) {
             $actual = $actual->mergeUnique($input);
         }
-
     }
 
     /**
@@ -564,7 +564,9 @@ class CollectionMethodsTest extends TestCase
                     ['id' => 4, 'name' => 'C'],
                     ['id' => 5, 'name' => 'C'],
                 ]),
-                static function ($a, $b) { return $a['id'] === $b['id']; },
+                static function ($a, $b) {
+                    return $a['id'] === $b['id'];
+                },
                 new Collection([
                     ['id' => 3, 'name' => 'B'],
                     ['id' => 4, 'name' => 'B'],

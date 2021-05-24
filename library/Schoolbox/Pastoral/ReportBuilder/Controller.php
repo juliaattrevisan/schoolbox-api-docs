@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\ReportBuilder;
@@ -31,7 +33,6 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\YearLevel;
 use Schoolbox\UserMapper;
-
 
 class Controller extends Base
 {
@@ -292,9 +293,9 @@ class Controller extends Base
                 'template' => '@pastoralReportBuilder/modify.twig',
                 'data'     => [
                     'moderator'        => $this->getUser()->getAccessList()->filterBy(
-                            'service',
-                            UserAccess::SERVICE_PASTORAL
-                        )->count() > 0,
+                        'service',
+                        UserAccess::SERVICE_PASTORAL
+                    )->count() > 0,
                     'years'            => $yearLevels,
                     'houses'           => $this->houseMapper->findAll()->sortBy('sequence', 'asc'),
                     'types'            => $this->pastoralTypeMapper->findAll(),

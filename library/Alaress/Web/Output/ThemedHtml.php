@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Output handling class that renders a Twig template and data into a theme.
  *

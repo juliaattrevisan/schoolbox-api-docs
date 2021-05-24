@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Datetime (no timezone) column type.
  *
@@ -10,8 +11,8 @@
 namespace Schoolbox\Column;
 
 use Alaress\Cache;
-use \DateTime as DateObject;
-use \Alaress_Date_Format;
+use DateTime as DateObject;
+use Alaress_Date_Format;
 
 class Datetime implements IColumnType
 {
@@ -54,7 +55,6 @@ class Datetime implements IColumnType
 
         try {
             return clone $this->cache->get($value, [$value, $this->input_format]);
-
         } catch (\Exception $e) {
             return new \Alaress_Date_NullDate();
         }

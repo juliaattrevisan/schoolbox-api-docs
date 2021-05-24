@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for resource moderation types.
  *
@@ -11,11 +12,14 @@
  */
 
 namespace Schoolbox\ResourceBooking\Item\ModerationType;
+
 use Schoolbox\Mapper as BaseMapper;
 
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    public function mapping() {
+    public function mapping()
+    {
         $this->hasTable('lu_resource_moderation_type');
         $this->hasModel('Schoolbox\\ResourceBooking\\Item\\ModerationType\\Model');
         $this->hasMap(
@@ -41,5 +45,4 @@ class Mapper extends BaseMapper {
             )
         );
     }
-
 }

@@ -315,7 +315,8 @@ class SitePage extends Page
             $this->goLoginPage();
         }
 
-        if (!$_SESSION['user'] instanceof User || //If session does not exist ||
+        if (
+            !$_SESSION['user'] instanceof User || //If session does not exist ||
             (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
             ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
@@ -406,7 +407,6 @@ class SitePage extends Page
         } else /* Lost in space and time, just go home */ {
             SitePage::localRedir('/');
         }
-
     }
 
     /**
@@ -607,7 +607,7 @@ class SitePage extends Page
         try {
             $this->getDi()->get('webFactory');
             throw new Unauthenticated();
-        } catch (\Aura\Di\Exception\ServiceNotFound|RuntimeException $e) {
+        } catch (\Aura\Di\Exception\ServiceNotFound | RuntimeException $e) {
             $parts = parse_url($_SERVER['REQUEST_URI']);
             if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
                 if ($parts['path'] != '/') {
@@ -672,7 +672,6 @@ class SitePage extends Page
                 }
 
                 $this->parse($handle . '_block', $handle, true);
-
             }
         } else {
             $this->setVar($handle . '_block', '');
@@ -766,7 +765,7 @@ class SitePage extends Page
 
         // Check referrer for if the last page was a create or modify page.
         unset($_SESSION['disableXssProtectionForNextPage']);
-        if(isset($_SERVER['HTTP_REFERER'])) {
+        if (isset($_SERVER['HTTP_REFERER'])) {
             $referer = parse_url($_SERVER['HTTP_REFERER']);
             if ($referer['host'] === $_SERVER['SERVER_NAME']) {
                 foreach (array('create', 'modify') as $path) {
@@ -842,7 +841,6 @@ class SitePage extends Page
         $l10n = $this->getDi()->get('l10n');
 
         foreach ($l10n->getAllTerms() as $term) {
-
             $upperTerm = strtoupper($term);
 
             $this->setVar([

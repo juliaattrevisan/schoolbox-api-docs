@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This script queries the database for various different key indicators of engagement and returns the data in JSON.
  * This data is used to populate our engagement database in influxDB and populate the graphs in monitor.schoolbox.com.au
@@ -15,7 +16,7 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-    public function run() : void
+    public function run(): void
     {
         /* @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');
@@ -54,7 +55,7 @@ $app = new class extends CliTool\App {
             'classes_with_course_implementations' => 'SELECT count(*) FROM folder f WHERE f.id IN (SELECT ci.folder_id FROM course_implementation ci WHERE ci.deleted_at IS NULL) AND f.id IN (SELECT folder_id FROM folder_code)',
             'class_assessments' => 'SELECT COUNT(*) FROM assessment JOIN assessment_folder af on assessment.id = af.assessment_id WHERE assessment.deleted_at IS NULL',
             'student_submissions' => 'SELECT COUNT(*) FROM student_submission WHERE deleted_at IS NULL',
-            'feedback_self_graded'=> 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
+            'feedback_self_graded' => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "self-grading"',
             'feedback_teacher'  => 'SELECT COUNT(*) FROM submission_return WHERE deleted_at IS  NULL AND review_route = "instructor"',
             'course_unit_implementations' => 'SELECT count(*) FROM course_unit_implementation ci WHERE ci.deleted_at IS NULL',
             'course_unit_specifications'  => 'SELECT count(*) FROM course_unit_specification cs WHERE cs.deleted_at IS NULL',
@@ -71,7 +72,7 @@ $app = new class extends CliTool\App {
             'tasks'             => 'SELECT count(*) FROM task JOIN assessment a ON a.id = task.assessment_id WHERE a.deleted_at IS NULL',
             'due_work_rubrics'  => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND use_rubric = 1',
             'due_work_self_assessments' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND self_reviewability != "none"',
-            'due_work_online_submission'=> 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
+            'due_work_online_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 1',
             'due_work_offline_submission' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND accept_submission = 0',
             'assessment_visibility_staff' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 0',
             'assessment_visibility_student' => 'SELECT COUNT(*) FROM assessment JOIN submission_box ON assessment.id = submission_box.assessment_id WHERE assessment.deleted_at IS NULL AND mark_visibility = 1',
@@ -177,8 +178,7 @@ $app = new class extends CliTool\App {
         $result['plan'] = $config->get('site_plan');
 
 
-        foreach($queryList as $name => $query) {
-
+        foreach ($queryList as $name => $query) {
             $statement = $db->executeQuery($query);
             $result[$name] = (int)$statement->fetchColumn(0);
         }
@@ -189,4 +189,3 @@ $app = new class extends CliTool\App {
 
 $kernel = new CliTool\Kernel($app);
 $kernel->runapp();
-

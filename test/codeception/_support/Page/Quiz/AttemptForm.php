@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -68,5 +69,4 @@ class AttemptForm
         $attemptId = intval(substr($endUrl, $pos + 1));
         return $attemptId;
     }
-
 }

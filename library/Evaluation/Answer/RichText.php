@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Answer_RichText
  *
@@ -9,7 +10,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
+abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short
+{
 
     /**
      * Javascript class to use when creating UI
@@ -84,7 +86,8 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
      * @param array $currentQuestion
      * @return void
      */
-    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
+    {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
         $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
@@ -123,7 +126,8 @@ abstract class Evaluation_Answer_RichText extends Evaluation_Answer_Short {
      * @param array $currentQuestion
      * @return void
      */
-    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
+    {
         $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
         /* Show correct answer

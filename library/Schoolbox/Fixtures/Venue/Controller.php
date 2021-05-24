@@ -1,20 +1,21 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Fixtures\Venue;
 
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Fixtures\Venue\Model as Venue;
-use \Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
-
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Fixtures\Venue\Model as Venue;
+use Schoolbox\Fixtures\Venue\Mapper as VenueMapper;
 
 class Controller extends AbstractController
 {
@@ -63,8 +64,7 @@ class Controller extends AbstractController
             }
 
             $this->getResponse()->content->set($this->buildJsonOutput($venues));
-        }
-        else {
+        } else {
             try {
                 $allVenues = $this->mapper->findAll(
                     [

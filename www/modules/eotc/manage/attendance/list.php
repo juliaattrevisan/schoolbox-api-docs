@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -69,7 +70,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
             // Ensure this file type is not in blacklist
 
             if (!in_array($fileType, $externalFiletypeBlacklist, false)) {
-
                 // Was not in blacklist, add it to the dropdown
 
                 $this->setVar([
@@ -101,7 +101,6 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
             'student_attendee_block' => ''
         ]);
     }
-
 } else {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }

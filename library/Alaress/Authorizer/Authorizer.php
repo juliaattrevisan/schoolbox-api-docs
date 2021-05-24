@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class description here
  *
@@ -6,13 +7,14 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
 
 namespace Alaress\Authorizer;
+
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\User;
 
-class Authorizer extends PathMatcher {
+class Authorizer extends PathMatcher
+{
 
     /**
      * @var User
@@ -26,7 +28,8 @@ class Authorizer extends PathMatcher {
      * @param Rule\IAuthorizationRule $rule The rule to check against.
      * @return $this
      */
-    public function addRule($path, Rule\IAuthorizationRule $rule) {
+    public function addRule($path, Rule\IAuthorizationRule $rule)
+    {
         $this->add($path, $rule, array('auth'));
         return $this;
     }
@@ -41,7 +44,8 @@ class Authorizer extends PathMatcher {
      * @param User   $user   The user to check.
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
-    public function authorizePathForUser($path, $params = array(), User $user = null) {
+    public function authorizePathForUser($path, $params = array(), User $user = null)
+    {
         $this->setUser($user);
         $this->check($path, $params);
     }
@@ -55,7 +59,8 @@ class Authorizer extends PathMatcher {
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @return array
      */
-    protected function getActionResult($callback, $params) {
+    protected function getActionResult($callback, $params)
+    {
         return $callback->authorize($params, $this->getUser());
     }
 
@@ -72,11 +77,11 @@ class Authorizer extends PathMatcher {
      * @param  User   $user
      * @return bool
      */
-    public function isPathAuthorizedForUser($path, $params = array(), User $user = null) {
+    public function isPathAuthorizedForUser($path, $params = array(), User $user = null)
+    {
         try {
             $this->authorizePathForUser($path, $params, $user);
-        }
-        catch (Failure\Base $e) {
+        } catch (Failure\Base $e) {
             return false;
         }
         return true;
@@ -86,7 +91,8 @@ class Authorizer extends PathMatcher {
      * @param  User $user
      * @return $this
      */
-    public function setUser($user) {
+    public function setUser($user)
+    {
         $this->user = $user;
         return $this;
     }
@@ -94,8 +100,8 @@ class Authorizer extends PathMatcher {
     /**
      * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
-
 }

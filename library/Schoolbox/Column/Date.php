@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Date column type.
  *

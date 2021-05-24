@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * This file iterates over each class and then retrieves all the assessments.  It will create those assessments
  * in the remote markbook system and then proceed to loop over all the grades and load those into the system.
@@ -99,7 +100,6 @@ Usage:         php sync.php -p=[folderID] {$addParamsShort}[--start=yyyy-mm-dd] 
 {$additionalParameters}
 
 HELP;
-
 }
 
 $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
@@ -164,21 +164,18 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
             if ($startTime->gt($endTime)) {
                 $log->error("ERROR: Invalid date range supplied, end date must be later than the start date.");
             }
-
         } catch (InvalidArgumentException $e) {
             // Creation of date/time objects failed, format must be wrong
 
             $log->error("ERROR: Invalid date supplied, please check date format matches (" . Alaress_Date_Format::DATABASE_DATE_FORMAT . ").");
             exit(1);
         }
-
     } elseif (date('n') > 6) {
         // If we have gone past June- assume a fake "Semester 2" and use the last six months of the year
         $startTime = new Alaress_Date_Format();
         $endTime   = new Alaress_Date_Format();
         $startTime->setDate(date('Y'), 7, 1)->setTime(0, 0, 0);
         $endTime->setDate(date('Y'), 12, 30)->setTime(23, 59, 59);
-
     } else {
         // Otherwise use a fake "Semester 1" and use the first six months of the year
         $startTime = new Alaress_Date_Format();
@@ -216,15 +213,13 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
     $log->info('Markbook synchronisation starting...');
     $log->info("Syncing work due between {$startTime->getLocalShort()} and {$endTime->getLocalShort()}...");
 
-    $totalSuccess=0;
-    $totalFailure=0;
+    $totalSuccess = 0;
+    $totalFailure = 0;
 
     foreach ($folderList as $folder) {
-
         $action = str_pad("Processing folder: ", 34, " ");
 
         if (!empty($folder->getCodeString())) {
-
             $code = "{$folder->getId()} - {$folder->getCodeString()}";
         } else {
             $code = "{$folder->getId()}";
@@ -255,7 +250,6 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
             // Check if we are allowed to create new markbook entries
 
             if (!$updateOnly) {
-
                 // Creation allowed
 
                 $action = str_pad("Action:", 30, " ");
@@ -264,9 +258,7 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 if (!$dryRun) {
                     $markbookExternal->syncAssessment($assessment);
                 }
-
             } else {
-
                 // No creation of new assessments in markbook is allowed
 
                 $action = str_pad("Action:", 30, " ");
@@ -288,8 +280,8 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
                 }
             }
 
-            $log->info(sprintf("    %s%d",  str_pad("Assessment Feedback Found:", 30, " "), $feedbackCount));
-            $log->info(sprintf("    %s%d",  str_pad("Assessment Feedback Missing:", 30, " "), $noFeedbackCount));
+            $log->info(sprintf("    %s%d", str_pad("Assessment Feedback Found:", 30, " "), $feedbackCount));
+            $log->info(sprintf("    %s%d", str_pad("Assessment Feedback Missing:", 30, " "), $noFeedbackCount));
 
             foreach ($assessment->getAllParticipants() as $participant) {
                 $feedback = $participant->findMostRecentInstructorGivenFeedback();
@@ -308,12 +300,11 @@ $kernel->run(static function (Injector $di, LoopInterface $loop, LoggerInterface
 
                 if (!$dryRun) {
                     if ($feedback) {
-                        if(!$markbookExternal->syncFeedback($feedback)) {
+                        if (!$markbookExternal->syncFeedback($feedback)) {
                             $level = 'warning';
                             $markLog = '(failed)';
                             $totalFailure++;
-                        }
-                        else {
+                        } else {
                             $totalSuccess++;
                         }
 //                    } else {

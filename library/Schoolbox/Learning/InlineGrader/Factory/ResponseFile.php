@@ -10,12 +10,13 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\InlineGrader\Factory;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as SubmissionFile;
-use \Schoolbox\User;
-use \Schoolbox\Video\ResourceVideoMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use Schoolbox\Video\ResourceVideoMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 class ResponseFile
@@ -91,7 +92,6 @@ class ResponseFile
         $mimetype = $file->getStorage()->getMimetype();
 
         if ($mimetype->isImage()) {
-
             /* Load an image html tag
              */
             return [
@@ -105,8 +105,7 @@ class ResponseFile
              */
             try {
                 $audio = ResourceVideoMapper::getInstance()->findByStorageHash($file->getHash());
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 $audio = null;
             }
 
@@ -125,8 +124,7 @@ class ResponseFile
              */
             try {
                 $video = ResourceVideoMapper::getInstance()->findByStorageHash($file->getHash());
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 $video = null;
             }
 

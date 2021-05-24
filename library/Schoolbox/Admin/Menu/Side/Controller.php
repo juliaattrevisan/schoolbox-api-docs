@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -11,8 +12,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\GenericCollection;
 use Schoolbox\Menu\Side\Campus\Mapper as MenuSideCampusMapper;
-use \Schoolbox\Menu\Side\Role\Mapper as MenuSideRoleMapper;
-use \Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
+use Schoolbox\Menu\Side\Role\Mapper as MenuSideRoleMapper;
+use Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
 use Schoolbox\Menu\Side\Campus\Model as MenuSideCampus;
 use Schoolbox\Menu\Side\Role\Model as MenuSideRole;
 use Schoolbox\Menu\Side\Section\Model as MenuSideSection;
@@ -327,7 +328,6 @@ class Controller extends Base
                     'result' => 'OK'
                 ],
             ]);
-
         } catch (MapperException $e) {
             $this->getResponse()->status->setCode(500);
             $this->getResponse()->content->set([
@@ -375,7 +375,6 @@ class Controller extends Base
 
             /** @var MenuSide $node */
             foreach ($parentChildren as $node) {
-
                 if ($orderCurrent == $post['position']) {
                     $orderCurrent++;
                 }
@@ -384,7 +383,6 @@ class Controller extends Base
                     $node->setSortOrder($post['position']);
                 } else {
                     $node->setSortOrder($orderCurrent++);
-
                 }
 
                 $this->getMenuSideMapper()->save($node);

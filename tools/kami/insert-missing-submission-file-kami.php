@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Finds student submission files that are supported by Kami but not in student_submission_file_kami and insert them
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -36,6 +37,7 @@ use Schoolbox\Fixtures;
 use Schoolbox\ResourceBooking;
 use Schoolbox\Application\CliTool;
 use Throwable;
+
 use function count;
 use function get_class;
 use function max;
@@ -457,8 +459,13 @@ EXAMPLES:
         $report = "\n$leadingHyphens Results - $runType $trailingHyphens\n";
 
         // Print table header
-        $report .= sprintf("| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s | %-{$maxIdsStringLength}s |\n",
-            'COUNT', 'TABLE', 'MAPPER', 'IDS');
+        $report .= sprintf(
+            "| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s | %-{$maxIdsStringLength}s |\n",
+            'COUNT',
+            'TABLE',
+            'MAPPER',
+            'IDS'
+        );
 
         // Print table rows
         foreach ($deDuplicatedResults as $mapperClass => $models) {
@@ -468,8 +475,12 @@ EXAMPLES:
             $rTrimMapperClass = preg_replace('/(\\\)?Mapper$/i', '', $mapperClass);
 
             // Print the first 3 non-wrapping columns
-            $report .= sprintf("| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s | [",
-                $count, $table, $rTrimMapperClass);
+            $report .= sprintf(
+                "| %{$maxCountLength}s | %-{$maxTableLength}s | %-{$maxMapperClassLength}s | [",
+                $count,
+                $table,
+                $rTrimMapperClass
+            );
 
             $countLineCharsAvailable = $maxIdsStringLength - 1;
 
@@ -583,7 +594,6 @@ EXAMPLES:
             $first = false;
         }
         return $id;
-
     }
 
 
@@ -634,4 +644,3 @@ EXAMPLES:
         return $string;
     }
 }
-

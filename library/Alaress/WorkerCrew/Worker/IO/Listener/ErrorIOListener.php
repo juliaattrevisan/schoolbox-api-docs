@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker\IO\Listener;
-
 
 use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\WorkerCrew\PoolInterface;
@@ -61,8 +61,7 @@ class ErrorIOListener extends LogIOListener
             $data = $e->getData();
 
             $this->pool->releaseWorker($this->pool->getProcessIdByResource($e->getStream()));
-
-        } catch(OutOfBoundsException $oob) {
+        } catch (OutOfBoundsException $oob) {
             $this->log->warning("Could not release worker with estream [:{$e->getStream()}]");
             return;
         }
@@ -78,12 +77,9 @@ class ErrorIOListener extends LogIOListener
                 $task->getCommand(),
                 $data
             );
-
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             // your reactor will explode if you don't catch exceptions coming from your response handler
             $this->log->info("Error from worker {{$pid}} failed to parse, worker still gone");
         }
-
     }
-
 }

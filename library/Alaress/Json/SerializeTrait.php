@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,9 +8,9 @@
  */
 
 namespace Alaress\Json;
+
 use Alaress\Json\Decorator\IDecorator;
 use Alaress\Json\Decorator\PropertyDecorator;
-
 
 /**
  * Trait SerializeTrait. Should be used to realize \JsonSerializable on models.
@@ -23,7 +24,7 @@ trait SerializeTrait
      * @param IDecorator ...$decorators
      * @return array
      */
-    public function jsonSerialize(IDecorator... $decorators)
+    public function jsonSerialize(IDecorator ...$decorators)
     {
         if (!\count($decorators)) {
             // to preserve default json_encode behaviour, enforce the property decorator

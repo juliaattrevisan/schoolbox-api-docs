@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Get a json-encoded list of textboxes in a given category
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;

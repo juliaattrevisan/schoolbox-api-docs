@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Definition for the curriculum import submodule.
  *
@@ -51,7 +52,7 @@ class Module extends BaseModule
                         UserAccess::ACCESS_WRITE
                     )
                 )
-        );
+            );
     }
 
     /**
@@ -68,7 +69,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
         $injector->setters[Controller::class]['setSourceMapper']

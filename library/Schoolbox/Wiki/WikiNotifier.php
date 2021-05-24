@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Wiki;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
@@ -145,7 +145,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
                     )
                 );
             } catch (\Schoolbox\Mapper\Exception $e) {
-                //noop 
+                //noop
             }
         }
 
@@ -236,5 +236,4 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
     {
         return $this->notifyCreated(Role::PARENT, $wiki, $author);
     }
-
-} 
+}

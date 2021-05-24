@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 use Schoolbox\Role;
 use Schoolbox\RoleCloner;
 use Schoolbox\RoleMapper;
-
 
 if (isset($this)) {
     error(2);
@@ -50,4 +50,3 @@ try {
 
 SitePage::localRedir('/adminv2/user');
 exit;
-

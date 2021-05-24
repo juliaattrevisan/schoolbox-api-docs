@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface for external database community portal classes.
  *

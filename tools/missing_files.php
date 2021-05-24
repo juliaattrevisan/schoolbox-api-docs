@@ -1,4 +1,5 @@
 <?php
+
 /*
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2020, Alaress Pty Ltd
@@ -22,8 +23,8 @@ $app = new class extends CliTool\App {
         $files    = $storageMapper->findAll();
         $countAll = $files->count();
         foreach ($files as $file) {
-            if($file->exists()) {
-                if($file->getFilesystem()->getSize($file->getPath()) === $file->getSize()) {
+            if ($file->exists()) {
+                if ($file->getFilesystem()->getSize($file->getPath()) === $file->getSize()) {
                     $okCount++;
                     $this->getLogger()->info("File OK $okCount/$errorCount/$countAll  {$file->getHash()}, '{$file->getBasename()}'");
                 } else {
@@ -41,4 +42,3 @@ $app = new class extends CliTool\App {
 
 $kernel = new CliTool\Kernel($app);
 $kernel->runapp();
-

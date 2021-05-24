@@ -61,7 +61,7 @@ class External_Pcschools_Class implements External_ClassInterface
                 INNER JOIN SUBJECT s  ON tf.SUBJECT = s.NO
                 INNER JOIN STUDENT st ON su.STUDKEY = st.STUDKEY
                 WHERE
-                    st.CURRENT_YEAR <> '".self::LEFT_YEAR."' AND
+                    st.CURRENT_YEAR <> '" . self::LEFT_YEAR . "' AND
                     {$codeQuery};";
 
         return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
@@ -80,7 +80,9 @@ class External_Pcschools_Class implements External_ClassInterface
         $query = $this->getTimefileFilter($classCode);
 
         return array_map(
-            function($v) { return $v['TEACHER']; },
+            function ($v) {
+                return $v['TEACHER'];
+            },
             $this->getDatabase()->trimAll(
                 $this->getDatabase()->getAll("
                     SELECT DISTINCT
@@ -104,7 +106,6 @@ class External_Pcschools_Class implements External_ClassInterface
     {
         $query = [];
         foreach (explode(',', $classCodes) as $code) {
-
             $parts = explode('/', $code);
             if (count($parts) > 1) {
                 [$timePeriod, $code] = $parts;
@@ -114,9 +115,9 @@ class External_Pcschools_Class implements External_ClassInterface
                 $filter .= " AND tf.TIME_PERIOD = {$this->getDatabase()->legacyQuote($timePeriod)}";
             }
 
-            $query[] = '('.$filter.')';
+            $query[] = '(' . $filter . ')';
         }
-        $query = '('.implode(' OR ', $query).')';
+        $query = '(' . implode(' OR ', $query) . ')';
 
         return $query;
     }

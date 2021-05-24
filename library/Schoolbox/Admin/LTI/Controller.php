@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Lists admin page
  *
@@ -21,7 +22,8 @@ class Controller extends Base
      * Controller constructor.
      * @param ProviderMapper $providerMapper
      */
-    public function __construct(ProviderMapper $providerMapper) {
+    public function __construct(ProviderMapper $providerMapper)
+    {
         $this->providerMapper = $providerMapper;
     }
 
@@ -95,7 +97,6 @@ class Controller extends Base
         $post = $this->getRequest()->post;
 
         try {
-
             if (!empty($post['id'])) {
                 $provider = $this->providerMapper->findById($post['id']);
             } else {
@@ -113,15 +114,13 @@ class Controller extends Base
             try {
                 $xmlContent = @file_get_contents($post['xml']);
 
-                if($xmlContent) {
-
+                if ($xmlContent) {
                     libxml_use_internal_errors(true);
 
                     $xml = simplexml_load_string($xmlContent);
 
 
                     if ($xml !== false) {
-
                         $launchUrl = $xml->children('blti', true)->secure_launch_url;
 
                         if (!empty($launchUrl)) {
@@ -139,8 +138,7 @@ class Controller extends Base
                         if (!empty($launchUrl)) {
                             $provider->setIcon((string)$icon);
                         }
-                    }
-                    else {
+                    } else {
                         $provider->setUrl($post['xml']);
                     }
                 }
@@ -149,7 +147,6 @@ class Controller extends Base
             }
 
             $this->providerMapper->save($provider);
-
         } catch (MapperException $e) {
         }
 

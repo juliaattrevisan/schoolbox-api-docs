@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\DueWork;
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
@@ -79,7 +81,6 @@ class StateMapper extends Mapper
     public function verifyUniqueCode(State $object): bool
     {
         if ($object->getId()) {
-
             /* If the object existed in the past,
              * see if any exist with the same name that -isn't- that particular instance
              * because renaming it is a possibility that should be allowed
@@ -88,7 +89,6 @@ class StateMapper extends Mapper
                 ->notEquals('id', $object->getId())
                 ->equals('code', $object->getCode());
         } else {
-
             /* Otherwise you're creating a new row and we just need to check
              * if that code was previously in use
              */

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -15,7 +16,6 @@ use GuzzleHttp\Promise;
 use Karriere\JsonDecoder\JsonDecoder;
 use Predis\ClientInterface as RedisClient;
 use Psr\Http\Message\ResponseInterface;
-
 
 /**
  * Bridge between high-level Atlas API calls and their low-level implementation.
@@ -136,7 +136,9 @@ class Bridge
                         // No decodeMultipleArray method exists :|
                         // Also need to massage standards so they're not strings
                         $assessment['standards'] = array_map(
-                            function ($v) { return ['rawText' => $v]; },
+                            function ($v) {
+                                return ['rawText' => $v];
+                            },
                             $assessment['standards']
                         );
                         return $this->decoder->decodeArray($assessment, Assessment::class);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Notice class for notifying admin of approved leave requests.
  *
@@ -10,9 +11,11 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-class Leave_Core_Notice_Admin_Authorised extends Leave_Core_Notice_Admin_Abstract {
+class Leave_Core_Notice_Admin_Authorised extends Leave_Core_Notice_Admin_Abstract
+{
 
-    public function send() {
+    public function send()
+    {
         return;
     }
 }

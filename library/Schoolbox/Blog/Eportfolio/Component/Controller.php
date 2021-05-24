@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Normal (non-eportfolio) blog component controller. Is responsible for rendering the TWIG into component
  * on non-eportfolio pages
@@ -20,7 +21,7 @@ use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use \Eportfolio_Page_Instance;
+use Eportfolio_Page_Instance;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SitePage;

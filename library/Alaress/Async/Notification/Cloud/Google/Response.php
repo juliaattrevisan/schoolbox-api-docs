@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Async\Notification\Cloud\Google;
-
 
 use Alaress\Async\Notification\Cloud\ResponseInterface;
 use OutOfBoundsException;
@@ -76,13 +76,10 @@ class Response implements ResponseInterface
                     $this->errors[$registrationIds[$i]] = $result['error'];
                 }
             }
-
         } elseif ($statusCode == 400) {
-            throw new OutOfBoundsException("Bad request: ".$response->getBody()->getContents(), 400);
-
+            throw new OutOfBoundsException("Bad request: " . $response->getBody()->getContents(), 400);
         } elseif ($statusCode == 401) {
             throw new OutOfBoundsException("The given GCM API key is not valid.", 401);
-
         } elseif ($statusCode >= 500) {
             // 5xx SERVER ERROR
             if ($response->hasHeader('Retry-After')) {

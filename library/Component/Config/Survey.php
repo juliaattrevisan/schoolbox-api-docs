@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -33,9 +34,7 @@ class Component_Config_Survey extends Component_Config_Abstract
 
             $page->setVar('COMPONENT_CONFIG_ID', $survey->getId());
             $page->setVar('COMPONENT_CONFIG_VALUE', json_encode($selectedValues));
-
         } catch (MapperException $e) {
-
             $page->setVar('COMPONENT_CONFIG_NAME', 'Survey');
             $page->setVar('COMPONENT_CONFIG_ID', '');
             $page->setVar('COMPONENT_CONFIG_VALUE', '[]');

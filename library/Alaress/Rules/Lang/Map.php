@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Rules\Lang;
-
 
 class Map implements Construct
 {
@@ -47,7 +47,6 @@ class Map implements Construct
             }
 
             return "'$key' => $value";
-
         }, array_keys($this->map), $this->map));
 
         $str .= "\n]";
@@ -75,7 +74,7 @@ class Map implements Construct
         foreach ($inputValue as $input) {
             if (array_key_exists($input, $this->map)) {
                 $mapVal = $this->map[$input];
-                if(is_array($mapVal)){
+                if (is_array($mapVal)) {
                     $output = array_merge($output, $this->flattenArray($mapVal));
                 } else {
                     $output[] = $mapVal;
@@ -92,8 +91,8 @@ class Map implements Construct
     protected function flattenArray(array $array)
     {
         $values = [];
-        foreach($array as $value){
-            if(is_array($value)){
+        foreach ($array as $value) {
+            if (is_array($value)) {
                 $values = array_merge($values, $this->flattenArray($value));
             } else {
                 $values[] = $value;
@@ -101,5 +100,4 @@ class Map implements Construct
         }
         return $values;
     }
-
-} 
+}

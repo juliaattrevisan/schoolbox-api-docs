@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -16,7 +17,7 @@ use Psr\Log\NullLogger;
 use Schoolbox\Mail;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User\Password\MailService;
-use \Schoolbox\UserMapper;
+use Schoolbox\UserMapper;
 use Alaress\Twig\Loader\IChainLoader;
 
 /**
@@ -80,7 +81,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'passwordService' => $injector->lazyNew(PasswordService::class),
                 'userMapper'      => $this->getMapperFactory()->getLazy(UserMapper::class),

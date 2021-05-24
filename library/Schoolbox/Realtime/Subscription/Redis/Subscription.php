@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -89,7 +90,7 @@ class Subscription implements ISubscription
     {
         if ($this->asyncClient instanceof Async\Client) {
             $this->asyncClient->unsubscribe($this->getRouteKey());
-            unset ($this->asyncClient);
+            unset($this->asyncClient);
         }
     }
 
@@ -153,5 +154,4 @@ class Subscription implements ISubscription
     {
         return $this->unreadRetriever->getUnread($this->instanceId, $this->userId);
     }
-
 }

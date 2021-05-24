@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -104,9 +105,9 @@ class Homepage
             '%s %s',
             $layout,
             self::ELEMENT_COMPONENT
-//            ,
-//            // Offset position by 1, due to the presence of a placeholder in first position
-//            $position + 1
+            //            ,
+            //            // Offset position by 1, due to the presence of a placeholder in first position
+            //            $position + 1
         );
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 use Alaress\Authorizer\Failure\AuthenticationTimedOut;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Resource\Browser\Office365\Tenant;
@@ -55,12 +56,10 @@ try {
         $conf       = $this->getDi()->get('config');
         $tenant     = new Tenant($conf->get('office365_tenant'), $conf->get('sharepoint_sitepath') ?: null);
         $browser    = $factory->buildOAuth($source, $resourceId, $tenant, $oAuthToken, $mimeFilter);
-
     } else {
         try {
             $browser = $factory->build($source, $resourceId, $mimeFilter);
         } catch (\Schoolbox\Mapper\Exception $e) {
-
             /* Our mappers encountered deleted node; go back to root node
              */
             $browser = $factory->build($source, IFolder::ROOT_ID, $mimeFilter);

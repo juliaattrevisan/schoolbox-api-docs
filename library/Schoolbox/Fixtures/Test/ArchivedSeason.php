@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -13,8 +14,8 @@ use Schoolbox\Fixtures\Sport;
 use Schoolbox\Fixtures\Season;
 use Schoolbox\Fixtures\Division;
 use Schoolbox\Fixtures\Team;
-use \Alaress_Date_Format;
-use \Alaress_Date_NullDate;
+use Alaress_Date_Format;
+use Alaress_Date_NullDate;
 
 class ArchivedSeason extends TestCase
 {

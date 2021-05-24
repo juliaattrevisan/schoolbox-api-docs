@@ -1,14 +1,17 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Date_Format;
 use InvalidArgumentException;
+
 use function array_diff;
 use function array_values;
 use function usort;

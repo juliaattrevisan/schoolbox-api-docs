@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -249,7 +250,6 @@ class DehydratorTest extends TestCase
         $this->assertArrayNotHasKey($userA->getId(), $actual['activities'][$quiz->getId()]['participants']);
         $this->assertArrayHasKey($userB->getId(), $actual['activities'][$quiz->getId()]['participants']);
         $this->assertArrayHasKey($userC->getId(), $actual['activities'][$quiz->getId()]['participants']);
-
     }
 
     /**

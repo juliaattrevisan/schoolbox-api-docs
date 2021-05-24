@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
@@ -191,5 +192,4 @@ class RelativeDayTest extends TestCase
 
         $this->assertEquals($expected, $result);
     }
-
 }

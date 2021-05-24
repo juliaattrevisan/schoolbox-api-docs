@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Generate key pairs for JWT.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -23,6 +24,5 @@ class Component_Config_DisplayPortraits extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_DISPLAYPORTRAITS_SELECTED', $o == $configValue ? ' selected="selected"' : '');
             $page->parse('display_p_block', 'display_p', true);
         }
-
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collection intended for column->property mappings for a mapper class.
  *
@@ -8,7 +9,9 @@
  */
 
 namespace Schoolbox;
+
 use function array_key_exists;
+
 use BadMethodCallException;
 use CallbackFilterIterator;
 
@@ -30,47 +33,49 @@ class MappingCollection extends Collection
      */
     private $columnToPropertyMap = [];
 
-	/**
-	 * Retrieves an iterator which filters out any element in the collection
-	 * which doesn't pass $this->accept().
-	 *
-	 * @return \Traversable
-	 */
-	public function getIterator() {
-		return new CallbackFilterIterator(parent::getIterator(), array($this, 'accept'));
-	}
+    /**
+     * Retrieves an iterator which filters out any element in the collection
+     * which doesn't pass $this->accept().
+     *
+     * @return \Traversable
+     */
+    public function getIterator()
+    {
+        return new CallbackFilterIterator(parent::getIterator(), array($this, 'accept'));
+    }
 
-	/**
-	 * Filters out disabled keys from the mapping.
-	 *
-	 * * Keys without an "enabled" field default to being enabled
-	 * * Keys with a callback as the enabled field are enabled if callback
-	 *   returns true
-	 * * Keys with any other "enabled" field are enabled if that field == true
-	 *
-	 * @param array     $current
-	 * @param int       $key
-	 * @param \Iterator $iterator
-	 *
-	 * @return bool
-	 */
-	public function accept($current, $key, $iterator) {
-		if (!isset($current['enabled'])) {
-			return true;
-		}
-		if (is_callable($current['enabled'])) {
-			return $current['enabled']();
-		}
-		return $current['enabled'];
-	}
+    /**
+     * Filters out disabled keys from the mapping.
+     *
+     * * Keys without an "enabled" field default to being enabled
+     * * Keys with a callback as the enabled field are enabled if callback
+     *   returns true
+     * * Keys with any other "enabled" field are enabled if that field == true
+     *
+     * @param array     $current
+     * @param int       $key
+     * @param \Iterator $iterator
+     *
+     * @return bool
+     */
+    public function accept($current, $key, $iterator)
+    {
+        if (!isset($current['enabled'])) {
+            return true;
+        }
+        if (is_callable($current['enabled'])) {
+            return $current['enabled']();
+        }
+        return $current['enabled'];
+    }
 
-	/**
-	 * Allows retrieval of an offset by its database column, instead of its
-	 * property name.
-	 *
-	 * @param  string $column
-	 * @return null|array
-	 */
+    /**
+     * Allows retrieval of an offset by its database column, instead of its
+     * property name.
+     *
+     * @param  string $column
+     * @return null|array
+     */
     public function getOffsetByColumn(string $column): ?array
     {
         if (!array_key_exists($column, $this->columnToPropertyMap)) {

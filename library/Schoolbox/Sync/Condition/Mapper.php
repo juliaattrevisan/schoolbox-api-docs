@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -40,7 +41,6 @@ class Mapper extends Schoolbox\Mapper
 
         $this->joins('rule_id', Rule\Mapper::class);
         $this->joins('condition_type_id', Type\Mapper::class);
-
     }
 
 
@@ -83,6 +83,4 @@ class Mapper extends Schoolbox\Mapper
 
         return $collection;
     }
-
-
 }

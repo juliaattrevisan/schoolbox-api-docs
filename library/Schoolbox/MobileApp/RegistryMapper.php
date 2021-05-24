@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\MobileApp;
-
 
 use PDOStatement;
 use Schoolbox\Collection;
@@ -38,8 +38,8 @@ class RegistryMapper extends Mapper
 
         $this->joins('user_id', UserMapper::class);
 
-        $this->uses('app_token',  self::TYPE_STRING, null, 'token');
-        $this->uses('device_id',  self::TYPE_STRING);
+        $this->uses('app_token', self::TYPE_STRING, null, 'token');
+        $this->uses('device_id', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('touched_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
 

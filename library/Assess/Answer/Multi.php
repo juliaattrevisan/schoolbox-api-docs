@@ -136,7 +136,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
                 /* This answer is correct
                  */
                 if ($currentAnswer->correct) {
-
                     /* The respondent chose the correct answer
                      */
                     if ($selectedByRespondent) {
@@ -161,7 +160,6 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
                 /* This answer is not correct
                  */
                 else {
-
                     /* The respondent chose this answer
                      */
                     if ($selectedByRespondent) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Subject
  *
@@ -11,7 +12,8 @@ namespace Schoolbox\External\Normalise\User\Student;
 
 use Schoolbox\External\Normalise\User\Common\Campus;
 
-class Subject {
+class Subject
+{
 
     /**
      * Abbreviated code
@@ -44,7 +46,8 @@ class Subject {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

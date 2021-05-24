@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,10 +9,10 @@
 
 namespace Alaress\File\Remote;
 
-
 use OutOfBoundsException;
 
-interface FetcherInterface {
+interface FetcherInterface
+{
 
     /**
      * Retrieves the metadata for the given fileId
@@ -30,5 +31,4 @@ interface FetcherInterface {
      * @return string
      */
     public function fetchToFile($fileId);
-
-} 
+}

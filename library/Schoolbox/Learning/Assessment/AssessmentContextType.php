@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -11,7 +12,6 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-
 
 /**
  * Encapsulates the mapping between AssessmentContext Types and:
@@ -44,7 +44,9 @@ class AssessmentContextType implements IType
     /**
      * Protected constructor to enforce singleton pattern
      */
-    protected function __construct(){}
+    protected function __construct()
+    {
+    }
 
     /**
      * Retrieves the singleton instance of this class.
@@ -68,16 +70,16 @@ class AssessmentContextType implements IType
      */
     public static function objectToString(AssessmentContext $context)
     {
-        if($context instanceof Folder){
+        if ($context instanceof Folder) {
             return self::TYPE_FOLDER;
-        } elseif($context instanceof Project){
+        } elseif ($context instanceof Project) {
             return self::TYPE_PROJECT;
-        } elseif($context instanceof UnitImplementation){
+        } elseif ($context instanceof UnitImplementation) {
             return self::TYPE_UNIT_IMPLEMENTATION;
-        } elseif($context instanceof UnitSpecification){
+        } elseif ($context instanceof UnitSpecification) {
             return self::TYPE_UNIT_SPECIFICATION;
         }
-        throw new \UnexpectedValueException('Unknown AssessmentContext: '.get_class($context));
+        throw new \UnexpectedValueException('Unknown AssessmentContext: ' . get_class($context));
     }
 
 
@@ -90,13 +92,13 @@ class AssessmentContextType implements IType
      */
     public static function stringToObject($stringVal)
     {
-        if(self::TYPE_FOLDER === $stringVal){
+        if (self::TYPE_FOLDER === $stringVal) {
             return new Folder();
-        } elseif(self::TYPE_PROJECT === $stringVal){
+        } elseif (self::TYPE_PROJECT === $stringVal) {
             return new Project();
-        } elseif(self::TYPE_UNIT_IMPLEMENTATION === $stringVal){
+        } elseif (self::TYPE_UNIT_IMPLEMENTATION === $stringVal) {
             return new UnitImplementation();
-        } elseif(self::TYPE_UNIT_SPECIFICATION === $stringVal){
+        } elseif (self::TYPE_UNIT_SPECIFICATION === $stringVal) {
             return new UnitSpecification();
         }
         throw new \UnexpectedValueException("Unknown AssessmentContext: $stringVal");
