@@ -297,6 +297,36 @@ class CollectionMethodsTest extends TestCase
         $this->assertSame($expected->getAll(), $first->intersect($second, $compare)->getAll());
     }
 
+
+    /**
+     * Test `getPropertyValues`
+     *
+     * @param Collection $collection
+     * @param string     $property
+     * @param array      $expected
+     * @covers \Schoolbox\Collection::getPropertyValues
+     * @dataProvider getTestGetPropertyValuesProvider
+     */
+    public function testGetPropertyValues(Collection $collection, string $property, array $expected): void
+    {
+        $this->assertSame($expected, $collection->getPropertyValues($property));
+    }
+
+    /**
+     * Test `getPropertyValues` case where the property does not exist:
+     * this should be a warning.
+     *
+     * @param Collection $collection
+     * @param string     $property
+     * @covers \Schoolbox\Collection::getPropertyValues
+     * @dataProvider getTestGetPropertyValuesPropertyDoesNotExistProvider
+     */
+    public function testGetPropertyValuesPropertyDoesNotExist(Collection $collection, string $property): void
+    {
+        $this->expectWarning();
+        $collection->getPropertyValues($property);
+    }
+
     // ============= Data Providers =============
 
     public function provider_limit()
@@ -572,6 +602,72 @@ class CollectionMethodsTest extends TestCase
                     ['id' => 4, 'name' => 'B'],
                 ]),
             ],
+        ];
+    }
+
+    /**
+     * Data provider for `testGetPropertyValues`.
+     *
+     * @return iterable
+     */
+    public function getTestGetPropertyValuesProvider(): iterable
+    {
+        $campusOne = new \Schoolbox\Campus();
+        $campusOne->setId(1);
+
+        $campusTwo = new \Schoolbox\Campus();
+        $campusTwo->setId(2);
+
+        $campusThree = new \Schoolbox\Campus();
+        $campusThree->setId(3);
+
+        $campusFour = new \Schoolbox\Campus();
+        $campusFour->setId(4);
+
+        $property = 'id';
+        return [
+            'empty'     => [new Collection(), 'id', []],
+            'populated' => [new Collection([$campusOne, $campusTwo, $campusThree, $campusFour]), $property, [1, 2, 3, 4]],
+            'reversed'  => [new Collection([$campusFour, $campusThree, $campusTwo, $campusOne]), $property, [4, 3, 2, 1]],
+        ];
+    }
+
+    /**
+     * Data provider for `testGetPropertyValuesPropertyDoesNotExist`.
+     *
+     * @return iterable
+     */
+    public function getTestGetPropertyValuesPropertyDoesNotExistProvider(): iterable
+    {
+        $campusOne = new \Schoolbox\Campus();
+        $campusOne->setId(1);
+
+        $campusTwo = new \Schoolbox\Campus();
+        $campusTwo->setId(2);
+
+        $campusThree = new \Schoolbox\Campus();
+        $campusThree->setId(3);
+
+        $campusFour = new \Schoolbox\Campus();
+        $campusFour->setId(4);
+
+        $dummy1 = new class {
+            public function getId()
+            {
+                return 1;
+            }
+        };
+
+        $dummy2 = new class {
+            public function getName()
+            {
+                return 'name';
+            }
+        };
+
+        return [
+            'none have property' => [new Collection([$dummy1, $dummy2]), 'date'],
+            'some have property' => [new Collection([$dummy1, $dummy2]), 'id'],
         ];
     }
 }
