@@ -23,7 +23,7 @@ class ValidHasReadMoreTest extends TestCase
 {
 
     /**
-     * @dataProvider provider_validHaReadMore
+     * @dataProvider providerValidHasReadMore
      * @param Model  $article
      * @param string $readMore
      * @param bool   $commentsAllowed
@@ -46,7 +46,7 @@ class ValidHasReadMoreTest extends TestCase
      *
      * @return array
      */
-    public function provider_validHaReadMore(): array
+    public function providerValidHasReadMore(): array
     {
 
         /* Empty article, avoid of everything
