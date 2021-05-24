@@ -270,7 +270,6 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     {
         foreach ($this as $item) {
             return $item;
-            break;
         }
         return null;
     }

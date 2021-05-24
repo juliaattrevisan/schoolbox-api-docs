@@ -3771,16 +3771,6 @@ parameters:
 			path: library/Schoolbox/Collection.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 2
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^Instanceof between array and Schoolbox\\\\Collection will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
 			message: "#^Parameter \\$callback of method Schoolbox\\\\Collection\\:\\:map\\(\\) has invalid typehint type Schoolbox\\\\callback\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
@@ -8749,11 +8739,6 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Test/CollectionMethodsTest.php
 
 		-
 			message: "#^Parameter \\#1 \\$name \\(null\\) of method Schoolbox\\\\Test\\\\MockDatabase\\:\\:lastInsertId\\(\\) should be compatible with parameter \\$name \\(string\\) of method Alaress\\\\IDatabase\\:\\:lastInsertId\\(\\)$#"
