@@ -7,7 +7,6 @@
 
 namespace Schoolbox\External\Importer\User\Hydrator;
 
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User as UserModel;
 
 /**
@@ -58,6 +57,16 @@ class Lookup implements HydratorInterface
         // Does the field exist in $row?
         if (isset($row[$this->fieldname])) {
             $row[$this->fieldname] = trim($row[$this->fieldname]);
+
+            /* If the row contains an empty string, set it to null
+             */
+            if ('' === $row[$this->fieldname]) {
+                return call_user_func(
+                    [$user, $this->setMethod],
+                    null
+                );
+            }
+
             // Is the field value in the list of lookup values?
             if (isset($this->lookupValues[$row[$this->fieldname]])) {
                 return call_user_func(
