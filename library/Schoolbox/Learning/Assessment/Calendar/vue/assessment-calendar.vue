@@ -59,7 +59,7 @@ export default {
         ViewEventModal,
         FullCalendar,
         RevealModal,
-		CustomisedCalendarEvent
+        CustomisedCalendarEvent
     },
 
     mixins: [
@@ -150,7 +150,7 @@ export default {
             },
             resourceAreaHeaderContent: 'Week',
             slotMinWidth: '50'
-        },
+        };
         this.resourceTimelineWeek = {
             dayHeaderFormat: this.formats.displayWeekDay,
             duration: { weeks: 1 },
@@ -160,12 +160,12 @@ export default {
             ],
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true
-        },
+        };
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin, adaptivePlugin ],
-            views: { 
-                resourceTimelineSemester: this.resourceTimelineSemester, 
+            views: {
+                resourceTimelineSemester: this.resourceTimelineSemester,
                 resourceTimelineWeek: this.resourceTimelineWeek
             },
             initialView: 'resourceTimelineSemester',
@@ -228,7 +228,7 @@ export default {
             this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
         });
     },
-    
+
     methods: {
 
         /**
@@ -286,7 +286,7 @@ export default {
 
                 // Filter out events which don't start
                 successCallback(response.data.filter(v => 'start' in v));
-                
+
             } );
             // Fail callback: consider a message saying something failed
         },
@@ -347,7 +347,7 @@ export default {
 
                 // Filter out events which don't start
                 successCallback(response.data.filter(v => 'start' in v));
-                
+
             });
         },
 
@@ -385,7 +385,7 @@ export default {
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
-            
+
             const eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping;
             const element = eventRenderInfo.el;
 
@@ -452,7 +452,7 @@ export default {
          * @param info
          */
         viewDidMount(info) {
-            
+
             const calendarApi = this.$refs.fullCalendar.getApi(); //runs before the nextTick, so need api here
             const eventSource = calendarApi.getEventSourceById('events');
             const groupedEventSource = calendarApi.getEventSourceById('groupedEvents');
@@ -662,7 +662,7 @@ export default {
         },
 
         redrawWeekNumbers() {
-            //@TODO - is this still needed? 
+            //@TODO - is this still needed?
             // document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach((element, index) => {
             //     element.innerHTML = index + 1;
             // });
@@ -927,7 +927,7 @@ export default {
 
 <template>
     <div>
-        <view-event-modal 
+        <view-event-modal
             ref="event"
             return-to="assessmentCalendar"
             :to-moment="$_fullCalendarHelper_toMoment"
@@ -944,7 +944,7 @@ export default {
             @eventModified="reloadEvents"
             @eventDeleted="reloadEvents"
         />
-        <view-grouped-events-modal 
+        <view-grouped-events-modal
             ref="groupedEvents"
             :to-moment="$_fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
