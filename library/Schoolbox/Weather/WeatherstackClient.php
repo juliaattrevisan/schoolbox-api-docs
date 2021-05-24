@@ -193,6 +193,17 @@ class WeatherstackClient
                 'windSpeed'      => $responseData['current']['wind_speed'],
                 'windDirection'  => $responseData['current']['wind_dir'],
                 'lastUpdated'    => Alaress_Date_Format::newFromTimestamp($lastUpdatedTimestamp)->getRelativeTime(),
+
+                /* Forecasts for multiple days
+                 */
+                'forecastDays'   => [],
+
+                /* Today's forecast
+                 */
+                'today'          => [
+                    'lowTemp' => null,
+                    'highTemp' => null
+                ],
             ]
         ];
 
