@@ -345,17 +345,19 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 
 
     /**
-     * This is a Collection-aware wrapper around array_column, for use in the Twig filter {{ | column($column) }}
+     * This is a Collection-aware wrapper around array_column, for use in the
+     * Twig filter {{ | column($column) }}
      *
-     * @param array $input
+     * @param mixed  $input  Should either be a Collection instance, or an array
      * @param string $column
-     * @throws InvalidArgumentException if the input given is not traversable
      * @return array
+     * @throws InvalidArgumentException if the input given is neither a
+     *                                  Collection nor an array
      */
-    public static function array_column($input, $column)
+    public static function arrayColumn($input, $column): array
     {
         if ($input instanceof self) {
-            return $input->getColumnValues($column);
+            return $input->getPropertyValues($column);
         }
         if (is_array($input)) {
             return array_column($input, $column);
