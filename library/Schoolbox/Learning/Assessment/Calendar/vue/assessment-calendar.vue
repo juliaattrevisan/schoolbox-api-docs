@@ -533,7 +533,7 @@ export default {
          * the initial month view will go to the current date
          */
         clickMonthView() {
-            this.switchView(VIEW_DAY_GRID_MONTH);
+            this.switchView(VIEW_DAY_GRID_MONTH, true);
         },
 
         /**
@@ -541,7 +541,7 @@ export default {
          * the initial month view will go to the current date
          */
         clickWeekView() {
-            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK);
+            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, true);
         },
 
         /**
@@ -549,14 +549,15 @@ export default {
          * the initial month view will go to the current date
          */
         clickSemesterView() {
-            this.switchView(VIEW_RESOURCE_TIMELINE_SEMESTER);
+            this.switchView(VIEW_RESOURCE_TIMELINE_SEMESTER, true);
         },
 
         /**
          * Custom method for switching calendar view
-         * @param viewType
+         * @param {String}  viewType
+         * @param {Boolean} updateDate
          */
-        switchView(viewType) {
+        switchView(viewType, updateDate) {
             /**
              * Since clicking of month and week view needs to be customised, so that initial loading of month or week
              * view goes to the current date.
@@ -572,10 +573,12 @@ export default {
                 setTimeout(() => resolve(1), 1000);
             }).then((result) => {
                 // Semester view, will just use the term start date that's set on page load
-                if (viewType === VIEW_RESOURCE_TIMELINE_SEMESTER) {
-                    this.calendarApi.gotoDate(this.termStartDate);
-                } else { //otherwise use current date
-                    this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
+                if (updateDate) {
+                    if (viewType === VIEW_RESOURCE_TIMELINE_SEMESTER) {
+                        this.calendarApi.gotoDate(this.termStartDate);
+                    } else { //otherwise use current date
+                        this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
+                    }
                 }
 
                 this.calendarApi.changeView(viewType);
@@ -916,7 +919,7 @@ export default {
          */
         viewWeek(date) {
             this.calendarApi.gotoDate(date);
-            this.calendarApi.changeView('resourceTimelineWeek');
+            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, false);
         },
 
     }
