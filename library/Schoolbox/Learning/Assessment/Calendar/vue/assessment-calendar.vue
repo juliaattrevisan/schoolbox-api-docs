@@ -59,7 +59,7 @@ export default {
         ViewEventModal,
         FullCalendar,
         RevealModal,
-		CustomisedCalendarEvent
+        CustomisedCalendarEvent
     },
 
     mixins: [
@@ -150,7 +150,7 @@ export default {
             },
             resourceAreaHeaderContent: 'Week',
             slotMinWidth: '50'
-        },
+        };
         this.resourceTimelineWeek = {
             dayHeaderFormat: this.formats.displayWeekDay,
             duration: { weeks: 1 },
@@ -160,12 +160,12 @@ export default {
             ],
             resourceAreaWidth: '15%',
             filterResourcesWithEvents: true
-        },
+        };
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, resourceTimelinePlugin, momentPlugin, adaptivePlugin ],
-            views: { 
-                resourceTimelineSemester: this.resourceTimelineSemester, 
+            views: {
+                resourceTimelineSemester: this.resourceTimelineSemester,
                 resourceTimelineWeek: this.resourceTimelineWeek
             },
             initialView: 'resourceTimelineSemester',
@@ -228,7 +228,7 @@ export default {
             this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
         });
     },
-    
+
     methods: {
 
         /**
@@ -286,7 +286,7 @@ export default {
 
                 // Filter out events which don't start
                 successCallback(response.data.filter(v => 'start' in v));
-                
+
             } );
             // Fail callback: consider a message saying something failed
         },
@@ -347,7 +347,7 @@ export default {
 
                 // Filter out events which don't start
                 successCallback(response.data.filter(v => 'start' in v));
-                
+
             });
         },
 
@@ -385,7 +385,7 @@ export default {
          * @return {boolean}
          */
         eventRender(eventRenderInfo) {
-            
+
             const eventGrouping = eventRenderInfo.event.extendedProps.data.meta.eventGrouping;
             const element = eventRenderInfo.el;
 
@@ -452,7 +452,7 @@ export default {
          * @param info
          */
         viewDidMount(info) {
-            
+
             const calendarApi = this.$refs.fullCalendar.getApi(); //runs before the nextTick, so need api here
             const eventSource = calendarApi.getEventSourceById('events');
             const groupedEventSource = calendarApi.getEventSourceById('groupedEvents');
@@ -533,7 +533,7 @@ export default {
          * the initial month view will go to the current date
          */
         clickMonthView() {
-            this.switchView(VIEW_DAY_GRID_MONTH);
+            this.switchView(VIEW_DAY_GRID_MONTH, true);
         },
 
         /**
@@ -541,7 +541,7 @@ export default {
          * the initial month view will go to the current date
          */
         clickWeekView() {
-            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK);
+            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, true);
         },
 
         /**
@@ -549,14 +549,15 @@ export default {
          * the initial month view will go to the current date
          */
         clickSemesterView() {
-            this.switchView(VIEW_RESOURCE_TIMELINE_SEMESTER);
+            this.switchView(VIEW_RESOURCE_TIMELINE_SEMESTER, true);
         },
 
         /**
          * Custom method for switching calendar view
-         * @param viewType
+         * @param {String}  viewType
+         * @param {Boolean} updateDate
          */
-        switchView(viewType) {
+        switchView(viewType, updateDate) {
             /**
              * Since clicking of month and week view needs to be customised, so that initial loading of month or week
              * view goes to the current date.
@@ -572,16 +573,19 @@ export default {
                 setTimeout(() => resolve(1), 1000);
             }).then((result) => {
                 // Semester view, will just use the term start date that's set on page load
-                if (viewType === VIEW_RESOURCE_TIMELINE_SEMESTER) {
-                    this.calendarApi.gotoDate(this.termStartDate);
-                } else { //otherwise use current date
-                    this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
+                if (updateDate) {
+                    if (viewType === VIEW_RESOURCE_TIMELINE_SEMESTER) {
+                        this.calendarApi.gotoDate(this.termStartDate);
+                    } else { //otherwise use current date
+                        this.calendarApi.gotoDate(this.convertDateToDateString(new Date()));
+                    }
                 }
 
                 this.calendarApi.changeView(viewType);
 
                 return result;
             }).then((result) => {
+                this.viewDidMount({view: this.calendarApi.view})
                 this.$_fullCalendarHelper_onLoading(false);
 
                 return result;
@@ -662,7 +666,7 @@ export default {
         },
 
         redrawWeekNumbers() {
-            //@TODO - is this still needed? 
+            //@TODO - is this still needed?
             // document.querySelectorAll('.fc-time-area .fc-content tr')[1].querySelectorAll('.fc-cell-text').forEach((element, index) => {
             //     element.innerHTML = index + 1;
             // });
@@ -916,7 +920,7 @@ export default {
          */
         viewWeek(date) {
             this.calendarApi.gotoDate(date);
-            this.calendarApi.changeView('resourceTimelineWeek');
+            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, false);
         },
 
     }
@@ -927,7 +931,7 @@ export default {
 
 <template>
     <div>
-        <view-event-modal 
+        <view-event-modal
             ref="event"
             return-to="assessmentCalendar"
             :to-moment="$_fullCalendarHelper_toMoment"
@@ -944,7 +948,7 @@ export default {
             @eventModified="reloadEvents"
             @eventDeleted="reloadEvents"
         />
-        <view-grouped-events-modal 
+        <view-grouped-events-modal
             ref="groupedEvents"
             :to-moment="$_fullCalendarHelper_toMoment"
             :format-display-date="formats.displayDate"
