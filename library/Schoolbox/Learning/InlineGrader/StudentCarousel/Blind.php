@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\InlineGrader\StudentCarousel;
@@ -90,7 +92,7 @@ class Blind
      * Find the first blind-reviewable person's url
      * If none exist, return null
      */
-    public function getFirstUrl() : ?string
+    public function getFirstUrl(): ?string
     {
         return $this->getAllPeople()[0]['value'] ?? null;
     }
@@ -111,7 +113,7 @@ class Blind
          * Filter out guys so that all who remain are students who have submitted a Response
          * electronically (online) and those Responses require published Feedback
          */
-        $allParticipants = $allParticipants->filter(function(Participant $currentParticipant) {
+        $allParticipants = $allParticipants->filter(function (Participant $currentParticipant) {
             return !(
                 $currentParticipant->isExcluded() ||
                 $currentParticipant->isResubmissionRequired() ||

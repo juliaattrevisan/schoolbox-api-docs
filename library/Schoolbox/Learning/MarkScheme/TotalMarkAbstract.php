@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -7,7 +8,7 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
-use \InvalidArgumentException;
+use InvalidArgumentException;
 use RangeException;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Quiz\Attempt as QuizAttempt;
@@ -47,7 +48,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param null|int|float $totalMark
      * @throws RangeException If $totalMark outside valid range
      */
-    protected abstract function rangeCheck($totalMark);
+    abstract protected function rangeCheck($totalMark);
 
     /**
      * Returns a string representation of a normalised Mark
@@ -112,7 +113,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     {
         $matches = [];
         $pattern = '/^\s*(-?[0-9.]+)/';
-        if(!preg_match($pattern, $humanReadableMark, $matches)){
+        if (!preg_match($pattern, $humanReadableMark, $matches)) {
             throw new InvalidArgumentException("Unable to parse numerator: $humanReadableMark");
         }
 

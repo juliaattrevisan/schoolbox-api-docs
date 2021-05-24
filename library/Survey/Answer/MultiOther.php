@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Answer_Multi
  *
@@ -32,7 +33,8 @@ class Survey_Answer_MultiOther extends Evaluation_Answer_MultiOther
      * @param array $currentQuestion
      * @return void
      */
-    public function graphResults($page, $currentQuestion) {
+    public function graphResults($page, $currentQuestion)
+    {
 
         /* The last element in the stack corresponds to "Other"
          * Its 'text' key is empty, and the Survey_Graph_Render class
@@ -58,7 +60,8 @@ class Survey_Answer_MultiOther extends Evaluation_Answer_MultiOther
      *
      * @return string
      */
-    protected function getIncorrectClass() {
+    protected function getIncorrectClass()
+    {
         return $this->correctClass;
     }
 
@@ -66,7 +69,8 @@ class Survey_Answer_MultiOther extends Evaluation_Answer_MultiOther
     /**
      * @inheritdoc
      */
-    public function configure(SitePage $page, $config) {
+    public function configure(SitePage $page, $config)
+    {
         $options = json_decode($config);
 
         $page->setVar(array(
@@ -81,7 +85,8 @@ class Survey_Answer_MultiOther extends Evaluation_Answer_MultiOther
      * @param SitePage $page
      * @param int $question_id
      */
-    protected function configureResponse($page, $question_id) {
+    protected function configureResponse($page, $question_id)
+    {
         $question = $this->questionHandler->getByID($question_id);
         $config = json_decode($question['config']);
 

@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,7 +13,8 @@ use Alaress\Rules\Condition;
 use Alaress\Rules\TokenizedRuleset;
 use Schoolbox\User;
 
-class Ruleset extends TokenizedRuleset {
+class Ruleset extends TokenizedRuleset
+{
 
     /** @var Tokenizer */
     protected $tokenizer;
@@ -104,5 +106,4 @@ class Ruleset extends TokenizedRuleset {
 
         return $all;
     }
-
 }

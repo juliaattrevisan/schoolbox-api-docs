@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for Schoolbox\Column\IColumnType objects.
  *

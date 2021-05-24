@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Leave Controller
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Application\Exception as ApplicationException;
 use Schoolbox\Error;
 use Schoolbox\Permission\Access\UserAccess;
@@ -197,11 +199,10 @@ class Leave_Controller extends Controller
         $returningToday = 0;
 
         foreach ($allHouses as $house) {
-
             //Getting a number of absent student from whatever is available
             $absentToday = 0;
             if ($house['absent_morning'] > 0 || $house['absent_day'] > 0 || $house['absent_night'] > 0) {
-                $absentToday = max(Array($house['absent_morning'], $house['absent_day'], $house['absent_night']));
+                $absentToday = max(array($house['absent_morning'], $house['absent_day'], $house['absent_night']));
             }
 
             $requestList = $this->getRequestMapper()->findAllByHouseId($house['houseId']);
@@ -210,7 +211,6 @@ class Leave_Controller extends Controller
             $totalPending = 0;
 
             foreach ($requestList as $request) {
-
                 if ($request->isApproved()) {
                     $totalApproved++;
                     if ($request->getStart()->isToday()) {
@@ -251,7 +251,7 @@ class Leave_Controller extends Controller
             $this->getPage()->parse('summary_house_block', 'summary_house', true);
         }
 
-        $this->getPage()->setVar(Array(
+        $this->getPage()->setVar(array(
             'SUMMARY_TODAY' => $today->getURLDate(),
             'SUMMARY_WEEK' => $today->addDays(7)->getURLDate(),
             'SUMMARY_DEPARTING' => $leavingToday,
@@ -260,9 +260,9 @@ class Leave_Controller extends Controller
 
         $colourList = Timetable_ColourMapper::getInstance()->findAll(array("limit" => 5));
 
-        $colourArray = Array();
-        if($colourList->count() > 0){
-            foreach ($colourList as $i=>$colour){
+        $colourArray = array();
+        if ($colourList->count() > 0) {
+            foreach ($colourList as $i => $colour) {
                 $colourArray[$i] = $colour->getHexColour();
             }
         }
@@ -271,15 +271,16 @@ class Leave_Controller extends Controller
             $colourArray[0] = '#ffffff';
         }
         //Rotating available colours to set 5 different styles
-        $k=0;
-        for ($i=0; $i<5; $i++) {
-            if(!($colourArray[$k])){
-                $k=0;
+        $k = 0;
+        for ($i = 0; $i < 5; $i++) {
+            if (!($colourArray[$k])) {
+                $k = 0;
             }
             $this->getPage()->setVar(
                 array(
                     'SUMMARY_COLOR_' . $i => $colourArray[$k],
-                ));
+                )
+            );
             $k++;
         }
     }
@@ -321,7 +322,7 @@ class Leave_Controller extends Controller
      */
     public function executeCreateRequest()
     {
-        if(!$this->hasCreatePermission()){
+        if (!$this->hasCreatePermission()) {
             error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
@@ -341,7 +342,9 @@ class Leave_Controller extends Controller
         $this->getPage()->setBlock(TEMPLATE_content, 'travel_drop', 'travel_drop_block');
         $this->getPage()->setBlock('student_selector', 'student_drop', 'student_drop_block');
         $this->getPage()->setBlock(
-            'custom_head', 'student_autocomplete_javascript', 'student_autocomplete_javascript_block'
+            'custom_head',
+            'student_autocomplete_javascript',
+            'student_autocomplete_javascript_block'
         );
         $this->getPage()->setBlock(TEMPLATE_content, 'student_autocomplete', 'student_autocomplete_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'student_name', 'student_name_block');
@@ -404,8 +407,8 @@ class Leave_Controller extends Controller
             $this->getPage()->parse('student_autocomplete_javascript_block', 'student_autocomplete_javascript');
         } elseif ($this->getGroup()->isParent()) {
             $studentBoarders = array();
-            foreach($_SESSION['children'] as $child){
-                if($this->getUserMapper()->findById($child['id'])->getResidentialHouse() instanceof HouseResidential){
+            foreach ($_SESSION['children'] as $child) {
+                if ($this->getUserMapper()->findById($child['id'])->getResidentialHouse() instanceof HouseResidential) {
                     $studentBoarders[] = $child;
                 }
             }
@@ -421,7 +424,6 @@ class Leave_Controller extends Controller
             );
             $this->getPage()->parse('student_selector_block', 'student_selector');
         } else {
-
             /* Student creating their own leave request
              */
             $this->getPage()->setVar([
@@ -448,19 +450,19 @@ class Leave_Controller extends Controller
         $user = $_SESSION["user"];
 
         // Are they staff?
-        if($user->getRole()->isStaff()) {
+        if ($user->getRole()->isStaff()) {
             return true;
         }
 
         // Are they a boarder?
-        if($user->getResidentialHouse() instanceof HouseResidential) {
+        if ($user->getResidentialHouse() instanceof HouseResidential) {
             return true;
         }
 
         // Are they a parent of a boarder?
-        if(is_array($_SESSION['children'])){
-            foreach($_SESSION['children'] as $child){
-                if($this->userMapper->findById($child['id'])->getResidentialHouse() instanceof HouseResidential) {
+        if (is_array($_SESSION['children'])) {
+            foreach ($_SESSION['children'] as $child) {
+                if ($this->userMapper->findById($child['id'])->getResidentialHouse() instanceof HouseResidential) {
                     return true;
                 }
             }
@@ -573,7 +575,7 @@ class Leave_Controller extends Controller
      */
     public function processCreateRequest($data)
     {
-        if(!$this->hasCreatePermission()){
+        if (!$this->hasCreatePermission()) {
             error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
@@ -595,7 +597,7 @@ class Leave_Controller extends Controller
             /* Use the userId field when submitting on someone else's behalf,
              * otherwise just your own id
              */
-            if(isset($data['userId'])) {
+            if (isset($data['userId'])) {
                 try {
                     /** @var \Schoolbox\User $boarder */
                     $boarder = $this->getUserMapper()->findById($data['userId']);
@@ -680,8 +682,7 @@ class Leave_Controller extends Controller
             if ($user->getResidentialHouse() instanceof HouseResidential) {
                 $houseId = $user->getResidentialHouse()->getId();
                 $house = $this->getHouseMapper()->findById($houseId);
-            }
-            else {
+            } else {
                 throw new ApplicationException\NotFound('User\'s house not found');
             }
         } catch (Schoolbox\Mapper\Exception $e) {
@@ -738,7 +739,8 @@ class Leave_Controller extends Controller
         /* What is the next/previous pending request?
          */
         $nextRequest = $this->getRequestMapper()->findNextPendingByHouseId(
-            $request->getId(), $houseId
+            $request->getId(),
+            $houseId
         );
 
         if ($nextRequest) {
@@ -752,7 +754,8 @@ class Leave_Controller extends Controller
         }
 
         $previousRequest = $this->getRequestMapper()->findPreviousPendingByHouseId(
-            $request->getId(), $houseId
+            $request->getId(),
+            $houseId
         );
 
         if ($previousRequest) {
@@ -790,8 +793,7 @@ class Leave_Controller extends Controller
             if ($user->getResidentialHouse() instanceof HouseResidential) {
                 $houseId = $user->getResidentialHouse()->getId();
                 $house = $this->getHouseMapper()->findById($houseId);
-            }
-            else {
+            } else {
                 throw new ApplicationException\NotFound('User\'s house not found');
             }
         } catch (Schoolbox\Mapper\Exception $e) {
@@ -799,7 +801,6 @@ class Leave_Controller extends Controller
         }
 
         if ($this->hasViewPermission($user->getId(), $house->getId())) {
-
             $this->getPage()->setFile(TEMPLATE_content, 'modules/leave/viewRequest.html');
 
             $travelTypes = $this->getTravelTypes();
@@ -860,7 +861,7 @@ class Leave_Controller extends Controller
         }
 
         $houseId = null;
-        if($request->getUser()->getResidentialHouse() instanceof HouseResidential) {
+        if ($request->getUser()->getResidentialHouse() instanceof HouseResidential) {
             $houseId = $request->getUser()->getResidentialHouse()->getId();
         }
 
@@ -1131,10 +1132,9 @@ class Leave_Controller extends Controller
             throw new ApplicationException\NotFound('User not found');
         }
         try {
-            if($house instanceof HouseResidential) {
+            if ($house instanceof HouseResidential) {
                 $house = $this->getHouseMapper()->findById($house->getId());
-            }
-            else {
+            } else {
                 throw new ApplicationException\NotFound('User not found');
             }
         } catch (Schoolbox\Mapper\Exception $e) {
@@ -1163,7 +1163,7 @@ class Leave_Controller extends Controller
         $user = $data['user'];
         $houseId = null;
 
-        if($user->getResidentialHouse() instanceof HouseResidential) {
+        if ($user->getResidentialHouse() instanceof HouseResidential) {
             $houseId = $user->getResidentialHouse()->getId();
         }
 
@@ -1269,63 +1269,63 @@ class Leave_Controller extends Controller
 
             /* Render each request
                 */
-            if (count($requestList)) {
-                $this->getPage()->setVar('no_requests_block', '');
+        if (count($requestList)) {
+            $this->getPage()->setVar('no_requests_block', '');
 
-                $pendingRequestCount = 0;
-                $previousRequestCount = 0;
+            $pendingRequestCount = 0;
+            $previousRequestCount = 0;
 
-                foreach ($requestList as $request) {
-                    /** @var \Leave_Request $request */
+            foreach ($requestList as $request) {
+                /** @var \Leave_Request $request */
+                $this->getPage()->setVar(
+                    array(
+                        'REQUEST_USER_ID' => $request->getUser()->getId(),
+                        'REQUEST_USER_NAME' => $request->getUser()->formatName(),
+                        'REQUEST_USER_YEAR' => $request->getUser()->getYear() ? $request->getUser()->getYear()->getName() : '',
+                        'REQUEST_ID' => $request->getId(),
+                        'REQUEST_START' => $request->getStart()->getLocal(),
+                        'REQUEST_DURATION' => $request->getDuration(),
+                        'REQUEST_HOST_TYPE' => $request->getHostType()->getName()
+                    )
+                );
+
+                if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
+                    $this->getPage()->parse('pending_request_block', 'pending_request', true);
+
+                    $pendingRequestCount++;
+                } else {
                     $this->getPage()->setVar(
                         array(
-                            'REQUEST_USER_ID' => $request->getUser()->getId(),
-                            'REQUEST_USER_NAME' => $request->getUser()->formatName(),
-                            'REQUEST_USER_YEAR' => $request->getUser()->getYear() ? $request->getUser()->getYear()->getName() : '',
-                            'REQUEST_ID' => $request->getId(),
-                            'REQUEST_START' => $request->getStart()->getLocal(),
-                            'REQUEST_DURATION' => $request->getDuration(),
-                            'REQUEST_HOST_TYPE' => $request->getHostType()->getName()
+                            'REQUEST_STATUS' => $request->getStatus(true),
+                            'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getLocal(),
+                            'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
+                            'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
                         )
                     );
 
-                    if ($request->getStatus() == Leave_Request::STATUS_PENDING) {
-                        $this->getPage()->parse('pending_request_block', 'pending_request', true);
+                    $this->getPage()->parse('previous_request_block', 'previous_request', true);
 
-                        $pendingRequestCount++;
-                    } else {
-                        $this->getPage()->setVar(
-                            array(
-                                'REQUEST_STATUS' => $request->getStatus(true),
-                                'REQUEST_AUTHORISATION_DATETIME' => $request->getAuthorisationDatetime(true)->getLocal(),
-                                'REQUEST_AUTHORISATION_USER_ID' => $request->getAuthorisationUser()->getId(),
-                                'REQUEST_AUTHORISATION_USER_NAME' => $request->getAuthorisationUser()->formatName(),
-                            )
-                        );
-
-                        $this->getPage()->parse('previous_request_block', 'previous_request', true);
-
-                        $previousRequestCount++;
-                    }
+                    $previousRequestCount++;
                 }
+            }
 
-                if ($pendingRequestCount) {
-                    $this->getPage()->parse('pending_request_list_block', 'pending_request_list');
-                } else {
-                    $this->getPage()->setVar('pending_request_list_block', '');
-                }
-
-                if ($previousRequestCount) {
-                    $this->getPage()->parse('previous_request_list_block', 'previous_request_list');
-                } else {
-                    $this->getPage()->setVar('previous_request_list_block', '');
-                }
+            if ($pendingRequestCount) {
+                $this->getPage()->parse('pending_request_list_block', 'pending_request_list');
             } else {
-                $this->getPage()->parse('no_requests_block', 'no_requests');
-
                 $this->getPage()->setVar('pending_request_list_block', '');
+            }
+
+            if ($previousRequestCount) {
+                $this->getPage()->parse('previous_request_list_block', 'previous_request_list');
+            } else {
                 $this->getPage()->setVar('previous_request_list_block', '');
             }
+        } else {
+            $this->getPage()->parse('no_requests_block', 'no_requests');
+
+            $this->getPage()->setVar('pending_request_list_block', '');
+            $this->getPage()->setVar('previous_request_list_block', '');
+        }
 //        else {
 //            error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
 //        }
@@ -1351,7 +1351,7 @@ class Leave_Controller extends Controller
             throw new ApplicationException\NotFound('User not found');
         }
 
-        if(!($house instanceof HouseResidential) ) {
+        if (!($house instanceof HouseResidential)) {
             throw new ApplicationException\NotFound('User\'s house not found');
         }
 
@@ -1411,7 +1411,7 @@ class Leave_Controller extends Controller
         /* Iterate through options
          */
         $houseId = null;
-        if($request->getUser()->getResidentialHouse() instanceof HouseResidential) {
+        if ($request->getUser()->getResidentialHouse() instanceof HouseResidential) {
             $houseId = $request->getUser()->getResidentialHouse()->getId();
         }
 
@@ -1472,7 +1472,7 @@ class Leave_Controller extends Controller
             error(Error\Mapper::ERROR_PERM_PAGE_VIEW);
         }
 
-        switch($timespan){
+        switch ($timespan) {
             case Leave_Controller::REPORT_TIMESPAN_DAY:
                 $reportStart  = Alaress_Date_Format::newLocalShort($dateStart);
                 $reportFinish = Alaress_Date_Format::newLocalShort($reportStart);
@@ -1491,7 +1491,9 @@ class Leave_Controller extends Controller
         }
 
         $requestList = $this->getRequestMapper()->getHouseReport(
-            $houseId, $reportStart->getDatabaseDate(), $reportFinish->getDatabaseDate()
+            $houseId,
+            $reportStart->getDatabaseDate(),
+            $reportFinish->getDatabaseDate()
         );
 
         $houseList = $this->getHouseMapper()->findAll();
@@ -1506,7 +1508,6 @@ class Leave_Controller extends Controller
             'requestList'    => $requestList,
             'houseList'      => $houseList
         );
-
     }
 
     /**
@@ -1642,7 +1643,6 @@ class Leave_Controller extends Controller
     public function sendParentNotice($request)
     {
         if (Config::get('boarder_leave_parent_notification_enabled')) {
-
             /* Choose the Factory, have it produce() the notice object and send
              */
             $leaveFactory = new Leave_Notice_Factory($request);
@@ -1826,7 +1826,8 @@ class Leave_Controller extends Controller
      * @param  \Schoolbox\Collection|\Leave\HostType[] $hostTypes
      * @return $this
      */
-    public function setHostTypes($hostTypes) {
+    public function setHostTypes($hostTypes)
+    {
         $this->hostTypes = $hostTypes;
         return $this;
     }
@@ -1834,7 +1835,8 @@ class Leave_Controller extends Controller
     /**
      * @return \Schoolbox\Collection|\Leave\HostType[]
      */
-    public function getHostTypes() {
+    public function getHostTypes()
+    {
         return $this->hostTypes;
     }
 
@@ -1842,7 +1844,8 @@ class Leave_Controller extends Controller
      * Get the enum list of report periods available
      * @return array|string[]
      */
-    public static function getTimespanOptions(){
+    public static function getTimespanOptions()
+    {
         return self::$timespanOptions;
     }
 }

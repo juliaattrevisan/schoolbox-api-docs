@@ -56,5 +56,3 @@ $translator = new ModelToArray();
 // Output
 header('Content-Type: application/json');
 echo json_encode($translator($queue));
-
-?>

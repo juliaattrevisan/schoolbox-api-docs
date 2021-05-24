@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -113,8 +114,7 @@ abstract class AbstractDefinition implements IDefinition
         /** @noinspection PhpUnusedParameterInspection */
         string $customAbstractKey,
         Page\Model $pageFilter
-    ): bool
-    {
+    ): bool {
         return true;
     }
 
@@ -261,9 +261,7 @@ abstract class AbstractDefinition implements IDefinition
          * If saved in DB, use that, else use system-initial values
          */
         foreach ($pageFilter->getOptions() as $option) {
-
             foreach ($roleTypes as $roleType) {
-
                 // Are we filtering results ?
                 if ($roleTypeFilter && $roleTypeFilter !== $roleType) {
                     continue;

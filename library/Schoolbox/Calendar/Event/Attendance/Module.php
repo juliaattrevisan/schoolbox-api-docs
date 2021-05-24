@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Event\Attendance;
@@ -67,7 +69,6 @@ class Module extends BaseModule
                                 return true;
                             }
                         } catch (Exception $e) {
-
                             // noop
                         }
 
@@ -78,7 +79,9 @@ class Module extends BaseModule
         });
 
 
-        $preloadEvent = function ($params) { return $this->preloadEvent($params); };
+        $preloadEvent = function ($params) {
+            return $this->preloadEvent($params);
+        };
 
         $this->register('GET', '/{eventId}', 'getCurrent', $getPerms, $preloadEvent);
         $this->register('POST', '/{eventId}/create', 'postCreate', $modifyPerms, $preloadEvent);

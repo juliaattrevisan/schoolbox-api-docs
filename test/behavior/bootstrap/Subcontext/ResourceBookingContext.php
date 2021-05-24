@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps for the resource booking system.
  *
@@ -9,7 +10,8 @@
 
 use Behat\Mink\Element;
 
-class Subcontext_ResourceBookingContext extends BaseContext {
+class Subcontext_ResourceBookingContext extends BaseContext
+{
 
     /**
      * Helper method for finding a resource.
@@ -19,7 +21,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @throws Exception           if the resource list is not on the page, or
      *                             the named resource is not found.
      */
-    protected function findResource($name) {
+    protected function findResource($name)
+    {
         $list = $this->getSession()->getPage()->find('css', '.resource-list');
         if (!($list instanceof Element\NodeElement)) {
             throw new Exception('Resource list not found on page');
@@ -42,7 +45,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      *
      * @param string $name
      */
-    public function viewResource($name) {
+    public function viewResource($name)
+    {
         $resource = $this->findResource($name);
         $resource->find('css', '.resource-read-link')->click();
     }
@@ -54,7 +58,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      *
      * @param string $name
      */
-    public function editResource($name) {
+    public function editResource($name)
+    {
         $resource = $this->findResource($name);
         $resource->find('css', '.resource-edit-link')->click();
     }
@@ -69,7 +74,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      *
      * @param string $timeString A valid date time format string
      */
-    public function startBookingResource($timeString = 'today') {
+    public function startBookingResource($timeString = 'today')
+    {
         $this
             ->getMainContext()->getSubcontext('calendar')
             ->clickDate('#calendar', $timeString);
@@ -91,7 +97,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @param string $timeString A valid date time format string
      * @throws Exception if user can book resource
      */
-    public function assertCannotBookResource($timeString = 'today') {
+    public function assertCannotBookResource($timeString = 'today')
+    {
         $this
             ->getMainContext()->getSubcontext('calendar')
             ->clickDate('#calendar', $timeString);
@@ -114,7 +121,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @return Element\NodeElement
      * @throws Exception if no booking was found
      */
-    public function getBooking($timeString, $status = null) {
+    public function getBooking($timeString, $status = null)
+    {
         /** @var Subcontext_CalendarContext $calendarContext */
         $calendarContext = $this->getMainContext()->getSubcontext('calendar');
         $calendarContext->clickDate('#calendar', $timeString);
@@ -124,7 +132,7 @@ class Subcontext_ResourceBookingContext extends BaseContext {
                 return $eventElement;
             }
         }
-        throw new Exception("No ".($status?"$status ":"")."booking found in calendar for time \"$timeString\"");
+        throw new Exception("No " . ($status ? "$status " : "") . "booking found in calendar for time \"$timeString\"");
     }
 
     /**
@@ -137,7 +145,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @throws Exception if no booking was found
      * @throws Exception if button wasn't found
      */
-    public function getActionButton($timeString, $action = null) {
+    public function getActionButton($timeString, $action = null)
+    {
         $booking = $this->getBooking($timeString);
         $booking->click();
         $button = $this->getSession()->getPage()->find('css', "#calendar-bubble .bookingActions a.btn.booking-$action");
@@ -156,7 +165,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @param  string $status     The status (approved, pending or rejected)
      * @throws Exception if no booking was found
      */
-    public function assertBookingExists($timeString, $status) {
+    public function assertBookingExists($timeString, $status)
+    {
         $this->getBooking($timeString, $status);
     }
 
@@ -171,11 +181,11 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @param  string $status     The status (approved, pending or rejected)
      * @throws Exception if a booking was found
      */
-    public function assertBookingNotExists($timeString, $status) {
+    public function assertBookingNotExists($timeString, $status)
+    {
         try {
             $this->getBooking($timeString, $status);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return;
         }
         throw new Exception("A $status booking was found in calendar for time \"$timeString\"");
@@ -193,7 +203,8 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @throws Exception if no booking was found
      * @throws Exception if button was not found
      */
-    public function changeBookingStatus($timeString, $action) {
+    public function changeBookingStatus($timeString, $action)
+    {
         $button = $this->getActionButton($timeString, $action);
         $button->click();
     }
@@ -208,14 +219,13 @@ class Subcontext_ResourceBookingContext extends BaseContext {
      * @param  string $action     The status action (approve, reject, cancel)
      * @throws Exception if button was found
      */
-    public function assertCannotChangeBookingStatus($timeString, $action) {
+    public function assertCannotChangeBookingStatus($timeString, $action)
+    {
         try {
             $this->getActionButton($timeString, $action);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return;
         }
         throw new Exception("A $action button was found for event at time \"$timeString\"");
     }
-
 }

@@ -1,10 +1,11 @@
 <?php
+
 /**
  * ${NAME}
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 use Calendar\Api\ModuleChecker;
@@ -17,8 +18,7 @@ $viewer = $_SESSION['user'];
 
 try {
     Calendar_Layout_Full_Ajax_JSON::permissionCheck($_GET['userId'], $viewer, new Group());
-}
-catch (Exception $e) {
+} catch (Exception $e) {
     error($e->getCode());
 }
 

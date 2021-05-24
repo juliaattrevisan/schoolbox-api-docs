@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Video\Factory;
 
 use Schoolbox\Permission\Access\UserAccess;
@@ -14,7 +16,8 @@ use Schoolbox\Resource\File\Model;
  *
  * @package Schoolbox\Video\Factory
  */
-class Video extends Base {
+class Video extends Base
+{
 
     /**
      * Check perms
@@ -22,7 +25,8 @@ class Video extends Base {
      * @param Model $file
      * @throws \Exception
      */
-    protected function permissionCheck($file) {
+    protected function permissionCheck($file)
+    {
 
         /* TODO: Don't throw root \Exception; should probably throw Unauthorised() or NotFound() instead.
          */

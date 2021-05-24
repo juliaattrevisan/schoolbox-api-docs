@@ -1,15 +1,16 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award\Translator;
 
 use Error;
 use Schoolbox\Learning\Badge\Award\Model;
-
 
 /**
  * Translator for converting an Award instance to an array representation, for

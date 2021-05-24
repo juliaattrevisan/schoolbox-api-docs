@@ -1,12 +1,14 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Effect\Fragment;
 
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 
 /**
  * Class Fragment
@@ -62,13 +64,13 @@ class Fragment
      * @param string $filename
      * @param Collection|null $data
      */
-    public function __construct($filename, $data = null) {
+    public function __construct($filename, $data = null)
+    {
         $this->filename = $filename;
 
         if ($data instanceof Collection) {
             $this->data = $data;
-        }
-        else {
+        } else {
             $this->data = new Collection();
         }
     }

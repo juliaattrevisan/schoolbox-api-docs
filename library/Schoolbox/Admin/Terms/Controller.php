@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -162,7 +163,6 @@ class Controller extends Base
             if ($term->getExtraordinary()) {
                 $term->setActualFinish($term->getDisplayFinish());
             }
-
         } catch (\Exception $e) {
             throw new \Exception('Finish date is not a valid date.');
         }

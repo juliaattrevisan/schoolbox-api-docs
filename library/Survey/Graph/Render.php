@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Graph_Render
  *
@@ -40,7 +41,8 @@ class Survey_Graph_Render
      * @param array $currentQuestion
      * @param string $templateFile
      */
-    public function __construct($page, $currentQuestion, $templateFile) {
+    public function __construct($page, $currentQuestion, $templateFile)
+    {
         $this->setPage($page);
         $this->setTemplateFile($templateFile);
         $this->setCurrentQuestion($currentQuestion);
@@ -53,7 +55,8 @@ class Survey_Graph_Render
      *
      * @return void
      */
-    public function graph() {
+    public function graph()
+    {
         $currentQuestion = $this->getCurrentQuestion();
 
         $this->getPage()->setFile($this->getComponentHandle(), $this->getTemplateFile());
@@ -65,9 +68,7 @@ class Survey_Graph_Render
         $i = 0;
 
         if (is_array($currentQuestion['summary']) && count($currentQuestion['summary'])) {
-
-            foreach($currentQuestion['summary'] as $key => $value) {
-
+            foreach ($currentQuestion['summary'] as $key => $value) {
                 /* If the option hasn't been responded to
                  */
                 if ($value['text'] == '') {
@@ -80,10 +81,9 @@ class Survey_Graph_Render
                     'SERIES_INDEX' => $i
                 ));
 
-                if ($i < (count($currentQuestion['summary'])-1)) {
+                if ($i < (count($currentQuestion['summary']) - 1)) {
                     $this->getPage()->parse('series_separator_block', 'series_separator');
-                }
-                else {
+                } else {
                     $this->getPage()->setVar('series_separator_block', '');
                 }
 
@@ -101,8 +101,7 @@ class Survey_Graph_Render
                     . '_'
                     . md5($currentQuestion['question']),
             ));
-        }
-        else {
+        } else {
             $this->getPage()->setVar('series_block', '');
         }
 
@@ -116,7 +115,8 @@ class Survey_Graph_Render
      * @param array $val
      * @return void
      */
-    protected function setCurrentQuestion($val) {
+    protected function setCurrentQuestion($val)
+    {
         $this->currentQuestion = $val;
     }
 
@@ -125,7 +125,8 @@ class Survey_Graph_Render
      *
      * @return array
      */
-    protected function getCurrentQuestion() {
+    protected function getCurrentQuestion()
+    {
         return $this->currentQuestion;
     }
 
@@ -135,7 +136,8 @@ class Survey_Graph_Render
      * @param string $val
      * @return void
      */
-    protected function setTemplateFile($val) {
+    protected function setTemplateFile($val)
+    {
         $this->templateFile = $val;
     }
 
@@ -144,7 +146,8 @@ class Survey_Graph_Render
      *
      * @return string
      */
-    protected function getTemplateFile() {
+    protected function getTemplateFile()
+    {
         return $this->templateFile;
     }
 
@@ -154,7 +157,8 @@ class Survey_Graph_Render
      * @param SitePage $val
      * @return void
      */
-    protected function setPage($val) {
+    protected function setPage($val)
+    {
         $this->page = $val;
     }
 
@@ -163,7 +167,8 @@ class Survey_Graph_Render
      *
      * @return SitePage
      */
-    protected function getPage() {
+    protected function getPage()
+    {
         return $this->page;
     }
 
@@ -173,7 +178,8 @@ class Survey_Graph_Render
      * @param string $val
      * @return void
      */
-    protected function setComponentHandle($val) {
+    protected function setComponentHandle($val)
+    {
         $this->componentHandle = $val;
     }
 
@@ -182,7 +188,8 @@ class Survey_Graph_Render
      *
      * @return string
      */
-    protected function getComponentHandle() {
+    protected function getComponentHandle()
+    {
         return $this->componentHandle;
     }
 }

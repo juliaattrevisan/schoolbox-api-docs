@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collector for the current Aura route.
  *

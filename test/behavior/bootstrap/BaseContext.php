@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The base context for all context classes (even the feature context!)
  *
@@ -14,19 +15,22 @@ use Behat\Mink\Element;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\MinkExtension\Context\RawMinkContext;
 
-abstract class BaseContext extends RawMinkContext {
+abstract class BaseContext extends RawMinkContext
+{
 
     /**
      * @return Subcontext_CoreContext
      */
-    public function getCoreContext() {
+    public function getCoreContext()
+    {
         return $this->getMainContext()->getSubcontext('core');
     }
 
     /**
      * @return MinkContext
      */
-    public function getMinkContext() {
+    public function getMinkContext()
+    {
         return $this->getMainContext()->getSubcontext('mink');
     }
 
@@ -39,7 +43,8 @@ abstract class BaseContext extends RawMinkContext {
      * @param  Element\Element $node
      * @return string
      */
-    protected function getBeginningText(Element\Element $node) {
+    protected function getBeginningText(Element\Element $node)
+    {
         return htmlspecialchars_decode(trim(preg_replace('/<.*/', '', $node->getHtml())));
     }
 
@@ -49,7 +54,8 @@ abstract class BaseContext extends RawMinkContext {
      * manipulating invisible elements - what if an element is transitioning
      * from visible to invisible?)
      */
-    protected function disableAnimation() {
+    protected function disableAnimation()
+    {
         $this->getSession()->executeScript('jQuery.fx.off = true');
     }
 
@@ -59,7 +65,8 @@ abstract class BaseContext extends RawMinkContext {
      * @param string $url       The URL to post to.
      * @param array  $post_vars An array of post variables to send.
      */
-    protected function ajaxPost($url, $post_vars) {
+    protected function ajaxPost($url, $post_vars)
+    {
         $this->getSession()->executeScript(
             sprintf('jQuery.post(%s, %s)', json_encode($url), json_encode($post_vars))
         );
@@ -78,21 +85,20 @@ abstract class BaseContext extends RawMinkContext {
      *                   returned true.
      * @return bool
      */
-    protected function spin($callback, $timeout = 15) {
+    protected function spin($callback, $timeout = 15)
+    {
         $finish_time = microtime(true) + $timeout;
         do {
             try {
                 if ($callback($this)) {
                     return true;
                 }
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 // do nothing
             }
             // Try again in 100 milliseconds (100 * 10e3 microseconds)
             usleep(100 * 10e3);
-        }
-        while (microtime(true) < $finish_time);
+        } while (microtime(true) < $finish_time);
 
         $backtrace = debug_backtrace();
 
@@ -109,9 +115,10 @@ abstract class BaseContext extends RawMinkContext {
      * @param  int                 $timeout
      * @throws Exception           if $timeout is reached element still isn't visible.
      */
-    protected function delayUntilVisible(Element\NodeElement $element, $timeout = 5) {
+    protected function delayUntilVisible(Element\NodeElement $element, $timeout = 5)
+    {
         $this->spin(
-            function($context) use($element) {
+            function ($context) use ($element) {
                 return $element->isVisible();
             },
             $timeout

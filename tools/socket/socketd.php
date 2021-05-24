@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * The Websocket Daemon.
  *
@@ -87,5 +88,3 @@ $kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $l
 //        throw $e;
 //    }
 });
-
-

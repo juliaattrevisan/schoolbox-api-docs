@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for class objects.
  *
@@ -10,14 +11,17 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox;
 
-class TimetablePeriodMapper extends Schoolbox\Mapper {
+class TimetablePeriodMapper extends Schoolbox\Mapper
+{
 
     /**
      * {@inheritdoc}
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('sis_timetable_period');
         $this->hasModel(TimetablePeriod::class);
         $this->hasMap(array(

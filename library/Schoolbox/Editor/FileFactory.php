@@ -1,16 +1,18 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Editor;
 
 use InvalidArgumentException;
-use \Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\My\Folder\Mapper as MyFolderMapper;
 use UnexpectedValueException;
 
 /**
@@ -36,7 +38,8 @@ class FileFactory
      *
      * @param string $hashTuple
      */
-    public function __construct($hashTuple) {
+    public function __construct($hashTuple)
+    {
 
         /* Ridiculous quick fix
          */
@@ -66,7 +69,6 @@ class FileFactory
         ];
 
         if ($this->hash) {
-
             /* When identifying a storage file via browse:xxx which is
              * a string used internally in resource browser messages
              */
@@ -79,8 +81,7 @@ class FileFactory
                 if ($filesystem === 'browse.folder') {
                     $folderMapper = FolderMapper::getInstance();
                     $type = 'folder';
-                }
-                else if ($filesystem === 'myfile.folder') {
+                } else if ($filesystem === 'myfile.folder') {
                     $folderMapper = MyFolderMapper::getInstance();
                     $type = 'myfolder';
                 }
@@ -101,12 +102,10 @@ class FileFactory
                             'mime'       => 'folder',
                             'id'         => $folder->getId()
                         ];
-                    }
-                    catch (\Exception $e) {
+                    } catch (\Exception $e) {
                     }
                 }
             } else {
-
                 /* Other files
                  */
                 $collector = (new CollectorFactory())->build([$this->hash])->getFirst();

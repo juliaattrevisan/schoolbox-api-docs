@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\Browser\Office365;
-
 
 use InvalidArgumentException;
 
@@ -81,5 +81,4 @@ class Tenant
     {
         return $this->name;
     }
-
 }

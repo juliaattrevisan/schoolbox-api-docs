@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Test;
-
 
 class ObjectReaderStringableClass
 {
@@ -31,5 +31,4 @@ class ObjectReaderStringableClass
     {
         return (string)$this->string;
     }
-
 }

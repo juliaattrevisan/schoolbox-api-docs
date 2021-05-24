@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Extension
  *
@@ -9,56 +10,60 @@
 
 namespace Schoolbox\File;
 
+class Extension
+{
 
-class Extension {
+    /**
+     * Identifier
+     *
+     * @var null
+     */
+    private $id = null;
 
-	/**
-	 * Identifier
-	 *
-	 * @var null
-	 */
-	private $id = null;
+    /**
+     * File extension
+     *
+     * @var string
+     */
+    private $extension = '';
 
-	/**
-	 * File extension
-	 *
-	 * @var string
-	 */
-	private $extension = '';
+    /**
+     * Set extension
+     *
+     * @param string $extension
+     */
+    public function setExtension($extension)
+    {
+        $this->extension = $extension;
+    }
 
-	/**
-	 * Set extension
-	 *
-	 * @param string $extension
-	 */
-	public function setExtension($extension) {
-		$this->extension = $extension;
-	}
+    /**
+     * Get extension
+     *
+     * @return string
+     */
+    public function getExtension()
+    {
+        return $this->extension;
+    }
 
-	/**
-	 * Get extension
-	 *
-	 * @return string
-	 */
-	public function getExtension() {
-		return $this->extension;
-	}
+    /**
+     * Set id
+     *
+     * @param null $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Set id
-	 *
-	 * @param null $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
-
-	/**
-	 * Get id
-	 *
-	 * @return null
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Get id
+     *
+     * @return null
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 }

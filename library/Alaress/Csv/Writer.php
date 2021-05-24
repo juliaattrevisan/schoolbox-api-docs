@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Really simple CSV writer
  *

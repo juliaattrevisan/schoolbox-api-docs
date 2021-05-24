@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Task;
 
 use Aura\Di\Exception\ServiceNotFound;
@@ -29,7 +31,7 @@ use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponse;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Assessment\Term;
@@ -94,7 +96,8 @@ class Controller extends Assessment\Controller
             $participantDataSource,
             $courseSpecificationMapper,
             $unitSpecificationMapper,
-            $replicator);
+            $replicator
+        );
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
 
@@ -113,8 +116,8 @@ class Controller extends Assessment\Controller
     public function getStatus(IAssessable $assessment): void
     {
         // Ensure completions are sorted most recent first
-        foreach($assessment->getAllParticipants() as $participant){
-            $participant->getAllResponses()->sortByCallback(static function(Assessment\IResponse $responseA, Assessment\IResponse $responseB){
+        foreach ($assessment->getAllParticipants() as $participant) {
+            $participant->getAllResponses()->sortByCallback(static function (Assessment\IResponse $responseA, Assessment\IResponse $responseB) {
                 return $responseB->getSubmittedAt()->compare($responseA->getSubmittedAt());
             });
         }
@@ -129,7 +132,9 @@ class Controller extends Assessment\Controller
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@learningAssessment/task/status.twig',
-                $twigData, "Status of {$assessment->getTitle()}", 'submission'
+                $twigData,
+                "Status of {$assessment->getTitle()}",
+                'submission'
             )
         );
     }
@@ -177,7 +182,7 @@ class Controller extends Assessment\Controller
         if ($this->getRequest()->query->get(Redirect::RETURN_URL)) {
             $returnUrl = Redirect::decode($this->getRequest()->query->get(Redirect::RETURN_URL));
         } else {
-            $returnUrl = '/homepage/'.$assessment->getBaseContext()->getFolder()->getId();
+            $returnUrl = '/homepage/' . $assessment->getBaseContext()->getFolder()->getId();
         }
 
         // How should the jewelry transition?
@@ -264,8 +269,7 @@ class Controller extends Assessment\Controller
                     )
                 );
             }
-        } catch (ConcurrentModificationException|InvalidTaskResponseException $e) {
-
+        } catch (ConcurrentModificationException | InvalidTaskResponseException $e) {
             // We don't need to log concurrent exceptions, we expect them to happen from time to time.
             if (!$e instanceof ConcurrentModificationException) {
                 $this->captureException($e);
@@ -327,7 +331,6 @@ class Controller extends Assessment\Controller
 
         // Is the learner self-assessing ?
         if (!$isInstructor && $response->isSelfAssessed()) {
-
             // 5. Is the task not self-assessable ?
             if (!$response->getAssessable()->isSelfAssessable()) {
                 throw new InvalidTaskResponseException("Learners may not self-assess a task if the task is not self-assessable");

@@ -1,34 +1,36 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Fixtures\Result;
 
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\User;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
 use Schoolbox\Collection;
-use \Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Permission\Access\UserAccessMapper;
-use \Schoolbox\Fixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\Fixtures\Match\Model as Match;
-use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use \Schoolbox\Fixtures\Match\Weather as MatchWeather;
-use \Schoolbox\Fixtures\Result\Model as Result;
-use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
+use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Match\Weather as MatchWeather;
+use Schoolbox\Fixtures\Result\Model as Result;
+use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Status\Mapper as StatusMapper;
 use Schoolbox\Fixtures\Status\Model as Status;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\Fixtures\Team\Metadata\Factory as TeamMetadataFactory;
-use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Team\Metadata\Factory as TeamMetadataFactory;
+use Schoolbox\TagCloud\Mapper as TagCloudMapper;
 use Schoolbox\Weather\WeatherstackClient;
 
 /**
@@ -196,7 +198,6 @@ class Controller extends AbstractController
                 )
             );
         } catch (MapperException $e) {
-
             /* No Results for this Match?
              * Prompt to spawn one
              */
@@ -274,13 +275,11 @@ class Controller extends AbstractController
          * This saves endless shenanigans in front-end land
          */
         if (!$match->getHomeTeam()) {
-
-            if($match->getHomeSchool()) {
+            if ($match->getHomeSchool()) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getHomeSchool()->getName());
 
                 $match->setHomeTeam($facelessTeam);
-            }
-            else {
+            } else {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
         }
@@ -289,13 +288,11 @@ class Controller extends AbstractController
          * This saves endless shenanigans in front-end land
          */
         if (!$match->getAwayTeam()) {
-
-            if($match->getAwaySchool()) {
+            if ($match->getAwaySchool()) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getAwaySchool()->getName());
 
                 $match->setAwayTeam($facelessTeam);
-            }
-            else {
+            } else {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
         }

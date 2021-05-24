@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\External;
 
 /**
@@ -77,7 +79,8 @@ class TimetableCycle
      * @param  int   $cycle_length
      * @return $this
      */
-    public function setCycleLength($cycle_length) {
+    public function setCycleLength($cycle_length)
+    {
         $this->cycle_length = $cycle_length;
         return $this;
     }
@@ -86,7 +89,8 @@ class TimetableCycle
     /**
      * @return int
      */
-    public function getCycleLength() {
+    public function getCycleLength()
+    {
         return $this->cycle_length;
     }
 
@@ -95,7 +99,8 @@ class TimetableCycle
      * @param  int   $day_length
      * @return $this
      */
-    public function setDayLength($day_length) {
+    public function setDayLength($day_length)
+    {
         $this->day_length = $day_length;
         return $this;
     }
@@ -104,7 +109,8 @@ class TimetableCycle
     /**
      * @return int
      */
-    public function getDayLength() {
+    public function getDayLength()
+    {
         return $this->day_length;
     }
 
@@ -113,7 +119,8 @@ class TimetableCycle
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -122,7 +129,8 @@ class TimetableCycle
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -131,7 +139,8 @@ class TimetableCycle
      * @param  string $title
      * @return $this
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
         return $this;
     }
@@ -140,7 +149,8 @@ class TimetableCycle
     /**
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -149,7 +159,8 @@ class TimetableCycle
      * @param  \Alaress_Date_Format $finish
      * @return $this
      */
-    public function setFinish($finish) {
+    public function setFinish($finish)
+    {
         $this->finish = $finish;
         return $this;
     }
@@ -158,7 +169,8 @@ class TimetableCycle
     /**
      * @return \Alaress_Date_Format
      */
-    public function getFinish() {
+    public function getFinish()
+    {
         return $this->finish;
     }
 
@@ -187,7 +199,8 @@ class TimetableCycle
      * @param  \Alaress_Date_Format $start
      * @return $this
      */
-    public function setStart($start) {
+    public function setStart($start)
+    {
         $this->start = $start;
         return $this;
     }
@@ -196,7 +209,8 @@ class TimetableCycle
     /**
      * @return \Alaress_Date_Format
      */
-    public function getStart() {
+    public function getStart()
+    {
         return $this->start;
     }
 

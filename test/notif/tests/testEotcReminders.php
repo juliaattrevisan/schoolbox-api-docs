@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\User;
@@ -139,7 +140,7 @@ class EotcReminders extends AbstractNotificationTest
             'targetStatus' => $targetStatus,
             'daysFromNow'  => $daysFromNow
         ];
-        
+
         $event->setAuthor($author);
         $event->setTeacherInCharge($tic);
         $event->setType($type);
@@ -194,14 +195,14 @@ class EotcReminders extends AbstractNotificationTest
             // if a session user is specified, configure the mapper to effect as them
             $this->configureMapper(\EOTC\EventMapper::getInstance(), $asUser);
         }
-        
+
         $eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper(\EOTC\EventMapper::getInstance());
         $eventRecurrenceMapper->save($event, 'self', '', '', $startDate, $endDate, null, $eventRelations);
     }
 
 
     /**
-     * When both daemons are ready to go, 
+     * When both daemons are ready to go,
      *
      * @routed    Added (?P<count>\d+) subscriptions
      * @scheduled Connected to STOMP
@@ -239,7 +240,6 @@ class EotcReminders extends AbstractNotificationTest
 
             $permissionMapper->save($permission);
         }
-
     }
 
 
@@ -268,7 +268,6 @@ class EotcReminders extends AbstractNotificationTest
 
         foreach ([ false, true ] as $ramsRequired) {
             foreach (EOTC\EventStatusMapper::getInstance()->findAll() as $targetStatus) {
-
                 if ($targetStatus->getId() == EOTC\EventStatusMapper::STATUS_REJECTED) {
                     // skip the cancelled status; it be special
                     continue;
@@ -335,26 +334,22 @@ class EotcReminders extends AbstractNotificationTest
         $targetStatus  = $testCase['targetStatus'];
 
         if ($currentStatus < $targetStatus) {
-
             $newStatus = EOTC\EventStatusMapper::getInstance()->findNextStatus($event);
 
             if ((new EOTC\Authenticator())->isEOTCAdministrator($recipient, $event)) {
                 // this user is allowed to transition this event from this state
                 $this->log->notice("{$recipient->formatName()} transitioning event #$eventId from $currentStatus to $newStatus", [ 'char' => '>' ]);
                 $this->transitionEvent($recipientId, $event, $newStatus);
-
             } else {
                 // block user transition
                 $this->log->info("{$recipient->formatName()} cannot transition event #$eventId from $currentStatus to $newStatus");
             }
-
         } else {
             // target status reached: update event startdate
             $this->log->notice("Event #$eventId has reached its target status of $targetStatus", [ 'char' => '+' ]);
 
             // if it hasn't been brought forward yet, bring it forward
             if ($event->getStartDateTime()->getYear() > Alaress_Date_Format::now()->getYear()) {
-
                 // we're going to update the event as the original author
                 $this->configureMapper(EOTC\EventMapper::getInstance(), $event->getAuthor()->getId());
 
@@ -365,9 +360,7 @@ class EotcReminders extends AbstractNotificationTest
 
                 EOTC\EventMapper::getInstance()->save($event);
             }
-
         }
-
     }
 
 
@@ -393,7 +386,6 @@ class EotcReminders extends AbstractNotificationTest
             $diff = $schedule->diffInDays($now);
             $this->log->notice(sprintf("This trigger is set for %d day%s from now", $diff, $diff == 1 ? '' : 's'));
         }
-
     }
 
 
@@ -420,7 +412,7 @@ class EotcReminders extends AbstractNotificationTest
         try {
             $message = $this->fetchMessageInstance($messageId)->jsonSerialize();
         } catch (OutOfBoundsException $e) {
-            $this->log->error($e->getMessage(), ['exception'=>$e]);
+            $this->log->error($e->getMessage(), ['exception' => $e]);
             return;
         }
 
@@ -452,7 +444,5 @@ class EotcReminders extends AbstractNotificationTest
                 EOTC\EventMapper::getInstance()->save($event);
             }
         }
-
     }
-
 }

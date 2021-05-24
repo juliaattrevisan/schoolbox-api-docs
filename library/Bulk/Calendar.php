@@ -71,7 +71,6 @@ class Bulk_Calendar extends Bulk_Abstract
     public function addCalendar()
     {
         if (is_file($this->getFile())) {
-
             /* Calendar Owner overrideco
              */
             if ($this->owner != null && is_numeric($this->owner)) {

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * CLI Tool
  *
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;

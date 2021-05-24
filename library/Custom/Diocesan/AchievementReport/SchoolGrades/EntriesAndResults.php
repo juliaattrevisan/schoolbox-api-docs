@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 use Custom\Diocesan\AchievementReport\Comments\Comments;
@@ -54,7 +56,7 @@ class EntriesAndResults extends Base
                 $finalStack[$year][$courseName]['allTeachers'] = [];
             }
 
-            foreach([1, 2, 3] as $currentTeacherIndex) {
+            foreach ([1, 2, 3] as $currentTeacherIndex) {
                 $key = "ClassTeacher{$currentTeacherIndex}";
                 $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 
@@ -96,7 +98,7 @@ class EntriesAndResults extends Base
             foreach ($allCourses as $name => $data) {
                 $subjects = $data['allAreas'];
 
-                uksort($subjects, function($a, $b) {
+                uksort($subjects, function ($a, $b) {
                     preg_match('/^\d+\.(\d+)/', $a, $matchesA);
                     preg_match('/^\d+\.(\d+)/', $b, $matchesB);
 

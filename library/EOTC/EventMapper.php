@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventMapper
  *
@@ -50,7 +51,7 @@ class EventMapper extends CalendarEventMapper
      * @return string
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getSelectString() : string
+    protected function getSelectString(): string
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -70,7 +71,7 @@ class EventMapper extends CalendarEventMapper
      * @return string
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    protected function getFromString() : string
+    protected function getFromString(): string
     {
         return "
             FROM `{$this->table}`
@@ -87,7 +88,7 @@ class EventMapper extends CalendarEventMapper
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
-    protected function hydrateSelect(\PDOStatement $statement) : GenericCollection
+    protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
@@ -99,7 +100,6 @@ class EventMapper extends CalendarEventMapper
         $allEvents = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             /* Assemble event pieces
              */
             $eventItem = $this->hydrate($row);
@@ -203,7 +203,7 @@ class EventMapper extends CalendarEventMapper
         array $allowedStatus = [],
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null
-    ) : ListGroup\Collection {
+    ): ListGroup\Collection {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
@@ -322,7 +322,7 @@ class EventMapper extends CalendarEventMapper
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function findAllByListGroupsForUser($user) : ListGroup\Collection
+    public function findAllByListGroupsForUser($user): ListGroup\Collection
     {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');

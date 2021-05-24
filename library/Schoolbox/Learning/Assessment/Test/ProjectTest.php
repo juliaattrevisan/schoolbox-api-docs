@@ -51,7 +51,7 @@ class ProjectTest extends TestCase
      */
     public function testInit()
     {
-        $project = new Project(new SummatorAverage);
+        $project = new Project(new SummatorAverage());
 
         $this->assertInstanceOf(Collection::class, $project->getAssessables());
         $this->assertInstanceOf(SummatorAverage::class, $project->getSummator());

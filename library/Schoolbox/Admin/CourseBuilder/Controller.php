@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Course builder admin page
  *
@@ -140,7 +141,7 @@ class Controller extends Base
 
         // Add course permissions back
 
-        foreach ($this->getRequest()->post->get('course_group',[]) as $roleId => $permission) {
+        foreach ($this->getRequest()->post->get('course_group', []) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('course');
             $model->setPermission($permission);
@@ -150,7 +151,7 @@ class Controller extends Base
 
         // Add unit permissions back
 
-        foreach ($this->getRequest()->post->get('unit_group',[]) as $roleId => $permission) {
+        foreach ($this->getRequest()->post->get('unit_group', []) as $roleId => $permission) {
             $model = $this->courseConfigMapper->createModel();
             $model->setPage('unit');
             $model->setPermission($permission);
@@ -180,6 +181,6 @@ class Controller extends Base
 
         // Send them back to the admin page
 
-        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' .$this->getRequest()->post["tab"]);
+        $this->getResponse()->redirect->afterPost('/adminv2/course-builder/' . $this->getRequest()->post["tab"]);
     }
 }

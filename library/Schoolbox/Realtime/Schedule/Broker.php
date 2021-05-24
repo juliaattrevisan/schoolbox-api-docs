@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Alaress\Async\Broker\StompRedis;
 use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Stomp\IClient;
 use Predis\ClientInterface;
-
 
 class Broker extends StompRedis\Broker
 {
@@ -62,6 +62,4 @@ class Broker extends StompRedis\Broker
     {
         return ''; // we want to use AMQP default exchange
     }
-
-
 }

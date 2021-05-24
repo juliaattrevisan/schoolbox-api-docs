@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event Source for bookings that this user moderates.
  *

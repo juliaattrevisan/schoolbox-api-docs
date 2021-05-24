@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -107,7 +108,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     {
         $c = new Collection();
 
-        if(!$this->mapper instanceof FeedableMapperInterface) {
+        if (!$this->mapper instanceof FeedableMapperInterface) {
             return $c;
         }
 
@@ -338,5 +339,4 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
     {
         return $this->notifyMentioned(Role::PARENT, $post, $poster);
     }
-
 }

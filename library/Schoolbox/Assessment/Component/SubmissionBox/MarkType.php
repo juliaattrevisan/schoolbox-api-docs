@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for submission box mark types.
  *

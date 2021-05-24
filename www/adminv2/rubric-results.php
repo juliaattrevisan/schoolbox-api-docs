@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,14 +9,13 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
-
-if(!isset($this)) {
+if (!isset($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     SitePage::localRedir('/adminv2/resultsets');
 }
 
-if(!$_SESSION['user']->isSuperuser()) {
+if (!$_SESSION['user']->isSuperuser()) {
     error(101, "", 401);
 }
 
@@ -34,17 +34,17 @@ $stmt = Database::getInstance()->prepare("
 $stmt->execute();
 
 $sets = array();
-while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $sets[$row['resultset_id']][$row['value']] = $row['label'];
 }
 
 $setNumber = 0;
-if(count($sets)) {
-    foreach($sets as $setID => $items) {
+if (count($sets)) {
+    foreach ($sets as $setID => $items) {
         $this->setVar('list_item_block', '');
         $this->setVar('RR_SET_NUMBER', $setNumber++);
         $resultNumber = 0;
-        foreach($items as $value => $label) {
+        foreach ($items as $value => $label) {
             $this->setVar(array(
                 'RR_VALUE' => $value,
                 'RR_LABEL' => $label,
@@ -58,8 +58,7 @@ if(count($sets)) {
         $this->parse('list_block', 'list', true);
         $this->setVar('ON_OFF', ++$setID % 2 ? '' : 'dark');
     }
-}
-else {
+} else {
     $this->setVar(array(
         'list_block' => '',
         'ON_OFF' => ''

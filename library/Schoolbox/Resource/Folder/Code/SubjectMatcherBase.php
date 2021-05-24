@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder\Code;
@@ -20,7 +22,7 @@ class SubjectMatcherBase implements ISubjectMatcher
 
     /**
      * Consistently generate a Schoolbox folder code from a SIS subject's campus+class codes
-     * 
+     *
      * TODO, consider a synergetic-specific implementation of this that uses a config flag to determine
      *       whether the campusCode is prefixed.
      *

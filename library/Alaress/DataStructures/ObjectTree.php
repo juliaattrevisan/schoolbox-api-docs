@@ -1,13 +1,16 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Alaress\DataStructures;
 
 use Closure;
+
 use function array_combine;
 use function array_key_exists;
 use function array_map;
@@ -55,7 +58,7 @@ class ObjectTree
     {
         $this->hashFunction = $hashFunction ?? static function ($element) {
                 return spl_object_hash($element);
-            };
+        };
     }
 
 

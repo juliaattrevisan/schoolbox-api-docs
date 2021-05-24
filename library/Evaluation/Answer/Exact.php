@@ -15,12 +15,12 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
 {
     use Comparison;
 
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationExact';
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'evaluationExact';
 
     /**
      * Creates an Answer. This is used when creating Questions and Answers in
@@ -30,7 +30,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      * @param int|string $question_id
      * @return bool|int
      */
-    public function create($object, $question_id = '') {
+    public function create($object, $question_id = '')
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
@@ -54,7 +55,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      * @param array $object
      * @return void
      */
-    public function update($object) {
+    public function update($object)
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($answer);
@@ -69,7 +71,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      * @param string $question_id
      * @return void
      */
-    public function modify(SitePage $page, $question_id = '') {
+    public function modify(SitePage $page, $question_id = '')
+    {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -89,28 +92,30 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
         }
     }
 
-	/**
-	 * Render answers in the QuestionBank
-	 *
-	 * @param SitePage $page
-	 * @param string $answer
-	 * @return void
-	 */
-	public function modifyInQuestionBank(SitePage $page, $answer) {
-		$page->setVar(array(
-			'ANSWER' => Scrub::text($answer),
-		));
-	}
+    /**
+     * Render answers in the QuestionBank
+     *
+     * @param SitePage $page
+     * @param string $answer
+     * @return void
+     */
+    public function modifyInQuestionBank(SitePage $page, $answer)
+    {
+        $page->setVar(array(
+            'ANSWER' => Scrub::text($answer),
+        ));
+    }
 
-	/**
-	 * Serialize for db storage (we shouldn't be using serialize anymore)
-	 *
-	 * @param array $data
-	 * @return array
-	 */
-	public function encodeForQuestionBank($data) {
-		return $data;
-	}
+    /**
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param array $data
+     * @return array
+     */
+    public function encodeForQuestionBank($data)
+    {
+        return $data;
+    }
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking
@@ -120,9 +125,9 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      */
     public function prepareResponse(SitePage $page, $attemptId, $question_id)
     {
-		/* Optional configuration hook
-		 */
-		$this->configureResponse($page, $question_id);
+        /* Optional configuration hook
+         */
+        $this->configureResponse($page, $question_id);
 
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
@@ -131,8 +136,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
         if ($existing['response']) {
             $page->setVar(
                 array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => Scrub::text($existing['response']),
                 )
@@ -140,8 +145,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
         } else {
             $page->setVar(
                 array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
+                    'QUESTION_ID' => $question_id,
+                    'QUESTION_PLUGIN' => $this->plugin,
                     'ANSWER_ID' => $currentAnswer['answer_id'],
                     'ANSWER' => '',
                 )
@@ -158,7 +163,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      * @param SitePage $page
      * @return void
      */
-    public function cleanupParse(SitePage $page) {
+    public function cleanupParse(SitePage $page)
+    {
     }
 
     /**
@@ -197,7 +203,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      * @param int $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id) {
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
+    {
         $object = array(
             'question_id' => $question_id,
             'sequence' => 1,
@@ -215,7 +222,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      *
      * @return array
      */
-    public function exportResponseToCSV($attempt_id, $question_id) {
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         /* Remove tab characters
@@ -241,7 +249,8 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
      *
      * @return mixed
      */
-    public function exportResponseToArray($attempt_id, $question_id) {
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = $response['response'];
@@ -268,8 +277,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
 
         if ($isCorrect) {
             $title = 'Respondent provided a correct answer';
-        }
-        else {
+        } else {
             $title = 'Respondent did not provide a correct answer';
         }
 
@@ -307,40 +315,40 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
         $page->parse('answerOption_block', 'answerOption', true);
     }
 
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param SitePage $page
-	 * @param int $attemptId
-	 * @param array $currentQuestion
-	 */
-	public function reviewResponseHorizontal(SitePage $page, $attemptId, $currentQuestion) {
-		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param array $currentQuestion
+     */
+    public function reviewResponseHorizontal(SitePage $page, $attemptId, $currentQuestion)
+    {
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
-		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+        $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
         $isCorrect = $this->compareStrings($existing['response'], $currentAnswer['answer']);
 
         if ($isCorrect) {
             $title = 'Respondent provided a correct answer';
-        }
-        else {
+        } else {
             $title = 'Respondent did not provide a correct answer';
         }
 
-		/* Removed this check because it was wrongly matching a blank saved
-		 * response with no response at all, preventing reviewed marks from
-		 * displaying properly.
-		 *
-		 * if ($existing['response'] != null) { ... } else { ... }
-		 */
-		$page->setVar(array(
-			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
-			'USER_FIRSTNAME' => $currentQuestion['firstname'],
-			'USER_LASTNAME' => $currentQuestion['lastname'],
-			'ANSWER_ID' => $currentAnswer['answer_id'],
-			'ANSWER' => Scrub::text($existing['response']),
+        /* Removed this check because it was wrongly matching a blank saved
+         * response with no response at all, preventing reviewed marks from
+         * displaying properly.
+         *
+         * if ($existing['response'] != null) { ... } else { ... }
+         */
+        $page->setVar(array(
+            'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+            'USER_FIRSTNAME' => $currentQuestion['firstname'],
+            'USER_LASTNAME' => $currentQuestion['lastname'],
+            'ANSWER_ID' => $currentAnswer['answer_id'],
+            'ANSWER' => Scrub::text($existing['response']),
             'ANSWER_OPTION_STATUS' => $isCorrect
                 ? 'evaluation-correct-answer-option'
                 : 'evaluation-incorrect-answer-option',
@@ -348,37 +356,38 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
                 ? 'evaluation-correct-answer-icon'
                 : 'evaluation-incorrect-answer-icon',
             'ANSWER_ICON_TITLE' => $title,
-			'RESPONSE_ID' => $existing['response_id'],
-			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-			'REVIEWED_MARKS' => $existing['mark'],
-		));
+            'RESPONSE_ID' => $existing['response_id'],
+            'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+            'REVIEWED_MARKS' => $existing['mark'],
+        ));
 
-		/* Show correct answer
-		   */
-		$page->setVar(array(
-			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-		));
+        /* Show correct answer
+           */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+        ));
 
-		$page->parse('answerOption_block', 'answerOption', true);
-	}
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
 
-	/**
-	 * The answer for a question during horizontal marking, so it appears at the
-	 * top under the question itself, and not repeated for each attempt
-	 *
-	 * @param SitePage $page
-	 * @param array $currentQuestion
-	 * @return void
-	 */
-	public function reviewResponseHorizontalAnswerForQuestion(SitePage $page, $currentQuestion) {
-		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+    /**
+     * The answer for a question during horizontal marking, so it appears at the
+     * top under the question itself, and not repeated for each attempt
+     *
+     * @param SitePage $page
+     * @param array $currentQuestion
+     * @return void
+     */
+    public function reviewResponseHorizontalAnswerForQuestion(SitePage $page, $currentQuestion)
+    {
+        $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
-		/* Show correct answer
-		 */
-		$page->setVar(array(
-			'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
-		));
+        /* Show correct answer
+         */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => Scrub::text($currentAnswer['answer'])
+        ));
 
-		$page->parse('answerTop_block', 'answerTop', true);
-	}
+        $page->parse('answerTop_block', 'answerTop', true);
+    }
 }

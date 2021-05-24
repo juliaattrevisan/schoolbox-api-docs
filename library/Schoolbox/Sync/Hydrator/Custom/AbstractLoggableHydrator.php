@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Hydrator\Custom;
-
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
@@ -54,5 +54,4 @@ abstract class AbstractLoggableHydrator implements HydratorInterface
         // fire and forget!
         $this->logger->log($level, $message, array_merge($core, $context));
     }
-
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid\Test;
@@ -13,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidDescriptorTest extends TestCase
 {
-    public function getTestIsSatisfiedByData() : iterable
+    public function getTestIsSatisfiedByData(): iterable
     {
         $hasMarkRange = true;
         $noMarkRange = false;
@@ -31,7 +33,7 @@ class ValidDescriptorTest extends TestCase
         /* Always invalid descriptors */
         $descriptorInvalid1 = '-1';
         $descriptorInvalid2 = 'abc';
-        $descriptorInvalid3= '-8';
+        $descriptorInvalid3 = '-8';
         $descriptorInvalid4 = '-0.5';
         $descriptorInvalid5 = 'f00d';
         $descriptorInvalid6 = 'l8';

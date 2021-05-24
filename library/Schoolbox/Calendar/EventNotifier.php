@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Calendar;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
@@ -103,8 +103,10 @@ class EventNotifier extends AbstractModuleNotifier
         /**
          * Created or published
          */
-        if ($eventVisible
-            && ($method === Mapper::METHOD_CREATE || ($method === Mapper::METHOD_UPDATE && !$previousVisible))) {
+        if (
+            $eventVisible
+            && ($method === Mapper::METHOD_CREATE || ($method === Mapper::METHOD_UPDATE && !$previousVisible))
+        ) {
             // advise 10 minutes before start
             $bundle->attach(self::TRIGGER_UPCOMING, $event->getStartDateTime()->addSeconds(-60 * self::UPCOMING_WINDOW)->getUnixTimeStamp());
             if ($event->getAttendance()) {
@@ -116,8 +118,10 @@ class EventNotifier extends AbstractModuleNotifier
         /**
          * Deleted or unpublished
          */
-        if ($method === Mapper::METHOD_DELETE
-            || ($method === Mapper::METHOD_UPDATE && $previousVisible && !$eventVisible)) {
+        if (
+            $method === Mapper::METHOD_DELETE
+            || ($method === Mapper::METHOD_UPDATE && $previousVisible && !$eventVisible)
+        ) {
             // Detach all existing triggers, and trigger the deleted event
             // (which retracts all messages for this event already in the queue)
             $bundle->detachEach([
@@ -131,9 +135,11 @@ class EventNotifier extends AbstractModuleNotifier
         /**
          * Updated past event or no-change
          */
-        if ($diff === null
+        if (
+            $diff === null
             || (\count($diff) === 1 && \array_key_exists('updatedAt', $diff))
-            || (!$eventVisible && !$previousVisible)) {
+            || (!$eventVisible && !$previousVisible)
+        ) {
             return;
         }
 
@@ -504,7 +510,8 @@ class EventNotifier extends AbstractModuleNotifier
                         [
                             'user' => new UserParam($effector),
                             'name' => new Param($event->getTitle(), sprintf(self::EVENT_DETAIL_URL, $event->getId())),
-                        ]);
+                        ]
+                    );
 
         foreach ($newlyInvited as $guest) {
             $envelope->targetToUser($guest, $bob->build());

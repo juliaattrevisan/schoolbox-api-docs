@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ResourceBooking\Booking;
 
 use DateTime;
@@ -248,13 +250,15 @@ class Validation
                 // messed with.
                 $series = new Series($this->getBookingMapper(), $this->getStatusMapper(), $this->getExternalTimetableHandler());
 
-                foreach ($series->getExistingSeries(
-                    $existingBooking,
-                    $startDate,
-                    $endDate,
-                    $postData['related_item'],
-                    $postData['efficacy']
-                ) as $check) {
+                foreach (
+                    $series->getExistingSeries(
+                        $existingBooking,
+                        $startDate,
+                        $endDate,
+                        $postData['related_item'],
+                        $postData['efficacy']
+                    ) as $check
+                ) {
                     /** @var Item\Model $thisResource */
                     [$thisResource, $thisStart, $thisEnd, $thisBooking] = $check;
 
@@ -449,7 +453,6 @@ class Validation
             if ($existingId) {
                 $existingSeriesId = $existingBooking->getEvent()->getSeriesId();
                 $conflictingBookings = $conflictingBookings->filter(
-
                     /**
                      * @param Model $item
                      * @return bool
@@ -473,7 +476,6 @@ class Validation
         if (count($conflictingBookings)) {
             $errors[self::START_DATETIME][] = self::ERROR_CONFLICT;
         } elseif (strlen($roomCode = $resource->getRoomCode()) > 0) {
-
             // Check if there's a timetabled class here, too.
             $roomEvents = $this->getTimetableRoomEvents(
                 $resource->getRoomCode(),

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SocialStream_Post_String
  *
@@ -7,7 +8,8 @@
  * @link        https://schoolbox.com.au/
  */
 
-class SocialStream_Post_String extends SocialStream_Post_Abstract {
+class SocialStream_Post_String extends SocialStream_Post_Abstract
+{
 
     /**
      * @var string
@@ -33,6 +35,7 @@ class SocialStream_Post_String extends SocialStream_Post_Abstract {
      * @param SitePage $page
      * @return mixed|void
      */
-    public function renderThumbnail(string $context, SitePage $page) {
+    public function renderThumbnail(string $context, SitePage $page)
+    {
     }
 }

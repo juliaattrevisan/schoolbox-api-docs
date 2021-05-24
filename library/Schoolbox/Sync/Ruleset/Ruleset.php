@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -91,7 +92,6 @@ class Ruleset implements Hydrator\HydratorInterface
         // Now: the grammar class is embedded at construct time.
         $this->grammar->hydrate($input, $previous);
         foreach ($this->getCustomRules() as $rule) {
-
             /* Only execute Custom Rules that have been switched on
              * Otherwise ignore them
              */

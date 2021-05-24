@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Calendar;
 
 use Alaress_Date_Format;
@@ -27,7 +29,6 @@ use Schoolbox\ISoftDeletable;
  */
 class Event implements ISoftDeletable
 {
-
     /**
      * Implement soft delete traits
      */
@@ -361,11 +362,12 @@ class Event implements ISoftDeletable
      */
     public function setupDates($date): void
     {
-        if (preg_match(
-            '/^(?P<d>\\d+)-(?P<m>\\d+)-(?P<y>\\d+)\\s+(?P<h>\\d+):(?P<i>\\d+)/',
-            $date,
-            $matches
-        )
+        if (
+            preg_match(
+                '/^(?P<d>\\d+)-(?P<m>\\d+)-(?P<y>\\d+)\\s+(?P<h>\\d+):(?P<i>\\d+)/',
+                $date,
+                $matches
+            )
         ) {
             $year = $matches['y'];
             $month = $matches['m'];
@@ -826,8 +828,8 @@ class Event implements ISoftDeletable
     public function setEndDate(string $endDate): self
     {
         // preserve time if already set
-        [$year, $month, $day] = explode('-',$endDate);
-        $this->getEndDateTime()->setDate($year,$month,$day);
+        [$year, $month, $day] = explode('-', $endDate);
+        $this->getEndDateTime()->setDate($year, $month, $day);
 
         return $this;
     }
@@ -842,8 +844,8 @@ class Event implements ISoftDeletable
     public function setEndTime(string $endTime): self
     {
         // preserve date if already set
-        [$hour, $min, $sec] = explode(':',$endTime);
-        $this->getEndDateTime()->setTime($hour,$min,$sec);
+        [$hour, $min, $sec] = explode(':', $endTime);
+        $this->getEndDateTime()->setTime($hour, $min, $sec);
 
         return $this;
     }
@@ -858,8 +860,8 @@ class Event implements ISoftDeletable
     public function setStartDate(string $startDate): self
     {
         // preserve time if set
-        [$year, $month, $day] = explode('-',$startDate);
-        $this->getStartDateTime()->setDate($year,$month,$day);
+        [$year, $month, $day] = explode('-', $startDate);
+        $this->getStartDateTime()->setDate($year, $month, $day);
         return $this;
     }
 
@@ -871,8 +873,8 @@ class Event implements ISoftDeletable
      */
     public function setStartTime(string $startTime): self
     {
-        [$hour, $min, $sec] = explode(':',$startTime);
-        $this->getStartDateTime()->setTime($hour,$min,$sec);
+        [$hour, $min, $sec] = explode(':', $startTime);
+        $this->getStartDateTime()->setTime($hour, $min, $sec);
         return $this;
     }
 
@@ -970,20 +972,20 @@ class Event implements ISoftDeletable
      * @param Collection $folderCollection
      * @return $this
      */    public function setFolderCollection(Collection $folderCollection): self
-    {
+{
         $this->folderCollection = $folderCollection;
         return $this;
-    }
+}
 
     /**
      * Get folder collection
      *
      * @return Collection
      */
-    public function getFolderCollection(): Collection
-    {
-        return $this->folderCollection;
-    }
+public function getFolderCollection(): Collection
+{
+    return $this->folderCollection;
+}
 
     /**
      * Set user collection
@@ -991,21 +993,21 @@ class Event implements ISoftDeletable
      * @param Collection|Relation\Personal[] $userCollection
      * @return $this
      */
-    public function setUserCollection($userCollection): self
-    {
-        $this->userCollection = $userCollection;
-        return $this;
-    }
+public function setUserCollection($userCollection): self
+{
+    $this->userCollection = $userCollection;
+    return $this;
+}
 
     /**
      * Get user collection
      *
      * @return Collection|Relation\Personal[]
      */
-    public function getUserCollection()
-    {
-        return $this->userCollection;
-    }
+public function getUserCollection()
+{
+    return $this->userCollection;
+}
 
     /**
      * Stub for event metadata. EOTC uses this, but base event's dont.
@@ -1014,67 +1016,67 @@ class Event implements ISoftDeletable
      *
      * @return null
      */
-    public function getMetadata()
-    {
-        return null;
-    }
+public function getMetadata()
+{
+    return null;
+}
 
     /**
      * @return string
      */
-    public function getSource(): ?string
-    {
-        return $this->source;
-    }
+public function getSource(): ?string
+{
+    return $this->source;
+}
 
 
     /**
      * @param string $source
      * @return $this
      */
-    public function setSource(?string $source): self
-    {
-        $this->source = $source;
-        return $this;
-    }
+public function setSource(?string $source): self
+{
+    $this->source = $source;
+    return $this;
+}
 
 
     /**
      * @return int|null
      */
-    public function getMaxAttendees(): ?int
-    {
-        return $this->maxAttendees;
-    }
+public function getMaxAttendees(): ?int
+{
+    return $this->maxAttendees;
+}
 
 
     /**
      * @param int|null $maxAttendees
      * @return $this
      */
-    public function setMaxAttendees(?int $maxAttendees): self
-    {
-        $this->maxAttendees = $maxAttendees;
-        return $this;
-    }
+public function setMaxAttendees(?int $maxAttendees): self
+{
+    $this->maxAttendees = $maxAttendees;
+    return $this;
+}
 
 
     /**
      * @return bool|null
      */
-    public function getShowAttendees(): ?bool
-    {
-        return $this->showAttendees;
-    }
+public function getShowAttendees(): ?bool
+{
+    return $this->showAttendees;
+}
 
 
     /**
      * @param bool|null $showAttendees
      * @return $this;
      */
-    public function setShowAttendees(?bool $showAttendees): self
-    {
-        $this->showAttendees = $showAttendees;
-        return $this;
-    }
+public function setShowAttendees(?bool $showAttendees): self
+{
+    $this->showAttendees = $showAttendees;
+    return $this;
+}
 }

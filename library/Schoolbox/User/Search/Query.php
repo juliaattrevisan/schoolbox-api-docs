@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\User\Search;
@@ -84,8 +86,9 @@ class Query
 
         $users = UserMapper::getInstance()->findByColumn(
             'id',
-            $userIds, [
-                'order'=>[
+            $userIds,
+            [
+                'order' => [
                     'lastname'  => 'ASC',
                     'firstname' => 'ASC',
                 ]

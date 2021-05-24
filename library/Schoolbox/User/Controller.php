@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      James Leckie <jleckie@alaress.com.au>
@@ -13,7 +14,7 @@ use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Role;
-use \Schoolbox\User;
+use Schoolbox\User;
 use User\Logger;
 use External_User;
 
@@ -54,7 +55,8 @@ class Controller extends Base
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function impersonate(User $user) {
+    public function impersonate(User $user)
+    {
         $previous = $_SESSION;
         $session = new \Session();
 
@@ -70,8 +72,7 @@ class Controller extends Base
                 ->setIp($_SERVER['REMOTE_ADDR']);
 
             $this->assumeUserLogMapper->save($logItem);
-        }
-        else {
+        } else {
             $_SESSION = $previous; //Recover old session
         }
         $this->getResponse()->redirect->found('/');

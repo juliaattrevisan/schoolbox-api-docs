@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Summator;
 
 /**
@@ -49,7 +51,7 @@ class Factory
                 return new WeightedAverage();
 
             case self::AVERAGE:
-                return new Average;
+                return new Average();
 
             case self::MAXIMUM:
                 return new Maximum();

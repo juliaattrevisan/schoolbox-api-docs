@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Repair script for cleaning up rubric data on spec due works after deletion of capability and indicator usages.
  * See SA-8261.

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Timetable;
@@ -168,8 +170,7 @@ class Preloader
                     $data['person']['externalId']
                 ));
             }
-        } catch(\InvalidArgumentException $e) {
-
+        } catch (\InvalidArgumentException $e) {
             /* We can't process any timetables in those cases, so log it and continue
              */
             $this->log->warning(sprintf(

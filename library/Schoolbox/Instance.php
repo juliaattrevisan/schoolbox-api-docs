@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -168,5 +169,4 @@ class Instance
     {
         return strpos($this->getType(), 'vagrant') !== false;
     }
-
 }

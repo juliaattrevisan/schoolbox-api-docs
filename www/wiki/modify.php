@@ -1,8 +1,8 @@
 <?php
 
 use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
 $wikiHandler  = new Wiki();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
@@ -18,7 +18,7 @@ if (is_numeric($this->arg[0])) {
         error(101);
     }
 
-    try{
+    try {
         $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(2);
@@ -74,8 +74,7 @@ if (is_numeric($this->arg[0])) {
             'class' => 'active',
         ]
     ]);
-}
-elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
+} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this->arg[2])) {
     /* Check permission
      *
      * First check that Allow Create is active. If it is, continue;
@@ -83,7 +82,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
      */
     $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->arg[2]);
 
-    try{
+    try {
         $folder = FolderMapper::getInstance()->findById($this->arg[1]);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(2);
@@ -138,7 +137,8 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1]) && is_numeric($this-
  * @param Wiki $wikiHandler
  * @param Schoolbox\Resource\Folder\Model $folder
  */
-function gimmeDaWikiSlugs($wikiHandler, $folder) {
+function gimmeDaWikiSlugs($wikiHandler, $folder)
+{
     //Collate the slugs of wikis on this page - used for validation
     $wikis = $wikiHandler->getByCategory($folder->getId());
 

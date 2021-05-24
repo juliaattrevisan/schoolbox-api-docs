@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -7,27 +8,26 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
 /* Check that you have write permissions
  */
 $authenticator = new \Etherpad\Authenticator();
 
-try{
-	$folder = FolderMapper::getInstance()->findById($this->arg[0]);
-}
-catch (\Schoolbox\Mapper\Exception $e) {
-	error(2);
+try {
+    $folder = FolderMapper::getInstance()->findById($this->arg[0]);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(2);
 }
 
 if ($authenticator->canCreate($this->arg[0])) {
-	$this->setFile(TEMPLATE_content, 'etherpad/create.html');
+    $this->setFile(TEMPLATE_content, 'etherpad/create.html');
 
-	$this->setVar(array(
-		'HOMEPAGE_ID' => $this->arg[0],
-		'FOLDER_NAME' => Scrub::text($folder->getName())
-	));
+    $this->setVar(array(
+        'HOMEPAGE_ID' => $this->arg[0],
+        'FOLDER_NAME' => Scrub::text($folder->getName())
+    ));
 
     /* Render out breadcrumbs
      */
@@ -44,9 +44,6 @@ if ($authenticator->canCreate($this->arg[0])) {
             'class' => 'active',
         ]
     ]);
+} else {
+    error(19);
 }
-else {
-	error(19);
-}
-
-

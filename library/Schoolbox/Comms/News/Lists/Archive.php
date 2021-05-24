@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Lists;
 
 use Alaress\Database\Predicate\InvalidColumnException;
@@ -22,6 +24,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_slice;
 use function count;
 use function in_array;
@@ -111,7 +114,7 @@ class Archive extends Base
          *     $limit === 0:    explicitly get all the items and disregard pagination ('all' is cast to zero)
          */
         $articleIds = $availableIds;
-        if((string)$params->getLimit() === '0'){
+        if ((string)$params->getLimit() === '0') {
             $paginator = null;
         } else {
             $limit   = $params->getLimit() ?? $this->defaultLimit;
@@ -133,7 +136,6 @@ class Archive extends Base
         /* Disregard the sticky bit for each article in the Archive
          */
         foreach ($articles as $article) {
-
             /* Artificially represent the presence of one or more files without having to hydrate them
              */
             $article->setAttachedFilesCount($attachmentCounts[$article->getId()] ?? 0);
@@ -191,7 +193,7 @@ class Archive extends Base
             ->setPageSize($limit)
             ->setTotal($total);
 
-       return (new Paginator())
+        return (new Paginator())
             ->setPaginator($paginator)
             ->setUrl($url)
             ->setParam(Querystring::PAGE_NUMBER);

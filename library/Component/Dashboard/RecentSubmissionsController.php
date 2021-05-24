@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -168,8 +169,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
              */
             if (isset($results[$assessmentId])) {
                 $results[$assessmentId]['responses']['num']++;
-            }
-            elseif (isset($allAssessments[$assessmentId])) {
+            } elseif (isset($allAssessments[$assessmentId])) {
                 $results[$assessmentId] = [
                     'assessment' => $allAssessments[$assessmentId],
                     'responses' => [

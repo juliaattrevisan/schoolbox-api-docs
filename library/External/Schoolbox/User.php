@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -307,7 +309,8 @@ class External_Schoolbox_User implements External_UserInterface
                       department AS StaffDepartment
             FROM      `sis_user_profile` sup
             JOIN      `sis_user_profile_staff` sups ON sup.id = sups.sis_user_profile_id
-        ")->fetchAll();
+        "
+        )->fetchAll();
     }
 
 
@@ -424,7 +427,7 @@ class External_Schoolbox_User implements External_UserInterface
         $yearLevelQuery = '';
         $nameQuery = '';
         $boardingQuery = '';
-        $formQuery= '';
+        $formQuery = '';
 
         if ($yearLevel) {
             $yearLevelQuery = ' AND sups.year_level = :year_level';
@@ -433,7 +436,7 @@ class External_Schoolbox_User implements External_UserInterface
 
         if ($name) {
             $nameQuery = " AND CONCAT(child.firstname,' ',child.lastname) LIKE :name";
-            $bindings[':name'] = '%'.$name.'%';
+            $bindings[':name'] = '%' . $name . '%';
         }
 
         if ($boardingStatus) {
@@ -483,6 +486,8 @@ class External_Schoolbox_User implements External_UserInterface
             JOIN      sis_user_profile parent ON supr.user_profile_id = parent.id
             JOIN      sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
             WHERE     1=1 {$yearLevelQuery} {$formQuery} {$nameQuery} {$boardingQuery}
-        ", $bindings)->fetchAll();
+        ",
+            $bindings
+        )->fetchAll();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -35,7 +36,8 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract
      *
      * @param \Alaress_Curl_Url $curl
      */
-    public function spawnMetadata($curl) {
+    public function spawnMetadata($curl)
+    {
     }
 
 
@@ -46,7 +48,8 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract
      * @param SitePage $page
      * @return bool
      */
-    public function renderThumbnail(string $context, SitePage $page) {
+    public function renderThumbnail(string $context, SitePage $page)
+    {
         $chain = new \SocialStream\Post\Player\Chain($this->getUrl());
 
         /* If it was interpreted, embed that player
@@ -128,25 +131,22 @@ class SocialStream_Post_Video extends SocialStream_Post_Abstract
             $prefix = null;
             if ($context == 'post') {
                 $prefix = 'SOCIALSTREAM_POST_VIDEO';
-            }
-            elseif ($context == 'comment') {
+            } elseif ($context == 'comment') {
                 $prefix = 'SOCIALSTREAM_COMMENT_VIDEO';
-            }
-            elseif ($context == 'reply') {
+            } elseif ($context == 'reply') {
                 $prefix = 'SOCIALSTREAM_REPLY_VIDEO';
             }
             if (isset($prefix)) {
                 $page->setVar(
                     array(
-                        $prefix.'_POSTER' => Scrub::text($result['poster']),
-                        $prefix.'_SRC'    => Scrub::text($result['src']),
-                        $prefix.'_STATUS' => Scrub::text(strtolower($result['status'])),
+                        $prefix . '_POSTER' => Scrub::text($result['poster']),
+                        $prefix . '_SRC'    => Scrub::text($result['src']),
+                        $prefix . '_STATUS' => Scrub::text(strtolower($result['status'])),
                     )
                 );
                 if ($result['status'] === 'completed') {
                     $page->parse("socialstream_{$context}_has_video_block", "socialstream_{$context}_has_video");
-                }
-                elseif ($result['status'] !== 'failed') {
+                } elseif ($result['status'] !== 'failed') {
                     $page->parse("socialstream_{$context}_has_video_pending_block", "socialstream_{$context}_has_video_pending");
                 }
                 return true;

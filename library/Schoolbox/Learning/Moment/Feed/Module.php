@@ -3,11 +3,10 @@
 /**
 *
  */
+
 declare(strict_types=1);
 
-
 namespace Schoolbox\Learning\Moment\Feed;
-
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
@@ -18,7 +17,6 @@ use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
-
 
 class Module extends BaseModule
 {
@@ -42,7 +40,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
-                 new Rule\IsUserOrParentOfUser(
+                new Rule\IsUserOrParentOfUser(
                     $this->getExternalUser(),
                     UserMapper::getInstance(),
                     'userId'

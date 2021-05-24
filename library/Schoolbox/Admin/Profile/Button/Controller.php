@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Button;
@@ -14,6 +15,7 @@ use Schoolbox\Profile\Button\Model as ProfileButton;
 use Schoolbox\CampusMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+
 /**
  * @package Schoolbox\Admin\Profile\Button
  */
@@ -69,8 +71,7 @@ class Controller extends Base
         Role\Availability\Mapper $roleAvailabilityMapper,
         Campus\Visibility\Mapper $campusVisibilityMapper,
         Role\Visibility\Mapper $roleVisibilityMapper
-    )
-    {
+    ) {
         $this->errorMapper = $errorMapper;
         $this->iconMapper = $iconMapper;
         $this->profileButtonMapper = $profileButtonMapper;
@@ -98,7 +99,7 @@ class Controller extends Base
         $roleVisibilitySelected = [];
         $campusVisibilitySelected = [];
 
-        foreach($buttons as $button) {
+        foreach ($buttons as $button) {
             $roleAvailabilitySelections = $this->roleAvailabilityMapper->findByColumn('profile_button_id', $button->getId());
             $roleAvailabilitySelected[$button->getId()] = array_fill_keys($roleAvailabilitySelections->indexBy('roleId')->keys(), true);
 

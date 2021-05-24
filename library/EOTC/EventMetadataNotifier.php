@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventMetadataNotifier
  *
@@ -8,7 +9,6 @@
  */
 
 namespace EOTC;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
@@ -83,7 +83,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $detachUpcoming = false;
         if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
             $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
-
         } elseif ($bundle->getMethod() == Mapper::METHOD_UPDATE) {
 
             /** @var EventMetadata $object */
@@ -253,8 +252,8 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ))
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
-            ->addTopic("eotc.$relEventId.".self::TRIGGER_UPCOMING)
-            ->setIcon("/images/icon.php?size=".$this->iconSize."&icon=".Realtime\Message\NSMapper::NS_EOTC)
+            ->addTopic("eotc.$relEventId." . self::TRIGGER_UPCOMING)
+            ->setIcon("/images/icon.php?size=" . $this->iconSize . "&icon=" . Realtime\Message\NSMapper::NS_EOTC)
             ->setAllowSelfSend(true);
 
         $msg = $bob->build();
@@ -301,7 +300,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             )
         );
 
-        $href = "/modules/eotc/status/modify/".$relEvent->getId();
+        $href = "/modules/eotc/status/modify/" . $relEvent->getId();
         $bob->setTitle(":applicant submitted new :eotc, :event")
             ->setParams(
                 array(
@@ -310,7 +309,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     'eotc'      => new Param($this->stone->translate('eotc', false, false)),
                 )
             )
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=".$applicant->getExternalId())
+            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $applicant->getExternalId())
             ->setHref($href)
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
@@ -467,7 +466,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // what we do is entirely contingent on what the new status is
         switch ($newStatus) {
-
             case EventStatusMapper::STATUS_INPRINCIPLE:
                 $bob->setTitle(":moderator has approved :event in principle")
                     ->setHref($hrefOwn)
@@ -551,7 +549,6 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     $envelope->targetToUser($id, $bob->build());
                 }
                 break;
-
         }
 
         // get list of moderators relevant to the current status
@@ -610,5 +607,4 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         }
         return array_unique($userIds);
     }
-
 }

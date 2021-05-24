@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -28,5 +29,4 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('site_school_code', self::TYPE_STRING, self::COLUMN_IDENTIFIER);
         $this->uses('access_token', self::TYPE_STRING);
     }
-
 }

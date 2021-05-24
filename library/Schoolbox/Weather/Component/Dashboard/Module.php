@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -22,7 +23,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector): void
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**

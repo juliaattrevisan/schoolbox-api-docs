@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\S3;
@@ -15,6 +17,7 @@ use PDO;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\FilesystemFactory;
+
 use function array_combine;
 use function array_key_exists;
 use function count;
@@ -305,20 +308,24 @@ class FileNester extends CliTool\App
             // Already nested under /storage top-level dir?
             $this->getLogger()->info("File appears to be a already be nested, ignoring");
             $this->countNestedFiles++;
-        } elseif (preg_match(
-            "#^[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/([0-9a-f]{40})$#",
-            $fileInS3,
-            $matches
-        )) {
+        } elseif (
+            preg_match(
+                "#^[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/([0-9a-f]{40})$#",
+                $fileInS3,
+                $matches
+            )
+        ) {
             // Un-nested storage file?
             $this->getLogger()->info("File is a un-nested storage file");
             $this->countUnNestedStorageFiles++;
             $this->processS3StorageFile($fileInS3, $matches[1], false);
-        } elseif (preg_match(
-            "#^[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/([0-9a-f]{40})-[\w-]+$#",
-            $fileInS3,
-            $matches
-        )) {
+        } elseif (
+            preg_match(
+                "#^[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/[0-9a-f]{5}/([0-9a-f]{40})-[\w-]+$#",
+                $fileInS3,
+                $matches
+            )
+        ) {
             // Un-nested transform file?
             $this->getLogger()->info("File is a un-nested transform file");
             $this->countUnNestedTransformFiles++;

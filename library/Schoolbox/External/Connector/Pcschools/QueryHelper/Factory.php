@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\External\Connector\Pcschools\QueryHelper;
 
 use Alaress\Database\Connector\IConnector;
 use TypeError;
-
 
 class Factory
 {

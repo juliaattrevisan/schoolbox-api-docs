@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Extends a standard schoolbox file into a video file
  *

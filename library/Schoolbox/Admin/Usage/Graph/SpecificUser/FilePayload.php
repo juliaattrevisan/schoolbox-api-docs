@@ -1,15 +1,16 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Usage\Graph\SpecificUser;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\User;
-
 
 /**
  * Class FilePayload
@@ -134,7 +135,6 @@ class FilePayload
         $stack = [];
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             /* Augment urls depending on $row['location']
              * Each place has its own send and deletion endpoints
              */

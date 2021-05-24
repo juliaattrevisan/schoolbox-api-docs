@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Show a list of the users classes on the dashboard
  *
@@ -21,7 +22,6 @@ use Timetable_ColourMapper;
 use Schoolbox\User;
 use SitePage;
 use Alaress_Date_Format;
-
 
 class ClassController extends Component_Dashboard_ControllerAbstract
 {
@@ -76,7 +76,7 @@ class ClassController extends Component_Dashboard_ControllerAbstract
      */
     public function execute()
     {
-        if ($this->getUser()->getHideTimetable()){
+        if ($this->getUser()->getHideTimetable()) {
             return false;
         }
 

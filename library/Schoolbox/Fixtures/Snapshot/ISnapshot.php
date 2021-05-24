@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ISnapshot
  *
@@ -8,7 +9,6 @@
  */
 
 namespace Schoolbox\Fixtures\Snapshot;
-
 
 interface ISnapshot
 {

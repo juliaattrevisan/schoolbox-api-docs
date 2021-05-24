@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Learning\Assessment;
-
 
 /**
  * Class TypeTrait
@@ -33,7 +33,7 @@ trait TypeTrait
             $values = array_map($map, $values);
         }
 
-        return '(?:'.implode('|', $values) . ')';
+        return '(?:' . implode('|', $values) . ')';
     }
 
 
@@ -50,6 +50,5 @@ trait TypeTrait
     /**
      * @return string[]
      */
-    protected abstract function toArray();
-
+    abstract protected function toArray();
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -14,7 +15,6 @@ use Alaress_Date_Format;
 
 class Model
 {
-
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;

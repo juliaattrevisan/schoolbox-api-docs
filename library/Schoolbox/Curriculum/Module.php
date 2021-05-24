@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Definition for the curriculum mapping module.
  *
@@ -30,7 +31,7 @@ class Module extends BaseModule
     public function initSubmodules(ContainerInterface $injector, $basePath)
     {
         $importModule = new Import\Module($injector);
-        $importModule->init($basePath.'/import');
+        $importModule->init($basePath . '/import');
     }
 
     /**
@@ -100,7 +101,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
                 [

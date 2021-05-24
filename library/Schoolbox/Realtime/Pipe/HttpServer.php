@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -31,5 +32,4 @@ class HttpServer extends \Ratchet\Http\HttpServer
         // say nothing
         $conn->close();
     }
-
 }

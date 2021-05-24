@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport;
 
 /**
@@ -45,7 +47,7 @@ class NormaliseTeachers
     {
         $teachers = [];
 
-        foreach(self::TEACHER_INDEXES as $currentTeacherIndex) {
+        foreach (self::TEACHER_INDEXES as $currentTeacherIndex) {
             $key = "ClassTeacher{$currentTeacherIndex}";
             $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
 

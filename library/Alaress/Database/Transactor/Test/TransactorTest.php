@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -45,7 +46,7 @@ class TransactorTest extends TestCase
         // Augment the transactor with a breakOut method, which simulates an
         // implicit commit.
         // (This should never be done in live code, hence it's in a mock.)
-        $this->transactor     = new class(new DummyStrategy()) extends Transactor
+        $this->transactor     = new class (new DummyStrategy()) extends Transactor
         {
             private $implicitlyCommitted = false;
 

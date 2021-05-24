@@ -66,12 +66,12 @@ class Session
     public static function getIP()
     {
         // Sourced from https://stackoverflow.com/questions/1634782/what-is-the-most-accurate-way-to-retrieve-a-users-correct-ip-address-in-php?rq=1
-        foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key){
-            if (array_key_exists($key, $_SERVER) === true){
-                foreach (explode(',', $_SERVER[$key]) as $ip){
+        foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
+            if (array_key_exists($key, $_SERVER) === true) {
+                foreach (explode(',', $_SERVER[$key]) as $ip) {
                     $ip = trim($ip); // just to be safe
 
-                    if (filter_var($ip, FILTER_VALIDATE_IP) !== false){
+                    if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
                         return $ip;
                     }
                 }
@@ -87,9 +87,9 @@ class Session
      */
     public function create($username, $remember = false)
     {
-        $userHandler  = new \User;
+        $userHandler  = new \User();
         $userMapper   = UserMapper::getInstance();
-        $groupHandler = new Group;
+        $groupHandler = new Group();
 
         //Clear all remnants of past sessions
         $this->destroy();
@@ -100,14 +100,13 @@ class Session
 
         /* if user is found and enabled and session is started create our user record */
         if ($user instanceof User && $user->getEnabled() && session_start()) {
-
             /* Start by creating a fresh ID to ensure ID has not been injected */
             session_regenerate_id();
 
             /* Store remember me cookie so user can return in the future */
 
             if ($remember == true) {
-                $key = sha1(microtime(true).mt_rand(10000, 90000));
+                $key = sha1(microtime(true) . mt_rand(10000, 90000));
                 $expire = strtotime('+2 month');
                 $cookieParams = session_get_cookie_params();
                 setcookie(
@@ -120,7 +119,7 @@ class Session
                     $cookieParams['httponly']
                 );
                 $redis = \Alaress\Redis::getClientInstance();
-                $redis->executeCommand($redis->createCommand('set', array($key, $username) ));
+                $redis->executeCommand($redis->createCommand('set', array($key, $username)));
                 $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
             }
 
@@ -177,7 +176,6 @@ class Session
             }
 
             return $result;
-
         } else {
             return false;
         }
@@ -218,19 +216,19 @@ class Session
         $user = $userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
 
         // Fall back to using email address
-        if(!$user instanceof \Schoolbox\User) {
+        if (!$user instanceof \Schoolbox\User) {
             if (Config::get('auth_email_enabled')) {
                 $user = $userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
                 //Override username with actual username, rather than email address so user can proceed
-                if($user instanceof \Schoolbox\User) {
+                if ($user instanceof \Schoolbox\User) {
                     $username = $user->getUsername();
                 }
             }
         }
 
-        if(!$user instanceof \Schoolbox\User) {
+        if (!$user instanceof \Schoolbox\User) {
             // Log the fact that user doesn't exist
-            $notif->notice("Login failure for non-existent user ".$username, array(
+            $notif->notice("Login failure for non-existent user " . $username, array(
                 'username' => $username,
                 'ip'       => $ip,
                 'login'    => 0,
@@ -240,7 +238,7 @@ class Session
 
         if (!($user->getEnabled())) {
             // Log the fact that user is not enabled
-            $notif->notice("Login failure for non-enabled user ".$user->getUsername(), array(
+            $notif->notice("Login failure for non-enabled user " . $user->getUsername(), array(
                 'username' => $user->getUsername(),
                 'ip'       => $ip,
                 'login'    => 0,
@@ -262,7 +260,7 @@ class Session
 
         if (!$result) {
             /* Log failure */
-            $notif->notice("Login failure for ".$user->getUsername(), array(
+            $notif->notice("Login failure for " . $user->getUsername(), array(
                 'username' => $user->getUsername(),
                 'ip'       => $ip,
                 'login'    => 0,
@@ -283,10 +281,9 @@ class Session
             $this->db->update('user', 'username', $save);
         }
 
-        if($result) {
+        if ($result) {
             return $user;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -381,7 +378,6 @@ class Session
                             $err_code = substr($matches[0], 5);
                             // error codes referenced from per http://wiki.service-now.com/index.php?title=LDAP_Error_Codes
                             switch ($err_code) {
-
                                 case '701': // ACCOUNT_EXPIRED
                                 case '533': // ACCOUNT_DISABLED
                                     throw new SchoolboxAccountDisabledException('Your account has expired or been disabled.');
@@ -453,14 +449,16 @@ class Session
         }
         foreach ($ldapConfigs as $ldapConfig) {
             $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertPath);
-            if ($ds && $this->ldapAuth(
-                $ds,
-                $username,
-                $password,
-                $ldapConfig['searchBase'],
-                $ldapUsernameField,
-                $ldapSearchFilter
-            )) {
+            if (
+                $ds && $this->ldapAuth(
+                    $ds,
+                    $username,
+                    $password,
+                    $ldapConfig['searchBase'],
+                    $ldapUsernameField,
+                    $ldapSearchFilter
+                )
+            ) {
                 return true;
             }
         }
@@ -534,7 +532,7 @@ class Session
      */
     private function setSynergyInfo(UserMapper $userMapper, User $user)
     {
-        $synUser = new External_User;
+        $synUser = new External_User();
         $folderMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
 
         $synergy_id = $_SESSION['sid'];
@@ -553,7 +551,6 @@ class Session
                 /* Get subject list for each student */
                 if (is_array($children)) {
                     foreach ($children as $child) {
-
                         try {
                             $childObject = $userMapper->findByExternalId($child['RelatedID']);
                         } catch (MapperException $e) {
@@ -613,20 +610,17 @@ class Session
                             'name' => $childObject->getFullName(),
                             'subjects' => $subjects
                         );
-
                     }
                 }
             } else {
                 //user is not parent so get timetable information
                 if (!$user->getHideTimetable()) {
                     $subjectList = $synUser->getSubjectList($_SESSION['user']);
-                }
-                else {
+                } else {
                     $subjectList = false;
                 }
                 $catList = array();
                 if (is_array($subjectList)) {
-
                     // declare the array
                     $_SESSION['subjects'] = [];
 
@@ -639,7 +633,8 @@ class Session
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();
-                                $subject['perm'] = $this->access->getFolderAccess($user, $result->getId());;
+                                $subject['perm'] = $this->access->getFolderAccess($user, $result->getId());
+                                ;
                                 $subject['code'] = $result->getMatchedCode();
                                 $_SESSION['subjects'][] = $subject;
 
@@ -658,9 +653,7 @@ class Session
                 } else {
                     $_SESSION['timetable'] = 0;
                 }
-
             }
-
         }
     }
 

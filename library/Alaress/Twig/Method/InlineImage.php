@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Twig function for outputting an image as a data: URL.
  *
@@ -11,7 +12,8 @@ namespace Alaress\Twig\Method;
 
 use Twig\Error\RuntimeError;
 
-class InlineImage {
+class InlineImage
+{
 
     /**
      * Outputs the image in $source (based in WEB_root) as a data: URL. Adds the
@@ -21,10 +23,11 @@ class InlineImage {
      * @return string
      * @throws RuntimeError if the file can't be read or doesn't exist.
      */
-    public static function execute($source) {
+    public static function execute($source)
+    {
         $realpath = WEB_root . '/' . $source;
         if (!(is_file($realpath) && is_readable($realpath))) {
-            throw new RuntimeError('Image file "'.$realpath.'" does not exist');
+            throw new RuntimeError('Image file "' . $realpath . '" does not exist');
         }
         return sprintf(
             'data:%s;base64,%s',

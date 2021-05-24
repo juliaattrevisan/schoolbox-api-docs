@@ -159,7 +159,6 @@ abstract class Alaress_Cache_Abstract
             if ($this->isExpired($this->cachedFile, $this->cachedTime)) {
                 if (file_exists($this->lockFile)) {
                     if ($this->isExpired($this->lockFile, $this->lockTime)) {
-
                         /* Update cached version
                          */
                         //$this->notifyObservers("Cache expired, lockfile expired perhaps due to timeout or halted. Regenerate everything.");

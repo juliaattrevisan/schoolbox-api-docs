@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Feed;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\Collection;
@@ -28,5 +28,4 @@ interface SourceInterface
      * @return Collection|Instance[]
      */
     public function getFeed($context, User $user, $limit = self::HARD_LIMIT, $offset = 0);
-
 }

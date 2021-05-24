@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for relations between users and classes.
  *
@@ -10,14 +11,17 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox;
 
-class ClassInvolvementMapper extends Schoolbox\Mapper {
+class ClassInvolvementMapper extends Schoolbox\Mapper
+{
 
     /**
      * {@inheritdoc}
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('sis_class_user');
         $this->hasModel(ClassInvolvement::class);
         $this->hasMap(array(
@@ -57,7 +61,8 @@ class ClassInvolvementMapper extends Schoolbox\Mapper {
      * @param  ClassEntry $class
      * @return int        The number of rows deleted.
      */
-    public function deleteInvolvementsForClass(ClassEntry $class) {
+    public function deleteInvolvementsForClass(ClassEntry $class)
+    {
         $query = "DELETE FROM `{$this->getTable()}` WHERE `class_id` = :class";
         $statement = $this->database->prepare($query);
         $statement->execute(array('class' => $class->getId()));

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -14,7 +15,6 @@ use Schoolbox\Realtime\Schedule\Trigger\DigestTrigger;
 use Schoolbox\Realtime\Schedule\Trigger\Test\MockDigestTrigger;
 use Schoolbox\Realtime\WorkNotifier;
 use Schoolbox\Role;
-
 
 class DigestTriggerFactory
 {
@@ -55,5 +55,4 @@ class DigestTriggerFactory
 
         return new DigestTrigger($this->notifier, $schedule, $role);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schoolbox table stub implementation of sync connector.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Pcschools implementation of external events
  *

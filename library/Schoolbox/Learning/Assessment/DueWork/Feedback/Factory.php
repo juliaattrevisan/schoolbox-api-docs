@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
@@ -16,10 +18,10 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Feedback\FileDecorator;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\MarkScheme\IMarkScheme;
-use \Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
+use Schoolbox\User;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\Assessment\DueWork\Response\Model as DueWorkResponse;
 use Schoolbox\Learning\Assessment\Feedback\SubSource\DueWork as DueWorkFeedbackDataSource;
 use Schoolbox\Learning\DueWork\StateMapper;
 
@@ -154,7 +156,6 @@ class Factory
     {
         // Is this the first feedback for this participant, or is most recent feedback already published ?
         if (is_null($this->mostRecentFeedback) || $this->mostRecentFeedback->isPublished()) {
-
             // create new feedback
             /** @var DueWorkFeedback $feedback */
             $feedback = $this->dueWorkFeedbackDataSource->createModel($this->participant->getAssessable())
@@ -185,7 +186,6 @@ class Factory
             ->setResubmissionRequired($this->resubmissionRequired);
 
         if ($this->mark !== null && $this->mark !== '') {
-
             // mark defined and non-empty
             try {
                 /** @var IMarkScheme $scheme */
@@ -198,16 +198,14 @@ class Factory
                 $feedback
                     ->setNormalisedMark($norm)
                     ->setHumanReadableMark($humanReadableMark);
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 $code = StateMapper::getInstance()->findOneByColumn('display_as', $this->mark);
 
                 $feedback
                     ->setNormalisedMark($code->getNormaliseAs())
                     ->setHumanReadableMark($this->mark);
             }
-        }
-        else {
+        } else {
             // TODO what on EARTH is going on here? what is this "special case"?
 
             //If mark is set to empty string this is a special case

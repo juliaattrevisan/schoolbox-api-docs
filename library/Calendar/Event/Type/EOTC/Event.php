@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Standard EOTC event for display in the calendar
  *
@@ -6,10 +7,10 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Calendar\Event\Type\EOTC;
 
 use Calendar\Event\Type\Day;
-
 
 class Event extends Day\Event
 {
@@ -30,8 +31,9 @@ class Event extends Day\Event
      *
      * @return bool
      */
-    public function canAttend() {
-		return false;
+    public function canAttend()
+    {
+        return false;
     }
 
     /**
@@ -39,7 +41,8 @@ class Event extends Day\Event
      *
      * @return string
      */
-    public function getDerivedEventLevel() {
+    public function getDerivedEventLevel()
+    {
         $eventLevel = '';
 
         if ($this->isCampusAccess()) {
@@ -51,10 +54,10 @@ class Event extends Day\Event
                 $eventLevel .= ' campus' . $this->getCampusList();
             }
         }
-		/* EOTC events are always campus, and aren't assigned to groups
-		 */
-		else {
-			$eventLevel = 'personal';
+        /* EOTC events are always campus, and aren't assigned to groups
+         */
+        else {
+            $eventLevel = 'personal';
         }
 
         return $eventLevel;
@@ -67,7 +70,8 @@ class Event extends Day\Event
      *
      * @return string
      */
-    public function getTime() {
+    public function getTime()
+    {
         //
         // All day event, or does it start and end on a different day?
         // Show a blank string.
@@ -80,11 +84,11 @@ class Event extends Day\Event
 
         $formattedTime = '';
 
-        if(!$this->getStartTime()->isAtStartOfDay()) {
+        if (!$this->getStartTime()->isAtStartOfDay()) {
             $formattedTime = $this->getStartTime()->getTimeOnly();
 
-            if(!$this->getEndTime()->isAtStartOfDay()) {
-                $formattedTime .= "&ndash;". $this->getEndTime()->getTimeOnly();
+            if (!$this->getEndTime()->isAtStartOfDay()) {
+                $formattedTime .= "&ndash;" . $this->getEndTime()->getTimeOnly();
             }
         }
 
@@ -100,7 +104,8 @@ class Event extends Day\Event
      *
      * @param string $attendance
      */
-    public function setAttendance($attendance) {
+    public function setAttendance($attendance)
+    {
         $this->attendance = $attendance;
     }
 
@@ -109,7 +114,8 @@ class Event extends Day\Event
      *
      * @return string
      */
-    public function getAttendance() {
+    public function getAttendance()
+    {
         return $this->attendance;
     }
 
@@ -145,4 +151,3 @@ class Event extends Day\Event
         ];
     }
 }
-

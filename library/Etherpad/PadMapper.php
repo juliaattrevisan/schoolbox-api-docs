@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PadMapper
  *
@@ -14,80 +15,82 @@ use Schoolbox\GenericCollection;
 /**
  * @method GenericCollection|Pad[] findByColumn($columnName, $columnValue, $options = [])
  */
-class PadMapper extends \Schoolbox\Mapper {
+class PadMapper extends \Schoolbox\Mapper
+{
 
-	/**
-	 * Define column/property mapping
-	 *
-	 * @return Bool|void
-	 */
-	protected function mapping() {
-		$this->hasTable('etherpad_pad');
+    /**
+     * Define column/property mapping
+     *
+     * @return Bool|void
+     */
+    protected function mapping()
+    {
+        $this->hasTable('etherpad_pad');
         $this->hasModel(Pad::class);
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
+        $this->hasMap(array(
+            'column'     => 'id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'pad_id',
-			'property'   => 'padId',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'pad_id',
+            'property'   => 'padId',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'homepage_id',
-			'property'   => 'homepageId',
-			'type'       => self::TYPE_INTEGER,
-		));
+        $this->hasMap(array(
+            'column'     => 'homepage_id',
+            'property'   => 'homepageId',
+            'type'       => self::TYPE_INTEGER,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'environment',
-			'property'   => 'environment',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'environment',
+            'property'   => 'environment',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'name',
-			'property'   => 'name',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'name',
+            'property'   => 'name',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'body',
-			'property'   => 'body',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'body',
+            'property'   => 'body',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'lock',
-			'property'   => 'lock',
-			'type'       => self::TYPE_INTEGER,
-		));
+        $this->hasMap(array(
+            'column'     => 'lock',
+            'property'   => 'lock',
+            'type'       => self::TYPE_INTEGER,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'created_at',
-			'property'   => 'createdAt',
-			'type'       => self::TYPE_DATETIME,
-		));
+        $this->hasMap(array(
+            'column'     => 'created_at',
+            'property'   => 'createdAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'updated_at',
-			'property'   => 'updatedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
+        $this->hasMap(array(
+            'column'     => 'updated_at',
+            'property'   => 'updatedAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'deleted_at',
-			'property'   => 'deletedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
+        $this->hasMap(array(
+            'column'     => 'deleted_at',
+            'property'   => 'deletedAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 
-		$this->hasSoftDeleteDateField('deleted_at');
-	}
+        $this->hasSoftDeleteDateField('deleted_at');
+    }
 
 
     /**
@@ -101,5 +104,4 @@ class PadMapper extends \Schoolbox\Mapper {
         // vicious lies
         return true;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Campus
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External\Normalise\User\Common;
 
-class Campus {
+class Campus
+{
 
     /**
      * Identifier
@@ -36,7 +38,8 @@ class Campus {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

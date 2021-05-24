@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -133,7 +134,6 @@ $allBoolean = new \Schoolbox\Collection(array(
 /* A whole bunch of boolean options
  */
 foreach ($allBoolean as $currentEportfolio) {
-
     $this->setVar(
         array(
             'SEARCH_EPORTFOLIO_ID' => $currentEportfolio['key'],

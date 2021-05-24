@@ -77,7 +77,7 @@ if ($this->arg[0] == 'new') {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $user->formatName()."'s Files",
+            'text' => $user->formatName() . "'s Files",
             'href' => "/cms/myFile/{$user->getId()}",
             'class' => '',
         ],
@@ -123,7 +123,7 @@ if ($this->arg[0] == 'new') {
     $trail = new Breadcrumbs();
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
-            'text' => $user->formatName()."'s Files",
+            'text' => $user->formatName() . "'s Files",
             'href' => "/cms/myFile/{$user->getId()}",
             'class' => '',
         ],
@@ -133,7 +133,6 @@ if ($this->arg[0] == 'new') {
             'class' => 'active',
         ]
     ]);
-
 } else {
     // unknown case
     error(2);
@@ -206,12 +205,12 @@ function renderPublishingOptions($page, $userId, $includeImageControllers, $publ
     }
 
     /* Get a list of pages with the File List component in it
-	 * and offer these as places to which you can publish.
-	 */
+     * and offer these as places to which you can publish.
+     */
     $availablePages = $eMap->findPublishablePages($userId);
 
     /* Manufacture the necessary info
-	 */
+     */
     if (is_array($availablePages) && count($availablePages)) {
         $allPageData = array();
 

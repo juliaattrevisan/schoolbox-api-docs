@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps that are intended to be generic across many tests.
  *
@@ -9,7 +10,8 @@
 
 use Behat\Mink\Element;
 
-class Subcontext_CoreContext extends BaseContext {
+class Subcontext_CoreContext extends BaseContext
+{
 
     /**
      * Resets the database to a known clean state.
@@ -22,7 +24,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @Given /^(?:|I )reset the database$/
      * @Given /^(?:|I )wipe the slate clean$/
      */
-    public function startAfresh() {
+    public function startAfresh()
+    {
         $this->getMinkContext()->visit('/test/reset.php');
     }
 
@@ -38,7 +41,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @Given /^(?:|I )do not wipe the slate clean$/
      * @Given /^(?:|I )continue from last scenario$/
      */
-    public function doNotStartAfresh() {
+    public function doNotStartAfresh()
+    {
     }
 
     /**
@@ -54,7 +58,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $password
      * @throws Exception if login failed
      */
-    public function login($username, $password) {
+    public function login($username, $password)
+    {
         $this->loginAttempt($username, $password);
         $this->waitForLink('go-msg', 10000);
     }
@@ -70,7 +75,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $password
      * @throws Exception if either username or password input aren't found
      */
-    public function loginAttempt($username, $password) {
+    public function loginAttempt($username, $password)
+    {
         // Logout first
         $this->logout();
         $page = $this->getSession()->getPage();
@@ -93,7 +99,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @Given /^(?:|I am) logged out$/
      * @Given /^(?:|I )log out$/
      */
-    public function logout() {
+    public function logout()
+    {
         $this->getMinkContext()->visit('/logout.php');
     }
 
@@ -105,7 +112,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $homepage_path
      * @throws Exception if the folder was not found.
      */
-    public function goToHomepage($homepage_path) {
+    public function goToHomepage($homepage_path)
+    {
         $this->getMinkContext()->visit('/resources/');
         $this->traverseTree($this->getSession()->getPage()->find('css', '#category-window'), $homepage_path);
         $this->getCoreContext()->waitForAjax();
@@ -120,7 +128,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $homepage_path
      * @throws Exception if the folder was not found.
      */
-    public function addFolderToHomepage($homepage_path) {
+    public function addFolderToHomepage($homepage_path)
+    {
         $this->getMinkContext()->visit('/resources/');
         $this->traverseTree($this->getSession()->getPage()->find('css', '#category-window'), $homepage_path);
         $this->getCoreContext()->waitForAjax();
@@ -135,7 +144,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $homepage_path
      * @throws Exception if the folder was not found.
      */
-    public function modifyFolder($homepage_path) {
+    public function modifyFolder($homepage_path)
+    {
         $this->getMinkContext()->visit('/resources/');
         $this->traverseTree($this->getSession()->getPage()->find('css', '#category-window'), $homepage_path);
         $this->getCoreContext()->waitForAjax();
@@ -151,7 +161,8 @@ class Subcontext_CoreContext extends BaseContext {
      * @return Element\NodeElement The node that represents the end of the path
      * @throws Exception if the end node couldn't be found
      */
-    public function traverseTree($tree, $path) {
+    public function traverseTree($tree, $path)
+    {
 
         $dirname_list      = array_filter(array_map('trim', explode('/', $path)), 'strlen');
         $current_folder_id = 0;
@@ -161,7 +172,7 @@ class Subcontext_CoreContext extends BaseContext {
             // Click the expand button, if there is one and it isn't expanded.
             // If this is the last item, click "visit homepage" instead.
             /** @var Element\NodeElement[] $child_folder_list */
-            $child_folder_list = $tree->findAll('css', '.child-of-node-'.$current_folder_id);
+            $child_folder_list = $tree->findAll('css', '.child-of-node-' . $current_folder_id);
             $is_dirname_found  = false;
             foreach ($child_folder_list as $child_folder) {
                 $label       = $child_folder->find('css', '.label');
@@ -171,14 +182,13 @@ class Subcontext_CoreContext extends BaseContext {
                 if ($dirname === $folder_name) {
                     $is_dirname_found = true;
                     list(, $current_folder_id) = explode('-', $child_folder->getAttribute('id'));
-                    if ($i < ($count-1)) {
+                    if ($i < ($count - 1)) {
                         // Not last folder: drill down to next in tree
                         if (!$is_expanded) {
                             $child_folder->find('css', '.elbow')->click();
                             $this->getCoreContext()->waitForAjax();
                         }
-                    }
-                    else {
+                    } else {
                         // Last folder: return it
                         $label->click();
                         return $label;
@@ -190,7 +200,8 @@ class Subcontext_CoreContext extends BaseContext {
                 throw new Exception(
                     sprintf(
                         'Could not find folder "%s" in path "%s"',
-                        $dirname, implode('/', array_slice($dirname_list, 0, $i))
+                        $dirname,
+                        implode('/', array_slice($dirname_list, 0, $i))
                     )
                 );
             }
@@ -210,8 +221,9 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $value
      * @throws Exception if the form was not found.
      */
-    public function setConfigurationSetting($type, $name, $value) {
-        $this->getMinkContext()->visit('/adminv2/setting/'.$type);
+    public function setConfigurationSetting($type, $name, $value)
+    {
+        $this->getMinkContext()->visit('/adminv2/setting/' . $type);
         $form  = $this->getSession()->getPage()->find('css', 'form#settings');
         $field = $this->findConfigurationField($form, $name);
         if (!$field) {
@@ -231,8 +243,9 @@ class Subcontext_CoreContext extends BaseContext {
      * @param string $value
      * @throws Exception if the form was not found.
      */
-    public function setResourceConfigurationSetting($type, $name, $value) {
-        $this->getMinkContext()->visit('/adminv2/setting/'.$type);
+    public function setResourceConfigurationSetting($type, $name, $value)
+    {
+        $this->getMinkContext()->visit('/adminv2/setting/' . $type);
         $form  = $this->getSession()->getPage()->find('css', 'form#settings');
         $field = $this->findConfigurationField($form, $name);
         if (!$field) {
@@ -241,7 +254,7 @@ class Subcontext_CoreContext extends BaseContext {
 
         // Click the button
         // Search for the item in the resource builder
-        $button = $form->find('css', 'input[data-input_name="'.$field->getAttribute('name').'"]');
+        $button = $form->find('css', 'input[data-input_name="' . $field->getAttribute('name') . '"]');
         $button->click();
         $this->waitForAjax();
 
@@ -260,7 +273,8 @@ class Subcontext_CoreContext extends BaseContext {
      *
      * @return Element\NodeElement
      */
-    protected function findConfigurationField($form, $name) {
+    protected function findConfigurationField($form, $name)
+    {
         // Name could be either a label text or field name, try field name first.
         $field = $form->findField($name);
         if (!$field) {
@@ -290,14 +304,15 @@ class Subcontext_CoreContext extends BaseContext {
      * @Then /^(?:|I )wait for an? "(?P<element>[^"]*)" element$/
      * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<element>[^"]*)" element$/
      */
-    public function waitForElementOnPage($element, $duration = 5000) {
+    public function waitForElementOnPage($element, $duration = 5000)
+    {
         $this->spin(
-            function($context) use($element) {
+            function ($context) use ($element) {
                 /** @param FeatureContext $context */
                 $context->getMinkContext()->assertElementOnPage($element);
                 return true;
             },
-            ($duration/1000)
+            ($duration / 1000)
         );
     }
 
@@ -307,13 +322,14 @@ class Subcontext_CoreContext extends BaseContext {
      * @Then /^(?:|I )wait for link "(?P<text>(?:[^"]|\\")*)"$/
      * @Then /^(?:|I )wait (?P<duration>\d+)ms for link "(?P<text>(?:[^"]|\\")*)"$/
      */
-    public function waitForLink($link, $duration = 5000) {
+    public function waitForLink($link, $duration = 5000)
+    {
         $this->spin(
-            function($context) use($link) {
+            function ($context) use ($link) {
                 /** @param FeatureContext $context */
                 return $context->getSession()->getPage()->findLink($link) instanceof Element\NodeElement;
             },
-            ($duration/1000)
+            ($duration / 1000)
         );
     }
 
@@ -329,15 +345,16 @@ class Subcontext_CoreContext extends BaseContext {
      * @Then /^(?:|I )wait for "(?P<text>(?:[^"]|\\")*)"$/
      * @Then /^(?:|I )wait (?P<duration>\d+)ms for "(?P<text>(?:[^"]|\\")*)"$/
      */
-    public function waitForText($text, $duration = 5000) {
+    public function waitForText($text, $duration = 5000)
+    {
 
         $this->spin(
-            function($context) use($text) {
+            function ($context) use ($text) {
                 /** @param FeatureContext $context */
                 $context->getMinkContext()->assertPageContainsText($text);
                 return true;
             },
-            ($duration/1000)
+            ($duration / 1000)
         );
     }
 
@@ -353,14 +370,15 @@ class Subcontext_CoreContext extends BaseContext {
      * @Then /^(?:|I )wait for an? "(?P<field>[^"]*)" field$/
      * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<field>[^"]*)" field$/
      */
-    public function waitForFieldOnPage($field, $duration = 5000) {
+    public function waitForFieldOnPage($field, $duration = 5000)
+    {
         $this->spin(
-            function($context) use($field) {
+            function ($context) use ($field) {
                 /** @param FeatureContext $context */
                 $element = $context->getSession()->getPage()->findField($field);
                 return $element instanceof Element\NodeElement;
             },
-            ($duration/1000)
+            ($duration / 1000)
         );
     }
 
@@ -374,7 +392,8 @@ class Subcontext_CoreContext extends BaseContext {
      *
      * @throws Exception if AJAX requests didn't finish in $duration
      */
-    public function waitForAjax($duration = 5000) {
+    public function waitForAjax($duration = 5000)
+    {
         //
         // wat. Sahi fails with a return in the script to evaluate,
         // Selenium fails without one. FAIL
@@ -383,11 +402,11 @@ class Subcontext_CoreContext extends BaseContext {
             $script = 'return (0 === jQuery.active)';
         }
         $this->spin(
-            function($context) use($script) {
+            function ($context) use ($script) {
                 /** @param FeatureContext $context */
                 return $context->getSession()->evaluateScript($script);
             },
-            ($duration/1000)
+            ($duration / 1000)
         );
     }
 
@@ -399,12 +418,13 @@ class Subcontext_CoreContext extends BaseContext {
      * @Then /^(?:|I )wait for an? "(?P<element>[^"]*)" element to be visible$/
      * @Then /^(?:|I )wait (?P<duration>\d+)ms for an? "(?P<element>[^"]*)" element to be visible$/
      */
-    public function waitForVisible($element, $duration = 5000) {
+    public function waitForVisible($element, $duration = 5000)
+    {
         $node = $this->getSession()->getPage()->find('css', $element);
         if (!($element instanceof Element\NodeElement)) {
             throw new Exception("Element \"$element\" was not found on page");
         }
-        $this->delayUntilVisible($node, $duration/1000);
+        $this->delayUntilVisible($node, $duration / 1000);
     }
 
     /**
@@ -417,20 +437,18 @@ class Subcontext_CoreContext extends BaseContext {
      * @When /^(?:|I )fill in wysiwyg "(?P<field>(?:[^"]|\\")*)" with:$/
      * @When /^(?:|I )fill in wysiwyg "(?P<value>(?:[^"]|\\")*)" for "(?P<field>(?:[^"]|\\")*)"$/
      */
-    public function fillWysiwygField($field, $value) {
+    public function fillWysiwygField($field, $value)
+    {
         try {
             $this->getMinkContext()->fillField($field, $value);
-        }
-        catch (\Behat\Mink\Exception\ElementNotFoundException $e) {
+        } catch (\Behat\Mink\Exception\ElementNotFoundException $e) {
             throw $e;
-        }
-        catch (\Behat\Mink\Exception\ElementException $e) {
+        } catch (\Behat\Mink\Exception\ElementException $e) {
             // Element probably wasn't found because it was invisible.
             // Fill it with JS.
             $script  = sprintf('return (tinyMCE.get(%s).setContent(%s) || true)', json_encode($field), json_encode($value));
             $this->getSession()->executeScript($script);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             throw $e;
         }
         // If it worked, this code would've used the "official" way to type into
@@ -450,14 +468,15 @@ class Subcontext_CoreContext extends BaseContext {
 //        $this->getSession()->switchToIFrame(null);
         return;
     }
-    
+
     /**
      * Asserts that title matches a given pattern.
      *
      * @Then /^(?:|I ) should see title containing "(?P<title>(?:[^"]|\\")*)"$/
      * @Then /^title should contain "(?P<title>(?:[^"]|\\")*)"$/
      */
-    public function assertTitle($title) {
+    public function assertTitle($title)
+    {
         $actual_title = $this->getSession()->getPage()->find('xpath', '/head/title');
         if (strpos($actual_title->getText(), $title) === 0) {
             throw new Exception('Title did not match');
@@ -470,7 +489,8 @@ class Subcontext_CoreContext extends BaseContext {
      *
      * @When /^(?:|I )press Enter$/
      */
-    public function pressEnterKey() {
+    public function pressEnterKey()
+    {
         $this->getSession()->executeScript("jQuery(':focus').trigger(jQuery.Event('keypress', {which: 9}));");
     }
 
@@ -479,7 +499,8 @@ class Subcontext_CoreContext extends BaseContext {
      *
      * @When /^(?:|I )click "(?P<link>[^"]*)"$/
      */
-    public function clickLink($link) {
+    public function clickLink($link)
+    {
         $node = $this->getSession()->getPage()->find('css', $link);
         $node->click();
     }

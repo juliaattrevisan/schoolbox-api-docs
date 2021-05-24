@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eportfolio_PermissionMapper
  *
@@ -6,170 +7,180 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Eportfolio;
+
 use Schoolbox;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 
-class PermissionMapper extends Schoolbox\Mapper {
+class PermissionMapper extends Schoolbox\Mapper
+{
 
-	/**
-	 * Define column/property mapping
-	 *
-	 * @return Bool|void
-	 */
-	protected function mapping() {
-		$this->hasTable('eportfolio_permission');
-		$this->hasModel(Permission::class);
+    /**
+     * Define column/property mapping
+     *
+     * @return Bool|void
+     */
+    protected function mapping()
+    {
+        $this->hasTable('eportfolio_permission');
+        $this->hasModel(Permission::class);
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
+        $this->hasMap(array(
+            'column'     => 'id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'page_id',
-			'property'   => 'pageId',
-			'type'       => self::TYPE_INTEGER,
-		));
+        $this->hasMap(array(
+            'column'     => 'page_id',
+            'property'   => 'pageId',
+            'type'       => self::TYPE_INTEGER,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'type',
-			'property'   => 'type',
-			'type'       => self::TYPE_STRING,
-		));
+        $this->hasMap(array(
+            'column'     => 'type',
+            'property'   => 'type',
+            'type'       => self::TYPE_STRING,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'value',
-			'property'   => 'value',
-			'type'       => self::TYPE_INTEGER,
-		));
+        $this->hasMap(array(
+            'column'     => 'value',
+            'property'   => 'value',
+            'type'       => self::TYPE_INTEGER,
+        ));
+    }
 
-	}
+    /**
+     * Facade method
+     *
+     * Create/update all permissions for a particular page
+     *
+     * @param int $pageId
+     * @param int $parent
+     * @param array $group
+     * @param array $individual
+     */
+    public function updatePermissions($pageId, $parent, $group, $individual)
+    {
+        $this->removeAllPermissions($pageId);
 
-	/**
-	 * Facade method
-	 *
-	 * Create/update all permissions for a particular page
-	 *
-	 * @param int $pageId
-	 * @param int $parent
-	 * @param array $group
-	 * @param array $individual
-	 */
-	public function updatePermissions($pageId, $parent, $group, $individual) {
-		$this->removeAllPermissions($pageId);
+        $this->addParentPermissions($pageId, $parent);
+        $this->addGroupPermissions($pageId, $group);
+        $this->addIndividualPermissions($pageId, $individual);
+    }
 
-		$this->addParentPermissions($pageId, $parent);
-		$this->addGroupPermissions($pageId, $group);
-		$this->addIndividualPermissions($pageId, $individual);
-	}
-
-	/**
-	 * Remove all permissions for a particular page
-	 *
-	 * @param int $pageId
-	 */
-	private function removeAllPermissions($pageId) {
-		$statement = $this->database->prepare("
+    /**
+     * Remove all permissions for a particular page
+     *
+     * @param int $pageId
+     */
+    private function removeAllPermissions($pageId)
+    {
+        $statement = $this->database->prepare("
             DELETE FROM  `{$this->table}`
             WHERE page_id = :identifierValue
         ");
 
-		$statement->bindParam(':identifierValue', $pageId);
-		$statement->execute();
-	}
+        $statement->bindParam(':identifierValue', $pageId);
+        $statement->execute();
+    }
 
-	/**
-	 * Add parent permissions to a particular page
-	 *
-	 * @param int $pageId
-	 * @param int $parent
-	 */
-	private function addParentPermissions($pageId, $parent) {
-		if (is_numeric($parent)) {
-			$permission = new Permission();
-			$permission->setPageId($pageId);
+    /**
+     * Add parent permissions to a particular page
+     *
+     * @param int $pageId
+     * @param int $parent
+     */
+    private function addParentPermissions($pageId, $parent)
+    {
+        if (is_numeric($parent)) {
+            $permission = new Permission();
+            $permission->setPageId($pageId);
             $permission->setType(Permission::TYPE_PARENT);
-			$permission->setValue($parent);
+            $permission->setValue($parent);
 
-			$this->save($permission);
-		}
-	}
+            $this->save($permission);
+        }
+    }
 
-	/**
-	 * Add group permissions to a particular page
-	 *
-	 * @param int $pageId
-	 * @param array $allGroups
-	 */
-	private function addGroupPermissions($pageId, $allGroups) {
-		if (is_array($allGroups) && count($allGroups)) {
-			foreach($allGroups as $currentGroup) {
-				if (is_numeric($currentGroup)) {
-					$permission = new Permission();
-					$permission->setPageId($pageId);
+    /**
+     * Add group permissions to a particular page
+     *
+     * @param int $pageId
+     * @param array $allGroups
+     */
+    private function addGroupPermissions($pageId, $allGroups)
+    {
+        if (is_array($allGroups) && count($allGroups)) {
+            foreach ($allGroups as $currentGroup) {
+                if (is_numeric($currentGroup)) {
+                    $permission = new Permission();
+                    $permission->setPageId($pageId);
                     $permission->setType(Permission::TYPE_GROUP);
-					$permission->setValue($currentGroup);
+                    $permission->setValue($currentGroup);
 
-					$this->save($permission);
-				}
-			}
-		}
-	}
+                    $this->save($permission);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Add individual permissions to a particular page
-	 *
-	 * @param int $pageId
-	 * @param array $allIndividuals
-	 */
-	private function addIndividualPermissions($pageId, $allIndividuals) {
-		if (is_array($allIndividuals) && count($allIndividuals)) {
-			foreach($allIndividuals as $currentIndividual) {
-				if (is_numeric($currentIndividual)) {
-					$permission = new Permission();
-					$permission->setPageId($pageId);
+    /**
+     * Add individual permissions to a particular page
+     *
+     * @param int $pageId
+     * @param array $allIndividuals
+     */
+    private function addIndividualPermissions($pageId, $allIndividuals)
+    {
+        if (is_array($allIndividuals) && count($allIndividuals)) {
+            foreach ($allIndividuals as $currentIndividual) {
+                if (is_numeric($currentIndividual)) {
+                    $permission = new Permission();
+                    $permission->setPageId($pageId);
                     $permission->setType(Permission::TYPE_STUDENT);
-					$permission->setValue($currentIndividual);
+                    $permission->setValue($currentIndividual);
 
-					$this->save($permission);
-				}
-			}
-		}
-	}
+                    $this->save($permission);
+                }
+            }
+        }
+    }
 
-	/**
-	 * Find the Parent permission settings for a particular page
-	 *
-	 * @param int $pageId
+    /**
+     * Find the Parent permission settings for a particular page
+     *
+     * @param int $pageId
      * @return Schoolbox\Collection|Permission[]
-	 */
-	public function findParentSetting($pageId) {
-		return $this->findByColumnList(array(
-			'page_id' => $pageId,
+     */
+    public function findParentSetting($pageId)
+    {
+        return $this->findByColumnList(array(
+            'page_id' => $pageId,
             'type' => Permission::TYPE_PARENT,
-		));
-	}
+        ));
+    }
 
-	/**
-	 * TODO: PDO Array support for using WHERE IN
-	 *
-	 * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
-	 * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
-	 *
-	 * @param int $pageId
-	 * @param string $type
-	 * @param array $permittedValues
-	 * @return Collection
-	 */
-	public function findValues($pageId, $type, $permittedValues) {
-		$permittedValuesSql = implode(',', $permittedValues);
+    /**
+     * TODO: PDO Array support for using WHERE IN
+     *
+     * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
+     * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
+     *
+     * @param int $pageId
+     * @param string $type
+     * @param array $permittedValues
+     * @return Collection
+     */
+    public function findValues($pageId, $type, $permittedValues)
+    {
+        $permittedValuesSql = implode(',', $permittedValues);
 
-		$statement = $this->database->prepare("
+        $statement = $this->database->prepare("
             SELECT {$this->getColumnString()}
             FROM `{$this->table}`
             WHERE `page_id` = :pageId
@@ -177,14 +188,14 @@ class PermissionMapper extends Schoolbox\Mapper {
 			AND `value` IN ({$permittedValuesSql})
         ");
 
-		$statement->bindParam(':pageId', $pageId);
-		$statement->bindParam(':type', $type);
-		$statement->execute();
+        $statement->bindParam(':pageId', $pageId);
+        $statement->bindParam(':type', $type);
+        $statement->execute();
 
-		$rowset = $statement->fetchAll();
+        $rowset = $statement->fetchAll();
 
-		return $this->hydrateList($rowset);
-	}
+        return $this->hydrateList($rowset);
+    }
 
 
     /**

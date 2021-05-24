@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -19,8 +20,7 @@ use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
 use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 use Schoolbox\Fixtures\Position\Model as Position;
-
-use \Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 
 /**
  * @method Mapper getMapper()

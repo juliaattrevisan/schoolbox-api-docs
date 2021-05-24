@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit tests for Alaress\Paginator\UrlGenerator class.
  *
@@ -8,12 +9,14 @@
  */
 
 namespace Alaress\Paginator\Test;
+
 use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
 use Zend\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 
-class UrlPaginatorTest extends TestCase {
+class UrlPaginatorTest extends TestCase
+{
 
     /**
      * Simple factory for a test UrlPaginator object.
@@ -24,7 +27,8 @@ class UrlPaginatorTest extends TestCase {
      * @param  string $param
      * @return UrlPaginator
      */
-    protected function buildPaginator($pageSize, $total, $url, $param) {
+    protected function buildPaginator($pageSize, $total, $url, $param)
+    {
         $paginator = new Paginator();
         $paginator->setPageSize($pageSize)->setTotal($total);
         $urlPaginator = new UrlPaginator();
@@ -35,11 +39,13 @@ class UrlPaginatorTest extends TestCase {
         return $urlPaginator;
     }
 
-    protected function getPathFromUrl($url) {
+    protected function getPathFromUrl($url)
+    {
         return parse_url($url, PHP_URL_PATH);
     }
 
-    protected function getQueryFromUrl($url) {
+    protected function getQueryFromUrl($url)
+    {
         parse_str(parse_url($url, PHP_URL_QUERY), $query);
         return $query;
     }
@@ -47,7 +53,8 @@ class UrlPaginatorTest extends TestCase {
     /**
      * Tests for basic URL generation
      */
-    public function testBasicUrl() {
+    public function testBasicUrl()
+    {
         $paginator = $this->buildPaginator(50, 300, 'https://www.google.com', 'p');
         $this->assertEquals('https://www.google.com/?p=1', $paginator->getUrlForPage(1));
         $this->assertEquals('https://www.google.com/?p=2', $paginator->getUrlForPage(2));
@@ -56,7 +63,8 @@ class UrlPaginatorTest extends TestCase {
     /**
      * Tests for URL generation from an incomplete URL
      */
-    public function testIncompleteUrl() {
+    public function testIncompleteUrl()
+    {
         $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b', 'page');
 
         $url = $paginator->getUrlForPage(1);
@@ -71,7 +79,8 @@ class UrlPaginatorTest extends TestCase {
     /**
      * Tests for URL generation from a URL which already has a page number
      */
-    public function testUrlWithPageAlready() {
+    public function testUrlWithPageAlready()
+    {
         $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b&page=3', 'page');
 
         $url = $paginator->getUrlForPage(1);
@@ -87,7 +96,8 @@ class UrlPaginatorTest extends TestCase {
      * Tests for checking that getPageUrls() and getPageUrlsBetween() creates
      * the correct number of pages, and correct URLs
      */
-    public function testPageUrlCount() {
+    public function testPageUrlCount()
+    {
         $paginator = $this->buildPaginator(50, 300, '/resource-booking/item?search=b', 'page');
         $this->assertCount(6, $paginator->getPageUrls());
 
@@ -103,7 +113,8 @@ class UrlPaginatorTest extends TestCase {
      * Tests for checking that getPageUrls() and getPageUrlsBetween() work as
      * expected for empty paginators
      */
-    public function testEmptyPaginatorPageUrlCount() {
+    public function testEmptyPaginatorPageUrlCount()
+    {
         $paginator = $this->buildPaginator(50, 0, '/resource-booking/item?search=b', 'page');
         $this->assertCount(0, $paginator->getPageUrls());
 

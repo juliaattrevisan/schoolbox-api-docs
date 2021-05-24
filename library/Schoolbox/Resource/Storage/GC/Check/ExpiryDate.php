@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\Storage\GC\Check;
-
 
 use Database;
 
@@ -35,5 +35,4 @@ class ExpiryDate extends DbCheck
     {
         return "last_accessed < DATE_SUB(NOW(), INTERVAL $this->window MONTH)";
     }
-
-} 
+}

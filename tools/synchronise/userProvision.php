@@ -28,8 +28,8 @@ $kernel = new Daemon\Kernel(
 
 // Signal handling unique to the provisioner
 // (ticks required for pcntl_signal functions to work)
-declare(ticks = 1);
-$cleanup = function($signo) use ($kernel) {
+declare(ticks=1);
+$cleanup = function ($signo) use ($kernel) {
     /** @var Provisioner $ups */
     $ups = $kernel->getDependencyInjector()->get('ups.provisioner');
     $ups->onInterrupt($signo);

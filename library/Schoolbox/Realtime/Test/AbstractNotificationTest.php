@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Test;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
@@ -253,7 +253,7 @@ abstract class AbstractNotificationTest extends AbstractTest
      */
     protected function clearRabbit()
     {
-        $queuesToClear = [ INSTANCE_ID.'.sb.sched', 'sb.schedule' ];
+        $queuesToClear = [ INSTANCE_ID . '.sb.sched', 'sb.schedule' ];
 
         foreach ($queuesToClear as $q) {
             `rabbitmqadmin get queue=$q count=10000 requeue=false`;

@@ -1,18 +1,20 @@
 <?php
+
 /**
  * @author    James Leckie <james.leckie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource;
 
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
-use \PDO;
+use PDO;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class GroupMapper
@@ -27,7 +29,8 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 class GroupMapper extends Mapper
 {
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasModel(Group::class);
         $this->hasTable('userGroups');
         $this->uses('type', self::TYPE_INTEGER);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -32,7 +33,7 @@ class CanActUponContext implements IAuthorizationRule
      *
      * @param IHasPermission ...$strategies
      */
-    public function __construct(IHasPermission... $strategies)
+    public function __construct(IHasPermission ...$strategies)
     {
         $this->strategies = $strategies;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Routing;
-
 
 class ByUserRouter implements IRouter
 {
@@ -68,5 +68,4 @@ class ByUserRouter implements IRouter
     {
         return $this;
     }
-
 }

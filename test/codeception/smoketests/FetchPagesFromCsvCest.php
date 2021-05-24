@@ -1,8 +1,6 @@
 <?php
 
-
 namespace SmokeTests;
-
 
 use Codeception\Exception\ConditionalAssertionFailed;
 use Codeception\TestInterface;
@@ -39,7 +37,7 @@ class FetchPagesFromCsvCest
      * Fail test to ensure we can get a 404 response from schoolbox.
      *
      * @param IntegrationTester $i
-     * 
+     *
      */
     public function getFailure404(IntegrationTester $i)
     {
@@ -61,7 +59,7 @@ class FetchPagesFromCsvCest
      * Fail test to ensure we can get a permission denied from schoolbox using sitepage
      *
      * @param IntegrationTester $i
-     * 
+     *
      */
     public function getFailureSitePagePermissionDenied(IntegrationTester $i)
     {
@@ -83,7 +81,7 @@ class FetchPagesFromCsvCest
      * Fail test to ensure we can get a permission denied from schoolbox using Aura
      *
      * @param IntegrationTester $i
-     * 
+     *
      */
     public function getFailureAuraPermissionDenied(IntegrationTester $i)
     {
@@ -130,24 +128,22 @@ class FetchPagesFromCsvCest
         $persona      = $example[2];
         $url          = $example[3];
         $expected_result = $example[4];
-        
+
         /*
-         * Due to the data from example url being so huge, over ride the feature to include an extra 
+         * Due to the data from example url being so huge, over ride the feature to include an extra
          * line with the details that can be huge. What user is doing, Persona, URL
         */
         $scenario->setFeature($scenario->getFeature() . PHP_EOL . 'Scenario: ' . $example[1] . ' | ' . $persona . ' | ' . $url);
 
-        if($expected_result=='IGNORE')
-        {
+        if ($expected_result == 'IGNORE') {
             $scenario->skip('Test ignored');
         }
 
-        if(!isset($this->users[$persona]))
-        {
+        if (!isset($this->users[$persona])) {
             $user_details = $this->personas[$persona];
             $this->loginUser($i, $user_details['username'], $user_details['password']);
             $session = $i->getSessionCookie();
-            $this->users[$persona]=[$session];
+            $this->users[$persona] = [$session];
         } else {
             $i->setSessionCookie($this->users[$persona][0]);
         }
@@ -158,26 +154,24 @@ class FetchPagesFromCsvCest
 
         #WHEN
         $i->sendRequest($getPayload);
-        
-        $skippedTest=false;
-        
+
+        $skippedTest = false;
+
         #THEN
         try {
             $i->seeResponseCodeIs('400');
-            $skippedTest=true;
+            $skippedTest = true;
         } catch (\Exception $e) {
             //If its a different code don't catch it
         }
-        
-        if ($skippedTest)
-        {
+
+        if ($skippedTest) {
             $scenario->skip('Error 400 is used sometimes instead of 401');
         }
-        
+
         $i->seeResponseCodeIs($expected_result);
 
         #THEN
-        
     }
 
     /** New Url Provider - reads a csv file to provide an array of data for the fetch all pages test.
@@ -198,7 +192,4 @@ class FetchPagesFromCsvCest
 
         return $csvData;
     }
-
 }
-
-

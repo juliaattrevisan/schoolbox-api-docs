@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,7 +10,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel\CapabilityMark;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Rubric\DataModel\Capability\Model as CapabilityModel;
 use Schoolbox\Mapper\Traits\Model\Id;
-
 
 /**
  * Model for marks on a rubric capability.

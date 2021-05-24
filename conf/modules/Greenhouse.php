@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -8,7 +9,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use \Schoolbox\Greenhouse\Module as GreenhouseModule;
+use Schoolbox\Greenhouse\Module as GreenhouseModule;
 
 class Greenhouse implements ModuleConfigInterface
 {

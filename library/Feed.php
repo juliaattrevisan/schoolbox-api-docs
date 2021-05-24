@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -66,7 +67,15 @@ class Feed
 
         //get each of the areas
         $feedList = array_merge(
-            $files, $links, $folders, $wiki, $forum, $blog, $blogComments, $onlineAssessments, $surveys
+            $files,
+            $links,
+            $folders,
+            $wiki,
+            $forum,
+            $blog,
+            $blogComments,
+            $onlineAssessments,
+            $surveys
         );
 
 
@@ -160,7 +169,6 @@ class Feed
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-
             $url = new Url($row['url']);
             if ($url->isLocalUrl()) {
                 $linkUrl    = $url->getRelativeURL();
@@ -175,8 +183,8 @@ class Feed
                 'type'        => 'icon-link',
                 'message'     => $userHandler->formatName($row) . ' submitted the link ' . Scrub::text($row['name']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' submitted the link <a href="' . $linkUrl . '" rel="' . $linkTarget . '">' . Scrub::text(
-                        $row['name']
-                    ) . '</a>',
+                    $row['name']
+                ) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
                 'cat_name'    => $row['cat_name'],
@@ -341,8 +349,8 @@ class Feed
                 'type'        => 'icon-folder',
                 'message'     => $userHandler->formatName($row) . ' created the folder ' . Scrub::text($row['name']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' created the folder <a href="/homepage/' . $row['id'] . '">' . Scrub::text(
-                        $row['name']
-                    ) . '</a>',
+                    $row['name']
+                ) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
                 'cat_name'    => $row['cat_name'],
@@ -374,14 +382,13 @@ class Feed
         $userHandler = new User();
 
         while ($row = $this->db->getNextArray()) {
-
             $forum[] = [
                 'date'        => $row['submitted'],
                 'type'        => 'icon-forum',
                 'message'     => $userHandler->formatName($row) . ' started the thread ' . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' started the thread <a href="/forum/thread/' . $row['threadID'] . '">' . Scrub::text(
-                        $row['heading']
-                    ) . '</a>',
+                    $row['heading']
+                ) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
                 'cat_name'    => $row['cat_name'],
@@ -426,8 +433,8 @@ class Feed
                 'type'        => 'icon-wiki',
                 'message'     => $userHandler->formatName($row) . ' updated the wiki ' . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' updated the wiki <a href="/wiki/' . $row['categoryID'] . '/' . $row['slug'] . '">' . Scrub::text(
-                        $row['heading']
-                    ) . '</a>',
+                    $row['heading']
+                ) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
                 'cat_name'    => $row['cat_name'],
@@ -474,8 +481,8 @@ class Feed
                 'type'        => 'icon-blog',
                 'message'     => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' updated the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
-                        $row['heading']
-                    ) . '</a>',
+                    $row['heading']
+                ) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
                 'cat_name'    => $row['cat_name'],
@@ -523,8 +530,8 @@ class Feed
                 'type'        => 'icon-blog',
                 'message'     => $userHandler->formatName($row) . ' updated the blog ' . Scrub::text($row['heading']),
                 'messageHTML' => $this->buildUsernameHTML($row, $row['uid'], $userHandler) . ' commented on the blog <a href="/blog/' . $row['blogID'] . '">' . Scrub::text(
-                        $row['heading']
-                    ) . '</a>',
+                    $row['heading']
+                ) . '</a>',
                 'external_id' => $row['external_id'],
                 'user_name'   => $userHandler->formatName($row),
                 'cat_name'    => $row['cat_name'],

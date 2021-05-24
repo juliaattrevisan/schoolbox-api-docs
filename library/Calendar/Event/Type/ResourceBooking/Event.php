@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar event for resource bookings.
  *
@@ -23,7 +24,8 @@ class Event extends Day\Event
      * @param  Model $booking
      * @return $this
      */
-    public function setBooking($booking) {
+    public function setBooking($booking)
+    {
         $this->booking = $booking;
         return $this;
     }
@@ -31,14 +33,16 @@ class Event extends Day\Event
     /**
      * @return Model
      */
-    public function getBooking() {
+    public function getBooking()
+    {
         return $this->booking;
     }
 
     /**
      * @inheritDoc
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->getBooking()->getName() ?: $this->getBooking()->getResource()->getName();
     }
 
@@ -54,12 +58,13 @@ class Event extends Day\Event
     {
         $location = $this->getBooking()->getResource()->getName();
         if ($this->getBooking()->getResource()->getRoomCode()) {
-            $location .= ' ['.$this->getBooking()->getResource()->getRoomCode().']';
+            $location .= ' [' . $this->getBooking()->getResource()->getRoomCode() . ']';
         }
         return $location;
     }
 
-    public function getCategory() {
+    public function getCategory()
+    {
         return $this->getBooking()->getResource()->getCategory()->getName();
     }
 

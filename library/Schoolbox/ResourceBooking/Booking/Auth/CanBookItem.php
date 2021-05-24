@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ResourceBooking\Booking\Auth;
 
 use Alaress\Authorizer\Rule;
@@ -78,7 +80,7 @@ class CanBookItem implements Rule\IAuthorizationRule
             // allow $user to book the item.
             $auth->prependRule(
                 new Rule\Callback(
-                    function($params = array(), User $user = null) use ($item) {
+                    function ($params = array(), User $user = null) use ($item) {
                         if ($user instanceof User) {
                             foreach ($item->getRoleList() as $rolePermission) {
                                 if ($rolePermission->getRole()->getId() == $user->getRole()->getId()) {

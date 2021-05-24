@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -234,16 +235,16 @@ class Model implements ISoftDeletable
     function __clone()
     {
         $this->id = null;
-        if($this->hasQuiz()){
+        if ($this->hasQuiz()) {
             $this->quiz = clone $this->quiz;
         }
-        if($this->hasDueWork()){
+        if ($this->hasDueWork()) {
             $this->dueWork = clone $this->dueWork;
         }
-        if($this->hasTask()){
+        if ($this->hasTask()) {
             $this->task = clone $this->task;
         }
-        if($this->hasProject()){
+        if ($this->hasProject()) {
             $this->project = clone $this->project;
         }
     }

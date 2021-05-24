@@ -66,7 +66,8 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
     /**
      * @inheritdoc
      */
-    public function configure(SitePage $page, $config) {
+    public function configure(SitePage $page, $config)
+    {
         $options = json_decode($config);
 
         $page->setVar(array(
@@ -118,8 +119,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
                         $page->parse('answerOption_block', 'answerOption', true);
                     }
-                }
-                else {
+                } else {
                     $page->setVar('answerOption_block', '');
                 }
             } else {
@@ -219,7 +219,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
             for ($i = 0; $i < $answerCount; $i++) {
                 $page->setVar(
                     array(
-                        'ANSWER_LEFT_VALUE'  => ($i+1).')',
+                        'ANSWER_LEFT_VALUE'  => ($i + 1) . ')',
                         'ANSWER_RIGHT_VALUE' => Scrub::text($right[$i]),
                     )
                 );
@@ -282,7 +282,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
-            if(is_array($allAnswers)){
+            if (is_array($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
                     $page->setVar('ANSWER_RIGHT_VALUE', Scrub::text($currentAnswer->answerRight));
                     $page->parse('answerCorrect_block', 'answerCorrect', true);
@@ -441,7 +441,7 @@ abstract class Evaluation_Answer_Ranking extends Evaluation_Answer
 
                 $page->setVar(
                     array(
-                        'ANSWER_LEFT_VALUE'             => ($i+1).')',
+                        'ANSWER_LEFT_VALUE'             => ($i + 1) . ')',
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,

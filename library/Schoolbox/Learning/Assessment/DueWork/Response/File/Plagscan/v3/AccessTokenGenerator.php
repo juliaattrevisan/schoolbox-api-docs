@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Exception\TransferException;
@@ -104,7 +106,7 @@ class AccessTokenGenerator
                 'form_params' => $postData,
             ]);
         } catch (TransferException $e) {
-            throw new \RuntimeException('Error: Plagscan unavailable. Could not generate access token.'.$e->getMessage());
+            throw new \RuntimeException('Error: Plagscan unavailable. Could not generate access token.' . $e->getMessage());
         }
 
         /* What was the outcome?

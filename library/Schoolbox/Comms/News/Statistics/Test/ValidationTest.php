@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidationTest
  *
@@ -32,7 +33,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validOpenReferrer(): array {
+    public function provider_validOpenReferrer(): array
+    {
         return [
             'Valid referrer: dashboard' => [
                 Statistics\Mapper::REFERRER_DASHBOARD,

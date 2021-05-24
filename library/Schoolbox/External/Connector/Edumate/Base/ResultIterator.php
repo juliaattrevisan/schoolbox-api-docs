@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Edumate-only result iterator wrapper - changes all result keys to lowercase
  * because Edumate is like that.

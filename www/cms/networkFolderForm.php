@@ -1,4 +1,5 @@
 <?php
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -36,7 +37,6 @@ if (isset($_POST['name'])) {
 
     SitePage::localRedir('/drives/' . $folder['id']);
 } elseif (is_numeric($_GET['delete'])) {
-
     if (!$folder = $folderHandler->getByID($_GET['delete'])) {
         error(2);
     }
@@ -90,4 +90,3 @@ function respondFailure($isAjax, $message, $code = 400)
     }
     die($message);
 }
-

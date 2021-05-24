@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit tests for Alaress\Date\Interval class.
  *

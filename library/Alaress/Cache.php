@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,6 +10,7 @@
 namespace Alaress;
 
 use InvalidArgumentException;
+
 use function array_key_exists;
 use function gettype;
 use function is_scalar;
@@ -55,7 +57,7 @@ class Cache
     public function get($key, array $fetchArgs = [], $invalidateCache = false)
     {
         if (!is_scalar($key)) {
-            throw new InvalidArgumentException("Key must be scalar, got ".gettype($key));
+            throw new InvalidArgumentException("Key must be scalar, got " . gettype($key));
         }
 
         if ($invalidateCache) {
@@ -77,7 +79,7 @@ class Cache
      */
     public function invalidate($key)
     {
-        unset ($this->cache[$key]);
+        unset($this->cache[$key]);
         return $this;
     }
 

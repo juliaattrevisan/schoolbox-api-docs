@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker\IO\Listener;
-
 
 use Alaress\Async\Listener\Stream\StreamEvent;
 
@@ -36,5 +36,4 @@ class LogIOListener extends AbstractIOStreamListener
     {
         $this->log->notice($e->getData());
     }
-
 }

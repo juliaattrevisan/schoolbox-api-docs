@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Isams Ping Object
  *

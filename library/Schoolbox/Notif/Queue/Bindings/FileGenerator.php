@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -62,5 +63,4 @@ class FileGenerator implements GeneratorInterface
 
         return $bindings;
     }
-
 }

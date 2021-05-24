@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Lumberjack;
-
 
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\NullHandler;
@@ -18,7 +18,8 @@ use Monolog\Processor\MemoryUsageProcessor;
 use Monolog\Processor\ProcessIdProcessor;
 use Psr\Log\LoggerInterface;
 
-class Logger implements LoggerInterface {
+class Logger implements LoggerInterface
+{
 
     // Command line options
     public const FIELD_MEM      = 'mem';        // Prepend a memory usage field to each log item
@@ -64,7 +65,8 @@ class Logger implements LoggerInterface {
      * @param array    $fields
      * @param bool     $porcelain
      */
-    public function __construct($outStream = STDOUT, $errStream = null, $threshold = Monologger::INFO, $fields = array(), $porcelain = false) {
+    public function __construct($outStream = STDOUT, $errStream = null, $threshold = Monologger::INFO, $fields = array(), $porcelain = false)
+    {
 
         $this->out = $outStream;
         $this->err = $errStream;
@@ -73,17 +75,17 @@ class Logger implements LoggerInterface {
 
         $processors = array(new MicrotimeProcessor());
 
-        if(in_array(self::FIELD_MEM, $fields)) {
+        if (in_array(self::FIELD_MEM, $fields)) {
             $processors[] = new MemoryUsageProcessor(false);
             $processors[] = new MemoryPeakUsageProcessor(false);
         }
 
-        if(in_array(self::FIELD_TRUE_MEM, $fields)) {
+        if (in_array(self::FIELD_TRUE_MEM, $fields)) {
             $processors[] = new MemoryUsageProcessor(true);
             $processors[] = new MemoryPeakUsageProcessor(true);
         }
 
-        if(in_array(self::FIELD_PID, $fields)) {
+        if (in_array(self::FIELD_PID, $fields)) {
             $processors[] = new ProcessIdProcessor();
         }
 
@@ -98,20 +100,20 @@ class Logger implements LoggerInterface {
     private function setLevel($level)
     {
         // attach STDOUT
-        if(is_resource($this->out)) {
+        if (is_resource($this->out)) {
             $handler = new StreamHandler($this->out, $level);
             $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain));
             $this->pushHandler($handler);
         }
 
         // attach STDERR
-        if(is_resource($this->err)) {
+        if (is_resource($this->err)) {
             $handler = new StreamHandler($this->err, max(Monologger::CRITICAL, $level));
             $handler->setFormatter(new TtyFormatter($this->out, $this->porcelain, true));
             $this->pushHandler($handler);
         }
 
-        if($this->out === null && $this->err === null) {
+        if ($this->out === null && $this->err === null) {
             $handler = new NullHandler($level);
             $this->pushHandler($handler);
         }
@@ -268,5 +270,4 @@ class Logger implements LoggerInterface {
             // output stream has already been closed :/
         }
     }
-
 }

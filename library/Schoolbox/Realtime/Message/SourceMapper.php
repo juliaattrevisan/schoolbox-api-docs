@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Realtime\Message;
 
 use Schoolbox\Collection;
@@ -17,7 +19,8 @@ use Schoolbox\Mapper;
 class SourceMapper extends Mapper
 {
 
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('msg_source');
         $this->hasModel(Source::class);
 

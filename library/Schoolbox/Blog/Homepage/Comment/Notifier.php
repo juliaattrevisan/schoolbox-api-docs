@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -275,5 +276,4 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
     {
         return $this->notifyFollowed($comment, $author);
     }
-
 }

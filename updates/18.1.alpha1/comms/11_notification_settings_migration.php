@@ -130,9 +130,9 @@ WHERE posted.msg_source_id = :posted and published.msg_source_id = :published;
      * Search settings and update for each roletypes
      */
     foreach ($sourceIdMap as $roleType => $sourceIds) {
-
         // msg_route_perm
-        $rows = $db->query($selectRoutePerm,
+        $rows = $db->query(
+            $selectRoutePerm,
             [
                 'posted' => $sourceIds['posted'],
                 'published' => $sourceIds['published']
@@ -144,13 +144,13 @@ WHERE posted.msg_source_id = :posted and published.msg_source_id = :published;
             $maskPublished = $row['mask_published'];
             $newMask = mergeOptions($maskPosted, $maskPublished, true);
             if ($newMask !== $maskPosted) {
-                $db->query($updateRoutePermMask,
+                $db->query(
+                    $updateRoutePermMask,
                     [
                         'mask' => $newMask,
                         'msg_source_id' => $sourceIds['posted'],
                         'role_id' => $row['role_id_posted']
                     ]
-
                 );
                 $log->info("Updating mask for 'posted' from {$maskPosted} to {$newMask} for role: {$row['role_id_posted']}");
             }
@@ -159,19 +159,20 @@ WHERE posted.msg_source_id = :posted and published.msg_source_id = :published;
             $defaultPublished = $row['role_default_published'];
             $newDefault = mergeOptions($defaultPosted, $defaultPublished);
             if ($newDefault !== $defaultPosted) {
-                $db->query($updateRoutePermDefault,
+                $db->query(
+                    $updateRoutePermDefault,
                     [
                         'role_default' => $newDefault,
                         'msg_source_id' => $sourceIds['posted'],
                         'role_id' => $row['role_id_posted']
                     ]
-
                 );
             }
         }
 
         // msg_reroute
-        $rows = $db->query($selectReroute,
+        $rows = $db->query(
+            $selectReroute,
             [
                 'posted' => $sourceIds['posted'],
                 'published' => $sourceIds['published']
@@ -186,9 +187,7 @@ WHERE posted.msg_source_id = :posted and published.msg_source_id = :published;
                 $db->query($updateReroute, ['delivery' => $newDelivery,
                         'msg_source_id' => $sourceIds['posted'],
                         'user_id' => $row['user_id_posted']
-                    ]
-
-                );
+                    ]);
                 $log->info("Updating delivery for 'posted' from {$deliveryPosted} to {$newDelivery} for user: {$row['user_id_posted']}");
             }
         }

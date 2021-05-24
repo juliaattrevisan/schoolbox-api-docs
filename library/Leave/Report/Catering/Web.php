@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Leave_Report_Catering_Web
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
 {
@@ -12,16 +13,16 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
     protected $houseMapper = null;
 
     /**
-	 * Setup
-	 */
+     * Setup
+     */
     protected function setup()
     {
         $this->setHouseMapper(HouseResidentialMapper::getInstance());
     }
 
     /**
-	 * Render
-	 */
+     * Render
+     */
     public function render()
     {
         $data = $this->getData();
@@ -39,8 +40,8 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
         ));
 
         /* For each day, render a heading
-		 * Exclude initial Friday -_-
-		 */
+         * Exclude initial Friday -_-
+         */
         for ($i = 0; $i < count($data['dateList']); $i++) {
             $currentDate = $data['dateList'][$i];
 
@@ -52,7 +53,7 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
         }
 
         /* For each day, render totals
-		 */
+         */
         for ($i = 0; $i < count($data['totals']); $i++) {
             $currentSegment = $data['totals'][$i];
 
@@ -66,13 +67,12 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
         }
 
         /* For each house
-		 */
+         */
         if (is_array($data['houseList'][0]) && count($data['houseList'][0])) {
             for ($i = 0; $i < count($data['houseList'][0]); $i++) {
-
                 /* For each day
-				 * (Exclude Friday -_-)
-				 */
+                 * (Exclude Friday -_-)
+                 */
                 for ($j = 0; $j < count($data['dateList']); $j++) {
                     $this->getPage()->setVar(array(
                         'REQUEST_PERIOD_MORNING' => (int)$data['houseList'][$j][$i]['present_morning'],
@@ -84,7 +84,7 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
                 }
 
                 /* Render house row, with alternating background colours
-				 */
+                 */
                 $this->getPage()->setVar(array(
                     'HOUSE_ID' => $data['houseList'][0][$i]['houseId'],
                     'HOUSE_NAME' => Scrub::text($data['houseList'][0][$i]['name']),
@@ -94,7 +94,7 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
                 $this->getPage()->parse('house_block', 'house', true);
 
                 /* Clear children after parsing out the parent
-				 */
+                 */
                 $this->getPage()->setVar('request_period_block', '');
             }
 
@@ -105,33 +105,33 @@ class Leave_Report_Catering_Web extends Leave_Report_Catering_Abstract
     }
 
     /* Getters/Setters
-	 */
+     */
 
     /**
-	 * Get template file
-	 *
-	 * @return string
-	 */
+     * Get template file
+     *
+     * @return string
+     */
     protected function getTemplateFile()
     {
         return $this->templateFile;
     }
 
     /**
-	 * Set house mapper
-	 *
-	 * @param HouseResidentialMapper $houseMapper
-	 */
+     * Set house mapper
+     *
+     * @param HouseResidentialMapper $houseMapper
+     */
     protected function setHouseMapper($houseMapper)
     {
         $this->houseMapper = $houseMapper;
     }
 
     /**
-	 * Get house mapper
-	 *
-	 * @return HouseResidentialMapper
-	 */
+     * Get house mapper
+     *
+     * @return HouseResidentialMapper
+     */
     protected function getHouseMapper()
     {
         return $this->houseMapper;

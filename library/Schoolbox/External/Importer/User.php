@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\External\Importer;
 
 use Alaress\Password\Service;
@@ -232,7 +234,6 @@ class User extends AbstractImporter
     public function save()
     {
         foreach ($this->reader as $i => $row) {
-
             // Step 1: identify user
             $user = $this->retrieveUser($row);
             if (!$user instanceof UserModel) {
@@ -262,7 +263,6 @@ class User extends AbstractImporter
                 } else {
                     $this->updateUser($userResult);
                 }
-
             }
 
             unset($userResult);
@@ -282,12 +282,11 @@ class User extends AbstractImporter
             try {
                 if (!$this->userMapper->save($user)) {
                     $this->log->error('Could not create user!');
-                }
-                else {
+                } else {
                     $this->log->info(sprintf('Created user "%s" (%d)', $user->formatName(), $user->getId()));
                 }
             } catch (\Exception $e) {
-                $this->log->error('User not created: '.$e->getMessage() );
+                $this->log->error('User not created: ' . $e->getMessage());
             }
         } else {
             $this->log->info(sprintf('Pretending to create user "%s"', $user->formatName()));
@@ -307,12 +306,11 @@ class User extends AbstractImporter
             try {
                 if (!$this->userMapper->save($user)) {
                     $this->log->error('Could not update user!');
-                }
-                else {
+                } else {
                     $this->log->info(sprintf('Updated user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);
                 }
             } catch (\Exception $e) {
-                $this->log->error('User not created: '.$e->getMessage() );
+                $this->log->error('User not created: ' . $e->getMessage());
             }
         } else {
             $this->log->info(sprintf('Pretending to update user "%s" (%d)', $user->formatName(), $user->getId()), ['diff' => $diff]);

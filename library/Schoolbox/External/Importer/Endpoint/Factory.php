@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Importer\Endpoint;
@@ -108,7 +110,6 @@ class Factory implements IFactory
     public function produce(?string $file, string $type): ?GenericCollection
     {
         switch ($type) {
-
             /* Produce the composites with optional Mock api connection
              * (use a locally-stored file path)
              */
@@ -119,7 +120,6 @@ class Factory implements IFactory
                     $this->host,
                     $this->key,
                     $file,
-
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),
@@ -127,7 +127,6 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
-
                     /* Timetable pieces
                      */
                     UserMapper::getInstance(),
@@ -146,7 +145,6 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     Loader::getInstance()->get('stream_dir'),
-
                     /* Profile pieces
                      */
                     UserProfile\Mapper::getInstance(),
@@ -154,7 +152,6 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
-
                     /* Timetable pieces
                      */
                     UserMapper::getInstance(),
@@ -171,7 +168,6 @@ class Factory implements IFactory
                     $this->perform,
                     $this->host,
                     $this->key,
-
                     /* Profile pieces
                     */
                     UserProfile\Mapper::getInstance(),
@@ -179,7 +175,6 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
-
                     /* Timetable pieces
                     */
                     CampusMapper::getInstance(),
@@ -199,7 +194,6 @@ class Factory implements IFactory
                     trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
                     (int)Loader::getInstance()->get('external_tass_addnum_father'),
                     (int)Loader::getInstance()->get('external_tass_addnum_mother'),
-
                     /* Profile pieces
                     */
                     UserProfile\Mapper::getInstance(),
@@ -207,7 +201,6 @@ class Factory implements IFactory
                     UserProfile\Parent\Mapper::getInstance(),
                     UserProfile\Staff\Mapper::getInstance(),
                     UserProfile\Relationship\Mapper::getInstance(),
-
                     /* Timetable pieces
                     */
                     TimetableCycleMapper::getInstance(),

@@ -1,13 +1,16 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 
 use External\Tass\Api\Exception\InvalidApiKey;
+
 use function base64_decode;
 use function base64_encode;
 use function json_decode;

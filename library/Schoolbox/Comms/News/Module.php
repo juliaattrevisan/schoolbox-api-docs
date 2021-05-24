@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News;
 
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -104,7 +106,9 @@ class Module extends BaseModule
                     new Rule\HasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_WRITE),
                     new Rule\HasHomepageAccess(
                         UserAccess::ACCESS_WRITE,
-                        function ($params) { return $params['folderId']; },
+                        function ($params) {
+                            return $params['folderId'];
+                        },
                         Access\Access::getInstance()
                     )
                 );
@@ -168,8 +172,7 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Rule\HasHomepageAccess(UserAccess::ACCESS_READ, function ($params) {
                         return $params['folderId'];
-                        }, Access\Access::getInstance()
-                    )
+                    }, Access\Access::getInstance())
                 )
             );
         });
@@ -200,7 +203,6 @@ class Module extends BaseModule
 
         // (async) Get a list of articles published-to/authored-by/moderated-by the user
         $this->register('GET', '/lists/feed', 'getListForIndex', $loggedIn);
-
     }
 
 
@@ -277,7 +279,6 @@ class Module extends BaseModule
                 /* Attach any associated files
                  */
                 $article->setAttachedFiles($this->getArticleMapper()->getJoinMapper('files')->findByColumn('article_id', $article->getId()));
-
             } catch (MapperException $e) {
                 throw new NotFound('Unknown news article.', 0, $e);
             }

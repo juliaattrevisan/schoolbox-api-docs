@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Check whether the schoolbox user record year value is equivalent to $year
  *

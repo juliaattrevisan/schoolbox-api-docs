@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -140,15 +141,14 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                         ));
 
                         $this->parse('video_list_comment_block', 'video_list_comment');
-                    }
-                    else {
+                    } else {
                         $this->setVar(array(
                             'video_list_comment_block' => ''
                         ));
                     }
 
                     // Owner name and optional link
-                    if($video->getFile()->getOwner()->isDeleted()){
+                    if ($video->getFile()->getOwner()->isDeleted()) {
                         $this->setVar('owner_exists_block', '');
                         $this->parse('owner_deleted_block', 'owner_deleted');
                     } else {
@@ -165,8 +165,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
                             ));
 
                             $this->parse('video_pending_comment_block', 'video_pending_comment');
-                        }
-                        else {
+                        } else {
                             $this->setVar(array(
                                 'video_pending_comment_block' => ''
                             ));

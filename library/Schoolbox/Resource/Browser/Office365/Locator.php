@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Browser\Office365;
 
 use Alaress\Authorizer\Failure\AuthenticationTimedOut;
@@ -87,7 +89,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
         } elseif ($item['type'] == 'Folder') {
             return $this->parseFolder($item);
         }
-        throw new InvalidArgumentException('Somehow not a file or folder; got '.$item['type']);
+        throw new InvalidArgumentException('Somehow not a file or folder; got ' . $item['type']);
     }
 
 
@@ -224,7 +226,7 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
      */
     protected function rq($path)
     {
-        $ch = Proxy\Server::getInstance()->curlInit($this->getTenant()->getBaseUri().$path);
+        $ch = Proxy\Server::getInstance()->curlInit($this->getTenant()->getBaseUri() . $path);
 
         curl_setopt_array($ch, [
             CURLOPT_HTTPHEADER     => [ 'Authorization: Bearer ' . $this->oAuthToken ],
@@ -242,11 +244,9 @@ class Locator implements Resource\File\ILocator, Resource\Folder\ILocator, Fetch
 
         // interpret errors
         if (isset($data['error'])) {
-            throw new RuntimeException('Office 365 Exception: '.$data['error']['message']);
-
+            throw new RuntimeException('Office 365 Exception: ' . $data['error']['message']);
         } elseif (isset($data['error_description'])) {
-            throw new Unauthorized('Office 365 Security Exception: '.$data['error_description']);
-
+            throw new Unauthorized('Office 365 Security Exception: ' . $data['error_description']);
         }
 
         return $data;

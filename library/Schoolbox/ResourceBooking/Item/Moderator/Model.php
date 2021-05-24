@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A join model between resources and their moderators.
  *
@@ -12,7 +13,8 @@ namespace Schoolbox\ResourceBooking\Item\Moderator;
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\User;
 
-class Model {
+class Model
+{
 
     /**
      * @var int
@@ -34,7 +36,8 @@ class Model {
      *
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -42,7 +45,8 @@ class Model {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -50,7 +54,8 @@ class Model {
      * @param  Item\Model $item
      * @return $this
      */
-    public function setResource($item) {
+    public function setResource($item)
+    {
         $this->resource = $item;
         return $this;
     }
@@ -58,7 +63,8 @@ class Model {
     /**
      * @return Item\Model
      */
-    public function getResource() {
+    public function getResource()
+    {
         return $this->resource;
     }
 
@@ -66,7 +72,8 @@ class Model {
      * @param  User $user
      * @return $this
      */
-    public function setModerator($user) {
+    public function setModerator($user)
+    {
         $this->moderator = $user;
         return $this;
     }
@@ -74,9 +81,8 @@ class Model {
     /**
      * @return User
      */
-    public function getModerator() {
+    public function getModerator()
+    {
         return $this->moderator;
     }
-
-
 }

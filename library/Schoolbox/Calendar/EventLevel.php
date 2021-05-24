@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventLevel
  *
@@ -11,67 +12,72 @@
 
 namespace Schoolbox\Calendar;
 
+class EventLevel
+{
 
-class EventLevel {
+    /**
+     * Id of the event level
+     *
+     * @var int
+     */
+    private $id = '';
 
-	/**
-	 * Id of the event level
-	 *
-	 * @var int
-	 */
-	private $id = '';
+    /**
+     * Name of the event level
+     *
+     * @var string
+     */
+    private $name = '';
 
-	/**
-	 * Name of the event level
-	 *
-	 * @var string
-	 */
-	private $name = '';
+    /**
+     * Constructor
+     *
+     * @param int $id
+     * @param string $name
+     */
+    public function __construct($id, $name)
+    {
+        $this->setId($id);
+        $this->setName($name);
+    }
 
-	/**
-	 * Constructor
-	 *
-	 * @param int $id
-	 * @param string $name
-	 */
-	public function __construct($id, $name) {
-		$this->setId($id);
-		$this->setName($name);
-	}
+    /**
+     * Set id
+     *
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
 
-	/**
-	 * Set id
-	 *
-	 * @param int $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
+    /**
+     * Get id
+     *
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * Get id
-	 *
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * Set name
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * Set name
-	 *
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
-
-	/**
-	 * Get name
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 }

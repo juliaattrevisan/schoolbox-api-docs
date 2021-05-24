@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Default event source for resource bookings - an alias for
  * Calendar_Api_EventType_ResourceBooking_Booking_ForUser.
@@ -10,6 +11,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-class Calendar_Api_EventType_ResourceBooking_Booking_Default
-    extends Calendar_Api_EventType_ResourceBooking_Booking_ForUser {
+class Calendar_Api_EventType_ResourceBooking_Booking_Default extends Calendar_Api_EventType_ResourceBooking_Booking_ForUser
+{
 }

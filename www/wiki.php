@@ -1,8 +1,8 @@
 <?php
 
 use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Breadcrumbs;
 
 $wikiHandler = new Wiki();
 $groupHandler = new Group(UserAccess::SERVICE_HOMEPAGE);
@@ -29,7 +29,7 @@ if ($this->arg[0] == 'revision') {
         error(101);
     }
 
-    try{
+    try {
         $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
     } catch (\Schoolbox\Mapper\Exception $e) {
         error(2);
@@ -68,8 +68,7 @@ if ($this->arg[0] == 'revision') {
     $locked = ($wiki['locked'] == 'true');
     if ($locked) {
         $this->parse('wiki_locked_block', 'wiki_locked');
-    }
-    else {
+    } else {
         $this->setVar(array(
             'wiki_locked_block' => '',
         ));
@@ -184,8 +183,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         try {
             $folderMapper = new FolderMapper();
             $folder = $folderMapper->findById($this->arg[0]);
-        }
-        catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             error(2);
         }
 
@@ -206,7 +204,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         ]);
     }
     /* Otherwise load it
-	 */
+     */
     else {
         $this->setFile(TEMPLATE_content, 'wiki.html');
         $this->setBlock(TEMPLATE_content, 'modify_link', 'modify_link_block');
@@ -225,7 +223,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
             error(101);
         }
 
-        try{
+        try {
             $folder = FolderMapper::getInstance()->findById($wiki['categoryID']);
         } catch (\Schoolbox\Mapper\Exception $e) {
             error(2);
@@ -264,8 +262,7 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
         $locked = ($wiki['locked'] == 'true');
         if ($locked) {
             $this->parse('wiki_locked_block', 'wiki_locked');
-        }
-        else {
+        } else {
             $this->setVar(array(
                 'wiki_locked_block' => '',
             ));
@@ -363,7 +360,6 @@ elseif (is_numeric($this->arg[0]) && strlen($this->arg[1])) {
             ]
         ]);
     }
-}
-else {
+} else {
     error(2);
 }

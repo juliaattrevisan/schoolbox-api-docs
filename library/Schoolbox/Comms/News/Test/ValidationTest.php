@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidationTest
  *
@@ -23,7 +24,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validBroadcastRequirements(): array {
+    public function provider_validBroadcastRequirements(): array
+    {
         $user = (new User())->setId(19);
         $date = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 14);
         $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
@@ -118,7 +120,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validArticle(): array {
+    public function provider_validArticle(): array
+    {
         $publishAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $expiresAt = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
 
@@ -179,7 +182,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validArticleDates(): array {
+    public function provider_validArticleDates(): array
+    {
         $date1 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 15);
         $date2 = (new \Alaress_Date_Format())->setDateTime(2018, 1, 1, 10, 12, 16);
 
@@ -228,7 +232,8 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function provider_validDateOffset(): array {
+    public function provider_validDateOffset(): array
+    {
         return [
             'Valid (+1 day)' => [
                 '+1 day',
@@ -411,5 +416,3 @@ class ValidationTest extends TestCase
         ];
     }
 }
-
-

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -99,13 +100,12 @@ class MapperProxy extends Mapper\AbstractMapperProxy
 
         $ids = [];
         foreach ($mapperModels as $attempt) {
-
             // Get the last time this record was updated
             $updatedAt = $attempt->getStart();
             /** @var \Alaress_Date_Format[] $interactionPoints */
             $interactionPoints = [$attempt->getFinish(), $attempt->getReviewed()];
-            foreach ($interactionPoints as $interaction){
-                if(!is_null($interaction) && !$interaction instanceof \Alaress_Date_NullDate && $interaction->lt($updatedAt)){
+            foreach ($interactionPoints as $interaction) {
+                if (!is_null($interaction) && !$interaction instanceof \Alaress_Date_NullDate && $interaction->lt($updatedAt)) {
                     $updatedAt = $interaction;
                 }
             }
@@ -169,11 +169,3 @@ class MapperProxy extends Mapper\AbstractMapperProxy
         return $dataModels;
     }
 }
-
-
-
-
-
-
-
-

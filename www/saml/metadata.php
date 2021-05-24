@@ -14,7 +14,7 @@ try {
         echo $metadata;
     } else {
         throw new OneLogin\Saml2\Error(
-            'Invalid SP metadata: '.implode(', ', $errors),
+            'Invalid SP metadata: ' . implode(', ', $errors),
             OneLogin\Saml2\Error::METADATA_SP_INVALID
         );
     }

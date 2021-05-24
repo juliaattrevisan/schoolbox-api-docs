@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
@@ -12,7 +14,9 @@ use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\InvalidColumnException;
 use External_ClassInterface;
 use Schoolbox\UserMapper;
+
 use function array_column;
+
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\Report;
 use DomainException;

@@ -57,7 +57,7 @@ if (is_numeric($this->arg[0])) {
         error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
-    if( $folder->getInherit() ) {
+    if ($folder->getInherit()) {
         error(ErrorMapper::ERROR_GROUP_NIAN_DENIED);
     }
 
@@ -295,7 +295,6 @@ if (is_numeric($this->arg[0])) {
             $this->parse("waiting_block", "waiting", true);
         }
         $this->parse("authorisation_block", "authorisation");
-
     } else {
         $this->setVar("authorisation_block", "");
     }
@@ -304,7 +303,7 @@ if (is_numeric($this->arg[0])) {
        Warning will show if they decrease their perms
     */
 
-    $userAccess = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' =>$this->arg[0], 'service' => UserAccess::SERVICE_HOMEPAGE, 'type' => UserAccess::ACCESS_FULL]);
+    $userAccess = $userAccessMapper->findByColumnList(['uid' => $_SESSION['user']->getId(), 'sid' => $this->arg[0], 'service' => UserAccess::SERVICE_HOMEPAGE, 'type' => UserAccess::ACCESS_FULL]);
     $admin = $userAccess->count();
 
     $this->setVar('ADMIN_NOT_SU', $admin && !$_SESSION['user']->isSuperuser());

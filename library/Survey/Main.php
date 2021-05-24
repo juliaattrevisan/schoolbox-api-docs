@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -111,7 +112,6 @@ class Survey_Main extends Evaluation_Main
         $allAssess = $this->db->getAll($query);
 
         if (is_array($allAssess) && count($allAssess)) {
-
             /* Get a list of questions and answers to softdelete
              */
             $assessHandler = new Survey_Main();

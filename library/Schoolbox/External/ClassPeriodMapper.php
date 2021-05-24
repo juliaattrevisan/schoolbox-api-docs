@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for class objects.
  *
@@ -10,14 +11,17 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox;
 
-class ClassPeriodMapper extends Schoolbox\Mapper {
+class ClassPeriodMapper extends Schoolbox\Mapper
+{
 
     /**
      * {@inheritdoc}
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('sis_class_period');
         $this->hasModel(ClassPeriod::class);
 
@@ -88,7 +92,8 @@ class ClassPeriodMapper extends Schoolbox\Mapper {
      *
      * @return int
      */
-    public function deleteForClassAndPeriod(ClassEntry $class, TimetablePeriod $period) {
+    public function deleteForClassAndPeriod(ClassEntry $class, TimetablePeriod $period)
+    {
         $query = "DELETE FROM `{$this->getTable()}` WHERE `class_id` = :class AND `period_id` = :cycle";
         $statement = $this->database->prepare($query);
         $statement->execute(array('class' => $class->getId(), 'cycle' => $period->getId()));

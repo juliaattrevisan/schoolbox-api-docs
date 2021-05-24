@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NESA Report
  *
@@ -11,6 +12,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Help\Nesa;
 
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
@@ -61,7 +63,7 @@ class Report
      * @param array $indicators
      * @return array
      */
-    public function generate(array $states, int $unaccreditedOnly, array $indicators) :array
+    public function generate(array $states, int $unaccreditedOnly, array $indicators): array
     {
         $dataSet = (new Acquisition(
             $states,

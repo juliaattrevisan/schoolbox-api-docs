@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Condition\Fragment;
 
 /**
@@ -29,7 +31,8 @@ class Fragment
      *
      * @param string $filename
      */
-    public function __construct($filename) {
+    public function __construct($filename)
+    {
         $this->filename = $filename;
     }
 

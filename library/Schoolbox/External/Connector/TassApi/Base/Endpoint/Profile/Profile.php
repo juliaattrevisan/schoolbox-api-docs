@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile;
@@ -466,7 +468,6 @@ class Profile implements IStrategy
 
         if (\count($emergencyContacts['commrules'])) {
             foreach ($emergencyContacts['commrules'][0]['addresses'] as $emergencyContact) {
-
                 /* Use addressee instead of m_ and f_ fields
                  */
                 $name = $emergencyContact['addressee'];
@@ -737,7 +738,6 @@ class Profile implements IStrategy
              * Empty string assumed to mean they are still active, they haven't ended yet
              */
             if ('' !== $value) {
-
                 /* Trim away microseconds
                  */
                 $endDate = new \Alaress_Date_Format(substr($employee['end_date'], 0, 19), \Alaress_Date_Format::DATABASE_FORMAT);
@@ -785,7 +785,6 @@ class Profile implements IStrategy
         $employeeCodec = new Codec\EmployeeExternalId();
 
         foreach ($employeeSetDedupe as $employee) {
-
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [

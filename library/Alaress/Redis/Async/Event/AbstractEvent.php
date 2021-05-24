@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -29,5 +30,4 @@ abstract class AbstractEvent implements IEvent
     {
         return $this->payload;
     }
-
 }

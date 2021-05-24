@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for verifying that checks that a date is at the start of a timespan work as expected.
  *
@@ -88,5 +89,4 @@ class IsAtStartOrEndTest extends TestCase
         $date->endOfDay();
         $this->assertTrue($date->isAtEndOfDay());
     }
-
 }

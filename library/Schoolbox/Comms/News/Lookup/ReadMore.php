@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Lookup;
@@ -10,7 +12,6 @@ namespace Schoolbox\Comms\News\Lookup;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Model;
 use Schoolbox\Comms\News\ValidHasReadMore;
-
 
 /**
  * Class ReadMore
@@ -41,7 +42,8 @@ class ReadMore
      * @param string $readMoreText
      * @param bool   $commentsIsEnabled
      */
-    public function __construct(string $readMoreText, bool $commentsIsEnabled) {
+    public function __construct(string $readMoreText, bool $commentsIsEnabled)
+    {
         $this->readMoreText = $readMoreText;
         $this->commentsIsEnabled = $commentsIsEnabled;
     }

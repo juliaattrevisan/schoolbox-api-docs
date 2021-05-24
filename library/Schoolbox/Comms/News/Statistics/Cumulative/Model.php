@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model
  *
@@ -26,7 +27,7 @@ class Model implements ISoftDeletable
      * @var \Alaress_Date_Format
      */
     private $date;
-    
+
     /**
      * @var int
      */

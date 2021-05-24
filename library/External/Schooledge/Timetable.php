@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -239,7 +240,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
 
         // SchoolEdge doesn't really have period numbers as such - use period name.
         $quotedTime      = $this->database->legacyQuote($dateObject->getDatabaseTime());
-        $timetablePeriod = $this->database->getRow($q="
+        $timetablePeriod = $this->database->getRow($q = "
             SELECT tp.*
             FROM fc.TimetablePeriod tp
 
@@ -428,8 +429,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
                 $newRow['StaffTitle']         = $row['ReplacementStaffTitle'];
                 $newRow['StaffPreferredName'] = $row['ReplacementStaffPreferredName'];
                 $newRow['StaffSurname']       = $row['ReplacementStaffSurname'];
-            }
-            else if ($row['UseBaseStaff']) {
+            } else if ($row['UseBaseStaff']) {
                 $newRow['StaffID']            = $row['BaseStaffID'];
                 $newRow['StaffTitle']         = $row['BaseStaffTitle'];
                 $newRow['StaffPreferredName'] = $row['BaseStaffPreferredName'];
@@ -650,15 +650,14 @@ class External_Schooledge_Timetable implements External_TimetableInterface
             'room'           => $timetabledClass['ReplacementRoom'] ?? $timetabledClass['BaseRoom'] ?? '',
         ];
         if ($timetabledClass['UseReplacementStaff']) {
-            $parts[$classCode.'-'.$timetabledClass['ReplacementStaffID']] = $basePart + [
+            $parts[$classCode . '-' . $timetabledClass['ReplacementStaffID']] = $basePart + [
                     'staffID'        => $timetabledClass['ReplacementStaffID'],
                     'staffFirstname' => $timetabledClass['ReplacementStaffPreferredName'],
                     'staffSurname'   => $timetabledClass['ReplacementStaffSurname'],
                     'staffTitle'     => $timetabledClass['ReplacementStaffTitle'],
                 ];
-        }
-        else if ($timetabledClass['UseBaseStaff']) {
-            $parts[$classCode.'-'.$timetabledClass['BaseStaffID']] = $basePart + [
+        } else if ($timetabledClass['UseBaseStaff']) {
+            $parts[$classCode . '-' . $timetabledClass['BaseStaffID']] = $basePart + [
                 'staffID'        => $timetabledClass['BaseStaffID'],
                 'staffFirstname' => $timetabledClass['BaseStaffPreferredName'],
                 'staffSurname'   => $timetabledClass['BaseStaffSurname'],
@@ -698,7 +697,6 @@ class External_Schooledge_Timetable implements External_TimetableInterface
                 $extraWhere
                 ORDER BY DayNumber asc, PeriodStart asc
             ";
-
         } elseif ($user->getRole()->isStaff()) {
             $query = "
                 {$this->getStaffBlockedTimetableQuery($externalUserId, $campus)}
@@ -708,7 +706,6 @@ class External_Schooledge_Timetable implements External_TimetableInterface
                 $extraWhere
                 ORDER BY DayNumber ASC, PeriodStart ASC
             ";
-
         } else {
             return [];
         }

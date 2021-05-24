@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Quiz;
 
 use Alaress\Authorizer\Authorizer;
@@ -91,7 +93,8 @@ class Module extends RestfulModule
             new Rule\Any(
                 new Rule\HasRole(Role::STAFF),
                 new Rule\IsSuperuser(),
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE,
+                new Rule\HasHomepageAccess(
+                    UserAccess::ACCESS_WRITE,
                     static function ($params) {
                         if ($params['assessment'] instanceof IAssessable) {
                             return $params['assessment']->getBaseContext()->getFolder()->getId();
@@ -126,7 +129,7 @@ class Module extends RestfulModule
 
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $matcher->add('#getQuizSummary#', function($params){
+        $matcher->add('#getQuizSummary#', function ($params) {
             /** @var \Schoolbox\Learning\Assessment\DataModel\MapperProxy $dataSource */
             $dataSource = $this->getInjector()->get('assessmentDataSource');
 

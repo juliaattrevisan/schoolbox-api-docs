@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit tests for Schoolbox\Resource\Folder\Mapper
  *

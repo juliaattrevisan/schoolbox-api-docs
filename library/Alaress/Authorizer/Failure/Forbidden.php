@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization failure - user is forbidden from viewing this page.
 

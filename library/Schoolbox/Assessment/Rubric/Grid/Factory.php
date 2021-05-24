@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -30,7 +31,7 @@ class Factory
      * @return Grid
      * @throws \InvalidArgumentException
      */
-    public function buildFromPostData(Grid $grid, array $postData, bool $validate=true): Grid
+    public function buildFromPostData(Grid $grid, array $postData, bool $validate = true): Grid
     {
         // we're only going to take the first one... this could be converted to foreach easily enough
         $rubricData   = reset($postData);
@@ -141,7 +142,6 @@ class Factory
             $indicatorUsage = new IndicatorUsage($indicator);
 
             foreach ($grid->getLevels() as $levelSequence => $level) {
-
                 if (empty($descriptors[$indicatorId][$levelSequence])) {
                     continue;
                 }
@@ -160,7 +160,7 @@ class Factory
                     // Validate descriptor
                     if ($validate) {
                         $descriptorSpec = new ValidDescriptor($usesMarkRange);
-                        if (! $descriptorSpec->isSatisfiedBy($descriptorValue) ) {
+                        if (! $descriptorSpec->isSatisfiedBy($descriptorValue)) {
                             throw new \InvalidArgumentException('Please use positive numbers only, and disable Mark Range to use decimal places in descriptor point values');
                         }
                     }
@@ -168,7 +168,6 @@ class Factory
                     // Only set the descriptor's value if it was valid
                     $indicatorUsage->getDescriptors()[$levelSequence]->setMaxValue('' !== $descriptorValue ? (float)$descriptorValue : null);
                 }
-
             }
 
             // Validate sequence of descriptor points

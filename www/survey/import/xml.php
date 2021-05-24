@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey import. Uses handlers to import their question types from Moodle format.
  *

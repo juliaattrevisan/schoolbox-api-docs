@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory for creating browsers out of a curriculum source model.
  *
@@ -24,7 +25,7 @@ class BrowserFactory
      */
     public function build(Model $source)
     {
-        $browserClass = $source->getClass().'\\Browser';
+        $browserClass = $source->getClass() . '\\Browser';
         $interface    = '\\Schoolbox\\Curriculum\\Source\\BrowserInterface';
         // PHP 5.5+
 //        $interface    = BrowserInterface::class;

@@ -2,10 +2,12 @@
 
 /* Schoolbox implementation of digest auth for Sabre WebDAV server */
 
-class DAV_Auth_Digest extends Sabre\DAV\Auth\Backend\AbstractDigest {
+class DAV_Auth_Digest extends Sabre\DAV\Auth\Backend\AbstractDigest
+{
 
-    function getDigestHash($realm, $username) {
-        $userHandler = new User;
+    function getDigestHash($realm, $username)
+    {
+        $userHandler = new User();
         $user = $userHandler->getByUsername($username);
         if ($user['hash']) {
             return $user['hash'];
@@ -19,7 +21,7 @@ class DAV_Auth_Digest extends Sabre\DAV\Auth\Backend\AbstractDigest {
         $result = parent::check($request, $response);
         list($authenticated, $username) = $result;
         if ($authenticated) {
-            $username = preg_replace('/^'.preg_quote($this->principalPrefix, '/').'/', '', $username);
+            $username = preg_replace('/^' . preg_quote($this->principalPrefix, '/') . '/', '', $username);
             $session  = new Session();
             $session->create($username);
         }

@@ -1,15 +1,17 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Term\Close;
 
 use Schoolbox\Collection;
-use \Schoolbox\Filter;
-use \Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
+use Schoolbox\Filter;
+use Schoolbox\Filter\Filters\Assessment\Term as AssessmentTermFilter;
 
 /**
  * A factory for building 'Term Close' filter objects

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Message;
-
 
 use Monolog\Logger;
 use OutOfBoundsException;
@@ -79,7 +79,6 @@ class RoutePermissionMapper extends Mapper
     {
         // if this perm is silent, don't save it; delete it!
         if ($object->getMask() === ['MU'] && $object->getDefault() === ['MU']) {
-
             // permissions are a composite-key object, so delete() doesn't work
             $cols = [
                 'msg_source_id' => $object->getMsgSource()->getId(),
@@ -135,7 +134,6 @@ class RoutePermissionMapper extends Mapper
         $schedule = $user->getRole()->getDigestSchedule();
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-
             if (empty($data[$r['ns_id']])) {
                 $data[$r['ns_id']] = [
                     'id'    => $r['ns_id'],
@@ -155,7 +153,6 @@ class RoutePermissionMapper extends Mapper
 
             if ($r['delivery']) {
                 $delivery = array_fill_keys(explode(',', $r['delivery']), true);
-
             } else {
                 $delivery = $default;
             }
@@ -281,7 +278,6 @@ class RoutePermissionMapper extends Mapper
 
                 $precedence[$r['user_id']][$leftness][$rightness] = $r['delivery'];
             }
-
         }
 
         // handle overrides

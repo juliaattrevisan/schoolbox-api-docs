@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JSON handler for ajax-loading admin summary modules.
  *
@@ -19,12 +20,12 @@ $page->initSession();
 
 $output = array();
 
-if(!isset($_POST['module'])) {
+if (!isset($_POST['module'])) {
     // don't bother returning anything
     die();
 }
 
-switch($_POST['module']) {
+switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
         /** @var IConnector $config */
@@ -34,7 +35,7 @@ switch($_POST['module']) {
         $totalUser     = 0;
         $totalLogin    = 0;
 
-        foreach($summary as $group) {
+        foreach ($summary as $group) {
             $output[] = array( 'GROUP_ID'        => $group['id'],
                                'GROUP_NAME'      => Scrub::text($group['name']),
                                'GROUP_USER'      => $group['total'],
@@ -42,16 +43,16 @@ switch($_POST['module']) {
             $totalUser += $group['total'];
             $totalLogin += $group['logged_in'];
         }
-        $output[] = array(  'GROUP_ID'=>'',
-                            'GROUP_NAME'=>'Total',
-                            'GROUP_USER'=>$totalUser,
-                            'GROUP_LOGGED_IN'=>$totalLogin,);
+        $output[] = array(  'GROUP_ID' => '',
+                            'GROUP_NAME' => 'Total',
+                            'GROUP_USER' => $totalUser,
+                            'GROUP_LOGGED_IN' => $totalLogin,);
 
         break;
 
     case 'service_www':
         $context = \Proxy\Server::getInstance()->getContext();
-        if(@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', null, $context)) {
+        if (@file_get_contents('https://repo.schoolbox.com.au/testfile.txt', null, $context)) {
             $output[] = array('WWW_LIGHT'  => 'success',
                               'WWW_STATUS' => 'Available'
             );

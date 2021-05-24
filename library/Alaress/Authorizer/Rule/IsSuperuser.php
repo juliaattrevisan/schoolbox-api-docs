@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This authorization method checks whether the user that is passed is a
  * superuser.

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
@@ -62,7 +64,7 @@ class Module extends BaseModule
 
         $this->register('GET', '/{folderId:\d+}', 'getMarkbook', $canViewPage, $preloadFolder);
         $this->register('POST', '/{folderId:\d+}', 'postMarkbook', $canViewPage, $preloadFolder);
-        $this->register('GET',  '/export/{folderId:\d+}', 'getMarkbookExport', $canViewPage, $preloadFolder);
+        $this->register('GET', '/export/{folderId:\d+}', 'getMarkbookExport', $canViewPage, $preloadFolder);
     }
 
 

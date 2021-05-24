@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
@@ -100,7 +102,6 @@ class OrphanRemover
         $orphans = implode(',', $orphanIds);
 
         if ('' !== $orphans) {
-
             /* Remove orphaned profiles' relationships
              *
              * Sometimes data is broken such that there are relationships between base profiles

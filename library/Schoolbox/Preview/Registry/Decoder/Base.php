@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Decoder
  *
@@ -8,7 +9,6 @@
  */
 
 namespace Schoolbox\Preview\Registry\Decoder;
-
 
 abstract class Base
 {

@@ -1,9 +1,10 @@
 <?php
+
 /************************************************************
 *                                                           *
 *         Copyright (c) 2003-2004 Lektec Consulting         *
 *                                                           *
-*	A collection of standard common functions				*
+*   A collection of standard common functions               *
 *   $Id: stdfuncs.php,v 1.5 2004/04/27 05:16:48 jleckie Exp $
 *                                                           *
 ************************************************************/
@@ -22,12 +23,12 @@ use Alaress\Lumberjack\Logger;
  * @param int    $code    HTTP response code, defaults to 400 (Bad Request)
  * @throws Exception
  */
-function error($ec, $message="", $code = 400)
+function error($ec, $message = "", $code = 400)
 {
     throw ErrorMapper::getInstance()->generateException($ec, null, $message, $code);
 }
 
-if(PHP_SAPI !== 'cli') {
+if (PHP_SAPI !== 'cli') {
     /**
      * An HTTP-sensitive way to send a plaintext failure response.
      *
@@ -63,8 +64,9 @@ if(PHP_SAPI !== 'cli') {
  * @param string $delim
  * @return string
  */
-function camel2score($camel, $delim = '_') {
-    $xpl = preg_split('/([[:upper:]][[:lower:]]+)/', $camel, null, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
+function camel2score($camel, $delim = '_')
+{
+    $xpl = preg_split('/([[:upper:]][[:lower:]]+)/', $camel, null, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
     return strtolower(implode($delim, $xpl));
 }
 
@@ -74,7 +76,8 @@ function camel2score($camel, $delim = '_') {
  * @param string $delim
  * @return string
  */
-function score2camel($score, $delim = '_') {
+function score2camel($score, $delim = '_')
+{
     return lcfirst(score2pascal($score, $delim));
 }
 
@@ -84,9 +87,10 @@ function score2camel($score, $delim = '_') {
  * @param string $delim
  * @return string
  */
-function score2pascal($score, $delim = '_') {
+function score2pascal($score, $delim = '_')
+{
     $xpl = explode($delim, $score);
-    foreach($xpl as &$v) {
+    foreach ($xpl as &$v) {
         $v = ucfirst($v);
     }
     return implode('', $xpl);
@@ -106,7 +110,8 @@ function score2pascal($score, $delim = '_') {
  * @param int    $options
  * @return array|string
  */
-function mb_pathinfo($filepath, $options = null) {
+function mb_pathinfo($filepath, $options = null)
+{
     $regexp = <<<REGEXP
 %^
 (?P<dirname>.*?)
@@ -144,7 +149,6 @@ REGEXP;
         if (strlen($filename)) {
             $ret[$map[PATHINFO_FILENAME]] = $filename;
         }
-
     }
 
     if ($options && isset($map[$options])) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -96,6 +97,5 @@ class TextboxCest
         // Verify what I entered is the heading and body
         $i->canSee("Test Text Box Title");
         $i->canSee("I am textbox content");
-
     }
 }

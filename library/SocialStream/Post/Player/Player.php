@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Player;
 
 /**
@@ -35,7 +37,8 @@ abstract class Player
      *
      * @param string $url
      */
-    public function __construct($url) {
+    public function __construct($url)
+    {
         $this->setUrl($url);
     }
 
@@ -56,7 +59,8 @@ abstract class Player
      *
      * @param Player $next
      */
-    public function setNext($next) {
+    public function setNext($next)
+    {
         $this->next = $next;
     }
 
@@ -65,7 +69,8 @@ abstract class Player
      *
      * @return Player|null
      */
-    public function getNext() {
+    public function getNext()
+    {
         return $this->next;
     }
 
@@ -74,7 +79,8 @@ abstract class Player
      *
      * @param string $url
      */
-    protected function setUrl($url) {
+    protected function setUrl($url)
+    {
         $this->url = $url;
     }
 
@@ -83,7 +89,8 @@ abstract class Player
      *
      * @return string
      */
-    protected function getUrl() {
+    protected function getUrl()
+    {
         return $this->url;
     }
 }

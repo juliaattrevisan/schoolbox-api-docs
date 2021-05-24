@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -23,7 +24,7 @@ class LTI extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $this->loadModule($kernel, LTIComponent::class,     "/lti");
-        $this->loadModule($kernel, LTIConsumer::class,      "/lti-consumer");
+        $this->loadModule($kernel, LTIComponent::class, "/lti");
+        $this->loadModule($kernel, LTIConsumer::class, "/lti-consumer");
     }
 }

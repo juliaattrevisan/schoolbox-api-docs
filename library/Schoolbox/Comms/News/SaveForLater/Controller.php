@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller
  *
@@ -68,7 +69,7 @@ class Controller extends Base
         $params = new News\Querystring($this->getRequest()->query);
         $params->setReferrer(News\Statistics\Mapper::REFERRER_SAVED);
 
-        if ( $this->isXhrRequest() ) {
+        if ($this->isXhrRequest()) {
             $this->getResponse()->content->set($this->buildJsonOutput($articles->getPropertyValues('id')));
             return;
         }
@@ -80,7 +81,6 @@ class Controller extends Base
         $attachmentCounts = $this->fileMapper->findCounts($articles->getPropertyValues('id'));
 
         foreach ($articles as $article) {
-
             /* Attachments aren't actually hydrated in $model, but we got the counts
              * for use in a metadata elsewhere, so we can reuse that fact here by
              * artificially representing the number of files without having the actual
@@ -123,7 +123,7 @@ class Controller extends Base
     {
         try {
             $this->addArticleToUserSavedList($article, $this->getUser());
-        } catch (BaseMapper\Exception|PDOException|UnexpectedValueException $e) {
+        } catch (BaseMapper\Exception | PDOException | UnexpectedValueException $e) {
             // Server-side error, not the client's fault. Developers to be alerted.
             $this->captureException($e);
             $this->getResponse()->status->set(500);

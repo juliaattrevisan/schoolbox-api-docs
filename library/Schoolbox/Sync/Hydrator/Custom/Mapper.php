@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -69,5 +70,4 @@ class Mapper extends BaseMapper
         $model->setHydrator($this->hydratorFactory->produceFromModel($model));
         return $model;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assess_Answer
  *
@@ -8,13 +9,15 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Assess_Answer extends Evaluation_Answer {
+class Assess_Answer extends Evaluation_Answer
+{
 
 
-	/**
-	 * Get an instance of a responseHandler upon instantiation
-	 */
-    public function __construct() {
+    /**
+     * Get an instance of a responseHandler upon instantiation
+     */
+    public function __construct()
+    {
         parent::__construct(new Assess_Response(), new Assess_Question());
     }
 

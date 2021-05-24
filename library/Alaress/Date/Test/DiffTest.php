@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for verifying diffs.
  *
@@ -258,18 +259,30 @@ class DiffTest extends TestCase
             [
                 // 1 month - 1 second: 1 month, apparently
                 // I think it should be 0 but i'm just testing the passthru
-                $this->buildDateObject('2015-03-22 12:34:56', Alaress_Date_Format::DATABASE_FORMAT,
-                    new DateTimeZone('UTC')),
-                $this->buildDateObject('2015-04-22 12:34:55', Alaress_Date_Format::DATABASE_FORMAT,
-                    new DateTimeZone('UTC')),
+                $this->buildDateObject(
+                    '2015-03-22 12:34:56',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')
+                ),
+                $this->buildDateObject(
+                    '2015-04-22 12:34:55',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')
+                ),
                 0,
             ],
             [
                 // 1 month
-                $this->buildDateObject('2015-03-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT,
-                    new DateTimeZone('UTC')),
-                $this->buildDateObject('2015-04-23 12:34:56', Alaress_Date_Format::DATABASE_FORMAT,
-                    new DateTimeZone('UTC')),
+                $this->buildDateObject(
+                    '2015-03-23 12:34:56',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')
+                ),
+                $this->buildDateObject(
+                    '2015-04-23 12:34:56',
+                    Alaress_Date_Format::DATABASE_FORMAT,
+                    new DateTimeZone('UTC')
+                ),
                 1,
             ],
         ];

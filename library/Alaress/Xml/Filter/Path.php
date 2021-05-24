@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Filter iterator for Alaress\Xml\Reader - filters out nodes that don't match
  * a path.

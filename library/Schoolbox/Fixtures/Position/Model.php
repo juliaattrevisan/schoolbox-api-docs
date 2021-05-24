@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,8 +10,8 @@ namespace Schoolbox\Fixtures\Position;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Alaress_Date_Format;
-use \Schoolbox\Fixtures\Sport\Model as Sport;
+use Alaress_Date_Format;
+use Schoolbox\Fixtures\Sport\Model as Sport;
 
 /**
  * Represents a Position a player may take in some Sport.
@@ -56,7 +57,8 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -64,7 +66,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -72,7 +75,8 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @param string $name
      * @return self
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -80,7 +84,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -89,7 +94,8 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @param Sport $sport
      * @return self
      */
-    public function setSport($sport) {
+    public function setSport($sport)
+    {
         $this->sport = $sport;
         return $this;
     }
@@ -97,7 +103,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return Sport
      */
-    public function getSport() {
+    public function getSport()
+    {
         return $this->sport;
     }
 
@@ -105,7 +112,8 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @param Alaress_Date_Format $createdAt
      * @return self
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -113,7 +121,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return Alaress_Date_Format $createdAt
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -121,7 +130,8 @@ class Model implements ISoftDeletable, \JsonSerializable
      * @param Alaress_Date_Format $updatedAt
      * @return self
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt($updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -129,7 +139,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 

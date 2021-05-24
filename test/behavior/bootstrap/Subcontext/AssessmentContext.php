@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps for online assessments.
  *
@@ -9,14 +10,16 @@
 
 use Behat\Mink\Element;
 
-class Subcontext_AssessmentContext extends BaseContext {
+class Subcontext_AssessmentContext extends BaseContext
+{
 
     /**
      * Clicks the "add rubric" button on a homepage.
      *
      * @Then /^(?:|I )edit rubrics$/
      */
-    public function setRubrics() {
+    public function setRubrics()
+    {
         $this->getSession()->getPage()->find('css', '.rubric_listing a.modify')->click();
     }
 
@@ -29,7 +32,8 @@ class Subcontext_AssessmentContext extends BaseContext {
      * @param  string $items
      * @throws Exception if the form isn't found
      */
-    public function addRubricGroup($name, $items) {
+    public function addRubricGroup($name, $items)
+    {
 
         // Find the rubric form, and add a new group to it.
         $this->getCoreContext()->waitForElementOnPage('form.rubric-settings');
@@ -37,7 +41,7 @@ class Subcontext_AssessmentContext extends BaseContext {
         $group = $form->find('css', 'ul#crit-list li.group.new');
         $group_input = $group->find('css', 'input.group.new');
         $this->spin(
-            function() use($group_input) {
+            function () use ($group_input) {
                 return $group_input->isVisible();
             }
         );
@@ -64,7 +68,7 @@ class Subcontext_AssessmentContext extends BaseContext {
             if (strlen($item)) {
                 $item_input = $group->find('css', 'input.item.new');
                 $this->spin(
-                    function() use($item_input) {
+                    function () use ($item_input) {
                         return $item_input->isVisible();
                     }
                 );
@@ -79,7 +83,8 @@ class Subcontext_AssessmentContext extends BaseContext {
      *
      * @Then /^(?:|I )choose 5-level result set$/
      */
-    public function selectFiveLevelResultSet() {
+    public function selectFiveLevelResultSet()
+    {
         $this->getSession()->getPage()->checkField('rs-2');
     }
 
@@ -92,7 +97,8 @@ class Subcontext_AssessmentContext extends BaseContext {
      * @param string $item
      * @throws Exception if the rubric option isn't found
      */
-    public function selectRubricOnDueWork($base_name, $item) {
+    public function selectRubricOnDueWork($base_name, $item)
+    {
         $label_text = "$base_name - $item";
         $form       = $this->getSession()->getPage()->find('css', 'form#createSubmissionForm');
         $input_id   = false;
@@ -123,7 +129,8 @@ class Subcontext_AssessmentContext extends BaseContext {
      * @param  bool   $correct
      * @throws Exception if the form isn't found
      */
-    public function addMultipleChoiceAnswer($position, $answer, $correct = true) {
+    public function addMultipleChoiceAnswer($position, $answer, $correct = true)
+    {
         $form = $this->getSession()->getPage()->find('css', 'form#createQuestionForm');
         if (!($form instanceof Element\NodeElement)) {
             throw new Exception('Add task button not found');
@@ -149,14 +156,16 @@ class Subcontext_AssessmentContext extends BaseContext {
      * @param  string $answer
      * @throws Exception if the form isn't found
      */
-    public function addWrongMultipleChoiceAnswer($position, $answer) {
+    public function addWrongMultipleChoiceAnswer($position, $answer)
+    {
         $this->addMultipleChoiceAnswer($position, $answer, false);
     }
 
     /**
      * @return Element\NodeElement[]
      */
-    protected function getAnswerInputList() {
+    protected function getAnswerInputList()
+    {
         $form = $this->getSession()->getPage()->find('css', 'form#createQuestionForm');
         $list = $form->findAll('css', '#answerCollection .inputs');
         return $list;
@@ -169,9 +178,10 @@ class Subcontext_AssessmentContext extends BaseContext {
      * @param string $answer
      * @param bool   $correct
      */
-    protected function editAnswer($position, $answer, $correct = true) {
+    protected function editAnswer($position, $answer, $correct = true)
+    {
         $element_list = $this->getAnswerInputList();
-        $element      = $element_list[$position-1];
+        $element      = $element_list[$position - 1];
         $element->fillField('answerDescription[]', $answer);
 
 
@@ -181,5 +191,4 @@ class Subcontext_AssessmentContext extends BaseContext {
             $checkbox->click();
         }
     }
-
 }

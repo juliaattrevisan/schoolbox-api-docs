@@ -1,6 +1,6 @@
 <?php
 
-use \Schoolbox\Breadcrumbs;
+use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 
 $forumHandler = new Forum();
@@ -203,9 +203,7 @@ if (is_array($threadList)) {
     $this->setVar(array(
         'no_thread_block' => ''
     ));
-}
-else {
-
+} else {
     $this->parse('no_thread_block', 'no_thread');
     $this->setVar(array(
         'thread_block' => '',
@@ -213,8 +211,8 @@ else {
         'no_post_block' => '',
     ));
 
-    if($is_post_allowed) {
-        $this->parse('no_post_block','no_post');
+    if ($is_post_allowed) {
+        $this->parse('no_post_block', 'no_post');
     }
 }
 

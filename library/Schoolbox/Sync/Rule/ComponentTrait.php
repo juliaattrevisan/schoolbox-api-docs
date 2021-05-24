@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Rule;
-
 
 trait ComponentTrait
 {
@@ -88,5 +88,4 @@ trait ComponentTrait
 
         return $this;
     }
-
 }

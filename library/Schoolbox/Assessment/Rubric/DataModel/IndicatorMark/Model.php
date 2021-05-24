@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -11,7 +12,6 @@ namespace Schoolbox\Assessment\Rubric\DataModel\IndicatorMark;
 use Schoolbox\Assessment\Rubric\DataModel\CapabilityMark\Model as CapabilityMarkModel;
 use Schoolbox\Assessment\Rubric\DataModel\Descriptor\Model as DescriptorModel;
 use Schoolbox\Mapper\Traits\Model\Id;
-
 
 /**
  * Class DescriptorMark

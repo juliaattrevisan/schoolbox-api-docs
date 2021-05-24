@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schoolbox implementation of user connector
  *
@@ -134,7 +135,6 @@ class User extends Base implements IUser
         // Now that we've got the data, work out what to do with it
 
         if (is_array($externalIds)) {
-
             // Requested multiple guardians, return results as a collection
 
             $results = new Collection();
@@ -144,9 +144,7 @@ class User extends Base implements IUser
             }
 
             return $results;
-
         } else {
-
             // Requested a single guardian, return result as a Guardian object
 
             return $this->hydrateGuardian($guardianIterator->current(), $hydrateStudents);
@@ -165,23 +163,19 @@ class User extends Base implements IUser
 
         foreach ($filter as $field => $value) {
             switch ($field) {
-
                 case 'year':
-
                     $filterSql[] = '(`user`.`year` LIKE :year)';
                     $filterBindings['year'] = "%{$value}%";
 
                     break;
 
                 case 'house':
-
                     $filterSql[] = '(`user`.`house` = :house)';
                     $filterBindings['house'] = $value;
 
                     break;
 
                 case 'name':
-
                     $count = 0;
                     $nameSql = '';
 
@@ -205,7 +199,6 @@ class User extends Base implements IUser
                     break;
 
                 case 'boarder':
-
                     $filterSql[] = '(`user`.`boarding_status` LIKE :boardingStatus)';
                     $filterBindings['boardingStatus'] = $value;
 
@@ -304,7 +297,6 @@ class User extends Base implements IUser
         }
 
         return $results;
-
     }
 
     /**
@@ -382,7 +374,6 @@ class User extends Base implements IUser
         // Now that we've got the data, work out what to do with it
 
         if (is_array($externalIds)) {
-
             // Requested multiple guardians, return results as a collection
 
             $results = new Collection();
@@ -392,9 +383,7 @@ class User extends Base implements IUser
             }
 
             return $results;
-
         } else {
-
             // Requested a single guardian, return result as a Guardian object
 
             return $this->hydrateStudent($studentIterator->current(), $hydrateGuardians);
@@ -545,7 +534,6 @@ class User extends Base implements IUser
         // Now that we've got the data, work out what to do with it
 
         if (is_array($externalIds)) {
-
             // Requested multiple staff, return results as a collection
 
             $results = new Collection();
@@ -555,9 +543,7 @@ class User extends Base implements IUser
             }
 
             return $results;
-
         } else {
-
             // Requested a single staff, return result as a Staff object
 
             return $this->hydrateStaff($staffIterator->current());
@@ -629,7 +615,7 @@ class User extends Base implements IUser
         // depending on what was requested
 
         if (is_array($externalIds)) {
-            return new Collection;
+            return new Collection();
         } else {
             return false;
         }
@@ -644,7 +630,8 @@ class User extends Base implements IUser
 
         $externalIdBindings = $this->databaseExternal->prepareInBindings($externalIds);
 
-        $statement = $this->databaseExternal->executeQuery("
+        $statement = $this->databaseExternal->executeQuery(
+            "
                 SELECT      CONCAT(lastname, ', ' , firstname) AS `name`,
                             `alt_email` as `email`
                 FROM        `user`
@@ -734,7 +721,6 @@ class User extends Base implements IUser
         $campusCodes = explode(chr(0x1E), $studentRow['campusCodes']);
 
         if (count($campusIds) > 0) {
-
             $campusCollection = new Collection();
 
             for ($i = 0; $i < count($campusIds); $i++) {
@@ -760,19 +746,14 @@ class User extends Base implements IUser
         $guardianIds = explode(chr(0x1E), $studentRow['guardianIds']);
 
         if (count($guardianIds) > 0) {
-
             $guardianCollection = new Collection();
 
             for ($i = 0; $i < count($guardianIds); $i++) {
-
                 if ($hydrateGuardians) {
-
                     // Return hydrated guardian record
 
                     $guardian = $this->getGuardians($guardianIds[$i]);
-
                 } else {
-
                     // Just return a blank guardian record with their ID
 
                     $guardian = new Guardian();
@@ -844,7 +825,6 @@ class User extends Base implements IUser
         $campusCodes = explode(chr(0x1E), $staffRow['campusCodes']);
 
         if (count($campusIds) > 0) {
-
             $campusCollection = new Collection();
 
             for ($i = 0; $i < count($campusIds); $i++) {
@@ -921,7 +901,6 @@ class User extends Base implements IUser
         $campusCodes = explode(chr(0x1E), $guardianRow['campusCodes']);
 
         if (count($campusIds) > 0) {
-
             $campusCollection = new Collection();
 
             for ($i = 0; $i < count($campusIds); $i++) {
@@ -947,17 +926,14 @@ class User extends Base implements IUser
         $studentIds = explode(chr(0x1E), $guardianRow['studentIds']);
 
         if (count($studentIds) > 0) {
-
             $studentCollection = new Collection();
 
             for ($i = 0; $i < count($studentIds); $i++) {
-
                 // Check if we wanted the student records hydrated
 
                 if ($hydrateStudents) {
                     $student = $this->getStudents($studentIds[$i]);
                 } else {
-
                     // We didn't want a fully hydrated student, just return a blank student with the external ID
 
                     $student = new Student();

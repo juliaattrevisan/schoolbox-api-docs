@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Boolean column type - either true or false.
  *
@@ -12,24 +13,28 @@
 
 namespace Schoolbox\Column;
 
-class Boolean implements IColumnType {
-	protected function isBoolean($value) {
-		if (is_numeric($value)) {
-			return floatval($value) ? true : false;
-		}
-		if (is_string($value)) {
-			return trim($value) ? true : false;
-		}
-		return $value ? true : false;
-	}
+class Boolean implements IColumnType
+{
+    protected function isBoolean($value)
+    {
+        if (is_numeric($value)) {
+            return floatval($value) ? true : false;
+        }
+        if (is_string($value)) {
+            return trim($value) ? true : false;
+        }
+        return $value ? true : false;
+    }
 
-	public function hydrate($value, $mapper = null) {
-		return $this->isBoolean($value);
-	}
+    public function hydrate($value, $mapper = null)
+    {
+        return $this->isBoolean($value);
+    }
 
-	public function dehydrate($value, $mapper = null) {
-		return $this->isBoolean($value) ? 1 : 0;
-	}
+    public function dehydrate($value, $mapper = null)
+    {
+        return $this->isBoolean($value) ? 1 : 0;
+    }
 
 
     /**

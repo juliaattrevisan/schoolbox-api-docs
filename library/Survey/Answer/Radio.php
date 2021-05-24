@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Answer_Radio
  *
@@ -91,7 +92,8 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
-                if ($existing['response']
+                if (
+                    $existing['response']
                     && is_array($existingAnswer)
                     && in_array($currentAnswer->value, $existingAnswer)
                 ) {
@@ -117,7 +119,8 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
     /**
      * @inheritdoc
      */
-    public function configure(SitePage $page, $config) {
+    public function configure(SitePage $page, $config)
+    {
         $options = json_decode($config);
 
         $page->setVar(array(
@@ -132,7 +135,8 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
      * @param SitePage $page
      * @param int $question_id
      */
-    protected function configureResponse($page, $question_id) {
+    protected function configureResponse($page, $question_id)
+    {
         $question = $this->questionHandler->getByID($question_id);
         $config = json_decode($question['config']);
 

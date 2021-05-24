@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 use Custom\Diocesan\AchievementReport\Base as AchievementReportBase;
@@ -180,7 +182,8 @@ abstract class Base extends AchievementReportBase
     /**
      * Explorer, reporting!
      */
-    protected function explorerReporting() {
+    protected function explorerReporting()
+    {
         $explorer = $this->db->executeQuery("
             SELECT TOP 5 *
             FROM dbo.uvSchoolBoxSchoolGradeResults

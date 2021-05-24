@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\User;
@@ -247,7 +249,6 @@ class BulkUpdater
          * https://stackoverflow.com/questions/652770/delete-with-join-in-mysql)
          */
         if (\count($statements['campus']['insert']['params'])) {
-
             /* Updating a user's campus
              */
             $statements['campus']['delete']['statement']->execute();
@@ -277,7 +278,6 @@ class BulkUpdater
          * despite being provided vars
          */
         if ($updated) {
-
             /* Should updating a user's campus also cause the user.updated_at field to change?
              *
              * There were three options:
@@ -319,8 +319,7 @@ class BulkUpdater
     {
         $statement = $this->userBulkMapper->getDatabase()->prepare("
             SELECT id, firstname, lastname FROM `user`
-            WHERE id IN ({$userIds})"
-        );
+            WHERE id IN ({$userIds})");
 
         $statement->execute();
 
@@ -352,13 +351,13 @@ class BulkUpdater
                 ],
                 'insert' => [
                     'statement' => null,
-                    'params' =>[]
+                    'params' => []
                 ]
             ],
             'user' => [
                 'update' => [
                     'statement' => null,
-                    'params' =>[]
+                    'params' => []
                 ]
             ],
         ];

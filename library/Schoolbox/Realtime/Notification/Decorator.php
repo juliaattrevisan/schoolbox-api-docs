@@ -1,10 +1,12 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Realtime\Notification;
@@ -105,7 +107,6 @@ class Decorator extends NotificationBundle
                         $array[$n->getId()]['meta'][$k] = $fqdn . $value;
                     }
                 }
-
             } catch (UnderflowException $e) {
                 unset($array[$n->getId()]);
             }
@@ -284,7 +285,6 @@ class Decorator extends NotificationBundle
         $text = $notification->getTitle();
 
         foreach ($notification->getParameters() as $token => $timeParams) {
-
             if (!count($timeParams)) {
                 // if this occurs, it's a bug in the notifier that created this notification.
                 throw new UnderflowException("Message '$text' contains no params for token '$token'");
@@ -412,5 +412,4 @@ class Decorator extends NotificationBundle
         }
         return $notification->getIcon();
     }
-
 }

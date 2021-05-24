@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Routing\Filter;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\User;
@@ -32,5 +32,4 @@ class RoletypeFilter extends ContextFilter
         }
         return true;
     }
-
 }

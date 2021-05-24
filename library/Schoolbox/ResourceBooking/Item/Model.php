@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A representation of a bookable resource.
  *
@@ -19,7 +20,8 @@ use Alaress\Date\Interval;
 use Schoolbox\User;
 use JsonSerializable;
 
-class Model implements ISoftDeletable, JsonSerializable {
+class Model implements ISoftDeletable, JsonSerializable
+{
 
     /**
      * @var int
@@ -113,7 +115,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      */
     protected $bookingIsAuthorized = false;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->setImage(new Storage\Model());
     }
 
@@ -121,7 +124,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Category\Model $category
      * @return $this
      */
-    public function setCategory($category) {
+    public function setCategory($category)
+    {
         $this->category = $category;
         return $this;
     }
@@ -129,7 +133,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Category\Model
      */
-    public function getCategory() {
+    public function getCategory()
+    {
         return $this->category;
     }
 
@@ -138,7 +143,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      *
      * @return $this
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -146,7 +152,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -154,7 +161,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Alaress_Date_Format $deletedAt
      * @return $this
      */
-    public function setDeletedAt($deletedAt) {
+    public function setDeletedAt($deletedAt)
+    {
         $this->deletedAt = $deletedAt;
         return $this;
     }
@@ -162,7 +170,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getDeletedAt() {
+    public function getDeletedAt()
+    {
         return $this->deletedAt;
     }
 
@@ -170,7 +179,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  string $description
      * @return $this
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
         return $this;
     }
@@ -178,7 +188,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 
@@ -186,7 +197,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -194,7 +206,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -202,7 +215,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Interval $maxReservationTime
      * @return $this
      */
-    public function setMaxReservationTime($maxReservationTime) {
+    public function setMaxReservationTime($maxReservationTime)
+    {
         $this->maxReservationTime = $maxReservationTime;
         return $this;
     }
@@ -210,7 +224,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Interval
      */
-    public function getMaxReservationTime() {
+    public function getMaxReservationTime()
+    {
         return $this->maxReservationTime;
     }
 
@@ -218,7 +233,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Boolean $currentTermRestriction
      * @return $this
      */
-    public function setCurrentTermRestriction($currentTermRestriction) {
+    public function setCurrentTermRestriction($currentTermRestriction)
+    {
         $this->currentTermRestriction = $currentTermRestriction;
         return $this;
     }
@@ -226,7 +242,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Boolean
      */
-    public function getCurrentTermRestriction() {
+    public function getCurrentTermRestriction()
+    {
         return $this->currentTermRestriction;
     }
 
@@ -234,7 +251,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Interval $minLeadTime
      * @return $this
      */
-    public function setMinLeadTime($minLeadTime) {
+    public function setMinLeadTime($minLeadTime)
+    {
         $this->minLeadTime = $minLeadTime;
         return $this;
     }
@@ -242,7 +260,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Interval
      */
-    public function getMinLeadTime() {
+    public function getMinLeadTime()
+    {
         return $this->minLeadTime;
     }
 
@@ -250,7 +269,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Interval $minReservationTime
      * @return $this
      */
-    public function setMinReservationTime($minReservationTime) {
+    public function setMinReservationTime($minReservationTime)
+    {
         $this->minReservationTime = $minReservationTime;
         return $this;
     }
@@ -258,7 +278,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Interval
      */
-    public function getMinReservationTime() {
+    public function getMinReservationTime()
+    {
         return $this->minReservationTime;
     }
 
@@ -266,7 +287,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Alaress_Date_Format $modifiedAt
      * @return $this
      */
-    public function setModifiedAt($modifiedAt) {
+    public function setModifiedAt($modifiedAt)
+    {
         $this->modifiedAt = $modifiedAt;
         return $this;
     }
@@ -274,7 +296,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getModifiedAt() {
+    public function getModifiedAt()
+    {
         return $this->modifiedAt;
     }
 
@@ -283,7 +306,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      *
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -291,7 +315,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -299,7 +324,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  string $roomCode
      * @return $this
      */
-    public function setRoomCode($roomCode) {
+    public function setRoomCode($roomCode)
+    {
         $this->roomCode = $roomCode;
         return $this;
     }
@@ -307,7 +333,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return string
      */
-    public function getRoomCode() {
+    public function getRoomCode()
+    {
         return $this->roomCode;
     }
 
@@ -315,7 +342,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  ModerationType\Model $moderationType
      * @return $this
      */
-    public function setModerationType($moderationType) {
+    public function setModerationType($moderationType)
+    {
         $this->moderationType = $moderationType;
         return $this;
     }
@@ -323,7 +351,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return ModerationType\Model
      */
-    public function getModerationType() {
+    public function getModerationType()
+    {
         return $this->moderationType;
     }
 
@@ -331,7 +360,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Storage\Model $image
      * @return $this
      */
-    public function setImage($image) {
+    public function setImage($image)
+    {
         $this->image = $image;
         return $this;
     }
@@ -339,7 +369,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Storage\Model
      */
-    public function getImage() {
+    public function getImage()
+    {
         return $this->image;
     }
 
@@ -347,7 +378,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Collection|User[] $moderatorList
      * @return $this
      */
-    public function setModeratorList($moderatorList) {
+    public function setModeratorList($moderatorList)
+    {
         $this->moderatorList = $moderatorList;
         return $this;
     }
@@ -355,7 +387,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Collection|User[]
      */
-    public function getModeratorList() {
+    public function getModeratorList()
+    {
         return $this->moderatorList;
     }
 
@@ -363,7 +396,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  User $moderator
      * @return $this
      */
-    public function addModerator($moderator) {
+    public function addModerator($moderator)
+    {
         return $this->getModeratorList()->add($moderator);
     }
 
@@ -371,7 +405,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  Collection|self[] $relatedResourceList
      * @return $this
      */
-    public function setRelatedResourceList($relatedResourceList) {
+    public function setRelatedResourceList($relatedResourceList)
+    {
         $this->relatedResourceList = $relatedResourceList;
         return $this;
     }
@@ -379,7 +414,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Collection|self[]
      */
-    public function getRelatedResourceList() {
+    public function getRelatedResourceList()
+    {
         return $this->relatedResourceList;
     }
 
@@ -387,7 +423,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  self  $resource
      * @return $this
      */
-    public function addRelatedResource($resource) {
+    public function addRelatedResource($resource)
+    {
         $this->getRelatedResourceList()->add($resource);
         return $this;
     }
@@ -397,7 +434,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      *
      * @return $this
      */
-    public function setRoleList($roleList) {
+    public function setRoleList($roleList)
+    {
         $this->roleList = $roleList;
         return $this;
     }
@@ -405,7 +443,8 @@ class Model implements ISoftDeletable, JsonSerializable {
     /**
      * @return Collection|RolePermission\Model[]
      */
-    public function getRoleList() {
+    public function getRoleList()
+    {
         return $this->roleList;
     }
 
@@ -432,7 +471,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      * @param  RolePermission\Model $role
      * @return $this
      */
-    public function addRole($role) {
+    public function addRole($role)
+    {
         $this->getRoleList()->add($role);
         return $this;
     }
@@ -442,7 +482,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      *
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 
@@ -464,7 +505,8 @@ class Model implements ISoftDeletable, JsonSerializable {
             return true;
         }
         foreach ($user->getAccessList() as $access) {
-            if ($access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
+            if (
+                $access->getService() == UserAccess::SERVICE_RESOURCE_BOOKING
                 && $access->getAccessLevel() == UserAccess::ACCESS_FULL
             ) {
                 return true;
@@ -483,7 +525,8 @@ class Model implements ISoftDeletable, JsonSerializable {
      *
      * @return array
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return array(
             'id'                   => $this->getId(),
             'name'                 => $this->getName(),
@@ -499,5 +542,4 @@ class Model implements ISoftDeletable, JsonSerializable {
             'bookingIsAuthorized'  => $this->getBookingIsAuthorized(),
         );
     }
-
 }

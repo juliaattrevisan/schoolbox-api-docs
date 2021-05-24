@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Discussion\Test;
@@ -164,7 +166,9 @@ class DataGenerator
         return implode(
             '',
             array_map(
-                function ($p) { return sprintf('<p>%s</p>', $p); },
+                function ($p) {
+                    return sprintf('<p>%s</p>', $p);
+                },
                 $this->faker->paragraphs($nb)
             )
         );

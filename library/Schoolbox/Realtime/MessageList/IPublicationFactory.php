@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\QueueInterface;
-
 
 interface IPublicationFactory extends IListFactory
 {
@@ -26,5 +26,4 @@ interface IPublicationFactory extends IListFactory
      * @return QueueInterface
      */
     public function email($userId);
-
 }

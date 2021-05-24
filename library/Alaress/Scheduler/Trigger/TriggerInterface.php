@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,7 +10,6 @@
 namespace Alaress\Scheduler\Trigger;
 
 use Alaress\Scheduler\Event\EventInterface;
-
 
 /**
  * At its most basic, a Trigger is a "what, when, how, why":
@@ -21,28 +21,29 @@ use Alaress\Scheduler\Event\EventInterface;
  * Interface TriggerInterface
  * @package Alaress\Schedule\Trigger
  */
-interface TriggerInterface {
+interface TriggerInterface
+{
 
-	/**
-	 * Return the timestamp at which this trigger should fire (can be in the past)
-	 *
-	 * @return int
-	 */
-	public function getTimestamp();
+    /**
+     * Return the timestamp at which this trigger should fire (can be in the past)
+     *
+     * @return int
+     */
+    public function getTimestamp();
 
-	/**
-	 * Return an array of callables that are appropriate for this trigger
-	 *
-	 * @return callable[]
-	 */
-	public function getCallbacks();
+    /**
+     * Return an array of callables that are appropriate for this trigger
+     *
+     * @return callable[]
+     */
+    public function getCallbacks();
 
-	/**
-	 * Return the trigger label that this trigger is based on
-	 *
-	 * @return string
-	 */
-	public function getLabel();
+    /**
+     * Return the trigger label that this trigger is based on
+     *
+     * @return string
+     */
+    public function getLabel();
 
     /**
      * Return the event that precipitated this trigger
@@ -82,5 +83,4 @@ interface TriggerInterface {
      * @return string
      */
     public function getEventObjectHash(): string;
-
 }

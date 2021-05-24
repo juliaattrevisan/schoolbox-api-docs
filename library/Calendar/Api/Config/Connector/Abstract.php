@@ -105,7 +105,7 @@ abstract class Calendar_Api_Config_Connector_Abstract implements Calendar_Api_Co
 
 
     /* Getters/Setters
-	 */
+     */
 
     /**
      * Set event type

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper
  *
@@ -80,7 +81,6 @@ class Mapper extends BaseMapper
         $eventIds = $this->findEventIdsUsingSource($sourceName);
 
         if (count($eventIds)) {
-
             /* Delete relations
              */
             PersonalMapper::getInstance()->deleteByColumn('event_id', $eventIds);
@@ -104,7 +104,6 @@ class Mapper extends BaseMapper
              */
             $deleteEvents = EventMapper::getInstance()->findByColumn('id', $eventIds, ['deleted' => true]);
             EventMapper::getInstance()->hardDelete($deleteEvents);
-
         }
     }
 }

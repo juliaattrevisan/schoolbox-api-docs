@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 /**
@@ -27,7 +29,8 @@ class GradeSummary extends Base
      *
      * @return mixed
      */
-    public function findData() {
+    public function findData()
+    {
 
         /**
          * Rearrange everything into a nice order
@@ -63,8 +66,7 @@ class GradeSummary extends Base
                             if ($fileyear == $this->getCurrentYear()) {
                                 if (!$this->isProgressive($data['Result'])) {
                                     $letter = $data['StrippedResult'];
-                                }
-                                else {
+                                } else {
                                     $letter = '';
                                 }
                             }
@@ -84,7 +86,7 @@ class GradeSummary extends Base
 
         /* Available Grades
          */
-        foreach($finalStack as $currentYear => $data) {
+        foreach ($finalStack as $currentYear => $data) {
             $finalStack[$currentYear]['availableGrades'] = $data['enteredGrades'] - array_sum($data['letters']);
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\Realtime\MessageList;
 
 use Alaress\Async\Queue\RedisQueue;
 use Predis\ClientInterface;
-
 
 abstract class AbstractList extends RedisQueue
 {
@@ -87,7 +87,5 @@ abstract class AbstractList extends RedisQueue
     /**
      * @return string
      */
-    protected abstract function getSuffix();
-
-
+    abstract protected function getSuffix();
 }

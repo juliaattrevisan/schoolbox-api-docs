@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -72,23 +73,18 @@ class DueWorkTest extends TestCase
                 ->add((new DueWorkFile())
                     ->setId(33)
                     ->setFilename('a file')
-                    ->setStorage($storage1)
-                )
+                    ->setStorage($storage1))
                 ->add((new DueWorkFile())
                     ->setId(65)
                     ->setFilename('an image')
-                    ->setStorage($storage2)
-                )
+                    ->setStorage($storage2))
                 ->add((new DueWorkFile())
                     ->setId(82)
                     ->setFilename('a sound')
-                    ->setStorage($storage3)
-                )
-            )
+                    ->setStorage($storage3)))
             ->setWorkType((new WorkType())
                 ->setId(12)
-                ->setName('A dumb type')
-            )
+                ->setName('A dumb type'))
             ->setMarkScheme(new None())
             ->setUseRubric(true)
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
@@ -353,8 +349,7 @@ class DueWorkTest extends TestCase
                     ->setId(33)
                     ->setWorkType((new WorkType())
                         ->setId(12)
-                        ->setName('A dumb type')
-                    )
+                        ->setName('A dumb type'))
             )
             ->setSkipUnsubmitted(false)
             ->setAcceptOnline(true)
@@ -364,8 +359,7 @@ class DueWorkTest extends TestCase
             ->setAttachments((new GenericCollection(SubmissionBox\SingleFile\Model::class))
                 ->add($file1)
                 ->add($file2)
-                ->add($file3)
-            )
+                ->add($file3))
             ->setMarkType($this->buildMarkType())
             ->setSelfReviewability(DueWorkModel::SELF_REVIEWABILITY_FULL)
         ;
@@ -418,8 +412,7 @@ class DueWorkTest extends TestCase
                     ->setId(33)
                     ->setWorkType((new WorkType())
                         ->setId(12)
-                        ->setName('A dumb type')
-                    )
+                        ->setName('A dumb type'))
             );
 
         $dueWorkDomainModel           = $this->translator->translateToDomainModel($dueWorkDataModel);

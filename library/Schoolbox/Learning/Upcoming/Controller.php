@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -22,7 +23,9 @@ use Schoolbox\Learning\Assessment\Calendar\Events\Api;
 use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Mapper\DefinitionException;
 use UnexpectedValueException;
+
 use function func_get_args;
+
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueDateSortStrategy;
@@ -237,7 +240,6 @@ class Controller extends Base
         $markSchemeFactory = new Factory($this->getConfigLoader());
 
         if (\count($displayGradesForFolders)) {
-
             $visibility = new Visibility($this->access);
             // Student's work
             $workPerFolder = $this->assessmentDataSource
@@ -315,7 +317,7 @@ class Controller extends Base
         // If there's a huge number of IDs, we may need to chunk them and query
         // on each chunk.
         $ids     = $this->assessmentIdFinder->findIdsByFilters($filters);
-        if(count($ids) > 0) {
+        if (count($ids) > 0) {
             $allWork = $this->assessmentDataSource
                 ->findAllByStudentBetweenDates($student, true, null, null, ['ids' => $ids]);
 
@@ -330,8 +332,7 @@ class Controller extends Base
                 })
                 ->sortByCallback(new DueDateSortStrategy($student))
                 ->limit(self::UPCOMING_WORK_LIMIT);
-        }
-        else {
+        } else {
             $upcomingWork = new Collection();
         }
 

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Statistics\Test;
@@ -264,9 +266,9 @@ class Obama
             But we also know our conscience cannot rest so long as the war goes on in Iraq. And there's another issue we must confront as well. Given my background, my politics, and my professed values and ideals, there will no doubt be those for whom my statements of condemnation are not enough. This has bred more fear and mistrust.
         "));
 
-        $this->titles = array_values(array_filter(array_map(function($string) {
+        $this->titles = array_values(array_filter(array_map(function ($string) {
             return ucwords($string);
-        }, $this->titleSource), function($string) {
+        }, $this->titleSource), function ($string) {
             return \strlen($string) > self::NUM_WORDS_PER_TITLE;
         }));
     }
@@ -341,7 +343,7 @@ class Obama
      */
     private function random(array $set)
     {
-        return $set[random_int(0, \count($set)-1)];
+        return $set[random_int(0, \count($set) - 1)];
     }
 
 
@@ -490,10 +492,11 @@ class Obama
      * @param float $gamma
      * @return int
      */
-    private function getWeightedRandom($min, $max, $gamma): int {
-        $offset= $max-$min+1;
+    private function getWeightedRandom($min, $max, $gamma): int
+    {
+        $offset = $max - $min + 1;
 
-        return (int)floor($min+ (lcg_value() ** $gamma) * $offset);
+        return (int)floor($min + (lcg_value() ** $gamma) * $offset);
     }
 
 
@@ -509,9 +512,9 @@ class Obama
          */
         $minBias = 0.75;
 
-        $indexablePopulation = \count($this->users)-1;
+        $indexablePopulation = \count($this->users) - 1;
 
-        return \random_int((int)floor($indexablePopulation*$minBias), $indexablePopulation);
+        return \random_int((int)floor($indexablePopulation * $minBias), $indexablePopulation);
     }
 
 
@@ -618,7 +621,7 @@ class Obama
     ): void {
         $numUsers = $this->generateIndexablePopulation();
 
-        new \Alaress_Probe(str_pad(' ',8)."{$numUsers} users were randomly selected for interaction generation");
+        new \Alaress_Probe(str_pad(' ', 8) . "{$numUsers} users were randomly selected for interaction generation");
 
         /* Create a thread
          */
@@ -770,8 +773,7 @@ class Obama
         int $chanceToOpen,
         int $chanceToSaveForLater,
         ?int $help = 0
-    ): void
-    {
+    ): void {
         /* Help text for quick reference
          */
         if ($help) {
@@ -804,13 +806,13 @@ class Obama
             new \Alaress_Probe("Created article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
             $this->createAudience($model);
-            new \Alaress_Probe(str_pad(' ',4)."Added audience for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
+            new \Alaress_Probe(str_pad(' ', 4) . "Added audience for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
             $this->createStatistics($model, $duration, $democraticness, $chanceToOpen, $chanceToComment);
-            new \Alaress_Probe(str_pad(' ',4)."Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
+            new \Alaress_Probe(str_pad(' ', 4) . "Generated randomised statistics for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
 
             $numSavedForLater = $this->createSavedForLater($model, $chanceToSaveForLater);
-            new \Alaress_Probe(str_pad(' ', 4)."Saved {$numSavedForLater} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
+            new \Alaress_Probe(str_pad(' ', 4) . "Saved {$numSavedForLater} times for article {$articleNum} with id {$model->getId()}: {$model->getTitle()}");
         }
 
         /* Statistical summary

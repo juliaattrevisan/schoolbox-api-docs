@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Helper trait that does some data manipulation common to all user types
  *

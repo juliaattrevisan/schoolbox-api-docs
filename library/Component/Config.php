@@ -1,100 +1,108 @@
 <?php
 
 /**
- * 
+ *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
- * 
+ *
  */
 
-class Component_Config {
-	/**
-	 * @var int
-	 */
-	protected $id;
+class Component_Config
+{
+    /**
+     * @var int
+     */
+    protected $id;
 
-	/**
-	 * @var int
-	 */
-	protected $configDefinitionId;
+    /**
+     * @var int
+     */
+    protected $configDefinitionId;
 
-	/**
-	 * @var int
-	 */
-	protected $instanceId;
+    /**
+     * @var int
+     */
+    protected $instanceId;
 
-	/**
-	 * @var string
-	 */
-	protected $value;
+    /**
+     * @var string
+     */
+    protected $value;
 
-	/**
-	 * @param  int $configDefinitionId
-	 *
-	 * @return $this
-	 */
-	public function setConfigDefinitionId($configDefinitionId) {
-		$this->configDefinitionId = $configDefinitionId;
-		return $this;
-	}
+    /**
+     * @param  int $configDefinitionId
+     *
+     * @return $this
+     */
+    public function setConfigDefinitionId($configDefinitionId)
+    {
+        $this->configDefinitionId = $configDefinitionId;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getConfigDefinitionId() {
-		return $this->configDefinitionId;
-	}
+    /**
+     * @return int
+     */
+    public function getConfigDefinitionId()
+    {
+        return $this->configDefinitionId;
+    }
 
-	/**
-	 * @param  int $id
-	 *
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param  int $instanceId
-	 *
-	 * @return $this
-	 */
-	public function setInstanceId($instanceId) {
-		$this->instanceId = $instanceId;
-		return $this;
-	}
+    /**
+     * @param  int $instanceId
+     *
+     * @return $this
+     */
+    public function setInstanceId($instanceId)
+    {
+        $this->instanceId = $instanceId;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getInstanceId() {
-		return $this->instanceId;
-	}
+    /**
+     * @return int
+     */
+    public function getInstanceId()
+    {
+        return $this->instanceId;
+    }
 
-	/**
-	 * @param  string $value
-	 *
-	 * @return $this
-	 */
-	public function setValue($value) {
-		$this->value = $value;
-		return $this;
-	}
+    /**
+     * @param  string $value
+     *
+     * @return $this
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getValue() {
-		return $this->value;
-	}
-
+    /**
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 }

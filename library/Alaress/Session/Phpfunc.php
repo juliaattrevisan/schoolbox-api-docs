@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Session;
-
 
 use Predis\ClientInterface;
 use Schoolbox\IConfigLoader;
@@ -66,7 +66,6 @@ class Phpfunc extends \Aura\Session\Phpfunc
         $username = $this->redis->get($this->cookies['remember']);
 
         if (strlen($username)) {
-
             // found a redis match; attempt to rebuild that session
 
             // For safety's sake regenerate their session ID

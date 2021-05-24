@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Due work homepage component controller
  *

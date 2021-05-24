@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides the offline version of the MarkbookInterface
  *

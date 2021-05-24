@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -44,8 +45,7 @@ class Replicator
         AssessmentMapperProxy $assessmentMapperProxy,
         QuizMapper $quizMapper,
         RubricDataSource $rubricMapper
-    )
-    {
+    ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->quizMapper = $quizMapper;
         $this->rubricMapper = $rubricMapper;
@@ -105,7 +105,7 @@ class Replicator
      */
     protected function replicateQuizConstituents(IAssessable $assessable)
     {
-        if(!$assessable instanceof Quiz){
+        if (!$assessable instanceof Quiz) {
             return;
         }
 
@@ -121,7 +121,7 @@ class Replicator
      */
     protected function replicateDueWorkRubric(IAssessable $assessable)
     {
-        if(!$assessable instanceof DueWork){
+        if (!$assessable instanceof DueWork) {
             return;
         }
 

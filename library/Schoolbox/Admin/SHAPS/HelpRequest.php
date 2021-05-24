@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HelpRequest
  *
@@ -133,7 +134,7 @@ class HelpRequest
         // Attempt to json decode the response body
         try {
             $decoded_response = json_decode($response->getBody()->getContents(), true);
-        } catch (\RuntimeException $e){
+        } catch (\RuntimeException $e) {
             throw new Exception\UnexpectedResponseException('Unable to read SHAPS API response', $request, $response, $e);
         }
 
@@ -199,7 +200,6 @@ class HelpRequest
             $participants = $enrolment['participants'];
 
             foreach ($participants as $n => $participant) {
-
                 /* Check if this participant's id exists in the provisionedUsers index
                  *
                  * If this participant's id wasn't in the provisionedUsers index, then this is
@@ -244,20 +244,18 @@ class HelpRequest
                 $this->execute('post', 'users', ['user' => $payload], ['byUsername' => '1']);
                 $code    = 200;
                 $message = 'OK';
-
             }  /** @noinspection PhpRedundantCatchClauseInspection */
-            catch (ClientException|Exception\UnexpectedResponseException|ConnectException|TooManyRedirectsException $e) {
+            catch (ClientException | Exception\UnexpectedResponseException | ConnectException | TooManyRedirectsException $e) {
                 // 400: empty payload (should never get this) or some users failed
                 $code    = 400;
                 $message = 'Bad Request';
                 if ($e->getResponse()) {
-                    try{
+                    try {
                         $data = json_decode($e->getResponse()->getBody()->getContents());
-                    } catch (\RuntimeException $e){
+                    } catch (\RuntimeException $e) {
                         // Not much we can do here.
                     }
                 }
-
             } catch (GuzzleException $e) {
                 // any other exception
                 $code    = 500;

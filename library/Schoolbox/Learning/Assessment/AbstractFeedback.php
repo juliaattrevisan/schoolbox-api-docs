@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AbstractFeedback
  *
@@ -9,11 +10,11 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use \Schoolbox\User;
-use \Schoolbox\Mapper\Traits\Model\Id;
-use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 abstract class AbstractFeedback implements IFeedback
 {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Overrides Aura\Session\SegmentFactory to return Alaress\Session\Segment
  * objects instead.
@@ -7,6 +8,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Alaress\Session;
 
 use Aura\Session\Session as BaseSession;

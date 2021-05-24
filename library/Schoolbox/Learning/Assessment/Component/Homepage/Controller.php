@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Homepage component controller
  *
@@ -116,7 +117,7 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
             'component_id' => $this->getInstance()->getId(),
             'compact'      => $this->getConfig('compactMode'),
             'context'      => $this->getSource(),
-            'contextType'  => AssessmentContextType::TYPE_FOLDER.'s',
+            'contextType'  => AssessmentContextType::TYPE_FOLDER . 's',
             'assessables'  => $this->assessments,
             'term'         => $term,
             'termCode'     => $term->getCode(),
@@ -165,7 +166,8 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      * @param AssessmentMapperProxy $assessmentDataMapper
      * @return $this
      */
-    public function setAssessmentMapper(AssessmentMapperProxy $assessmentDataMapper) {
+    public function setAssessmentMapper(AssessmentMapperProxy $assessmentDataMapper)
+    {
         $this->assessmentMapper = $assessmentDataMapper;
         return $this;
     }
@@ -173,7 +175,8 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     /**
      * @return AssessmentMapperProxy
      */
-    public function getAssessmentMapper() {
+    public function getAssessmentMapper()
+    {
         return $this->assessmentMapper;
     }
 
@@ -181,7 +184,8 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
      * @param TermMapper $termMapper
      * @return $this
      */
-    public function setTermMapper($termMapper) {
+    public function setTermMapper($termMapper)
+    {
         $this->termMapper = $termMapper;
         return $this;
     }
@@ -189,7 +193,8 @@ abstract class Controller extends Component_Homepage_ControllerAbstract
     /**
      * @return TermMapper
      */
-    public function getTermMapper() {
+    public function getTermMapper()
+    {
         return $this->termMapper;
     }
 }

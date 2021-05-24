@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Overrides Aura\Session\Session to provide easy access to the following:
  * * the logged-in user
@@ -10,11 +11,13 @@
  */
 
 namespace Alaress\Session;
+
 use Aura\Session\Session as BaseSession;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 
-class Session extends BaseSession {
+class Session extends BaseSession
+{
 
     /**
      * The loader for config settings.
@@ -44,7 +47,7 @@ class Session extends BaseSession {
      * @param int                            $requestTime         Request time, to compare the session time against
      */
     public function __construct(
-        SegmentFactory   $segment_factory,
+        SegmentFactory $segment_factory,
         \Aura\Session\CsrfTokenFactory $csrf_token_factory,
         \Aura\Session\Phpfunc $phpfunc,
         array $cookies = array(),
@@ -75,7 +78,8 @@ class Session extends BaseSession {
      *
      * @return User
      */
-    public function getAuthUser() {
+    public function getAuthUser()
+    {
         $user = null;
         if ($this->isAuthSessionAlive()) {
             $user = $this->getSegment(null)->get('user');
@@ -87,7 +91,8 @@ class Session extends BaseSession {
      * Updates the last time that the user was accessed to whatever this
      * request's time is.
      */
-    public function updateLastTime() {
+    public function updateLastTime()
+    {
         $authSession = $this->getSegment(null);
         $authSession->set('lasttime', $this->getRequestTime());
 
@@ -98,7 +103,8 @@ class Session extends BaseSession {
      * Set the expiry time on an session cookie that already exists
      * @param int $lifetime
      */
-    public function setCookieExpiry($lifetime) {
+    public function setCookieExpiry($lifetime)
+    {
         $cookieParams  = $this->getCookieParams();
         $sessionExpiry = $lifetime > 0
             ? $this->getRequestTime() + $lifetime
@@ -121,13 +127,13 @@ class Session extends BaseSession {
      *
      * @return bool
      */
-    public function isAuthSessionAlive() {
+    public function isAuthSessionAlive()
+    {
         $authSession   = $this->getSegment(null);
 
-        if($authSession->get('remember')) {
+        if ($authSession->get('remember')) {
             return true;
-        }
-        else {
+        } else {
             $lastTime      = $authSession->get('lasttime');
             $sessionLength = $this->getConfig()->get('session_length');
 
@@ -143,14 +149,14 @@ class Session extends BaseSession {
      *
      * @param string $value The URL to store in history.
      */
-    public function pushHistory($value) {
+    public function pushHistory($value)
+    {
 
         $session = $this->getSegment(null);
         $history = $session->get('history');
         if (empty($history)) {
             $history = array();
-        }
-        else {
+        } else {
             // Don't save history if this is the same as the most recent item in
             // history.
             [$mostRecent] = $history;
@@ -172,7 +178,8 @@ class Session extends BaseSession {
      * @param  string $default If nothing in history, return this.
      * @return string
      */
-    public function getHistory($level = 1, $default = '/') {
+    public function getHistory($level = 1, $default = '/')
+    {
         $session = $this->getSegment(null);
         $history = $session->get('history');
         if (empty($history)) {
@@ -188,7 +195,8 @@ class Session extends BaseSession {
      * @param  IConfigLoader $config
      * @return $this
      */
-    public function setConfig($config) {
+    public function setConfig($config)
+    {
         $this->config = $config;
         return $this;
     }
@@ -196,7 +204,8 @@ class Session extends BaseSession {
     /**
      * @return IConfigLoader
      */
-    public function getConfig() {
+    public function getConfig()
+    {
         return $this->config;
     }
 
@@ -204,7 +213,8 @@ class Session extends BaseSession {
      * @param  int   $requestTime
      * @return $this
      */
-    public function setRequestTime($requestTime) {
+    public function setRequestTime($requestTime)
+    {
         $this->requestTime = $requestTime;
         return $this;
     }
@@ -212,7 +222,8 @@ class Session extends BaseSession {
     /**
      * @return int
      */
-    public function getRequestTime() {
+    public function getRequestTime()
+    {
         return $this->requestTime;
     }
 
@@ -239,5 +250,4 @@ class Session extends BaseSession {
     {
         $this->getSegment($namespace)->set($key, $value);
     }
-
 }

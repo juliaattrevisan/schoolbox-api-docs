@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -70,5 +71,4 @@ class Splitter
         // There is no notifier, which is fine
         return [];
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -80,7 +81,7 @@ class Framework
             }
         }
         // and finish off with removing this altogether
-        unset ($this->daemonInstances);
+        unset($this->daemonInstances);
     }
 
 
@@ -133,8 +134,7 @@ class Framework
         $prompt  = "Choose a test to run: (alternatively you can specify this via --testcase={classname})\n\n";
 
         $classes = array_map(
-            function ($file)
-            {
+            function ($file) {
                 if (preg_match('`test([^/]*)\.php$`', $file, $matches)) {
                     return $matches[1];
                 }
@@ -144,8 +144,7 @@ class Framework
         );
 
         $prompt .= implode("\n", array_map(
-            function ($k, $v)
-            {
+            function ($k, $v) {
                 if ($v) {
                     return "$k) $v";
                 }
@@ -280,7 +279,6 @@ class Framework
                 $this->daemonInstances[$name] = $this->spawnDaemon($name);
 
                 $log->info("$name launched", [ 'char' => '+' ]);
-
             } catch (RuntimeException $e) {
                 $log->critical("Could not launch $name; aborting test");
                 return;
@@ -375,7 +373,7 @@ class Framework
         // the sequence here is important - we want to de-register the
         // daemon BEFORE we actually kill it in case it dodges the blow
         [$pp, $pipes] = $this->daemonInstances[$name];
-        unset ($this->daemonInstances[$name]);
+        unset($this->daemonInstances[$name]);
 
         $status = proc_get_status($pp);
 
@@ -468,7 +466,6 @@ class Framework
 
             foreach ($regex as $pattern => $count) {
                 if (preg_match($pattern, $line, $captures)) {
-
                     // remove the full string capture
                     array_shift($captures);
 
@@ -490,19 +487,17 @@ class Framework
                     try {
                         // attempt to fire this subscription; if the preconditions are not met it won't fire
                         $unhook = $subscription->fire($this->hooks[$testClass][$callbackName]);
-
                     } catch (AssertionFailedError $e) {
                         // it failed assertions, but it *did* fire, so we can unhook
                         $unhook = true;
 
                         // handle the exception
-                        $this->log->warning($e->getMessage(), [ 'exception'=>$e ]);
-
+                        $this->log->warning($e->getMessage(), [ 'exception' => $e ]);
                     } catch (\Exception $e) {
                         // we can't exceptions exploding our harness; this is one of those rare cases you need to catch EVERYTHING
                         $unhook = true;
 
-                        $this->log->critical($e->getMessage(), [ 'exception'=>$e ]);
+                        $this->log->critical($e->getMessage(), [ 'exception' => $e ]);
                     }
 
                     if ($unhook !== false) {
@@ -515,7 +510,6 @@ class Framework
                     return true;
                 }
             }
-
         }
 
         return false;

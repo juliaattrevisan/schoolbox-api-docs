@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Save changes to EOTC configuration
  *
@@ -94,7 +95,6 @@ if ($sessionUser->isSuperuser()) {
     // Redirect back to the config page
 
     $page->localRedir('/modules/eotc/config/modify');
-
 } else {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }

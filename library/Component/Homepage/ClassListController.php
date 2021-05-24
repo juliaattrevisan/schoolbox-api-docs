@@ -204,7 +204,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
             /* Student bulk email
              */
-            if ($this->getContentPermission() > UserAccess::ACCESS_READ
+            if (
+                $this->getContentPermission() > UserAccess::ACCESS_READ
                 && $this->getConfigLoader()->get('mail_enable')
                 && $this->getUser()->hasEmail()
             ) {
@@ -222,7 +223,8 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
             /* Parent bulk email
              */
-            if (count($synergyIds)
+            if (
+                count($synergyIds)
                 && $this->getContentPermission() > UserAccess::ACCESS_READ
                 && $this->getConfigLoader()->get('email_all_parents')
                 && $this->getConfigLoader()->get('mail_enable')

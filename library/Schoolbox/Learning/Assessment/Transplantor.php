@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper;
-use \ICollection;
+use ICollection;
 
 /**
  * Responsible for moving Assessments between Contexts

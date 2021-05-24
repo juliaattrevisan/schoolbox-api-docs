@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ExtensionMapper
  *
@@ -18,14 +19,16 @@ use Schoolbox\Mapper;
  * @package Schoolbox\File
  * @method Collection|Extension[] findByColumn($columnName, $columnValue, $options = [])
  */
-class ExtensionMapper extends Mapper {
+class ExtensionMapper extends Mapper
+{
 
     /**
      * Mapping
      *
      * @return Bool|void
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('allowedFileExtension');
         $this->hasModel(Extension::class);
 

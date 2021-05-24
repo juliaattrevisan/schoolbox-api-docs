@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Homepage configuration for course instance component
  *

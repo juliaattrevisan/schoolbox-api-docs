@@ -32,7 +32,6 @@ class Attendance_Synergetic_AttendanceRecord
     public function update($data)
     {
         if (isset($data['ID'], $data['AttendanceMasterSeq'])) {
-
             $userID = $data['ID'];
             $AttendanceMasterSeq = $data['AttendanceMasterSeq'];
             unset($data['ID']);
@@ -64,7 +63,6 @@ class Attendance_Synergetic_AttendanceRecord
             $params['id'] = $userID;
 
             return $this->connector->executeQuery($query, $params);
-
         }
 
         return false;

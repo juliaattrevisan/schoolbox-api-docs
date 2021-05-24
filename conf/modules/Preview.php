@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Preview
  *
@@ -12,18 +13,20 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Schoolbox\Preview\Module;
 
-class Preview implements ModuleConfigInterface {
+class Preview implements ModuleConfigInterface
+{
 
-	/**
-	 * Run configuration for the given module
-	 *
-	 * @param Kernel $kernel
-	 * @return void
-	 */
-	public function configure($kernel) {
-		$di = $kernel->getDependencyInjector();
+    /**
+     * Run configuration for the given module
+     *
+     * @param Kernel $kernel
+     * @return void
+     */
+    public function configure($kernel)
+    {
+        $di = $kernel->getDependencyInjector();
 
         $module = new Module($di);
         $module->init('/preview');
-	}
+    }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * UserAccessXORTest
  *
@@ -16,7 +17,6 @@ namespace Schoolbox\Sync\Provisioner\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Sync\Provisioner\UserAccessXOR;
-
 
 class UserAccessXORTest extends TestCase
 {
@@ -46,7 +46,8 @@ class UserAccessXORTest extends TestCase
      *
      * @return array
      */
-    public function provider_same() : array {
+    public function provider_same(): array
+    {
         return [
 
             /* Both inputs are empty
@@ -168,7 +169,8 @@ class UserAccessXORTest extends TestCase
      *
      * @return array
      */
-    public function provider_different() : array {
+    public function provider_different(): array
+    {
         return [
 
             /* Tuple in first array doesn't appear in second
@@ -259,4 +261,3 @@ class UserAccessXORTest extends TestCase
         ];
     }
 }
-

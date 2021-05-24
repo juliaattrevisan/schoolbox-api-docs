@@ -1,9 +1,11 @@
 <?php
+
  /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Mail;
 
 use Alaress\Mail\TwigMailer;
@@ -15,7 +17,8 @@ use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
  *
  * @package Schoolbox\Mail
  */
-class TwigEmail extends TwigMailer {
+class TwigEmail extends TwigMailer
+{
 
     /**
      * @var array
@@ -59,7 +62,8 @@ class TwigEmail extends TwigMailer {
      */
     public function composeHTML()
     {
-        $preformat = $this->twig->render($this->templateFilename,
+        $preformat = $this->twig->render(
+            $this->templateFilename,
             array_replace_recursive($this->coreContext, $this->context)
         );
         $this->rendercache = $this->cssInliner->convert($preformat);

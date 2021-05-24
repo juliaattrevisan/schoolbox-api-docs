@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -10,6 +11,7 @@ namespace Schoolbox\External\Importer\User\Identifier;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\UserMapper;
+
 use function trim;
 
 /**
@@ -61,10 +63,11 @@ class ExternalId implements IdentifierInterface
         }
 
         try {
-            return $this->userMapper->findOneByColumnList([
+            return $this->userMapper->findOneByColumnList(
+                [
                 'group_id'   => $role->getId(),
                 'synergy_id' => $row['External ID'],
-            ],
+                ],
                 ['cache' => false]
             );
         } catch (MapperException $e) {

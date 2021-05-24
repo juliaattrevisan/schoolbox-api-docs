@@ -35,7 +35,7 @@ class Collector extends DataCollector implements Renderable, AssetProvider
     public function __construct($broker)
     {
         $this->broker = $broker;
-        $this->widget_name .= str_replace(".","",$broker->getHostname());
+        $this->widget_name .= str_replace(".", "", $broker->getHostname());
     }
 
     /**

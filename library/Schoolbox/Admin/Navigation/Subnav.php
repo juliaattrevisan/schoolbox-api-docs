@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Navigation;
@@ -17,7 +19,6 @@ use Schoolbox\Filter\Page\Model as FilterPageModel;
 use Schoolbox\IConfigLoader;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
-
 
 /**
  * Class Subnav
@@ -948,7 +949,6 @@ class Subnav
             if (\count($parentData['children'])) {
                 foreach ($parentData['children'] as $childUrl => $childData) {
                     if ($childUrl === $url) {
-
                         /* parentUrl is sometimes the same as a childUrl
                          * and manifest twice in the breadcrumb trail; we only
                          * need the parent node if it was different to its child node

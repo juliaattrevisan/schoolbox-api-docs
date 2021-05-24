@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Wiki;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
@@ -196,5 +196,4 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
     {
         return $this->notifyRevised(Role::PARENT, $revision, $author);
     }
-
-} 
+}

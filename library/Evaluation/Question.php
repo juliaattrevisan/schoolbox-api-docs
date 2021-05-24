@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Question
  *
@@ -128,7 +129,8 @@ abstract class Evaluation_Question extends DeprecatedModel
      * @param int|string $assess_id
      * @return array|bool
      */
-    public function getAll($assess_id = '') {
+    public function getAll($assess_id = '')
+    {
         $query = "
             SELECT
                 assess_section.section_id,
@@ -223,15 +225,16 @@ abstract class Evaluation_Question extends DeprecatedModel
      *
      * @param array $allIds
      */
-    public function reorderQuestions($allIds) {
+    public function reorderQuestions($allIds)
+    {
         if (is_array($allIds) && count($allIds)) {
             $queryComponents = array();
             $sequence = 1;
 
-            foreach($allIds as $currentId) {
+            foreach ($allIds as $currentId) {
                 $id = str_replace('question_', '', $currentId);
 
-                $queryComponents[]= "($id, $sequence)";
+                $queryComponents[] = "($id, $sequence)";
 
                 $sequence++;
             }
@@ -258,7 +261,8 @@ abstract class Evaluation_Question extends DeprecatedModel
      *
      * @param array $allowedFields
      */
-    public function setAllowedFields($allowedFields) {
+    public function setAllowedFields($allowedFields)
+    {
         $this->allowedFields = $allowedFields;
     }
 

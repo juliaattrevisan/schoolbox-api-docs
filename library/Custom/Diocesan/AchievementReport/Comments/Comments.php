@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\Comments;
 
 use Custom\Diocesan\AchievementReport\NormaliseTeachers;
@@ -147,7 +149,6 @@ class Comments extends Base
         $result = $this->db->executeQuery($query, $params)->fetchAll();
 
         return $this->formatData($result);
-
     }
 
 

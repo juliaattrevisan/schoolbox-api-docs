@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A paginator object that contains a URL, and knows how to modify that URL to
  * point to a page within that URL.
@@ -10,7 +11,8 @@
 
 namespace Alaress\Paginator;
 
-interface IUrlPaginator extends IPaginator {
+interface IUrlPaginator extends IPaginator
+{
 
     /**
      * Creates a URL out of whatever the URL I passed is.
@@ -44,5 +46,4 @@ interface IUrlPaginator extends IPaginator {
      * @return $this
      */
     public function setUrl($url);
-
 }

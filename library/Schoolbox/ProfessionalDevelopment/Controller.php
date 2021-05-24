@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -92,8 +93,7 @@ class Controller extends Base
             $this->pdMapper->save($pd);
 
             $status = self::ACCREDIT_SUCCESS;
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             $status = self::ACCREDIT_FAIL;
         }
 

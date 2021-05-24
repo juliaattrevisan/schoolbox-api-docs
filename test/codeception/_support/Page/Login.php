@@ -51,7 +51,7 @@ class Login
     public function loginSAML($username, $password)
     {
         $this->tester->click(self::SAML_BUTTON);
-        $this->tester->waitForText("ADFS Schoolbox",5);
+        $this->tester->waitForText("ADFS Schoolbox", 5);
         $this->tester->fillField(self::SAML_FIELD_USERNAME, $username);
         $this->tester->fillField(self::SAML_FIELD_PASSWORD, $password);
         $this->tester->click(self::SAML_LOGIN_BUTTON);

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\Writing;
@@ -72,7 +74,7 @@ class Data extends Base
     public function findData()
     {
         $params = [
-            'externalId' =>$this->getExternalUserId(),
+            'externalId' => $this->getExternalUserId(),
         ];
 
         $query = '
@@ -109,7 +111,6 @@ class Data extends Base
         ];
 
         foreach ($result as $row) {
-
             /* Accumulate the x-axis categories
              */
             $stack['x']['categories'][] = $row['xAxis'];

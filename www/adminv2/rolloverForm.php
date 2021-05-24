@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Resource\HomepageConfig;
 
 /**

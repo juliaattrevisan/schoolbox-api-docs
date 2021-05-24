@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for resource moderation types.
  *
@@ -6,12 +7,13 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Item\ModerationType;
 
 use JsonSerializable;
 
-class Model implements JsonSerializable {
+class Model implements JsonSerializable
+{
 
     /**
      * Open resources may be booked by anyone, and are automatically confirmed.
@@ -48,7 +50,8 @@ class Model implements JsonSerializable {
      * @param  string $description
      * @return $this
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
         return $this;
     }
@@ -56,7 +59,8 @@ class Model implements JsonSerializable {
     /**
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 
@@ -64,7 +68,8 @@ class Model implements JsonSerializable {
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -72,7 +77,8 @@ class Model implements JsonSerializable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -80,7 +86,8 @@ class Model implements JsonSerializable {
      * @param  string $name
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -88,28 +95,32 @@ class Model implements JsonSerializable {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
      * @return bool
      */
-    public function isOpen() {
+    public function isOpen()
+    {
         return $this->id == self::TYPE_OPEN;
     }
 
     /**
      * @return bool
      */
-    public function isModerated() {
+    public function isModerated()
+    {
         return $this->id == self::TYPE_MODERATED;
     }
 
     /**
      * @return bool
      */
-    public function isManaged() {
+    public function isManaged()
+    {
         return $this->id == self::TYPE_MANAGED;
     }
 
@@ -118,7 +129,8 @@ class Model implements JsonSerializable {
      *
      * @return array
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return array(
             'id'          => $this->getId(),
             'name'        => $this->getName(),
@@ -127,5 +139,4 @@ class Model implements JsonSerializable {
             'isManaged'   => $this->isManaged(),
         );
     }
-
 }

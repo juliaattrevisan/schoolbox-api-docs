@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Custom chain loader for Twig templates.
  *

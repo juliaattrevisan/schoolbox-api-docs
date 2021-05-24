@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -74,7 +75,6 @@ class Translator
         }
         foreach ($division->getTeams() as $team) {
             $dataModel['teams'][] = $this->getTeamTranslator()->translateTeam($team);
-
         }
 
         /* A list of assigned ids

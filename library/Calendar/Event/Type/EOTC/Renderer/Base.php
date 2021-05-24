@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Event_Type_Day_Renderer_Default
  *
@@ -14,7 +15,6 @@ use Aura\Router\Router;
 use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\EOTC;
 use Schoolbox\User;
-
 
 abstract class Base extends RendererBase
 {

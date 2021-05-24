@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface for how school management systems should determine user's detention.
  *

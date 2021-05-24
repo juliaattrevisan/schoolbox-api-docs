@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event source configuration for the external database events.
  *

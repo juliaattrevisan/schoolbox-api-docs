@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -127,7 +128,6 @@ class DueWork implements IAssessmentTypeTranslator
             $seen = [];
 
             foreach ($domainObject->getAttachedFiles() as $file) {
-
                 /* Skip hashes we've already seen
                  * Won't take into account same file with different filename
                  */

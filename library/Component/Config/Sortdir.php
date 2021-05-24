@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -26,6 +27,5 @@ class Component_Config_Sortdir extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_SORTDIR_SELECTED', $k == $configValue ? ' selected="selected"' : '');
             $page->parse('sorting_dir_block', 'sorting_dir', true);
         }
-
     }
 }

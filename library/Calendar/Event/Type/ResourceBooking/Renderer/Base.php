@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is the base renderer for day events,
  * it provides support functions for determining how to render a day event
@@ -11,7 +12,7 @@ namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
 use Alaress\Authorizer\Authorizer;
 use Aura\Router\Router;
-use \Calendar\Event\Type\RendererBase;
+use Calendar\Event\Type\RendererBase;
 use Calendar\Event\Type\ResourceBooking;
 use Schoolbox\User;
 
@@ -37,40 +38,42 @@ abstract class Base extends RendererBase
         $this->event = $event;
     }
 
-    public function getEditURL() {
+    public function getEditURL()
+    {
         return $this->getRouteIfAuthorized(
             'resourceBooking.edit',
             array('id' => $this->getEvent()->getBooking()->getId(), 'item' => $this->getEvent()->getBooking(),)
         );
     }
 
-    public function getCancelURL() {
+    public function getCancelURL()
+    {
         return $this->getRouteIfAuthorized(
             'resourceBooking.cancel',
             array('id' => $this->getEvent()->getBooking()->getId(), 'item' => $this->getEvent()->getBooking(),)
         );
     }
 
-    public function getApproveURL() {
+    public function getApproveURL()
+    {
         if (!$this->getEvent()->getBooking()->getStatus()->isApproved()) {
             return $this->getRouteIfAuthorized(
                 'resourceBooking.approve',
                 array('id' => $this->getEvent()->getBooking()->getId(), 'item' => $this->getEvent()->getBooking(),)
             );
-        }
-        else {
+        } else {
             return '';
         }
     }
 
-    public function getRejectURL() {
+    public function getRejectURL()
+    {
         if (!$this->getEvent()->getBooking()->getStatus()->isRejected() && !$this->getEvent()->getBooking()->getStatus()->isApproved()) {
             return $this->getRouteIfAuthorized(
                 'resourceBooking.reject',
                 array('id' => $this->getEvent()->getBooking()->getId(), 'item' => $this->getEvent()->getBooking(),)
             );
-        }
-        else {
+        } else {
             return '';
         }
     }

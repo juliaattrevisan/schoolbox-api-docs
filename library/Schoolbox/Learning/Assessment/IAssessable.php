@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IAssessable
  *
@@ -17,10 +18,10 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
-use \Schoolbox\User;
-use \Schoolbox\Collection;
+use Schoolbox\User;
+use Schoolbox\Collection;
 use Alaress_Date_Format;
-use \DomainException;
+use DomainException;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Curriculum\Node;
 

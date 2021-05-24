@@ -2,11 +2,11 @@
 
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
-use \Schoolbox\User as UserModel;
-use \Schoolbox\UserMapper;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Permission\Access\Access;
+use Schoolbox\User as UserModel;
+use Schoolbox\UserMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
 
 class Group extends DeprecatedModel
 {
@@ -467,7 +467,8 @@ class Group extends DeprecatedModel
         $permission = (int)$permission;
 
         // allow staff write access to UserAccess::SERVICE_NEWS by default except at shore...
-        if ($user->getRole()->isStaff()
+        if (
+            $user->getRole()->isStaff()
             && (Config::get('news_staff_post_enabled') == '1')
             && ($this->_service == UserAccess::SERVICE_NEWS)
             && ($permission < UserAccess::ACCESS_WRITE)
@@ -566,7 +567,7 @@ class Group extends DeprecatedModel
 
         // default to current user
         if ($userID > 0) {
-            $userHandler = new User;
+            $userHandler = new User();
             $user = $userHandler->getByID($userID);
 
             if ($user['su']) {
@@ -639,7 +640,7 @@ class Group extends DeprecatedModel
         $userMapper = UserMapper::getInstance();
         try {
             $user = $userMapper->findById($userID);
-        } catch (MapperException $e)  {
+        } catch (MapperException $e) {
             /* Just return an empty set if the user does not exist */
             return $allFolders;
         }
@@ -647,7 +648,7 @@ class Group extends DeprecatedModel
         $folderMapper = FolderMapper::getInstance();
 
         if ($user->getExternalId()) {
-            $externalUser = new External_User;
+            $externalUser = new External_User();
             $externalSubjectList = $externalUser->getSubjectList($user);
 
             if (is_array($externalSubjectList)) {

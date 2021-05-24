@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Project;
 
 use Alaress_Date_Format;
@@ -49,7 +51,7 @@ class Controller extends Assessment\Controller
         return [
             'types'             => new Assessment\AssessmentType(),
             'selectedSummator'  => $selectedSummator,
-            'acceptingResponses'=> false,
+            'acceptingResponses' => false,
             'allSummators'      => $summatorMapping,
             'allMarkTypes'      => $this->getAllMarkTypes($assessment),
             'allGradeSchemes'   => $this->getAllGradeSchemes(),
@@ -106,12 +108,12 @@ class Controller extends Assessment\Controller
 
         $assessmentStats = new GenericCollection(Assessment\Statistics::class);
         $assessmentStats[$assessment->getId()] = new Assessment\Statistics($assessment);
-        foreach($assessment->getAssessables() as $subAssessable){
+        foreach ($assessment->getAssessables() as $subAssessable) {
             $assessmentStats[$subAssessable->getId()] = new Assessment\Statistics($subAssessable);
         }
 
         $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
-        foreach($participants as $participant){
+        foreach ($participants as $participant) {
             $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
         }
 
@@ -197,7 +199,6 @@ class Controller extends Assessment\Controller
                 $twigData
             )
         );
-
     }
 
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Initialise a survey
  *
@@ -16,50 +17,50 @@ $attemptHandler  = new Survey_Attempt();
 $groupHandler    = new Group();
 
 if (!is_numeric($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
-	$this->pageNotFound();
+    $this->pageNotFound();
 }
 
 if (!is_numeric($this->arg[1])) {
-	error(115);
+    error(115);
 }
 
 $survey = $surveyHandler->getByID($this->arg[0]);
 $section = $sectionHandler->getByID($this->arg[1]);
 
 if ($surveyHandler->isDeleted($survey['assess_id'])) {
-	error(112);
+    error(112);
 }
 
 if (!$section) {
-	error(115);
+    error(115);
 }
 
 /* Check if you are in this category, so you can't submit other category's
  * surveys unless you are a part of that category.
  */
 if (!$surveyHandler->canDoAssessment($survey['assess_id'])) {
-	error(19);
+    error(19);
 }
 
 /* Check if this assessment can be started
  */
 if ($surveyHandler->isExpired($survey['assess_id'])) {
-	error(120);
+    error(120);
 }
 
 /* Participants should be blocked from attempting if it hasn't started,
  * but authors should be able to test out their content
  */
 if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-	error(144);
+    error(144);
 }
 
 if (!$questionHandler->numQuestions($survey['assess_id'])) {
-	error(137);
+    error(137);
 }
 
 /* Disabled: doing so will allow teachers to give their test a "dry run" and
@@ -83,13 +84,12 @@ $attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $use
  * Otherwise start a new attempt if there is a limit
  */
 if (!$attempt) {
-	if (($survey['max_attempts'] > 0) && ($numAttempts + 1 > $survey['max_attempts'])) {
-		/* Clear and exit when you attempt to make more than is allowed
-		 */
-		error(146);
-	}
-	else {
-		$attemptId = $attemptHandler->start($userId, $this->arg[0]);
+    if (($survey['max_attempts'] > 0) && ($numAttempts + 1 > $survey['max_attempts'])) {
+        /* Clear and exit when you attempt to make more than is allowed
+         */
+        error(146);
+    } else {
+        $attemptId = $attemptHandler->start($userId, $this->arg[0]);
         // Assign all questions on init, not starting a section.
         $responseHandler = new Survey_Response();
         $sectionHandler  = new Survey_Section();
@@ -102,7 +102,7 @@ if (!$attempt) {
                 false
             );
         }
-	}
+    }
 }
 
 /* Redirect to the original destination

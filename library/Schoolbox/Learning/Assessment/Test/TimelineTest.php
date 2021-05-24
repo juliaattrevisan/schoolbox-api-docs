@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TimelineTest
  *
@@ -11,14 +12,14 @@ namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DueWorkDataModel;
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Timeline\Full as Timeline;
-use \Schoolbox\User;
+use Schoolbox\User;
 
 class TimelineTest extends TestCase
 {
@@ -158,8 +159,7 @@ class TimelineTest extends TestCase
 
         $response1->setAllFeedback((new Collection())
             ->add($feedback1)
-            ->add($feedback2)
-        );
+            ->add($feedback2));
 
         $plan        = $this->linker->createAndLinkPlan($assessment);
         $participant = $this->linker->createAndLinkParticipant(new User(), $plan);

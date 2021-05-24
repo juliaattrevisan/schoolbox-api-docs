@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class object for Schoolbox. (Can't call it Class because that's a reserved
  * name)
@@ -10,7 +11,8 @@
 
 namespace Schoolbox\External;
 
-class ClassEntry {
+class ClassEntry
+{
 
     /**
      * @var int
@@ -36,7 +38,8 @@ class ClassEntry {
      * @param  string $code
      * @return $this
      */
-    public function setCode($code) {
+    public function setCode($code)
+    {
         $this->code = $code;
         return $this;
     }
@@ -44,7 +47,8 @@ class ClassEntry {
     /**
      * @return string
      */
-    public function getCode() {
+    public function getCode()
+    {
         return $this->code;
     }
 
@@ -52,7 +56,8 @@ class ClassEntry {
      * @param  string $description
      * @return $this
      */
-    public function setDescription($description) {
+    public function setDescription($description)
+    {
         $this->description = $description;
         return $this;
     }
@@ -60,7 +65,8 @@ class ClassEntry {
     /**
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 
@@ -68,7 +74,8 @@ class ClassEntry {
      * @param  int $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -76,7 +83,8 @@ class ClassEntry {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -84,7 +92,8 @@ class ClassEntry {
      * @param  string $name
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -92,8 +101,8 @@ class ClassEntry {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
-
 }

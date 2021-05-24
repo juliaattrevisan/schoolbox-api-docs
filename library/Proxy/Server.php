@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Encapsulating class to provide details about how Schoolbox is configured to interact with proxy servers
  *
@@ -225,7 +226,6 @@ class Server
         }
 
         return $guzzle;
-
     }
 
     /**
@@ -256,5 +256,4 @@ class Server
 
         return $asArray ? $opts : stream_context_create($opts);
     }
-
 }

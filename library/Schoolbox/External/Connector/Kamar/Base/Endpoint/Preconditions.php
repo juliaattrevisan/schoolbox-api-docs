@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
@@ -84,7 +86,7 @@ class Preconditions
          * in profile xml so you can identify who is in a class ($container)
          */
         $analysis = [
-            self::ANALYSIS_XML =>[
+            self::ANALYSIS_XML => [
                 Receiver::XML_FULL => [],
                 Receiver::XML_STUDENTTIMETABLES => []
             ],

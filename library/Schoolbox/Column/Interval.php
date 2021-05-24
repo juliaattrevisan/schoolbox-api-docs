@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Timespan column type, stored as an integer.
  *
@@ -6,12 +7,14 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Column;
+
 use DateInterval;
 use Alaress\Date\Interval as IntervalObject;
 
-class Interval implements IColumnType {
+class Interval implements IColumnType
+{
 
     /**
      * Translates a value from a database field or other data store, into a
@@ -22,7 +25,8 @@ class Interval implements IColumnType {
      *
      * @return IntervalObject
      */
-    public function hydrate($value, $mapper = null) {
+    public function hydrate($value, $mapper = null)
+    {
         if (!is_numeric($value)) {
             return null;
         }
@@ -38,7 +42,8 @@ class Interval implements IColumnType {
      *
      * @return null|int
      */
-    public function dehydrate($value, $mapper = null) {
+    public function dehydrate($value, $mapper = null)
+    {
         if (is_numeric($value)) {
             return intval($value);
         }
@@ -51,16 +56,14 @@ class Interval implements IColumnType {
                 $seconds *= -1;
             }
             return $seconds;
-        }
-        else {
+        } else {
             if (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+):(?P<s>\\d+)$/', $value, $matches)) {
                 // H:MM:SS
                 $hours    = $matches['h'];
                 $minutes  = $matches['m'];
                 $seconds  = $matches['s'];
                 $negative = !empty($matches['i']);
-            }
-            elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+)$/', $value, $matches)) {
+            } elseif (preg_match('/^(?P<i>-)?(?P<h>\\d+):(?P<m>\\d+)$/', $value, $matches)) {
                 // H:MM
                 $hours    = $matches['h'];
                 $minutes  = $matches['m'];

@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Forum;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
@@ -28,7 +28,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 
-class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
+class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface
+{
 
     const TRIGGER_FOLLOWED  = 'followed';
 
@@ -45,7 +46,6 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
             $dependencies['categoryMapper'] = FolderMapper::getInstance();
         }
         parent::loadDependencies($dependencies);
-
     }
 
 
@@ -76,7 +76,6 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
         if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
             $bundle->attach(self::TRIGGER_FOLLOWED, self::IMMEDIATELY);
         }
-
     }
 
 
@@ -87,7 +86,7 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
     {
         $c = new Collection();
 
-        if(!$this->mapper instanceof FeedableMapperInterface) {
+        if (!$this->mapper instanceof FeedableMapperInterface) {
             return $c;
         }
 
@@ -193,6 +192,4 @@ class ThreadNotifier extends AbstractModuleNotifier implements SourceInterface {
     {
         return $this->notifyFollowed(Role::PARENT, $thread, $author);
     }
-
-
 }

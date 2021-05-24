@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation
  *
@@ -36,6 +37,7 @@
  * question. This is used to reformat a question; e.g. matching pairs: changing
  * the inputs to readonly; fillgaps: changing <span></span> elements to <input>s.
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 
 abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
@@ -211,7 +213,6 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
                     if (empty(trim($currentQuestion['description']))) {
                         $page->setVar('has_section_description_block', '');
                         $page->parse('empty_description_block', 'empty_description');
-
                     } else {
                         $page->setVar('empty_description_block', '');
                         $page->parse('has_section_description_block', 'has_section_description');
@@ -277,7 +278,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
         $hours = intval(intval($sec) / 3600);
 
         // add hours to $hms (with a leading 0 if asked for)
-        if($hours) {
+        if ($hours) {
             $hms .= ($padHours)
                 ? str_pad($hours, 2, "0", STR_PAD_LEFT) . ":"
                 : $hours . "hrs ";
@@ -289,7 +290,7 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
         $minutes = intval(($sec / 60) % 60);
 
         // add minutes to $hms (with a leading 0 if needed)
-        if($minutes) {
+        if ($minutes) {
             $hms .= str_pad($minutes, 2, "0", STR_PAD_LEFT) . "min ";
         }
 
@@ -343,13 +344,12 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
         $perm         = $groupHandler->getPermission($assess['category_id']);
 
         // Users with write access can always do the assessment (generally teachers)
-        if($perm >= UserAccess::ACCESS_WRITE) {
+        if ($perm >= UserAccess::ACCESS_WRITE) {
             return true;
         }
 
         // Students that are involved in the class can do the assessment, but not other students
-        if($perm >= UserAccess::ACCESS_READ) {
-
+        if ($perm >= UserAccess::ACCESS_READ) {
             $categoryList = $groupHandler->involvedInCategoryList($_SESSION['id']);
 
             /* See if you're in the Category first
@@ -446,5 +446,5 @@ abstract class Evaluation_Main extends DeprecatedModel implements \Schoolbox\IHo
      *
      * @return string
      */
-    protected abstract function getAvailabilityType();
+    abstract protected function getAvailabilityType();
 }

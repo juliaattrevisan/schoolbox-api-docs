@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Quiz homepage component controller
  *

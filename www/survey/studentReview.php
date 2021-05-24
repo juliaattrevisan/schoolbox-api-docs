@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Review assessment. The marks for each submitted question can be modified here
  * but the actual answers cannot be changed, only seen. Structurally, this is
@@ -244,10 +245,10 @@ $trail->renderIntoSitePage(
             'href'  => '/survey/attempts/' . $survey['assess_id'] . '/' . $user->getId(),
             'class' => 'active'
         ],
-//        [
-//            'text'  => 'Review',
-//            'href'  => '#',
-//            'class' => 'active'
-//        ],
+    //        [
+    //            'text'  => 'Review',
+    //            'href'  => '#',
+    //            'class' => 'active'
+    //        ],
     ]
 );

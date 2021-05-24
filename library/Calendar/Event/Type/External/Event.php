@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Rendering external events
  *
@@ -6,6 +7,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Calendar\Event\Type\External;
 
 use Calendar\Event\Type\EventBase;
@@ -46,7 +48,8 @@ class Event extends EventBase
      *
      * @return bool
      */
-    public function canAttend() {
+    public function canAttend()
+    {
         return false;
     }
 

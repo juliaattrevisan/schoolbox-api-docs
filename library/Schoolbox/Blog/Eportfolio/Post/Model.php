@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for e-portfolio blog posts
  *
@@ -22,7 +23,7 @@ class Model implements ISoftDeletable
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
-	use DeletedAtDate;
+    use DeletedAtDate;
 
     /**
      * Misnomer. This represents the **author** of this post.
@@ -31,82 +32,88 @@ class Model implements ISoftDeletable
      *
      * @var User
      */
-	protected $owner;
+    protected $owner;
 
     /** @var Page */
     protected $page;
 
-	/** @var string */
-	protected $heading;
+    /** @var string */
+    protected $heading;
 
-	/** @var string */
-	protected $body;
+    /** @var string */
+    protected $body;
 
-	/**
+    /**
      * @param Page $page
-	 * @return self
-	 */
+     * @return self
+     */
     public function setPage(Page $page)
     {
         $this->page = $page;
-		return $this;
-	}
+        return $this;
+    }
 
-	/**
+    /**
      * @return Page
-	 */
+     */
     public function getPage()
     {
         return $this->page;
-	}	
+    }
 
 
-	/**
-	 * @param User $owner
-	 * @return self
-	 */
-	public function setOwner($owner) {
-		$this->owner = $owner;
-		return $this;
-	}
+    /**
+     * @param User $owner
+     * @return self
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
 
-	/**
-	 * @return User
-	 */
-	public function getOwner() {
-		return $this->owner;
-	}
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
 
 
-	/**
-	 * @param string $heading
-	 * @return self
-	 */
-	public function setHeading($heading) {
-		$this->heading = $heading;
-		return $this;
-	}
+    /**
+     * @param string $heading
+     * @return self
+     */
+    public function setHeading($heading)
+    {
+        $this->heading = $heading;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getHeading() {
-		return $this->heading;
-	}
+    /**
+     * @return string
+     */
+    public function getHeading()
+    {
+        return $this->heading;
+    }
 
-	/**
-	 * @param string $body
-	 * @return self
-	 */
-	public function setBody($body) {
-		$this->body = $body;
-		return $this;
-	}
+    /**
+     * @param string $body
+     * @return self
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getBody() {
-		return $this->body;
-	}
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
 }

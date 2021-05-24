@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -86,7 +87,6 @@ class ClassList
         // Are we looking at current classes, or historical?
 
         if ($isTermCurrent) {
-
             // Iterate all subjects from the SIS and try to find folders with that class code
 
             foreach ($this->user->getSubjectCollection() as $subject) {
@@ -124,7 +124,7 @@ class ClassList
         }
         $folderList->sortByCallback(static function (Folder\Model $a, Folder\Model $b) use ($classTypes): int {
             //Sort on Class Type, Folder Name, Code
-            return \strnatcasecmp($classTypes[$a->getId()].$a->getNameWithCodes(), $classTypes[$b->getId()].$b->getNameWithCodes());
+            return \strnatcasecmp($classTypes[$a->getId()] . $a->getNameWithCodes(), $classTypes[$b->getId()] . $b->getNameWithCodes());
         }, true);
 
         return [

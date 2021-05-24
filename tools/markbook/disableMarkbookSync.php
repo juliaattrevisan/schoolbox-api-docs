@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Lazy way to enable/disable external markbook sync
  *
@@ -20,5 +21,4 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
     $configMapper = ConfigMapper::getInstance();
     $configMapper->getDatabase()->query("UPDATE config SET value = 0 WHERE name = 'external_markbook'");
-
 });

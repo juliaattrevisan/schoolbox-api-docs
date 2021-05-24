@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 namespace Schoolbox\MobileApp;
 
 use Schoolbox\Resource\Storage\IStorage;
-
 
 /**
  * This class is ONLY used to get data into/out of the database.
@@ -133,5 +133,4 @@ class Service
         $this->certificate = $certificate;
         return $this;
     }
-
 }

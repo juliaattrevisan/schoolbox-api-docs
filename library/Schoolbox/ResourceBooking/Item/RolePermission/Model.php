@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for resource role permissions.
  *
@@ -6,14 +7,15 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Item\RolePermission;
 
 use Schoolbox\ResourceBooking\Item;
 use Schoolbox\Role;
 use JsonSerializable;
 
-class Model implements JsonSerializable {
+class Model implements JsonSerializable
+{
 
     /**
      * @var int
@@ -39,7 +41,8 @@ class Model implements JsonSerializable {
      * @param  boolean $allowed
      * @return $this
      */
-    public function setAllowed($allowed) {
+    public function setAllowed($allowed)
+    {
         $this->allowed = $allowed;
         return $this;
     }
@@ -47,7 +50,8 @@ class Model implements JsonSerializable {
     /**
      * @return boolean
      */
-    public function getAllowed() {
+    public function getAllowed()
+    {
         return $this->allowed;
     }
 
@@ -55,7 +59,8 @@ class Model implements JsonSerializable {
      * @param  int $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -63,7 +68,8 @@ class Model implements JsonSerializable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -71,7 +77,8 @@ class Model implements JsonSerializable {
      * @param  Item\Model $resource
      * @return $this
      */
-    public function setResource($resource) {
+    public function setResource($resource)
+    {
         $this->resource = $resource;
         return $this;
     }
@@ -79,7 +86,8 @@ class Model implements JsonSerializable {
     /**
      * @return Item\Model
      */
-    public function getResource() {
+    public function getResource()
+    {
         return $this->resource;
     }
 
@@ -87,7 +95,8 @@ class Model implements JsonSerializable {
      * @param  Role $role
      * @return $this
      */
-    public function setRole($role) {
+    public function setRole($role)
+    {
         $this->role = $role;
         return $this;
     }
@@ -95,7 +104,8 @@ class Model implements JsonSerializable {
     /**
      * @return Role
      */
-    public function getRole() {
+    public function getRole()
+    {
         return $this->role;
     }
 
@@ -107,12 +117,12 @@ class Model implements JsonSerializable {
      * @return mixed data which can be serialized by <b>json_encode</b>,
      *       which is a value of any type other than a resource.
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return array(
             'role'     => $this->role->getId(),
             'resource' => $this->resource->getId(),
             'allowed'  => $this->getAllowed(),
         );
     }
-
 }

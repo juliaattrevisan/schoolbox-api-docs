@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -255,5 +256,4 @@ class MapperTest extends TestCase
         // these two variables point to the same memory address, this test must fail
         $this->assertNotSame($model, $previous);
     }
-
 }

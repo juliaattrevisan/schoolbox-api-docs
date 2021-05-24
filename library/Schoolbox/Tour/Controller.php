@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -88,7 +89,6 @@ class Controller extends Base
             //Save it real good
             $this->tourStatusMapper->save($newTourStatus);
             $this->getResponse()->status->set(204);
-
         } catch (Mapper\Exception $e) {
             //Attempted to save invalid data
             $this->getResponse()->content->set($this->buildJsonOutput('Invalid status data. Did not save status.'));

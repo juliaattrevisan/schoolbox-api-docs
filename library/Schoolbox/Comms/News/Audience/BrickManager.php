@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
@@ -13,6 +15,7 @@ use PDO;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use UnexpectedValueException;
+
 use function array_values;
 
 /**
@@ -69,8 +72,8 @@ class BrickManager
         /** @var GenericCollection|Brick[] $bricks */
         $bricks = new GenericCollection(Brick::class);
 
-        foreach($audience as $segment){
-            if($segment->isSimple()){
+        foreach ($audience as $segment) {
+            if ($segment->isSimple()) {
                 $newBrick = new Brick(
                     [new Dimension($segment->getEntityType(), $segment->getEntityValue())],
                     $segment->getRelationship()

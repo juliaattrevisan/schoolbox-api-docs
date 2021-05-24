@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -13,9 +14,8 @@ use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\Assessment\Test\ParticipantLinker;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use \InvalidArgumentException;
+use InvalidArgumentException;
 use Schoolbox\User;
-
 
 class TotalMarkFractionalTest extends TestCase
 {
@@ -508,7 +508,7 @@ class TotalMarkFractionalTest extends TestCase
             ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }

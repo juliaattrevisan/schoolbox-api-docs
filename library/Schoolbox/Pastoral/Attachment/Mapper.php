@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -117,7 +118,8 @@ class Mapper extends BaseMapper
     {
         // Do NOT sync private attachments for now, for privacy reasons
         // TODO move this restriction to the pastoral upload Q
-        if (!$previous instanceof Model
+        if (
+            !$previous instanceof Model
             && !$model->getPrivate()
             && $this->getConfigLoader()->get("external_pastoral_upload")
         ) {

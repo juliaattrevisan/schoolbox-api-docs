@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Offline stub implementation of sync connector.
  *

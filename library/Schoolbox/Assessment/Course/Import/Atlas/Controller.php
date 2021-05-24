@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -257,7 +258,6 @@ class Controller extends BaseController
             // SHUP.
             /** @noinspection PhpUnhandledExceptionInspection */
             $this->response->status->setCode(204);
-
         } catch (SchoolboxException $e) {
             if ($this->request->isXhr()) {
                 $this->response->status->set(400);
@@ -280,7 +280,8 @@ class Controller extends BaseController
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->response->status->setCode(400);
         $this->response->content->set(
-            $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
+            $this->buildUnthemedHtmlOutput(
+                'sub/mage-error.twig',
                 [
                     'error' => [
                         'problem' => 'You must select a curriculum plan.',
@@ -302,15 +303,12 @@ class Controller extends BaseController
         if ($e instanceof HttpException\ServerException) {
             // Something went wrong with Atlas
             $message .= ' Please try again later.';
-
         } elseif ($e instanceof HttpException\ClientException) {
             // Something went wrong with us, probably configuration
             $message .= ' Please contact your system administrator.';
-
         } elseif ($e instanceof HttpException\RequestException) {
             // Something went wrong somewhere; probably a timeout
             $message .= ' Please try again later.';
-
         } else {
             // Something unpredictable went wrong
             $message .= ' Please try again later.';
@@ -321,7 +319,8 @@ class Controller extends BaseController
         /** @noinspection PhpUnhandledExceptionInspection */
         $this->response->status->setCode($e->getCode() ?: 400);
         $this->response->content->set(
-            $this->buildUnthemedHtmlOutput('sub/mage-error.twig',
+            $this->buildUnthemedHtmlOutput(
+                'sub/mage-error.twig',
                 [
                     'error' => [
                         'problem' => $message,

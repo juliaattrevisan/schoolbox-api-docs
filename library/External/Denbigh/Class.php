@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Anyone Foolish Enough To Claim It <everyone@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd

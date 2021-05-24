@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for normal (non-eportfolio) blog posts
  *
@@ -147,7 +148,6 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface, 
                     ->setFolder($this->hydrateJoin($r, 'folder', 'c'))
             );
         }
-
     }
 
     /**

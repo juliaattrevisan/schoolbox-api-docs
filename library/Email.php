@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Adds validation and detection methods for email addresses and things related
  * to email addresses.

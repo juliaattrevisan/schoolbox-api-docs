@@ -1,14 +1,17 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
 use function array_key_exists;
 use function count;
+
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Schoolbox\GenericCollection;
@@ -21,7 +24,9 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+
 use function sprintf;
+
 use UnexpectedValueException;
 
 class MiddleYearsAssessmentTasks extends BaseComponent
@@ -135,7 +140,8 @@ class MiddleYearsAssessmentTasks extends BaseComponent
         // Does the set include an assessment imported to this class and in which the student is participating?
         $classAssessment = null;
         foreach ($cohortAssessments as $assessment) {
-            if ($assessment->isParticipant($this->student) &&
+            if (
+                $assessment->isParticipant($this->student) &&
                 (int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()
             ) {
                 $classAssessment = $assessment;

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Metadata;
 
 /**
@@ -60,7 +62,8 @@ abstract class Metadata
      * @param \DOMXpath $xml
      * @param string $url
      */
-    public function __construct($xml, $url) {
+    public function __construct($xml, $url)
+    {
         $this->setXml($xml);
         $this->setUrl($url);
     }
@@ -80,11 +83,12 @@ abstract class Metadata
      * @param array $allowableAttributes
      * @return string|null
      */
-    protected function analyse($query, $allowableAttributes) {
+    protected function analyse($query, $allowableAttributes)
+    {
         $allElements = $this->getXml()->query($query);
 
-        foreach($allElements as $currentElement) {
-            foreach($currentElement->attributes as $currentAttribute) {
+        foreach ($allElements as $currentElement) {
+            foreach ($currentElement->attributes as $currentAttribute) {
                 if (in_array($currentAttribute->nodeName, $allowableAttributes)) {
                     return trim($currentAttribute->nodeValue);
                 }
@@ -102,7 +106,8 @@ abstract class Metadata
      *
      * @param Metadata $next
      */
-    public function setNext($next) {
+    public function setNext($next)
+    {
         $this->next = $next;
     }
 
@@ -111,7 +116,8 @@ abstract class Metadata
      *
      * @return Metadata|null
      */
-    public function getNext() {
+    public function getNext()
+    {
         return $this->next;
     }
 
@@ -120,7 +126,8 @@ abstract class Metadata
      *
      * @param string $url
      */
-    protected function setUrl($url) {
+    protected function setUrl($url)
+    {
         $this->url = $url;
     }
 
@@ -129,7 +136,8 @@ abstract class Metadata
      *
      * @return string
      */
-    protected function getUrl() {
+    protected function getUrl()
+    {
         return $this->url;
     }
 
@@ -138,7 +146,8 @@ abstract class Metadata
      *
      * @param string $description
      */
-    protected function setDescription($description) {
+    protected function setDescription($description)
+    {
         $this->description = $description;
     }
 
@@ -147,7 +156,8 @@ abstract class Metadata
      *
      * @return string
      */
-    public function getDescription() {
+    public function getDescription()
+    {
         return $this->description;
     }
 
@@ -156,7 +166,8 @@ abstract class Metadata
      *
      * @param string $title
      */
-    protected function setTitle($title) {
+    protected function setTitle($title)
+    {
         $this->title = $title;
     }
 
@@ -165,7 +176,8 @@ abstract class Metadata
      *
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -174,7 +186,8 @@ abstract class Metadata
      *
      * @param \DOMXpath $xml
      */
-    protected function setXml($xml) {
+    protected function setXml($xml)
+    {
         $this->xml = $xml;
     }
 
@@ -183,7 +196,8 @@ abstract class Metadata
      *
      * @return \DOMXpath
      */
-    protected function getXml() {
+    protected function getXml()
+    {
         return $this->xml;
     }
 }

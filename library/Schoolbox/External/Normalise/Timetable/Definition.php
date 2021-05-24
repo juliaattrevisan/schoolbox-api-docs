@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Definition
  *
@@ -45,7 +46,8 @@ class Definition
      * @param PeriodBase $period
      * @return $this
      */
-    public function addPeriod(PeriodBase $period) {
+    public function addPeriod(PeriodBase $period)
+    {
         $this->getAllPeriods()->add($period);
 
         return $this;
@@ -69,7 +71,7 @@ class Definition
         ];
 
         foreach ($this->getAllPeriods() as $currentPeriod) {
-            $periodIndex = $currentPeriod->getNumber()-1;
+            $periodIndex = $currentPeriod->getNumber() - 1;
 
             $decompiled['desc'][$periodIndex] = $currentPeriod->getName();
             $decompiled['start'][$periodIndex] = $currentPeriod->getStart();

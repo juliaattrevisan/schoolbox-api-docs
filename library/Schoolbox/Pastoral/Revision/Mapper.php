@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Please don't use this mapper directly in web requests!
  *

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Payload\Calendar\Event;
@@ -14,12 +16,12 @@ use Schoolbox\Calendar;
 class Update extends Request
 {
     use PostTrait;
-    
+
     var $event;
 
     public function __construct(Calendar\Event $event)
     {
-        $this->event=$event;
+        $this->event = $event;
         $this->setReferer("/calendar/event/" . $this->event->getId() . "/modify");
 
         $this->setFormParam('id', $event->getId());
@@ -47,5 +49,3 @@ class Update extends Request
         return "/calendar/event/" . $this->event->getId() . "/modify";
     }
 }
-
-

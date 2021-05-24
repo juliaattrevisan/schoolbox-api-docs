@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_SilentProbe
  *
@@ -6,21 +7,23 @@
  *
  * Silently output dump to a hidden div so you can discreetly diagnose
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 
 use Alaress\DebugBar\Instance as DebugBar;
 
-class Alaress_Submarine {
+class Alaress_Submarine
+{
 
     /**
      * Alaress_SilentProbe constructor.
      * @param null $_
      * @throws \DebugBar\DebugBarException
      */
-    public function __construct($_ = null) {
+    public function __construct($_ = null)
+    {
         $numArgs = func_num_args();
 
         if (DebugBar::isEnabled()) {

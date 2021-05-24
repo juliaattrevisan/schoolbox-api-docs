@@ -1,14 +1,15 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource;
-
 
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
@@ -43,9 +44,14 @@ class LinkNotifier extends ResourceNotifier
         }
 
         return $this->notify(
-            LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_CREATED,    // "link.{id}.created"
+            LogMapper::KIND_LINK,
+            $link->getId(),
+            self::TRIGGER_CREATED,    // "link.{id}.created"
             new Param($link->getDescription(), $link->getHref(), ParameterInterface::STACKING_APPEND), // the :resource param
-            $effector, $category, $roletype, $this->getAccessLevel($link)
+            $effector,
+            $category,
+            $roletype,
+            $this->getAccessLevel($link)
         );
     }
 
@@ -63,9 +69,14 @@ class LinkNotifier extends ResourceNotifier
 
         // abstract this so far it doesn't even make sense any more
         return $this->notify(
-            LogMapper::KIND_LINK, $link->getId(), self::TRIGGER_DELETED,    // "link.{id}.deleted"
+            LogMapper::KIND_LINK,
+            $link->getId(),
+            self::TRIGGER_DELETED,    // "link.{id}.deleted"
             new Param($link->getDescription(), null, ParameterInterface::STACKING_APPEND), // the :resource param
-            $effector, $category, $roletype, $this->getAccessLevel($link)
+            $effector,
+            $category,
+            $roletype,
+            $this->getAccessLevel($link)
         );
     }
 

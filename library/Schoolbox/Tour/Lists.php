@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Tour;
 
 use Schoolbox\User;
@@ -36,7 +38,8 @@ class Lists
      * @param Mapper      $tourMapper
      * @param Step\Mapper $stepMapper
      */
-    public function __construct(Mapper $tourMapper, Step\Mapper $stepMapper) {
+    public function __construct(Mapper $tourMapper, Step\Mapper $stepMapper)
+    {
         $this->tourMapper = $tourMapper;
         $this->stepMapper = $stepMapper;
     }
@@ -48,7 +51,8 @@ class Lists
      * @return array
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getTours(User $user, $url) : array {
+    public function getTours(User $user, $url): array
+    {
         // Store the tours we are going to serve in an array
 
         $data = [];
@@ -63,13 +67,11 @@ class Lists
 
         /** @var Model $tour */
         foreach ($tours as $tour) {
-
             // Create an array to store the selectors/events
             $triggerArray = [];
 
             /** @var Trigger\Model $tourTrigger */
             foreach ($tour->getTriggerList() as $tourTrigger) {
-
                 // Add the selector/event to the return data
 
                 $triggerArray[] = [

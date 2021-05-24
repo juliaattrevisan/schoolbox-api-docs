@@ -8,7 +8,7 @@ class Homepage
 {
 
     /* Used to remove homepage components and reset template
-	 */
+     */
     const REMOVE_HOMEPAGE_TEMPLATE_ID = -1;
     const KEEP_EXISTING_HOMEPAGE      = 0;
 
@@ -285,7 +285,6 @@ class Homepage
         $query = substr($query, 0, -2);
         $query .= " WHERE cid = '" . $this->cid . "'";
         return $this->db->query($query);
-
     }
 
     public function getConfig($categoryId = null)

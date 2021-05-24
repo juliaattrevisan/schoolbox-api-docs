@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Repair Google Drive file extensions that were mistakenly cast to .pdf
  *
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -77,8 +79,13 @@ $app = new class extends CliTool\App
                 'storageId' => $row['storage_id']
             ]);
 
-            $this->getLogger()->notice(sprintf('storageId %d: rename (%s, %s) to (%s, %s)',
-                $row['storage_id'], $row['filename'], $row['ext'], $newFilename, $row['original_extension']
+            $this->getLogger()->notice(sprintf(
+                'storageId %d: rename (%s, %s) to (%s, %s)',
+                $row['storage_id'],
+                $row['filename'],
+                $row['ext'],
+                $newFilename,
+                $row['original_extension']
             ));
 
             $count++;

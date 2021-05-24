@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Module;
-
 
 use Aura\Di\ContainerInterface;
 use Twig\Error\LoaderError;
@@ -31,13 +31,13 @@ trait StandardModuleTrait
      * @param string             $basename
      * @return $this
      */
-    protected abstract function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '');
+    abstract protected function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '');
 
 
     /**
      * @return string
      */
-    protected abstract function getBasename();
+    abstract protected function getBasename();
 
 
     /**
@@ -74,9 +74,8 @@ trait StandardModuleTrait
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->getBasename(),
+            'controller:' . $this->getBasename(),
             $injector->lazyNew($this->getControllerClassName())
         );
     }
-
 }

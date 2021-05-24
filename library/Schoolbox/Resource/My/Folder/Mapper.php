@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\My\Folder;
-
 
 use Schoolbox\Resource\AbstractFolderMapper;
 use Schoolbox\Resource\Folder\IFolder;
@@ -127,4 +127,4 @@ class Mapper extends AbstractFolderMapper implements ILocator
         }
         return false;
     }
-} 
+}

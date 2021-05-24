@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\RubricUsage;
@@ -155,7 +157,7 @@ class Factory extends AbstractFactory
             $selections,
             $overrides[$pageFilter->getFilter()->getId()],
             $this->getSelectionMapper(),
-            new Codec,
+            new Codec(),
             $capabilities,
             $showCapabilities,
             $showIndicators
@@ -170,6 +172,6 @@ class Factory extends AbstractFactory
      */
     public function buildKeyConverter(Filter\Model $filter): Filter\IKeyConverter
     {
-        return new KeyConverter($filter, new Codec);
+        return new KeyConverter($filter, new Codec());
     }
 }

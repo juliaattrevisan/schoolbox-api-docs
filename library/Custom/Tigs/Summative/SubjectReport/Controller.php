@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport;
@@ -24,6 +26,7 @@ use Schoolbox\Resource\Textbox;
 use Schoolbox\User;
 use External_UserInterface;
 use Schoolbox\UserMapper;
+
 use function array_merge;
 
 class Controller extends Web\Controller\Base
@@ -153,8 +156,7 @@ class Controller extends Web\Controller\Base
                 'dataAttributeError' => Config::ERROR_DATA_ATTRIBUTE,
                 'showErrors'         => ($roleTypeOverride ?? $this->getUser()->getRole()->getType()) === Role::STAFF,
                 'isEnabled'          => $this->getConfigLoader()->get(Config::_TIGS_SUBJECT_REPORT_ENABLED),
-            ]
-        );
+            ]);
 
         $output = $this->buildHtmlOutput('@tigsSubjectReport/subject.twig', $data, "Subject Report");
 

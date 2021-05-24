@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Rules\Token\Test;
-
 
 use Alaress\Rules\Lang\Map;
 use PHPUnit\Framework\TestCase;
@@ -186,5 +186,4 @@ class TokenizerTest extends TestCase
 
         $this->assertEquals($expected, $actual);
     }
-
 }

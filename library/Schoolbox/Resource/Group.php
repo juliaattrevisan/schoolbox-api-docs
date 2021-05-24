@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains information about the type of group that a folder represents
  * Folders can have groups of type, free, moderator or private.
@@ -8,9 +9,11 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource;
 
-class Group {
+class Group
+{
 
     /**
      * The three types of groups you can join:

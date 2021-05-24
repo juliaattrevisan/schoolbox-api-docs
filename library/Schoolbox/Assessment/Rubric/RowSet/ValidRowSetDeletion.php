@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
@@ -126,7 +128,8 @@ class ValidRowSetDeletion extends Base
         foreach ($deletedCapabilityIds as $deletedCapabilityId) {
             $existingCapability = $this->existingRowSet->retrieveCapability($deletedCapabilityId);
             if ($existingCapability && $existingCapability->isInUse($this->allowModifyExclusion)) {
-                $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
+                $errorMessage = sprintf(
+                    "Cannot delete %s '%s' because it is in use elsewhere",
                     $this->translator->translate('rubricGroup'),
                     $existingCapability->getName()
                 );
@@ -139,7 +142,8 @@ class ValidRowSetDeletion extends Base
         foreach ($deletedIndicatorIds as $deletedIndicatorId) {
             $existingIndicator = $this->existingRowSet->retrieveIndicator($deletedIndicatorId);
             if ($existingIndicator && $existingIndicator->isInUse($this->allowModifyExclusion)) {
-                $errorMessage = sprintf("Cannot delete %s '%s' because it is in use elsewhere",
+                $errorMessage = sprintf(
+                    "Cannot delete %s '%s' because it is in use elsewhere",
                     $this->translator->translate('rubricCriterion'),
                     $existingIndicator->getName()
                 );

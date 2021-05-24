@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Task\Decorator;
 
 use Schoolbox\Collection;
@@ -59,7 +61,6 @@ class Decorator implements DecoratorInterface
         /* $this->getAttachedFiles() is a list of hashes
          */
         if (count($this->getAttachedFiles())) {
-
             /* These are the task_file relations we already know about
              */
             $existing = $assessment->getAttachedFiles()->indexBy('hash')->getAll();
@@ -70,7 +71,6 @@ class Decorator implements DecoratorInterface
             /* Exclude any hashes that are no longer in the set
              */
             foreach ($attachments as $file) {
-
                 /* If this was already in the $assessment model:
                  *
                  * Reuse the id in the task_file table so we don't keep accumulating relations
@@ -90,4 +90,3 @@ class Decorator implements DecoratorInterface
         $assessment->setAttachedFiles($newList);
     }
 }
-

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Create dashboard feature tour
  *
@@ -242,7 +243,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     // Insert the content
     $i = 0;
     foreach ($stepsReversed as $step) {
-
         $statement = $database->prepare("
           INSERT INTO   `tour_step`
           (
@@ -280,7 +280,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
 
         if ($step['type'] === 'tooltip') {
-
             $statement = $database->prepare("
               INSERT INTO   `tour_step_tooltip`
               (
@@ -308,9 +307,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                 'content'        => trim($step['content']),
                 'selector'       => $step['selector'],
             ]);
-
         } elseif ($step['type'] === 'modal') {
-
             $statement = $database->prepare("
               INSERT INTO   `tour_step_modal`
               (
@@ -339,7 +336,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                 'content'        => trim($step['content']),
                 'css_class'      => $step['css_class'],
             ]);
-
         }
 
         // Insert any step events

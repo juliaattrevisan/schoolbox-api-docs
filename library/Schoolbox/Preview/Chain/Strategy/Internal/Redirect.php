@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Redirect
  *
@@ -9,18 +10,19 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
-
-class Redirect extends Base {
+class Redirect extends Base
+{
 
     /**
      * Base case
      *
      * @return mixed
      */
-    public function test() {
+    public function test()
+    {
         return [
             'type' => 'redirect',
             'src' => $this->getUrl(),
         ];
     }
-} 
+}

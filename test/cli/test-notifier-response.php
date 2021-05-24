@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -36,13 +37,13 @@ if (!$rc->isSubclassOf(AbstractModuleNotifier::class)) {
 }
 
 if (!$rc->hasMethod($method)) {
-    die ("Method $classname::$method does not exist\n");
+    die("Method $classname::$method does not exist\n");
 }
 
 $rm = $rc->getMethod($method);
 
 if (!$rm->isPublic()) {
-    die ("Method $classname::$method is not accessible\n");
+    die("Method $classname::$method is not accessible\n");
 }
 
 /** @var AbstractModuleNotifier $notifier */
@@ -72,6 +73,5 @@ foreach ($envelope->getAll() as $instance) {
 
     $html2text = new Html2Text($pageArray['title']);
 
-    printf(" ** [%s] '%s'\n", $pageArray['href'], str_replace("\n","",$html2text->getText()));
+    printf(" ** [%s] '%s'\n", $pageArray['href'], str_replace("\n", "", $html2text->getText()));
 }
-

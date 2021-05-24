@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -46,6 +47,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use TypeError;
 use UnexpectedValueException;
+
 use function func_get_args;
 
 class Controller extends Base
@@ -108,8 +110,7 @@ class Controller extends Base
         Access $access,
         AssessmentFilters\IdFinder $assessmentIdFinder,
         Filter\IFactoryFactory $filterFactoryFactory
-    )
-    {
+    ) {
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->termMapper            = $termMapper;
         $this->folderMapper          = $folderMapper;
@@ -137,7 +138,8 @@ class Controller extends Base
 
         $this->getResponse()->redirect->to(
             $this->getRouter()->generate(
-                'learningGrades.getGrades', [
+                'learningGrades.getGrades',
+                [
                     'userId'   => $this->getUser()->getId(),
                     'termCode' => $termCode
                 ]
@@ -198,7 +200,8 @@ class Controller extends Base
             static function (Folder\Model $folder) use ($assessmentsPerFolder, $displayFolderIds) {
                 return $assessmentsPerFolder->keyExists($folder->getId())
                     && in_array($folder->getId(), $displayFolderIds);
-            })->indexBy('id');
+            }
+        )->indexBy('id');
 
         /* If we're in an Extraordinary Term, limit the list of $folders to those which occur
          * as being related to the Extraordinary Term.
@@ -286,9 +289,11 @@ class Controller extends Base
         foreach ($assessments as $assessment) {
             $folder = $assessment->getContext()->getFolder();
 
-            if (!$folder instanceof Folder\Model
+            if (
+                !$folder instanceof Folder\Model
                 || $folder->isDeleted()
-                || !$folder->isGradePageEnabled()) {
+                || !$folder->isGradePageEnabled()
+            ) {
                 continue;
             }
             if (!isset($markbooksFolders[$folder->getId()])) {
@@ -676,7 +681,6 @@ class Controller extends Base
                 'returnUrlSuffix'       => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($_SERVER['REQUEST_URI']),
             ])->getAsString(),
         ]));
-
     }
 
     /**
@@ -815,7 +819,6 @@ class Controller extends Base
                 } else {
                     $graphData[] = [];
                 }
-
             }
         }
 
@@ -926,7 +929,7 @@ class Controller extends Base
      */
     private function getYearUrl(int $vieweeId)
     {
-        try{
+        try {
             return $this->getRouter()->generate('learningGrades.getGradesYear', ['userId' => $vieweeId]);
         } catch (RouteNotFound $e) {
             return null;

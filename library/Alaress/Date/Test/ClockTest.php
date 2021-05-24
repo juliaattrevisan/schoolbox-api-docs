@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that \Alaress\Date\Clock works as expected.
  *

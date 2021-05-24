@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AccessDenied
  *
@@ -8,7 +9,6 @@
  */
 
 namespace Schoolbox\Application\Exception;
-
 
 class AccessDenied extends Exception
 {

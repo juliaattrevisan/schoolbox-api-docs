@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is the main controller for standard (non-eportfolio) blogs that handles all the CRUD operations
  *
@@ -174,7 +175,6 @@ class Controller extends Base
                 // The attachment was found in the database, remove it
                 $attachment->setUpdatedAt(\Alaress_Date_Format::now());
                 $this->getBlogImageMapper()->delete($attachment);
-
             } else {
                 // We are keeping this attachment
                 $retainedAttachments[] = $attachment->getHash();
@@ -206,8 +206,7 @@ class Controller extends Base
      */
     public function getItem(BlogModel $blog)
     {
-        try
-        {
+        try {
             // Grab the record
 
             // Hydrate the owner and folder details
@@ -235,9 +234,7 @@ class Controller extends Base
             // Load in images
 
             $images = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
-        }
-        catch (MapperException $e)
-        {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
@@ -381,14 +378,12 @@ class Controller extends Base
         // This creates an array of unique year/months for the date selector
 
         /** @var BlogModel $blog */
-        foreach ($blogs as $blog)
-        {
+        foreach ($blogs as $blog) {
             $dateSelectorArray[$blog->getCreatedAt()->getYear() . "-" . $blog->getCreatedAt()->getMonth(true)] = $blog->getCreatedAt();
             $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
             $blog->setOwner($user);
 
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
-
                 $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
                 $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
@@ -429,126 +424,144 @@ class Controller extends Base
     /**
      * @param UserAccessMapper $userAccessMapper
      */
-    public function setUserAccessMapper($userAccessMapper) {
+    public function setUserAccessMapper($userAccessMapper)
+    {
         $this->userAccessMapper = $userAccessMapper;
     }
 
     /**
      * @return UserAccessMapper
      */
-    public function getUserAccessMapper() {
+    public function getUserAccessMapper()
+    {
         return $this->userAccessMapper;
     }
 
     /**
      * @param RoleMapper $roleMapper
      */
-    public function setRoleMapper($roleMapper) {
+    public function setRoleMapper($roleMapper)
+    {
         $this->roleMapper = $roleMapper;
     }
 
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
     /**
      * @param UserMapper $userMapper
      */
-    public function setUserMapper($userMapper) {
+    public function setUserMapper($userMapper)
+    {
         $this->userMapper = $userMapper;
     }
 
     /**
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
     /**
      * @param ErrorMapper $errorMapper
      */
-    public function setErrorMapper($errorMapper) {
+    public function setErrorMapper($errorMapper)
+    {
         $this->errorMapper = $errorMapper;
     }
 
     /**
      * @return ErrorMapper
      */
-    public function getErrorMapper() {
+    public function getErrorMapper()
+    {
         return $this->errorMapper;
     }
 
     /**
      * @param FolderMapper $folderMapper
      */
-    public function setFolderMapper($folderMapper) {
+    public function setFolderMapper($folderMapper)
+    {
         $this->folderMapper = $folderMapper;
     }
 
     /**
      * @return FolderMapper
      */
-    public function getFolderMapper() {
+    public function getFolderMapper()
+    {
         return $this->folderMapper;
     }
 
     /**
      * @param FileMapper $fileMapper
      */
-    public function setFileMapper($fileMapper) {
+    public function setFileMapper($fileMapper)
+    {
         $this->fileMapper = $fileMapper;
     }
 
     /**
      * @return FileMapper
      */
-    public function getFileMapper() {
+    public function getFileMapper()
+    {
         return $this->fileMapper;
     }
 
     /**
      * @param BlogMapper $blogMapper
      */
-    public function setBlogMapper($blogMapper) {
+    public function setBlogMapper($blogMapper)
+    {
         $this->blogMapper = $blogMapper;
     }
 
     /**
      * @return BlogMapper
      */
-    public function getBlogMapper() {
+    public function getBlogMapper()
+    {
         return $this->blogMapper;
     }
 
     /**
      * @param BlogImageMapper $blogImageMapper
      */
-    public function setBlogImageMapper($blogImageMapper) {
+    public function setBlogImageMapper($blogImageMapper)
+    {
         $this->blogImageMapper = $blogImageMapper;
     }
 
     /**
      * @return BlogImageMapper
      */
-    public function getBlogImageMapper() {
+    public function getBlogImageMapper()
+    {
         return $this->blogImageMapper;
     }
 
     /**
      * @param BlogCommentMapper $blogCommentMapper
      */
-    public function setBlogCommentMapper($blogCommentMapper) {
+    public function setBlogCommentMapper($blogCommentMapper)
+    {
         $this->blogCommentMapper = $blogCommentMapper;
     }
 
     /**
      * @return BlogCommentMapper
      */
-    public function getBlogCommentMapper() {
+    public function getBlogCommentMapper()
+    {
         return $this->blogCommentMapper;
     }
 }

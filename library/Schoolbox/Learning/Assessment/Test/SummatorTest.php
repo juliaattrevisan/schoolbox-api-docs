@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Summator
  *
@@ -98,12 +99,12 @@ class SummatorTest extends TestCase
 
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
-                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0, 0)
             );
 
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0, 0));
             }
         }
 
@@ -137,18 +138,17 @@ class SummatorTest extends TestCase
 
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                if($currentAssessable instanceof Task){
+                if ($currentAssessable instanceof Task) {
                     $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
                 }
-
             }
 
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    if($currentAssessable instanceof Task){
+                    if ($currentAssessable instanceof Task) {
                         $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
@@ -309,12 +309,12 @@ class SummatorTest extends TestCase
 
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
-                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0, 0)
             );
 
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0, 0));
             }
         }
 
@@ -348,7 +348,7 @@ class SummatorTest extends TestCase
 
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                if($currentAssessable instanceof Task){
+                if ($currentAssessable instanceof Task) {
                     $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
@@ -358,7 +358,7 @@ class SummatorTest extends TestCase
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    if($currentAssessable instanceof Task){
+                    if ($currentAssessable instanceof Task) {
                         $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
@@ -514,7 +514,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testWeightedAverage10() {
+    public function testWeightedAverage10()
+    {
         $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
@@ -553,7 +554,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testWeightedAverage11() {
+    public function testWeightedAverage11()
+    {
         $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
@@ -586,7 +588,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testWeightedAverage12() {
+    public function testWeightedAverage12()
+    {
         $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
@@ -627,7 +630,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testWeightedAverage13() {
+    public function testWeightedAverage13()
+    {
         $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
@@ -663,7 +667,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testWeightedAverage14() {
+    public function testWeightedAverage14()
+    {
         $project = $this->spawnProject(new SummatorWeightedAverage());
         $project->setAssessables($this->massProduce());
 
@@ -716,12 +721,12 @@ class SummatorTest extends TestCase
 
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
-                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0, 0)
             );
 
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0, 0));
             }
         }
 
@@ -755,7 +760,7 @@ class SummatorTest extends TestCase
 
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                if($currentAssessable instanceof Task){
+                if ($currentAssessable instanceof Task) {
                     $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
@@ -765,7 +770,7 @@ class SummatorTest extends TestCase
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    if($currentAssessable instanceof Task){
+                    if ($currentAssessable instanceof Task) {
                         $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
@@ -890,7 +895,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMaximum6() {
+    public function testMaximum6()
+    {
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables($this->massProduce());
 
@@ -913,7 +919,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMaximum7() {
+    public function testMaximum7()
+    {
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables($this->massProduce());
 
@@ -941,7 +948,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMaximum8() {
+    public function testMaximum8()
+    {
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables($this->massProduce());
 
@@ -971,7 +979,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMaximum9() {
+    public function testMaximum9()
+    {
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables($this->massProduce());
 
@@ -1012,7 +1021,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMaximum10() {
+    public function testMaximum10()
+    {
         $project = $this->spawnProject(new SummatorMaximum());
         $project->setAssessables($this->massProduce());
 
@@ -1315,12 +1325,12 @@ class SummatorTest extends TestCase
 
         foreach ($project->getAssessables() as $currentAssessable) {
             $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(
-                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0)
+                $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0, 0)
             );
 
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0,0));
+                $currentResponse->setAllFeedback($currentResponse->getAllFeedback()->slice(0, 0));
             }
         }
 
@@ -1354,7 +1364,7 @@ class SummatorTest extends TestCase
 
             /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                if($currentAssessable instanceof Task){
+                if ($currentAssessable instanceof Task) {
                     $currentFeedback->getResponse()->setCreatedAt(null);
                 } else {
                     $currentFeedback->setPublishedAt(null);
@@ -1364,7 +1374,7 @@ class SummatorTest extends TestCase
             /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
                 foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    if($currentAssessable instanceof Task){
+                    if ($currentAssessable instanceof Task) {
                         $currentFeedback->getResponse()->setCreatedAt(null);
                     } else {
                         $currentFeedback->setPublishedAt(null);
@@ -1477,7 +1487,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMinimum6() {
+    public function testMinimum6()
+    {
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables($this->massProduce());
 
@@ -1499,7 +1510,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMinimum7() {
+    public function testMinimum7()
+    {
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables($this->massProduce());
 
@@ -1527,7 +1539,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMinimum8() {
+    public function testMinimum8()
+    {
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables($this->massProduce());
 
@@ -1557,7 +1570,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMinimum9() {
+    public function testMinimum9()
+    {
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables($this->massProduce());
 
@@ -1597,7 +1611,8 @@ class SummatorTest extends TestCase
      *
      * @throws \UnexpectedValueException
      */
-    public function testMinimum10() {
+    public function testMinimum10()
+    {
         $project = $this->spawnProject(new SummatorMinimum());
         $project->setAssessables($this->massProduce());
 
@@ -2737,7 +2752,7 @@ class SummatorTest extends TestCase
             ],
         ];
         $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
+        foreach ($responses as $response) {
             $marksGiven += $response['mark'];
             $marksAvailable += $response['available'];
         }

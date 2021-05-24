@@ -1,16 +1,19 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\MimetypeMapper;
 
 /**
  * Class SocialStream_Post_Url
  */
-class SocialStream_Post_Url extends SocialStream_Post_Abstract {
+class SocialStream_Post_Url extends SocialStream_Post_Abstract
+{
 
     /**
      * @var string
@@ -71,7 +74,8 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract {
      *
      * @return bool
      */
-    public function hasThumbnail(): bool {
+    public function hasThumbnail(): bool
+    {
         return '' !== $this->getThumbnail();
     }
 

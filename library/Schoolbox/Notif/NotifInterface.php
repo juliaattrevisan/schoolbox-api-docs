@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Notif;
-
 
 use Psr\Log\LoggerInterface;
 
@@ -50,5 +50,4 @@ interface NotifInterface extends LoggerInterface
      * @return bool
      */
     public function logTo($topic, $level, $message, array $context = array());
-
 }

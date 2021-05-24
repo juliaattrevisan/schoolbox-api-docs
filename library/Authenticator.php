@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -223,5 +224,4 @@ class Authenticator
 
         return $ip;
     }
-
 }

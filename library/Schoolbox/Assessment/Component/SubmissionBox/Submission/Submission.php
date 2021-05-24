@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\Submission;
-
 
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -89,7 +89,7 @@ class Submission implements IStorage, ISoftDeletable
         $isSubmitted = ! $this->isDraft();
 
         // Submitted after due date ?
-        if($isSubmitted && $this->submittedAt->gt($dueDate)){
+        if ($isSubmitted && $this->submittedAt->gt($dueDate)) {
             return true;
         }
 
@@ -126,9 +126,8 @@ class Submission implements IStorage, ISoftDeletable
         }
 
         if ($user->getRole()->isStaff()) {
-
             // Owns the submission Box
-            if((int)$this->getSubmissionBox()->getOwner()->getId() === $user->getId()){
+            if ((int)$this->getSubmissionBox()->getOwner()->getId() === $user->getId()) {
                 return true;
             }
 
@@ -139,8 +138,8 @@ class Submission implements IStorage, ISoftDeletable
                 UserAccess::ACCESS_WRITE,
                 true
             );
-            foreach($teachers as $teacher){
-                if($teacher->getId() == $user->getId()){
+            foreach ($teachers as $teacher) {
+                if ($teacher->getId() == $user->getId()) {
                     return true;
                 }
             }

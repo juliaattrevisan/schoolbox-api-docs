@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Browser;
 
 use Scrub;
@@ -95,7 +97,6 @@ class NodeRenderer
             $this->getPage()->setBlock($this->getHandle(), $b, $bk);
             $this->getPage()->setVar($bk, '');
         }
-
     }
 
 
@@ -277,5 +278,4 @@ class NodeRenderer
     {
         return $this->handle;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -24,7 +25,6 @@ use Schoolbox\Realtime\MessageList;
 use Schoolbox\Realtime\Routing;
 use Schoolbox\Realtime\Routing\Filter;
 use Schoolbox\UserMapper;
-
 
 class WorkerFactory
 {

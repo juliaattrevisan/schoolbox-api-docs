@@ -1,14 +1,15 @@
 <?php
+
 /**
  *
  * @author      James Leckie <jleckie@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
-
 
 class External_Isams_Cis_User extends External_Isams_User
 {

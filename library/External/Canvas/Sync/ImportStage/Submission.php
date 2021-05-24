@@ -1,9 +1,11 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2020, Alaress Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\ImportStage;
@@ -30,6 +32,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Mapper;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+
 use function array_key_exists;
 use function implode;
 
@@ -188,7 +191,8 @@ class Submission extends SectionAssignment
                                 }
                                 // $participant should be a school box user with this reviewee_id as their external_id
                                 $reviewee = $participant->getUser();
-                                if (!empty($canvasSubmission['comment']
+                                if (
+                                    !empty($canvasSubmission['comment']
                                     && $canvasSubmission['comment_created_at'] > $canvasSubmission['graded_at'])
                                 ) {
                                     $reviewer     = $this->findUserByCanvasUserId($canvasSubmission['commenter_id']);
@@ -199,7 +203,13 @@ class Submission extends SectionAssignment
                                 }
 
                                 $feedback            = $this->syncFeedback(
-                                    $submissionBox, $reviewer, $reviewee, $canvasSubmission, $existingFeedbacks, $markScheme, $feedbackTime
+                                    $submissionBox,
+                                    $reviewer,
+                                    $reviewee,
+                                    $canvasSubmission,
+                                    $existingFeedbacks,
+                                    $markScheme,
+                                    $feedbackTime
                                 );
                                 $syncedFeedbackIds[] = $feedback->getId();
                                 $this->syncMarkCount++;
@@ -249,9 +259,9 @@ class Submission extends SectionAssignment
         }
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
-
             // check whether the rest are the same
-            if ($existingFeedback->getOwner()->getId() === $reviewee->getId()
+            if (
+                $existingFeedback->getOwner()->getId() === $reviewee->getId()
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
                 && $existingFeedback->getComment() == $canvasSubmission['comment']
                 && $existingFeedback->getHumanReadableMark() == $readableMark

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Search for messages that match the given pattern(s) and blast from existence.
  *
@@ -50,10 +51,18 @@ $app = new class extends CliTool\App{
         $printf = "%-28s: ";
 
         $params = array(
-            'body'  => array("Bodytext $type)",             function ($v) { return $v; }),
-            'href'  => array("Href $type)",                 function ($v) { return $v; }),
-            'start' => array("No earlier than (strtotime)", function ($v) { return strtotime($v); }),
-            'end'   => array("No later than (strtotime)",   function ($v) { return strtotime($v); })
+            'body'  => array("Bodytext $type)",             function ($v) {
+                return $v;
+            }),
+            'href'  => array("Href $type)",                 function ($v) {
+                return $v;
+            }),
+            'start' => array("No earlier than (strtotime)", function ($v) {
+                return strtotime($v);
+            }),
+            'end'   => array("No later than (strtotime)",   function ($v) {
+                return strtotime($v);
+            })
         );
 
         $args = array();
@@ -153,7 +162,6 @@ $app = new class extends CliTool\App{
 
             // iterate messages
             while ($m = $amqp->readFromQueue($queueName)) {
-
                 $data = json_decode($m->body, true);
                 $msg  = json_decode($data['message'], true);
 

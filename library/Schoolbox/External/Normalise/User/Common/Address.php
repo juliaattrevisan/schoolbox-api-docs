@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Address
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External\Normalise\User\Common;
 
-class Address {
+class Address
+{
 
     /**
      * Address 1
@@ -63,7 +65,8 @@ class Address {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /**
@@ -72,7 +75,8 @@ class Address {
      * @param string|null $separator
      * @return string
      */
-    public function getAsString($separator = "\n") {
+    public function getAsString($separator = "\n")
+    {
         $address = array_filter(array(
             $this->getAddress1(),
             $this->getAddress2(),

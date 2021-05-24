@@ -1,16 +1,17 @@
 <?php
+
 /**
  *
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\MarkedGrid\Test;
 
 use Schoolbox\Assessment\Rubric\MarkedGrid\ValidCapabilityMark;
 use PHPUnit\Framework\TestCase;
-
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -19,11 +20,10 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 
-
 class ValidCapabilityMarkTest extends TestCase
 {
 
-    public function getTestIsSatisfiedByData() : iterable
+    public function getTestIsSatisfiedByData(): iterable
     {
         /* Mark types */
         $markSchemePercentage = new Percentage();

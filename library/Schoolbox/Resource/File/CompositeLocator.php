@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Amri Sannang <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\File;
 
 use InvalidArgumentException;
@@ -33,7 +35,8 @@ class CompositeLocator implements ILocator
      *
      * @throws InvalidArgumentException if any param is not a ILocator
      */
-    public function __construct() {
+    public function __construct()
+    {
 
         /** @var ILocator $subLocator */
         foreach (func_get_args() as $subLocator) {

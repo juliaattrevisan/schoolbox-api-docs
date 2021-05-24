@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync;
@@ -45,6 +47,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\UserMapper;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function fclose;
 use function file_exists;
 use function floor;
@@ -63,7 +66,6 @@ use function sprintf;
  */
 class CliImporter extends CliTool\App
 {
-
     use CanvasDatabaseTrait;
 
     private const OPT_SHORT_HELP = 'h';           // print help
@@ -144,8 +146,10 @@ class CliImporter extends CliTool\App
     private function buildCanvasApiConnectionOrExit(): Connector
     {
         // Check api config
-        if (!$this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY) ||
-            !$this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)) {
+        if (
+            !$this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_KEY) ||
+            !$this->getConfig()->get(ConfigMapper::_CANVAS_DATA_API_SECRET)
+        ) {
             $this->getLogger()->warning('API Key or secret is not set.');
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }

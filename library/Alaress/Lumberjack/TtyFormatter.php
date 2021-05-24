@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -77,7 +78,6 @@ class TtyFormatter extends CliFormatter
         if (is_array($record['extra'])) {
             foreach ($record['extra'] as $key => $value) {
                 if (isset($map[$key])) {
-
                     $value = sprintf($map[$key][1], $value);
                     $key = $map[$key][0];
 
@@ -86,7 +86,6 @@ class TtyFormatter extends CliFormatter
                     } else {
                         $left[] = $value;
                     }
-
                 } else {
                     $left[] = "[$value]";
                 }
@@ -105,7 +104,7 @@ class TtyFormatter extends CliFormatter
         if ($this->contextualise) {
             $context = $record['context'];
             unset($context['char']);
-            foreach($context as $key => $value) {
+            foreach ($context as $key => $value) {
                 $pieces[] = "\n   $key => $value";
             }
         }
@@ -148,10 +147,12 @@ class TtyFormatter extends CliFormatter
         $cut = strpos($middle, ' ') < $maxMiddle;
 
         foreach (explode("\n", wordwrap($middle, $maxMiddle, "\n", $cut)) as $chunk) {
-
             if ($first) {
-                $output .= sprintf(static::P_PATTERN,
-                    $left, $chunk, str_pad($right, $this->tty - ($leftLen + strlen($chunk) + static::P_PAD), ' ', STR_PAD_LEFT)
+                $output .= sprintf(
+                    static::P_PATTERN,
+                    $left,
+                    $chunk,
+                    str_pad($right, $this->tty - ($leftLen + strlen($chunk) + static::P_PAD), ' ', STR_PAD_LEFT)
                 );
 
                 $first = false;
@@ -162,5 +163,4 @@ class TtyFormatter extends CliFormatter
 
         return substr($output, 0, -1);
     }
-
 }

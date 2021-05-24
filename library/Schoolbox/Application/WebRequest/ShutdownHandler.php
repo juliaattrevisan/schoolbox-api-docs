@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Wrapper to handle registration of shutdown functions and allow ordering of execution
  */
@@ -9,8 +10,8 @@ class ShutdownHandler
 {
 
     private static $instance = false;
-    private        $enabled  = true;
-    private        $functions;
+    private $enabled  = true;
+    private $functions;
 
     private function __construct()
     {

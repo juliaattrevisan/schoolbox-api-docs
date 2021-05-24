@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Quiz XML import.
  *
@@ -8,7 +9,6 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Project;
@@ -53,7 +53,7 @@ $quiz = $import->getQuiz();
 $route = $this->routeLookup('learningAssessment.getUpdateAssessmentForm', ['assessmentId' => $quiz->getId()]);
 
 // Configure Update page to return to requested URL, or default to context homepage
-if(isset($_GET[Redirect::RETURN_URL]) ){
+if (isset($_GET[Redirect::RETURN_URL])) {
     $returnUrl = Redirect::decode($_GET[Redirect::RETURN_URL]);
 } else {
     $returnUrl = $quiz->getContext() instanceof Project
@@ -61,4 +61,3 @@ if(isset($_GET[Redirect::RETURN_URL]) ){
         : "/homepage/{$quiz->getBaseContext()->getFolder()->getId()}";
 }
 SitePage::localRedir($route . Redirect::queryString($returnUrl));
-

@@ -1,4 +1,5 @@
 <?php
+
 namespace Helper;
 
 // here you can define custom actions
@@ -80,8 +81,7 @@ class Acceptance extends \Codeception\Module
 
         $this->originalConfig[$name] = $currentValue;
         $db->updateInDatabase('config', ['value' => $value], ['name' => 'debug_mode']);
-
-    }    
+    }
 
     /**
      * Resets database value back
@@ -100,7 +100,7 @@ class Acceptance extends \Codeception\Module
      */
     public function runShellCommand(string $command)
     {
-        $cli=$this->getCliModule();
+        $cli = $this->getCliModule();
         $cli->runShellCommand($command, false);
     }
 

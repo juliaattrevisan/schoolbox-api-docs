@@ -13,7 +13,7 @@
  * Creates Categorys as required (synonymous with folders)
  */
 
-use \Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 class ZipFileUpload extends DeprecatedModel
 {
@@ -72,8 +72,8 @@ class ZipFileUpload extends DeprecatedModel
         $this->path = $this->extractTo . '/' . $this->prefix . uniqid();
 
         /* Prepare folder: if folder already exists, unlink all the stuff in it
-		 * and start it again
-		 */
+         * and start it again
+         */
         $this->cleanup();
     }
 
@@ -129,7 +129,7 @@ class ZipFileUpload extends DeprecatedModel
         $roleAccessMapper = \Schoolbox\Permission\Access\RoleAccessMapper::getInstance();
 
         /* Begin traversal
-		 */
+         */
         while (false !== ($obj = readdir($dh))) {
             if (($obj == '.') || ($obj == '..')) {
                 continue;
@@ -144,7 +144,6 @@ class ZipFileUpload extends DeprecatedModel
              * permissions
              */
             if (is_dir($currentPath)) {
-
                 $category = $folderMapper->createModel();
 
                 if ($parent->getId() != 0 && $inherit == '1') {
@@ -161,7 +160,6 @@ class ZipFileUpload extends DeprecatedModel
                         $roleAccess->setRole($roleMapper->findById($id));
                         $roleAccess->setType($perm);
                         $roleAccessMapper->save($roleAccess);
-
                     } catch (\Exception $e) {
                         // noop
                     }
@@ -178,7 +176,6 @@ class ZipFileUpload extends DeprecatedModel
                  * Otherwise, it's a file, and we add it to the parent Category
                  */
                 $this->traverse($currentPath, $category->getId(), $perms);
-
             } else {
                 // Ignore filenames starting with a . (these are usually
                 // hidden or system files, and should be ignored)
@@ -204,7 +201,6 @@ class ZipFileUpload extends DeprecatedModel
                     }
 
                     $fileMapper->save($file);
-
                 } catch (\Schoolbox\File\Exception $e) {
                     $this->errorFiles[] = [
                         'file'    => $obj,
@@ -215,7 +211,6 @@ class ZipFileUpload extends DeprecatedModel
                     if ($this->verbose) {
                         echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
                     }
-
                 } catch (\RuntimeException $e) {
                     // because common interfaces would make this too easy...
                     $this->errorFiles[] = [
@@ -227,7 +222,6 @@ class ZipFileUpload extends DeprecatedModel
                     if ($this->verbose) {
                         echo "Error: could not make <strong>$obj</strong> in $parentID<br>";
                     }
-
                 }
             }
         }

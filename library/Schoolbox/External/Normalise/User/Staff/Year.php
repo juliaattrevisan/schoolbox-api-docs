@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Year
  *
@@ -11,7 +12,8 @@
 
 namespace Schoolbox\External\Normalise\User\Staff;
 
-class Year {
+class Year
+{
 
     /**
      * The numeric value of a students' Year

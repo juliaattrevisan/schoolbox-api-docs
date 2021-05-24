@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Synergetic implementation of sync connector for Donvale
  *

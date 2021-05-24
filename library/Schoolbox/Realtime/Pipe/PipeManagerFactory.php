@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -112,5 +113,4 @@ class PipeManagerFactory
 
         return $pipeManager;
     }
-
 }

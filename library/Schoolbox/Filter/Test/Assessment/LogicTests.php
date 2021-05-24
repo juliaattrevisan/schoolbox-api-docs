@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,6 +18,7 @@ use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_merge;
 
 class LogicTests extends TestCase
@@ -40,12 +42,12 @@ class LogicTests extends TestCase
         $actual          = $qbt->getDoContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
-            AssessmentFilters\NullableContext\UnitImportSpec\Definition::class . ': ' . $this->toStr($uis).
-            AssessmentFilters\Folder\TeacherInvolved\Definition::class         . ': ' . $this->toStr($f).
-            AssessmentFilters\NullableContext\Project\Definition::class        . ': ' . $this->toStr($p).
-            AssessmentFilters\NullableContext\UnitImpl\Definition::class       . ': ' . $this->toStr($ui).
-            AssessmentFilters\NullableContext\UnitSpec\Definition::class       . ': ' . $this->toStr($us).
-            $this->toStr($completeFilters)."\n";
+            AssessmentFilters\NullableContext\UnitImportSpec\Definition::class . ': ' . $this->toStr($uis) .
+            AssessmentFilters\Folder\TeacherInvolved\Definition::class         . ': ' . $this->toStr($f) .
+            AssessmentFilters\NullableContext\Project\Definition::class        . ': ' . $this->toStr($p) .
+            AssessmentFilters\NullableContext\UnitImpl\Definition::class       . ': ' . $this->toStr($ui) .
+            AssessmentFilters\NullableContext\UnitSpec\Definition::class       . ': ' . $this->toStr($us) .
+            $this->toStr($completeFilters) . "\n";
 
         $this->assertEquals($expected, $actual, $message);
     }
@@ -69,12 +71,12 @@ class LogicTests extends TestCase
         $actual          = $qbt->getDoNonContextFiltersGuaranteeEmptySet($completeFilters);
 
         $message =
-            AssessmentFilters\AssessmentType\Definition::class . ':  '. $this->toStr($a).
-            AssessmentFilters\Term\Close\Definition::class     . ': ' . $this->toStr($tc).
-            AssessmentFilters\Term\Due\Definition::class       . ': ' . $this->toStr($td).
-            AssessmentFilters\WeightingType\Definition::class  . ': ' . $this->toStr($wt).
-            AssessmentFilters\WorkType\Definition::class       . ': ' . $this->toStr($wk).
-            $this->toStr($completeFilters)."\n";
+            AssessmentFilters\AssessmentType\Definition::class . ':  ' . $this->toStr($a) .
+            AssessmentFilters\Term\Close\Definition::class     . ': ' . $this->toStr($tc) .
+            AssessmentFilters\Term\Due\Definition::class       . ': ' . $this->toStr($td) .
+            AssessmentFilters\WeightingType\Definition::class  . ': ' . $this->toStr($wt) .
+            AssessmentFilters\WorkType\Definition::class       . ': ' . $this->toStr($wk) .
+            $this->toStr($completeFilters) . "\n";
 
         $this->assertEquals($expected, $actual, $message);
     }
@@ -134,7 +136,7 @@ class LogicTests extends TestCase
         $found = (bool)preg_match_all('/(\d) AS \'case\'/', $query, $matches);
         $this->assertTrue($found, "No sub-queries recognised: $message");
 
-        if($found){
+        if ($found) {
             $this->assertEquals($expected, $matches[1], $message);
         }
     }
@@ -187,15 +189,15 @@ class LogicTests extends TestCase
      */
     private function toStr($var, $level = 0): string
     {
-        if(null === $var){
+        if (null === $var) {
             return 'NULL' . (!$level ? "\n" : '');
         }
-        if(!($var instanceOf Collection || is_array($var))){
+        if (!($var instanceof Collection || is_array($var))) {
             return $var;
         }
         $string = '[';
         $first = true;
-        foreach($var as $key => $val){
+        foreach ($var as $key => $val) {
             $string .= (!$first ? ', ' : '') . "'$key' => {$this->toStr($val, $level + 1)}";
             $first = false;
         }
@@ -214,7 +216,7 @@ class LogicTests extends TestCase
     {
         $string = '[';
         $first = true;
-        foreach($params as $key => $val){
+        foreach ($params as $key => $val) {
             $string .= (!$first ? ', ' : '') . "$key => $val";
             $first = false;
         }

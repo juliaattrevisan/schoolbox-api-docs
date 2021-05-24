@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -76,7 +77,7 @@ class SurveyForm
         $i = $this->tester;
         $i->waitForElement(self::SELECTOR_BUTTON_CREATE);
         $i->scrollTo(['css' => self::SELECTOR_BUTTON_CREATE]);
-        $i->waitForElementVisible(['css' => self::SELECTOR_BUTTON_CREATE],5);
+        $i->waitForElementVisible(['css' => self::SELECTOR_BUTTON_CREATE], 5);
         //$i->click(['css' => 'input[type=submit][value="Create"]']);
         $i->click(['css' => self::SELECTOR_BUTTON_CREATE]);
         $i->waitForElement('input[name="assess_id"]');

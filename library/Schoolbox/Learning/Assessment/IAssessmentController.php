@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -124,5 +125,4 @@ interface IAssessmentController
      * @param User        $student
      */
     public function postCreateResponse(IAssessable $assessment, User $student): void;
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\SaveForLater;
 
 use Alaress\Authorizer\Failure\InvalidPath;
@@ -58,7 +60,7 @@ class Module extends BaseModule
      * @param array $params
      * @return array
      */
-    private function preloadNews(array $params) :array
+    private function preloadNews(array $params): array
     {
         if (\array_key_exists('article', $params)) {
             $article = $params['article'];
@@ -175,7 +177,8 @@ class Module extends BaseModule
                     }
                     // TODO, can the user see this article? Probably: $article->isSharable() || isUserInAudience($user, $article)
                     return true;
-                }));
+                })
+            );
         });
     }
 
@@ -196,7 +199,8 @@ class Module extends BaseModule
                         throw new InvalidPath('This feature has been disabled.');
                     }
                     return true;
-                }));
+                })
+            );
         });
     }
 }

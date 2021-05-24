@@ -1,10 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Fixtures\Team;
 
 use Alaress\Authorizer\Authorizer;
@@ -15,7 +16,7 @@ use Aura\Router\Router;
 use Schoolbox\Fixtures\Authorizer\Rule\IsSeasonNotArchived;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends RestfulModule
 {

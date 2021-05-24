@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Schedule\Module;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Psr\Log\LoggerInterface;
@@ -289,7 +289,8 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
 
         // All other notifiers: notify{$roleType}{$key}
         foreach ($sourceCollection as $source) {
-            $method = sprintf("notify%s%s",
+            $method = sprintf(
+                "notify%s%s",
                 ucfirst(strtolower($source->getRoleType())),
                 ucfirst(strtolower($source->getKey()))
             );
@@ -349,7 +350,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     /**
      * @return string
      */
-    protected abstract function getSlug();
+    abstract protected function getSlug();
 
 
     /**
@@ -395,7 +396,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      * @param object $model
      * @return Envelope
      */
-    protected function retractEventObject(Envelope $envelope, $model) : Envelope
+    protected function retractEventObject(Envelope $envelope, $model): Envelope
     {
         $bob = new Builder(false);
 
@@ -420,5 +421,4 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
     {
         return "/portrait.php?id={$user->getId()}&size={$this->iconSize}";
     }
-
 }

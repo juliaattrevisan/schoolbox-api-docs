@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A date interval class which handles remainders more effectively than
  * DateInterval.
@@ -9,13 +10,15 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Alaress\Date;
+
 use DateTime;
 use DateInterval;
 use JsonSerializable;
 
-class Interval implements JsonSerializable {
+class Interval implements JsonSerializable
+{
 
     /**
      * Number of seconds in the interval.
@@ -36,7 +39,8 @@ class Interval implements JsonSerializable {
      *
      * @param int $seconds
      */
-    public function __construct($seconds) {
+    public function __construct($seconds)
+    {
         if ($seconds < 0) {
             $seconds *= -1;
             $this->invert = true;
@@ -50,7 +54,8 @@ class Interval implements JsonSerializable {
      * @param  DateInterval $interval The interval to create from.
      * @return static
      */
-    public static function createFromDateInterval(DateInterval $interval) {
+    public static function createFromDateInterval(DateInterval $interval)
+    {
         $seconds = 0;
         if ($interval->y) {
             trigger_error('DateInterval contains y: assuming 365 days', E_USER_WARNING);
@@ -85,7 +90,8 @@ class Interval implements JsonSerializable {
      * @param  string $dateString
      * @return static
      */
-    public static function createFromDateString($dateString) {
+    public static function createFromDateString($dateString)
+    {
         return static::createFromDateInterval(DateInterval::createFromDateString($dateString));
     }
 
@@ -97,7 +103,8 @@ class Interval implements JsonSerializable {
      * @param  DateTime $to
      * @return static
      */
-    public static function createFromDateTimeDifference(DateTime $from, DateTime $to) {
+    public static function createFromDateTimeDifference(DateTime $from, DateTime $to)
+    {
         return new static($to->getTimestamp() - $from->getTimestamp());
     }
 
@@ -106,7 +113,8 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function getDayTotal() {
+    public function getDayTotal()
+    {
         return intval($this->getHourTotal() / 24);
     }
 
@@ -115,7 +123,8 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function getHourTotal() {
+    public function getHourTotal()
+    {
         return intval($this->getMinuteTotal() / 60);
     }
 
@@ -125,7 +134,8 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function getHourRemainder() {
+    public function getHourRemainder()
+    {
         return intval($this->getHourTotal() % 24);
     }
 
@@ -134,7 +144,8 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function getMinuteTotal() {
+    public function getMinuteTotal()
+    {
         return intval($this->getSecondTotal() / 60);
     }
 
@@ -144,7 +155,8 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function getMinuteRemainder() {
+    public function getMinuteRemainder()
+    {
         return $this->getMinuteTotal() % 60;
     }
 
@@ -153,7 +165,8 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function getSecondTotal() {
+    public function getSecondTotal()
+    {
         return $this->seconds;
     }
 
@@ -163,11 +176,13 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function getSecondRemainder() {
+    public function getSecondRemainder()
+    {
         return $this->getSecondTotal() % 60;
     }
 
-    public function isInverted() {
+    public function isInverted()
+    {
         return $this->invert;
     }
 
@@ -192,7 +207,8 @@ class Interval implements JsonSerializable {
      * @param  string $format
      * @return string
      */
-    public function format($format) {
+    public function format($format)
+    {
         return strtr(
             $format,
             array(
@@ -247,7 +263,8 @@ class Interval implements JsonSerializable {
      *
      * @return DateInterval
      */
-    public function getAsDateInterval() {
+    public function getAsDateInterval()
+    {
         $interval = new DateInterval($this->format('P%DDT%hH%iM%sS'));
         $interval->invert = $this->invert;
         return $interval;
@@ -259,7 +276,8 @@ class Interval implements JsonSerializable {
      *
      * @return int
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         $seconds = $this->getSecondTotal();
         if ($this->isInverted()) {
             $seconds *= -1;

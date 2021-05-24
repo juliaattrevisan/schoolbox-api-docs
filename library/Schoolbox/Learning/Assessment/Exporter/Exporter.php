@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CSV exporter for Accelerus
  *
@@ -9,7 +10,7 @@
 
 namespace Schoolbox\Learning\Assessment\Exporter;
 
-use Alaress\Csv\Writer AS CsvWriter;
+use Alaress\Csv\Writer as CsvWriter;
 use Schoolbox\Filter\BrokenFilterException;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType;

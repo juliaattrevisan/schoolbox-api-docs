@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
@@ -22,6 +24,7 @@ use PDO;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_diff;
 use function array_intersect;
 use function array_merge;
@@ -321,7 +324,6 @@ class UserResolver implements IUserResolver
         $sql = "SELECT {$userTableAlias}.id, 'self' relationship FROM user {$userTableAlias} WHERE {$pb->getWhereIntersect()}";
 
         return [$sql, $pb->getParams()];
-
     }
 
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for subjects stored within external database.
  *
@@ -95,18 +96,18 @@ class SubjectMapper extends Schoolbox\External\Mapper
 			LEFT JOIN folder_code co ON co.folder_id = c.id AND co.deleted_at IS NULL
 			WHERE (co.code=? OR co.code=?)
 		');
-        $add_id_map = function($subject) use ($category_statement) {
+        $add_id_map = function ($subject) use ($category_statement) {
             $category_statement->execute([
                 $subject['code'],
                 $subject['campusCode'] . "/" . $subject['code']
             ]);
             if ($row = $category_statement->fetch()) {
                 $subject['id']   = $row['id'];
-//				$subject['code'] = $row['code'];
+//              $subject['code'] = $row['code'];
             }
             return $subject;
         };
-        $id_filter = function($subject) {
+        $id_filter = function ($subject) {
             return isset($subject['id']);
         };
         return new SubjectCollection(

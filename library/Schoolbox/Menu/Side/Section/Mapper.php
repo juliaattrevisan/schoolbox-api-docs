@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -30,7 +31,8 @@ class Mapper extends BaseMapper
      * Return default section names
      * @return array
      */
-    public static function getSectionNameDefaults() {
+    public static function getSectionNameDefaults()
+    {
 
         // TODO SA-8354: inject this
         $config = new \Schoolbox\Config\Loader();

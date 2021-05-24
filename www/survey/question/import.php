@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assessment export. Uses the handlers to export their question types into a
  * Moodle format.
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 
 SitePage::extendExecutionTime(300);

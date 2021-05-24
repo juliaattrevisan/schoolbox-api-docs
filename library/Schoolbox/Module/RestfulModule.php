@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,14 +9,13 @@
 
 namespace Schoolbox\Module;
 
-
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Mapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Alaress\Module\Module as AlaressModule;
-use \Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Alaress\Module\Module as AlaressModule;
+use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Class RestfulModule
@@ -112,7 +112,6 @@ abstract class RestfulModule extends AlaressModule
         foreach ($routes['POST'] as $path => $controllerMethod) {
             $this->addPostRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
         }
-
     }
 
 
@@ -162,7 +161,6 @@ abstract class RestfulModule extends AlaressModule
                 ];
             });
         }
-
     }
 
 

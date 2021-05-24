@@ -145,7 +145,6 @@ if (isset($_POST['description'])) {
                             // set this component's image to this one
                             foreach ($component->getConfig() as $config) {
                                 if ($config->getKey() == 'eportfolioImage') {
-
                                     /* Try to find an existing record and reuse it, if possible
                                      */
                                     try {
@@ -158,7 +157,6 @@ if (isset($_POST['description'])) {
                                         $configInstance->setId(null);
                                         $configInstance->setConfigDefinitionId($config->getId());
                                         $configInstance->setInstanceId($component->getId());
-
                                     }
 
                                     $configInstance->setValue($file->getId());

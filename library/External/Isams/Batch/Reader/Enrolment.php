@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XML reader for finding class enrolments in iSAMS' batch API response.
  *

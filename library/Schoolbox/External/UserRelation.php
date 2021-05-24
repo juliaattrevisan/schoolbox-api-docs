@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User relation object for Schoolbox.
  *
@@ -8,9 +9,11 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox\User;
 
-class UserRelation {
+class UserRelation
+{
 
     /**
      * Value for $this->relationType. (Currently, the only valid one.)
@@ -39,7 +42,8 @@ class UserRelation {
     /**
      * @return User
      */
-    public function getRelation() {
+    public function getRelation()
+    {
         return $this->relation;
     }
 
@@ -47,7 +51,8 @@ class UserRelation {
      * @param  User $relation
      * @return $this
      */
-    public function setRelation($relation) {
+    public function setRelation($relation)
+    {
         $this->relation = $relation;
         return $this;
     }
@@ -55,7 +60,8 @@ class UserRelation {
     /**
      * @return User
      */
-    public function getUser() {
+    public function getUser()
+    {
         return $this->user;
     }
 
@@ -63,7 +69,8 @@ class UserRelation {
      * @param  User $user
      * @return $this
      */
-    public function setUser($user) {
+    public function setUser($user)
+    {
         $this->user = $user;
         return $this;
     }
@@ -71,7 +78,8 @@ class UserRelation {
     /**
      * @return int
      */
-    public function getRelationType() {
+    public function getRelationType()
+    {
         return $this->relationType;
     }
 
@@ -79,9 +87,9 @@ class UserRelation {
      * @param  int $relationType
      * @return $this
      */
-    public function setRelationType($relationType) {
+    public function setRelationType($relationType)
+    {
         $this->relationType = $relationType;
         return $this;
     }
-
 }

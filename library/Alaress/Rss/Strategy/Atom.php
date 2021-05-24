@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Rss_Strategy_Atom
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox;
 
-interface ValueLabelInterface {
+interface ValueLabelInterface
+{
 
     /**
      * Find a key/value representation of this model's data

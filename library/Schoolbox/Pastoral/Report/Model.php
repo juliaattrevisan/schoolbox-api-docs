@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -220,7 +221,7 @@ class Model implements ISoftDeletable
      * @param null|string $subTypesCsv
      * @return $this
      */
-    public function setSubTypesCsv(?string $subTypesCsv) : self
+    public function setSubTypesCsv(?string $subTypesCsv): self
     {
         $this->subTypesCsv = $subTypesCsv;
         return $this;
@@ -229,7 +230,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|string
      */
-    public function getSubTypesCsv() : ?string
+    public function getSubTypesCsv(): ?string
     {
         return $this->subTypesCsv;
     }
@@ -238,7 +239,7 @@ class Model implements ISoftDeletable
      * @param null|string $housesCsv
      * @return $this
      */
-    public function setHousesCsv(?string $housesCsv) : self
+    public function setHousesCsv(?string $housesCsv): self
     {
         $this->housesCsv = $housesCsv;
         return $this;
@@ -247,7 +248,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|string
      */
-    public function getHousesCsv() : ?string
+    public function getHousesCsv(): ?string
     {
         return $this->housesCsv;
     }
@@ -416,7 +417,7 @@ class Model implements ISoftDeletable
      * @param bool $usesRelativeDate
      * @return self
      */
-    public function setUsesRelativeDate(bool $usesRelativeDate) : self
+    public function setUsesRelativeDate(bool $usesRelativeDate): self
     {
         $this->usesRelativeDate = $usesRelativeDate;
 
@@ -426,7 +427,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|bool
      */
-    public function getUsesRelativeDate() : ?bool
+    public function getUsesRelativeDate(): ?bool
     {
         return $this->usesRelativeDate;
     }
@@ -435,7 +436,7 @@ class Model implements ISoftDeletable
      * @param null|string $relativeDateString
      * @return self
      */
-    public function setRelativeDateString(string $relativeDateString = null) : self
+    public function setRelativeDateString(string $relativeDateString = null): self
     {
         $this->relativeDateString = $relativeDateString;
 
@@ -445,7 +446,7 @@ class Model implements ISoftDeletable
     /**
      * @return string|null
      */
-    public function getRelativeDateString() : ?string
+    public function getRelativeDateString(): ?string
     {
         return $this->relativeDateString;
     }
@@ -515,7 +516,7 @@ class Model implements ISoftDeletable
      *
      * @return self
      */
-    public function setSubTypes(Collection $subTypes) : self
+    public function setSubTypes(Collection $subTypes): self
     {
         $this->subTypes = $subTypes;
 
@@ -525,7 +526,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|Collection|PastoralSubType\Model[]
      */
-    public function getSubTypes() : ?Collection
+    public function getSubTypes(): ?Collection
     {
         return $this->subTypes;
     }
@@ -534,7 +535,7 @@ class Model implements ISoftDeletable
      * @param Collection|House[] $houses
      * @return $this
      */
-    public function setHouses(Collection $houses) : self
+    public function setHouses(Collection $houses): self
     {
         $this->houses = $houses;
         return $this;
@@ -543,7 +544,7 @@ class Model implements ISoftDeletable
     /**
      * @return null|Collection|House[]
      */
-    public function getHouses() : ?Collection
+    public function getHouses(): ?Collection
     {
         return $this->houses;
     }

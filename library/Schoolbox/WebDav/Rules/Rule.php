@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -37,12 +38,12 @@ class Rule extends Super
         $pattern   = $this->negate ? "IF NOT (%s)\nTHEN %s" : "IF %s\nTHEN %s";
         $condition = implode("\nAND ", array_map(function ($cond) {
                     return $cond->getSummary();
-                }, $this->getConditions()));
+        }, $this->getConditions()));
         $effect    = $this->getEffect();
 
         $mapped = array_map(function ($k, $v) {
                 return $v ? "$k = " . (is_array($v) ? "[\n  " . implode(",\n  ", $v) . "\n]" : $v) : null;
-            }, array_keys($effect), $effect);
+        }, array_keys($effect), $effect);
 
         $filtered = array_filter($mapped);
 
@@ -55,9 +56,8 @@ class Rule extends Super
      */
     public function getHtmlSummary()
     {
-        $summary = preg_replace('`([A-Z=]+ )`','<span class="ctrl $1">$1</span>', $this->getSummary());
+        $summary = preg_replace('`([A-Z=]+ )`', '<span class="ctrl $1">$1</span>', $this->getSummary());
 
         return $summary;
     }
-
-} 
+}

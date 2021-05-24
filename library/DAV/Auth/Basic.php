@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Basic authentication scheme for WebDAV access to Schoolbox.
  *

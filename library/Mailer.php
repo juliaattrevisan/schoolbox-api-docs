@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Wrapper for a PHPLib template object and a mailer class.
  */
@@ -52,7 +53,6 @@ class Mailer extends \Alaress\Mail\AbstractMailer
         } else {
             return 'core/email/' . $template;
         }
-
     }
 
     function setVar($name, $value = '')
@@ -112,5 +112,4 @@ class Mailer extends \Alaress\Mail\AbstractMailer
         }
         return '../../' . $genericTemplate;
     }
-
 }

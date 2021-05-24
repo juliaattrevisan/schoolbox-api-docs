@@ -1,11 +1,13 @@
 <?php
+
 /**
  * Assess_Question_Category_List
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
-class Assess_Question_Category_List extends Evaluation_Question_Category_List {
+class Assess_Question_Category_List extends Evaluation_Question_Category_List
+{
 
 }

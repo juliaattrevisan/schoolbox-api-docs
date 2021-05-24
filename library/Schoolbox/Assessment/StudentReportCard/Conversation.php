@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Assessment\StudentReportCard;
-
 
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
@@ -42,7 +42,7 @@ class Conversation
     {
         $this->participants = new Collection();
 
-        if($config->get('grade_comments_enable')) {
+        if ($config->get('grade_comments_enable')) {
             /* Find the parents of this particular student
              */
             $student->loadParents();

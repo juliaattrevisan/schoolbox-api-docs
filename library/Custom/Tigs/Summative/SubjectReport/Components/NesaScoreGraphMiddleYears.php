@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
@@ -174,7 +176,6 @@ class NesaScoreGraphMiddleYears extends BaseComponent
                 ];
             }
             foreach ($this->retrieveAssessments($unitImpl) as $assessment) {
-
                 if (!$this->isDueWithinReportWindow($assessment, $semester)) {
                     continue;
                 }
@@ -249,7 +250,6 @@ class NesaScoreGraphMiddleYears extends BaseComponent
             }
             /** @var DueWork\Model $assessment */
             foreach ($folderData['assessments'] as $assessment) {
-
                 // Feedback not visible to the viewer? Do not collate marks
                 if (!$this->isFeedbackVisibleToUser($assessment)) {
                     continue;

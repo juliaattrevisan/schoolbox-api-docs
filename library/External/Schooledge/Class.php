@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schooledge implementation of class connection.
  *

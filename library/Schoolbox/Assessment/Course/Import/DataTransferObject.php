@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -210,7 +211,7 @@ class DataTransferObject
             // Neither
             $rightSeq = $rightSpec->getSequence();
             $leftSeq  = $leftSpec->getSequence();
-            if($leftSeq > $rightSeq){
+            if ($leftSeq > $rightSeq) {
                 return 1;
             }
             return $leftSeq < $rightSeq ? -1 : 0;
@@ -243,7 +244,6 @@ class DataTransferObject
     {
 
         foreach ($this->unitSpecAssessments as $unitSpecId => $assessmentPairs) {
-
             $unitImpl = $this->unitImplementations[$unitSpecId];
 
             /* $nextAvailable time is always set to 00:00:00
@@ -294,7 +294,6 @@ class DataTransferObject
 
 
         foreach ($sortedPairs as $pair) {
-
             // Is this a new-import?
             if (!$this->isImportModify) {
                 /* New-Import:
@@ -345,7 +344,6 @@ class DataTransferObject
                 $due->endOfDay();
                 $spec->setDueAt($due->setTimeFromString($this->defaultDueTime));
                 $spec->setCloseAt($end);
-
             } // Else this is an import-modify.
             else {
                 /* Import-modify:
@@ -587,7 +585,6 @@ class DataTransferObject
 
         /** @var AssessmentPair[] $assessmentPairs */
         foreach ($this->unitSpecAssessments as $unitSpecId => $assessmentPairs) {
-
             // Is this a fresh unit import?
             if (!$this->unitImplementations[$unitSpecId]->getId()) {
                 $this->selectedAssessmentCounts[$unitSpecId] = $this->availableAssessmentCounts[$unitSpecId];
@@ -599,7 +596,6 @@ class DataTransferObject
                 }
                 $this->selectedAssessmentCounts[$unitSpecId] = $count;
             }
-
         }
         return true;
     }
@@ -738,7 +734,6 @@ class DataTransferObject
                 } else {
                     $subPairs->setOffset($impl->getId(), $this->addAssessmentImpl($unitSpecId, $impl, true));
                 }
-
             }
 
             foreach ($assessmentSpec->getAssessables() as $spec) {
@@ -773,5 +768,4 @@ class DataTransferObject
         }
         return false;
     }
-
 }

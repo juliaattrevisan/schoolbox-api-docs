@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades\Cohort;
@@ -214,7 +216,6 @@ class ClassResults
          * We'll need to make a five-point summary of each of these specifications' values
          */
         foreach ($assessments as $assessment) {
-
             /* Assessment's mark scheme must be quantitative
              *
              * There's no check on isFeedbackVisibleToUser because we're doing cohort analysis
@@ -222,7 +223,6 @@ class ClassResults
              * but those values still contribute to the statistical numbers
              */
             if ($assessment->getMarkScheme()->isQuantitative()) {
-
                 /* For each assessment, get all the Participants' feedbacks, and find out their normalised mark
                  * Index them by specification id; we eventually calculate a five point summary of everything here
                  */
@@ -293,7 +293,6 @@ class ClassResults
                         'info'         => $comment ?? '',
                     ];
                 } else {
-
                     /* Otherwise, nothing to show
                      */
                     $graphInfo[$specificationId] = [];
@@ -307,7 +306,6 @@ class ClassResults
         $statistics = [];
 
         foreach ($normMarks as $specificationId => $dataSet) {
-
             /* The hover info thingy on the highcharts
              */
             $statistics['graphInfo'][] = $graphInfo[$specificationId];

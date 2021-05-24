@@ -8,7 +8,6 @@ $page = $kernel->get('sitePage');
 $page->initSession();
 
 if ($_GET) {
-
     $to = $_GET['directTo'];
     switch ($to) {
         case "studyskills":
@@ -23,7 +22,6 @@ if ($_GET) {
         default:
             echo "Did not recognise the site";
             break;
-
     }
 
 

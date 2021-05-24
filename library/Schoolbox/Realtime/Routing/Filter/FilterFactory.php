@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,10 +9,8 @@
 
 namespace Schoolbox\Realtime\Routing\Filter;
 
-
 use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\MessageList;
-
 
 class FilterFactory
 {
@@ -60,5 +59,4 @@ class FilterFactory
 
         return $bundle;
     }
-
 }

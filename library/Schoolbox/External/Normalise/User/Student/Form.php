@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Form
  *
@@ -13,7 +14,8 @@ namespace Schoolbox\External\Normalise\User\Student;
 
 use Schoolbox\External\Normalise\User\Staff;
 
-class Form {
+class Form
+{
 
     /**
      * The numeric value of a students' Form
@@ -41,14 +43,16 @@ class Form {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->setup();
     }
 
     /**
      * Hook method
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->setCoordinator(new Staff());
     }
 

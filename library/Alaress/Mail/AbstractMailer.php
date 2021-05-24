@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,11 +9,12 @@
 
 namespace Alaress\Mail;
 
-
 use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Schoolbox\Config\Loader as ConfigLoader;
+
 use function count;
+
 use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -24,6 +26,7 @@ use Swift_RfcComplianceException;
 use Swift_SmtpTransport;
 use Swift_SwiftException;
 use Swift_Transport;
+
 use function trim;
 
 abstract class AbstractMailer implements IMailer
@@ -198,7 +201,7 @@ abstract class AbstractMailer implements IMailer
      *
      * @return string
      */
-    protected abstract function composeHTML();
+    abstract protected function composeHTML();
 
 
     /**
@@ -206,7 +209,7 @@ abstract class AbstractMailer implements IMailer
      *
      * @return string
      */
-    protected abstract function composePlain();
+    abstract protected function composePlain();
 
 
     /**
@@ -283,7 +286,6 @@ abstract class AbstractMailer implements IMailer
 
             $mailer->send($this->email);
         } catch (\Exception $e) {
-
             $retriesMsg = $retries == 1 ? 'retry remains' : 'retries remain';
             // this means "mail server went away"
             $errMsg = sprintf('Internal Mailing %s occurred (%d %s): %s', \get_class($e), $retries, $retriesMsg, $e->getMessage());
@@ -325,7 +327,8 @@ abstract class AbstractMailer implements IMailer
         if (!(self::$transport instanceof Swift_Transport) || $reinitialise) {
             if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
                 self::$transport = new Swift_SmtpTransport(
-                    $conf->get('mail_smtp_host'), $conf->get('mail_smtp_port')
+                    $conf->get('mail_smtp_host'),
+                    $conf->get('mail_smtp_port')
                 );
                 self::$transport->setLocalDomain(
                     $conf->get('site_hostname') . '.' . $conf->get('site_domain')
@@ -416,7 +419,6 @@ abstract class AbstractMailer implements IMailer
         $emailList = explode(\chr(self::EMAIL_SEPARATOR_CODE), $emailAddresses);
 
         foreach ($emailList as $email) {
-
             $email = trim($email);
 
             // Check if string is a valid email OR

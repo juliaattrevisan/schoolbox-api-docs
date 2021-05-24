@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -129,7 +130,7 @@ class MarkedGrid
      * which default to the indicator max if mark per cap is off.
      * @return float
      */
-    public function calculateTotalAvailableMarks() : float
+    public function calculateTotalAvailableMarks(): float
     {
         // Ignore max value for cap usage, if it's not mark per capability
         $useMarkPerCapability = $this->grid->isMarkPerCapability();
@@ -202,7 +203,8 @@ class MarkedGrid
     {
         foreach ($this->capabilityMarks as $capabilityMark) {
             // TODO capability usage should have its own ID
-            if ($capabilityMark->getCapabilityUsage()->getCapability()->getId()
+            if (
+                $capabilityMark->getCapabilityUsage()->getCapability()->getId()
                 === $capabilityUsage->getCapability()->getId()
             ) {
                 return $capabilityMark;

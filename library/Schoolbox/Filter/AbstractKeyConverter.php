@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -10,7 +11,6 @@ namespace Schoolbox\Filter;
 use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
-
 
 abstract class AbstractKeyConverter implements IKeyConverter
 {
@@ -78,7 +78,7 @@ abstract class AbstractKeyConverter implements IKeyConverter
         }
 
         // Are a subset of possible options available, and none of the subset were selected ?
-        if($countAll !== $countAvailable && 0 === $countSelected){
+        if ($countAll !== $countAvailable && 0 === $countSelected) {
             // Nothing selected is the same as all available options being selected.
             return $availableItems;
         }
@@ -106,5 +106,4 @@ abstract class AbstractKeyConverter implements IKeyConverter
     {
         return $this->filter;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: jleckie
@@ -25,7 +26,8 @@ class Evaluate
         $this->database = Database::getInstance();
     }
 
-    public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $type) {
+    public function created(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $type)
+    {
         $query = "
                 SELECT COUNT(*) FROM assess
                 WHERE created_at >= :start AND created_at <= :end
@@ -41,7 +43,8 @@ class Evaluate
         return $statement->fetchColumn(0);
     }
 
-    public function attempted(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $type) {
+    public function attempted(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $type)
+    {
         $query = "SELECT COUNT(*) FROM assess_attempt JOIN assess ON assess.assess_id = assess_attempt.assess_id
                   WHERE assess_attempt.start >= :start AND assess_attempt.start <= :end
                   AND availability = :type";
@@ -53,8 +56,5 @@ class Evaluate
 
         $statement->execute();
         return $statement->fetchColumn(0);
-
-
-
     }
 }

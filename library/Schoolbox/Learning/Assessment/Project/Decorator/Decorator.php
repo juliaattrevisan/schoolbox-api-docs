@@ -7,12 +7,13 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Project\Decorator;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use \Schoolbox\Learning\Assessment\DecoratorInterface;
-use \Schoolbox\Learning\Assessment\Project;
-use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
+use Schoolbox\Learning\Assessment\DecoratorInterface;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 
 class Decorator implements DecoratorInterface
 {

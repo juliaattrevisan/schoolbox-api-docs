@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -184,7 +185,7 @@ class Mapper extends BaseMapper
         if (!$repeat) {
             $userQuery['bindings']['user_id'] = $user->getId();
 
-            $sql = $sql. "AND
+            $sql = $sql . "AND
                             tour.uuid NOT IN (
                             SELECT tour_uuid
                             FROM tour_status

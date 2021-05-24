@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Timetable;
-
 
 use Alaress\Date\IClock;
 use Alaress\Scheduler\CronScheduler;
@@ -92,7 +92,6 @@ class TimetableScheduler extends CronScheduler
                 }
             } catch (InvalidArgumentException $e) {
                 $this->logException($e);
-
             } catch (RuntimeException $e) {
                 $this->logException($e);
             }
@@ -130,5 +129,4 @@ class TimetableScheduler extends CronScheduler
     {
         $this->conf->dropCache();
     }
-
 }

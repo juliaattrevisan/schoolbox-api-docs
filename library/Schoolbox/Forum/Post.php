@@ -9,12 +9,13 @@
  */
 
 namespace Schoolbox\Forum;
+
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 
-
-class Post implements ISoftDeletable {
+class Post implements ISoftDeletable
+{
 
     /** @var int */
     protected $id;
@@ -48,7 +49,8 @@ class Post implements ISoftDeletable {
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -57,7 +59,8 @@ class Post implements ISoftDeletable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -66,7 +69,8 @@ class Post implements ISoftDeletable {
      * @param Thread $thread
      * @return self
      */
-    public function setThread($thread) {
+    public function setThread($thread)
+    {
         $this->thread = $thread;
         return $this;
     }
@@ -75,7 +79,8 @@ class Post implements ISoftDeletable {
     /**
      * @return Thread
      */
-    public function getThread() {
+    public function getThread()
+    {
         return $this->thread;
     }
 
@@ -105,7 +110,8 @@ class Post implements ISoftDeletable {
      * @param User $owner
      * @return self
      */
-    public function setOwner($owner) {
+    public function setOwner($owner)
+    {
         $this->owner = $owner;
         return $this;
     }
@@ -114,7 +120,8 @@ class Post implements ISoftDeletable {
     /**
      * @return User
      */
-    public function getOwner() {
+    public function getOwner()
+    {
         return $this->owner;
     }
 
@@ -123,7 +130,8 @@ class Post implements ISoftDeletable {
      * @param Alaress_Date_Format $date
      * @return self
      */
-    public function setDate($date) {
+    public function setDate($date)
+    {
         $this->date = $date;
         return $this;
     }
@@ -132,7 +140,8 @@ class Post implements ISoftDeletable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getDate() {
+    public function getDate()
+    {
         return $this->date;
     }
 
@@ -141,7 +150,8 @@ class Post implements ISoftDeletable {
      * @param string $body
      * @return self
      */
-    public function setBody($body) {
+    public function setBody($body)
+    {
         $this->body = $body;
         return $this;
     }
@@ -150,7 +160,8 @@ class Post implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
@@ -160,7 +171,8 @@ class Post implements ISoftDeletable {
      *
      * @return string
      */
-    public function getBodyWithoutQuote() {
+    public function getBodyWithoutQuote()
+    {
         $tag = 'blockquote';
 
         if (($i = strrpos($this->body, "</$tag>")) !== false) {
@@ -179,7 +191,8 @@ class Post implements ISoftDeletable {
      * @param string $deleted
      * @return self
      */
-    public function setDeleted($deleted) {
+    public function setDeleted($deleted)
+    {
         $this->deleted = $deleted;
         return $this;
     }
@@ -188,7 +201,8 @@ class Post implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getDeleted() {
+    public function getDeleted()
+    {
         return $this->deleted;
     }
 
@@ -197,7 +211,8 @@ class Post implements ISoftDeletable {
      * @param Alaress_Date_Format $modified
      * @return self
      */
-    public function setModified($modified) {
+    public function setModified($modified)
+    {
         $this->modified = $modified;
         return $this;
     }
@@ -206,7 +221,8 @@ class Post implements ISoftDeletable {
     /**
      * @return Alaress_Date_Format
      */
-    public function getModified() {
+    public function getModified()
+    {
         return $this->modified;
     }
 
@@ -215,7 +231,8 @@ class Post implements ISoftDeletable {
      * @param string $censored
      * @return self
      */
-    public function setCensored($censored) {
+    public function setCensored($censored)
+    {
         $this->censored = $censored;
         return $this;
     }
@@ -224,7 +241,8 @@ class Post implements ISoftDeletable {
     /**
      * @return string
      */
-    public function getCensored() {
+    public function getCensored()
+    {
         return $this->censored;
     }
 
@@ -232,7 +250,8 @@ class Post implements ISoftDeletable {
      * Is this object deleted?
      * @return bool
      */
-    public function isDeleted(){
+    public function isDeleted()
+    {
         return ($this->getDeleted() == 'true');
     }
 }

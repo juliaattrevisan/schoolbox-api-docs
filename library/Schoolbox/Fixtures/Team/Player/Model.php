@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -7,8 +8,8 @@
 
 namespace Schoolbox\Fixtures\Team\Player;
 
-use \Schoolbox\User as User;
-use \Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\User as User;
+use Schoolbox\Fixtures\Team\Model as Team;
 
 /**
  * Model for relation between teams and users.

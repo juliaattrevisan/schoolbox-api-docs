@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Notif;
-
 
 use InvalidArgumentException;
 use Monolog\Handler\HandlerInterface;
@@ -112,7 +112,6 @@ class Notif implements NotifInterface
 
             // append a file logger
             $handlers[] = $this->factory->getFileLogHandler($this->topic);
-
         } else {
             // resolve the stack so far
             $handlers = $this->factory->getStack($stack);
@@ -123,7 +122,6 @@ class Notif implements NotifInterface
             HandlerFactory::SYS_NULL_DEBUG,
             HandlerFactory::SYS_DEBUG_MAIL
         ]));
-
     }
 
 
@@ -173,11 +171,9 @@ class Notif implements NotifInterface
         try {
             $log = new Logger($this->topic, $this->getHandlers());
             return $log->addRecord($level, $message, $context);
-
         } catch (Swift_TransportException $e) {
             // rabbit failed... email failed... at least it's logged to file
             return false;
-
         } catch (InvalidArgumentException $e) {
             // failed to load the handler stack
             return false;
@@ -290,5 +286,4 @@ class Notif implements NotifInterface
     {
         return $this->log(Logger::EMERGENCY, $message, $context);
     }
-
 }

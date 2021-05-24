@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -16,7 +17,6 @@ use RuntimeException;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\MobileApp\Registry;
 use Schoolbox\MobileApp\RegistryMapper;
-
 
 /**
  * Google Cloud Messaging
@@ -118,7 +118,8 @@ class GCM extends AbstractService
 
             try {
                 $rs = $client->post(
-                    $apiUri, [
+                    $apiUri,
+                    [
                         'headers' => $headers,
                         'body'    => $payload,
                     ]
@@ -141,22 +142,18 @@ class GCM extends AbstractService
                             // we need to delete this token, it will only break things
                             $this->deleteToken($regId);
                         }
-
                     } else {
                         $this->report("$regId", "All ok!", Logger::DEBUG);
                     }
                 }
-
             } catch (RuntimeException $e) {
                 if ($e->getCode() == 401) {
                     // your API key is bad: don't try to do anything else
                     throw $e;
                 }
-                $this->getLog()->warning($e->getMessage(), [ 'exception'=>$e ]);
+                $this->getLog()->warning($e->getMessage(), [ 'exception' => $e ]);
             }
             // range exception not caught here
         }
-
     }
-
 }

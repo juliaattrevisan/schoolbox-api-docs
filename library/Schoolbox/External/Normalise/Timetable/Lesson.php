@@ -7,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\External\Normalise\Timetable;
 
 use Schoolbox\Collection;
@@ -19,8 +20,8 @@ class Lesson
      *
      * @var int
      */
-    private $id = '';    
-    
+    private $id = '';
+
     /**
      * Lesson/class name
      *
@@ -34,14 +35,14 @@ class Lesson
      * @var string
      */
     private $code = '';
-    
+
     /**
      * The subject this lesson relates to
-     * 
+     *
      * @var Subject $subject
      */
     private $subject;
-    
+
     /**
      * The type of Lesson (aka. FileType)
      *
@@ -112,8 +113,7 @@ class Lesson
                 'staffSurname'   => $staffMember->getLastname(),
                 'staffTitle'     => $staffMember->getTitle()
             ];
-        }
-        else {
+        } else {
             $staffInfo = [
                 'staffID'        => '',
                 'staffFirstname' => '',
@@ -172,7 +172,7 @@ class Lesson
         $this->name = $name;
 
         return $this;
-    }    
+    }
 
     /**
      * Get code
@@ -218,7 +218,7 @@ class Lesson
         $this->subject = $subject;
 
         return $this;
-    }    
+    }
 
     /**
      * Get type

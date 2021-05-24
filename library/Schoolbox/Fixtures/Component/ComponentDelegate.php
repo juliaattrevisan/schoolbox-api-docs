@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Delegate class for logic that is common to both the dashboard and homepage
  * tile components.
@@ -17,12 +18,12 @@ use Alaress\Database\Connector\Base;
 use Alaress\Database\Exception;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\Fixtures\Match\Model as Match;
-use \Schoolbox\Fixtures\Match\Mapper as MatchMapper;
-use \Schoolbox\Fixtures\Result\Model as Result;
-use \Schoolbox\Fixtures\Result\Mapper as ResultMapper;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Fixtures\Result\Model as Result;
+use Schoolbox\Fixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Fixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
 use Alaress\Database\Predicate\Builder;
 use UnexpectedValueException;
@@ -189,7 +190,6 @@ class ComponentDelegate
         $playedMatchIds = [];
 
         try {
-
             /* Load all home and away matches for the team we've configured in the component
              */
             $team = $this->getTeamMapper()->findById($teamId);
@@ -206,13 +206,11 @@ class ComponentDelegate
                 $matchDay->endOfDay();
 
                 if ($includeHistorical && $matchDay->isPast()) {
-
                     /* Include matches previously played
                      */
                     $matches[$match->getId()] = $match;
                     $playedMatchIds[] = $match->getId();
                 } elseif ($matchDay->isFuture()) {
-
                     /* If no threshold was specified, add it to the list
                      * This shows all future matches
                      *

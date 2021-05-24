@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Renders out a JSON blob for day event objects, this is used by full calendar
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Reroute filter - stops disabled users from receiving notifications at all.
  *

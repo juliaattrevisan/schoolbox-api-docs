@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Routing;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Exception;
@@ -134,7 +134,6 @@ class QueueSorter implements FilterInterface
                 }
             }
             return true;
-
         } catch (FilterException $e) {
             $this->log->notice(
                 sprintf(
@@ -146,14 +145,11 @@ class QueueSorter implements FilterInterface
                 )
             );
             return true;
-
         } catch (Swift_RfcComplianceException $e) {
             $this->log->warning($e->getMessage());
-
         } catch (PDOException $e) {
             // this needs to be escalated
             throw $e;
-
         } catch (Exception $e) {
             $this->log->error(get_class($e) . ' occurred during rerouting: ' . $e->getMessage(), ['exception' => $e]);
         }
@@ -282,7 +278,8 @@ class QueueSorter implements FilterInterface
         }
 
         // if the user in question has no digest schedule and digest level is selected, upgrade to instant
-        if ($this->permMapper->isDigest($intent)
+        if (
+            $this->permMapper->isDigest($intent)
             && (string)$user->getRole()->getDigestSchedule() === Role::DIGEST_NEVER
         ) {
             $this->log->info("User doesn't have digest schedule: ensuring delivery is at least instant");
@@ -298,5 +295,4 @@ class QueueSorter implements FilterInterface
 
         return $intent;
     }
-
 }

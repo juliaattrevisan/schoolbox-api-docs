@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -201,8 +202,7 @@ class Capability extends TestCase
         RubricCapability $capability,
         IAssessable $assessment,
         bool $expected
-    ): void
-    {
+    ): void {
         $this->assertEquals($expected, $capability->isInUseExcluding($assessment));
     }
 }

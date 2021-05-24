@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Answer_Radio
  *
@@ -8,14 +9,15 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
+abstract class Evaluation_Answer_Radio extends Evaluation_Answer
+{
 
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationRadio';
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'evaluationRadio';
 
     /**
      * @var string
@@ -35,7 +37,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param int|string $question_id
      * @return bool|int
      */
-    public function create($object, $question_id = '') {
+    public function create($object, $question_id = '')
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
         $answer['sequence'] = 1;
@@ -67,7 +70,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param array $object
      * @return void
      */
-    public function update($object) {
+    public function update($object)
+    {
         $this->create($object, $object['question_id']);
     }
 
@@ -80,7 +84,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '')
+    {
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
@@ -117,55 +122,56 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
         }
     }
 
-	/**
-	 * Render answers in the QuestionBank
-	 *
-	 * @param SitePage $page
-	 * @param string $answerGroup
-	 * @return void
-	 */
-	public function modifyInQuestionBank($page, $answerGroup) {
-		if (strlen($answerGroup)) {
-			$allAnswers = unserialize($answerGroup);
+    /**
+     * Render answers in the QuestionBank
+     *
+     * @param SitePage $page
+     * @param string $answerGroup
+     * @return void
+     */
+    public function modifyInQuestionBank($page, $answerGroup)
+    {
+        if (strlen($answerGroup)) {
+            $allAnswers = unserialize($answerGroup);
 
-			if (is_array($allAnswers) && count($allAnswers)) {
-				foreach ($allAnswers as $currentAnswer) {
-					$page->setVar(array(
-						'ANSWER_VALUE' => $currentAnswer->value,
-						'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-						'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
-					));
+            if (is_array($allAnswers) && count($allAnswers)) {
+                foreach ($allAnswers as $currentAnswer) {
+                    $page->setVar(array(
+                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                        'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                    ));
 
-					$page->parse('answerOption_block', 'answerOption', true);
-				}
-			}
-			else {
-				$page->setVar('answerOption_block', '');
-			}
-		}
-		else {
-			$page->setVar('answerOption_block', '');
-		}
-	}
+                    $page->parse('answerOption_block', 'answerOption', true);
+                }
+            } else {
+                $page->setVar('answerOption_block', '');
+            }
+        } else {
+            $page->setVar('answerOption_block', '');
+        }
+    }
 
-	/**
-	 * Serialize for db storage (we shouldn't be using serialize anymore)
-	 *
-	 * @param string $data
-	 * @return string
-	 */
-	public function encodeForQuestionBank($data) {
-		return serialize(json_decode($data));
-	}
+    /**
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param string $data
+     * @return string
+     */
+    public function encodeForQuestionBank($data)
+    {
+        return serialize(json_decode($data));
+    }
 
-	/**
+    /**
     /**
      * Translate an integer to letters
      *
      * @param int $num
      * @return string
      */
-    protected function findLetterIndex($num) {
+    protected function findLetterIndex($num)
+    {
         $firstLetter = floor($num / 26);
         $lastLetter = $num % 26;
 
@@ -179,10 +185,9 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
         /* Convert from numeric to alpha
          */
         if ($firstLetter) {
-            $string = chr($firstLetter+64) . chr($lastLetter+64);
-        }
-        else {
-            $string = chr($lastLetter+64);
+            $string = chr($firstLetter + 64) . chr($lastLetter + 64);
+        } else {
+            $string = chr($lastLetter + 64);
         }
 
         return $string;
@@ -215,8 +220,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
 
                 $page->setVar(
                     array(
-						'QUESTION_ID' => $question_id,
-						'QUESTION_PLUGIN' => $this->plugin,
+                        'QUESTION_ID' => $question_id,
+                        'QUESTION_PLUGIN' => $this->plugin,
                         'ANSWER_ID' => $answerGroup['answer_id'],
                         'ANSWER_VALUE_FACADE' => $valueFacade,
                         'ANSWER_VALUE' => $currentAnswer->value,
@@ -265,7 +270,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param SitePage $page
      * @return void
      */
-    public function cleanupParse($page) {
+    public function cleanupParse($page)
+    {
     }
 
     /**
@@ -275,7 +281,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param array $data
      * @return array
      */
-    public function saveResponse($data) {
+    public function saveResponse($data)
+    {
 
         /* Enforce array format for radio answers
            */
@@ -304,7 +311,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-            if(is_array($allAnswers)) {
+            if (is_array($allAnswers)) {
                 foreach ($allAnswers as $currentAnswer) {
                     $page->setVar([
                         'ACTUAL_CORRECT_VALUE' => $currentAnswer->correct ? '100' : '0',
@@ -326,9 +333,9 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param  int $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id) {
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
+    {
         foreach ($xmlObj->answer as $currentAnswer) {
-
             /* Set up data object in accordance with $this->create();
              */
             $answer['description'] = trim((string)$currentAnswer->text);
@@ -360,13 +367,13 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param int $question_id
      * @return mixed
      */
-    public function exportResponseToCSV($attempt_id, $question_id) {
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
 
         if (is_array($data)) {
-
             /* Answer text to appear in export
                 */
             if ($this->getUseLongAnswers()) {
@@ -385,11 +392,11 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
         }
 
         /* Append commentary
-		 */
+         */
         $data['comment'] = $response['comment'];
 
         /* Append awarded mark
-		 */
+         */
         $data['mark'] = $response['mark'];
 
         return $data;
@@ -402,7 +409,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param int $value
      * @return string
      */
-    public function getAnswerText($question_id, $value) {
+    public function getAnswerText($question_id, $value)
+    {
         $answer = $this->getByQuestionID($question_id);
 
         $allOptions = unserialize($answer['answer']);
@@ -423,7 +431,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      * @param int $question_id
      * @return mixed
      */
-    public function exportResponseToArray($attempt_id, $question_id) {
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = unserialize($response['response']);
@@ -515,7 +524,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getCorrectClass() {
+    protected function getCorrectClass()
+    {
         return $this->correctClass;
     }
 
@@ -524,7 +534,8 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
      *
      * @return string
      */
-    protected function getIncorrectClass() {
+    protected function getIncorrectClass()
+    {
         return $this->incorrectClass;
     }
 }

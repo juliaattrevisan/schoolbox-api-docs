@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AccountDisabled
  *
@@ -8,7 +9,6 @@
  */
 
 namespace Schoolbox\Application\Exception;
-
 
 class AccountDisabled extends Exception
 {

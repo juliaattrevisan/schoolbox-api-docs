@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Resource\My\Folder as MyFolder;
 use Schoolbox\Mapper;
 use Schoolbox\Error;
@@ -69,7 +70,7 @@ if (isset($_POST['name'])) {
     }
     $destination = $myFolderMapper->findById($destinationId);
 
-    if($myFolderMapper->isDescendant($destination, $myFolder)){
+    if ($myFolderMapper->isDescendant($destination, $myFolder)) {
         respondFailure($isAjax, 'Cannot move folder to own descendant');
     }
     $myFolder->setParent($destination);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -16,7 +17,6 @@ use Schoolbox\Json\Api\AuraLink;
 use Schoolbox\Json\Api\SitePageLink;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use PHPUnit\Framework\TestCase;
-
 
 class LinkDecoratorTest extends TestCase
 {
@@ -66,7 +66,6 @@ class LinkDecoratorTest extends TestCase
                     'site' => new SitePageLink('/test/link')
                 ];
             }
-
         };
     }
 

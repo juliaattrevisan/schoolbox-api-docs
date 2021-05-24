@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2021, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Schoolbox\Geosnapshot\Component\Homepage;
 
 use Alaress\Module\Module as BaseModule;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Builds notice classes for notifications for admin emails.
  *
@@ -7,14 +8,16 @@
  * @link       https://schoolbox.com.au/
  * @copiedfrom Steve Chan <steve.chan@alaress.com.au>
  */
-class Leave_Core_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory {
+class Leave_Core_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory
+{
 
     /**
      * Produce a notification for the request based on status.
      *
      * @return Leave_Core_Notice_Admin_Abstract
      */
-    public function produce() {
+    public function produce()
+    {
         $notice = null;
         // Admins only get notified if the request is new.
         // (it's reasonable to assume that boarder leave admin approved the request)
@@ -22,12 +25,10 @@ class Leave_Core_Notice_Admin_Factory extends Leave_Notice_Abstract_Factory {
         if ($request->isPending()) {
             $notice = new Leave_Core_Notice_Admin_Submitted($request);
             $notice->setup();
-        }
-        else if ($request->isApproved()) {
+        } else if ($request->isApproved()) {
             $notice = new Leave_Core_Notice_Admin_Authorised($request);
             $notice->setup();
-        }
-        else if ($request->isRejected()) {
+        } else if ($request->isRejected()) {
             $notice = new Leave_Core_Notice_Admin_Rejected($request);
             $notice->setup();
         }

@@ -8,7 +8,8 @@
  *
  */
 
-class Component_Dashboard_QuicklinksController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_QuicklinksController extends Component_Dashboard_ControllerAbstract
+{
 
     private $quicklinks;
 
@@ -17,7 +18,8 @@ class Component_Dashboard_QuicklinksController extends Component_Dashboard_Contr
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute () {
+    public function execute()
+    {
 
         // data setup is based on the user that's about to see it
         $groupHandler = new Group();
@@ -27,42 +29,38 @@ class Component_Dashboard_QuicklinksController extends Component_Dashboard_Contr
             'news' => array('/news', 'News'),
         );
 
-        if($groupHandler->isStaff()) {
+        if ($groupHandler->isStaff()) {
             $this->quicklinks['staff'] = array(
                 'my-timetable' => array('/timetable', 'My Timetable'),
                 'synergetic' => array('/synergetic', 'Synergetic Web Application'),
             );
-
-        }
-        elseif($groupHandler->isParent()) {
+        } elseif ($groupHandler->isParent()) {
             $this->quicklinks['parents'] = array(
                 'synergetic-parent-portal' => array('/synergetic', 'Synergetic Parent Portal'),
                 'evi-parent-homepage' => array('#', 'eVI Parent Homepage'),
             );
-
-        }
-        elseif($groupHandler->isStudent()) {
+        } elseif ($groupHandler->isStudent()) {
             $this->quicklinks['students'] = array(
                 'my-timetable' => array('/timetable', 'My Timetable'),
                 'eportfolio' => array('#', 'My ePortfolio'),
             );
-        }
-        else {
+        } else {
             return false;
         }
 
         return true;
     }
 
-    public function renderTemplate ($templateHandle) {
-        if ( !$this->loadTemplate($templateHandle, 'quicklinks') ) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!$this->loadTemplate($templateHandle, 'quicklinks')) {
             return false;
         }
 
         $this->setBlock($templateHandle, 'qlinks_item', 'qlinks_item_block');
 
-        foreach($this->quicklinks as $groupName => $items) {
-            foreach($items as $class => $item) {
+        foreach ($this->quicklinks as $groupName => $items) {
+            foreach ($items as $class => $item) {
                 $this->setVar(array(
                     'GROUP_NAME' => $groupName,
                     'QUICKLINK_CLASS' => $class,
@@ -75,5 +73,4 @@ class Component_Dashboard_QuicklinksController extends Component_Dashboard_Contr
 
         return true;
     }
-
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
@@ -13,8 +15,8 @@ use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
 use Schoolbox\Learning\Assessment\Response\NotSubmittedFilter;
 use Schoolbox\Learning\Assessment\Response\SubmittedFilter;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use \Schoolbox\User;
-use \DomainException;
+use Schoolbox\User;
+use DomainException;
 use Alaress_Date_Format;
 
 /**

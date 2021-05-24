@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker;
-
 
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
 use Alaress\WorkerCrew\Worker\IO\Listener\InputStreamListener;
@@ -125,7 +125,7 @@ abstract class AbstractProcess implements WorkerInterface
             if (!in_array($cmd, $this->strat->getSupportedActions())) {
                 throw new InvalidArgumentException("Rejecting command '$cmd'");
             }
-        } catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->log->error("Rejecting data '$buffer'", ['exception' => $e]);
             throw $e;
         }
@@ -178,6 +178,5 @@ abstract class AbstractProcess implements WorkerInterface
      * @throws InvalidArgumentException
      * @return mixed
      */
-    protected abstract function process($command, $args);
-
-} 
+    abstract protected function process($command, $args);
+}

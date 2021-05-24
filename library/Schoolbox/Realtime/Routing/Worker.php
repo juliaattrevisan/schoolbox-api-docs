@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -58,5 +59,4 @@ class Worker extends AbstractProcess
 
         return $count;
     }
-
 }

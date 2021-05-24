@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for tiles in Schoolbox.
  *
@@ -6,7 +7,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Tile;
 
 use Alaress_Date_Format;

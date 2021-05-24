@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for the pastoral tags lookup table
  *

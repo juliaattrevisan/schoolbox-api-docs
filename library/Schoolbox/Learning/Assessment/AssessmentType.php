@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -44,16 +45,16 @@ class AssessmentType implements IType
      */
     public static function objectToString(IAssessable $assessment)
     {
-        if($assessment instanceof Project){
+        if ($assessment instanceof Project) {
             return self::TYPE_PROJECT;
-        } elseif($assessment instanceof DueWork){
+        } elseif ($assessment instanceof DueWork) {
             return self::TYPE_DUE_WORK;
-        } elseif($assessment instanceof Task){
+        } elseif ($assessment instanceof Task) {
             return self::TYPE_TASK;
-        } elseif($assessment instanceof Quiz){
+        } elseif ($assessment instanceof Quiz) {
             return self::TYPE_QUIZ;
         }
-        throw new \UnexpectedValueException('Unknown IAssessable: '.get_class($assessment));
+        throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessment));
     }
 
 
@@ -68,7 +69,6 @@ class AssessmentType implements IType
     {
         if (self::TYPE_PROJECT == $stringVal) {
             return (new Project())->setContext($context);
-
         } elseif (self::TYPE_DUE_WORK == $stringVal) {
             $object = (new DueWork())->setContext($context);
 
@@ -77,10 +77,8 @@ class AssessmentType implements IType
             }
 
             return $object;
-
         } elseif (self::TYPE_TASK == $stringVal) {
             return (new Task())->setContext($context);
-
         } elseif (self::TYPE_QUIZ == $stringVal) {
             return (new Quiz())->setContext($context);
         }

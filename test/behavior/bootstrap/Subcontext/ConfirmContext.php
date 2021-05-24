@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps that relate to confirm() dialogs. Copied from
  * https://gist.github.com/benjaminlazarecki/2888851
@@ -12,13 +13,15 @@
 
 use Behat\Mink\Element;
 
-class Subcontext_ConfirmContext extends BaseContext {
+class Subcontext_ConfirmContext extends BaseContext
+{
 
     /**
      * @return \WebDriver\Session
      * @throws \Behat\Behat\Exception\PendingException if not a Webdriver session
      */
-    protected function getWebDriverSession() {
+    protected function getWebDriverSession()
+    {
         $driver = $this->getSession()->getDriver();
         if (method_exists($driver, 'getWebDriverSession')) {
             return $driver->getWebDriverSession();
@@ -29,14 +32,16 @@ class Subcontext_ConfirmContext extends BaseContext {
     /**
      * @when /^(?:|I )confirm the popup$/
      */
-    public function confirmPopup() {
+    public function confirmPopup()
+    {
         $this->getWebDriverSession()->accept_alert();
     }
 
     /**
      * @when /^(?:|I )cancel the popup$/
      */
-    public function cancelPopup() {
+    public function cancelPopup()
+    {
         $this->getWebDriverSession()->dismiss_alert();
     }
 
@@ -46,7 +51,8 @@ class Subcontext_ConfirmContext extends BaseContext {
      * @param  string $message
      * @return bool
      */
-    public function assertPopupMessage($message) {
+    public function assertPopupMessage($message)
+    {
         return $message == $this->getWebDriverSession()->getAlert_text();
     }
 
@@ -55,7 +61,8 @@ class Subcontext_ConfirmContext extends BaseContext {
      *
      * @param string $message
      */
-    public function setPopupText($message) {
+    public function setPopupText($message)
+    {
         $this->getWebDriverSession()->postAlert_text($message);
     }
 }

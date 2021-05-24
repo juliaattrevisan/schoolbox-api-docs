@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -19,4 +20,4 @@ $key = md5($hash);
 $username = urlencode($_SESSION['user']->getUsername());
 
 $destination = "{$url}/?id={$username}&key={$key}";
-header('Location:'.$destination, false, 301);
+header('Location:' . $destination, false, 301);

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Blog\Eportfolio\Comment;
@@ -76,8 +78,8 @@ class Notifier extends AbstractModuleNotifier
         $dependencies['postMapper']       = $dependencies['postMapper'] ?? Post\Mapper::getInstance();
         $dependencies['folderMapper']     = $dependencies['folderMapper'] ?? Folder\Mapper::getInstance();
         $dependencies['blogAccess']       = $dependencies['blogAccess'] ?? new Access(
-                $dependencies['permissionMapper'] ?? PermissionMapper::getInstance(),
-                $dependencies['folderMapper']
+            $dependencies['permissionMapper'] ?? PermissionMapper::getInstance(),
+            $dependencies['folderMapper']
         );
         $dependencies['userMapper']       = $dependencies['userMapper'] ?? UserMapper::getInstance();
         parent::loadDependencies($dependencies);
@@ -221,7 +223,6 @@ class Notifier extends AbstractModuleNotifier
             $envelope->targetToUser($owner->getId(), $bob->build());
 
             return $envelope;
-
         } catch (Exception $e) {
             // page or owner was invalid.
             return new Envelope();

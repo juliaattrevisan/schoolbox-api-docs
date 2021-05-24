@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Schedule;
-
 
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use RuntimeException;
@@ -23,13 +23,14 @@ use SplQueue;
  * Class PoolingStrategy
  * @package Schoolbox\Realtime\Schedule
  */
-class SchedulerDispatchStrategy extends DefaultDispatchStrategy {
+class SchedulerDispatchStrategy extends DefaultDispatchStrategy
+{
 
-	/** @var QueueItemMapper */
-	protected $mapper;
+    /** @var QueueItemMapper */
+    protected $mapper;
 
-	/** @var Notif */
-	protected $notifier;
+    /** @var Notif */
+    protected $notifier;
 
 
     /**
@@ -45,42 +46,42 @@ class SchedulerDispatchStrategy extends DefaultDispatchStrategy {
     }
 
 
-	/**
-	 * Get the name of the strategy currently being used
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return 'Schedule';
-	}
+    /**
+     * Get the name of the strategy currently being used
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return 'Schedule';
+    }
 
 
-	/**
-	 * Constructs the queue, but also checks for any SQL-rescued events from AMQP being offline
-	 *
-	 * @return SplQueue
-	 */
-	public function buildQueue() {
-		try {
-			/** @var QueueItem[] $qiColl */
-			$qiColl = $this->mapper->findAll();
+    /**
+     * Constructs the queue, but also checks for any SQL-rescued events from AMQP being offline
+     *
+     * @return SplQueue
+     */
+    public function buildQueue()
+    {
+        try {
+            /** @var QueueItem[] $qiColl */
+            $qiColl = $this->mapper->findAll();
 
-			foreach($qiColl as $qi) {
-				$event = $qi->getIdentifier();
-				$command = $qi->getCommand();
+            foreach ($qiColl as $qi) {
+                $event = $qi->getIdentifier();
+                $command = $qi->getCommand();
 
-				if($event instanceof Event) {
-					if($this->notifier->setTopic($command)->notice(serialize($event))) {
-						$this->mapper->delete($qi);
-					}
-				}
-			}
-		}
-		catch(RuntimeException $e) {
-			// couldn't unserialize or rabbit offline, just leave it for now
-		}
+                if ($event instanceof Event) {
+                    if ($this->notifier->setTopic($command)->notice(serialize($event))) {
+                        $this->mapper->delete($qi);
+                    }
+                }
+            }
+        } catch (RuntimeException $e) {
+            // couldn't unserialize or rabbit offline, just leave it for now
+        }
 
-		return parent::buildQueue();
-	}
-
+        return parent::buildQueue();
+    }
 }

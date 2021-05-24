@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface for Twig chain loaders.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assessment Attempt deletion. Responses are all softdeleted if
  * the Attempt is softdeleted.
@@ -24,36 +25,31 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\UserMapper;
 
 $attemptsToDelete = [];
-
 /** @var Assessment\MapperProxy $assessmentDataSource */
 $assessmentDataSource = $this->getDi()->get('assessmentDataSource');
 $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $groupHandler    = new Group();
-
-
 $getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler, $assessHandler, $groupHandler) {
+
     if (!is_numeric($attemptId)) {
         throw \Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
     }
 
     $attempt = $attemptHandler->getByID($attemptId);
-
     if (!$assessHandler->isValidUrlAccess($attempt['assess_id'])) {
         throw new NotFound();
     }
 
     $assess = $assessHandler->getByID($attempt['assess_id']);
-
     if (!$assessHandler->isOwner($assess['assess_id']) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
         throw Schoolbox\Error\Mapper::getInstance()->generateException(Schoolbox\Error\Mapper::ERROR_PERM_ATTEMPT_DELETE);
     }
 
     try {
         $user = UserMapper::getInstance()->findById($attempt['user_id']);
-    }
-    catch (Mapper\Exception $e) {
+    } catch (Mapper\Exception $e) {
         error(Error\Mapper::ERROR_USER_NOT_FOUND);
         die();
     }
@@ -62,8 +58,7 @@ $getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler,
      */
     try {
         Folder\Mapper::getInstance()->findById($assess['category_id']);
-    }
-    catch (Mapper\Exception $e) {
+    } catch (Mapper\Exception $e) {
         error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
     }
 
@@ -76,27 +71,21 @@ $getAttempt = function ($attemptId) use ($assessmentDataSource, $attemptHandler,
 
     return $attempt;
 };
-
 $deleteAttempt = function (array $attempt) use ($responseHandler, $attemptHandler) {
+
     $responseHandler->deleteResponsesForAttempt($attempt['attempt_id']);
     $attemptHandler->update(array(
         'attempt_id' => $attempt['attempt_id'],
         'deleted_at' => 'NOW()'
     ));
-
 };
-
-
 if (isset($_POST['userIds']) && isset($_POST['assessmentId'])) {
-
     $quiz = Schoolbox\Learning\Quiz\Mapper::getInstance()->findOneByColumn('assessment_id', $_POST['assessmentId']);
-
     $userAttemptIds = Schoolbox\Learning\Quiz\Attempt\Mapper::getInstance()->findIdsByColumnList([
         'user_id'     => $_POST['userIds'],
         'assess_id'   => $quiz->getId(),
         'reviewed_at' => null
     ]);
-
     foreach ($userAttemptIds as $attemptId) {
         $attemptsToDelete[] = $getAttempt($attemptId);
     }

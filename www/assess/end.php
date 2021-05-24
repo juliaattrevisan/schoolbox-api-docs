@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assessment completion. Marks when an assessment is finished.
  *
@@ -49,8 +50,7 @@ if (!($attempt['user_id'] == $_SESSION['user']->getId() && $attempt['assess_id']
  */
 try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-}
-catch (Mapper\Exception $e) {
+} catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
@@ -191,11 +191,10 @@ if ($numUnmarkedQuestions) {
     $this->setVar('unmarkedRemaining_block', '');
 }
 
-if($assess['completion_message']) {
+if ($assess['completion_message']) {
     $this->parse('has_complete_block', 'has_complete');
-}
-else {
-    $this->setVar('has_complete_block','');
+} else {
+    $this->setVar('has_complete_block', '');
 }
 
 /* View Attempt link
@@ -216,7 +215,6 @@ $currentUser = $_SESSION['user'];
 if ($assessment->isFeedbackVisibleToUser($currentUser)) {
     $this->parse('has_marks_block', 'has_marks');
     $this->parse('view_attempt_block', 'view_attempt');
-
 } else {
     $this->setVar(
         array(
@@ -236,9 +234,8 @@ $term  = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate(
 
 if (!empty($_GET[Redirect::RETURN_URL])) {
     $folderUrl = Redirect::decode($_GET[Redirect::RETURN_URL]);
-}
-else {
-    $folderUrl = '/homepage/'.$folder->getId();
+} else {
+    $folderUrl = '/homepage/' . $folder->getId();
 }
 
 $trail->renderIntoSitePage($this, 'BREADCRUMB', [
@@ -249,7 +246,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
     ],
     [
         'text'  => $folder->getName(),
-        'href'  => '/homepage/'.$folder->getId(),
+        'href'  => '/homepage/' . $folder->getId(),
         'class' => ''
     ],
     [

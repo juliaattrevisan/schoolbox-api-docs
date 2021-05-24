@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for e-portfolio blog comments
  *
@@ -22,63 +23,69 @@ class Model implements ISoftDeletable
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
-	use DeletedAtDate;
+    use DeletedAtDate;
 
-	/** @var EportfolioBlogModel */
-	protected $blog;
+    /** @var EportfolioBlogModel */
+    protected $blog;
 
-	/** @var User */
-	protected $owner;
+    /** @var User */
+    protected $owner;
 
-	/** @var string */
-	protected $body;
+    /** @var string */
+    protected $body;
 
 
-	/**
-	 * @param EportfolioBlogModel $blog
-	 * @return self
-	 */
-	public function setBlog($blog) {
-		$this->blog = $blog;
-		return $this;
-	}
+    /**
+     * @param EportfolioBlogModel $blog
+     * @return self
+     */
+    public function setBlog($blog)
+    {
+        $this->blog = $blog;
+        return $this;
+    }
 
-	/**
-	 * @return EportfolioBlogModel
-	 */
-	public function getBlog() {
-		return $this->blog;
-	}
+    /**
+     * @return EportfolioBlogModel
+     */
+    public function getBlog()
+    {
+        return $this->blog;
+    }
 
-	/**
-	 * @param User $owner
-	 * @return self
-	 */
-	public function setOwner($owner) {
-		$this->owner = $owner;
-		return $this;
-	}
+    /**
+     * @param User $owner
+     * @return self
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
 
-	/**
-	 * @return User
-	 */
-	public function getOwner() {
-		return $this->owner;
-	}
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
 
-	/**
-	 * @param string $body
-	 * @return self
-	 */
-	public function setBody($body) {
-		$this->body = $body;
-		return $this;
-	}
+    /**
+     * @param string $body
+     * @return self
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getBody() {
-		return $this->body;
-	}
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
 }

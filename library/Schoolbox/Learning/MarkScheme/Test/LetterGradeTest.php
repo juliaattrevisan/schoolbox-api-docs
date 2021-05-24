@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -7,13 +8,12 @@
 
 namespace Schoolbox\Learning\MarkScheme\Test;
 
-
 use PHPUnit\Framework\TestCase;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
-use \InvalidArgumentException;
+use InvalidArgumentException;
 
 class LetterGradeTest extends TestCase
 {
@@ -115,7 +115,7 @@ class LetterGradeTest extends TestCase
             ['16', '75', '88', 'Very Good'],
             ['17', '90', '95', 'Excellent'],
         ];
-        foreach($levelDatums as $levelDatum){
+        foreach ($levelDatums as $levelDatum) {
             $level = new GradeLevel();
             $level->setId($levelDatum[0]);
             $level->setLowerBound($levelDatum[1]);

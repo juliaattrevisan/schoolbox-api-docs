@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test model used by TestMapper.
  *

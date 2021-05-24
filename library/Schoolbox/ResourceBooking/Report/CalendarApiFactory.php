@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Builder for calendar APIs for a model.
  *
@@ -6,7 +7,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Report;
 
 use Calendar_Api_Composite;

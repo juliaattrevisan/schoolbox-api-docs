@@ -1,6 +1,6 @@
 <?php
 
-use \Schoolbox\File\MimetypeMapper;
+use Schoolbox\File\MimetypeMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -13,7 +13,6 @@ $folderHandler = PortfolioWebDAV::factory();
 $fileHandler = $folderHandler;
 
 if (is_numeric($_POST['relationID'])) {
-
     $folderList = $folderHandler->getFolderList($_POST['relationID']);
     $output = array();
     if (is_array($folderList)) {
@@ -28,9 +27,7 @@ if (is_numeric($_POST['relationID'])) {
     }
     header("Content-type: application/json");
     print json_encode($output);
-}
-elseif (is_numeric($_POST['categoryID'])) {
-
+} elseif (is_numeric($_POST['categoryID'])) {
     // save current view
     $_SESSION['portfolioID'] = $_POST['categoryID'];
 
@@ -41,7 +38,7 @@ elseif (is_numeric($_POST['categoryID'])) {
         foreach ($fileList as $file) {
             $modifiedDate = new Alaress_Date_Format(strtotime($file['submitted']), 'U');
 
-            try{
+            try {
                 $mime = MimetypeMapper::getInstance()->getByFilename($file['description']);
             } catch (Exception $e) {
                 $mime = MimetypeMapper::getInstance()->getUnknownMime();
@@ -59,8 +56,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 
     header("Content-type: application/json");
     print json_encode($output);
-}
-elseif (is_numeric($_POST['saveID'])) {
+} elseif (is_numeric($_POST['saveID'])) {
     // save current view
     $_SESSION['portfolioID'] = $_POST['saveID'];
 }

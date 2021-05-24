@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey_Answer_Short
  *
@@ -74,7 +75,8 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
     /**
      * @inheritdoc
      */
-    public function configure(SitePage $page, $config) {
+    public function configure(SitePage $page, $config)
+    {
         $options = json_decode($config);
 
         $page->setVar(array(
@@ -89,7 +91,8 @@ class Survey_Answer_Short extends Evaluation_Answer_Short
      * @param SitePage $page
      * @param int $question_id
      */
-    protected function configureResponse($page, $question_id) {
+    protected function configureResponse($page, $question_id)
+    {
         $question = $this->questionHandler->getByID($question_id);
         $config = json_decode($question['config']);
 

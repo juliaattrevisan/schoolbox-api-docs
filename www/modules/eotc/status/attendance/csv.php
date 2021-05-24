@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Attendance List CSV
  *
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use EOTC\Authenticator;
 use EOTC\EventMapper;
 use Schoolbox\Collection;
@@ -19,11 +21,10 @@ use Schoolbox\User;
 $event = false;
 
 try {
-	$eventMapper = EventMapper::getInstance();
-	$event = $eventMapper->findById($this->arg[0]);
-}
-catch (MapperException $e) {
-	error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
+    $eventMapper = EventMapper::getInstance();
+    $event = $eventMapper->findById($this->arg[0]);
+} catch (MapperException $e) {
+    error(ErrorMapper::ERROR_EVENT_NOT_FOUND);
 }
 
 /** @var User $sessionUser */
@@ -38,12 +39,12 @@ $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
 
 if ($isEOTCAdministrator || $isSubscribedUser) {
     $roleMapper = RoleMapper::getInstance();
-	$csv = '';
+    $csv = '';
 
-	$this->setVar([
-		'EVENT_ID' => $event->getId(),
-		'EVENT_NAME' => $event->getTitle(),
-	]);
+    $this->setVar([
+        'EVENT_ID' => $event->getId(),
+        'EVENT_NAME' => $event->getTitle(),
+    ]);
 
     $row = [
         'External ID',
@@ -74,18 +75,16 @@ if ($isEOTCAdministrator || $isSubscribedUser) {
         }
     }
 
-	/* Thump out a csv
+    /* Thump out a csv
      */
-	$slug = new \Url("{$event->getId()}-{$event->getTitle()}-attendees");
-	$filename = $slug->getSlug();
+    $slug = new \Url("{$event->getId()}-{$event->getTitle()}-attendees");
+    $filename = $slug->getSlug();
 
-	header('Content-type: text/ascii');
-	header("Content-disposition: attachment; filename=\"{$filename}.csv\"");
-	echo $csv;
+    header('Content-type: text/ascii');
+    header("Content-disposition: attachment; filename=\"{$filename}.csv\"");
+    echo $csv;
 
-	exit();
+    exit();
+} else {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
-else {
-	error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
-}
-

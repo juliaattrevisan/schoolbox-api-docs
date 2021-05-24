@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Queue\QueueInterface;
 use Schoolbox\MobileApp;
-
 
 class Mobile implements QueueInterface
 {

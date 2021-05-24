@@ -45,7 +45,6 @@ class Page
                 $this->pageNotFound();
             }
         }
-
     }
 
 
@@ -97,7 +96,6 @@ class Page
         } else {
             $this->setVar($handle . '_block', '');
         }
-
     }
 
     public function outputPage()

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -24,7 +25,6 @@ use Schoolbox\User\Password\Reset;
 use Schoolbox\UserMapper;
 use Twig\Error\LoaderError;
 use Alaress\Twig\Loader\IChainLoader;
-
 
 class Module extends Alaress\Module\Module
 {
@@ -59,7 +59,7 @@ class Module extends Alaress\Module\Module
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
     }
@@ -113,5 +113,4 @@ class Module extends Alaress\Module\Module
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
-
 }

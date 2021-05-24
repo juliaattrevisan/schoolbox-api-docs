@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Phone
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External\Normalise\User\Common;
 
-class Phone {
+class Phone
+{
 
     /**
      * The phone number
@@ -28,7 +30,8 @@ class Phone {
     /**
      * Constructor
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 
     /* Getters/Setters

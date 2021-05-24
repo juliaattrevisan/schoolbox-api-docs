@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Methods for translating date() format strings to formats for use by other
  * libraries.

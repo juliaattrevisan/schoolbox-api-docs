@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implementation of Aura\Router\RouterFactory.
  *

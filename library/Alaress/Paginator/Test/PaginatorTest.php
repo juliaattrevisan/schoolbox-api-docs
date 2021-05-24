@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit tests for Alaress\Paginator\Paginator class.
  *
@@ -8,11 +9,13 @@
  */
 
 namespace Alaress\Paginator\Test;
+
 use Alaress\Paginator\Paginator;
 use PHPUnit\Framework\TestCase;
 use OutOfRangeException;
 
-class PaginatorTest extends TestCase {
+class PaginatorTest extends TestCase
+{
 
     /**
      * Simple factory for a test Paginator object.
@@ -21,7 +24,8 @@ class PaginatorTest extends TestCase {
      * @param  int $total
      * @return Paginator
      */
-    protected function buildPaginator($pageSize, $total) {
+    protected function buildPaginator($pageSize, $total)
+    {
         $paginator = new Paginator();
         $paginator->setPageSize($pageSize)->setTotal($total);
         return $paginator;
@@ -30,10 +34,11 @@ class PaginatorTest extends TestCase {
     /**
      * @return array
      */
-    public function getTestPageCountData() {
+    public function getTestPageCountData()
+    {
         return array(
-            array($this->buildPaginator(1,  0),  0),
-            array($this->buildPaginator(1,  9),  9),
+            array($this->buildPaginator(1, 0),  0),
+            array($this->buildPaginator(1, 9),  9),
 
             array($this->buildPaginator(10, 9),  1),
             array($this->buildPaginator(10, 10), 1),
@@ -61,19 +66,21 @@ class PaginatorTest extends TestCase {
      *
      * @dataProvider getTestPageCountData
      */
-    public function testPageCount(Paginator $paginator, $expectedPageCount) {
+    public function testPageCount(Paginator $paginator, $expectedPageCount)
+    {
         $this->assertEquals($expectedPageCount, $paginator->getPageCount());
     }
 
     /**
      * @return array
      */
-    public function getTestItemsOnPageData() {
+    public function getTestItemsOnPageData()
+    {
         return array(
-            array($this->buildPaginator(1,  9),  1, 0, 1, 1),
-            array($this->buildPaginator(1,  9),  2, 1, 2, 2),
-            array($this->buildPaginator(1,  9),  8, 7, 8, 8),
-            array($this->buildPaginator(1,  9),  9, 8, 9, 9),
+            array($this->buildPaginator(1, 9),  1, 0, 1, 1),
+            array($this->buildPaginator(1, 9),  2, 1, 2, 2),
+            array($this->buildPaginator(1, 9),  8, 7, 8, 8),
+            array($this->buildPaginator(1, 9),  9, 8, 9, 9),
 
             array($this->buildPaginator(10, 9),  1, 0,  1, 9),
             array($this->buildPaginator(10, 10), 1, 0,  1, 10),
@@ -103,10 +110,11 @@ class PaginatorTest extends TestCase {
      *
      * @dataProvider getTestItemsOnPageData
      */
-    public function testItemsOnPage(Paginator $paginator, $pageNumber, $expectedOffset, $expectedFirst, $expectedLast) {
+    public function testItemsOnPage(Paginator $paginator, $pageNumber, $expectedOffset, $expectedFirst, $expectedLast)
+    {
         $this->assertEquals($expectedOffset, $paginator->getOffset($pageNumber));
-        $this->assertEquals($expectedFirst,  $paginator->getFirstOnPage($pageNumber));
-        $this->assertEquals($expectedLast,   $paginator->getLastOnPage($pageNumber));
+        $this->assertEquals($expectedFirst, $paginator->getFirstOnPage($pageNumber));
+        $this->assertEquals($expectedLast, $paginator->getLastOnPage($pageNumber));
     }
 
 
@@ -119,7 +127,8 @@ class PaginatorTest extends TestCase {
      *
      *
      */
-    public function testZeroPagesize() {
+    public function testZeroPagesize()
+    {
         $this->expectException(OutOfRangeException::class);
         $this->buildPaginator(0, 0);
     }
@@ -129,7 +138,8 @@ class PaginatorTest extends TestCase {
      *
      *
      */
-    public function testNegativePagesize() {
+    public function testNegativePagesize()
+    {
         $this->expectException(OutOfRangeException::class);
         $this->buildPaginator(-1, 0);
     }
@@ -139,7 +149,8 @@ class PaginatorTest extends TestCase {
      *
      *
      */
-    public function testZeroTotalOffset() {
+    public function testZeroTotalOffset()
+    {
         $this->expectException(OutOfRangeException::class);
         $paginator = $this->buildPaginator(10, 0);
         $paginator->getOffset(1);
@@ -150,7 +161,8 @@ class PaginatorTest extends TestCase {
      *
      *
      */
-    public function testZeroTotalFirstOnPage() {
+    public function testZeroTotalFirstOnPage()
+    {
         $this->expectException(OutOfRangeException::class);
         $paginator = $this->buildPaginator(10, 0);
         $paginator->getFirstOnPage(1);
@@ -161,7 +173,8 @@ class PaginatorTest extends TestCase {
      *
      *
      */
-    public function testZeroTotalLastOnPage() {
+    public function testZeroTotalLastOnPage()
+    {
         $this->expectException(OutOfRangeException::class);
         $paginator = $this->buildPaginator(10, 0);
         $paginator->getLastOnPage(1);
@@ -172,7 +185,8 @@ class PaginatorTest extends TestCase {
      *
      *
      */
-    public function testNegativeTotal() {
+    public function testNegativeTotal()
+    {
         $this->expectException(OutOfRangeException::class);
         $this->buildPaginator(10, -1);
     }
@@ -181,12 +195,13 @@ class PaginatorTest extends TestCase {
     /**
      * @return array
      */
-    public function getTestPageNumberLowerBoundData() {
+    public function getTestPageNumberLowerBoundData()
+    {
         return array(
-            array($this->buildPaginator(1,  0),  -1),
+            array($this->buildPaginator(1, 0),  -1),
 
-            array($this->buildPaginator(1,  9),   0),
-            array($this->buildPaginator(1,  9),  -1),
+            array($this->buildPaginator(1, 9),   0),
+            array($this->buildPaginator(1, 9),  -1),
 
             array($this->buildPaginator(10, 9),   0),
             array($this->buildPaginator(10, 9),  -1),
@@ -203,7 +218,8 @@ class PaginatorTest extends TestCase {
      * @dataProvider      getTestPageNumberLowerBoundData
      *
      */
-    public function testPageNumberLowerBound(Paginator $paginator, $pageNumber) {
+    public function testPageNumberLowerBound(Paginator $paginator, $pageNumber)
+    {
         $this->expectException(OutOfRangeException::class);
         $paginator->getFirstOnPage($pageNumber);
     }
@@ -212,11 +228,12 @@ class PaginatorTest extends TestCase {
     /**
      * @return array
      */
-    public function getTestPageNumberUpperBoundData() {
+    public function getTestPageNumberUpperBoundData()
+    {
         return array(
-            array($this->buildPaginator(1,  0),  1),
+            array($this->buildPaginator(1, 0),  1),
 
-            array($this->buildPaginator(1,  9),  10),
+            array($this->buildPaginator(1, 9),  10),
 
             array($this->buildPaginator(10, 9),  2),
             array($this->buildPaginator(10, 9),  4),
@@ -233,7 +250,8 @@ class PaginatorTest extends TestCase {
      * @dataProvider      getTestPageNumberUpperBoundData
      *
      */
-    public function testPageNumberUpperBound(Paginator $paginator, $pageNumber) {
+    public function testPageNumberUpperBound(Paginator $paginator, $pageNumber)
+    {
         $this->expectException(OutOfRangeException::class);
         $paginator->getFirstOnPage($pageNumber);
     }

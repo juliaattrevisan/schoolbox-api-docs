@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Preview\Chain\Strategy;
 
 /**
@@ -29,7 +31,8 @@ abstract class Base
      *
      * @return array|null
      */
-    protected function testNext() {
+    protected function testNext()
+    {
         if ($this->getNext()) {
             return $this->getNext()->test();
         }
@@ -54,7 +57,8 @@ abstract class Base
      *
      * @param Base $next
      */
-    public function setNext($next) {
+    public function setNext($next)
+    {
         $this->next = $next;
     }
 
@@ -64,7 +68,8 @@ abstract class Base
      *
      * @return Base
      */
-    public function getNext() {
+    public function getNext()
+    {
         return $this->next;
     }
 }

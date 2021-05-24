@@ -10,7 +10,7 @@ use RobRichards\XMLSecLibs\XMLSecurityDSig;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-$spBaseUrl = 'https://'.Config::get('site_hostname').'.'.Config::get('site_domain');
+$spBaseUrl = 'https://' . Config::get('site_hostname') . '.' . Config::get('site_domain');
 
 
 $settingsInfo = array (
@@ -54,7 +54,7 @@ try {
     $idpMetadata = $cache->init($idpMetadataUrl);
 
     // if cache exists, update $setting info from cache
-    if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents()) ) {
+    if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents())) {
         try {
             $settingsInfo = IdPMetadataParser::injectIntoSettings($settingsInfo, IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
         } catch (Exception $e) {
@@ -72,19 +72,19 @@ try {
 $privateKey = false;
 
 $privateKeyResource = openssl_pkey_get_private(Config::get('saml_private_cert'), sha1(strtolower(trim(Config::get('site_school_code')))));
-if( $privateKeyResource !== false ) {
+if ($privateKeyResource !== false) {
     openssl_pkey_export($privateKeyResource, $privateKey);
 }
 
 $settingsInfo['sp'] = [
         'entityId' => Config::get('saml_sp_entityid') ?: $spBaseUrl,
         'assertionConsumerService' => [
-            'url' => $spBaseUrl.'/saml/consume.php',
+            'url' => $spBaseUrl . '/saml/consume.php',
             'binding' => Constants::BINDING_HTTP_POST,
 
         ],
         'singleLogoutService' => [
-            'url' => $spBaseUrl.'/saml/consume.php?sls',
+            'url' => $spBaseUrl . '/saml/consume.php?sls',
             'binding' => Constants::BINDING_HTTP_REDIRECT,
         ],
         'NameIDFormat' => Constants::NAMEID_UNSPECIFIED,
@@ -98,10 +98,11 @@ $settingsInfo['sp'] = [
  *
  * @return boolean
  */
-function useSAMLKerberos() {
+function useSAMLKerberos()
+{
 
     // If whitelist not in use, don't use kerberos at all
-    if (trim(Config::get('saml_krb_whitelist'))==''){
+    if (trim(Config::get('saml_krb_whitelist')) == '') {
         SAMLDebugLog("Kerberos whitelist not in use");
         return false;
     }
@@ -109,7 +110,7 @@ function useSAMLKerberos() {
     // Check if the user is in the IP whitelist
 
 
-    if (!IpUtils::checkIp(Session::getIP(),  array_map('trim', explode(',',Config::get('saml_krb_whitelist'))))) {
+    if (!IpUtils::checkIp(Session::getIP(), array_map('trim', explode(',', Config::get('saml_krb_whitelist'))))) {
         SAMLDebugLog("IP not in kerberos whitelist");
         return false;
     }
@@ -134,7 +135,7 @@ function useSAMLKerberos() {
     SAMLDebugLog(json_encode($browser->getUserAgent()));
     if (!$browser->isMobile()) {
         if ($browser->getPlatform() == BrowserDetection::PLATFORM_WINDOWS || $browser->getPlatform() == BrowserDetection::PLATFORM_MACINTOSH) {
-            switch($browser->getName()) {
+            switch ($browser->getName()) {
                 case BrowserDetection::BROWSER_IE:
                     return true;
 
@@ -142,13 +143,25 @@ function useSAMLKerberos() {
                     return true;
 
                 case BrowserDetection::BROWSER_CHROME:
-                    if (Config::get('saml_krb_chrome')) { return true; } else { return false; }
+                    if (Config::get('saml_krb_chrome')) {
+                        return true;
+                    } else {
+                        return false;
+                    }
 
                 case BrowserDetection::BROWSER_SAFARI:
-                    if (Config::get('saml_krb_safari')) { return true; } else { return false; }
+                    if (Config::get('saml_krb_safari')) {
+                        return true;
+                    } else {
+                        return false;
+                    }
 
                 case BrowserDetection::BROWSER_FIREFOX:
-                    if (Config::get('saml_krb_firefox')) { return true; } else { return false; }
+                    if (Config::get('saml_krb_firefox')) {
+                        return true;
+                    } else {
+                        return false;
+                    }
 
                 default:
                     return false;
@@ -161,8 +174,9 @@ function useSAMLKerberos() {
     }
 }
 
-function SAMLDebugLog($msg) {
+function SAMLDebugLog($msg)
+{
     if (Config::get('saml_debug')) {
-        file_put_contents(Config::get('logs_dir')."/saml.log", "[".date("Y-m-d H:i:s")."] ".$_SERVER['REMOTE_ADDR']." ".$msg."\n", FILE_APPEND);
+        file_put_contents(Config::get('logs_dir') . "/saml.log", "[" . date("Y-m-d H:i:s") . "] " . $_SERVER['REMOTE_ADDR'] . " " . $msg . "\n", FILE_APPEND);
     }
 }

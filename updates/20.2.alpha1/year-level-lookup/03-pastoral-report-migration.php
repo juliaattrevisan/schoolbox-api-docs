@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -66,7 +68,7 @@ $app = new class extends CliTool\App {
              */
             $newYearNames = [];
 
-            foreach($yearNames as $yearName) {
+            foreach ($yearNames as $yearName) {
                 $newYearNames[] = $yearLevels[$yearName]['id'] ?? null;
             }
 

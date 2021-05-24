@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -22,7 +23,7 @@ trait External_Synergetic_ClearInvalidValuesTrait
     {
         // Remove the 'Not Selected' Synergetic placeholder value
 
-        return array_map(function($value) use ($placeholder) {
+        return array_map(function ($value) use ($placeholder) {
             if (is_array($value)) {
                 return $this->clearInvalidValues($value);
             } else {

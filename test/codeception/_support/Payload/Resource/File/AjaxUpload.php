@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -7,7 +8,6 @@
 namespace Payload\Resource\File;
 
 use Payload;
-
 
 class AjaxUpload extends Upload
 {

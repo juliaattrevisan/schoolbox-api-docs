@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -95,18 +96,18 @@ class Factory
             // FC and VCal treat event end as exclusive, so add one day to end
             $endDate = clone $context->getDueDate();
             $result->add([
-                'id'         => 'unit-'.$context->getId(),
+                'id'         => 'unit-' . $context->getId(),
                 'title'      => $context->getTitle(),
                 'editable'   => false,
                 'start'      => $context->getOpenDate()->getDatabase(),
                 'end'        => $endDate->addDays(1)->getDatabase(),
                 'allDay'     => true,
-                'resourceId' => $folder->getId().'-unit',
+                'resourceId' => $folder->getId() . '-unit',
                 'className'  => ['unit', 'readonly'],
                 'meta'       => [
                     'type'        => 'unit',
                     'description' => '',
-                    'link'        => '/homepage/'.$context->getSpecification()->getFolder()->getId(),
+                    'link'        => '/homepage/' . $context->getSpecification()->getFolder()->getId(),
                 ],
             ]);
 
@@ -125,7 +126,6 @@ class Factory
                     // A foreground event for the actual activity
                     $result->add($this->buildAssessableEvent($activity, $folder, 'activity', $student, $participation));
                 }
-
             } else {
                 // It's a content area
 
@@ -153,12 +153,12 @@ class Factory
         // FC and VCal treat event end as exclusive, so add one day to end
         $endDate = clone $assessable->getDueAt();
         return [
-            'id'         => $resourceType.'-'.$assessable->getId().'-bounds',
+            'id'         => $resourceType . '-' . $assessable->getId() . '-bounds',
             'editable'   => false,
             'start'      => $assessable->getOpenAt()->getDatabase(),
             'end'        => $endDate->addDays(1)->getDatabase(),
             'allDay'     => true,
-            'resourceId' => $folder->getId().'-'.$resourceType,
+            'resourceId' => $folder->getId() . '-' . $resourceType,
             'rendering'  => 'background',
             'className'  => [$resourceType],
             'meta'       => [],
@@ -210,12 +210,11 @@ class Factory
             $feedback          = $participantObject->getAuthoritativeFeedback(true);
 
             if ($feedback instanceof IFeedback) {
-
                 // Currently unavoidable hardcode of task handling -_-
                 if ($assessable instanceof Task) {
                     $response = $participantObject->findMostRecentResponse();
                     if ($response instanceof TaskResponse) {
-                        if($response->getMarkedComplete()){
+                        if ($response->getMarkedComplete()) {
                             if ($response->isSelfAssessed()) {
                                 $className[] = 'notmarked';
                             } else {
@@ -223,7 +222,6 @@ class Factory
                             }
                         }
                     }
-
                 } else {
                     $mark = $feedback->getNormalisedMark();
                     if (isset($mark)) {
@@ -231,13 +229,11 @@ class Factory
                         $className[] = ($mark >= $this->conf->get('pbl_mastery_threshold') ? 'mastered' : 'fail');
                     }
                 }
-
             } else {
                 // No feedback yet. Is there a response?
                 if ($participantObject->hasSubmittedResponse()) {
                     $className[] = 'notmarked';
                 }
-
             }
         }
 
@@ -246,14 +242,14 @@ class Factory
         // Do the same for assessmentEnd for consistency, even though FullCalendar doesn't require it
         $assessmentEndDate = clone $assessmentEnd;
         return [
-            'id'         => $resourceType.'-'.$assessable->getId(),
+            'id'         => $resourceType . '-' . $assessable->getId(),
             'title'      => $assessable->getTitle(),
             'editable'   => true,
             'start'      => $studentStart->getDatabase(),
             'end'        => $endDate->addDays(1)->getDatabase(),
             'allDay'     => true,
-            'resourceId' => $folder->getId().'-'.$resourceType,
-            'constraint' => $resourceType.'-'.$assessable->getId().'-bounds',
+            'resourceId' => $folder->getId() . '-' . $resourceType,
+            'constraint' => $resourceType . '-' . $assessable->getId() . '-bounds',
             'className'  => $className,
             'meta'       => [
                 'type'            => $assessable->getFamilyName(),

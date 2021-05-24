@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Minute10
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Statistics\Scale;
 
 class Minute10 extends Base

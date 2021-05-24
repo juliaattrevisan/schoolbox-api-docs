@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -126,8 +127,8 @@ class UserAccess implements IModel
         2 => 'Write',
         3 => 'Full'
     ];
-    
-    
+
+
     /** @var User */
     protected $user;
 
@@ -277,6 +278,4 @@ class UserAccess implements IModel
     {
         return $this->accessLevel;
     }
-
-
 }

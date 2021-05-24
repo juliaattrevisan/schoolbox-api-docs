@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -12,7 +13,7 @@ class Component_Config_EportfolioVideo extends Component_Config_Abstract
     {
 
         /* Sort order
-		 */
+         */
         $sortConfig = array();
         if ($component instanceof Component_ControllerAbstract) {
             $sortConfig = array(

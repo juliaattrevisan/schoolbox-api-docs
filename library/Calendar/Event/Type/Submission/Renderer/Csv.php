@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Event_Type_Day_Renderer_Default
  *
@@ -9,7 +10,8 @@
 
 namespace Calendar\Event\Type\Submission\Renderer;
 
-class Csv extends Base{
+class Csv extends Base
+{
 
     /**
      * Render this event out as CSV data
@@ -35,4 +37,3 @@ class Csv extends Base{
         return fread($fd, 10000);
     }
 }
-

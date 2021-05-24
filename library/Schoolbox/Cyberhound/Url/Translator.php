@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -76,16 +77,15 @@ class Translator
     public function translate($url)
     {
         if ($this->apiSharedKey && $this->apiUrl) {
-
             /* Test if user is local before using API */
             $local = false;
-            foreach($this->whitelist as $range) {
-                if(IpUtils::checkIp($this->ip, $range)) {
+            foreach ($this->whitelist as $range) {
+                if (IpUtils::checkIp($this->ip, $range)) {
                     $local = true;
                     break;
                 }
             }
-            if(!$local) {
+            if (!$local) {
                 return $url;
             }
 
@@ -105,8 +105,7 @@ class Translator
                         ]);
                     $url = $cyberHoundUrl->toString();
                 }
-            }
-            catch (\InvalidArgumentException $e) {
+            } catch (\InvalidArgumentException $e) {
                 return $url;
             }
         }

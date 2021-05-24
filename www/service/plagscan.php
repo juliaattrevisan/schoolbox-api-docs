@@ -11,13 +11,11 @@
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
-use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Callback as PlagscanCallback;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Callback as PlagscanCallback;
 
 try {
     $callback = new PlagscanCallback();
-}
-catch (\DomainException $e) {
-
+} catch (\DomainException $e) {
     /* Plagscan not configured - nothing to do
      */
     exit();
@@ -27,6 +25,6 @@ catch (\DomainException $e) {
  */
 $documentId = $_SERVER["QUERY_STRING"];
 
-if (!empty($documentId) ) {
+if (!empty($documentId)) {
     echo $callback->notifyComplete($documentId);
 }

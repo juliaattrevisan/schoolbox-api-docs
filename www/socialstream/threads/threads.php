@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -25,10 +26,8 @@ $instance = \Component_InstanceMapper::getInstance()->findByInstanceId($instance
 /* Sew thread if instance exists
  */
 if ($instance) {
-	$thread = new Threads($instance, $homepageId, $start, $offset);
-	$output = $thread->generate($page)->render();
+    $thread = new Threads($instance, $homepageId, $start, $offset);
+    $output = $thread->generate($page)->render();
 
-	echo $output;
+    echo $output;
 }
-
-

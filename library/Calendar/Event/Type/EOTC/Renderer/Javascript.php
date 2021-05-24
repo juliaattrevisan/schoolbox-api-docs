@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Event_Type_EOTC_Renderer_Javascript
  *
@@ -10,7 +11,6 @@
  */
 
 namespace Calendar\Event\Type\EOTC\Renderer;
-
 
 class Javascript extends Base
 {
@@ -144,5 +144,4 @@ class Javascript extends Base
 
         return json_encode($event, JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
-
 }

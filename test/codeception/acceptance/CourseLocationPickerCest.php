@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -43,7 +44,6 @@ class CourseLocationPickerCest
     {
         // Set the location of the 'Java Programming' course to 'Class 1: Introduction' unit
         $i->updateInDatabase('folder', ['parent' => 508], ['id' => 545]);
-
     }
 
 

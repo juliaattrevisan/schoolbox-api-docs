@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,12 +9,10 @@
 
 namespace Alaress\WorkerCrew\Pooling;
 
-
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use Alaress\WorkerCrew\Worker\Worker;
 use Alaress\WorkerCrew\Worker\WorkerBundleInterface;
 use OutOfBoundsException;
-
 
 class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
 {
@@ -92,7 +91,7 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
         // if a worker is free, yes we can accept
         try {
             return $workers->getPidWhere(Worker::READY);
-        } catch(OutOfBoundsException $e) {
+        } catch (OutOfBoundsException $e) {
             // ok, so there's none of those
         }
 
@@ -165,5 +164,4 @@ class ConfiguredDispatchStrategy extends DefaultDispatchStrategy
     {
         return $hard ? $this->workerTimeoutHard : $this->workerTimeoutSoft;
     }
-
 }

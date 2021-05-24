@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Navigator;
 
 /**
@@ -41,7 +43,8 @@ class Node
      * @param string $url
      * @param bool $active
      */
-    public function __construct($name, $url, $active) {
+    public function __construct($name, $url, $active)
+    {
         $this->setName($name);
         $this->setUrl($url);
         $this->setActive($active);
@@ -52,7 +55,8 @@ class Node
      *
      * @return bool
      */
-    public function isActive() {
+    public function isActive()
+    {
         return $this->getActive();
     }
 

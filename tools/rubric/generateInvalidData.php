@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -189,7 +190,6 @@ $app = new class extends CliTool\App {
         $courseFolder->setCourseSpecification($courseSpec);
         $this->folderMapper->save($courseFolder);
         return $courseSpec;
-
     }
 
     /**

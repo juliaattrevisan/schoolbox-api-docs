@@ -8,26 +8,28 @@
  *
  */
 
-class Component_Dashboard_PapercutController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_PapercutController extends Component_Dashboard_ControllerAbstract
+{
 
-	/**
-	 * Outputs HTML template defined by config variable 'template'
-	 *
-	 * @param String $templateHandle
-	 * @return bool
-	 */
-	public function renderTemplate($templateHandle) {
-		if(!parent::loadTemplate($templateHandle, 'papercut')) {
-			return false;
-		}
+    /**
+     * Outputs HTML template defined by config variable 'template'
+     *
+     * @param String $templateHandle
+     * @return bool
+     */
+    public function renderTemplate($templateHandle)
+    {
+        if (!parent::loadTemplate($templateHandle, 'papercut')) {
+            return false;
+        }
 
-		$this->parseConfig();
+        $this->parseConfig();
 
-		$this->setVar(array(
-			'PAPERCUT_USERNAME' => $this->getUser()->getUsername(),
-			'PAPERCUT_SERVER' => $this->getConfig('url'),
-		));
+        $this->setVar(array(
+            'PAPERCUT_USERNAME' => $this->getUser()->getUsername(),
+            'PAPERCUT_SERVER' => $this->getConfig('url'),
+        ));
 
-		return true;
-	}
+        return true;
+    }
 }

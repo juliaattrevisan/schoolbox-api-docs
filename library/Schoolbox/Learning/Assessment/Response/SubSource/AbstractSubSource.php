@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -90,7 +91,7 @@ abstract class AbstractSubSource implements IResponseDataSource
         /** @var Collection|IResponse[][] $responses */
         $responses = $this->mapperProxy
             ->findByColumnList($columns)
-            ->groupByCallback(function(IResponse $v) {
+            ->groupByCallback(function (IResponse $v) {
                 return $v->getAssessable()->getId();
             })
         ;

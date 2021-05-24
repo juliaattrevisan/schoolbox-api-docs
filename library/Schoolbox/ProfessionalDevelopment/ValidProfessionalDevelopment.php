@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ProfessionalDevelopment;
 
 /**
@@ -38,7 +40,7 @@ class ValidProfessionalDevelopment
      * @param string $pdNumber
      * @return bool
      */
-    private function isValidNumber($pdNumber) :bool
+    private function isValidNumber($pdNumber): bool
     {
         return preg_match('/^[a-zA-Z0-9]+$/', $pdNumber);
     }
@@ -51,7 +53,7 @@ class ValidProfessionalDevelopment
      * @param string $state
      * @return bool
      */
-    private function isValidRegistrationState($state) :bool
+    private function isValidRegistrationState($state): bool
     {
         return \in_array($state, $this->states, true);
     }
@@ -63,7 +65,7 @@ class ValidProfessionalDevelopment
      * @param Model $pd
      * @return bool
      */
-    public function isSatisfiedBy(Model $pd) :bool
+    public function isSatisfiedBy(Model $pd): bool
     {
         try {
             $number = $pd->getNumber();
@@ -71,7 +73,6 @@ class ValidProfessionalDevelopment
 
             return $this->isValidNumber($number) && $this->isValidRegistrationState($state);
         } catch (\Throwable $e) {
-
             // In case it came out of the db as null etc.
             return false;
         }

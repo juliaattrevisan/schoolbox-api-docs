@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -6,6 +7,7 @@
  */
 
 namespace Alaress\Html;
+
 use Html2Text\Html2Text;
 
 /**

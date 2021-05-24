@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Calendar;
@@ -164,7 +166,6 @@ class Controller extends Base
 
         /** @var Term $term */
         foreach ($terms as $term) {
-
             if ($term->getStart()->getDatabaseDate() < $currentTermStartDate) {
                 $termDates['past'][] = [
                     'start' => $term->getStart()->getDatabaseDate(),

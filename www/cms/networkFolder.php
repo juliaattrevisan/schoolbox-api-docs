@@ -10,7 +10,6 @@ $folderHandler = PortfolioWebDAV::factory();
 
 
 if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
-
     if (!($folder = $folderHandler->getByID($this->arg[0]))) {
         error(2);
     }
@@ -42,7 +41,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text' => 'Drives',
-            'href' => "/drives/".$folder['parent'],
+            'href' => "/drives/" . $folder['parent'],
             'class' => '',
         ],
         [
@@ -51,10 +50,8 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
             'class' => 'active',
         ]
     ]);
-
 } else {
     if ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
         $this->setFile(TEMPLATE_content, 'cms/networkFolder.html');
         $this->setBlock(TEMPLATE_content, 'parent_list', 'parent_list_block');
 
@@ -77,7 +74,7 @@ if (is_numeric($this->arg[0]) && $this->arg[0] > 0) {
         $trail->renderIntoSitePage($this, 'BREADCRUMB', [
             [
                 'text' => 'Drives',
-                'href' => "/drives/".$this->arg[1],
+                'href' => "/drives/" . $this->arg[1],
                 'class' => '',
             ],
             [

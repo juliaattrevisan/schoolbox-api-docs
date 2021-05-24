@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Export_Graph
  *
@@ -64,7 +65,8 @@ class Evaluation_Export_Graph
      * @param Evaluation_Attempt $attemptHandler
      * @param Evaluation_Question $questionHandler
      */
-    public function __construct($assess, $factory, $sectionHandler, $attemptHandler, $questionHandler) {
+    public function __construct($assess, $factory, $sectionHandler, $attemptHandler, $questionHandler)
+    {
         $this->setAssessID($assess['assess_id']);
         $this->setFactory($factory);
         $this->setSectionHandler($sectionHandler);
@@ -79,7 +81,8 @@ class Evaluation_Export_Graph
      * @param array $allQuestions
      * @return array
      */
-    protected function getQuestionData($allQuestions) {
+    protected function getQuestionData($allQuestions)
+    {
         $allData = array();
 
         for ($i = 0; $i < count($allQuestions); $i++) {
@@ -94,7 +97,6 @@ class Evaluation_Export_Graph
                 'question_id' => $currentQuestion['question_id'],
                 'type_id' => $currentQuestion['type_id'],
             );
-
         }
 
         return $allData;
@@ -109,7 +111,8 @@ class Evaluation_Export_Graph
      * @param int $questionIndex
      * @return void
      */
-    protected function updateResponseSummary($currentQuestion, $currentAttempt, $sectionIndex, $questionIndex) {
+    protected function updateResponseSummary($currentQuestion, $currentAttempt, $sectionIndex, $questionIndex)
+    {
         if ($currentQuestion['type_id']) {
             $answerHandler = $this->getFactory()->createAnswerModel($currentQuestion['type_id']);
 
@@ -119,8 +122,7 @@ class Evaluation_Export_Graph
 
             if (is_array($currentResponse)) {
                 unset($currentResponse['other']);
-                foreach($currentResponse as $individualResponse) {
-
+                foreach ($currentResponse as $individualResponse) {
                     /* Find out if you need to extract the response text for the
                      * options that were available
                      */
@@ -153,7 +155,8 @@ class Evaluation_Export_Graph
      * @param int $sectionIndex
      * @return void
      */
-    private function accumulatePossibleQuestions($allQuestions, $sectionIndex) {
+    private function accumulatePossibleQuestions($allQuestions, $sectionIndex)
+    {
         for ($i = 0; $i < count($allQuestions); $i++) {
             if ($allQuestions[$i]['type_id']) {
                 $answerHandler = $this->getFactory()->createAnswerModel($allQuestions[$i]['type_id']);
@@ -167,7 +170,7 @@ class Evaluation_Export_Graph
                  * Short answers are not serialized
                  */
                 if (is_array($allAnswers) && count($allAnswers)) {
-                    foreach($allAnswers as $currentAnswer) {
+                    foreach ($allAnswers as $currentAnswer) {
                         $this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['values'] = 0;
                         $this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['text'] = $currentAnswer->description;
                     }
@@ -181,7 +184,8 @@ class Evaluation_Export_Graph
      *
      * @return array
      */
-    public function getSectionValues() {
+    public function getSectionValues()
+    {
 
         /* Determine whether to get all sections, or just the one belonging to
          * the question by which to filter
@@ -192,8 +196,7 @@ class Evaluation_Export_Graph
             /* Need to be in array format, for iteration
              */
             $allSections = array($this->getSectionHandler()->getByID($question['section_id']));
-        }
-        else {
+        } else {
             $allSections = $this->getSectionHandler()->getList($this->getAssessID());
         }
 
@@ -213,7 +216,6 @@ class Evaluation_Export_Graph
             /* If there are questions for this survey
              */
             if ($allQuestions) {
-
                 /* Get the question text, id and type, store it
                  * with its summary of results and attempt list
                  */
@@ -232,7 +234,6 @@ class Evaluation_Export_Graph
                         $currentAttempt = $allAttempts[$j];
 
                         if ($allQuestions) {
-
                             /* Accumulate attempt data
                              */
                             for ($i = 0; $i < count($allQuestions); $i++) {
@@ -290,7 +291,8 @@ class Evaluation_Export_Graph
      * @param int $questionIndex
      * @return void
      */
-    public function exportResponsesToCSV($assess_id, $question_id, $questionIndex) {
+    public function exportResponsesToCSV($assess_id, $question_id, $questionIndex)
+    {
         $sectionValues = $this->getSectionValues();
 
         /* Format output
@@ -305,16 +307,15 @@ class Evaluation_Export_Graph
         header('Content-disposition: attachment; filename="exported_response_' . $filename_id . '.csv"');
 
         if (is_array($sectionValues) && count($sectionValues)) {
-            foreach($sectionValues as $currentSection) {
+            foreach ($sectionValues as $currentSection) {
                 echo 'Section: ' . $currentSection['section'] . "\n";
 
                 if (is_array($currentSection['questions']) && count($currentSection['questions'])) {
-
                     /* Question index
                      */
                     $i = $questionIndex;
 
-                    foreach($currentSection['questions'] as $currentQuestion) {
+                    foreach ($currentSection['questions'] as $currentQuestion) {
                         $this->outputCSV2(array(
                             array("Q$i. " . strip_tags($currentQuestion['question']) . "\n"),
                             $this->getColumnHeadings(),
@@ -323,7 +324,7 @@ class Evaluation_Export_Graph
                         /* Generate attempts for this question
                          */
                         if (is_array($currentQuestion['attempts'])) {
-                            foreach($currentQuestion['attempts'] as $currentAttempt) {
+                            foreach ($currentQuestion['attempts'] as $currentAttempt) {
                                 $attemptList = array();
 
                                 $attemptList[] = $currentAttempt['synergy_id'];
@@ -357,7 +358,8 @@ class Evaluation_Export_Graph
      * @param array $data
      * @return void
      */
-    public function outputCSV2($data) {
+    public function outputCSV2($data)
+    {
         $outstream = fopen("php://output", 'rectum');
 
         array_walk($data, array($this, '__outputCSV'), $outstream);
@@ -373,7 +375,8 @@ class Evaluation_Export_Graph
      * @param resource $filehandler
      * @return void
      */
-    public function __outputCSV(&$vals, $key, $filehandler) {
+    public function __outputCSV(&$vals, $key, $filehandler)
+    {
         fputcsv($filehandler, $vals, ',', '"');
     }
 
@@ -385,7 +388,8 @@ class Evaluation_Export_Graph
      *
      * @return array
      */
-    public function getColumnHeadings() {
+    public function getColumnHeadings()
+    {
         return $this->columnHeadings;
     }
 
@@ -395,7 +399,8 @@ class Evaluation_Export_Graph
      * @param bool $val
      * @return void
      */
-    public function setLegendHTML($val) {
+    public function setLegendHTML($val)
+    {
         $this->legendHTML = $val;
     }
 
@@ -404,7 +409,8 @@ class Evaluation_Export_Graph
      *
      * @return bool
      */
-    public function getLegendHTML() {
+    public function getLegendHTML()
+    {
         return $this->legendHTML;
     }
 
@@ -414,7 +420,8 @@ class Evaluation_Export_Graph
      * @param int $assess_id
      * @return void
      */
-    protected function setAssessID($assess_id) {
+    protected function setAssessID($assess_id)
+    {
         $this->assess_id = $assess_id;
     }
 
@@ -423,7 +430,8 @@ class Evaluation_Export_Graph
      *
      * @return int
      */
-    protected function getAssessID() {
+    protected function getAssessID()
+    {
         return $this->assess_id;
     }
 
@@ -433,7 +441,8 @@ class Evaluation_Export_Graph
      * @param Evaluation_Factory $factory
      * @return void
      */
-    protected function setFactory($factory) {
+    protected function setFactory($factory)
+    {
         $this->factory = $factory;
     }
 
@@ -442,7 +451,8 @@ class Evaluation_Export_Graph
      *
      * @return Evaluation_Factory
      */
-    protected function getFactory() {
+    protected function getFactory()
+    {
         return $this->factory;
     }
 
@@ -452,7 +462,8 @@ class Evaluation_Export_Graph
      * @param Evaluation_Section $sectionHandler
      * @return void
      */
-    protected function setSectionHandler($sectionHandler) {
+    protected function setSectionHandler($sectionHandler)
+    {
         $this->sectionHandler = $sectionHandler;
     }
 
@@ -461,7 +472,8 @@ class Evaluation_Export_Graph
      *
      * @return Evaluation_Section
      */
-    protected function getSectionHandler() {
+    protected function getSectionHandler()
+    {
         return $this->sectionHandler;
     }
 
@@ -471,7 +483,8 @@ class Evaluation_Export_Graph
      * @param Evaluation_Attempt $attemptHandler
      * @return void
      */
-    protected function setAttemptHandler($attemptHandler) {
+    protected function setAttemptHandler($attemptHandler)
+    {
         $this->attemptHandler = $attemptHandler;
     }
 
@@ -480,7 +493,8 @@ class Evaluation_Export_Graph
      *
      * @return Evaluation_Attempt
      */
-    protected function getAttemptHandler() {
+    protected function getAttemptHandler()
+    {
         return $this->attemptHandler;
     }
 
@@ -490,7 +504,8 @@ class Evaluation_Export_Graph
      * @param Evaluation_Question $questionHandler
      * @return void
      */
-    protected function setQuestionHandler($questionHandler) {
+    protected function setQuestionHandler($questionHandler)
+    {
         $this->questionHandler = $questionHandler;
     }
 
@@ -499,7 +514,8 @@ class Evaluation_Export_Graph
      *
      * @return Evaluation_Question
      */
-    protected function getQuestionHandler() {
+    protected function getQuestionHandler()
+    {
         return $this->questionHandler;
     }
 
@@ -509,7 +525,8 @@ class Evaluation_Export_Graph
      * @param int $question_id
      * @return void
      */
-    public function setFilterByQuestion($question_id) {
+    public function setFilterByQuestion($question_id)
+    {
         $this->filterByQuestion = $question_id;
     }
 
@@ -518,7 +535,8 @@ class Evaluation_Export_Graph
      *
      * @return bool
      */
-    public function getFilterByQuestion() {
+    public function getFilterByQuestion()
+    {
         return $this->filterByQuestion;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -61,7 +62,7 @@ class Resolver
     protected function resolve($topic, array $seenPaths)
     {
         if (isset($seenPaths[$topic])) {
-            throw new OverflowException('Recursion detected: '. implode(' -> ', array_keys($seenPaths)) . " -> $topic");
+            throw new OverflowException('Recursion detected: ' . implode(' -> ', array_keys($seenPaths)) . " -> $topic");
         }
 
         try {
@@ -78,7 +79,6 @@ class Resolver
                 if (is_int($key)) {
                     // treat integers as user IDs
                     $userIds[$key] = $payload;
-
                 } else {
                     // treat strings as a redirect path
                     foreach ($this->resolve($key, $seenPaths) as $userId => $payload) {
@@ -88,7 +88,6 @@ class Resolver
             }
 
             return $this->output($userIds);
-
         } catch (InvalidArgumentException $e) {
             // nobody subscribed, and that's totally ok
             return [];
@@ -123,5 +122,4 @@ class Resolver
     {
         return $this->router;
     }
-
 }

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
@@ -132,7 +134,6 @@ class Cleanup implements IStrategy
         /* Only move files around if we're performing
          */
         if ($this->perform) {
-
             /* Create an archive dir
              */
             if (!is_dir($this->archiveDir)) {

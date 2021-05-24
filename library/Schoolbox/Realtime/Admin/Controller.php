@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -367,7 +368,8 @@ class Controller extends BaseController
 
         foreach ($ns as $i => $namespace) {
             foreach ($checkEnabled as $notifType => $notifs) {
-                if (in_array($namespace->getSlug(), $notifs, true)
+                if (
+                    in_array($namespace->getSlug(), $notifs, true)
                     && !$config->get($notifType . '_enabled')
                 ) {
                     unset($ns[$i]);
@@ -412,7 +414,6 @@ class Controller extends BaseController
             $ns     = reset($config);
             $source = reset($ns['sources']);
             $role   = $source['roles'][$q['role']];
-
         } else {
             // no config set (not persisted?) mimic defaults
             $role = [
@@ -464,10 +465,8 @@ class Controller extends BaseController
 
         foreach ($postData as $slug => $sources) {
             foreach ($sources as $key => $roles) {
-
                 // if this is a custom job being copied to all, replicate the relevant roles at this point
                 if (count($roles) == 1 && $copyTo) {
-
                     // procure the settings
                     $settings = reset($roles);
 
@@ -484,7 +483,6 @@ class Controller extends BaseController
                             // this roletype does not support this message
                         }
                     }
-
                 } else {
                     foreach ($roles as $roleId => $settings) {
                         $conf[$slug][$key][$roleId] = $this->getConfig()->persistRole($roleId, $slug, $key, $settings);
@@ -544,7 +542,6 @@ class Controller extends BaseController
             }
 
             $log->warning('-- END --');
-
         } else {
             $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll(['order' => ['user_id' => 'asc']]);
         }
@@ -555,5 +552,4 @@ class Controller extends BaseController
 
         $this->getResponse()->content->set($content);
     }
-
 }

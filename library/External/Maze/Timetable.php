@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -88,32 +89,32 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getTest()
     {
-//		$query = "
-//			SELECT *
-//			FROM TH
-//			INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
-//			INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
-//			INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
-//			WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-//			AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-//			AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
-//			AND THTQ.QCOL = '{$this->getDayNumber(1)}'
-//			AND STMA.SKEY = 'ABBOMEG'
-//		";
+//      $query = "
+//          SELECT *
+//          FROM TH
+//          INNER JOIN THTQ ON TH.THKEY = THTQ.QKEY
+//          INNER JOIN STMA ON THTQ.IDENT = STMA.IDENT
+//          INNER JOIN TCTD ON THTQ.QROW = TCTD.TIME_INDEX
+//          WHERE TH.THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+//          AND TCTD.QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+//          AND TCTD.TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+//          AND THTQ.QCOL = '{$this->getDayNumber(1)}'
+//          AND STMA.SKEY = 'ABBOMEG'
+//      ";
 //
-//		$result1 = $this->getDb()->getAll($query);
+//      $result1 = $this->getDb()->getAll($query);
 //
-//		$query = "
-//			SELECT TOP 100 *
-//			FROM TCTD
-//			WHERE QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
-//			AND TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
-//			ORDER BY TIME_INDEX
-//		";
+//      $query = "
+//          SELECT TOP 100 *
+//          FROM TCTD
+//          WHERE QKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+//          AND TCTDKEY = '{$this->getHelper()->currentDate()} 12:00:00:000AM'
+//          ORDER BY TIME_INDEX
+//      ";
 //
-//		$result2 = $this->getDb()->getAll($query);
+//      $result2 = $this->getDb()->getAll($query);
 //
-//		new \Alaress_ThreeProbe(null, $result1, null);
+//      new \Alaress_ThreeProbe(null, $result1, null);
     }
 
 
@@ -189,8 +190,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         if ($date == 0) {
             $tempDate = $this->getHelper()->currentDate();
-        }
-        else {
+        } else {
             $temp = new Alaress_Date_Format($date, 'U');
             $tempDate = $temp->getDatabaseDate();
         }
@@ -356,8 +356,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         if ($date instanceof Alaress_Date_Format) {
             $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
-        }
-        else {
+        } else {
             $definition = $this->getTimetableDefinition($externalUserId, $campus);
         }
 
@@ -459,8 +458,7 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         if ($date instanceof Alaress_Date_Format) {
             $definition = $this->getTimetableDefinition($externalUserId, $campus, null, $date->getDatabaseDate());
-        }
-        else {
+        } else {
             $definition = $this->getTimetableDefinition($externalUserId, $campus);
         }
 
@@ -626,8 +624,8 @@ class External_Maze_Timetable implements External_TimetableInterface
              * Note that $timetable is now using a 1-index array
              */
             for ($day = 0; $day < $campus->getTimetableDay(); $day++) {
-                if($allDayTimetables[$day][$period]['class'][0]['description']) {
-                    $timetable[$period]['day'][$day+1][0] = array(
+                if ($allDayTimetables[$day][$period]['class'][0]['description']) {
+                    $timetable[$period]['day'][$day + 1][0] = array(
                         'description'       => $allDayTimetables[$day][$period]['class'][0]['description'],
                         'code'              => $allDayTimetables[$day][$period]['class'][0]['code'],
                         'campus'            => $allDayTimetables[$day][$period]['class'][0]['campus'],
@@ -637,9 +635,8 @@ class External_Maze_Timetable implements External_TimetableInterface
                         'staffSurname'      => $allDayTimetables[$day][$period]['class'][0]['staffSurname'],
                         'staffTitle'        => $allDayTimetables[$day][$period]['class'][0]['staffTitle'],
                     );
-                }
-                else {
-                    $timetable[$period]['day'][$day+1] = array();
+                } else {
+                    $timetable[$period]['day'][$day + 1] = array();
                 }
             }
         }

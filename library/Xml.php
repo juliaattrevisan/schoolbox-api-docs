@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Alaress_Rss_Cache
  *
@@ -65,4 +66,3 @@ class Xml
         return $this->xml->$property ?? null;
     }
 }
-

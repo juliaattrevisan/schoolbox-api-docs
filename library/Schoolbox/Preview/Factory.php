@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
+
 namespace Schoolbox\Preview;
 
 use DomainException;
@@ -67,12 +69,10 @@ class Factory
         $url = new \Url($testUrl);
 
         if ($url->isLocalUrl()) {
-
             /* Internal Chain
              */
             $result = (new Internal($url->getUrl()))->getResult();
         } else {
-
             /* External Chain
              */
             $result = (new External($url->getUrl()))->getResult();

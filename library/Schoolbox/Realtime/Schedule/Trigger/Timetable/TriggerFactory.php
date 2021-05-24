@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
-
 
 use Alaress\Date\IClock;
 use OutOfBoundsException;
@@ -26,9 +26,15 @@ class TriggerFactory
     public function __construct(IClock $clock)
     {
         $this->strats = [
-            TimetableTrigger::TARGET_START => function (Campus $campus) use ($clock) { return new StartTrigger($campus, $clock); },
-            TimetableTrigger::TARGET_WARN  => function (Campus $campus) use ($clock) { return new WarnTrigger($campus, $clock);  },
-            TimetableTrigger::TARGET_END   => function (Campus $campus) use ($clock) { return new EndTrigger($campus, $clock);   },
+            TimetableTrigger::TARGET_START => function (Campus $campus) use ($clock) {
+                return new StartTrigger($campus, $clock);
+            },
+            TimetableTrigger::TARGET_WARN  => function (Campus $campus) use ($clock) {
+                return new WarnTrigger($campus, $clock);
+            },
+            TimetableTrigger::TARGET_END   => function (Campus $campus) use ($clock) {
+                return new EndTrigger($campus, $clock);
+            },
         ];
     }
 
@@ -47,5 +53,4 @@ class TriggerFactory
 
         throw new OutOfBoundsException("No trigger for '$label' exists.");
     }
-
 }

@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -9,7 +10,6 @@
 namespace Alaress\Rules\Condition;
 
 use Alaress\Rules\Condition as Super;
-
 
 /**
  * @logic IF :input.$field (NOT) IN ( $validValues )
@@ -43,7 +43,7 @@ abstract class In extends Super
      * @param mixed $input
      * @return bool
      */
-    public abstract function assertIn($input);
+    abstract public function assertIn($input);
 
 
     /**
@@ -71,5 +71,4 @@ abstract class In extends Super
     {
         return sprintf(":input.%s %sIN (%s)", $this->field, $this->isNegated() ? 'NOT ' : '', implode(', ', $this->getValidValues()));
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -11,7 +12,6 @@ namespace Alaress\Async\Broker;
 use Alaress\Async\Broker\StompRedis\Resolver;
 use Throwable;
 use UnexpectedValueException;
-
 
 class PayloadBrokenException extends UnexpectedValueException implements IBrokerException
 {
@@ -41,5 +41,4 @@ class PayloadBrokenException extends UnexpectedValueException implements IBroker
     {
         return $this->resolver;
     }
-
 }

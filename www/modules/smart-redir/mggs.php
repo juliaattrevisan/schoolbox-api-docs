@@ -12,10 +12,8 @@ $page->initSession();
 //lwcawood
 
 if ($_GET) {
-
     $to = $_GET['directTo'];
     switch ($to) {
-
         case "worldbook":
             $form                 = "loginForm";
             $action               = "https://www.worldbookonline.com/wb/products?ed=all";
@@ -197,7 +195,6 @@ if ($_GET) {
         default:
             echo "Did not recognise the site";
             break;
-
     }
     ?>
 

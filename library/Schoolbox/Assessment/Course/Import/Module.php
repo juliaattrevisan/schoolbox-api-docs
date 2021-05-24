@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -49,25 +50,24 @@ class Module extends \Alaress\Module\Module
 
         $preloadImport = $this->buildPreloadImport();
 
-        $preloadCourse = function (array $params)
-        {
+        $preloadCourse = function (array $params) {
             return [
                 'courseImpl' => $this->getCourseImplementationMapper()->findById($params['courseImplId'])
             ];
         };
 
         // courseSpecId + folderId required (even if 0), componentId optional
-        $this->register('GET',    '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport',       $staffOnly, $preloadImport);
-        $this->register('GET',    '/{courseImplId:\d+}/modify',                          'getModify',       $staffOnly, $preloadCourse);
-        $this->register('GET',    '/classes',                                            'searchClasses',   $staffOnly);
-        $this->register('GET',    '/management/{folderId}',                              'getManagement',   $staffOnly);
+        $this->register('GET', '/{courseSpecId:\d+}/folder/{folderId}{/componentId}', 'getImport', $staffOnly, $preloadImport);
+        $this->register('GET', '/{courseImplId:\d+}/modify', 'getModify', $staffOnly, $preloadCourse);
+        $this->register('GET', '/classes', 'searchClasses', $staffOnly);
+        $this->register('GET', '/management/{folderId}', 'getManagement', $staffOnly);
 
-        $this->register('POST',   '/classes',                                            'postClasses',     $staffOnly);
-        $this->register('POST',   '/ownership',                                          'postOwnership',   $staffOnly);
-        $this->register('POST',   '/units',                                              'postUnits',       $staffOnly);
-        $this->register('POST',   '/activities',                                         'postAssessments', $staffOnly);
-        $this->register('DELETE', '/{courseImplId:\d+}',                                 'importDelete',    $staffOnly, $preloadCourse);
-        $this->register('POST',   '/{courseImplId:\d+}/restore',                         'restoreCourse',   $staffOnly, $preloadCourse);
+        $this->register('POST', '/classes', 'postClasses', $staffOnly);
+        $this->register('POST', '/ownership', 'postOwnership', $staffOnly);
+        $this->register('POST', '/units', 'postUnits', $staffOnly);
+        $this->register('POST', '/activities', 'postAssessments', $staffOnly);
+        $this->register('DELETE', '/{courseImplId:\d+}', 'importDelete', $staffOnly, $preloadCourse);
+        $this->register('POST', '/{courseImplId:\d+}/restore', 'restoreCourse', $staffOnly, $preloadCourse);
     }
 
 
@@ -90,7 +90,7 @@ class Module extends \Alaress\Module\Module
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'unitSpecificationMapper'         => $this->getMapperFactory()->getLazy(UnitSpecificationMapper::class),
                 'unitImplementationMapper'        => $this->getMapperFactory()->getLazy(UnitImplementationMapper::class),
@@ -111,7 +111,6 @@ class Module extends \Alaress\Module\Module
                 'assessmentMapperProxy'           => $injector->lazyGet('assessmentDataSource'),
             ])
         );
-
     }
 
     /**
@@ -124,21 +123,20 @@ class Module extends \Alaress\Module\Module
      */
     private function buildPreloadImport(): callable
     {
-        return function ($params)
-        {
-            try{
+        return function ($params) {
+            try {
                 $courseSpec = $params['courseSpecId']
                     ? $this->getCourseSpecificationMapper()->findById($params['courseSpecId'])
                     : null;
-            } catch (MapperException $e){
+            } catch (MapperException $e) {
                 throw new NotFound("Course Spec not found. id: {$params['courseSpecId']}");
             }
 
-            try{
+            try {
                 $folder = $params['folderId']
                     ? $this->getFolderMapper()->findById($params['folderId'])
                     : null;
-            } catch (MapperException $e){
+            } catch (MapperException $e) {
                 throw new NotFound("Folder not found. id: {$params['folderId']}");
             }
 
@@ -150,20 +148,19 @@ class Module extends \Alaress\Module\Module
                 throw new NotFound("Component not found. id: {$params['componentId']}");
             }
 
-            if($componentInstance){
+            if ($componentInstance) {
                 $definitionId = $componentInstance->getDefinitionId();
                 $componentDefinition = $this->getComponentDefinitionMapper()->findById($definitionId);
                 if ($componentDefinition->getClass() !== Outline\Controller::class) {
                     throw new NotFound("Not a Course-Outline component. id: {$params['componentId']}");
                 }
-                if(!$folder){
+                if (!$folder) {
                     // No folder?
                     throw new NotFound('You cannot specify a component without a folder');
                 }
-                if((int)$componentInstance->getIdentifier() !== (int)$folder->getId()){
+                if ((int)$componentInstance->getIdentifier() !== (int)$folder->getId()) {
                     throw new NotFound('Component does not reside on specified folder');
                 }
-
             }
 
             return [

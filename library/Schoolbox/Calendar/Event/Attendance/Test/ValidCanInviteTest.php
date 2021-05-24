@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -14,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Schoolbox\Calendar\Event\Attendance\ValidCanInvite;
 use Schoolbox\Role;
 use Schoolbox\User;
-
 
 /**
  * Class ValidCanInviteTest
@@ -45,7 +45,8 @@ class ValidCanInviteTest extends TestCase
      *
      * @return array
      */
-    public function provider_validCanInvite() : array {
+    public function provider_validCanInvite(): array
+    {
 
         /* Superuser prototypes
          */

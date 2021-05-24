@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker\IO\Listener;
-
 
 use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\Async\Listener\Stream\StreamListener;
@@ -64,5 +64,4 @@ abstract class AbstractIOStreamListener implements StreamListener
         $msg = sprintf('stream [:%d] error: %s', $e->getStream(), $e->getData());
         $this->log->error($msg, array($e->getData()));
     }
-
 }

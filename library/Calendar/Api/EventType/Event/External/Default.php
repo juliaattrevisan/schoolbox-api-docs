@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -15,7 +16,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract {
+class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract
+{
 
     /**
      * Default id for an event type that was chosen in admin, but doesn't exist anymore
@@ -74,7 +76,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @return Collection
      * @throws MapperException
      */
-    public function getEvents($startTimestamp, $endTimestamp) {
+    public function getEvents($startTimestamp, $endTimestamp)
+    {
 
         $stack = new Collection();
         /** @var IIterator $externalEvents */
@@ -127,22 +130,21 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
             //Where is the best place to format this? TODO
             $eventDetail = '';
-            if(strlen(strip_tags($externalEvent['comment'])) > 0) {
+            if (strlen(strip_tags($externalEvent['comment'])) > 0) {
                 $eventDetail .= strip_tags($externalEvent['comment']);
             }
-            if(strlen($externalEvent['team']) > 0) {
-                $eventDetail .= '<br />Team: '.$externalEvent['team'];
+            if (strlen($externalEvent['team']) > 0) {
+                $eventDetail .= '<br />Team: ' . $externalEvent['team'];
             }
-            if(strlen($eventDetail) > 0) {
-                $event->setDetail('<p>'.$eventDetail.'</p>');
+            if (strlen($eventDetail) > 0) {
+                $event->setDetail('<p>' . $eventDetail . '</p>');
             }
 
             /* Determine event location
              */
             if (strlen($externalEvent['location'])) {
                 $location = $externalEvent['location'];
-            }
-            else {
+            } else {
                 $location = $externalEvent['room'];
             }
 
@@ -178,7 +180,6 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
         }
 
         return $stack;
-
     }
 
     /**
@@ -186,7 +187,8 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @param int $eventId
      * @return string
      */
-    public function getEvent($eventId) {
+    public function getEvent($eventId)
+    {
         return '';
     }
 }

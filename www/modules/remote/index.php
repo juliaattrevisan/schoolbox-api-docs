@@ -39,9 +39,8 @@ preg_match("#zx_h=([0-9]+)#", $fragment, $matches);
 
 if (isset($matches[1])) {
     //Assume px
-    $heightStyle = 'height: '.$matches[1].'px';
-}
-else {
+    $heightStyle = 'height: ' . $matches[1] . 'px';
+} else {
     //Bad or no data supplied
     $class = "fullscreen";
 }
@@ -63,7 +62,7 @@ $query['key'] = sha1($secret . $time . $externalUserId);
 $url->setQuery($query);
 
 if ($isWindow) {
-    header('Location: '.$url->toString());
+    header('Location: ' . $url->toString());
     exit;
 } else {
     $this->setFile(TEMPLATE_content, 'modules/remote/frame.html');
@@ -73,4 +72,3 @@ if ($isWindow) {
         'FRAME_CLASS' => $class,
     ));
 }
-

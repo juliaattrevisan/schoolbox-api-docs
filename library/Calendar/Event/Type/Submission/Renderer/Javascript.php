@@ -11,7 +11,7 @@
 
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use \Scrub;
+use Scrub;
 
 /**
  * Class Javascript
@@ -200,5 +200,4 @@ class Javascript extends Base
             'moreDetailsLink' => $moreDetailsLink,
         ];
     }
-
 }

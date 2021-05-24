@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Merge duplicate rubric capabilities.
  *

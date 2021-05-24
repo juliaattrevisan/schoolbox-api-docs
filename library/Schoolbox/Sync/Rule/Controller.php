@@ -1,15 +1,17 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Rule;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
-use \Schoolbox\Sync\Navigator\Navigator;
-use \Schoolbox\Sync\Navigator\Node;
+use Schoolbox\Sync\Navigator\Navigator;
+use Schoolbox\Sync\Navigator\Node;
 
 /**
  * Class Controller
@@ -24,7 +26,8 @@ class Controller extends Base
      *
      * @param array $params
      */
-    public function add($params) {
+    public function add($params)
+    {
 
         /* Breadcrumbs
          */

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 namespace Alaress\Async;
 
 use Predis\ClientInterface;
-
 
 class Synchroniser
 {
@@ -27,7 +27,7 @@ class Synchroniser
      */
     public function __construct($context, ClientInterface $redis)
     {
-        $this->key   = 'sb:cb:'.sha1(get_class($context));
+        $this->key   = 'sb:cb:' . sha1(get_class($context));
         $this->redis = $redis;
     }
 

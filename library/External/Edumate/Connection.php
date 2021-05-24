@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Provides the common connection functionality to the Edumate connection classes
  *
@@ -48,7 +49,8 @@ class External_Edumate_Connection
      * @param string $value
      * @return string
      */
-    public function quote($value) {
+    public function quote($value)
+    {
         return db2_escape_string($value);
     }
 }

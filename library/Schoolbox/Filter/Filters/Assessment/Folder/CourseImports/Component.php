@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
@@ -12,7 +14,6 @@ use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
 use Schoolbox\Resource\Folder;
-
 
 class Component extends Filter\BaseComponent
 {

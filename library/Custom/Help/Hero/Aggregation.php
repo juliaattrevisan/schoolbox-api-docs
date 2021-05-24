@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aggregation
  *
@@ -15,7 +16,6 @@ namespace Custom\Help\Hero;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
-
 
 class Aggregation
 {

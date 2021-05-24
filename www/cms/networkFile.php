@@ -21,7 +21,6 @@ $zone->setAttachmentsLabel('')
     ->setModalTitle('Select file');
 
 if (is_numeric($this->arg[0])) {
-
     /* Modify existing file */
 
     $file = $fileHandler->getByID($this->arg[0]);
@@ -55,7 +54,7 @@ if (is_numeric($this->arg[0])) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text'  => "Drives",
-            'href'  => "/drives/".$file['parent'],
+            'href'  => "/drives/" . $file['parent'],
             'class' => '',
         ],
         [
@@ -64,9 +63,7 @@ if (is_numeric($this->arg[0])) {
             'class' => 'active',
         ]
     ]);
-}
-elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
-
+} elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     /* Add new file to system */
     if ($this->arg[1] == 0) {
         $parent = array('id' => 0);
@@ -99,7 +96,7 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
     $trail->renderIntoSitePage($this, 'BREADCRUMB', [
         [
             'text'  => "Drives",
-            'href'  => "/drives/".$parent['id'],
+            'href'  => "/drives/" . $parent['id'],
             'class' => '',
         ],
         [
@@ -108,7 +105,6 @@ elseif ($this->arg[0] == 'new' && is_numeric($this->arg[1])) {
             'class' => 'active',
         ]
     ]);
-}
-else {
+} else {
     error(2);
 }

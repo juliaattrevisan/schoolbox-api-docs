@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -123,7 +124,7 @@ class Indicator extends Base
                 $this->useV2Queries
                     ? self::DELETE_INDICATOR_QUERY_V2
                     : self::DELETE_INDICATOR_QUERY_V1
-        );
+            );
 
         $this->findCapabilityIndicatorsQuery
             = $this->db->prepareQuery(

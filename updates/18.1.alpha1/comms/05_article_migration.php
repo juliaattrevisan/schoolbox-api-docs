@@ -139,7 +139,7 @@ function createSchoolNewsArticle(IDatabase $db, array $row, LoggerInterface $log
 
     $keys = implode(', ', array_keys($mapping));
 
-    $params = array_combine(array_map(function($element) {
+    $params = array_combine(array_map(function ($element) {
         return ":{$element}";
     }, array_keys($mapping)), array_values($mapping));
 
@@ -202,12 +202,11 @@ function createSchoolNewsUserAudience(IDatabase $db, int $oldId, int $articleId,
     ");
 
     foreach ($users as $user) {
-
         /* Assign user
          */
         $db->query("
             INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type,  entity_value, relationship)
-            VALUES ('{$articleId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\User::getEntityType()."', '{$user['id']}', '".Model::RELATIONSHIP_SELF."')
+            VALUES ('{$articleId}', '" . \Schoolbox\Comms\News\Audience\Segment\Strategy\User::getEntityType() . "', '{$user['id']}', '" . Model::RELATIONSHIP_SELF . "')
         ");
 
         /* Log it
@@ -236,14 +235,12 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
 
 
     foreach ($roleIds as $roleId) {
-
         foreach ($campusIds as $campusId) {
-
             /* Create composite
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (comms_news_article_id, entity_type, relationship)
-                VALUES ('{$articleId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\Composite::getEntityType()."', '".Model::RELATIONSHIP_SELF."');
+                VALUES ('{$articleId}', '" . \Schoolbox\Comms\News\Audience\Segment\Strategy\Composite::getEntityType() . "', '" . Model::RELATIONSHIP_SELF . "');
             ");
 
             $compositeSegmentId = $db->lastInsertId();
@@ -256,7 +253,7 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$compositeSegmentId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\Campus::getEntityType()."', '{$campusId}', '".Model::RELATIONSHIP_SELF."')
+                VALUES ('{$compositeSegmentId}', '" . \Schoolbox\Comms\News\Audience\Segment\Strategy\Campus::getEntityType() . "', '{$campusId}', '" . Model::RELATIONSHIP_SELF . "')
             ");
 
             /* Log it
@@ -267,7 +264,7 @@ function createSchoolNewsCampusRoleAudience(IDatabase $db, int $oldId, int $arti
              */
             $db->query("
                 INSERT INTO `comms_news_audience` (parent_id, entity_type, entity_value, relationship)
-                VALUES ('{$compositeSegmentId}', '". \Schoolbox\Comms\News\Audience\Segment\Strategy\Role::getEntityType()."', '{$roleId}', '".Model::RELATIONSHIP_SELF."')
+                VALUES ('{$compositeSegmentId}', '" . \Schoolbox\Comms\News\Audience\Segment\Strategy\Role::getEntityType() . "', '{$roleId}', '" . Model::RELATIONSHIP_SELF . "')
             ");
 
             /* Log it
@@ -371,7 +368,7 @@ function createHomepageNewsArticle(IDatabase $db, array $row, LoggerInterface $l
         'body' => $row['body'] ?: '',
         'blurb' => '',
         'author_id' => $row['owner'],
-        'submitted_at' =>$createdAt,
+        'submitted_at' => $createdAt,
         'accepted_by' => $row['owner'],
         'accepted_at' => $createdAt,
         'publish_at' => $publishAt,
@@ -383,7 +380,7 @@ function createHomepageNewsArticle(IDatabase $db, array $row, LoggerInterface $l
 
     $keys = implode(', ', array_keys($mapping));
 
-    $params = array_combine(array_map(function($element) {
+    $params = array_combine(array_map(function ($element) {
         return ":{$element}";
     }, array_keys($mapping)), array_values($mapping));
 
@@ -403,7 +400,7 @@ function createHomepageNewsArticle(IDatabase $db, array $row, LoggerInterface $l
     $log->debug("Homepage News {$row['id']} {$row['heading']} is now article_id {$lastInsertId}");
 
     $query = "UPDATE subject_news SET migration_id = :migrate_id WHERE id = :article_id";
-    $db->prepare($query)->execute([':migrate_id'=>$lastInsertId,':article_id'=>$row['id']]);
+    $db->prepare($query)->execute([':migrate_id' => $lastInsertId,':article_id' => $row['id']]);
     return $lastInsertId;
 }
 

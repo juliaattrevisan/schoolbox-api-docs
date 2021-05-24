@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Skips this parent if they have no children currently attending the school.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Delegate class for logic that is common to both the dashboard and homepage
  * tile components.

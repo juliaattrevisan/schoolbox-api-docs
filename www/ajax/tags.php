@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damien Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -13,7 +14,7 @@ use Schoolbox\Fixtures\Coach;
 use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
 use Schoolbox\UserMapper;
 
-if(!isset($this)) {
+if (!isset($this)) {
     require_once __DIR__ . '/../../conf/core/require.php';
     $kernel = new \Schoolbox\Application\WebRequest\Kernel();
     error(2);
@@ -36,10 +37,10 @@ $registry = [
 // Validate params
 $errors = [];
 
-if(empty($this->arg[0])){
+if (empty($this->arg[0])) {
     $errors[] = 'Tag type not supplied';
 }
-if(empty($registry[$this->arg[0]])){
+if (empty($registry[$this->arg[0]])) {
     $errors[] = 'Tag type not in registry';
 }
 
@@ -51,7 +52,6 @@ if ($errors) {
     /** @var \Schoolbox\Mapper\UsableAsTagSource $mapper */
     $mapper = $registry[$this->arg[0]]();
     if ($mapper instanceof \Schoolbox\Mapper\UsableAsTagSource) {
-
         /* Optionally provide a column name by which to sort
          */
         $query = (string)$_GET['query'];

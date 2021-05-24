@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -17,6 +18,7 @@ use Schoolbox\Comms\News\Audience;
 use PDO;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use UnexpectedValueException;
+
 use function array_merge;
 use function array_unique;
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outputs form to get users mail details and processes the information
  *
@@ -30,14 +31,12 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     if ($email->isValid()) {
         $mail->addFrom($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
         $mail->addReplyTo($_SESSION['user']->getEmail(), $_SESSION['user']->formatName());
-    }
-    else {
+    } else {
         error(42);
     }
 
     //if id is submitted to form convert to email
-    if(is_numeric($to)) {
-
+    if (is_numeric($to)) {
         $userMapper = new \Schoolbox\UserMapper();
 
         try {
@@ -49,31 +48,27 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
             } else {
                 error(9, 'Your email address is not valid.');
             }
-
         } catch (Exception $e) {
             error(7);
         }
-    }
-    else {
+    } else {
         $emailAddresses = Mailer::parseAddressString(Mailer::standardiseEmailSeparator($to));
 
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
                 $mail->addTo($address, $name);
-            }
-            catch (Exception $e) {
-                error(9, 'Email address "'.$address.'" is not valid.');
+            } catch (Exception $e) {
+                error(9, 'Email address "' . $address . '" is not valid.');
             }
         }
     }
 
     //check if its got no to address but has either cc or bcc
     //put the users email in the to field
-    if (!stristr($to,'@') && ($bcc || $cc)) {
+    if (!stristr($to, '@') && ($bcc || $cc)) {
         try {
             $mail->addTo($_SESSION['user']->getEmail(), $to);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             error(9, 'Your email address is not valid.');
         }
     }
@@ -87,9 +82,8 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
                 $mail->addCc($address, $name);
-            }
-            catch (Exception $e) {
-                error(9, 'Email address "'.$address.'" is not valid.');
+            } catch (Exception $e) {
+                error(9, 'Email address "' . $address . '" is not valid.');
             }
         }
     }
@@ -100,9 +94,8 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
         foreach ($emailAddresses[AbstractMailer::KEY_VALID] as $address => $name) {
             try {
                 $mail->addBcc($address, $name);
-            }
-            catch (Exception $e) {
-                error(9, 'Email address "'.$address.'" is not valid.');
+            } catch (Exception $e) {
+                error(9, 'Email address "' . $address . '" is not valid.');
             }
         }
     }
@@ -125,7 +118,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     } catch (Swift_IoException $e) {
         error(9, $e->getMessage() . ': ' . $basename);
         exit; // shut UP, storm.
-    } catch (\Schoolbox\Mapper\Exception|FileNotFoundException $e) {
+    } catch (\Schoolbox\Mapper\Exception | FileNotFoundException $e) {
         error(41);
         exit; // shut UP, storm.
     } catch (\InvalidArgumentException $e) {
@@ -136,8 +129,7 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
     try {
         $mailer = new Swift_Mailer(Mailer::getSwiftTransport());
         $mailer->send($mail);
-    }
-    catch (Exception $ex) {
+    } catch (Exception $ex) {
         error(9, $ex->getMessage());
     }
 }
@@ -147,15 +139,12 @@ function sendMail($to, $cc, $bcc, $subject, $message, $attachments, IConfigLoade
 $hasRecipient = (isset($_POST['to']) && $_POST['to']) || (isset($_POST['bcc']) && $_POST['bcc']) || (isset($_POST['cc']) && $_POST['cc']);
 
 //if form has been submitted
-if($hasRecipient && Config::get('mail_enable'))
-{
+if ($hasRecipient && Config::get('mail_enable')) {
     $attachments = isset($_POST['attachment']) ? $_POST['attachment'] : array();
 
     sendMail($_POST['to'], $_POST['cc'], $_POST['bcc'], $_POST['subject'], $_POST['message'], $attachments, $kernel->get('config'));
 
     $page->backToTheFuture(3);
-}
-else
-{
+} else {
     error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }

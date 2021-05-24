@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Timetable Colour Data Mapper
  *

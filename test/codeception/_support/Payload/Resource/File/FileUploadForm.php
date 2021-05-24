@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Payload\Resource\File;
-
 
 class FileUploadForm extends Upload
 {

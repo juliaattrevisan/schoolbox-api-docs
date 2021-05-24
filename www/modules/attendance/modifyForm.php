@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Allows the updating of attendance records in synergetic.
  *
@@ -65,7 +66,6 @@ foreach ($attendancePeriods as $attendancePeriod) {
     }
 
     try {
-
         $externalUserHandler = new External_User();
 
         $attendanceHandler = new External_Synergetic_Attendance(
@@ -78,7 +78,6 @@ foreach ($attendancePeriods as $attendancePeriod) {
             $_SESSION['user']->getExternalId(),
             $timetableGroup
         );
-
     } catch (ExternalException $e) {
         error(ErrorMapper::ERROR_ATTENDANCE_LIST);
     }
@@ -91,7 +90,6 @@ foreach ($attendancePeriods as $attendancePeriod) {
     // Create everyone's attendance initially
 
     if (is_array($_POST['studentID'])) {
-
         // This is a pretty hollow shell of a class, it just contains the mssql instance and a query to insert/update
 
         $attendanceRecord = new Attendance_Synergetic_AttendanceRecord();
@@ -105,7 +103,6 @@ foreach ($attendancePeriods as $attendancePeriod) {
         }
 
         for ($i = 0; $_POST['studentID'][$i]; $i++) {
-
             // Create a new record
 
             $data = [

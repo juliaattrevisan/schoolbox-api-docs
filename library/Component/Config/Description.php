@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component_Config_Description
  *

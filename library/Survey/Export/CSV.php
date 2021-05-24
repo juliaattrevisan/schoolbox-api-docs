@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Survey_Export_CSV
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 class Survey_Export_CSV extends Evaluation_Export_CSV
 {
@@ -20,7 +21,8 @@ class Survey_Export_CSV extends Evaluation_Export_CSV
      *
      * @return mixed|void
      */
-    protected function setup() {
+    protected function setup()
+    {
     }
 
 
@@ -32,7 +34,8 @@ class Survey_Export_CSV extends Evaluation_Export_CSV
      *
      * @param array $survey
      */
-    public function adjustAnonymousResult($survey) {
+    public function adjustAnonymousResult($survey)
+    {
         if ($survey['anonymous_result']) {
             $this->adjustHeadings();
             $this->adjustResponses();
@@ -53,7 +56,8 @@ class Survey_Export_CSV extends Evaluation_Export_CSV
      * @param array $row
      * @return array
      */
-    protected function adjustRowForAnonymity($row) {
+    protected function adjustRowForAnonymity($row)
+    {
         return array_slice($row, $this->getIncludeExternalId() ? 4 : 3);
     }
 
@@ -61,7 +65,8 @@ class Survey_Export_CSV extends Evaluation_Export_CSV
     /**
      * Adjust headings for Anonymity
      */
-    private function adjustHeadings() {
+    private function adjustHeadings()
+    {
         $this->setHeadings($this->adjustRowForAnonymity($this->getHeadings()));
     }
 
@@ -69,7 +74,8 @@ class Survey_Export_CSV extends Evaluation_Export_CSV
     /**
      * Adjust responses for Anonymity
      */
-    private function adjustResponses() {
+    private function adjustResponses()
+    {
         $collection = array();
         foreach ($this->getResponses() as $currentResponse) {
             $collection[] = $this->adjustRowForAnonymity($currentResponse);

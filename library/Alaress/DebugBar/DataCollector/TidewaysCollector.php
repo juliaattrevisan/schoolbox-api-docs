@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collector for XHProf runs - outputs into an iframe
  *
@@ -15,12 +16,14 @@ use DebugBar\DataCollector\DataCollector;
 use DebugBar\DataCollector\Renderable;
 use XHProfRuns_Default;
 
-class TidewaysCollector extends DataCollector implements Renderable {
+class TidewaysCollector extends DataCollector implements Renderable
+{
 
     /**
      * Constructor: enables XHProf profiling
      */
-    public function __construct() {
+    public function __construct()
+    {
         if (extension_loaded('tideways_xhprof')) {
             tideways_xhprof_enable(TIDEWAYS_XHPROF_FLAGS_MEMORY | TIDEWAYS_XHPROF_FLAGS_CPU);
         }
@@ -29,7 +32,8 @@ class TidewaysCollector extends DataCollector implements Renderable {
     /**
      * {@inheritDoc}
      */
-    public function collect() {
+    public function collect()
+    {
         if (extension_loaded('tideways_xhprof')) {
             $profiler_namespace = 'schoolbox';
             $xhprof_data = tideways_xhprof_disable();
@@ -47,14 +51,16 @@ class TidewaysCollector extends DataCollector implements Renderable {
     /**
      * {@inheritDoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return 'tideways';
     }
 
     /**
      * {@inheritDoc}
      */
-    public function getWidgets() {
+    public function getWidgets()
+    {
         return array(
             "Tideways XHprof" => array(
                 "widget" => "PhpDebugBar.Widgets.IFrameWidget",

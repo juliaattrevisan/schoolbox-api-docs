@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext\Project;
@@ -116,27 +118,30 @@ class Component extends Filter\BaseComponent
         $onClassUnitImpl = $inUnitImpl && $folder->getCodes()->count() > 0;
         $onGroupUnitImpl = $inUnitImpl && $folder->getGroup();
 
-        if ($onClassFolder && $optionDefaults->offsetExists(Definition::KEY_ON_CLASS_FOLDER)
+        if (
+            $onClassFolder && $optionDefaults->offsetExists(Definition::KEY_ON_CLASS_FOLDER)
             && $optionDefaults[Definition::KEY_ON_CLASS_FOLDER]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($onGroupFolder && $optionDefaults->offsetExists(Definition::KEY_ON_GROUP_FOLDER)
+        if (
+            $onGroupFolder && $optionDefaults->offsetExists(Definition::KEY_ON_GROUP_FOLDER)
             && $optionDefaults[Definition::KEY_ON_GROUP_FOLDER]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($onClassUnitImpl && $optionDefaults->offsetExists(Definition::KEY_ON_CLASS_UNIT_IMPL)
+        if (
+            $onClassUnitImpl && $optionDefaults->offsetExists(Definition::KEY_ON_CLASS_UNIT_IMPL)
             && $optionDefaults[Definition::KEY_ON_GROUP_FOLDER]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
-        if ($onGroupUnitImpl && $optionDefaults->offsetExists(Definition::KEY_ON_GROUP_UNIT_IMPL)
+        if (
+            $onGroupUnitImpl && $optionDefaults->offsetExists(Definition::KEY_ON_GROUP_UNIT_IMPL)
             && $optionDefaults[Definition::KEY_ON_GROUP_FOLDER]->getDefaults()[$roleType]->getSelected()
         ) {
             return true;
         }
         return false;
     }
-
 }

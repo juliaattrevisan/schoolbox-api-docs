@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for statistics actions
  *
@@ -21,8 +22,8 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Alaress_Date_Format;
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Log\Mapper AS FolderLogMapper;
-use Schoolbox\Resource\Folder\Visits\Mapper AS VisitsMapper;
+use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
+use Schoolbox\Resource\Folder\Visits\Mapper as VisitsMapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -77,8 +78,7 @@ class Module extends BaseModule
                 if (array_key_exists('folderId', $params)) {
                     try {
                         $params['folder'] = $folderMapper->findById($params['folderId']);
-                    }
-                    catch (MapperException $e) {
+                    } catch (MapperException $e) {
                         throw $errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                     }
                 }
@@ -159,7 +159,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**

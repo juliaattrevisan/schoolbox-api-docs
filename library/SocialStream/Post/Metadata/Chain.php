@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Metadata;
 
 /**
@@ -28,7 +30,8 @@ class Chain
      * @param \Alaress_Curl_Url $curl
      * @param string $url
      */
-    public function __construct($curl, $url) {
+    public function __construct($curl, $url)
+    {
 
         /* xml the curl result so we can find things better
          * This allows us to xpath our way around
@@ -80,14 +83,16 @@ class Chain
      *
      * @param string $result
      */
-    private function setResult($result) {
+    private function setResult($result)
+    {
         $this->result = $result;
     }
 
     /**
      * @return string
      */
-    public function getResult() {
+    public function getResult()
+    {
         return $this->result;
     }
 }

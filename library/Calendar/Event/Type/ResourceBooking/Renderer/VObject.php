@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is the vcal renderer for ResourceBooking events
  * it provides support functions for determining how to render a day event
@@ -13,7 +14,6 @@ use Calendar\Event\Render\VObjectTrait;
 
 class VObject extends Base
 {
-
     /**
      * Inherit default VObject formatting
      * render()

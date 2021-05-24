@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 use function array_filter;
 use function array_unique;
 
@@ -120,5 +122,4 @@ class Mapper extends \Schoolbox\Mapper
         // noop
         return false;
     }
-
 }

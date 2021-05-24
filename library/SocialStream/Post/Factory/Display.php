@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Factory;
 
 /**
@@ -28,7 +30,8 @@ class Display extends AbstractFactory
      *
      * @param string $type
      */
-    public function __construct(string $type) {
+    public function __construct(string $type)
+    {
         $this->type = trim($type);
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Twig function for requiring a module.
  *
@@ -44,7 +45,7 @@ class RequireModule
     public function __invoke($moduleName)
     {
         try {
-            $module = $this->di->get('module:'.$moduleName);
+            $module = $this->di->get('module:' . $moduleName);
         } catch (Di\Exception\ServiceNotFound $e) {
             throw new RuntimeError(sprintf('Module "%s" does not exist', $moduleName));
         }

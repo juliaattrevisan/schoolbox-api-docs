@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Roster
  *
@@ -48,7 +49,7 @@ class Permissions
      * @throws \UnexpectedValueException
      * @throws \PDOException
      */
-    public function generate() : array
+    public function generate(): array
     {
         $services = [];
 

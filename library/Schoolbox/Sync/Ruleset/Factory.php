@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory
  *
@@ -41,7 +42,6 @@ class Factory
     public function produceTemplateData($rulesetId)
     {
         switch ($rulesetId) {
-
             /* Students
              */
             case Role::STUDENT:

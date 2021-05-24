@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -49,7 +50,6 @@ class Matcher
     public function __invoke(EventInterface $event): bool
     {
         foreach ($this->filters as $filterClass => $filter) {
-
             // Event type check
             if ($filterClass === EventType\Definition::class) {
                 // No items selected: filter in

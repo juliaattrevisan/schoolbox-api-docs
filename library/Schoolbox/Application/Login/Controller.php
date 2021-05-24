@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -66,10 +67,12 @@ class Controller extends Base
         // don't show the login page, redirect to the SAML login page.
         // (unless ?samlLogin=0 is set)
         // (or the users IP exists in the blacklist
-        if (( $this->getConfigLoader()->get('saml_enabled') || $this->samlForce() )
+        if (
+            ( $this->getConfigLoader()->get('saml_enabled') || $this->samlForce() )
             && ($this->getConfigLoader()->get('saml_sso_url') !== '' || $this->getConfigLoader()->get('saml_idp_metadata_url') !== '')
             && $samlAuth !== '0'
-            && (!$this->samlBlacklist() || $samlAuth === '1')) {
+            && (!$this->samlBlacklist() || $samlAuth === '1')
+        ) {
             $redirectUrl = '/saml/index.php';
             if ($pageUri->isValidRelative()) {
                 $redirectUrl .= '?page=' . rawurlencode($pageUri);
@@ -82,7 +85,7 @@ class Controller extends Base
         $data['requestParams'] = http_build_query($getParams);
 
         //Determine if page redirect is valid
-        if ($pageUri->isValidRelative() && $page !== '/login' && $page !== '/login/' ) {
+        if ($pageUri->isValidRelative() && $page !== '/login' && $page !== '/login/') {
             $data['page'] = $pageUri->toString();
         } else {
             $data['page'] = '';
@@ -135,7 +138,7 @@ class Controller extends Base
         $remember = $this->getRequest()->post['rememberme'] === '1';
 
         if (strlen($username) && strlen($password)) {
-            $sessionHandler = new Session;
+            $sessionHandler = new Session();
 
             if ($sessionHandler->checkBruteForce()) {
                 // first check for brute force attempt
@@ -165,7 +168,8 @@ class Controller extends Base
                     $message = $e->getMessage();
                 }
                 if ($authenticated) {
-                    if (strlen($page)
+                    if (
+                        strlen($page)
                         && $pageUri->isValidRelative()
                         && $page !== '/'
                         && $page !== '/login'

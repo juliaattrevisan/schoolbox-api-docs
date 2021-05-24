@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LinkRedir
  *
@@ -61,7 +62,6 @@ class LinkRedir extends Base
 
         $linkMapper->logAction($_SESSION['user'], 'access', $link);
         return $link->getUrl();
-
     }
 
 

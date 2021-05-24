@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -68,7 +69,6 @@ class QuestionForm
     {
         $this->tester->fillCkEditorById('question', $question);
         return $this;
-
     }
 
     /**
@@ -112,7 +112,6 @@ class QuestionForm
     {
         $sectionId = $this->tester->grabValueFrom(self::SELECTOR_SECTION_ID);
         return $sectionId;
-
     }
 
     /**
@@ -123,10 +122,11 @@ class QuestionForm
      */
     public function getQuestionId(int $type, int $sectionId)
     {
-        $questionIds = $this->tester->grabColumnFromDatabase('assess_question', 'question_id',
-            ['type_id' => $type, 'section_id' => $sectionId]);
+        $questionIds = $this->tester->grabColumnFromDatabase(
+            'assess_question',
+            'question_id',
+            ['type_id' => $type, 'section_id' => $sectionId]
+        );
         return $questionIds[0];
     }
-
-
 }

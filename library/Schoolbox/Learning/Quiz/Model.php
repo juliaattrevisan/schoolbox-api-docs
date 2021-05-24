@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for online assessments.
  *
@@ -11,7 +12,7 @@
 
 namespace Schoolbox\Learning\Quiz;
 
-use \Alaress_Date_Format;
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\GenericCollection;

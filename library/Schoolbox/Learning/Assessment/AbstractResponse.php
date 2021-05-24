@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AbstractResponse
  *
@@ -9,16 +10,16 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Feedback\InstructorGivenFilter;
 use Schoolbox\Learning\Assessment\Feedback\PublishedFilter;
 use Schoolbox\Learning\Assessment\Feedback\SelfAssessmentFilter;
-use \Schoolbox\User;
-use \Schoolbox\Mapper\Traits\Model\Id;
-use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 abstract class AbstractResponse implements IResponse
 {
@@ -207,8 +208,8 @@ abstract class AbstractResponse implements IResponse
      */
     public function hasPublishedFeedback()
     {
-        foreach($this->allFeedback as $feedback){
-            if($feedback->isPublished()){
+        foreach ($this->allFeedback as $feedback) {
+            if ($feedback->isPublished()) {
                 return true;
             }
         }

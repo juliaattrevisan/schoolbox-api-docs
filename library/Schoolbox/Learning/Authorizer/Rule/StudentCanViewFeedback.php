@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -24,7 +25,7 @@ class StudentCanViewFeedback extends AbstractCanViewFeedback
      */
     public function authorize(array $params = [], User $user = null)
     {
-        if(!$user){
+        if (!$user) {
             throw new \InvalidArgumentException('User object required.');
         }
 

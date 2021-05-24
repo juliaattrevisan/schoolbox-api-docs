@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -169,5 +170,4 @@ class SubscriptionDictionary implements IDictionary
     {
         return $key === $this->map[self::NUM];
     }
-
 }

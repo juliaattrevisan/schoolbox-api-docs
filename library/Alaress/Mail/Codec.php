@@ -2,7 +2,6 @@
 
 namespace Alaress\Mail;
 
-
 class Codec
 {
     public const COMMA_REPLACEMENT = 0x1B;

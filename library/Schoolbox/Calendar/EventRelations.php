@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Calendar;
 
 use PDOException;
@@ -127,7 +129,7 @@ class EventRelations
      */
     public function __construct($level, $group, $roles, $guests, bool $attendanceDirty)
     {
-        $this->level= $level;
+        $this->level = $level;
         $this->group = $group;
         $this->roles = $roles;
         $this->guests = $guests;
@@ -266,7 +268,6 @@ class EventRelations
         /* Otherwise process the people who were added
          */
         if ($this->attendanceDirty) {
-
             /* If the attendanceDirty bit is set, reset attendance responses entirely
              */
             $this->attendanceMapper->deleteByColumn('event_id', $event->getId());

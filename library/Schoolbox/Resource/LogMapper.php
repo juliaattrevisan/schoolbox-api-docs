@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource;
 
 use PDO;
@@ -36,7 +38,8 @@ class LogMapper extends Mapper
     /**
      * @inheritDoc
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('cmsLog');
         $this->hasModel(Log::class);
 
@@ -122,8 +125,7 @@ class LogMapper extends Mapper
      */
     public function findRecent(int $limit = 30): array
     {
-        $stmt = $this->database->prepare
-        ("
+        $stmt = $this->database->prepare("
             (SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`username`=login_log.username AND `user`.`deleted_at` IS NULL ORDER BY DATE DESC LIMIT 0, {$limit})
             UNION
             (SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog LEFT JOIN `user` ON `user`.id=`cmsLog`.`user` AND `user`.`deleted_at` IS NULL ORDER BY `time` DESC LIMIT 0, {$limit})
@@ -213,7 +215,7 @@ class LogMapper extends Mapper
 
         $collection = new Collection();
 
-        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $user = $this->hydrateJoin($r, 'user', 'u');
 
             /* Special case for logs:

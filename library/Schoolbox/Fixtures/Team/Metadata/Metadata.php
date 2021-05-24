@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Metadata
  *
@@ -16,11 +17,11 @@
 namespace Schoolbox\Fixtures\Team\Metadata;
 
 use Schoolbox\Fixtures\Team\Metadata\Strategy\IMetadataStrategy;
-use \Schoolbox\Collection;
-use \Schoolbox\Fixtures\Team\Position\Model as TeamPosition;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Team\Player\Model as TeamPlayer;
-use \Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Collection;
+use Schoolbox\Fixtures\Team\Position\Model as TeamPosition;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Team\Player\Model as TeamPlayer;
+use Schoolbox\Fixtures\Match\Model as Match;
 use Schoolbox\Fixtures\Team\Position\Participant\Model as TeamPositionParticipant;
 
 class Metadata
@@ -72,7 +73,7 @@ class Metadata
      */
     public function collect()
     {
-        foreach($this->getMatch()->getAllTeams() as $team) {
+        foreach ($this->getMatch()->getAllTeams() as $team) {
             $this->collectForTeam($team);
         }
     }
@@ -85,7 +86,6 @@ class Metadata
     protected function collectForTeam(Team $team)
     {
         if ($team->getId()) {
-
             /* Get a list of Players currently in the Team
              */
             $this->getPlayers()->setOffset($team->getId(), new Collection());

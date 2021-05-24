@@ -1,14 +1,16 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Effect\Fragment;
 
-use \Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
-use \Schoolbox\UserMapper;
-use \Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Sync\Effect\Type\Mapper as EffectTypeMapper;
+use Schoolbox\UserMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * Class Factory
@@ -118,7 +120,8 @@ class Factory
      *
      * @param string $roleType
      */
-    public function __construct(string $roleType) {
+    public function __construct(string $roleType)
+    {
 
         /* Determine if Groups perms are enabled before making them accessible
          */
@@ -162,11 +165,10 @@ class Factory
             /* Condense types
              */
             switch ($currentMap['type']) {
-
                 /* Both Boolean types (lol)
                  */
-                case UserMapper::TYPE_BOOL_ENUM :
-                case UserMapper::TYPE_BOOLEAN :
+                case UserMapper::TYPE_BOOL_ENUM:
+                case UserMapper::TYPE_BOOLEAN:
                     $allFields[$key] = [
                         'type' => self::TYPE_BOOLEAN,
                         'label' => $label
@@ -176,7 +178,7 @@ class Factory
 
                 /* Model Join (Lookup, typically)
                  */
-                case UserMapper::TYPE_MODEL :
+                case UserMapper::TYPE_MODEL:
                     $allFields[$key] = [
                         'type' => self::TYPE_LOOKUP,
                         'label' => $label
@@ -184,7 +186,7 @@ class Factory
 
                     break;
 
-                case UserMapper::TYPE_COLLECTION :
+                case UserMapper::TYPE_COLLECTION:
                      $allFields[$key] = [
                          'type' => self::TYPE_COLLECTION,
                          'label' => $label
@@ -195,7 +197,6 @@ class Factory
                 /* All other types
                  */
                 default:
-
                     /* At this stage, joins (such as UserAccess) would have been given
                      * self::TYPE_STRING. Check joins stack before assuming string
                      */
@@ -204,8 +205,7 @@ class Factory
                             'type' => self::TYPE_COLLECTION,
                             'label' => $label
                         ];
-                    }
-                    else {
+                    } else {
                         $allFields[$key] = [
                             'type'  => self::TYPE_STRING,
                             'label' => $label

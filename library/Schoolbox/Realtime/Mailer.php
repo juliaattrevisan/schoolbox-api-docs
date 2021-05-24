@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -19,7 +20,6 @@ use Swift_RfcComplianceException;
 use Swift_SwiftException;
 use Twig\Error\RuntimeError;
 use UnderflowException;
-
 
 class Mailer
 {
@@ -100,7 +100,6 @@ class Mailer
                 $effectors = $this->userMapper->findByColumn('id', $decorator->getNotifications(1)[0]->getEffectorIds());
                 // do NOT format rcf2822, because swift mailer
                 $email->setReplyTo($this->getReplyTo($effectors));
-
             } catch (Swift_RfcComplianceException $e) {
                 $this->log->warning('Error applying reply-to: ' . $e->getMessage());
             }
@@ -119,12 +118,10 @@ class Mailer
             }
 
             $this->log->warning("Failed to email to $address");
-
         } catch (Swift_SwiftException $e) {
-            $this->log->warning(get_class($e) . ': ' . $e->getMessage(), ['exception'=>$e]);
-
+            $this->log->warning(get_class($e) . ': ' . $e->getMessage(), ['exception' => $e]);
         } catch (RuntimeError $e) {
-            $this->log->error(get_class($e) . ': ' . $e->getMessage(), ['exception'=>$e]);
+            $this->log->error(get_class($e) . ': ' . $e->getMessage(), ['exception' => $e]);
 
             if (strpos($e->getMessage(), 'Invalid multibyte sequence in argument') !== false) {
                 // this means the template couldn't render the mail because of bad data, so we have to flush it :/

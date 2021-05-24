@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox;
-
 
 use SitePage;
 
@@ -29,15 +29,14 @@ class Breadcrumbs
         $page->setVar('breadcrumb_block', '');
 
         foreach ($data as $crumb) {
-            $page->setVar('BREADCRUMB_HREF',  $crumb['href']);
-            $page->setVar('BREADCRUMB_TEXT',  \Scrub::text($crumb['text']));
+            $page->setVar('BREADCRUMB_HREF', $crumb['href']);
+            $page->setVar('BREADCRUMB_TEXT', \Scrub::text($crumb['text']));
             $page->setVar('BREADCRUMB_CLASS', $crumb['class']);
 
             $page->parse('breadcrumb_block', 'breadcrumb', true);
         }
 
         $page->parse($handle, self::TPL);
-
     }
 
 
@@ -82,5 +81,4 @@ class Breadcrumbs
             ],
         ];
     }
-
 }

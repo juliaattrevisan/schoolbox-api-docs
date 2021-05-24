@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Resource\Storage\GC\Check;
-
 
 class HardLinks extends DbCheck
 {
@@ -84,5 +84,4 @@ class HardLinks extends DbCheck
 
         return sprintf("`hash` NOT IN (%s)", implode(' UNION ', $queries));
     }
-
-} 
+}

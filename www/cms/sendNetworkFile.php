@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This script opens files for download and send them to the user with correct filename
  *
@@ -17,32 +18,33 @@ if (is_numeric($_GET['id']) && Config::get('webdav_enable')) {
     /** @var SitePage $page */
     $page = $kernel->get('sitePage');
     $page->initSession();
-    $groupHandler = new Group;
+    $groupHandler = new Group();
     $fileHandler  = PortfolioWebDAV::factory();
     try {
         $filename = $fileHandler->getFile($_GET['id']);
-    }
-    catch (Sabre\DAV\Exception $ex) {
+    } catch (Sabre\DAV\Exception $ex) {
         error(41);
     }
     $file['realname'] = substr($_SESSION['portfolioIdPathMap'][$_GET['id']], strrpos($_SESSION['portfolioIdPathMap'][$_GET['id']], '/') + 1);
 
-    if ($_GET['save'])
+    if ($_GET['save']) {
         $attach = "attachment;";
-    else
+    } else {
         $attach = "";
+    }
 
     $filesize = filesize($filename);
-    if ($filesize == FALSE) { //if we cannot find the file (something is wrong dont link to it)
+    if ($filesize == false) { //if we cannot find the file (something is wrong dont link to it)
         unlink($filename);
         error(41);
     }
 
     //send headers
-    if ($file['mime_type'])
+    if ($file['mime_type']) {
         header("Content-Type: {$file['mime_type']}");
-    else
+    } else {
         header("Content-Type: application/octet-stream");
+    }
 
     header("Pragma: ");
     header("Cache-control: private");
@@ -51,6 +53,6 @@ if (is_numeric($_GET['id']) && Config::get('webdav_enable')) {
     header("Content-Length: $filesize");
     readfile($filename);
     unlink($filename);
-} else
+} else {
     error(2);
-
+}

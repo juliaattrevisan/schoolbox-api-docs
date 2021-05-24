@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * This script should read the schedule queue, and attempt to safely repair any damaged messages in it
  *
@@ -87,7 +88,6 @@ $sqlq = Database::getInstance()->query("SELECT * FROM scheduleq")->fetchAll(PDO:
 DeprecatedDatabase::getInstance();
 
 foreach ($sqlq as $qi) {
-
     // do this for every message that comes in
     $d->info('Processing message from SQL', [ 'char' => '>' ]);
 
@@ -104,35 +104,29 @@ foreach ($sqlq as $qi) {
             if ($perform) {
                 // split this message off onto a special queue
                 Database::reinitialise();
-                Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '".$qi['id_hash']."'");
+                Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
             }
-        }
-        else {
+        } else {
             $d->notice('Message retained', [ 'char' => '+' ]);
         }
-
     } catch (RuntimeException $e) {
         // this message is can't be parsed, so we ACK it to make it go away
         $d->error('RuntimeException: ' . $e->getMessage());
         $d->notice('Message unparseable', [ 'char' => '-' ]);
-
     } catch (ScheduleException $e) {
         // we're happy to ignore this, it just means no scheduling strategy exists for this Model
         $d->warning('Schedule Exception: ' . $e->getMessage());
         $d->notice('Message ignorable', [ 'char' => '-' ]);
-
     } catch (CompressionException $e) {
         // this message is unparseable, so we'll eventually ACK it to make it go away
         $d->error('Compression Exception: ' . $e->getMessage());
         $d->notice('Message unparseable', [ 'char' => '-' ]);
-
     }
 
     if ($perform) {
         Database::reinitialise();
-        Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '".$qi['id_hash']."'");
+        Database::getInstance()->exec("DELETE FROM scheduleq WHERE id_hash = '" . $qi['id_hash'] . "'");
     }
-
 }
 
 // now move onto stuff in rabbit
@@ -143,8 +137,8 @@ $loop  = $kernel->getDependencyInjector()->values['react.loop'];
 $stomp = $kernel->getDependencyInjector()->get('stomp');
 
 $amqpConn = \Schoolbox\Notif\MQ\Connector::getInstance();
-$amqpConn->declareQueue(INSTANCE_ID.'.sb.reviewsched');
-$amqpConn->bindQueue(INSTANCE_ID.'.sb.reviewsched', 'deadmessage');
+$amqpConn->declareQueue(INSTANCE_ID . '.sb.reviewsched');
+$amqpConn->bindQueue(INSTANCE_ID . '.sb.reviewsched', 'deadmessage');
 $amqpConn->closeConnection();
 unset($amqpConn);
 
@@ -152,14 +146,18 @@ $stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $ker
 
     $di = $kernel->getDependencyInjector();
 
-    $timer = $loop->addTimer(4, function() { exit(0); });
+    $timer = $loop->addTimer(4, function () {
+        exit(0);
+    });
 
     $stomp->subscribeWithAck(
-        INSTANCE_ID.'.sb.sched',
+        INSTANCE_ID . '.sb.sched',
         IClient::ACK_MODE_CLIENT_INDIVIDUAL,
         function (IFrame $frame, IAckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
             $loop->cancelTimer($timer);
-            $timer = $loop->addTimer(4, function() { exit(0); });
+            $timer = $loop->addTimer(4, function () {
+                exit(0);
+            });
 
             $date = date('Y-m-d H:i:s', $frame->getHeader('timestamp'));
 
@@ -181,7 +179,6 @@ $stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $ker
                     unset($amqpConn);
                     $resolver->ack();
                 }
-
             } else {
                 $d->notice("Message retained", [ 'char' => '+' ]);
             }
@@ -240,7 +237,6 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
 
         foreach ($trigger->getCallbacks() as $callback) {
             if (is_array($callback) && count($callback) == 2) {
-
                 list ($object, $method) = array_values($callback);
 
                 $methodName = get_class($object) . "::$method";
@@ -263,18 +259,15 @@ function verifyFrameTrigger(IFrame $input, LoggerInterface $log)
                     $log->warning("$methodName failed execution");
                     $exit = 1;
                 }
-
             } else {
                 $log->warning('Could not test callback, is not an array');
             }
         }
-
     } catch (InvalidArgumentException $e) {
-        $log->critical('Payload is not a valid trigger instance: '.$e->getMessage(), [ 'exception'=>$e ]);
+        $log->critical('Payload is not a valid trigger instance: ' . $e->getMessage(), [ 'exception' => $e ]);
         $exit = 2;
-
     } catch (ErrorException $e) {
-        $log->critical('Failed to unserialize payload', [ 'exception'=>$e ]);
+        $log->critical('Failed to unserialize payload', [ 'exception' => $e ]);
         $exit = 2;
     }
 
@@ -294,7 +287,8 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
     $pid = pcntl_fork();
 
     switch ($pid) {
-        case -1: return false; // failed to fork
+        case -1:
+            return false; // failed to fork
         case 0: // I am child
             break;
         default: // I am parent
@@ -340,7 +334,6 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
 
         // handle this message by splitting this event and propagating its triggers
         (new Propagator($splitter, $redis, $broker, $instanceId))->propagateEvent($event);
-
     } catch (CompressionException $e) {
         $log->debug($e->getMessage());
 
@@ -348,16 +341,14 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
         if ($input instanceof IFrame) {
             $exit = verifyFrameTrigger($input, $log);
         } else {
-            $log->critical($e->getMessage(), [ 'exception'=>$e ]);
+            $log->critical($e->getMessage(), [ 'exception' => $e ]);
             $exit = 2;
         }
-
     } catch (ScheduleException $e) {
-        $log->notice($e->getMessage(), [ 'exception'=>$e ]);
+        $log->notice($e->getMessage(), [ 'exception' => $e ]);
         $exit = 2;
-
     } catch (Exception $e) {
-        $log->critical($e->getMessage(), [ 'exception'=>$e ]);
+        $log->critical($e->getMessage(), [ 'exception' => $e ]);
         $exit = 2;
     }
 
@@ -390,4 +381,3 @@ function frame2trigger(\Predis\ClientInterface $redis, IFrame $frame)
 
     throw new InvalidArgumentException('Could not unserialize trigger');
 }
-

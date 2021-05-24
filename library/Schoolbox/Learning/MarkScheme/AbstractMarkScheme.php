@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -75,8 +76,8 @@ abstract class AbstractMarkScheme implements IMarkScheme
     protected function validateNormalisedMarkValue($normalisedMark)
     {
         if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN || $normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
-            $msg = 'Normalised mark must lie between '.IMarkScheme::NORMALISED_MARK_MIN.
-                ' and '.IMarkScheme::NORMALISED_MARK_MAX.' inclusive: '.$normalisedMark;
+            $msg = 'Normalised mark must lie between ' . IMarkScheme::NORMALISED_MARK_MIN .
+                ' and ' . IMarkScheme::NORMALISED_MARK_MAX . ' inclusive: ' . $normalisedMark;
             throw new RangeException($msg);
         }
     }

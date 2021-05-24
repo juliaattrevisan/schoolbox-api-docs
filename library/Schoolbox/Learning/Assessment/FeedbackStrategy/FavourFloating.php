@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: andy
@@ -47,7 +48,7 @@ class FavourFloating implements IFeedbackTraversalStrategy
 
         foreach ($participant->getAllFeedbacks() as $feedback) {
             if (!$publishedOnly || $feedback->isPublished()) {
-                if(!$feedback->getResponse() instanceof IResponse){
+                if (!$feedback->getResponse() instanceof IResponse) {
                     if (!$mostRecentFloatingFeedback || $feedback->getUpdatedAt()->gt($mostRecentFloatingFeedback->getUpdatedAt())) {
                         $mostRecentFloatingFeedback = $feedback;
                     }
@@ -55,22 +56,22 @@ class FavourFloating implements IFeedbackTraversalStrategy
             }
         }
 
-        if($mostRecentFloatingFeedback){
+        if ($mostRecentFloatingFeedback) {
             return $mostRecentFloatingFeedback;
         }
 
         /** @var IResponse $latestResponseWithFeedback */
         $latestResponseWithFeedback = null;
 
-        foreach($participant->getAllResponses() as $response){
-            if(!$latestResponseWithFeedback || $response->getUpdatedAt()->gt($latestResponseWithFeedback->getUpdatedAt())){
-                if(!$publishedOnly){
-                    if(count($response->getAllFeedback())){
+        foreach ($participant->getAllResponses() as $response) {
+            if (!$latestResponseWithFeedback || $response->getUpdatedAt()->gt($latestResponseWithFeedback->getUpdatedAt())) {
+                if (!$publishedOnly) {
+                    if (count($response->getAllFeedback())) {
                         $latestResponseWithFeedback = $response;
                     }
                 } else {
-                    foreach($response->getAllFeedback() as $feedback){
-                        if($feedback->isPublished()){
+                    foreach ($response->getAllFeedback() as $feedback) {
+                        if ($feedback->isPublished()) {
                             $latestResponseWithFeedback = $response;
                             break;
                         }
@@ -80,14 +81,14 @@ class FavourFloating implements IFeedbackTraversalStrategy
         }
 
         // No Response with Feedback?
-        if(!$latestResponseWithFeedback){
+        if (!$latestResponseWithFeedback) {
             return null;
         }
 
         /** @var IFeedback $mostRecentLinkedFeedback */
         $mostRecentLinkedFeedback = null;
 
-        foreach($latestResponseWithFeedback->getAllFeedback() as $feedback){
+        foreach ($latestResponseWithFeedback->getAllFeedback() as $feedback) {
             if (!$publishedOnly || $feedback->isPublished()) {
                 if (!$mostRecentLinkedFeedback || $feedback->getUpdatedAt()->gt($mostRecentLinkedFeedback->getUpdatedAt())) {
                     $mostRecentLinkedFeedback = $feedback;

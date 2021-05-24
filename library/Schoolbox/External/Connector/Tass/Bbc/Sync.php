@@ -1,4 +1,5 @@
 <?php
+
 /**
  * TASS implementation of sync connector.
  *
@@ -26,7 +27,6 @@ class Sync extends BaseSync
          * from there as well
          */
         if (Config::get('external_tass_commrules')) {
-
             $addnum = $this->helper->getAddNum();
             $typecode = $this->helper->getTypeCode();
 
@@ -49,8 +49,7 @@ class Sync extends BaseSync
         }
 
         // Single Tuple contains data for [P]arent and [S]pouse
-        $iterator = $this->databaseExternal->getQueryIterator
-        (
+        $iterator = $this->databaseExternal->getQueryIterator(
             "
                 SELECT DISTINCT
                     CASE
@@ -152,5 +151,4 @@ class Sync extends BaseSync
 
         return new Iterator\Guardian($iterator);
     }
-
 }

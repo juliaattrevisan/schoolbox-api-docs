@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
@@ -62,7 +63,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
         $pageId = $this->getInstance()->getIdentifier();
 
         /* Sort order
-		 */
+         */
         $sortConfig = array(
             'sort' => $this->getConfig('sort'),
             'sortdir' => $this->getConfig('sortdir')
@@ -70,7 +71,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 
 
         if ($this->getConfig('size') > 1) {
-            $this->outputList = $this->getMapper()->findByEportfolioPage($pageId, $sortConfig, $this->getConfig('size')-1);
+            $this->outputList = $this->getMapper()->findByEportfolioPage($pageId, $sortConfig, $this->getConfig('size') - 1);
         } elseif ($this->getConfig('size') == 0) {
             $this->outputList = $this->getMapper()->findByEportfolioPage($pageId, $sortConfig);
         } else {

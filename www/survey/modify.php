@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey modification.
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
@@ -28,7 +30,6 @@ if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($su
 }
 
 if (!empty($_POST)) {
-
     /* Format date, time
      */
     $start = Alaress_Date_Format::newLocal($_POST['start']['date']);
@@ -68,7 +69,6 @@ if (!empty($_POST)) {
 
     SitePage::localRedir('/survey/summary/' . $this->arg[0]);
 } else {
-
     /* Render modify page
      */
     $this->setFile(TEMPLATE_content, 'survey/modify.html');
@@ -86,8 +86,7 @@ if (!empty($_POST)) {
 
     try {
         $folder = $folderMapper->findById($survey['category_id']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(117);
     }
 

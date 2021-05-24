@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\Bridge;
@@ -15,6 +17,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Learning\Quiz;
+
 use function array_filter;
 use function array_key_exists;
 use function array_map;

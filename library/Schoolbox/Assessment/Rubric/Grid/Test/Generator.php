@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -168,7 +169,6 @@ class Generator
         $this->dueWork = (new DueWork())
             ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
             ->setMaxMark(100);
-
     }
 
 

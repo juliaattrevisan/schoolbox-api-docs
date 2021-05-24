@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -46,7 +47,8 @@ class Fixture
     {
         return str_replace(
             [self::URL_SEASON_ID, self::URL_DIVISION_ID],
-            [$seasonId, $divisionId], self::URL_CREATE_MATCH
+            [$seasonId, $divisionId],
+            self::URL_CREATE_MATCH
         );
     }
 
@@ -96,8 +98,11 @@ class Fixture
 
         $i->click('#matchForm [type=submit][value="Create Match"]');
         $i->waitForText('Seasons');
-        $matchIds = $i->grabColumnFromDatabase('sportsfixtures_match', 'id',
-            ['name' => $fields[self::SELECTOR_NAME], 'start_at' => $startAtDb]);
+        $matchIds = $i->grabColumnFromDatabase(
+            'sportsfixtures_match',
+            'id',
+            ['name' => $fields[self::SELECTOR_NAME], 'start_at' => $startAtDb]
+        );
         return $matchIds[0];
     }
 

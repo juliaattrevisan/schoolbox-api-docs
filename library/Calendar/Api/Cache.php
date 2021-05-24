@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Api_Cache
  *
@@ -6,7 +7,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Calendar_Api_Cache extends Alaress_Cache_Abstract {
+class Calendar_Api_Cache extends Alaress_Cache_Abstract
+{
 
     /**
      * The url of the stream you just got
@@ -59,7 +61,8 @@ class Calendar_Api_Cache extends Alaress_Cache_Abstract {
      *
      * @return mixed|void
      */
-    protected function setup() {
+    protected function setup()
+    {
         $this->cachedTime = Config::get('calendar_api_caching');
 
         /* By default, set the lockTime to be a multiple of cachedTime

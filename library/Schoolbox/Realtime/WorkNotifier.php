@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,14 +9,14 @@
 
 namespace Schoolbox\Realtime;
 
-
 use Alaress\Lumberjack\Logger;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Config\Loader;
 use Schoolbox\IConfigLoader;
 use Serializable;
 
-abstract class WorkNotifier implements Serializable {
+abstract class WorkNotifier implements Serializable
+{
 
     /** @var IConfigLoader */
     protected $conf;
@@ -27,7 +28,8 @@ abstract class WorkNotifier implements Serializable {
      * @param IConfigLoader   $configLoader
      * @param LoggerInterface $log
      */
-    public function __construct($configLoader = null, $log = null) {
+    public function __construct($configLoader = null, $log = null)
+    {
         // TODO SA-8354: inject this always
         $this->conf = $configLoader ?: new Loader();
 
@@ -40,7 +42,8 @@ abstract class WorkNotifier implements Serializable {
     /**
      * @param LoggerInterface $debug
      */
-    public function setLogger($debug) {
+    public function setLogger($debug)
+    {
         $this->log = $debug;
     }
 
@@ -64,13 +67,14 @@ abstract class WorkNotifier implements Serializable {
      * @param object $object the object to process
      * @return int the number of actions taken
      */
-    public abstract function process($object);
+    abstract public function process($object);
 
 
     /**
      * @return string the string representation of the object or null
      */
-    public function serialize() {
+    public function serialize()
+    {
         // no serialization
         return get_class($this);
     }
@@ -80,9 +84,9 @@ abstract class WorkNotifier implements Serializable {
      * @param string $serialized
      * @return void
      */
-    public function unserialize($serialized) {
+    public function unserialize($serialized)
+    {
         // no serialization
         $this->__construct();
     }
-
 }

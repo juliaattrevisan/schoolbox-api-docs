@@ -110,7 +110,6 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
     try {
         // sooo, this case is much simpler
         if ($modifyExisting) {
-
             if ($groupHandler->getPermission($_POST['category']) < UserAccess::ACCESS_WRITE || 0 == $_POST['category']) {
                 error(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
             }
@@ -118,9 +117,7 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
             $file->setModifiedBy($_SESSION['user']);
             $file->setFolder(FolderMapper::getInstance()->createModel()->setId($_POST['category']));
             $affectedIds = FileMapper::getInstance()->save($file);
-
         } else {
-
             // this is the collection we'll be saving
             $collection = new \Schoolbox\Collection();
 
@@ -143,7 +140,6 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
         // Did caller request to inject the file into a specific component?
         if (isset($_POST['component']) && is_numeric($_POST['component']) && $_POST['component'] > 0) {
-
             // Retrieve component
             $componentInstance = Component_InstanceMapper::getInstance()->findByInstanceId($_POST['component']);
 
@@ -188,15 +184,12 @@ if (is_string($_POST['description']) && isset($_POST['category'])) {
 
         if (isset($_POST['return'])) {
             SitePage::localRedir($_POST['return']);
-
         } elseif ($ajax) {
             http_response_code(201);
             die(json_encode(array('id' => $affectedIds[0])));
-
         } else {
             $page->backToTheFuture(2);
         }
-
     } catch (Exception $e) {
         outputException($e, $file, $ajax);
     }
@@ -205,7 +198,7 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
 
-        if(0 == $_POST['categoryID']){
+        if (0 == $_POST['categoryID']) {
             $result = "Cannot attach files to root";
         } elseif ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
             $result = "Insufficient permssions";
@@ -301,7 +294,8 @@ else {
  * @param IFile     $file
  * @param bool      $ajax
  */
-function outputException(Exception $e, IFile $file, $ajax = false) {
+function outputException(Exception $e, IFile $file, $ajax = false)
+{
 
     // Output errors
     if ($e->getCode() == \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
@@ -320,5 +314,4 @@ function outputException(Exception $e, IFile $file, $ajax = false) {
     } else {
         error($code, $msg);
     }
-
 }

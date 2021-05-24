@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Event source - base class for resource booking retrieval.
  *
@@ -75,7 +76,6 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
             /** @var EventType $eventType */
             $eventType = EventTypeMapper::getInstance()->findOneByColumn('eventType', 'Booking');
             $this->getEventConverter()->setBookingEventType($eventType);
-
         } catch (MapperException $e) {
             // Not found: doesn't matter, don't use it
         }
@@ -100,7 +100,7 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      */
     public function getEvent($eventId)
     {
-        return new Collection;
+        return new Collection();
     }
 
     /**

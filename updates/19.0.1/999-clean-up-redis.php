@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Run the deleting old trigger script.
  * @copyright Copyright 2019, Schoolbox Pty Ltd

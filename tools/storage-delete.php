@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Usage: ./gc-storage.php [--hash] [-p] [-vvv]
  *
@@ -57,7 +58,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
 
         exit(0);
     }
-
 }, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

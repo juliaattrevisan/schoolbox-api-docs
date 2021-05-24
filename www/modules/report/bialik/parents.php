@@ -1,4 +1,5 @@
 <?php
+
 $searchName = '';
 $searchBoardingStatus = '';
 $searchForm = '';
@@ -8,8 +9,7 @@ $searchYear = '';
  */
 if (isset($_GET['searchYear'])) {
     $searchYear = $_GET['searchYear'];
-}
-else {
+} else {
     $searchYear = $this->arg[0];
 }
 

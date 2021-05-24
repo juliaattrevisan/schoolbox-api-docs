@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module
  *
@@ -31,7 +32,8 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
+    public function initRoutes(Router $router, $basePath)
+    {
         $this->addGetRoute($router, 'logs', $basePath, "/logs");
         $this->addGetRoute($router, 'logFormat', $basePath, "/log/{logId}.{format}")->addTokens(['logId' => '\d+']);
         $this->addGetRoute($router, 'log', $basePath, "/log/{logId}");
@@ -48,7 +50,8 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher) {
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
         $this->addRoutePreload(
             $matcher,
             '(?:dryRun|performUpdate)',
@@ -96,7 +99,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
                 ['mimetypeMapper' => $this->getMapperFactory()->getLazy(MimetypeMapper::class),]

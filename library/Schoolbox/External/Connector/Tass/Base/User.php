@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tass implementation of user connector
  *

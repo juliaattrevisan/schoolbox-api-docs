@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -63,7 +64,6 @@ class RecursiveRoute implements IRoute
                 foreach ($this->flattenMap($more, $passthru) as $path => $trie) {
                     $paths[$path] = $trie;
                 }
-
             } else {
                 $paths[sprintf('%s%s%s', $prepend, '\\' . $this->delim, $key)] = $more;
             }
@@ -88,7 +88,6 @@ class RecursiveRoute implements IRoute
             // no remainder
             $head      = $path;
             $remainder = '';
-
         } else {
             list ($head, $remainder) = explode($this->delim, $path, 2);
         }
@@ -101,7 +100,6 @@ class RecursiveRoute implements IRoute
         foreach ($trie->match($path) as $leaf) {
             // match the current path remainder as a leaf, and store it if it matches
             $matches[$leaf->key()] = $leaf;
-
         }
 
         return $matches;
@@ -126,7 +124,6 @@ class RecursiveRoute implements IRoute
                     foreach ($trie->fetch($matches) as $key => $value) {
                         $data[$key] = $value;
                     }
-
                 } catch (InvalidArgumentException $e) {
                     // suppress and continue
                     continue;
@@ -140,5 +137,4 @@ class RecursiveRoute implements IRoute
 
         return $data;
     }
-
 }

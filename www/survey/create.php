@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey creation. Surveys must always belong in a Category.
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Breadcrumbs;
@@ -134,4 +136,3 @@ if (!empty($_POST)) {
         ]
     ]);
 }
-

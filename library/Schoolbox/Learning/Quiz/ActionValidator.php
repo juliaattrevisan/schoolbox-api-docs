@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Quiz;
@@ -92,7 +94,6 @@ class ActionValidator
 
         // Does user have a participation for this assessment?
         if ($participant) {
-
             // Instructors are not bound by the normal rules
             if ($isInstructor) {
                 return true;
@@ -189,8 +190,7 @@ class ActionValidator
         User $student,
         Quiz\Model $quiz,
         bool $restrictStudentSubmissions
-    ): bool
-    {
+    ): bool {
         return
             $quiz->isFeedbackVisibleToUser($user)
             && $this->canSeeAttempts($user, $student, $quiz, $restrictStudentSubmissions);

@@ -1,19 +1,22 @@
 <?php
+
 /**
  * Survey_Import_Xml
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Learning\Quiz\Model as Quiz;
-use \Evaluation\Import\Parser\IParser;
-use \Survey\Import\Parser\IParser as SurveyParser;
+use Evaluation\Import\Parser\IParser;
+use Survey\Import\Parser\IParser as SurveyParser;
 
 /**
  * Survey-specific import logic
  */
-class Survey_Import_Xml extends Evaluation_Import_Xml {
+class Survey_Import_Xml extends Evaluation_Import_Xml
+{
 
     /**
      * Gets a version-dependent parser that knows how to interpret a specific version format, but
@@ -25,7 +28,7 @@ class Survey_Import_Xml extends Evaluation_Import_Xml {
      */
     protected function getParser(SimpleXMLElement $xml, $fileFormatVersion)
     {
-        switch($fileFormatVersion){
+        switch ($fileFormatVersion) {
             case IParser::FORMAT_VERSION_160:
                 return new \Survey\Import\Parser\V160($xml);
             case IParser::FORMAT_VERSION_165:

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component_Eportfolio_FileListController
  *
@@ -7,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * @method \Component\Eportfolio\FileListMapper getMapper()

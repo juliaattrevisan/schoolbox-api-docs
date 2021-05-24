@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,8 @@
 /**
  * Provides common behaviour for HTML-based rendering (Print or Browser)
  */
-abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererBase {
+abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererBase
+{
 
     /**
      * @var string $templateFile
@@ -109,11 +111,10 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
     {
         $this->getPage()->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
 
-        foreach(Leave_Controller::getTimespanOptions() as $timespanOption)
-        {
+        foreach (Leave_Controller::getTimespanOptions() as $timespanOption) {
             $optionSelected = $timespanOption === $this->getReportTimespan();
 
-            switch($timespanOption){
+            switch ($timespanOption) {
                 case Leave_Controller::REPORT_TIMESPAN_DAY:
                     $timespanLabel = 'Single Day';
                     break;
@@ -275,7 +276,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                             foreach ($currentPeriod['request_period'][$section] as $request) {
                                 if ($request['status'] == Leave_Request::STATUS_PENDING && $request['display']) {
                                     $requestOutput .= $this->getDecorationPendingStart() . $request['display'] . $this->getDecorationPendingEnd();
-
                                 } else {
                                     if ($request['status'] == Leave_Request::STATUS_APPROVED && $request['display']) {
                                         $requestOutput .= $this->getDecorationApprovedStart() . $request['display'] . $this->getDecorationApprovedEnd();
@@ -407,5 +407,4 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
     {
         return $this->decoration['approvedEnd'];
     }
-
 }

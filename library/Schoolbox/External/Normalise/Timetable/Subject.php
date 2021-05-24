@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Subject
  *
@@ -11,7 +12,8 @@
 
 namespace Schoolbox\External\Normalise\Timetable;
 
-abstract class Subject {
+abstract class Subject
+{
 
     /**
      * A unique identifier
@@ -27,7 +29,7 @@ abstract class Subject {
      */
 
     protected $name = '';
-    
+
     /**
      * Getters/Setters
      */
@@ -70,5 +72,5 @@ abstract class Subject {
     public function getName()
     {
         return $this->name;
-    }    
+    }
 }

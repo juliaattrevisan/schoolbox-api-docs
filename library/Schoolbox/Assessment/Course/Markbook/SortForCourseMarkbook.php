@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
@@ -189,7 +191,7 @@ class SortForCourseMarkbook implements IAssessableComparator
 
         /** @var UnitImplementation\Model $firstLeftUnitImpl */
         $firstLeftUnitImpl = null;
-        foreach($leftCourse->getUnits() as $unitImpl) {
+        foreach ($leftCourse->getUnits() as $unitImpl) {
             if (!$firstLeftUnitImpl || $unitImpl->getOpenDate()->lt($firstLeftUnitImpl->getOpenDate())) {
                 $firstLeftUnitImpl = $unitImpl;
             }
@@ -197,7 +199,7 @@ class SortForCourseMarkbook implements IAssessableComparator
 
         /** @var UnitImplementation\Model $firstRightUnitImpl */
         $firstRightUnitImpl = null;
-        foreach($rightCourse->getUnits() as $unitImpl) {
+        foreach ($rightCourse->getUnits() as $unitImpl) {
             if (!$firstRightUnitImpl || $unitImpl->getOpenDate()->lt($firstRightUnitImpl->getOpenDate())) {
                 $firstRightUnitImpl = $unitImpl;
             }

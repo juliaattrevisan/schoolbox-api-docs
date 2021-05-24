@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Notif;
-
 
 use Alaress\Lumberjack;
 use ConfigFallback;
@@ -88,7 +88,6 @@ class Notifactory
         if ($conf) {
             // use the provided config
             $this->conf = $conf;
-
         } elseif (extension_loaded('pdo')) {
             try {
                 // try for a config mapper instance
@@ -96,12 +95,10 @@ class Notifactory
 
                 $this->conf = ConfigLoader::getInstance();
                 $this->conf->get('mail_support_address');
-
             } catch (PDOException $e) {
                 // if something PDO-esque broke, fall back
                 $this->conf = new ConfigFallback();
             }
-
         } else {
             // fallback to hardcoded config vars
             $this->conf = new ConfigFallback();
@@ -131,5 +128,4 @@ class Notifactory
         $this->log = $log ?: new Lumberjack\Logger(null);
         return $this;
     }
-
 }

@@ -6,12 +6,12 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
-$allowedFiles = new AllowedFile;
+$allowedFiles = new AllowedFile();
 
 if (isset($_POST['relationID'])) {
     // native folder node request
 
-    $folderHandler = new MyFolder;
+    $folderHandler = new MyFolder();
 } else {
     // native files request
 
@@ -20,7 +20,6 @@ if (isset($_POST['relationID'])) {
 
 
 if (is_numeric($_POST['relationID'])) {
-
     $folderList = $folderHandler->getFolderList($_POST['relationID']);
     $output = array();
     if (is_array($folderList)) {
@@ -35,9 +34,7 @@ if (is_numeric($_POST['relationID'])) {
     }
     header("Content-type: application/json");
     print json_encode($output);
-}
-elseif (is_numeric($_POST['categoryID'])) {
-
+} elseif (is_numeric($_POST['categoryID'])) {
     // save current view
     $_SESSION['portfolioID'] = $_POST['categoryID'];
 
@@ -46,7 +43,6 @@ elseif (is_numeric($_POST['categoryID'])) {
     $output = array();
     if ($fileList->count()) {
         foreach ($fileList as $file) {
-
             $output[] = array('id' => $file->getId(),
                 'name' => Scrub::text($file->getTitle()),
                 'category' => $file->getFolder()->getId(),
@@ -59,8 +55,7 @@ elseif (is_numeric($_POST['categoryID'])) {
 
     header("Content-type: application/json");
     print json_encode($output);
-}
-elseif (is_numeric($_POST['saveID'])) {
+} elseif (is_numeric($_POST['saveID'])) {
     // save current view
     $_SESSION['portfolioID'] = $_POST['saveID'];
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
@@ -244,9 +246,7 @@ class Definition implements IStrategy
                         ));
 
                         $period->setTitle($newTitle);
-
                     } catch (\Schoolbox\Mapper\Exception $e) {
-
                         // noop; doesn't already exist, just create it as normal
                     }
 
@@ -373,7 +373,6 @@ class Definition implements IStrategy
          * student's timetable doesn't use it
          */
         foreach ($students as $externalId => $person) {
-
             /* Hit That Api to find every student's timetable and cache it somewhere
              * We'll need to operate on it all again later anyway
              */
@@ -542,7 +541,6 @@ class Definition implements IStrategy
         $days = range(1, $cycle['cycleLength']);
 
         foreach ($days as $i => $dayIndex) {
-
             /* Build a list of periods in a day
 
             $struct['days'][

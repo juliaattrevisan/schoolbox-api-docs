@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component for outputting a student's subject list.
  *
@@ -6,7 +7,8 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-class Component_Dashboard_SubjectController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_SubjectController extends Component_Dashboard_ControllerAbstract
+{
 
     /**
      * A list of subjects to show
@@ -27,7 +29,8 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute() {
+    public function execute()
+    {
         $this->subject_list = $_SESSION['subjects'];
         return !empty($this->subject_list);
     }
@@ -38,7 +41,8 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
      * @param  string $templateHandle
      * @return bool
      */
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!$this->loadTemplate($templateHandle, 'subject')) {
             return false;
         }

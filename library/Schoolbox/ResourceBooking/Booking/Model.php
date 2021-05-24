@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A representation of a bookable resource.
  *
@@ -267,7 +268,7 @@ class Model implements ISoftDeletable, JsonSerializable
                 return $booking;
             }
         }
-        throw new \OutOfBoundsException('No related booking exists for resource '.$resourceId);
+        throw new \OutOfBoundsException('No related booking exists for resource ' . $resourceId);
     }
 
     /**

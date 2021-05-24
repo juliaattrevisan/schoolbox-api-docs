@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\ImportStage;
@@ -21,6 +23,7 @@ use Schoolbox\Resource\Folder\TreeBuilder;
 use SplQueue;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_key_exists;
 use function array_keys;
 use function count;

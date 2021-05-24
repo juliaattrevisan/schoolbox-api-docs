@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -124,15 +125,14 @@ class Controller extends Base
         $sessionSegment = $this->getSessionSegment();
         $sessionSegment->setFlash('isEmailSubmitted', true);
 
-        if(strlen($emailAddress) > 0) {
+        if (strlen($emailAddress) > 0) {
             $sessionSegment->setFlash('email', $emailAddress);
 
             $this->passwordMailService->sendResetLinkToAddress(
                 $emailAddress,
                 $this->getRequest()->server->get('REMOTE_ADDR')
             );
-        }
-        else {
+        } else {
             $sessionSegment->setFlash('isEmailValid', false);
         }
 

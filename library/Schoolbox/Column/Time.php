@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Time value column type, used to store a time of day.
  *
@@ -11,12 +12,13 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Column;
 
-class Time extends Datetime implements IColumnType {
-	protected $input_format  = 'H:i:s';
-	protected $output_format = 'H:i:s';
+class Time extends Datetime implements IColumnType
+{
+    protected $input_format  = 'H:i:s';
+    protected $output_format = 'H:i:s';
 
     /**
      * There's no zero value for times.

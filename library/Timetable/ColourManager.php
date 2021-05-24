@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Color manager - handles cycling through a list of colors, and assigning a
  * color in that list to a unique color.

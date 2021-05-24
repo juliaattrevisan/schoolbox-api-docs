@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -72,12 +73,11 @@ $kernel->run(
         $descriptorMarkCount = $selectDescriptorMarksQuery->rowCount();
         $log->info(sprintf('Migrating %d distinct groups of rubric_descriptor_mark rows...', $descriptorMarkCount));
         foreach ($selectDescriptorMarksQuery->getIterator() as $i => $row) {
-
             // Insert new rubric_group rows
             $log->info(
                 sprintf(
                     'Migrating rubric_descriptor_mark group %d/%d (rubric_group_id #%d, return_id #%d) to rubric_group...',
-                    $i+1,
+                    $i + 1,
                     $descriptorMarkCount,
                     $row['rubric_group_id'],
                     $row['return_id']

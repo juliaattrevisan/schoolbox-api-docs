@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -26,7 +27,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, Logger $log, array $opts) {
     $perform = \array_key_exists('perform', $opts);
 
     if ($perform) {
@@ -52,7 +53,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     $modelClasses = [];
 
     foreach ($offendingMappers as $mapper) {
-        $modelClasses[] = str_replace('\\','\\\\\\\\', $mapper->getModel());
+        $modelClasses[] = str_replace('\\', '\\\\\\\\', $mapper->getModel());
     }
 
     $regex = sprintf('`(%s)`', implode('|', $modelClasses));
@@ -75,8 +76,8 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, Logger $log, array 
     $log->notice(sprintf(
         'Total reclamation: %d keys accounting for %s',
         count($deletions),
-        Alaress_Byte_Format::bytesToString(array_sum($deletions)))
-    );
+        Alaress_Byte_Format::bytesToString(array_sum($deletions))
+    ));
 
     if ($perform) {
         $redis->del(array_keys($deletions));

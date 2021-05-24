@@ -26,7 +26,7 @@ $passwordService = new PasswordService();
  * @param array $getValues
  * @return User
  */
-$setUserFields = function(User $user, $getValues) use ($roleMapper, $campusMapper, $yearLevelMapper, $passwordService) {
+$setUserFields = function (User $user, $getValues) use ($roleMapper, $campusMapper, $yearLevelMapper, $passwordService) {
     // Update only included fields
     if (!empty($getValues['username'])) {
         $user = $user->setUsername($getValues['username']);
@@ -115,9 +115,7 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
                  </response>";
 
     echo $response;
-
 } elseif (empty($_GET['action'])) {
-
     $response = "<?xml version='1.0' standalone='yes'?>
                  <response>
                     <code>400</code>
@@ -126,7 +124,6 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
 
     echo $response;
 } else {
-
     $key = $_GET['key'];
     $action = $_GET['action'];
 
@@ -158,7 +155,6 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
                                 <user_id>{$user->getId()}</user_id>
                             </user>
                          </response>";
-
         } catch (\Exception $e) {
             $message  = Scrub::xml($e->getMessage());
             $response = "<?xml version='1.0' standalone='yes'?>
@@ -174,7 +170,6 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
 
     /* Update operation */
     elseif ($action == 'update') {
-
         try {
             if (!empty($_GET['user_id'])) {
                 $user = $userMapper->findById($_GET['user_id']);
@@ -207,7 +202,6 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
                             <code>201</code>
                             <message>User successfully updated.</message>
                          </response>";
-
         } catch (\Exception $e) {
             $message  = Scrub::xml($e->getMessage());
             $response = "<?xml version='1.0' standalone='yes'?>
@@ -254,9 +248,7 @@ if (empty($_GET['key']) || Config::get('api_key') != $_GET['key']) {
                      </response>";
 
         echo $response;
-    }
-
-    else {
+    } else {
         $response = "<?xml version='1.0' standalone='yes'?>
                      <response>
                         <code>404</code>

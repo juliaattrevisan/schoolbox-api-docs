@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
-class CriterionMetadata {
+class CriterionMetadata
+{
     public const DIRECTION_ASCENDING = 'asc';
     public const DIRECTION_DESCENDING = 'desc';
 
@@ -66,7 +67,8 @@ class CriterionMetadata {
      * @param array $levelIds
      * @param array $levelDescriptors
      */
-    public function __construct(array $levelIds, array $levelDescriptors) {
+    public function __construct(array $levelIds, array $levelDescriptors)
+    {
         $this->levelIds = $levelIds;
         $this->numLevels = \count($levelIds);
         $this->levelDescriptors = $levelDescriptors;
@@ -83,7 +85,7 @@ class CriterionMetadata {
      * Returns an array of level ID => metadata for the level descriptor
      * @return array
      */
-    private function generateDescriptorMetadata() : array
+    private function generateDescriptorMetadata(): array
     {
         $meta = [];
 
@@ -95,7 +97,6 @@ class CriterionMetadata {
 
         // Loop through all the levels in the rubric. Not all of them may have a descriptor in a given criterion...
         for ($levelIndex = 0; $levelIndex < $this->numLevels; $levelIndex++) {
-
             // Have we already seen all the descriptors that have levels?
             $isLastDescriptor = ($iteration === \count($this->levelDescriptors) - 1);
 
@@ -124,7 +125,6 @@ class CriterionMetadata {
                 // How many levels with descriptors have we seen?
                 $iteration++;
             }
-
         }
 
         return $meta;
@@ -134,7 +134,7 @@ class CriterionMetadata {
      * Work out whether the values of descriptors in this criterion go up or down.
      * @return string
      */
-    private function calculateDirection() : string
+    private function calculateDirection(): string
     {
         $startValue = $this->calculateStartValue();
         $endValue = $this->calculateEndValue();
@@ -150,7 +150,7 @@ class CriterionMetadata {
      * Work out the value of the first descriptor that has a value. Used to calculate direction
      * @return float|null
      */
-    private function calculateStartValue() : ?float
+    private function calculateStartValue(): ?float
     {
         // By default, assume the first level has a value
         $firstValuedLevelIndex = 0;
@@ -172,7 +172,7 @@ class CriterionMetadata {
      * Work out the value of the last descriptor that has a value. Used to calculate direction
      * @return float|null
      */
-    private function calculateEndValue() : ?float
+    private function calculateEndValue(): ?float
     {
         // By default, assume the last level has a value
         $this->lastValuedLevelIndex = $this->numLevels - 1;
@@ -194,9 +194,8 @@ class CriterionMetadata {
     /**
      * @return array
      */
-    public function getMetadata() : array
+    public function getMetadata(): array
     {
         return $this->metadata;
     }
-
 }

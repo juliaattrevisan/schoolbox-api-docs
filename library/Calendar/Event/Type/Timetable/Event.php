@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implementation of our standard day event in Schoolbox.
  * Note this events can be campus, group or personal events.

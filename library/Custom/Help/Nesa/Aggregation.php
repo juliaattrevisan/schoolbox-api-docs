@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NESA Report Data Aggregation
  *
@@ -25,7 +26,8 @@ class Aggregation
      *
      * @param array $dataSet an array of investigation results from Acquisition
      */
-    public function __construct(array $dataSet) {
+    public function __construct(array $dataSet)
+    {
         $this->dataSet = $dataSet;
     }
 
@@ -34,7 +36,7 @@ class Aggregation
      *
      * @return array
      */
-    public function generate() :array
+    public function generate(): array
     {
 
         /* A condensed version of the output stack that discards the capability/indicator hierarchy
@@ -48,7 +50,6 @@ class Aggregation
         $pdRoster = $this->dataSet['roster'];
 
         foreach ((array)$this->dataSet['stack'] as $current) {
-
             /* Store condensed descriptor data for this user into a hashtable for quick lookups when rendering
              * Otherwise merge into existing hashtable index
              */

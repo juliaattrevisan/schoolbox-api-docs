@@ -1,4 +1,5 @@
 <?php
+
 /**
  * help.schoolbox.com.au
  *
@@ -18,6 +19,7 @@ use Schoolbox\Learning\Course\DataModel\Specification;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+
 use function ini_set;
 
 class Controller extends Base
@@ -83,8 +85,7 @@ class Controller extends Base
          */
         try {
             $courseSpecification = $this->courseSpecificationMapper->findById(Acquisition::HERO_COURSE_SPEC_ID);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->errorMapper->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 

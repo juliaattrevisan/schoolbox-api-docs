@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -81,7 +82,6 @@ class SectionForm
     {
         $sectionId = $this->tester->grabValueFrom(self::SELECTOR_SECTION_ID);
         return $sectionId;
-
     }
 
     /**
@@ -95,5 +95,4 @@ class SectionForm
         $i->waitForText('Finish Modifying');
         $i->click('Finish Modifying');
     }
-
 }

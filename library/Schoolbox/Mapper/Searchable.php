@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,14 +9,14 @@
 
 namespace Schoolbox\Mapper;
 
-
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\User;
 
-interface Searchable {
+interface Searchable
+{
 
-	const DEFAULT_LIMIT = 20;
+    const DEFAULT_LIMIT = 20;
 
 
     /**
@@ -30,6 +31,5 @@ interface Searchable {
      * @param string          $sortDirection
      * @return Collection
      */
-	public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC');
-
-} 
+    public function search(ArticleResolver $articleResolver, $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC');
+}

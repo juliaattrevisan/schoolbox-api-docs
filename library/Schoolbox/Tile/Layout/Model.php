@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for tile layouts in Schoolbox.
  *

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Realtime\Pipe;
 
 use Psr\Http\Message\RequestInterface;
@@ -45,7 +47,8 @@ class Pipe implements PipeInterface
     /**
      * @param ConnectionInterface $conn
      */
-    public function __construct(ConnectionInterface $conn) {
+    public function __construct(ConnectionInterface $conn)
+    {
         $this->socketConnection = $conn;
     }
 
@@ -106,7 +109,8 @@ class Pipe implements PipeInterface
      *
      * @return string
      */
-    public function getRemoteAddress() {
+    public function getRemoteAddress()
+    {
         // kosher according to http://socketo.me/docs/migration-3
         return $this->socketConnection->remoteAddress ?: '0.0.0.0';
     }
@@ -133,7 +137,8 @@ class Pipe implements PipeInterface
      * @param string $data
      * @return $this
      */
-    public function send($data) {
+    public function send($data)
+    {
         $this->socketConnection->send($data);
         return $this;
     }
@@ -142,7 +147,8 @@ class Pipe implements PipeInterface
     /**
      * @return int
      */
-    public function getUserId() {
+    public function getUserId()
+    {
         return $this->userId;
     }
 
@@ -150,7 +156,8 @@ class Pipe implements PipeInterface
     /**
      * @param int $id
      */
-    public function setUserId($id) {
+    public function setUserId($id)
+    {
         $this->userId = $id;
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface for authorization rules (for plugging into Alaress\Authorizer\Authorizer)
  *
@@ -8,9 +9,11 @@
  */
 
 namespace Alaress\Authorizer\Rule;
+
 use Schoolbox\User;
 
-interface IAuthorizationRule {
+interface IAuthorizationRule
+{
     /**
      * Performs an authorization check.
      *

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream;
 
 use Component_Instance;
@@ -348,7 +350,7 @@ class Threads
             ]);
 
             // Owner name and optional link
-            if ($currentPost->getOwner()->isDeleted()){
+            if ($currentPost->getOwner()->isDeleted()) {
                 $page->setVar('owner_exists_block', '');
                 $page->parse('owner_deleted_block', 'owner_deleted');
             } else {
@@ -416,7 +418,7 @@ class Threads
                 ]);
 
                 // Commenter name and optional link
-                if ($currentComment->getOwner()->isDeleted()){
+                if ($currentComment->getOwner()->isDeleted()) {
                     $page->setVar('commenter_exists_block', '');
                     $page->parse('commenter_deleted_block', 'commenter_deleted');
                 } else {
@@ -509,7 +511,7 @@ class Threads
                     ]);
 
                     // Replier name and optional link
-                    if($currentReply->getOwner()->isDeleted()){
+                    if ($currentReply->getOwner()->isDeleted()) {
                         $page->setVar('replier_exists_block', '');
                         $page->parse('replier_deleted_block', 'replier_deleted');
                     } else {
@@ -544,7 +546,7 @@ class Threads
                         'socialstream_reply_has_delete_block'        => '',
                     ]);
                 }
-                
+
                 if (count($currentComment->getChildren())) {
                     $page->parse('socialstream_reply_list_block', 'socialstream_reply_list');
                 } else {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -9,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Comment;
 
 use function count;
+
 use PDO;
 use PDOStatement;
 use Schoolbox\Discussion\Thread;
@@ -158,8 +160,8 @@ class Mapper extends BaseMapper
         $selectColumns = implode(',', $columns);
 
         $pb = $this->getPredicateBuilder()
-            ->in($this->table.'.discussion_thread_id', $threadIds)
-            ->isNull($this->table.'.deleted_at');
+            ->in($this->table . '.discussion_thread_id', $threadIds)
+            ->isNull($this->table . '.deleted_at');
 
         $where = implode("\nAND ", $pb->getWhere());
 

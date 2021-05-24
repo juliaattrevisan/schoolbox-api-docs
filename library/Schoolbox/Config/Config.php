@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -11,7 +12,6 @@ use Schoolbox\Mapper\Traits\Model\Id;
 
 class Config
 {
-
     use Id;
 
     /** @var string */

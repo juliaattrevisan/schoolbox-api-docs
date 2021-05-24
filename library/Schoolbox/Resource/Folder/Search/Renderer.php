@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Folder\Search;
 
 use Schoolbox\Permission\Access\Access;
@@ -11,7 +13,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\MapperResult\Base as MapperResult;
 use Schoolbox\Resource\Search\Renderer\Base;
 use Scrub;
-
 /* Folder specific
  */
 use Schoolbox\Resource\Folder;

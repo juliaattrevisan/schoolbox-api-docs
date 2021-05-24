@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Custom implementation of sync connector for CAS
  *

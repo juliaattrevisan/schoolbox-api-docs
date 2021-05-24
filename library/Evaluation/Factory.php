@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Factory
  *
@@ -47,7 +48,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
     public function createQuestionModel($type_id)
     {
         $fullClassName = $this->getFullClassName($type_id, $this->questionPrefix);
-        if(!$fullClassName){
+        if (!$fullClassName) {
             error(133);
         }
         return new $fullClassName($this->getSectionHandler());
@@ -63,7 +64,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
     public function createAnswerModel($type_id)
     {
         $fullClassName = $this->getFullClassName($type_id, $this->answerPrefix);
-        if(!$fullClassName){
+        if (!$fullClassName) {
             error(133);
         }
         return new $fullClassName($this->getResponseHandler(), $this->getQuestionHandler());
@@ -79,7 +80,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      */
     protected function getFullClassName($type_id, $prefix)
     {
-        if(!is_numeric($type_id)){
+        if (!is_numeric($type_id)) {
             return false;
         }
 
@@ -100,7 +101,8 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * @param int $type_id
      * @return bool
      */
-    public function isQuestionTypeAvailable($type_id) {
+    public function isQuestionTypeAvailable($type_id)
+    {
         return $this->getFullClassName($type_id, $this->answerPrefix)
             && $this->getFullClassName($type_id, $this->questionPrefix);
     }
@@ -153,5 +155,5 @@ abstract class Evaluation_Factory extends DeprecatedModel
     /**
      * @return string
      */
-    protected abstract function getFactoryName();
+    abstract protected function getFactoryName();
 }

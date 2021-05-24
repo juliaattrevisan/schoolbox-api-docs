@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -52,7 +53,6 @@ class Middleware
         }
 
         if (isset($serverVars['REQUEST_METHOD']) && !\in_array($serverVars['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
-
             // Check against whitelist first
             foreach ($uriWhitelist as $path) {
                 if (fnmatch($path, $serverVars['REQUEST_URI'])) {

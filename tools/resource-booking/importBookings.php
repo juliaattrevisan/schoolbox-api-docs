@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Script for importing resource bookings from CSV into ours.
  */
@@ -132,7 +133,7 @@ HELP
                         $log->notice("Booking saved [id={$booking->getId()}]");
                     }
                 } catch (Exception $e) {
-                    $log->error("Exception while importing: ".$e->getMessage());
+                    $log->error("Exception while importing: " . $e->getMessage());
                 }
             }
         }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Saves a Response to a Question.
  *
@@ -115,8 +116,7 @@ $data = $_POST;
 $data['section_id'] = $question['section_id'];
 $data['question_id'] = $this->arg[0];
 
-if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']->getId(), $data['attempt_id'])) {
-
+if ($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']->getId(), $data['attempt_id'])) {
     $result = $answerHandler->saveResponse($data);
 
     /* Find out how many questions were completed in this section already
@@ -124,12 +124,10 @@ if($attemptHandler->checkAttemptIsValid($section['assess_id'], $_SESSION['user']
     $result['percentageComplete'] = $sectionHandler->sectionPercentageComplete($question['section_id'], $data['attempt_id']);
 
     echo json_encode($result);
-}
-else {
+} else {
     http_response_code(403);
 }
 
 /* Prevent rendering of template
  */
 exit();
-

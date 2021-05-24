@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy;
@@ -39,7 +41,7 @@ class Squares
 
             foreach ($groupData as $category => $vals) {
                 for ($i = 0; $i < $numSeries; $i++) {
-                    $grey[$index+$i] = $vals[$areaSeqMapping[$i]];
+                    $grey[$index + $i] = $vals[$areaSeqMapping[$i]];
                 }
 
                 /* Move to the next group of data points

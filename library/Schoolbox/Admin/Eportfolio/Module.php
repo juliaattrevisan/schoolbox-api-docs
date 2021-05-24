@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -40,11 +41,13 @@ class Module extends BaseModule
             ]
         ];
 
-        foreach ($routes['GET'] as $path => $alias)
+        foreach ($routes['GET'] as $path => $alias) {
             $this->addGetRoute($router, $alias, $basePath, $path);
+        }
 
-        foreach ($routes['POST'] as $path => $alias)
+        foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
+        }
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -14,7 +15,9 @@ use Alaress\Module\Module as BaseModule;
 use InvalidArgumentException;
 use Twig\Error\LoaderError;
 use UnexpectedValueException;
+
 use function array_key_exists;
+
 use Aura\Di\Container;
 use Aura\Di\Exception\ServiceNotFound;
 use Schoolbox\Application\Exception as ApplicationException;
@@ -29,7 +32,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use \Timetable_ColourMapper;
+use Timetable_ColourMapper;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Resource\Folder;
 
@@ -104,7 +107,8 @@ class Module extends BaseModule
     {
         $this->addRoutePermission($authorizer, '(?:getPendingAssessments|getClasses)', new Rule\IsLoggedIn());
 
-        $this->addRoutePermission($authorizer,
+        $this->addRoutePermission(
+            $authorizer,
             '(?:getStudentListByClassId|getClassListPage)',
             new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -165,7 +169,6 @@ class Module extends BaseModule
                     } else {
                         $args['term'] = $this->getTermMapper()->findForToday();
                     }
-
                 } catch (MapperException $e) {
                     /* If nonexistent term is specified, 404
                      */
@@ -176,7 +179,6 @@ class Module extends BaseModule
                     try {
                         $args['subject'] = $this->getFolderMapper()->findById($params['subjectId']);
                     } catch (MapperException $e) {
-
                         /* If nonexistent subject is specified, 404
                          */
                         throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);

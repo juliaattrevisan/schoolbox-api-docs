@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -108,5 +109,4 @@ class TravelLog
 
         return $this->cache->cacheFunctionCall('verso_api', $callback, $externalId, $timeout);
     }
-
 }

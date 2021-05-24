@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\LiteracyNumeracy;
@@ -44,7 +46,6 @@ class Stars
 
         foreach ($groupData as $category => $vals) {
             for ($i = 0; $i < $numSeries; $i++) {
-
                 /* Initialise with string 'null' for each x category
                  */
                 if (!isset($payload[$i])) {
@@ -53,7 +54,7 @@ class Stars
 
                 /* Insert values algorithmically
                  */
-                $payload[$i][$index+$i] = $vals[$areaSeqMapping[$i]];
+                $payload[$i][$index + $i] = $vals[$areaSeqMapping[$i]];
 
                 /* Might as well do data detection here
                  * If the student has a row with maskseq != 0, they have data

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Config;
@@ -20,6 +22,7 @@ use Schoolbox\Notif\MQ;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_merge;
 use function defined;
 use function exec;
@@ -31,6 +34,7 @@ use function preg_replace;
 use function realpath;
 use function rename;
 use function sprintf;
+
 use const INSTANCE_ID;
 
 /**
@@ -172,7 +176,6 @@ class InstanceIdManager extends CliTool\App
         $this->getLogger()->info("Fetching redis keys containing ':$oldInstanceId:' ...");
         $oldKeys = new Keyspace($this->redis, "*");
         foreach ($oldKeys as $oldKey) {
-
             // I don't know how to modify payloads in rabbitmq. Seems like we don't need to, so long as it
             // can find the payload in redis, all is well.
             if (preg_match("/^msg:$oldInstanceId:s:.+$/", $oldKey)) {
@@ -234,10 +237,10 @@ class InstanceIdManager extends CliTool\App
         $streamDir = rtrim($this->getConfig()->get('stream_dir'), '/') . '/';
         $handle = opendir($streamDir);
         while (false !== ($file = readdir($handle))) {
-            if ('.' === $file || '..' === $file){
+            if ('.' === $file || '..' === $file) {
                 continue;
             }
-            if(!preg_match("/$oldInstanceId\.lock/", $file)){
+            if (!preg_match("/$oldInstanceId\.lock/", $file)) {
                 continue;
             }
             $newFile = preg_replace("/$oldInstanceId\.lock/", "$newInstanceId.lock", $file);
@@ -263,7 +266,7 @@ class InstanceIdManager extends CliTool\App
             "%s.sb.reviewsched",
             "%s.sb.sched",
         ];
-        foreach($queues as $queue){
+        foreach ($queues as $queue) {
             $oldQueue = sprintf($queue, $oldInstanceId);
             $newQueue = sprintf($queue, $newInstanceId);
             $this->getLogger()->debug("TODO - rename MQ '$oldQueue' to '$newQueue'");

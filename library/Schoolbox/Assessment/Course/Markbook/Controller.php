@@ -1,17 +1,21 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
 
 use Schoolbox\Assessment\Course\Markbook\Export\CSV;
 use Schoolbox\Filter\Codec;
+
 use function array_combine;
 use function func_get_args;
+
 use Schoolbox\Assessment\Course\Task\Completion;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -181,7 +185,7 @@ class Controller extends WebController\Base
         $courseMarkbook = $this->buildCourseMarkbook($courseSpec, $assessmentIds);
 
         $csvExporter = new CSV();
-        $csvExporter->export($courseMarkbook, $courseSpec->getTitle() .' - Markbook.csv');
+        $csvExporter->export($courseMarkbook, $courseSpec->getTitle() . ' - Markbook.csv');
         exit;
     }
 
@@ -228,7 +232,6 @@ class Controller extends WebController\Base
                     'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
                 ])->getAsString(),
             ]));
-
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);
             $data = [

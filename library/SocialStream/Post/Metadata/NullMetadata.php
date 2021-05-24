@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Null
  *
@@ -12,15 +13,16 @@
 
 namespace SocialStream\Post\Metadata;
 
+class NullMetadata extends Metadata
+{
 
-class NullMetadata extends Metadata {
-
-	/**
-	 * Fetch information out of the meta tags
-	 *
-	 * @return mixed
-	 */
-	public function fetchMetadata() {
-		return $this;
-	}
+    /**
+     * Fetch information out of the meta tags
+     *
+     * @return mixed
+     */
+    public function fetchMetadata()
+    {
+        return $this;
+    }
 }

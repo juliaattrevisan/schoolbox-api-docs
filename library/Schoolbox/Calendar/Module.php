@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Calendar;
@@ -68,8 +70,10 @@ class Module extends BaseModule
                 if (array_key_exists('userId', $params)) {
                     $params['user'] = $this->getUserMapper()->findById($params['userId']);
                 }
-                if (array_key_exists('selectedDate', $params) && $params['selectedDate'] !== ''
-                    && !in_array($params['selectedDate'], ['week', 'month', 'full', 'week-list', 'month-list'])) {
+                if (
+                    array_key_exists('selectedDate', $params) && $params['selectedDate'] !== ''
+                    && !in_array($params['selectedDate'], ['week', 'month', 'full', 'week-list', 'month-list'])
+                ) {
                     try {
                         $selectedDate = new \Alaress_Date_Format($params['selectedDate'], \Alaress_Date_Format::URL_FORMAT);
                         $params['selectedDate'] = $selectedDate->getDatabaseDate();

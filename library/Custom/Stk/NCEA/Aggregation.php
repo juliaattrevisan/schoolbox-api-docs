@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aggregation
  *
@@ -84,7 +85,7 @@ class Aggregation
         foreach ($allRecords as $current) {
             $subjectKey = $current['subjectSort'];
             $levelKey = "L{$current['nceaLevel']}";
-            $gradeKey = str_replace('+','', $current['grade']);
+            $gradeKey = str_replace('+', '', $current['grade']);
 
             /* Data for Graph: only care about the achievements listed in $this->achievements
              * All others are ignored
@@ -98,7 +99,6 @@ class Aggregation
             /* Data for Tables
              */
             if ($current['year'] === $year) {
-
                 /* Set up a new subject's information if it hasn't been encountered before
                  */
                 if (!isset($aggregatedData[$subjectKey])) {
@@ -125,9 +125,7 @@ class Aggregation
                 /* Also aggregate this summary total for the current year
                  */
                 $credits['gainedThisYear'][$levelKey] += $current['creditsGained'];
-            }
-            elseif ($current['year'] < $year) {
-
+            } elseif ($current['year'] < $year) {
                 /* Accumulate a total of credits that were obtained in a previous year
                  */
                 $credits['broughtForward'][$levelKey] += $current['creditsGained'];

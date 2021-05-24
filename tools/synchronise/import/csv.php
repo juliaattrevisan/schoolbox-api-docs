@@ -56,7 +56,7 @@ $getReader = function ($file, Logger $logger) {
 };
 
 // Output help
-if (!isset($options['user']) &&!isset($options['structure']) && !isset($options['timetable']) && !isset($options['enrolment'])) {
+if (!isset($options['user']) && !isset($options['structure']) && !isset($options['timetable']) && !isset($options['enrolment'])) {
     $basename = basename(__FILE__);
     echo <<<HELP
 Imports timetable from CSV into the Schoolbox user connector.
@@ -148,7 +148,7 @@ if (isset($options['user']) || isset($options['enrolment'])) {
         /** @var WritableCache $cache */
         $cache = $kernel->get('subscriptionCache');
         $cache->cacheAllUsers(INSTANCE_ID);
-    } catch (\RuntimeException|\Aura\Di\Exception $e) {
-        $logger->error($e->getMessage(), [ 'exception'=>$e ]);
+    } catch (\RuntimeException | \Aura\Di\Exception $e) {
+        $logger->error($e->getMessage(), [ 'exception' => $e ]);
     }
 }

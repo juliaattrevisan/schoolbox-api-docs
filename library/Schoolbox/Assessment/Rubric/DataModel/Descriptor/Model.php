@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for rubric descriptors
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A factory method which builds the session handler.
  *
@@ -11,10 +12,12 @@
  */
 
 namespace Alaress\Session;
+
 use Aura\Session as SessionLibrary;
 use Predis;
 
-class Factory {
+class Factory
+{
 
     /**
      * @var array
@@ -44,7 +47,8 @@ class Factory {
      * @param Predis\ClientInterface $redis
      * @param int $requestTime Unix timestamp, usually from $_SERVER['REQUEST_TIME'].
      */
-    public function __construct($cookies, \Schoolbox\IConfigLoader $config, $redis, $requestTime) {
+    public function __construct($cookies, \Schoolbox\IConfigLoader $config, $redis, $requestTime)
+    {
         $this->cookies = $cookies;
         $this->redis = $redis;
         $this->config = $config;
@@ -56,7 +60,8 @@ class Factory {
      *
      * @return Session
      */
-    public function build() {
+    public function build()
+    {
         $func             = new Phpfunc($this->config, $this->redis, $this->cookies);
         $segmentFactory   = new SegmentFactory();
         $csrfTokenFactory = new SessionLibrary\CsrfTokenFactory(

@@ -26,7 +26,8 @@ class Wiki
         $this->database = Database::getInstance();
     }
 
-    public function revision(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function revision(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM wikiRevision
                   WHERE created >= :start AND created <= :end";
 
@@ -37,5 +38,4 @@ class Wiki
         $statement->execute();
         return $statement->fetchColumn(0);
     }
-
 }

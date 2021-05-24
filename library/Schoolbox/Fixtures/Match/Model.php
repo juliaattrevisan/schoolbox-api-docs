@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model
  *
@@ -9,7 +10,7 @@
 
 namespace Schoolbox\Fixtures\Match;
 
-use \Alaress_Date_Format;
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -90,22 +91,19 @@ class Model implements ISoftDeletable
 
         if (($this->getHomeTeam() instanceof Team) && ($this->getHomeTeam()->getId())) {
             $homeName = $this->getHomeTeam()->getName();
-        }
-        elseif (($this->getHomeSchool() instanceof School) && ($this->getHomeSchool()->getId())) {
+        } elseif (($this->getHomeSchool() instanceof School) && ($this->getHomeSchool()->getId())) {
             $homeName = $this->getHomeSchool()->getName();
         }
 
         if (($this->getAwayTeam() instanceof Team) && ($this->getAwayTeam()->getId())) {
             $awayName = $this->getAwayTeam()->getName();
-        }
-        elseif (($this->getAwaySchool() instanceof School) && ($this->getAwaySchool()->getId())) {
+        } elseif (($this->getAwaySchool() instanceof School) && ($this->getAwaySchool()->getId())) {
             $awayName = $this->getAwaySchool()->getName();
         }
 
         if (strlen($this->getName())) {
             $matchName = "{$this->getName()}; ";
-        }
-        else {
+        } else {
             $matchName = '';
         }
 
@@ -134,7 +132,8 @@ class Model implements ISoftDeletable
      * Returns a collection of all teams involved in match
      * @return Collection
      */
-    public function getAllTeams() {
+    public function getAllTeams()
+    {
         $allTeams = new Collection();
 
         if ($this->getHomeTeam() instanceof Team) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -6,9 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Realtime\Notification\Parameter;
-
 
 use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -26,5 +25,4 @@ class CategoryParam extends Param
     {
         parent::__construct($category->getName(), "/homepage/{$category->getId()}", $stacking);
     }
-
 }

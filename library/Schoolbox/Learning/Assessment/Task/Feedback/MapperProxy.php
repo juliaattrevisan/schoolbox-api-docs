@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -17,7 +18,6 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Task\Response\Model as TaskResponseDomainObject;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as DomainObject;
 use Schoolbox\Mapper;
-
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback
@@ -111,8 +111,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     {
         $taskFeedbacks = new GenericCollection(DomainObject::class);
 
-        foreach($mapperModels as $completion){
-
+        foreach ($mapperModels as $completion) {
             // Exclude completions that are self-assessed, these are not considered IFeedbacks
             if (Completion::STATUS_TEACHER_ASSESSED_COMPLETE !== $completion->getCompletionStatus()) {
                 continue;

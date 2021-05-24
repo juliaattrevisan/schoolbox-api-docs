@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Pooling;
-
 
 use Alaress\WorkerCrew\IPC\AlaressIPCProtocol;
 use Alaress\WorkerCrew\IPC\ProtocolInterface;
@@ -130,7 +130,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
         try {
             $free = $workers->getPidWhere(Worker::READY);
             return $free;
-        } catch(OutOfBoundsException $e) {
+        } catch (OutOfBoundsException $e) {
             // ok, so there's none of those
         }
 
@@ -365,7 +365,7 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
      */
     public function handleException($exception, $log)
     {
-        $log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), ['exception'=>$exception]);
+        $log->critical(sprintf("Exception during dispatch - %s: %s", get_class($exception), $exception->getMessage()), ['exception' => $exception]);
 
         // allow PDO exceptions to get out
         if ($exception instanceof PDOException) {
@@ -421,5 +421,4 @@ class DefaultDispatchStrategy implements DispatchStrategyInterface
     {
         return $hard ? self::WORKER_HARD_TIMEOUT : self::WORKER_SOFT_TIMEOUT;
     }
-
 }

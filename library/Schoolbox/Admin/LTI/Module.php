@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Course builder admin page
  *
@@ -18,7 +19,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Schoolbox\LTI\Provider\Mapper as ProviderMapper;
 use Alaress\Web\Router\PathMatcher;
 
-
 class Module extends BaseModule
 {
     protected $basename = 'adminLti';
@@ -37,7 +37,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
 
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
              ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
@@ -46,14 +47,16 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+    public function initControllers(ContainerInterface $injector)
+    {
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) {
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 
@@ -91,5 +94,4 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(ProviderMapper::class);
     }
-
 }

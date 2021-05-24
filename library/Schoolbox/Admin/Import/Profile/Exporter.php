@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
@@ -220,17 +222,14 @@ class Exporter
                 /* Assign data to $row template
                  */
                 if ($value instanceof \Alaress_Date_Format) {
-
                     /* If it's an ADF, use a db date
                      */
                     $row[$heading] = $value->getDatabaseDate();
                 } elseif ($value instanceof Model) {
-
                     /* If it's a BaseProfile instance, use the external id
                      */
                     $row[$heading] = $value->getExternalId();
                 } else {
-
                     /* Otherwise just use whatever's there
                      */
                     $row[$heading] = $value;

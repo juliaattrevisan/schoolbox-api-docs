@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * For each due work participant, if they have multiple draft feedbacks, soft-delete
  * all but the most recent draft feedback.

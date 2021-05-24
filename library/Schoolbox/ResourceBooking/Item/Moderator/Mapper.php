@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A mapping for the join between resources and their moderators.
  *
@@ -6,14 +7,16 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
 
 namespace Schoolbox\ResourceBooking\Item\Moderator;
+
 use Schoolbox\Mapper as BaseMapper;
 
-class Mapper extends BaseMapper {
+class Mapper extends BaseMapper
+{
 
-    public function mapping() {
+    public function mapping()
+    {
         $this->hasTable('resource_moderator');
         $this->hasModel('Schoolbox\\ResourceBooking\\Item\\Moderator\\Model');
         $this->hasMap(
@@ -57,5 +60,4 @@ class Mapper extends BaseMapper {
             )
         );
     }
-
 }

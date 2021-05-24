@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
 /**
@@ -132,7 +134,6 @@ class CreditSummary extends Base
              */
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
-
                     /* Special case for N
                      *
                      * According to Sheeba,
@@ -200,7 +201,6 @@ class CreditSummary extends Base
              */
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
-
                     /* Sum of A, M, E values from both Internally Assessed
                      * and Externally Assessed types
                      */
@@ -262,14 +262,12 @@ class CreditSummary extends Base
              */
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
-
                     /* Only accumulate some values
                      */
                     if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
                         if (in_array($current['StandardType'], $unitTypeList, false)) {
                             $finalStack[$level]['unit'] += $current['ResultCredits'];
-                        }
-                        elseif (in_array($current['StandardType'], $achievementTypeList, false)) {
+                        } elseif (in_array($current['StandardType'], $achievementTypeList, false)) {
                             $finalStack[$level]['achievement'] += $current['ResultCredits'];
                         }
                     }
@@ -326,7 +324,6 @@ class CreditSummary extends Base
              */
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
-
                     /* Only accumulate some values
                      */
                     if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
@@ -385,14 +382,11 @@ class CreditSummary extends Base
              */
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
-
                     if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
-
                         /* Only accumulate some values
                          */
                         $finalStack[$level][$current['StrippedResult']] += $current['ResultCredits'];
                     } elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
-
                         /* Special treatment
                          */
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];

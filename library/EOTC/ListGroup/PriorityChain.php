@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PriorityChain
  *
@@ -15,47 +16,51 @@
 
 namespace EOTC\ListGroup;
 
-use \EOTC\Event;
+use EOTC\Event;
 
-class PriorityChain {
+class PriorityChain
+{
 
-	/**
-	 * @var Response
-	 */
-	private $result;
+    /**
+     * @var Response
+     */
+    private $result;
 
-	/**
-	 * Constructor
-	 *
-	 * @param \EOTC\Event $event
-	 */
-	public function __construct(Event $event) {
+    /**
+     * Constructor
+     *
+     * @param \EOTC\Event $event
+     */
+    public function __construct(Event $event)
+    {
 
-		/* Set up chain of responsibility
- 		 */
-		$urgent = new Type\Urgent($event);
+        /* Set up chain of responsibility
+         */
+        $urgent = new Type\Urgent($event);
 
-		/* Start motor
-		 */
-		$this->setResult($urgent->determine());
-	}
+        /* Start motor
+         */
+        $this->setResult($urgent->determine());
+    }
 
-	/* Getters/Setters
- 	 */
+    /* Getters/Setters
+     */
 
-	/**
-	 * Set result
-	 *
-	 * @param string $result
-	 */
-	private function setResult($result) {
-		$this->result = $result;
-	}
+    /**
+     * Set result
+     *
+     * @param string $result
+     */
+    private function setResult($result)
+    {
+        $this->result = $result;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getResult() {
-		return $this->result;
-	}
-} 
+    /**
+     * @return string
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+}

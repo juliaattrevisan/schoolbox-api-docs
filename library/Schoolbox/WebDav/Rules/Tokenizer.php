@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,8 @@ use Alaress\Rules\Token\Token;
 use Alaress\Rules\Token\Tokenizer as Super;
 use Schoolbox\User;
 
-class Tokenizer extends Super {
+class Tokenizer extends Super
+{
 
     /**
      * TODO this could probably be better...
@@ -87,7 +89,6 @@ class Tokenizer extends Super {
             /** @var User $user */
             return $settings['baseUri'];
         }));
-
     }
 
 
@@ -105,5 +106,4 @@ class Tokenizer extends Super {
 
         return $settings;
     }
-
 }

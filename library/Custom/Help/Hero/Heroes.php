@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Heroes
  *
@@ -60,8 +61,7 @@ class Heroes
         try {
             $folder = $this->folderMapper->findById(self::HERO_FOLDER_ID);
             $users = $this->userAccessMapper->findUsersInCategory($folder);
-        }
-        catch (Mapper\Exception $e) {
+        } catch (Mapper\Exception $e) {
             throw new \DomainException('Could not obtain Hero Wall folder id');
         }
 

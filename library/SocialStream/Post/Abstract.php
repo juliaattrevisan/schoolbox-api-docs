@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -139,7 +141,7 @@ abstract class SocialStream_Post_Abstract implements ISoftDeletable
     abstract public function renderThumbnail(string $context, SitePage $page);
 
     /* Getters/Setters
-	 */
+     */
 
     /**
      * Set body

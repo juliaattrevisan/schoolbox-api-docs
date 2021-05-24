@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Course builder homepage component controller
  *
@@ -59,7 +60,7 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute()
     {
-        if(!parent::execute()){
+        if (!parent::execute()) {
             return false;
         }
         return $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
@@ -104,7 +105,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         $data = [
             'unitSpec'         => $unitSpec,
             'returnUrlName'    => Assessment\Redirect::RETURN_URL,
-            'encodedReturnUrl' => Assessment\Redirect::encode('/homepage/'.$folder->getId()),
+            'encodedReturnUrl' => Assessment\Redirect::encode('/homepage/' . $folder->getId()),
         ];
 
         $data['componentInstance'] = $this->getInstance();

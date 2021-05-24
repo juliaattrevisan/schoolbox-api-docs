@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,11 +9,11 @@
 
 namespace Schoolbox\Resource\Attachment\Collector;
 
-
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\File;
 
-class StorageHandler implements TypeHandlerInterface {
+class StorageHandler implements TypeHandlerInterface
+{
 
     /** @var Storage\Mapper */
     protected $mapper;
@@ -48,5 +49,4 @@ class StorageHandler implements TypeHandlerInterface {
 
         return $storage;
     }
-
 }

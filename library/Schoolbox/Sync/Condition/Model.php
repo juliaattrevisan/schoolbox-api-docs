@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -36,5 +37,4 @@ class Model
         $this->conditionType = $conditionType;
         return $this;
     }
-
 }

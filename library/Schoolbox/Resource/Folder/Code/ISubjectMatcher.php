@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder\Code;
@@ -27,5 +29,4 @@ interface ISubjectMatcher
      * @see  \External\Synergetic\SubjectMatcher for details
      */
     public function isMatch(string $sbFolderCode, ?string $sisCampus, string $sisClass): bool;
-
 }

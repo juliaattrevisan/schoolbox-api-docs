@@ -38,7 +38,7 @@ $this->setBlock(TEMPLATE_content, 'component', 'component_block');
     ->generateBreadcrumbsHtml($this, '/adminv2/dashboard');
 
 // Get list of roles
-$userHandle = new User;
+$userHandle = new User();
 $groupList = $userHandle->getGroupList();
 
 if (is_array($groupList)) {

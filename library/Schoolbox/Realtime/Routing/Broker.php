@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Alaress\Async\AMQP\AMQPInterface;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Stomp\IClient;
 use Predis\ClientInterface;
-
 
 class Broker extends \Alaress\Async\Broker\StompRedis\Broker
 {
@@ -60,6 +60,4 @@ class Broker extends \Alaress\Async\Broker\StompRedis\Broker
     {
         return '';
     }
-
-
 }

@@ -134,5 +134,4 @@ abstract class Alaress_Date_Locale_Abstract implements Alaress_Date_Locale_Inter
     {
         return $this->weekendDays;
     }
-
 }

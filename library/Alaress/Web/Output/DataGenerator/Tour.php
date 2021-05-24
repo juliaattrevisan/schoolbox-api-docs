@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -11,6 +12,7 @@ namespace Alaress\Web\Output\DataGenerator;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Tour\Lists as TourLists;
 use Schoolbox\User;
+
 use function array_key_exists;
 
 /**

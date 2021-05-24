@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Section modification.
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -20,7 +22,7 @@ if (!empty($_POST)) {
     }
 
 
-    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
     $assess = $assessHandler->getByID($_POST['assess_id']);
 
@@ -48,8 +50,7 @@ if (!empty($_POST)) {
      */
     SitePage::localRedir('/assess/summary/' . $_POST['assess_id'] . $returnUrl);
 } else {
-
-    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_GET[Redirect::RETURN_URL]}" : "";
+    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
 
     if (!is_numeric($this->arg[0])) {
         error(112);
@@ -64,8 +65,7 @@ if (!empty($_POST)) {
 
     if ($section) {
         $assess = $assessHandler->getByID($section['assess_id']);
-    }
-    else {
+    } else {
         error(115);
     }
 
@@ -80,8 +80,7 @@ if (!empty($_POST)) {
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($assess['category_id']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(117);
     }
 

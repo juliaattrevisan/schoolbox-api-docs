@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -91,12 +92,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
         foreach ($this->getUser()->getCampusCollection() as $campus) {
             if ($campus instanceof Campus) {
-
                 $campusId   = $campus->getId();
                 $campusCode = $campus->getExtTimetableCode();
 
                 if (!isset($checkedCampusList[$campusCode])) {
-
                     $checkedCampusList[$campusCode] = true;
                     $dayNumber                      = $timetableHandler->getDayNumber($campus);
 
@@ -105,7 +104,10 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->dayName[$campusId]       = $timetableHandler->getDayName($dayNumber);
                         $this->currentPeriod[$campusId] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser()) ?: null;
                         $this->timetable[$campusId]     = $timetableHandler->getTimetableForDate(
-                            $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
+                            $this->getUser()->getExternalId(),
+                            $this->getUser()->getId(),
+                            $campus,
+                            Alaress_Date_Format::now()
                         );
                     }
                 }
@@ -278,7 +280,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     $this->getUser()->getCampusCollection(),
                     $campusId,
                     $this->getUser()->getExternalId(),
-                    $this->dayNumber[$campusId]),
+                    $this->dayNumber[$campusId]
+                ),
                 'marked' => (bool)$class['AttendanceMarked'],
                 'target' => $this->externalAttendanceLink->getAttendanceLinkTarget(),
             ];
@@ -303,7 +306,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->colourIndex      = 0;
 
         foreach ($this->timetable as $campusId => $timetable) {
-
             // Don't render if external connector didn't return expected format, or if campus timetable lacks classes
             if (!\is_array($timetable) || !$this->getClassCountForTimetable($timetable)) {
                 continue;

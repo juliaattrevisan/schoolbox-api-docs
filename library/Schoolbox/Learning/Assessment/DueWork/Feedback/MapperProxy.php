@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -11,7 +12,6 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Mapper;
-
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkDataObject;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\Submission as Submission;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork as DataObject;
@@ -101,7 +101,7 @@ class MapperProxy extends Mapper\AbstractMapperProxy
     {
         $dueWorkFeedbacks = new GenericCollection(DomainObject::class);
 
-        foreach($mapperModels as $submissionReturn){
+        foreach ($mapperModels as $submissionReturn) {
             $feedback = (new DomainObject())
                 ->setId($submissionReturn->getId())
                 ->setAssessable((new DueWork())->setId($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId()))

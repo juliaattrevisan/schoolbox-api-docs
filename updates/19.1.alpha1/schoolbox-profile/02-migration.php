@@ -1,9 +1,11 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database;
@@ -46,7 +48,8 @@ $app = new class extends CliTool\App
             'ALTER TABLE `user`
                 MODIFY synergy_id VARCHAR(64)
                     CHARACTER SET utf8mb4
-                        COLLATE utf8mb4_unicode_ci');
+                        COLLATE utf8mb4_unicode_ci'
+        );
     }
 
     /*
@@ -163,8 +166,6 @@ JOIN user user2 ON user_relation.relation_id = user2.id
 JOIN sis_user_profile up2 ON user2.synergy_id = up2.external_id"
         );
     }
-
 };
 /** @noinspection PhpUnhandledExceptionInspection */
 (new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG]))->runApp();
-

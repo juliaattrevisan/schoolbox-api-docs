@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * This script takes a CSV file and uploads the contents into the pastoral system.  The CSV file must be in a specific
  * format and all records are created with standard visibility rules.
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -142,10 +144,10 @@ HELP;
             $this->getLogger()->info("{$count} feedback will be processed.");
             $this->userMapper->getDatabase()->rollback();
         }
-
     }
 
-    function process(array $row) {
+    function process(array $row)
+    {
 
         $pastoral = new Pastoral\Model();
         try {
@@ -163,14 +165,14 @@ HELP;
         $pastoral->setType((new Pastoral\Type\Model())->setId((int)$row['type_id']));
         $pastoral->setSubType((new Pastoral\SubType\Model())->setId((int)$row['subtype_id']));
         $pastoral->setHeading(trim($row['heading']));
-        $pastoral->setBodyPrivate('<p>'.trim($row['body_private']).'</p>');
-        $pastoral->setBodyPublic('<p>'.trim($row['body_public']).'</p>');
+        $pastoral->setBodyPrivate('<p>' . trim($row['body_private']) . '</p>');
+        $pastoral->setBodyPublic('<p>' . trim($row['body_public']) . '</p>');
         $pastoral->setPoints((float)$row['points']);
-        $pastoral->setModifiedBy((new User)->setId((int)$row['owner_id']));
+        $pastoral->setModifiedBy((new User())->setId((int)$row['owner_id']));
 
         $this->pastoralMapper->save($pastoral);
 
-        foreach($this->groupAccess as $group) {
+        foreach ($this->groupAccess as $group) {
             $pastoralAccess = new Pastoral\Access\Model();
             $pastoralAccess->setGroup((new Schoolbox\Pastoral\Group\Model())->setId($group));
             $pastoralAccess->setAccess(Pastoral\Access\Mapper::ACCESS_PRIVATE);
@@ -187,7 +189,6 @@ HELP;
     {
         return false;
     }
-
 };
 
 $options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO];

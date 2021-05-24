@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -276,7 +277,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $this->pastoralLogMapper->save($log);
 
         if ($importRecords) {
-
             // Only load a severity if it is enabled by policy
 
             $severity = $this->getPastoralSeverity();
@@ -362,14 +362,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
                         //Find existing records, if they exist you may either delete them or skip them depending on flag
                         $existingRecords = $this->pastoralMapper->findByColumn('external_id', $record["PastoralCareSeq"]);
-                        if(count($existingRecords)) {
-                            if($deleteRecords) {
+                        if (count($existingRecords)) {
+                            if ($deleteRecords) {
                                 // If this pastoral care record already exists in Schoolbox, delete it so we don't end up with duplicate
                                 // records. Could update the record, but its contents may have deviated it was originally imported, and
                                 // deleting will at least keep that history
                                 $this->pastoralMapper->deleteByColumn("external_id", $record["PastoralCareSeq"]);
-                            }
-                            else {
+                            } else {
                                 $logRecord->setResult("Skipped record already exists ({$record["PastoralCareSeq"]})");
                                 $this->pastoralLogMapper->save($logRecord);
                                 continue;
@@ -427,7 +426,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                              * and there's an externalId
                              */
                             if ($importAttachments && null !== $pastoralRecord->getExternalId() && \strlen($pastoralRecord->getExternalId())) {
-
                                 // Import attachments from Synergetic DocMan
 
                                 $queryDocuments = $this->connector->getQueryIterator("
@@ -494,7 +492,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // Import audience members for each record we created
 
             foreach ($pastoralRecordsCreated as $pastoralRecord) {
-                $queryAudience = $this->connector->executeQuery('
+                $queryAudience = $this->connector->executeQuery(
+                    '
                     SELECT  ID
                     FROM    PastoralCareContacts
                     WHERE   PastoralCareSeq = :pastoralCareSeq
@@ -520,7 +519,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     $audienceUser = $this->getSchoolboxUser($audience["ID"]);
 
                     if ($audienceUser instanceof User) {
-
                         // If the school does not want parents given access to pastoral records, then don't add them
 
                         if ($importParentAccess || $audienceUser->getRole()->isStaff()) {
@@ -535,7 +533,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         } else {
                             $logAccess->setResult("Skipped Audience: {$audienceUser->getFullName()}");
                         }
-
                     } else {
                         $logAccess->setResult("Error Audience: {$audience["ID"]}");
                     }
@@ -719,7 +716,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     {
         // Blow away any existing contacts in Synergetic
 
-        $this->connector->executeQuery("
+        $this->connector->executeQuery(
+            "
                 DELETE FROM     PastoralCareContacts
                 WHERE           PastoralCareSeq = :externalId
             ",
@@ -774,9 +772,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      * @param int|null $externalId
      * @return boolean
      */
-    private function checkPastoralRecordExists(?int $externalId) : bool
+    private function checkPastoralRecordExists(?int $externalId): bool
     {
-        if(is_null($externalId)) {
+        if (is_null($externalId)) {
             return false;
         }
 
@@ -796,15 +794,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             return false;
         }
 
-        if ($pastoral->getType()
+        if (
+            $pastoral->getType()
             && !empty($pastoral->getType()->getExternalCode())
-            && !array_key_exists($pastoral->getType()->getExternalCode(), $this->getTypeList())) {
+            && !array_key_exists($pastoral->getType()->getExternalCode(), $this->getTypeList())
+        ) {
             return false;
         }
 
-        if ($pastoral->getSubType()
+        if (
+            $pastoral->getSubType()
             && !empty($pastoral->getSubType()->getExternalCode())
-            && !array_key_exists($pastoral->getSubType()->getExternalCode(), $this->getSubTypeList())) {
+            && !array_key_exists($pastoral->getSubType()->getExternalCode(), $this->getSubTypeList())
+        ) {
             return false;
         }
 
@@ -835,9 +837,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         }
 
         // Can only do this if the pastoral record exists in synergetic, and has an external ID
-        if (!$this->checkPastoralRecordExists($pastoral->getExternalId())
+        if (
+            !$this->checkPastoralRecordExists($pastoral->getExternalId())
             || !$this->isExternalIdValid($pastoral->getExternalId())
-            || !$this->isExternalIdValid($owner->getExternalId())) {
+            || !$this->isExternalIdValid($owner->getExternalId())
+        ) {
             return false;
         }
 
@@ -1457,7 +1461,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ];
         }
         return $pastoralTypeLookup;
-
     }
 
     /**

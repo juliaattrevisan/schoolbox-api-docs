@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Map function - converts an XML node from ASC Timetables XML export to a more
  * understandable intermediary format.

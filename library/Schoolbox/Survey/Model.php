@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This is just enough of a mapper to get the survey component rendering. This is in no way complete, and is only being
  * used to read data out of the table. This should be blown to smithereeens(sp?) when Quiz/Surveys are sucked out of
@@ -140,7 +141,7 @@ class Model implements ISoftDeletable
     public function getAssessment()
     {
         return $this->assessment;
-    }    
+    }
 
     /**
      * @param Collection $sections

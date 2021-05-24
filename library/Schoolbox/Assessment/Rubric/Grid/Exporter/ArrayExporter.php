@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -82,7 +83,6 @@ class ArrayExporter
         foreach ($grid->getCapabilityUsages() as $capabilityUsage) {
             $groupRendered = false;
             foreach ($capabilityUsage->getIndicatorUsages() as $indicatorUsage) {
-
                 $square[$currentDRow][0] = $groupRendered ? '' : $capabilityUsage->getCapability()->getName();
                 $square[$currentDRow][1] = $indicatorUsage->getIndicator()->getName();
 

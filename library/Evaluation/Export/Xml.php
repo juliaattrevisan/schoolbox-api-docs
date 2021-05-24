@@ -1,64 +1,65 @@
 <?php
+
 /**
  * Evaluation_Export_Xml
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 abstract class Evaluation_Export_Xml
 {
     /**  @var array */
-	private $assess;
+    private $assess;
 
     /** @var Evaluation_Section */
     private $sectionHandler;
 
-	/**  @var Evaluation_Question */
+    /**  @var Evaluation_Question */
     private $questionHandler;
 
-	/** @var Evaluation_Factory */
+    /** @var Evaluation_Factory */
     private $factory;
 
-	/** @var SitePage */
+    /** @var SitePage */
     private $page;
 
-	/**
-	 * Constructor
-	 *
-	 * @param array $assess
-	 * @param Evaluation_Factory $factory
-	 * @param Evaluation_Section $sectionHandler
-	 * @param Evaluation_Question $questionHandler
-	 * @param SitePage $page
-	 */
-	public function __construct($assess, $factory, $sectionHandler, $questionHandler, $page)
+    /**
+     * Constructor
+     *
+     * @param array $assess
+     * @param Evaluation_Factory $factory
+     * @param Evaluation_Section $sectionHandler
+     * @param Evaluation_Question $questionHandler
+     * @param SitePage $page
+     */
+    public function __construct($assess, $factory, $sectionHandler, $questionHandler, $page)
     {
-		$this->setAssess($assess);
-		$this->setSectionHandler($sectionHandler);
-		$this->setQuestionHandler($questionHandler);
-		$this->setFactory($factory);
-		$this->setPage($page);
-	}
+        $this->setAssess($assess);
+        $this->setSectionHandler($sectionHandler);
+        $this->setQuestionHandler($questionHandler);
+        $this->setFactory($factory);
+        $this->setPage($page);
+    }
 
-	/**
-	 * Set up xml content
-	 */
-	protected function setupBlocks()
+    /**
+     * Set up xml content
+     */
+    protected function setupBlocks()
     {
-		$this->getPage()->setFile('xml', $this->getTemplateFile());
-		$this->getPage()->setBlock('xml', 'section', 'section_block');
+        $this->getPage()->setFile('xml', $this->getTemplateFile());
+        $this->getPage()->setBlock('xml', 'section', 'section_block');
         $this->getPage()->setBlock('section', 'question', 'question_block');
         $this->getPage()->setBlock('question', 'answer_configuration', 'answer_configuration_block');
-		$this->getPage()->setBlock('question', 'answerInputs', 'answerInputs_block');
-	}
+        $this->getPage()->setBlock('question', 'answerInputs', 'answerInputs_block');
+    }
 
     /**
      * Set the assess (quiz|survey) data using most-authoritative source
      *
      * @param mixed[] $assess
      */
-	protected function renderEvaluation(array $assess)
+    protected function renderEvaluation(array $assess)
     {
         $this->getPage()->setVar([
             'ASSESS_COMPLETION_MESSAGE' => Scrub::HTML($assess['completion_message']),
@@ -78,13 +79,13 @@ abstract class Evaluation_Export_Xml
         $sections = $this->getSectionHandler()->getList($this->assess['assess_id']);
 
         // Do we not have any sections to render?
-        if(!is_array($sections) || !count($sections)){
+        if (!is_array($sections) || !count($sections)) {
             // Bug out early.
             $this->getPage()->setVar('section_block', '');
             return;
         }
 
-        foreach($sections as $currentSection) {
+        foreach ($sections as $currentSection) {
             $this->renderSection($currentSection);
         }
     }
@@ -104,16 +105,15 @@ abstract class Evaluation_Export_Xml
         $allQuestions = $this->sectionHandler->getContents($this->assess['assess_id'], $section['section_id']);
 
         // Filter questions that don't have a type (not sure if this still necessary)
-        $allQuestions = (new \Schoolbox\Collection($allQuestions))->filter(function($question){
+        $allQuestions = (new \Schoolbox\Collection($allQuestions))->filter(function ($question) {
             return $question['type_id'];
         });
 
         if ($allQuestions) {
-            foreach($allQuestions as $idx => $currentQuestion) {
+            foreach ($allQuestions as $idx => $currentQuestion) {
                 $this->renderQuestion($currentQuestion, $idx > 0);
             }
-        }
-        else {
+        } else {
             $this->getPage()->setVar('question_block', '');
         }
 
@@ -178,15 +178,15 @@ abstract class Evaluation_Export_Xml
     }
 
 
-	/**
-	 * Render headers and xml data
-	 */
-	public function render()
+    /**
+     * Render headers and xml data
+     */
+    public function render()
     {
         $this->setupBlocks();
         $this->setVars();
         $this->parse();
-	}
+    }
 
     protected function parse()
     {
@@ -198,109 +198,121 @@ abstract class Evaluation_Export_Xml
         die();
     }
 
-	/**
-	 * Retrieves the XML content of the export, without outputting it.
-	 *
-	 * @return string
-	 */
-	public function retrieveContents() {
-		return $this->getPage()->template->parse('finaloutput', 'xml');
-	}
+    /**
+     * Retrieves the XML content of the export, without outputting it.
+     *
+     * @return string
+     */
+    public function retrieveContents()
+    {
+        return $this->getPage()->template->parse('finaloutput', 'xml');
+    }
 
-	/**
-	 * Generate a filename for the exported xml
-	 *
-	 * @return string
-	 */
-	protected function generateFilename() {
-		$assess = $this->getAssess();
+    /**
+     * Generate a filename for the exported xml
+     *
+     * @return string
+     */
+    protected function generateFilename()
+    {
+        $assess = $this->getAssess();
 
-		$filename = preg_replace('/[^a-zA-Z0-9\-\_]/', '_', $assess['title']) . '-' . date('YmdHis') . '.xml';
+        $filename = preg_replace('/[^a-zA-Z0-9\-\_]/', '_', $assess['title']) . '-' . date('YmdHis') . '.xml';
 
-		return $filename;
-	}
+        return $filename;
+    }
 
-	/**
-	 * @param SitePage $page
-	 */
-	protected function setPage($page) {
-		$this->page = $page;
-	}
+    /**
+     * @param SitePage $page
+     */
+    protected function setPage($page)
+    {
+        $this->page = $page;
+    }
 
-	/**
-	 * @return SitePage
-	 */
-	protected function getPage() {
-		return $this->page;
-	}
+    /**
+     * @return SitePage
+     */
+    protected function getPage()
+    {
+        return $this->page;
+    }
 
-	/**
-	 * @param Evaluation_Factory $factory
-	 */
-	protected function setFactory($factory) {
-		$this->factory = $factory;
-	}
+    /**
+     * @param Evaluation_Factory $factory
+     */
+    protected function setFactory($factory)
+    {
+        $this->factory = $factory;
+    }
 
-	/**
-	 * @return Evaluation_Factory
-	 */
-	protected function getFactory() {
-		return $this->factory;
-	}
+    /**
+     * @return Evaluation_Factory
+     */
+    protected function getFactory()
+    {
+        return $this->factory;
+    }
 
-	/**
-	 * @param array $assess
-	 */
-	protected function setAssess($assess) {
-		$this->assess = $assess;
-	}
+    /**
+     * @param array $assess
+     */
+    protected function setAssess($assess)
+    {
+        $this->assess = $assess;
+    }
 
-	/**
-	 * @return array
-	 */
-	protected function getAssess() {
-		return $this->assess;
-	}
+    /**
+     * @return array
+     */
+    protected function getAssess()
+    {
+        return $this->assess;
+    }
 
-	/**
-	 * @param Evaluation_Section $sectionHandler
-	 */
-	protected function setSectionHandler($sectionHandler) {
-		$this->sectionHandler = $sectionHandler;
-	}
+    /**
+     * @param Evaluation_Section $sectionHandler
+     */
+    protected function setSectionHandler($sectionHandler)
+    {
+        $this->sectionHandler = $sectionHandler;
+    }
 
-	/**
-	 * @return Evaluation_Section
-	 */
-	protected function getSectionHandler() {
-		return $this->sectionHandler;
-	}
+    /**
+     * @return Evaluation_Section
+     */
+    protected function getSectionHandler()
+    {
+        return $this->sectionHandler;
+    }
 
-	/**
-	 * Get template file
-	 *
-	 * @return string
-	 */
-	abstract protected function getTemplateFile();
+    /**
+     * Get template file
+     *
+     * @return string
+     */
+    abstract protected function getTemplateFile();
 
-	/**
-	 * Get evaluation type
-	 *
-	 * @return string
-	 */
-	abstract protected function getEvaluationType();
+    /**
+     * Get evaluation type
+     *
+     * @return string
+     */
+    abstract protected function getEvaluationType();
 
-	/**
-	 * @param Evaluation_Question $questionHandler
-	 */
-	protected function setQuestionHandler($questionHandler) {
-		$this->questionHandler = $questionHandler;
-	}
+    /**
+     * @param Evaluation_Question $questionHandler
+     */
+    protected function setQuestionHandler($questionHandler)
+    {
+        $this->questionHandler = $questionHandler;
+    }
 
-	/**
-	 * @return Evaluation_Question
-	 */
-	protected function getQuestionHandler() {
-		return $this->questionHandler;
-	}
+    /**
+     * @return Evaluation_Question
+     */
+    protected function getQuestionHandler()
+    {
+        return $this->questionHandler;
+    }
 }

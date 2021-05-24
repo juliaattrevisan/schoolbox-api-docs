@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\SchoolGrades;
 
 /**
@@ -44,7 +46,6 @@ class YearlyBreakdown extends Base
          * "duplicate records" (misleading definition in specification)
          */
         foreach ($preprocessed as $year => $allCourses) {
-
             /* Initialise totals for letters
              */
             if (!is_array($totals[$year]['letters'])) {
@@ -59,7 +60,6 @@ class YearlyBreakdown extends Base
              * We don't gather stats for Areas, just Courses
              */
             foreach ($allCourses as $courseName => $allAreas) {
-
                 /* Initialise totals for letters
                  */
                 if (!is_array($yearStack[$year][$courseName]['letters'])) {

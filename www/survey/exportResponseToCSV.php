@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assessment export. Uses the handlers to export their question types into a
  * Moodle format.
@@ -23,7 +24,7 @@ $survey = $surveyHandler->getByID($this->arg[0]);
 
 
 if ($surveyHandler->isDeleted($survey['assess_id'])) {
-	error(112);
+    error(112);
 }
 
 $surveyExporter = new Survey_Exporter($survey, $factory, new Survey_Section(), new Survey_Attempt(), new Survey_Question());
@@ -31,7 +32,7 @@ $surveyExporter = new Survey_Exporter($survey, $factory, new Survey_Section(), n
 /* Optionally filter by question
  */
 if (is_numeric($this->arg[1])) {
-	$surveyExporter->setFilterByQuestion($this->arg[1]);
+    $surveyExporter->setFilterByQuestion($this->arg[1]);
 }
 
 $surveyExporter->exportResponsesToCSV($survey['assess_id'], $this->arg[1], $this->arg[2]);

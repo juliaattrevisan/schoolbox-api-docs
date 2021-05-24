@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -20,7 +21,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
-
 
 class Module extends BaseModule
 {
@@ -64,10 +64,10 @@ class Module extends BaseModule
         );
 
         // TODO - add 'getMarkbookForUnitImportSpec' to be used in 'outline/unit.twig' to jump to specific unit import
-        $this->register('GET',  '/class/{folderId:\d+}',                 'getMarkbookForClass',        $permissions, $preload);
-        $this->register('POST', '/class/{folderId:\d+}',                 'postMarkbookForClass',       $permissions, $preload);
-        $this->register('GET',  '/class/{folderId:\d+}/term/{termCode}', 'getMarkbookForClassAndTerm', $permissions, $preload);
-        $this->register('GET',  '/class/{folderId:\d+}/export',          'getMarkbookExportForClass',  $permissions, $preload);
+        $this->register('GET', '/class/{folderId:\d+}', 'getMarkbookForClass', $permissions, $preload);
+        $this->register('POST', '/class/{folderId:\d+}', 'postMarkbookForClass', $permissions, $preload);
+        $this->register('GET', '/class/{folderId:\d+}/term/{termCode}', 'getMarkbookForClassAndTerm', $permissions, $preload);
+        $this->register('GET', '/class/{folderId:\d+}/export', 'getMarkbookExportForClass', $permissions, $preload);
     }
 
 

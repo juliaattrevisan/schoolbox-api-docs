@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\L10n\RosettaStoneFactory;
 

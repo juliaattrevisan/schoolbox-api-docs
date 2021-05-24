@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eportfolio_PageMapper
  *
@@ -54,12 +55,13 @@ class PageMapper extends Schoolbox\Mapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasJoin(
-            'permissions', [
+            'permissions',
+            [
             'multiple'  => true,
             'mapper'    => PermissionMapper::class,
             'this_key'  => 'page_id',
             'other_key' => 'page_id',
-        ]
+            ]
         );
     }
 
@@ -96,7 +98,6 @@ class PageMapper extends Schoolbox\Mapper
         $allPages = $this->findPagesWithPermissions($ownerId);
 
         foreach ($allPages as $currentPage) {
-
             /* They can be a superuser
              */
             $isSuperuser = $_SESSION['su'];
@@ -112,10 +113,9 @@ class PageMapper extends Schoolbox\Mapper
             if ($isSuperuser || $isStaff || $isOwner) {
                 $viewablePages->setOffset($currentPage->getPageId(), $currentPage);
             } /* If there are any specific permissions, try those too
-			 */
+             */
             else {
                 foreach ($currentPage->getPermissions() as $currentPermission) {
-
                     /* They can be a parent (the getValue() here is a binary 1 or 0)
                      */
                     $isParent = (($currentPermission->getType() === Permission::TYPE_PARENT)

@@ -1,19 +1,20 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-namespace Schoolbox\Fixtures\Status;
 
+namespace Schoolbox\Fixtures\Status;
 
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Fixtures\Result\Model as Result;
-use \Schoolbox\Fixtures\Status\Model as Status;
-use \Schoolbox\Fixtures\Status\Mapper as StatusMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Fixtures\Result\Model as Result;
+use Schoolbox\Fixtures\Status\Model as Status;
+use Schoolbox\Fixtures\Status\Mapper as StatusMapper;
 
 class Controller extends AbstractController
 {

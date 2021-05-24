@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper
  *
@@ -9,12 +10,11 @@
 
 namespace Schoolbox\Fixtures\Match;
 
-
 use OutOfBoundsException;
 use PDO;
 use PDOStatement;
 use Schoolbox\GenericCollection;
-use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Fixtures\Match\Model as Match;
 use Schoolbox\Fixtures\Division\Model as Division;
@@ -261,7 +261,7 @@ class Mapper extends BaseMapper
             /* Append all Result instances as you go
              */
             if ($row['r.team_id']) {
-                $resultsKey = $matchId.'-'.$row['r.team_id'];
+                $resultsKey = $matchId . '-' . $row['r.team_id'];
                 if (!$results[$resultsKey] instanceof Result) {
                     /** @var Result $result */
                     $result = $this->hydrateJoin($row, 'result', 'r');
@@ -269,12 +269,16 @@ class Mapper extends BaseMapper
                     $results[$resultsKey] = $result;
 
                     // Figure out if this result if for the home or away team
-                    if ($matches[$matchId]->getHomeTeam() != null &&
-                        $matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()) {
+                    if (
+                        $matches[$matchId]->getHomeTeam() != null &&
+                        $matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()
+                    ) {
                         $matches[$matchId]->setHomeTeamResult($result);
                     } else {
-                        if ($matches[$matchId]->getAwayTeam() != null &&
-                            $matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()) {
+                        if (
+                            $matches[$matchId]->getAwayTeam() != null &&
+                            $matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()
+                        ) {
                             $matches[$matchId]->setAwayTeamResult($result);
                         } else {
                             // This result doesn't belong to either team.
@@ -361,8 +365,7 @@ class Mapper extends BaseMapper
         // create a new event, and send it to the scheduler
         try {
             $this->getEventPropagator()->propagate($this->sessionData['user'], $verb, $object, $this, $diff);
-        }
-        catch( \ErrorException $e) {
+        } catch (\ErrorException $e) {
             //Unable to connect to notification system
             return false;
         }

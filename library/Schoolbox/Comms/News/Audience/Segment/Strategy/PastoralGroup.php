@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -18,6 +19,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
+
 use function array_intersect;
 use function count;
 use function implode;
@@ -161,16 +163,16 @@ class PastoralGroup extends SimpleStrategy
      */
     public function isUserInAudienceValues(User $user, array $entityValues, string $relationship): ?bool
     {
-        switch($relationship){
+        switch ($relationship) {
             case Audience\Model::RELATIONSHIP_SELF:
                 return null;
             case Audience\Model::RELATIONSHIP_PARENTS_OF:
-                if(!$user->getRole()->isParent()){
+                if (!$user->getRole()->isParent()) {
                     return false;
                 }
                 return null;
             case Audience\Model::RELATIONSHIP_TEACHERS_OF:
-                if(!$user->getRole()->isStaff()){
+                if (!$user->getRole()->isStaff()) {
                     return false;
                 }
                 return null;

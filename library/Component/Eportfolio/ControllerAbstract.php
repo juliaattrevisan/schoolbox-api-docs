@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,8 +8,7 @@
  */
 
 use Schoolbox\User;
-use \Schoolbox\Permission\Access\UserAccess;
-
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * @method Eportfolio_Page_Instance|null getContext()
@@ -116,7 +116,6 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
             $conf->parse($page, $key, $key, Scrub::text($params['value']), $this);
 
             if ($key == 'componentname') {
-
                 /* Get the config so we have the name
                  */
                 $configInstance = Component_ConfigMapper::getInstance()->findByColumnList(

@@ -1,13 +1,14 @@
 <?php
+
 /**
  * Evaluation_Export_CSV
  *
  * Protected class variables are intended to be set after
  * instantiation and/or overridden in subclasses
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 abstract class Evaluation_Export_CSV
 {
@@ -117,7 +118,8 @@ abstract class Evaluation_Export_CSV
      * @param Evaluation_Attempt $attemptHandler
      * @param Evaluation_Question $questionHandler
      */
-    public function __construct($evaluation_id, $factory, $attemptHandler, $questionHandler) {
+    public function __construct($evaluation_id, $factory, $attemptHandler, $questionHandler)
+    {
         $this->setEvaluationId($evaluation_id);
         $this->setFactory($factory);
         $this->setAttemptHandler($attemptHandler);
@@ -142,7 +144,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return $this
      */
-    public function generate() {
+    public function generate()
+    {
 
         /* Get all the attempts and questions for this Evaluation
          */
@@ -163,7 +166,8 @@ abstract class Evaluation_Export_CSV
     /**
      * Combine header and response data into a mega grid
      */
-    public function activateTheGrid() {
+    public function activateTheGrid()
+    {
 
         /* Format output
          */
@@ -190,7 +194,8 @@ abstract class Evaluation_Export_CSV
      * @param int $question_id
      * @return bool
      */
-    private function isQuestionFiltered($question_id) {
+    private function isQuestionFiltered($question_id)
+    {
         if (is_numeric($this->getQuestionFilter()) && ($question_id == $this->getQuestionFilter())) {
             return true;
         }
@@ -203,7 +208,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return bool
      */
-    private function useQuestionFilter() {
+    private function useQuestionFilter()
+    {
         if ($this->getQuestionFilter() !== null) {
             return true;
         }
@@ -216,7 +222,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    private function collateHeadings() {
+    private function collateHeadings()
+    {
         $allColumns = $this->getMandatoryColumns();
 
         /* Optionally include external_id
@@ -226,7 +233,7 @@ abstract class Evaluation_Export_CSV
         }
 
         if (is_array($this->getAllQuestions()) && count($this->getAllQuestions())) {
-            foreach($this->getAllQuestions() as $currentQuestion) {
+            foreach ($this->getAllQuestions() as $currentQuestion) {
                 if (!$this->useQuestionFilter() || $this->isQuestionFiltered($currentQuestion['question_id'])) {
                     $prefix = "S{$currentQuestion['section_sequence']}. Q{$currentQuestion['question_sequence']}. ";
                     $questionText = preg_replace('/\n+/', ' ', strip_tags(html_entity_decode($currentQuestion['question'])));
@@ -238,7 +245,7 @@ abstract class Evaluation_Export_CSV
 
                     /* Append additional columns
                      */
-                    foreach($this->getAdditionalColumns() as $heading => $value) {
+                    foreach ($this->getAdditionalColumns() as $heading => $value) {
                         $additionalColumns[] =  $prefix . $questionText . ' ' . $heading;
                     }
 
@@ -255,14 +262,14 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    private function collateResponses() {
+    private function collateResponses()
+    {
         $allResponses = array();
 
         /* Collate all attempts and their responses
          */
         if (is_array($this->getAllAttempts()) && count($this->getAllAttempts())) {
-            foreach($this->getAllAttempts() as $currentAttempt) {
-
+            foreach ($this->getAllAttempts() as $currentAttempt) {
                 /* Get attempt details
                  */
                 $user = $this->getAttemptHandler()->getUser($currentAttempt['attempt_id']);
@@ -272,8 +279,7 @@ abstract class Evaluation_Export_CSV
                 if ($currentAttempt['finish']) {
                     $finish = new Alaress_Date_Format($currentAttempt['finish'], 'Y-m-d H:i:s');
                     $finishTime = $finish->getShort();
-                }
-                else {
+                } else {
                     $finishTime = 'Incomplete';
                 }
 
@@ -297,7 +303,7 @@ abstract class Evaluation_Export_CSV
                  */
                 $additionalColumns = array();
 
-                foreach($this->getAllQuestions() as $currentQuestion) {
+                foreach ($this->getAllQuestions() as $currentQuestion) {
                     if (!$this->useQuestionFilter() || $this->isQuestionFiltered($currentQuestion['question_id'])) {
                         $answerHandler = $this->getFactory()->createAnswerModel($currentQuestion['question_type_id']);
 
@@ -348,7 +354,8 @@ abstract class Evaluation_Export_CSV
      * @param array $data
      * @return void
      */
-    public function outputCSV2($data) {
+    public function outputCSV2($data)
+    {
         $outstream = fopen("php://output", 'rectum');
 
         array_walk($data, array($this, '__outputCSV'), $outstream);
@@ -364,7 +371,8 @@ abstract class Evaluation_Export_CSV
      * @param resource $filehandler
      * @return void
      */
-    public function __outputCSV(&$vals, $key, $filehandler) {
+    public function __outputCSV(&$vals, $key, $filehandler)
+    {
         fputcsv($filehandler, $vals, ',', '"');
     }
 
@@ -376,7 +384,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param int $evaluation_id
      */
-    private function setEvaluationId($evaluation_id) {
+    private function setEvaluationId($evaluation_id)
+    {
         $this->evaluation_id = $evaluation_id;
     }
 
@@ -385,7 +394,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return int
      */
-    private function getEvaluationId() {
+    private function getEvaluationId()
+    {
         return $this->evaluation_id;
     }
 
@@ -394,7 +404,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param Evaluation_Attempt $attemptHandler
      */
-    private function setAttemptHandler($attemptHandler) {
+    private function setAttemptHandler($attemptHandler)
+    {
         $this->attemptHandler = $attemptHandler;
     }
 
@@ -403,7 +414,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return Evaluation_Attempt
      */
-    private function getAttemptHandler() {
+    private function getAttemptHandler()
+    {
         return $this->attemptHandler;
     }
 
@@ -412,7 +424,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param Evaluation_Question $questionHandler
      */
-    private function setQuestionHandler($questionHandler) {
+    private function setQuestionHandler($questionHandler)
+    {
         $this->questionHandler = $questionHandler;
     }
 
@@ -421,7 +434,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return Evaluation_Question
      */
-    private function getQuestionHandler() {
+    private function getQuestionHandler()
+    {
         return $this->questionHandler;
     }
 
@@ -430,7 +444,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param Evaluation_Factory $factory
      */
-    private function setFactory($factory) {
+    private function setFactory($factory)
+    {
         $this->factory = $factory;
     }
 
@@ -439,7 +454,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return Evaluation_Factory
      */
-    private function getFactory() {
+    private function getFactory()
+    {
         return $this->factory;
     }
 
@@ -448,7 +464,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param array $allQuestions
      */
-    private function setAllQuestions($allQuestions) {
+    private function setAllQuestions($allQuestions)
+    {
         $this->allQuestions = $allQuestions;
     }
 
@@ -457,7 +474,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    private function getAllQuestions() {
+    private function getAllQuestions()
+    {
         return $this->allQuestions;
     }
 
@@ -466,7 +484,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param array $headings
      */
-    protected function setHeadings($headings) {
+    protected function setHeadings($headings)
+    {
         $this->headings = $headings;
     }
 
@@ -475,7 +494,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    protected function getHeadings() {
+    protected function getHeadings()
+    {
         return $this->headings;
     }
 
@@ -484,7 +504,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    private function getMandatoryColumns() {
+    private function getMandatoryColumns()
+    {
         return $this->mandatoryColumns;
     }
 
@@ -493,7 +514,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param array $allAttempts
      */
-    private function setAllAttempts($allAttempts) {
+    private function setAllAttempts($allAttempts)
+    {
         $this->allAttempts = $allAttempts;
     }
 
@@ -502,7 +524,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    private function getAllAttempts() {
+    private function getAllAttempts()
+    {
         return $this->allAttempts;
     }
 
@@ -511,7 +534,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return bool
      */
-    private function getLegendHTML() {
+    private function getLegendHTML()
+    {
         return $this->legendHTML;
     }
 
@@ -520,7 +544,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param array $responses
      */
-    protected function setResponses($responses) {
+    protected function setResponses($responses)
+    {
         $this->responses = $responses;
     }
 
@@ -529,7 +554,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    protected function getResponses() {
+    protected function getResponses()
+    {
         return $this->responses;
     }
 
@@ -538,7 +564,8 @@ abstract class Evaluation_Export_CSV
      *
      * @param int $questionFilter
      */
-    public function setQuestionFilter($questionFilter) {
+    public function setQuestionFilter($questionFilter)
+    {
         $this->questionFilter = $questionFilter;
     }
 
@@ -547,7 +574,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return int|null
      */
-    private function getQuestionFilter() {
+    private function getQuestionFilter()
+    {
         return $this->questionFilter;
     }
 
@@ -556,7 +584,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return array
      */
-    private function getAdditionalColumns() {
+    private function getAdditionalColumns()
+    {
         return $this->additionalColumns;
     }
 
@@ -565,7 +594,8 @@ abstract class Evaluation_Export_CSV
      *
      * @return bool
      */
-    protected function getIncludeExternalId() {
+    protected function getIncludeExternalId()
+    {
         return $this->includeExternalId;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module
  *
@@ -90,7 +91,8 @@ class Module extends BaseModule
          * will receive scalars and redirect to current term equivalent
          */
         $this->addRoutePreload(
-            $matcher, '.*With.*Term',
+            $matcher,
+            '.*With.*Term',
             function ($params) {
                 return $this->loadDependencies($params);
             }
@@ -107,10 +109,9 @@ class Module extends BaseModule
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, '.*', new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF)
-                )
-            );
+                new Rule\IsSuperuser(),
+                new Rule\HasRole(Role::STAFF)
+            ));
     }
 
 
@@ -224,7 +225,7 @@ class Module extends BaseModule
 
             // If filtering to class, ensure assessment belongs to class
             /** @param Folder $classFolder */
-            if ($classFolder && $classFolder->getId() !== $assessment->getBaseContext()->getFolder()->getId()){
+            if ($classFolder && $classFolder->getId() !== $assessment->getBaseContext()->getFolder()->getId()) {
                 return false;
             }
 

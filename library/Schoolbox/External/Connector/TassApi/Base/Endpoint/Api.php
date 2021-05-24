@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint;
@@ -12,7 +14,6 @@ use GuzzleHttp\Client;
 use InvalidArgumentException;
 use RuntimeException;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Explorer\BrokenPayloadCodec;
-
 
 /**
  * Class Api
@@ -123,7 +124,7 @@ class Api implements IApi
 
         /* Set up guzzle client
          */
-        $this->client = $this->initClient($dsn, $module,self::DEFAULT_TIMEOUT);
+        $this->client = $this->initClient($dsn, $module, self::DEFAULT_TIMEOUT);
 
         /* Record some stats about api usage
          * Turn this into an Observer pattern if you want to record more details
@@ -204,7 +205,6 @@ class Api implements IApi
         /* Try multiple times in case tass dies for a random reason
          */
         while ($fails < self::NUM_RETRY) {
-
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              *
              * I don't think tass plays in the same reality as most other people
@@ -238,7 +238,6 @@ class Api implements IApi
 
                 sleep(self::NAP_TIMEOUT);
             } else {
-
                 /* Couldn't decode json, or tass server refused something, or something else died
                  */
                 throw new DomainException('Could not access Tass server, or bad json payload returned.');
@@ -251,7 +250,6 @@ class Api implements IApi
              * otherwise we'll get stuck in an infinite loop and pound the api
              */
             if ($fails >= self::NUM_RETRY) {
-
                 /* Some schools intermittently report a Bad Endpoint in a non-repeating fashion
                  * Sometimes a guy will succeed, sometimes he won't; there's no particular pattern
                  * just by looking at the log itself. In this circumstance, base64 the payload we

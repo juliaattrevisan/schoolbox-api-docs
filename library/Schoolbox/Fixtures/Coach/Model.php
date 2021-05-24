@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -97,11 +98,11 @@ class Model implements \JsonSerializable, ISoftDeletable
     public function formatId()
     {
         if ($this->getId()) {
-            return self::PREFIX_EXISTING_TAG.':'.$this->getId();
+            return self::PREFIX_EXISTING_TAG . ':' . $this->getId();
         } elseif ($this->getUser()->getId()) {
-            return self::PREFIX_NEW_FROM_USER.':'.$this->getUser()->getId();
+            return self::PREFIX_NEW_FROM_USER . ':' . $this->getUser()->getId();
         } else {
-            return self::PREFIX_NEW_FROM_INPUT.':'.$this->getName();
+            return self::PREFIX_NEW_FROM_INPUT . ':' . $this->getName();
         }
     }
 
@@ -116,7 +117,7 @@ class Model implements \JsonSerializable, ISoftDeletable
             // Format similarly to ajax user
             $name = sprintf("%s - %s", $this->getUser()->formatName(), $this->getUser()->getRole()->getName());
             if ($this->getUser()->getExternalId()) {
-                $name .= ' ('.$this->getUser()->getExternalId().')';
+                $name .= ' (' . $this->getUser()->getExternalId() . ')';
             }
             return $name;
         } else {

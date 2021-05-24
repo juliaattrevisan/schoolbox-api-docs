@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NESA Report CSV format
  *
@@ -52,12 +53,10 @@ class Csv
                 if (isset($currentRow['condensed'][$indicator]['outcome'])) {
                     if ($outcome) {
                         $data[$indicator] = 'Y';
-                    }
-                    else {
+                    } else {
                         $data[$indicator] = 'N';
                     }
-                }
-                else {
+                } else {
                     $data[$indicator] = '';
                 }
             }

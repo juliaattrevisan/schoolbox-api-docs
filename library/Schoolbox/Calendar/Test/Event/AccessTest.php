@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
@@ -131,16 +132,16 @@ class AccessTest extends TestCase
             ]);
 
             $this->events = [
-                'personal' => (new Event)
+                'personal' => (new Event())
                     ->setId(1)
                     ->setAccess(Event::ACCESS_PERSONAL),
 
-                'group' => (new Event)
+                'group' => (new Event())
                     ->setId(2)
                     ->setAccess(Event::ACCESS_GROUP)
                     ->setFolderCollection($folderCollection),
 
-                'campus' => (new Event)
+                'campus' => (new Event())
                     ->setId(3)
                     ->setAccess(Event::ACCESS_CAMPUS)
                     ->setCampusCollection($campusCollection),

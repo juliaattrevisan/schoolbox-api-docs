@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Timetable period object for Schoolbox "external" connector
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External;
 
-class TimetablePeriod {
+class TimetablePeriod
+{
 
     /**
      * @var int
@@ -55,7 +57,8 @@ class TimetablePeriod {
      * @param  \Schoolbox\External\TimetableCycle $cycle
      * @return $this
      */
-    public function setCycle($cycle) {
+    public function setCycle($cycle)
+    {
         $this->cycle = $cycle;
         return $this;
     }
@@ -63,7 +66,8 @@ class TimetablePeriod {
     /**
      * @return \Schoolbox\External\TimetableCycle
      */
-    public function getCycle() {
+    public function getCycle()
+    {
         return $this->cycle;
     }
 
@@ -71,7 +75,8 @@ class TimetablePeriod {
      * @param  int   $day
      * @return $this
      */
-    public function setDay($day) {
+    public function setDay($day)
+    {
         $this->day = $day;
         return $this;
     }
@@ -79,7 +84,8 @@ class TimetablePeriod {
     /**
      * @return int
      */
-    public function getDay() {
+    public function getDay()
+    {
         return $this->day;
     }
 
@@ -87,7 +93,8 @@ class TimetablePeriod {
      * @param  \Alaress_Date_Format $finish
      * @return $this
      */
-    public function setFinish($finish) {
+    public function setFinish($finish)
+    {
         $this->finish = $finish;
         return $this;
     }
@@ -95,7 +102,8 @@ class TimetablePeriod {
     /**
      * @return \Alaress_Date_Format
      */
-    public function getFinish() {
+    public function getFinish()
+    {
         return $this->finish;
     }
 
@@ -103,7 +111,8 @@ class TimetablePeriod {
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -111,7 +120,8 @@ class TimetablePeriod {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -119,7 +129,8 @@ class TimetablePeriod {
      * @param  int   $sequence
      * @return $this
      */
-    public function setSequence($sequence) {
+    public function setSequence($sequence)
+    {
         $this->sequence = $sequence;
         return $this;
     }
@@ -127,7 +138,8 @@ class TimetablePeriod {
     /**
      * @return int
      */
-    public function getSequence() {
+    public function getSequence()
+    {
         return $this->sequence;
     }
 
@@ -135,7 +147,8 @@ class TimetablePeriod {
      * @param  \Alaress_Date_Format $start
      * @return $this
      */
-    public function setStart($start) {
+    public function setStart($start)
+    {
         $this->start = $start;
         return $this;
     }
@@ -143,7 +156,8 @@ class TimetablePeriod {
     /**
      * @return \Alaress_Date_Format
      */
-    public function getStart() {
+    public function getStart()
+    {
         return $this->start;
     }
 
@@ -151,7 +165,8 @@ class TimetablePeriod {
      * @param  string $title
      * @return $this
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
         return $this;
     }
@@ -159,7 +174,8 @@ class TimetablePeriod {
     /**
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -167,7 +183,8 @@ class TimetablePeriod {
      * @param  bool  $usable
      * @return $this
      */
-    public function setUsable($usable) {
+    public function setUsable($usable)
+    {
         $this->usable = $usable;
         return $this;
     }
@@ -175,8 +192,8 @@ class TimetablePeriod {
     /**
      * @return boolean
      */
-    public function getUsable() {
+    public function getUsable()
+    {
         return $this->usable;
     }
-
 }

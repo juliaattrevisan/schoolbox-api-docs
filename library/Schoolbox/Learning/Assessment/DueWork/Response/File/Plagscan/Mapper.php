@@ -7,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 
 use Aura\Di\Exception\ServiceNotFound;
@@ -141,15 +142,13 @@ class Mapper extends \Schoolbox\Mapper
         if (strlen($plagscanApiKey) && strlen($plagscanClientId) && strlen($plagscanUsername)) {
             try {
                 $this->connector = new Connector($plagscanClientId, $plagscanApiKey);
-            }
-            catch (\DomainException $e) {
+            } catch (\DomainException $e) {
                 /* Could not spawn for some reason, but due to mapper usage
                  * we don't want to detonate - just quietly not use plagscan
                  * Let's send the error to sentry though
                  */
                 $this->logConnectorException($e);
-            }
-            catch (RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 /* Could not spawn because plagscan api is down
                  */
                 $this->logConnectorException(
@@ -179,7 +178,6 @@ class Mapper extends \Schoolbox\Mapper
          * If so, there is a functioning username/apikey
          */
         if ($this->getConnector()) {
-
             /* Staffs and super can always see plagscan results
              */
             if ($user->isSuperuser() || $user->getRole()->isStaff()) {
@@ -266,7 +264,7 @@ class Mapper extends \Schoolbox\Mapper
         $previousPlagscans = $this->findPreviousIncarnationsOf($file->getId());
 
         /** @var Plagscan $currentPlagscan */
-        foreach($previousPlagscans as $currentPlagscan) {
+        foreach ($previousPlagscans as $currentPlagscan) {
             $this->privatise($currentPlagscan);
         }
 
@@ -278,9 +276,7 @@ class Mapper extends \Schoolbox\Mapper
         /** @var Plagscan $plagscan */
         try {
             $plagscan = $this->findOneByColumn('student_submission_file_id', $file->getId(), ['cache' => false]);
-        }
-        catch (MapperException $e) {
-
+        } catch (MapperException $e) {
             /* No plagscan stub existed for this file
              * Spawn one and continue
              */
@@ -442,7 +438,6 @@ class Mapper extends \Schoolbox\Mapper
     public function privatise(Plagscan $plagscan): void
     {
         try {
-
             /* If this plagscan record has a plagscanId, privatise it
              *
              * Otherwise we are waiting to obtain it and can't operate on it yet,
@@ -453,7 +448,6 @@ class Mapper extends \Schoolbox\Mapper
              * is easily solved.
              */
             if ($plagscan->getPlagscanId()) {
-
                 /* Privatise in plagscan.com then update our records too
                  */
                 $this->getConnector()->privatise($plagscan->getPlagscanId());
@@ -461,9 +455,7 @@ class Mapper extends \Schoolbox\Mapper
                 $plagscan->setPrivatisedAt(\Alaress_Date_Format::now());
                 $this->save($plagscan);
             }
-        }
-        catch (RuntimeException $e) {
-
+        } catch (RuntimeException $e) {
             /* Noop - could not privatise in plagscan
              *
              * Leave unchanged if plagscan refuses to do it on their end (jleckie, 6:43pm @ June 1)
@@ -482,7 +474,7 @@ class Mapper extends \Schoolbox\Mapper
      * @param \Exception $ce
      * @return void
      */
-    private function logConnectorException(\Exception $ce) : void
+    private function logConnectorException(\Exception $ce): void
     {
         try {
             /** @var HubInterface $sentry */

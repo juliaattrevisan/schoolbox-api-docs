@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper
  *
@@ -85,8 +86,7 @@ class Mapper extends BaseMapper
                 }
 
                 $collection->add($pd);
-            }
-            catch (BaseMapper\Exception $e) {
+            } catch (BaseMapper\Exception $e) {
                 // noop, couldn't hydrate for some reason
             }
         }
@@ -117,7 +117,7 @@ class Mapper extends BaseMapper
 
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
 
-        $states = explode("','", preg_replace("/(enum|set)\('(.+?)'\)/","\\2", $row['column_type']));
+        $states = explode("','", preg_replace("/(enum|set)\('(.+?)'\)/", "\\2", $row['column_type']));
 
         return $states;
     }

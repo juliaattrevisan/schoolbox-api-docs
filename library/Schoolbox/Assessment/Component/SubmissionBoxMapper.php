@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for the SubmissionBox model.
  *
@@ -256,7 +257,8 @@ class SubmissionBoxMapper extends BaseMapper
      *
      * @return Collection
      */
-    public function findYears() {
+    public function findYears()
+    {
         $query = "
             SELECT DISTINCT YEAR(date) AS year
             FROM {$this->getTable()} sb
@@ -417,7 +419,6 @@ class SubmissionBoxMapper extends BaseMapper
         $stmt->execute(array('box_id' => $submission_box_id));
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
-
     }
 
 
@@ -458,7 +459,6 @@ class SubmissionBoxMapper extends BaseMapper
         $progress['return_count'] = $stmt->fetchColumn(0);
 
         return $progress;
-
     }
 
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -40,5 +41,4 @@ class RedisPublisher implements IPublisher
 
         return (int)$this->redis->publish($topic, "$instance");
     }
-
 }

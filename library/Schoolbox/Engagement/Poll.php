@@ -26,7 +26,8 @@ class Poll
         $this->database = Database::getInstance();
     }
 
-    public function votes(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function votes(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM pollLog
                   WHERE created >= :start AND created <= :end";
 
@@ -37,5 +38,4 @@ class Poll
         $statement->execute();
         return $statement->fetchColumn(0);
     }
-
 }

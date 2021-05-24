@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ResourceBooking\Booking;
 
 use DateTime;
@@ -56,7 +58,6 @@ class Series
         $this->setBookingMapper($bookingMapper);
         $this->setStatusMapper($statusMapper);
         $this->setExternalTimetableHandler($externalTimetableHandler);
-
     }
 
 
@@ -157,8 +158,7 @@ class Series
         DateTime $endDate,
         $related = null,
         $efficacy = null
-    )
-    {
+    ) {
         $relatedItems  = [];
         foreach ($related ?: [] as $relatedItem) {
             if ($relatedItem['resource_id']) {

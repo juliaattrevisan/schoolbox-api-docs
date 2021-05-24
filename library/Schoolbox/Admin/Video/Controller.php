@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -59,14 +60,14 @@ class Controller extends Base
      * @since 165
      * @param VideoQueue $queue
      */
-    public function getLog($queue) {
-        $this->getResponse()->content->set( $this->buildUnthemedHtmlOutput(
+    public function getLog($queue)
+    {
+        $this->getResponse()->content->set($this->buildUnthemedHtmlOutput(
             '@adminVideo/log.twig',
-             [
+            [
                 'log' => $queue,
             ]
         ));
-
     }
 
     /**
@@ -91,7 +92,6 @@ class Controller extends Base
             $data = [
                 'result' => 'success'
             ];
-
         } catch (MapperException $e) {
             $this->getResponse()->status->setCode(500);
             $data = [

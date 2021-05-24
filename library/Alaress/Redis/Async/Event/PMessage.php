@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -32,5 +33,4 @@ class PMessage extends Message
     {
         return $this->pattern;
     }
-
 }

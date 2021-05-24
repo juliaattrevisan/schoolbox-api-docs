@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -207,7 +208,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $weekLength = $this->getDatabase()->getRow($query);
 
         $definitionArray['dayCount'] = $campus->getTimetableDay() * $weekLength['TimetableWeekLength'];
-        $definitionArray['periodCount'] = $times['NoOfPeriods'];;
+        $definitionArray['periodCount'] = $times['NoOfPeriods'];
+        ;
 
         return $definitionArray;
     }
@@ -361,7 +363,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             // Check if this is the current period
 
             if ($time >= $period_start && $time < $period_end && $period['PeriodDuration'] > 0) {
-
                 // Lets do some time based gymnastics because someone thought it'd be smart to store time as an integer
 
                 $time_from = $this->helper->getTimeFromMinutes($period_start);
@@ -444,7 +445,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         ";
 
         if ($type == 'student') {
-
             $query .=
                 "
                 '' AS StaffID,
@@ -499,9 +499,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
                 ORDER BY DayNumber, PeriodNumber
             ";
-
         } else {
-
             $query .=
                 "
                 tcs.StaffID AS StaffID,
@@ -580,7 +578,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+                if (
+                    $desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
                     && !isset($timetable[$x]['class'][$desc['ClassCode']])
                 ) {
@@ -719,9 +718,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
                 ORDER BY DayNumber, PeriodNumber
             ";
-
         } else {
-
             $query .=
                 "
                 tcs.StaffID AS StaffID,
@@ -805,7 +802,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
                 if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber'] && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])) {
-
                     $timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']] =
                         [
                             'description' => $desc['Description'],
@@ -888,4 +884,3 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         return [];
     }
 }
-

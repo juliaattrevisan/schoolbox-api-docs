@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for userspace actions
  *
@@ -21,9 +22,9 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\UserMapper;
-use \Schoolbox\User;
-use \Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\UserMapper;
+use Schoolbox\User;
+use Alaress\Authorizer\Failure\Unauthorized;
 use User\Logger;
 use External_User;
 
@@ -36,7 +37,7 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $folderPermFull = new Rule\HasHomepageAccess(UserAccess::ACCESS_FULL, function(array $params = array(), User $user = null) {
+        $folderPermFull = new Rule\HasHomepageAccess(UserAccess::ACCESS_FULL, function (array $params = array(), User $user = null) {
             return $params['folderId'];
         }, Access::getInstance());
 
@@ -86,8 +87,7 @@ class Module extends BaseModule
                 if (array_key_exists('folderId', $params)) {
                     try {
                         $params['folder'] = $folderMapper->findById($params['folderId']);
-                    }
-                    catch (MapperException $e) {
+                    } catch (MapperException $e) {
                         throw $errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
                     }
                 }

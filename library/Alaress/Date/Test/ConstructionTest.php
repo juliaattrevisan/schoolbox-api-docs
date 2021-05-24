@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that various constructors and static builders work as expected.
  *

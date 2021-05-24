@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_ImageGalleryController extends Component_Dashboard_ControllerAbstract
@@ -37,7 +39,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return false;
         }
 

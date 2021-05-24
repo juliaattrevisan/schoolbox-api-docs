@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Alaress\Color\ColorFactory;
 use Eportfolio\Permission;
 use Eportfolio\PermissionMapper as EportfolioPermissionMapper;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -83,8 +84,7 @@ class GarbageCollector
             $query .= ' `hash` = :hash';
             $statement = $this->mapper->getDatabase()->prepare($query);
             $statement->bindValue(':hash', $hash);
-        }
-        else {
+        } else {
             $query .= ' `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0, :limit';
             $statement = $this->mapper->getDatabase()->prepare($query);
             $statement->bindValue(':limit', $this->limit, \PDO::PARAM_INT);
@@ -101,13 +101,13 @@ class GarbageCollector
 
         $hashes = $this->list;
 
-        $this->log->info('Starting with '.count($this->list).' files');
+        $this->log->info('Starting with ' . count($this->list) . ' files');
 
         // iterate the checks, and retain the intersection each time
         foreach ($this->checks as $check) {
-            $this->log->notice('Applying '.get_class($check), ['char' => '+']);
+            $this->log->notice('Applying ' . get_class($check), ['char' => '+']);
             $staleHashes = $check->getStale($hashes);
-            $this->log->info('Retained '.count($staleHashes). ' stale');
+            $this->log->info('Retained ' . count($staleHashes) . ' stale');
         }
 
         return $this->list;
@@ -129,14 +129,14 @@ class GarbageCollector
             return 0;
         }
 
-        $this->log->error('Deleting '.count($purge).' stale');
+        $this->log->error('Deleting ' . count($purge) . ' stale');
         foreach ($purge as $hash) {
             try {
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to a database issue: ".$e->getMessage());
+                $this->log->error("Could not delete storage file '$hash' due to a database issue: " . $e->getMessage());
             } catch (FlysystemException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to filesystem issue: ".$e->getMessage());
+                $this->log->error("Could not delete storage file '$hash' due to filesystem issue: " . $e->getMessage());
             }
         }
 
@@ -174,5 +174,4 @@ class GarbageCollector
             $this->log->debug("Would have deleted $hash");
         }
     }
-
 }

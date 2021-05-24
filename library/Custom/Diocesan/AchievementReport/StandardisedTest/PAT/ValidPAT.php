@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport\StandardisedTest\PAT;
@@ -79,14 +81,13 @@ class ValidPAT
 
         /* Years 3-10 always show the tab
          */
-        if (\in_array((int)$user->getYear()->getName(), [3,4,5,6,7,8,9,10], true) ) {
+        if (\in_array((int)$user->getYear()->getName(), [3,4,5,6,7,8,9,10], true)) {
             return true;
         }
 
         /* 11-13 requires us to check constituent pieces - if any exist, the PAT tab exists
          */
         if (\in_array((int)$user->getYear()->getName(), [11,12,13], true)) {
-
             /* Minimise queries by testing in order until one return true
              */
             $registry = [

@@ -18,7 +18,7 @@ if (!isset($this)) {
 
 /** @var SitePage $this */
 if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
-    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403 );
+    $this->error(\Schoolbox\Error\Mapper::ERROR_PERM_PAGE_VIEW, '', 403);
 }
 
 

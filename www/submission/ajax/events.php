@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FullCalendar source for submission related events.
  *

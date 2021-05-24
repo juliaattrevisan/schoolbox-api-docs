@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Formats text strings into more meaningful stuff
  *
@@ -14,11 +15,11 @@ class TextFormatter
      *
      * @return string
      */
-    public static function greeting() {
+    public static function greeting()
+    {
         if (date('A') == 'AM') {
             return 'Good Morning';
-        }
-        else if (date('G') < 17) {
+        } else if (date('G') < 17) {
             return 'Good Afternoon';
         }
 
@@ -34,7 +35,8 @@ class TextFormatter
      * @param  string $encoding Encoding of $content
      * @return string
      */
-    public static function cutString($content, $chars, $encoding = 'UTF-8') {
+    public static function cutString($content, $chars, $encoding = 'UTF-8')
+    {
         $summary = mb_substr($content, 0, $chars, $encoding);
 
         if (strlen($content) > strlen($summary)) {
@@ -55,7 +57,8 @@ class TextFormatter
      * @param  string $encoding Encoding of $content
      * @return string
      */
-    public static function cutSentence($content, $chars, $addEllipsis = false, $encoding = 'UTF-8') {
+    public static function cutSentence($content, $chars, $addEllipsis = false, $encoding = 'UTF-8')
+    {
 
         $content = strip_tags($content);
 
@@ -70,14 +73,11 @@ class TextFormatter
 
         if ($position > 1 && $position > $positionQ && $position > $positionB) {
             $output = mb_substr($summary, 0, $position, $encoding);
-        }
-        else if ($positionQ > 1 && $positionQ > $positionB) {
+        } else if ($positionQ > 1 && $positionQ > $positionB) {
             $output = mb_substr($summary, 0, $positionQ, $encoding);
-        }
-        else if($positionB > 1) {
+        } else if ($positionB > 1) {
             $output = mb_substr($summary, 0, $positionB, $encoding);
-        }
-        else {
+        } else {
             $position = mb_strrpos($summary, ' ', null, $encoding);
             $output   = mb_substr($summary, 0, $position, $encoding);
 
@@ -100,28 +100,28 @@ class TextFormatter
      * @param string $enclosure
      * @return string
      */
-    public static function outputCSV($line, $delimiter=',', $enclosure='"') {
+    public static function outputCSV($line, $delimiter = ',', $enclosure = '"')
+    {
         // No leading delimiter
-        $writeDelimiter = FALSE;
+        $writeDelimiter = false;
         $string = '';
 
-        foreach($line as $dataElement){
+        foreach ($line as $dataElement) {
            // Replaces a double quote with two double quotes
-           $dataElement = str_replace('"', '""', $dataElement);
+            $dataElement = str_replace('"', '""', $dataElement);
 
            // Adds a delimiter before each field (except the first)
-           if ($writeDelimiter) {
-               $string .= $delimiter;
-           }
+            if ($writeDelimiter) {
+                $string .= $delimiter;
+            }
 
            // Encloses each field with $enclosure and adds it to the string
-           $string .= $enclosure . $dataElement . $enclosure;
+            $string .= $enclosure . $dataElement . $enclosure;
 
            // Delimiters are used every time except the first.
-           $writeDelimiter = TRUE;
+            $writeDelimiter = true;
         }
 
         return $string;
     }
 }
-

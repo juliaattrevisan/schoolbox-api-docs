@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Does this user have this access level to this homepage?
  *

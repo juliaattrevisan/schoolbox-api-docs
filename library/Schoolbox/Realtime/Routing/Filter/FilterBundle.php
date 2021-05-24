@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Routing\Filter;
-
 
 use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\User;
@@ -35,7 +35,8 @@ class FilterBundle implements FilterInterface
      * @param FilterInterface $filter
      * @return self
      */
-    public function attach(FilterInterface $filter) {
+    public function attach(FilterInterface $filter)
+    {
         $this->filters->attach($filter);
         return $this;
     }
@@ -45,7 +46,8 @@ class FilterBundle implements FilterInterface
      * @param FilterInterface[] $filters
      * @return self
      */
-    public function attachEach(array $filters) {
+    public function attachEach(array $filters)
+    {
         foreach ($filters as $filter) {
             $this->attach($filter);
         }
@@ -70,5 +72,4 @@ class FilterBundle implements FilterInterface
 
         return true;
     }
-
 }

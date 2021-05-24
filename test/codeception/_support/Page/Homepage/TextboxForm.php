@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -76,7 +77,7 @@ class TextboxForm
      */
     public function fillContent(string $content): self
     {
-        $this->tester->executeJS('for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].setData(\''.$content.'\')}');
+        $this->tester->executeJS('for(var i in CKEDITOR.instances) { CKEDITOR.instances[i].setData(\'' . $content . '\')}');
         return $this;
     }
 

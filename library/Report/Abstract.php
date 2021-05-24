@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Report_Abstract
  *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link		https://schoolbox.com.au/
+ * @link        https://schoolbox.com.au/
  */
 abstract class Report_Abstract
 {
@@ -58,7 +59,8 @@ abstract class Report_Abstract
      *
      * @return bool
      */
-    protected function checkPermissions(): bool {
+    protected function checkPermissions(): bool
+    {
         return $this->getGroupHandler()->isParent() || $this->getGroupHandler()->isSuperuser() || $this->getGroupHandler()->isStaff();
     }
 
@@ -79,7 +81,8 @@ abstract class Report_Abstract
      *
      * @param string $yearLevel
      */
-    protected function setYearLevel($yearLevel) {
+    protected function setYearLevel($yearLevel)
+    {
         $this->yearLevel = $yearLevel;
     }
 
@@ -88,7 +91,8 @@ abstract class Report_Abstract
      *
      * @return string
      */
-    public function getYearLevel() {
+    public function getYearLevel()
+    {
         return $this->yearLevel;
     }
 
@@ -97,7 +101,8 @@ abstract class Report_Abstract
      *
      * @param Group $groupHandler
      */
-    protected function setGroupHandler($groupHandler) {
+    protected function setGroupHandler($groupHandler)
+    {
         $this->groupHandler = $groupHandler;
     }
 
@@ -106,7 +111,8 @@ abstract class Report_Abstract
      *
      * @return Group
      */
-    public function getGroupHandler() {
+    public function getGroupHandler()
+    {
         return $this->groupHandler;
     }
 
@@ -115,21 +121,24 @@ abstract class Report_Abstract
      *
      * @param External_User $externalUserHandler
      */
-    protected function setExternalUserHandler($externalUserHandler) {
+    protected function setExternalUserHandler($externalUserHandler)
+    {
         $this->externalUserHandler = $externalUserHandler;
     }
 
     /**
      * @param User $userHandler
      */
-    protected function setUserHandler($userHandler) {
+    protected function setUserHandler($userHandler)
+    {
         $this->userHandler = $userHandler;
     }
 
     /**
      * @return User
      */
-    protected function getUserHandler() {
+    protected function getUserHandler()
+    {
         return $this->userHandler;
     }
 
@@ -138,7 +147,8 @@ abstract class Report_Abstract
      *
      * @return External_UserInterface
      */
-    protected function getExternalUserHandler() {
+    protected function getExternalUserHandler()
+    {
         return $this->externalUserHandler;
     }
 
@@ -147,7 +157,8 @@ abstract class Report_Abstract
      *
      * @param SitePage $page
      */
-    protected function setPage($page) {
+    protected function setPage($page)
+    {
         $this->page = $page;
     }
 
@@ -156,7 +167,8 @@ abstract class Report_Abstract
      *
      * @return SitePage
      */
-    protected function getPage() {
+    protected function getPage()
+    {
         return $this->page;
     }
 
@@ -165,7 +177,8 @@ abstract class Report_Abstract
      *
      * @param array $allRecords
      */
-    protected function setAllRecords($allRecords) {
+    protected function setAllRecords($allRecords)
+    {
         $this->allRecords = $allRecords;
     }
 
@@ -174,7 +187,8 @@ abstract class Report_Abstract
      *
      * @return array
      */
-    protected function getAllRecords() {
+    protected function getAllRecords()
+    {
         return $this->allRecords;
     }
 }

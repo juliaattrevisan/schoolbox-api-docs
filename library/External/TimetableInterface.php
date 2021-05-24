@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by JetBrains PhpStorm.
  * User: aetworowsky
@@ -6,6 +7,7 @@
  * Time: 4:45 PM
  * To change this template use File | Settings | File Templates.
  */
+
 use Schoolbox\Campus;
 
 /**

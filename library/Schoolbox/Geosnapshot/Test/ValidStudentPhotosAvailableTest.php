@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidStudentPhotosAvailableTest
  *
@@ -17,7 +18,6 @@ namespace Schoolbox\Geosnapshot\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Role;
-
 
 /**
  * Class ValidStudentPhotosAvailableTest
@@ -53,7 +53,7 @@ class ValidStudentPhotosAvailableTest extends TestCase
      *
      * @return array
      */
-    public function provider_validStudentPhotosAvailable() : array
+    public function provider_validStudentPhotosAvailable(): array
     {
 
         /* A classically-correct user

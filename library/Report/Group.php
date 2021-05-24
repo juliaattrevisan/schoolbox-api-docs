@@ -51,7 +51,6 @@ class Report_Group extends Report_Abstract implements Report_IReport
 
         if (!$this->checkPermissions()) {
             error(19);
-
         } else {
             $this->setPage($page);
             $this->setUserHandler(new User());

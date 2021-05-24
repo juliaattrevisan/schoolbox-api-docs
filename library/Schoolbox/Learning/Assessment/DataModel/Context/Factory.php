@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  */
+
 namespace Schoolbox\Learning\Assessment\DataModel\Context;
 
 use Schoolbox\Learning\Assessment\AssessmentContextType;
@@ -98,7 +100,6 @@ class Factory
         }
 
         return $mapper->findById($id);
-
     }
 
     /**

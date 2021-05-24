@@ -1,7 +1,8 @@
 #!/usr/bin/php
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -25,16 +26,16 @@ $opts = getopt('v', array_merge($fields, array('porcelain')));
 
 $display = array();
 
-foreach($fields as $f) {
-    if(isset($opts[$f])) {
+foreach ($fields as $f) {
+    if (isset($opts[$f])) {
         $display[] = $f;
     }
 }
 
 $threshold = 0;
-if(isset($opts['v'])) {
+if (isset($opts['v'])) {
     $threshold = 1;
-    if(is_array($opts['v'])) {
+    if (is_array($opts['v'])) {
         $threshold = min(3, count($opts['v']));
     }
 }
@@ -66,4 +67,3 @@ $l->critical("Something CRITICAL(500) is when an exception or error goes uncaugh
 $l->alert("An ALERT(550) means an external service other than MySQL is offline");
 $l->emergency("If you get an EMERGENCY(600), MySQL is offline", array(new PDOException("MySQL went away")));
 $l->debug("[ ] => You can also force a completely custom log at any level if it's formatted like this one (don't forget the trailing newline)\n");
-

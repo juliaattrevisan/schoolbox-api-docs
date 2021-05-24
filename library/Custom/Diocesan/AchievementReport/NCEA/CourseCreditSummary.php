@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\NCEA;
 
 /**
@@ -107,7 +109,6 @@ class CourseCreditSummary extends Base
              */
             if (!$this->isProgressive($current['Result'])) {
                 if ($this->includeData($internalExternal, $current['StudentYear'])) {
-
                     /* Only accumulate A/M/E values
                      */
                     if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {

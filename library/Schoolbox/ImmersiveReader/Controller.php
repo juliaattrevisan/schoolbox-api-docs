@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ImmersiveReader;
 
 use Alaress\Web\Controller\Base;
@@ -31,7 +33,8 @@ class Controller extends Base
         $httpClient = new Client(['curl' => ProxyServer::getInstance()->buildCurlOptions()]);
 
         try {
-            $result = $httpClient->post('https://login.windows.net/' . $tenant_id . '/oauth2/token',
+            $result = $httpClient->post(
+                'https://login.windows.net/' . $tenant_id . '/oauth2/token',
                 [
                     'headers'     => ['Content-Type' => 'application/x-www-form-urlencoded'],
                     'form_params' => [
@@ -45,14 +48,13 @@ class Controller extends Base
 
             $authToken = json_decode($result->getBody()->getContents(), true);
 
-            if($authToken['access_token']) {
-                $output = ['token'=>$authToken['access_token'], 'subdomain' => $subdomain];
+            if ($authToken['access_token']) {
+                $output = ['token' => $authToken['access_token'], 'subdomain' => $subdomain];
                 $this->getResponse()->content->set(
                     $this->buildJsonOutput($output)
                 );
             }
-
-        } catch (ClientException $e ) {
+        } catch (ClientException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
             $this->getResponse()->content->set(

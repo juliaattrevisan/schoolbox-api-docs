@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Settings\FieldType\SelectKey\Test;
@@ -165,12 +167,12 @@ class RendererTest extends TestCase
             "optional, empty string "       => [$renderer, $config, false, '',              true],
             "optional, valid value"         => [$renderer, $config, false, '0',             true],
             "optional, invalid int value"   => [$renderer, $config, false, '9',             true],
-            "optional, invalid string value"=> [$renderer, $config, false, 'invalid value', true],
+            "optional, invalid string value" => [$renderer, $config, false, 'invalid value', true],
             "required, null"                => [$renderer, $config, true,  null,            true],
             "required, empty string "       => [$renderer, $config, true,  '',              true],
             "required, valid value"         => [$renderer, $config, true,  '0',             false],
             "required, invalid int value"   => [$renderer, $config, true,  '9',             true],
-            "required, invalid string value"=> [$renderer, $config, true,  'invalid value', true],
+            "required, invalid string value" => [$renderer, $config, true,  'invalid value', true],
         ];
     }
 

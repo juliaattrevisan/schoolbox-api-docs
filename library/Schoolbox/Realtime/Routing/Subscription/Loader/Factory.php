@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -60,7 +61,6 @@ class Factory
             }
             // pull in from cache
             return new CacheLoader($this->redis, $cacheKey, $this->log);
-
         } catch (InvalidArgumentException $e) {
             // empty/invalid cache: load up the subscriptions manually
             $this->log->warning($e->getMessage());
@@ -147,5 +147,4 @@ class Factory
         }
         return $this->folderMapper;
     }
-
 }

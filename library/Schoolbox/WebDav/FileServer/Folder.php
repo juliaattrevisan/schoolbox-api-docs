@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\WebDav\FileServer;
 
 use Sabre\DAV;
@@ -134,7 +136,7 @@ class Folder extends DAV\Collection
         foreach ($allFolders as $currentFolder) {
             if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), $currentFolder->getId()) >= UserAccess::ACCESS_READ) {
                 $folders[] = new Folder(
-                    $this->getPath().'/'.$currentFolder->getName(),
+                    $this->getPath() . '/' . $currentFolder->getName(),
                     $this->getUserSource(),
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
@@ -153,7 +155,7 @@ class Folder extends DAV\Collection
 
             foreach ($fileList as $file) {
                 $files[] = new File(
-                    $this->getPath().'/'.$file->getBasename(),
+                    $this->getPath() . '/' . $file->getBasename(),
                     $this->getUserSource(),
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
@@ -216,7 +218,7 @@ class Folder extends DAV\Collection
         if (strlen($this->getPath()) === 0) {
             $this_folder = $name;
         } else {
-            $this_folder = $this->getPath().'/'.$name;
+            $this_folder = $this->getPath() . '/' . $name;
         }
 
         if ($this->hasSubjectList() && $this_folder === $this->getSubjectList()->getName()) {
@@ -233,7 +235,7 @@ class Folder extends DAV\Collection
                 $this->getAccessor()
             );
         } else {
-            $realname = pathinfo($name,PATHINFO_FILENAME);
+            $realname = pathinfo($name, PATHINFO_FILENAME);
 
             /** @var Collection|FileModel[] $result */
             $result = $this->getFileMapper()->findByColumnList([
@@ -243,7 +245,7 @@ class Folder extends DAV\Collection
 
             if ($result->count()) {
                 return new File(
-                    $this->getPath().'/'.$result->first()->getBasename(),
+                    $this->getPath() . '/' . $result->first()->getBasename(),
                     $this->getUserSource(),
                     $this->getFolderMapper(),
                     $this->getFileMapper(),
@@ -270,7 +272,7 @@ class Folder extends DAV\Collection
         if ($this->isFolder($name, $this->getFolderID())) {
             return true;
         } else {
-            $realname = pathinfo($name,PATHINFO_FILENAME);
+            $realname = pathinfo($name, PATHINFO_FILENAME);
 
             if ($this->getFileMapper()->findByColumnList([ 'realname' => $realname, 'category' => $this->getFolderID() ])->count()) {
                 return true;
@@ -295,8 +297,7 @@ class Folder extends DAV\Collection
     {
         if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), $this->getFolderID()) >= UserAccess::ACCESS_WRITE) {
             $this->getFolderMapper()->deleteFolder($this->getFolder()->getId(), $this->retrieveUserFromSource());
-        }
-        else {
+        } else {
             throw new DAV\Exception\Forbidden('Permission denied to delete folder');
         }
     }
@@ -322,12 +323,11 @@ class Folder extends DAV\Collection
             $file = $this->fileMapper->createModel()
                                      ->setStorage($storage)
                                      ->setTitle($name)
-                                     ->setFilename(pathinfo($name,PATHINFO_FILENAME))
+                                     ->setFilename(pathinfo($name, PATHINFO_FILENAME))
                                      ->setFolder($this->folder)
                                      ->setOwner($this->retrieveUserFromSource());
 
             $this->getFileMapper()->save($file);
-
         } else {
             throw new DAV\Exception\Forbidden('Permission denied to create file');
         }
@@ -368,11 +368,9 @@ class Folder extends DAV\Collection
     public function setName($newName)
     {
         if ($this->getAccessor()->getFolderAccess($this->retrieveUserFromSource(), $this->getFolder()->getParent()->getId()) >= UserAccess::ACCESS_WRITE) {
-
             $this->getFolder()->setName($newName);
             $this->getFolderMapper()->save($this->getFolder());
-        }
-        else {
+        } else {
             throw new DAV\Exception\Forbidden('Permission denied to modify directory');
         }
     }

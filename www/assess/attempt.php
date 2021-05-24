@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Attempt creation. When someone makes an Attempt at an Assessment, record the
  * various details. This is loaded for each Section in the Assessment.
@@ -60,8 +61,7 @@ if (!$section) {
  */
 try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-}
-catch (Mapper\Exception $e) {
+} catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
@@ -83,7 +83,6 @@ if ($accessLevel < UserAccess::ACCESS_WRITE) {
     if ($assessment->isSpecification()) {
         error(19);
     }
-
 } else {
     // I can do whatever I want
 }
@@ -123,7 +122,7 @@ $attemptEndTime = $attemptStartTime + $assess['duration'];
  * attempts waiting for you to complete and you don't have an attempt_id
  */
 if (!is_numeric($attempt['attempt_id'])) {
-	SitePage::localRedir('/assess/intro/' . $assess['assess_id']);
+    SitePage::localRedir('/assess/intro/' . $assess['assess_id']);
 }
 
 /* Check if Attempt ran out of time
@@ -162,10 +161,9 @@ $this->setVar(array(
     'CURRENT_SECTION_SEQUENCE' => $section['sequence'],
 ));
 
-if($section['description']) {
+if ($section['description']) {
     $this->parse('sectionDescription_block', 'sectionDescription');
-}
-else {
+} else {
     $this->setVar('sectionDescription_block', '');
 }
 
@@ -179,7 +177,6 @@ if ($allQuestions) {
     $randomQuestionNumber = 1;
 
     foreach ($allQuestions as $currentQuestion) {
-
         /* Ignore questions that don't exist, or cannot be determined
          * This formerly used to error() critically whenever type_id
          * didn't save properly for whatever reason

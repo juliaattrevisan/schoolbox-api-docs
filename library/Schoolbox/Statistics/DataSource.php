@@ -1,17 +1,19 @@
 <?php
+
 /**
  * @author    Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Statistics;
 
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Log\Mapper AS FolderLogMapper;
-use Schoolbox\Resource\Folder\Visits\Mapper AS VisitsMapper;
+use Schoolbox\Resource\Folder\Log\Mapper as FolderLogMapper;
+use Schoolbox\Resource\Folder\Visits\Mapper as VisitsMapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
@@ -262,7 +264,6 @@ class DataSource
         $statement = $this->folderLogMapper->getDatabase()->prepare($query);
         $statement->execute($queryParams);
         return $statement->fetchColumn();
-
     }
 
 
@@ -342,12 +343,11 @@ class DataSource
                     $records[$row['objectId']]['filesize'] = $row['filesize'];
                     $records[$row['objectId']]['iconFile'] = $row['iconFile'];
                 }
-
             }
         }
 
         // Sort by most accessed first
-        usort($records, function($a, $b) {
+        usort($records, function ($a, $b) {
             return $b['accessCount'] - $a['accessCount'];
         });
 

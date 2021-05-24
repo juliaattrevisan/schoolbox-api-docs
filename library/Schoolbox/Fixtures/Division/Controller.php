@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -18,16 +19,16 @@ use Schoolbox\Fixtures\Sport\Model as Sport;
 use Schoolbox\Fixtures\Sport\Mapper as SportMapper;
 use Schoolbox\Fixtures\Season\Model as Season;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
-use \Schoolbox\Fixtures\Position\Model as Position;
-use \Schoolbox\Fixtures\Position\Mapper as PositionMapper;
-use \Schoolbox\Fixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\Fixtures\Team\Position\Model as TeamPosition;
-use \Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
+use Schoolbox\Fixtures\Position\Model as Position;
+use Schoolbox\Fixtures\Position\Mapper as PositionMapper;
+use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\Fixtures\Team\Position\Model as TeamPosition;
+use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\Fixtures\Division\Model as Division;
 use Schoolbox\Fixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\Fixtures\Division\User\Model as DivisionUser;
-use \Schoolbox\Fixtures\Division\User\Mapper as DivisionUserMapper;
+use Schoolbox\Fixtures\Division\User\Model as DivisionUser;
+use Schoolbox\Fixtures\Division\User\Mapper as DivisionUserMapper;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 
@@ -145,8 +146,7 @@ class Controller extends AbstractController
                 'sport'        => $context,
                 'allDivisions' => $allDivisions
             ]));
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
     }
@@ -182,8 +182,7 @@ class Controller extends AbstractController
             // Load division
             /** @var Division $division */
             $division = $this->getMapper()->findById($entityId);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
@@ -234,7 +233,6 @@ class Controller extends AbstractController
             }
 
             $this->getResponse()->redirect->afterPost($return);
-
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
@@ -287,15 +285,13 @@ class Controller extends AbstractController
 
             // Try external ID, then username
 
-            if(!empty($key)) {
+            if (!empty($key)) {
                 try {
                     $user = $this->getUserMapper()->findByExternalId($key);
-                }
-                catch (MapperException $e) {
+                } catch (MapperException $e) {
                     try {
                         $user = $this->getUserMapper()->findOneByColumn('username', $key);
-                    }
-                    catch (MapperException $e) {
+                    } catch (MapperException $e) {
                         // noop
                     }
                 }
@@ -315,7 +311,6 @@ class Controller extends AbstractController
             }
         }
         $this->renderPostAddPlayersResponse($division);
-
     }
 
     /**
@@ -375,14 +370,14 @@ class Controller extends AbstractController
      *
      * @param int $entityId
      */
-    public function postPlayerPositions($entityId) {
+    public function postPlayerPositions($entityId)
+    {
 
         $teamId = $this->getRequest()->post['team_id'];
         try {
             // Load team
             $team = $this->getTeamMapper()->findById($teamId);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
@@ -390,8 +385,7 @@ class Controller extends AbstractController
         try {
             // Load player
             $player = $this->getUserMapper()->findById($userId);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
@@ -679,5 +673,4 @@ class Controller extends AbstractController
         $this->divisionTranslator = $divisionTranslator;
         return $this;
     }
-
 }

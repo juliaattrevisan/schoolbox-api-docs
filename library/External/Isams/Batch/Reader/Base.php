@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XML reader for finding items in iSAMS' batch API response.
  *

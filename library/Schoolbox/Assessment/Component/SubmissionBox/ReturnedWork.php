@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for teacher returns for student submissions into submission boxes.
  *
@@ -16,11 +17,10 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Mapper\Traits;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use \Schoolbox\Mapper\Traits\Model\Id;
-use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class ReturnedWork implements ISoftDeletable
 {

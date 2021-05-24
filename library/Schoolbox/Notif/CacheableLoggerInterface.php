@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -23,5 +24,4 @@ interface CacheableLoggerInterface extends LoggerInterface
      * @return Storage\Model
      */
     public function flushToStorage($basename = '');
-
 }

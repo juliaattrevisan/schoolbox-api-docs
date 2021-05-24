@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -56,7 +57,7 @@ class Percentage extends AbstractMarkScheme
 
         $matches = [];
         $pattern = '/^\s*(-?[0-9.]+)/';
-        if(!preg_match($pattern, $humanReadableMark, $matches)){
+        if (!preg_match($pattern, $humanReadableMark, $matches)) {
             throw new InvalidArgumentException("Unable to parse percentage value: $humanReadableMark");
         }
 

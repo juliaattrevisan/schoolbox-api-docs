@@ -242,7 +242,7 @@ class Base implements Serializable, IConnector
 
         // Create the correct broker class
 
-        $this->broker = new $settings['brokerClass'];
+        $this->broker = new $settings['brokerClass']();
         $this->broker->setConnector($this);
         $this->broker->connect();
     }

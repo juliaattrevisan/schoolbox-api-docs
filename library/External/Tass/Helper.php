@@ -75,13 +75,13 @@ class External_Tass_Helper
     public function getAddNum()
     {
         $addnum = '';
-        $addnum_array = array_unique(explode(',',trim(Config::get('external_tass_addnum'))));
+        $addnum_array = array_unique(explode(',', trim(Config::get('external_tass_addnum'))));
 
         foreach ($addnum_array as $value) {
             $addnum = $addnum . ',' . $this->getDatabase()->legacyQuote(trim($value));
         }
-        if (strlen($addnum) > 0 ) {
-            $addnum = substr($addnum,1);
+        if (strlen($addnum) > 0) {
+            $addnum = substr($addnum, 1);
         } else {
             $addnum = "'1','4','5'"; // default matching previous hardcodes
         }
@@ -118,7 +118,7 @@ class External_Tass_Helper
     public function getAddNumFather()
     {
         $addnum = $this->getDatabase()->legacyQuote(trim(Config::get('external_tass_addnum_father')));
-        if ($addnum == "''" ) {
+        if ($addnum == "''") {
             $addnum = "'5'"; // TASS default
         }
 
@@ -131,13 +131,13 @@ class External_Tass_Helper
     public function getTypeCode()
     {
         $typecode = '';
-        $typecode_array = array_unique(explode(',',trim(Config::get('external_tass_commrules_typecode'))));
+        $typecode_array = array_unique(explode(',', trim(Config::get('external_tass_commrules_typecode'))));
 
         foreach ($typecode_array as $value) {
             $typecode = $typecode . ',' . $this->getDatabase()->legacyQuote(trim($value));
         }
-        if (strlen($typecode) > 0 ) {
-            $typecode = substr($typecode,1);
+        if (strlen($typecode) > 0) {
+            $typecode = substr($typecode, 1);
         }
 
         return $typecode;

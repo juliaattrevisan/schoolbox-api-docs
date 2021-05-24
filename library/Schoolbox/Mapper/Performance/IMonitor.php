@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Mapper\Performance;
-
 
 use Alaress\Database\Predicate\Builder;
 use Psr\Log\LoggerInterface;
@@ -45,5 +45,4 @@ interface IMonitor extends LoggerInterface
      * @return void
      */
     public function stopExecuteSelectTimer(Mapper $mapper, Builder $predicateBuilder);
-
 }

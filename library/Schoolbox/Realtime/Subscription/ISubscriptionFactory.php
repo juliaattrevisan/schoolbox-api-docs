@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -17,5 +18,4 @@ interface ISubscriptionFactory
      * @return ISubscription
      */
     public function build($instanceId, $userId);
-
 }

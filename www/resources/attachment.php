@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\Factory as ResourceAttachmentFactory;
@@ -72,7 +74,6 @@ if ($_SESSION['user'] instanceof User) {
 }
 
 foreach ($factory->getMappedControllers() as $controller) {
-
     /* Render out the attachment option
      */
     $this->setVar([

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -92,7 +93,7 @@ class AssessmentForm
     public function update(): self
     {
         $i = $this->tester;
-        $i->waitForElementVisible(self::SELECTOR_BUTTON_UPDATE,5);
+        $i->waitForElementVisible(self::SELECTOR_BUTTON_UPDATE, 5);
         $i->click(self::SELECTOR_BUTTON_UPDATE);
         return $this;
     }

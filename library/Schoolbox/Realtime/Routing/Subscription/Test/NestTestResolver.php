@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\Realtime\Routing\Subscription\Test;
 
 use OverflowException;
 use Schoolbox\Realtime\Routing\Subscription\Resolver;
-
 
 class NestTestResolver extends Resolver
 {

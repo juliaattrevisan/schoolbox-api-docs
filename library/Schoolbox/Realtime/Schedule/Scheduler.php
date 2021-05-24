@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Schedule;
-
 
 use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IBrokerException;
@@ -118,7 +118,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     public function onException(\Exception $e)
     {
         if ($e instanceof IBrokerException) {
-
             $msg = $e->getMessage();
             if ($e->getPrevious()) {
                 $msg .= " - {$e->getPrevious()->getMessage()}";
@@ -135,7 +134,7 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             return;
         }
 
-        $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), ['exception'=>$e]);
+        $this->log->critical(sprintf('%s in %s:%s: "%s"', get_class($e), $e->getFile(), $e->getLine(), $e->getMessage()), ['exception' => $e]);
         // we need the daemon to crash if there's a database issue
         if ($e instanceof PDOException || $e instanceof External\Exception) {
             throw $e;
@@ -202,27 +201,21 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
             // notice that we don't acknowledge the resolver here before returning
             return;
-
         } catch (Deleted $e) {
             // this can be thrown from the hydration of the trigger
-            $this->log->warning('Refusing to schedule notification, target object has been deleted.', [ 'exception'=>$e ]);
-
+            $this->log->warning('Refusing to schedule notification, target object has been deleted.', [ 'exception' => $e ]);
         } catch (InvalidArgumentException $e) {
-            $this->log->error($e->getMessage(), [ 'exception'=>$e ]);
-
+            $this->log->error($e->getMessage(), [ 'exception' => $e ]);
         } catch (PDOException $e) {
             // this must be thrown out!
             throw $e;
-
         } catch (RuntimeException $e) {
             $this->log->critical('There was a runtime issue: ' . $e->getMessage(), ['exception' => $e]);
             // this message is can't be parsed, so we ACK it to make it go away
-
         } catch (CompressionException $e) {
-            $this->log->debug('Failed to inflate message: ' . $e->getMessage(), [ 'exception'=>$e ]);
-
+            $this->log->debug('Failed to inflate message: ' . $e->getMessage(), [ 'exception' => $e ]);
         } catch (ErrorException $e) {
-            $this->log->critical('Error Exception: '. $e->getMessage(), [ 'exception'=>$e ]);
+            $this->log->critical('Error Exception: ' . $e->getMessage(), [ 'exception' => $e ]);
         }
 
         $resolver->acknowledge();
@@ -269,7 +262,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
         if ($this->jit) {
             if ($this->jit->saveSchedule($this->resolvers)) {
                 $this->log->debug('Queue save successful');
-
             } else {
                 $this->log->alert('Failed to save queue!');
             }
@@ -321,17 +313,14 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 
         // if this is a cancel trigger, we're not going to even attempt attaching a resolver for it
         if (!$trigger instanceof CancelTrigger) {
-
             // if we have a resolver, attach it
             if ($resolver instanceof IResolver) {
                 $this->attachResolverTrigger($resolver, $trigger);
-
             } else {
                 // it's not the end of the world, but it might indicate a problem
                 $this->log->warning('No resolver supplied for attaching trigger');
             }
         }
-
     }
 
 
@@ -459,7 +448,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
             $resolverCount = count($this->resolvers->getAllResolvers());
             $this->log->debug("Trigger '{$trigger->getIdString()}' detached: $msg [Resolver count {$resolverCount}]");
             return $count;
-
         } catch (OutOfBoundsException $e) {
             $this->log->debug("Trigger '{$trigger->getIdString()}' not detached: " . $e->getMessage());
         }
@@ -485,7 +473,6 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
                 // don't detach, just return the count
                 $resolver = $this->resolvers->getResolverByTrigger($trigger);
                 return $this->resolvers->getTriggerCount($resolver);
-
             } catch (OutOfBoundsException $e) {
                 // resolver was already detached; this isn't good, since a scheduler restart would lose state
                 $this->log->warning("Resolver was already detached for trigger '{$trigger->getIdString()}'");
@@ -503,6 +490,4 @@ class Scheduler extends AbstractScheduler implements IConsumer, EventListener
     {
         return DefaultDispatchStrategy::TASK_PUBLISH;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Output handlnig class that renders xml
  *

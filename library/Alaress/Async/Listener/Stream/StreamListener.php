@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Listener\Stream;
-
 
 use Alaress\Async\Listener\EventListener;
 
@@ -57,5 +57,4 @@ interface StreamListener extends EventListener
      * @return void
      */
     public function errorOccurred(StreamEvent $e);
-
-} 
+}

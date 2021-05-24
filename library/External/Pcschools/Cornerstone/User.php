@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Pcschools_Cornerstone_User
  *
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 class External_Pcschools_Cornerstone_User extends External_Pcschools_User

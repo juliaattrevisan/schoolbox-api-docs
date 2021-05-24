@@ -59,7 +59,8 @@ class Broker extends Base
     /**
      * @inheritdoc
      */
-    public function getDsn() {
+    public function getDsn()
+    {
         $portString = '';
 
         if (!empty($this->connector->getPort())) {
@@ -111,9 +112,7 @@ class Broker extends Base
                     DebugBar::getInstance()->addCollector($collector);
                 }
             }
-
         } catch (Exception $e) {
-
             // Something went wrong during connection
 
             throw new Exception("Error connecting to database.\nPDO Wrapper Error: {$e->getMessage()}");
@@ -132,5 +131,4 @@ class Broker extends Base
     {
         return true;
     }
-
 }

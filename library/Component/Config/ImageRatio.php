@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -24,6 +25,5 @@ class Component_Config_ImageRatio extends Component_Config_Abstract
             $page->setVar('COMPONENT_CONFIG_IMAGERATIO_SELECTED', $o == $configValue ? ' selected="selected"' : '');
             $page->parse('imageratio_block', 'imageratio', true);
         }
-
     }
 }

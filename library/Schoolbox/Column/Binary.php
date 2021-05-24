@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Binary column type - doesn't perform any translation on hydration or
  * dehydration.

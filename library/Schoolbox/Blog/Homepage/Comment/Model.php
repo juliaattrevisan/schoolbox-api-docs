@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for normal (non-eportfolio) blog comments
  *
@@ -16,121 +17,131 @@ use Schoolbox\User;
 
 class Model implements ISoftDeletable
 {
-	use DeletedAtDate;
+    use DeletedAtDate;
 
-	/** @var int */
-	protected $id;
+    /** @var int */
+    protected $id;
 
-	/** @var BlogModel */
-	protected $blog;
+    /** @var BlogModel */
+    protected $blog;
 
-	/** @var User */
-	protected $owner;
+    /** @var User */
+    protected $owner;
 
-	/** @var \Alaress_Date_Format */
-	protected $createdAt;
+    /** @var \Alaress_Date_Format */
+    protected $createdAt;
 
-	/** @var \Alaress_Date_Format */
-	protected $updatedAt;
+    /** @var \Alaress_Date_Format */
+    protected $updatedAt;
 
-	/** @var string */
-	protected $body;
+    /** @var string */
+    protected $body;
 
-	/**
-	 * @param int $id
-	 * @return self
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param BlogModel $blog
-	 * @return self
-	 */
-	public function setBlog($blog) {
-		$this->blog = $blog;
-		return $this;
-	}
+    /**
+     * @param BlogModel $blog
+     * @return self
+     */
+    public function setBlog($blog)
+    {
+        $this->blog = $blog;
+        return $this;
+    }
 
-	/**
-	 * @return BlogModel
-	 */
-	public function getBlog() {
-		return $this->blog;
-	}
+    /**
+     * @return BlogModel
+     */
+    public function getBlog()
+    {
+        return $this->blog;
+    }
 
-	/**
-	 * @param User $owner
-	 * @return self
-	 */
-	public function setOwner($owner) {
-		$this->owner = $owner;
-		return $this;
-	}
+    /**
+     * @param User $owner
+     * @return self
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+        return $this;
+    }
 
-	/**
-	 * @return User
-	 */
-	public function getOwner() {
-		return $this->owner;
-	}
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
 
-	/**
-	 * @param \Alaress_Date_Format $createdAt
-	 * @return self
-	 */
-	public function setCreatedAt($createdAt) {
-		$this->createdAt = $createdAt;
-		return $this;
-	}
+    /**
+     * @param \Alaress_Date_Format $createdAt
+     * @return self
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreatedAt() {
-		return $this->createdAt;
-	}
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getUpdatedAt()
-	{
-		return $this->updatedAt;
-	}
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
 
-	/**
-	 * @param  \Alaress_Date_Format $updatedAt
-	 * @return $this
-	 */
-	public function setUpdatedAt($updatedAt)
-	{
-		$this->updatedAt = $updatedAt;
-		return $this;
-	}
+    /**
+     * @param  \Alaress_Date_Format $updatedAt
+     * @return $this
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
 
-	/**
-	 * @param string $body
-	 * @return self
-	 */
-	public function setBody($body) {
-		$this->body = $body;
-		return $this;
-	}
+    /**
+     * @param string $body
+     * @return self
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getBody() {
-		return $this->body;
-	}
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
 }

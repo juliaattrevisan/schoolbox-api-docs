@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream;
 
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -31,13 +33,11 @@ $postMapper = PostMapper::getInstance();
 /* Delete a post
  */
 if (is_numeric($_GET['delete'])) {
-
     /* Softdelete the post and the entire thread
      */
     try {
         $post = $postMapper->findById($_GET['delete']);
-    }
-    catch(\Schoolbox\Mapper\Exception $e){
+    } catch (\Schoolbox\Mapper\Exception $e) {
         error(ErrorMapper::ERROR_POST_NOT_FOUND);
     }
 
@@ -54,7 +54,6 @@ if (is_numeric($_GET['delete'])) {
         if ($post->getRootId() === 0) {
             $allPosts = $postMapper->findByColumn('root_id', $_GET['delete']);
         } else {
-
             /* For any threaded stuff that isn't a top-level post
              * delete by parent_id
              */

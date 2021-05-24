@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Result;
 
 use Alaress\Web\Router\PathMatcher;
@@ -48,7 +50,8 @@ class Module extends RestfulModule
      *
      * @param Authorizer $authorizer
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
 
         /* Any authenticated user can access the result page
          */
@@ -126,8 +129,7 @@ class Module extends RestfulModule
         $this->addRoutePreload($matcher, '(?:getCreateFormForTeam)', function ($params) {
             try {
                 $team = $this->getTeamMapper()->findById($params['teamId']);
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
 
@@ -151,8 +153,7 @@ class Module extends RestfulModule
         $this->addRoutePreload($matcher, '(?:getResultForTeam)', function ($params) {
             try {
                 $team = $this->getTeamMapper()->findById($params['teamId']);
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
 
@@ -181,6 +182,4 @@ class Module extends RestfulModule
     {
         return $this->getMapperFactory()->get(ErrorMapper::class);
     }
-
-
 }

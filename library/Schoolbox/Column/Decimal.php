@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Decimal number column type. Converted to float in models.
  *

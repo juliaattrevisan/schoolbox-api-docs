@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Test;
-
 
 use Schoolbox\Mapper;
 
@@ -23,5 +23,4 @@ abstract class AbstractTestMapper extends Mapper
         parent::__construct();
         $this->setConfigLoader(new \ConfigFallback());
     }
-
 }

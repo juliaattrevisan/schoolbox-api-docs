@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -50,5 +51,4 @@ class DispatchTransaction extends AbstractTransaction
     {
         $this->dispatcher->enqueue($timer, $this->command, $data);
     }
-
 }

@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,12 +9,12 @@
 
 namespace Alaress\Redis;
 
-
 use Predis\Client;
 use Predis\Command\CommandInterface;
 use Predis\CommunicationException;
 
-class AutoRefreshClient extends Client {
+class AutoRefreshClient extends Client
+{
 
     const MAX_ATTEMPTS = 3;
 
@@ -39,11 +40,10 @@ class AutoRefreshClient extends Client {
     {
         try {
             return parent::executeCommand($command);
-        }
-        catch(CommunicationException $e) {
+        } catch (CommunicationException $e) {
             // redis timed out, this attempt should have reawoken it
 
-            if($retries <= 0) {
+            if ($retries <= 0) {
                 // if we've run out of retries, rethrow the exception
                 throw $e;
             }
@@ -52,5 +52,4 @@ class AutoRefreshClient extends Client {
             return $this->tryCommand($command, $retries - 1);
         }
     }
-
-} 
+}

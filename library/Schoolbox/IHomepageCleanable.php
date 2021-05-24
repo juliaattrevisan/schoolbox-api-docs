@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface for Homepage cleanable components
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox;
 
-interface IHomepageCleanable {
+interface IHomepageCleanable
+{
 
     /**
      * Soft-deletes content for specified homepage

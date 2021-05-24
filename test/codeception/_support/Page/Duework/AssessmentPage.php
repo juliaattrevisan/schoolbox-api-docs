@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -79,7 +80,6 @@ class AssessmentPage
 
         $feedbackForm = new FeedbackForm($i);
         return $feedbackForm;
-
     }
 
     /**
@@ -93,5 +93,4 @@ class AssessmentPage
 
         return new StatusPage($i);
     }
-
 }

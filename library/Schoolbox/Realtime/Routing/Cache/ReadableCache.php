@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\Realtime\Routing\Cache;
 
 use Alaress\Routing\IRouter;
 
-
 interface ReadableCache
 {
     /**
@@ -19,5 +19,4 @@ interface ReadableCache
      * @return void
      */
     public function readIntoRouter($instanceId, IRouter $router);
-
 }

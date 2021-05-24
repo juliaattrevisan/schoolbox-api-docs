@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -15,7 +16,6 @@ use Aura\Router\Router;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
-
 
 class Module extends RestfulModule
 {
@@ -57,7 +57,6 @@ class Module extends RestfulModule
         foreach ($routes['POST'] as $path => $controllerMethod) {
             $this->addPostRoute($router, $controllerMethod, $basePath, $path)->addTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
         }
-
     }
 
 
@@ -87,7 +86,8 @@ class Module extends RestfulModule
      *
      * @param Authorizer $authorizer
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
 
         /* Permissions requirements for being a Sports Administrator
          */

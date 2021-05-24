@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -82,13 +83,13 @@ class BlogForm
         return $this;
     }
 
-    public function selectTemplate():self
+    public function selectTemplate(): self
     {
         $this->tester->selectOption(self::FORM . ' select[name="page_template"]', self::TEMPLATE_MY_LEARNING);
         return $this;
     }
 
-    public function checkGroupPermission():self
+    public function checkGroupPermission(): self
     {
         $inputs = $this->tester->grabMultiple('#folderForm > section > fieldset:nth-child(2) input', 'id');
         foreach ($inputs as $input) {

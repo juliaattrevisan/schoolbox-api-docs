@@ -1,7 +1,8 @@
 <?php
+
 /**
  * Update dashboard feature tour
- * 
+ *
  * These adjustments were required because of the side menu stash feature
  */
 
@@ -164,15 +165,15 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     ];
 
     // Delete all the current steps in the tour for a fresh slate
-    $database->query("SET FOREIGN_KEY_CHECKS=0" );
+    $database->query("SET FOREIGN_KEY_CHECKS=0");
     $statement = $database->prepare("
         DELETE `tour_step`, `tst`, `tse`, `tsm` FROM `tour_step` 
         LEFT JOIN tour_step_event tse on tour_step.uuid = tse.tour_step_uuid
         LEFT JOIN tour_step_modal tsm on tour_step.uuid = tsm.tour_step_uuid
         LEFT JOIN tour_step_tooltip tst on tour_step.uuid = tst.tour_step_uuid
-        WHERE tour_uuid = :tour_uuid" );
-    $statement->execute([':tour_uuid'=>$tour_uuid]);
-    $database->query("SET FOREIGN_KEY_CHECKS=1" );
+        WHERE tour_uuid = :tour_uuid");
+    $statement->execute([':tour_uuid' => $tour_uuid]);
+    $database->query("SET FOREIGN_KEY_CHECKS=1");
 
 
     // Reverse the step array so that we can insert the 'next_step_uuid' without getting an FK error
@@ -181,7 +182,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
     // Insert the content
     $i = 0;
     foreach ($stepsReversed as $step) {
-
         $statement = $database->prepare("
           INSERT INTO   `tour_step`
           (
@@ -219,7 +219,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
 
 
         if ($step['type'] === 'tooltip') {
-
             $statement = $database->prepare("
               INSERT INTO   `tour_step_tooltip`
               (
@@ -247,9 +246,7 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                 'content'        => trim($step['content']),
                 'selector'       => $step['selector'],
             ]);
-
         } else if ($step['type'] === 'modal') {
-
             $statement = $database->prepare("
               INSERT INTO   `tour_step_modal`
               (
@@ -278,7 +275,6 @@ $kernel->run(function ($di, $loop, LoggerInterface $log, $opts) {
                 'content'        => trim($step['content']),
                 'css_class'      => $step['css_class'],
             ]);
-
         }
 
         // Insert any step events

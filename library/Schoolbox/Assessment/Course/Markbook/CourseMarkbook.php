@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Markbook;
@@ -520,7 +522,7 @@ class CourseMarkbook
                     // Special case for project. No directly attached feedbacks.
                     $authNormMark      = $participant->getNormalisedMark(false);
                     $publishedNormMark = $participant->getNormalisedMark(true);
-                    if(null !== $authNormMark){
+                    if (null !== $authNormMark) {
                         $authHrMark           = $participant->getHumanReadableMark(false);
                         $assessmentAnyMarks[] = $authNormMark;
 
@@ -534,14 +536,14 @@ class CourseMarkbook
                         }
 
                         // Only store 'any' mark if is different from 'published' mark, indicating it is composed of at least 1 draft.
-                        if($authNormMark !== $publishedNormMark){
+                        if ($authNormMark !== $publishedNormMark) {
                             // We can short-circuit the conclusion here if the published-only mark differs from the 'any' mark.
                             $pendingDraft = true;
                         } else {
                             // Not sure. Need to go the long way.
                             $pendingDraft = $aImpl->hasPendingDraftAuthoritativeFeedback($participant);
                         }
-                        if($pendingDraft){
+                        if ($pendingDraft) {
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['norm'] = $authNormMark;
                             $this->studentMarks[$courseImplId][$aId][$userId]['draft']['hr']   = $authHrMark;
 
@@ -554,7 +556,7 @@ class CourseMarkbook
                             }
                         }
                     }
-                    if(null !== $publishedNormMark){
+                    if (null !== $publishedNormMark) {
                         $publishedHrMark            = $participant->getHumanReadableMark(true);
                         $assessmentPublishedMarks[] = $publishedNormMark;
 
@@ -654,20 +656,20 @@ class CourseMarkbook
             }
 
             // Calculate average mark for this assessmentImpl
-            if(\count($assessmentAnyMarks)){
-                $this->assessmentImplAverages[$aImplId]['any'] = \array_sum($assessmentAnyMarks)/\count($assessmentAnyMarks);
+            if (\count($assessmentAnyMarks)) {
+                $this->assessmentImplAverages[$aImplId]['any'] = \array_sum($assessmentAnyMarks) / \count($assessmentAnyMarks);
             }
 
 
             // Calculate average published mark for this assessmentImpl
-            if(\count($assessmentPublishedMarks)){
-                $this->assessmentImplAverages[$aImplId]['published'] =  \array_sum($assessmentPublishedMarks)/\count($assessmentPublishedMarks);
+            if (\count($assessmentPublishedMarks)) {
+                $this->assessmentImplAverages[$aImplId]['published'] =  \array_sum($assessmentPublishedMarks) / \count($assessmentPublishedMarks);
             }
         }
 
         // Unset any aggregate assessment impl marks that were not built from published only but didn't encounter any drafts
-        foreach($this->assessmentImplAverages as $aImplId => $marks){
-            if(!\array_key_exists($aImplId, $assessmentImplMarkContainsDrafts)){
+        foreach ($this->assessmentImplAverages as $aImplId => $marks) {
+            if (!\array_key_exists($aImplId, $assessmentImplMarkContainsDrafts)) {
                 unset($this->assessmentImplAverages[$aImplId]['any']);
             }
         }
@@ -680,8 +682,8 @@ class CourseMarkbook
             }
         }
         // Unset any aggregate assessment spec marks that were not built from published only but didn't encounter any drafts
-        foreach($this->assessmentSpecAverages as $aSpecId => $marksForType){
-            if(!\array_key_exists($aSpecId, $assessmentSpecMarkContainsDrafts)){
+        foreach ($this->assessmentSpecAverages as $aSpecId => $marksForType) {
+            if (!\array_key_exists($aSpecId, $assessmentSpecMarkContainsDrafts)) {
                 unset($this->assessmentSpecAverages[$aSpecId]['any']);
             }
         }
@@ -698,18 +700,18 @@ class CourseMarkbook
         }
 
         // Unset any student aggregate mark if it was not composed of any drafts
-        foreach($studentAverageMarks as $courseImplId => $courseMarks){
+        foreach ($studentAverageMarks as $courseImplId => $courseMarks) {
             foreach ($courseMarks as $userId => $studentCourseMarks) {
-                if(!\array_key_exists($userId, $studentMarkContainsDrafts)){
+                if (!\array_key_exists($userId, $studentMarkContainsDrafts)) {
                     unset($studentAverageMarks[$courseImplId][$userId]['any']);
                 }
             }
         }
 
         // And convert into human-readable form
-        foreach($studentAverageMarks as $courseImplId => $courseMarks){
+        foreach ($studentAverageMarks as $courseImplId => $courseMarks) {
             foreach ($courseMarks as $userId => $studentCourseMarks) {
-                foreach ($studentCourseMarks as $publishType => $normalised){
+                foreach ($studentCourseMarks as $publishType => $normalised) {
                     /** @var float $normalised */
                     $this->studentAverageMarks[$courseImplId][$userId][$publishType] = [
                         'norm' => $normalised,

@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @author      James Leckie <james.leckie@alaress.com.au>
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Video;
 
 use Psr\Log\LoggerInterface;
@@ -257,8 +259,8 @@ class Queue extends ResourceVideo
 
         $filenameSource             = $this->getLocalFilename($this->getStorage());
         $filenameTranscodeVideo     = $this->getTempFilename($this->getStorage()->getHash(), "mp4");
-        $filenameTranscodeThumbnail = $this->getTempFilename($this->getStorage()->getHash().'-thumbnail', "jpg");
-        $filenameTranscodePoster    = $this->getTempFilename($this->getStorage()->getHash().'-poster', "jpg");
+        $filenameTranscodeThumbnail = $this->getTempFilename($this->getStorage()->getHash() . '-thumbnail', "jpg");
+        $filenameTranscodePoster    = $this->getTempFilename($this->getStorage()->getHash() . '-poster', "jpg");
 
         // Remember all the temporary files we create so when we error out or finish we can unlink them
 
@@ -301,7 +303,7 @@ class Queue extends ResourceVideo
             ' -y' .
             ' -nostats' .
             " -i {$filenameSourceEscaped}" .
-            ' -max_muxing_queue_size 1024'.  //Set queue size larger to work around bug in some videos
+            ' -max_muxing_queue_size 1024' .  //Set queue size larger to work around bug in some videos
             " -c:v libx264 {$videoMetadata["videoScale"]}" .
             ' -preset slow' .
             " -b:v {$videoBitrateEscaped}" .
@@ -346,7 +348,7 @@ class Queue extends ResourceVideo
                 " -y" .
                 ' -nostats' .
                 " -i {$filenameSourceEscaped}" .
-                ' -max_muxing_queue_size 1024'.
+                ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
                 " -ss {$thumbnailSecondsEscaped}" .
                 " -vf {$videoMetadata["thumbScale"]}crop=64:64" .
@@ -369,7 +371,7 @@ class Queue extends ResourceVideo
                 ' -y' .
                 ' -nostats' .
                 " -i {$filenameSourceEscaped}" .
-                ' -max_muxing_queue_size 1024'.
+                ' -max_muxing_queue_size 1024' .
                 ' -f image2 ' .
                 " -ss {$thumbnailSecondsEscaped}" .
                 ' -frames:v 1' .
@@ -517,7 +519,7 @@ class Queue extends ResourceVideo
 
         if (preg_match("/rotate=(\\d+)/", $infoMessage, $matches)) {
             $rotation = (int)$matches[1];
-            if($rotation === 90 || $rotation === 270) {
+            if ($rotation === 90 || $rotation === 270) {
                 $temp = $height;
                 $height = $width;
                 $width = $temp;
@@ -564,7 +566,7 @@ class Queue extends ResourceVideo
             $height = $maxHeight;
         }
 
-        return [(int)(ceil($width /2)*2), (int)(ceil($height / 2) * 2)];
+        return [(int)(ceil($width / 2) * 2), (int)(ceil($height / 2) * 2)];
     }
 
 

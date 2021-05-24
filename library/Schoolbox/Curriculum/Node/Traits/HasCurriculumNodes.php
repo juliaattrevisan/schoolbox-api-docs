@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base trait for model classes that have curriculum nodes.
  *

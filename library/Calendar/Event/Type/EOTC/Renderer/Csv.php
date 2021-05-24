@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Event_Type_Day_Renderer_Default
  *
@@ -9,15 +10,13 @@
 
 namespace Calendar\Event\Type\EOTC\Renderer;
 
-
 use Calendar\Event\Render\CSVTrait;
 
-class Csv extends Base {
-
+class Csv extends Base
+{
     /**
      * Inherit default CSV formatting
      * render()
      */
     use CSVTrait;
-
 }

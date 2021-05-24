@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,7 +10,7 @@ namespace Schoolbox;
 
 use Aura\Di\Container;
 use Aura\Di\Lazy;
-use \InvalidArgumentException;
+use InvalidArgumentException;
 use Schoolbox\Mapper as BaseMapper;
 
 class MapperFactory
@@ -68,7 +69,7 @@ class MapperFactory
                 return $mapperName::getInstance();
             }
 
-            return new $mapperName;
+            return new $mapperName();
         });
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -7,7 +8,7 @@
 
 namespace Schoolbox\Learning\Quiz\Section\Question\Solution;
 
-use \Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Learning\Quiz\Section\Question\Mapper as QuizQuestionMapper;
 
 /**

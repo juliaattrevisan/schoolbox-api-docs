@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -9,8 +10,8 @@ namespace Schoolbox\Fixtures\Season;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Alaress_Date_Format;
-use \Schoolbox\ValueLabelInterface;
+use Alaress_Date_Format;
+use Schoolbox\ValueLabelInterface;
 
 /**
  * Represents a Season during which sport is conducted
@@ -81,7 +82,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param int $id
      * @return static
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -89,7 +91,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -97,7 +100,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param string $name
      * @return static
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -105,7 +109,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -113,7 +118,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $start
      * @return static
      */
-    public function setStart(Alaress_Date_Format $start) {
+    public function setStart(Alaress_Date_Format $start)
+    {
         $this->start = $start;
         return $this;
     }
@@ -121,7 +127,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return Alaress_Date_Format
      */
-    public function getStart() {
+    public function getStart()
+    {
         return $this->start;
     }
 
@@ -129,7 +136,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $end
      * @return static
      */
-    public function setEnd(Alaress_Date_Format $end) {
+    public function setEnd(Alaress_Date_Format $end)
+    {
         $this->end = $end;
         return $this;
     }
@@ -137,7 +145,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return Alaress_Date_Format
      */
-    public function getEnd() {
+    public function getEnd()
+    {
         return $this->end;
     }
 
@@ -145,7 +154,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $archivedAt
      * @return static
      */
-    public function setArchivedAt(Alaress_Date_Format $archivedAt) {
+    public function setArchivedAt(Alaress_Date_Format $archivedAt)
+    {
         $this->archivedAt = $archivedAt;
         return $this;
     }
@@ -153,7 +163,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return Alaress_Date_Format
      */
-    public function getArchivedAt() {
+    public function getArchivedAt()
+    {
         return $this->archivedAt;
     }
 
@@ -161,7 +172,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $createdAt
      * @return static
      */
-    public function setCreatedAt(Alaress_Date_Format $createdAt) {
+    public function setCreatedAt(Alaress_Date_Format $createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -169,7 +181,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return Alaress_Date_Format $createdAt
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -177,7 +190,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $updatedAt
      * @return static
      */
-    public function setUpdatedAt(Alaress_Date_Format $updatedAt) {
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -185,7 +199,8 @@ class Model implements ISoftDeletable, ValueLabelInterface
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 }

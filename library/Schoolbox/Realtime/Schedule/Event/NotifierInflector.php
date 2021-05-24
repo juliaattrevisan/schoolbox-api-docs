@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Aura\Di\Exception\ReflectionFailure;
 use Schoolbox\Di\Configurator;
 use Schoolbox\Mapper;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
-
 
 class NotifierInflector
 {
@@ -50,15 +50,12 @@ class NotifierInflector
         if ($event->getMapper() instanceof Mapper && $event->getMapper()->getModuleNotifier()) {
             // first try: does the event have a mapper, and if so, does it have a modulenotifier declared?
             $classname = $event->getMapper()->getModuleNotifier();
-
         } elseif (class_exists($modelClass . 'Notifier')) {
             // next, try for '\Schoolbox\User' => '\Schoolbox\UserNotifier'
             $classname = $modelClass . 'Notifier';
-
         } elseif (class_exists($pregClass)) {
             // then, try for '\Schoolbox\User' => '\Schoolbox\Notifier'
             $classname = $pregClass;
-
         } else {
             return null;
         }
@@ -97,13 +94,10 @@ class NotifierInflector
         try {
             /** @var ModuleNotifierInterface $notifier */
             $notifier = $this->configurator->newInstance($classname);
-
         } catch (\Aura\Di\Exception $e) {
             throw new ReflectionFailure($e->getMessage(), $e->getCode(), $e);
         }
 
         return $notifier;
     }
-
-
 }

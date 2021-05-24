@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DSNCodecTest
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Test;
@@ -33,7 +35,7 @@ class DSNTest extends TestCase
             'Valid DSN 1 (original order)' => [
                 'studentdetails:companycode=123;appcode=ADweh/189;token=923nAD/j\l35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj7///8fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd',
                 [
-                    'studentdetails'=> [
+                    'studentdetails' => [
                         'companycode' => 123,
                         'appcode' => 'ADweh/189',
                         'token' => '923nAD/j\l35h0sd7725=='
@@ -66,7 +68,7 @@ class DSNTest extends TestCase
                         'appcode' => 'xcjFh28',
                         'token' => 'ckbj78fj1kdhg=',
                     ],
-                    'studentdetails'=> [
+                    'studentdetails' => [
                         'companycode' => 123,
                         'appcode' => 'ADweh189',
                         'token' => '923nADjl35h0sd7725=='
@@ -236,5 +238,3 @@ class DSNTest extends TestCase
         $codec->decode($dsn);
     }
 }
-
-

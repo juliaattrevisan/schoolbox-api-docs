@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -49,5 +50,4 @@ class Model extends AbstractFile
         return $this->getPublishedAt() instanceof Alaress_Date_Format
             && $this->getPublishedAt()->getUnixTimeStamp() < Alaress_Date_Format::now()->getUnixTimeStamp();
     }
-
 }

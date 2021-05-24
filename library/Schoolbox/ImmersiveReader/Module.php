@@ -1,16 +1,17 @@
 <?php
+
 /**
  * @author      James Leckie
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\ImmersiveReader;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Config\ConfigMapper;
-
 
 class Module extends BaseModule
 {
@@ -26,8 +27,8 @@ class Module extends BaseModule
     protected function registerRoutes()
     {
         $isLoggedIn = new Rule\All(
-                        new Rule\IsConfigOn('office365_immersive_reader_name', $this->getConfig()),
-                        new Rule\IsLoggedIn()
+            new Rule\IsConfigOn('office365_immersive_reader_name', $this->getConfig()),
+            new Rule\IsLoggedIn()
         );
 
         $this->register('GET', '/getAuth', 'getTokenAndSubdomain', $isLoggedIn, null);
@@ -40,11 +41,14 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename,
+        $injector->set(
+            'controller:' . $this->basename,
             $injector->lazyNew(
-            Controller::class, [
+                Controller::class,
+                [
                         'configMapper'           => $this->getMapperFactory()->getLazy(ConfigMapper::class)
-            ]
-        ));
+                ]
+            )
+        );
     }
 }

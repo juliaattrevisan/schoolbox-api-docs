@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -189,7 +190,8 @@ class CapabilityMark
     {
         foreach ($this->indicatorMarks as $indicatorMark) {
             // TODO indicator usage should have its own ID
-            if ($indicatorMark->getIndicatorUsage()->getIndicator()->getId()
+            if (
+                $indicatorMark->getIndicatorUsage()->getIndicator()->getId()
                 === $indicatorUsage->getIndicator()->getId()
             ) {
                 return $indicatorMark;

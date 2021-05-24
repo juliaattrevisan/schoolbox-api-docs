@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,13 +9,13 @@
 
 namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
 
-
 use Alaress\Date\IClock;
 use Alaress_Date_Format as ADF;
 use OutOfBoundsException;
 use Schoolbox\Campus;
 
-class WarnTrigger extends TimetableTrigger {
+class WarnTrigger extends TimetableTrigger
+{
 
     /**
      * @param Campus $campus
@@ -84,5 +85,4 @@ class WarnTrigger extends TimetableTrigger {
 
         throw new OutOfBoundsException("Date not relevant");
     }
-
 }

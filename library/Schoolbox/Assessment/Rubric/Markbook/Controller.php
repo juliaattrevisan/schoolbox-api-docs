@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Markbook;
@@ -39,6 +41,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_key_exists;
 use function array_keys;
 use function array_merge;
@@ -433,7 +436,7 @@ class Controller extends Base
                 'indicators'   => $indicators,
                 'show'         => $capabilityMaxValue && ($selectedCapabilities === null || in_array((int)$row['capability_id'], $selectedCapabilities, true)),
             ];
-;
+            ;
             // Stuff everything about the assessment into an array
             $assessments[$row['assessment_id']] = [
                 'name'           => $row['assessment_name'],
@@ -631,7 +634,6 @@ class Controller extends Base
 
         foreach ($students as $studentId => $student) {
             foreach ($student['assessments'] as $assessmentId => $assessmentMarks) {
-
                 $assessmentMaxMark = $decimalHydrator->hydrate($assessments[$assessmentId]['maxMark']);
 
                 // Fill out a Due Work with the data we need for the markscheme factory to work
@@ -658,7 +660,7 @@ class Controller extends Base
                 /* Only try to fetch a Capability Grade Group once
                  */
                 $capabilityGradeGroup = null;
-                if ( $assessments[$assessmentId]['capabilityGradeGroupId'] !== null) {
+                if ($assessments[$assessmentId]['capabilityGradeGroupId'] !== null) {
                     try {
                         $capabilityGradeGroup = $this->gradeGroupMapper->findById($assessments[$assessmentId]['capabilityGradeGroupId']);
                     } catch (Mapper\Exception $e) {
@@ -860,7 +862,8 @@ class Controller extends Base
      * @param array $b
      * @return int
      */
-    private function sortByName($a, $b) {
+    private function sortByName($a, $b)
+    {
         return strnatcasecmp($a['name'], $b['name']);
     }
 
@@ -925,7 +928,6 @@ class Controller extends Base
         foreach ($assessments as $assessmentId => $assessmentData) {
             $assessmentWeight = $assessmentData['weight'];
             foreach ($assessmentData['capabilities'] as $capabilityId => $capabilityData) {
-
                 // First time we've seen this capability?
                 if (!array_key_exists($capabilityId, $overallMarks)) {
                     $overallMarks[$capabilityId] = [

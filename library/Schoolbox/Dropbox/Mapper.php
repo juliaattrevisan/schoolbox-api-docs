@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -14,7 +15,6 @@ use Schoolbox\Collection;
 use Schoolbox\Resource;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\AbstractFileMapper;
-
 
 /**
  * Class Mapper
@@ -32,7 +32,8 @@ class Mapper extends AbstractFileMapper implements Schoolbox\IHomepageCleanable
     protected $storageMapper;
 
 
-    public function getFolderFieldname(){
+    public function getFolderFieldname()
+    {
         return 'category';
     }
 
@@ -108,8 +109,8 @@ class Mapper extends AbstractFileMapper implements Schoolbox\IHomepageCleanable
      * @param int $cid
      * @return void
      */
-    public function homepageClean($cid){
-        $this->deleteByColumn('category',$cid);
+    public function homepageClean($cid)
+    {
+        $this->deleteByColumn('category', $cid);
     }
-
-} 
+}

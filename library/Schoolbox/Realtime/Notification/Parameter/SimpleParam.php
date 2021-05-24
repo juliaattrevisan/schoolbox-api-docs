@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -22,5 +23,4 @@ class SimpleParam extends Param
     {
         parent::__construct($value, null, Param::STACKING_REPLACE_NO_DECORATION);
     }
-
 }

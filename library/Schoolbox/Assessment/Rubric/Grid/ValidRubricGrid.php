@@ -1,12 +1,13 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\Grid;
-
 
 /**
  * Spec pattern for validating rubric grids.
@@ -24,7 +25,7 @@ class ValidRubricGrid extends \Alaress\Specification\Base
      * @param Grid $candidate
      * @return bool
      */
-    public function isSatisfiedBy($candidate) : bool
+    public function isSatisfiedBy($candidate): bool
     {
         if (!$candidate instanceof Grid) {
             return false;

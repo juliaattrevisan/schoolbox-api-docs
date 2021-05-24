@@ -1,10 +1,12 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
@@ -85,7 +87,7 @@ HELP;
                     'message' => "Cannot access api endpoint: cannot open/read at least one {$key} xml",
                     'status' => ISpecification::STATUS_EMPTY
                 ];
-            } catch (InvalidUriPartException|InvalidArgumentException $e) {
+            } catch (InvalidUriPartException | InvalidArgumentException $e) {
                 $result[] = [
                     'message' => "Cannot access api endpoint, bad url: {$e->getMessage()}",
                     'status' => ISpecification::STATUS_EMPTY

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
@@ -147,13 +149,11 @@ class Reader implements \Iterator
     public function __construct($filename, bool $hasHeaderRow, bool $filldown = false)
     {
         if (\is_resource($filename)) {
-
             /* Check if it's a fopen'd resource
              */
             $this->filename = null;
             $this->fp = $filename;
         } elseif (is_readable($filename)) {
-
             /* Otherwise maybe it's a path to a filename
              */
             $this->filename = $filename;
@@ -352,13 +352,10 @@ class Reader implements \Iterator
          */
         if (isset($combined['esl'])) {
             if (isset($combined['eal'])) {
-
                 /* Both columns exist; use the EAL column's value as modern usage
                  * should take precedent over legacy usage (noop)
                  */
-
             } else {
-
                 /* ESL column exists, but EAL column doesn't
                  * Map the ESL value into the EAL column
                  */

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -23,7 +24,7 @@ class Model
     protected $visible;
 
     /** @var string */
-    private   $title;
+    private $title;
 
     /**
      * @param int $id

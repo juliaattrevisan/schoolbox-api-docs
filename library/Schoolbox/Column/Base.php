@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Most basic column type - doesn't perform any translation on hydration or
  * dehydration, besides ensuring that values are stored in valid UTF-8.

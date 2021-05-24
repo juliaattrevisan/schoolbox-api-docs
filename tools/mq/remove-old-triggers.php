@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au
@@ -115,7 +116,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                         // add 2 weeks to the date in the msg payload
                         $this->setTTL('CompressedTrigger', $triggerDate, $key);
                     }
-
                 } catch (Exception $e) {
                     $this->deleteFromRedis('CompressedTrigger for deleted object', null, $key);
                 }
@@ -155,9 +155,10 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      * @param CompressedTrigger $instance
      * @return string
      */
-    private static function triggerInfo(TriggerInterface $output,
-                                        CompressedTrigger $instance): string
-    {
+    private static function triggerInfo(
+        TriggerInterface $output,
+        CompressedTrigger $instance
+    ): string {
         $object = $output->getEvent()->getObject();
         $classname = '';
         $withId = '';
@@ -173,7 +174,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             }
         }
         return "CompressedTrigger [{$output->getLabel()}] : Object {$classname} {$withId} {$output->getEvent()->getAction()}";
-
     }
 
     /**
@@ -218,7 +218,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
         $this->redis->expireat($key, $expireTime->getUnixTimeStamp());
     }
-
 }, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

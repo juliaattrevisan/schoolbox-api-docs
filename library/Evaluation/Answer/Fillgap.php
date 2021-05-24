@@ -15,12 +15,12 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
 {
     use Comparison;
 
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationFillGap';
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'evaluationFillGap';
 
     /**
      * HTML input element prefix used in conjunction with a question_id to
@@ -98,28 +98,30 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         }
     }
 
-	/**
-	 * Render answers in the QuestionBank
-	 *
-	 * @param SitePage $page
-	 * @param string $answer
-	 * @return void
-	 */
-	public function modifyInQuestionBank($page, $answer) {
-		$page->setVar(array(
-			'ANSWER' => Scrub::text($answer)
-		));
-	}
+    /**
+     * Render answers in the QuestionBank
+     *
+     * @param SitePage $page
+     * @param string $answer
+     * @return void
+     */
+    public function modifyInQuestionBank($page, $answer)
+    {
+        $page->setVar(array(
+            'ANSWER' => Scrub::text($answer)
+        ));
+    }
 
-	/**
-	 * Serialize for db storage (we shouldn't be using serialize anymore)
-	 *
-	 * @param string $data
-	 * @return string
-	 */
-	public function encodeForQuestionBank($data) {
-		return $data;
-	}
+    /**
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param string $data
+     * @return string
+     */
+    public function encodeForQuestionBank($data)
+    {
+        return $data;
+    }
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking
@@ -127,13 +129,13 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
      *
      * @inheritdoc
      */
-	public function prepareResponse(SitePage $page, $attemptId, $question_id)
-	{
-		/* Optional configuration hook
-		 */
-		$this->configureResponse($page, $question_id);
+    public function prepareResponse(SitePage $page, $attemptId, $question_id)
+    {
+        /* Optional configuration hook
+         */
+        $this->configureResponse($page, $question_id);
 
-		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
@@ -153,8 +155,8 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             }
 
             $page->setVar(array(
-				'QUESTION_ID' => $question_id,
-				'QUESTION_PLUGIN' => $this->plugin,
+                'QUESTION_ID' => $question_id,
+                'QUESTION_PLUGIN' => $this->plugin,
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => $ans,
             ));
@@ -166,8 +168,8 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             $replace = " <input spellcheck='false' name='fillgap_{$question_id}[]' type='text' value='' /> ";
 
             $page->setVar(array(
-				'QUESTION_ID' => $question_id,
-				'QUESTION_PLUGIN' => $this->plugin,
+                'QUESTION_ID' => $question_id,
+                'QUESTION_PLUGIN' => $this->plugin,
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => preg_replace($pattern, $replace, $currentAnswer['answer']),
             ));
@@ -210,7 +212,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         if ($isNotEmpty) {
             $processedResponse = serialize($data[$this->prefix . $data['question_id']]);
         } else {
-            $processedResponse = NULL;
+            $processedResponse = null;
         }
 
         return parent::saveResponseInternal($data['attempt_id'], $data['section_id'], $data['question_id'], $processedResponse);
@@ -315,214 +317,215 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         return $data;
     }
 
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param SitePage $page
-	 * @param int $attemptId
-	 * @param int $question_id
-	 * @return void
-	 */
-	public function reviewResponse($page, $attemptId, $question_id)
-	{
-		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param int $question_id
+     * @return void
+     */
+    public function reviewResponse($page, $attemptId, $question_id)
+    {
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
-		$currentAnswer = $this->getByQuestionID($question_id);
+        $currentAnswer = $this->getByQuestionID($question_id);
         $decodedAnswer = html_entity_decode($currentAnswer['answer'], ENT_IGNORE | ENT_QUOTES);
 
 
-		/* Pattern match spans to find answers
-		   */
-		$matches = array();
-		$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+        /* Pattern match spans to find answers
+           */
+        $matches = array();
+        $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 
         preg_match_all($pattern, $decodedAnswer, $matches);
 
-		$actualAnswers = $matches[1];
+        $actualAnswers = $matches[1];
 
-		/* Remember where the answers were, so we can compare between the
-		   * student's reponse and the actual answer
-		   */
-		$replace = " <span class='fillgap correct'>$1</span> ";
+        /* Remember where the answers were, so we can compare between the
+           * student's reponse and the actual answer
+           */
+        $replace = " <span class='fillgap correct'>$1</span> ";
         $correctResponse = preg_replace($pattern, $replace, $decodedAnswer);
 
-		if ($existing['response']) {
-			$existingAnswer = unserialize($existing['response']);
+        if ($existing['response']) {
+            $existingAnswer = unserialize($existing['response']);
 
-			/* Prepare a special way to show Fillgap answers. This replaces
-				* %%token%% tokens with inputs and the already-submitted values
-				*/
+            /* Prepare a special way to show Fillgap answers. This replaces
+                * %%token%% tokens with inputs and the already-submitted values
+                */
             $ans = $decodedAnswer;
 
-			$i = 0;
+            $i = 0;
 
-			foreach ($existingAnswer as $val) {
-				$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-				$val = Scrub::text($val);
+            foreach ($existingAnswer as $val) {
+                $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+                $val = Scrub::text($val);
 
-				/* Indicate matching/non-matching responses to answers
-					 */
-				if ($this->compareStrings((string)$actualAnswers[$i], (string)$existingAnswer[$i])) {
-					$replace = " <span class='fillgap correct'>$val</span> ";
-				} else {
-					$replace = " <span class='fillgap incorrect'>$val</span> ";
-				}
+                /* Indicate matching/non-matching responses to answers
+                     */
+                if ($this->compareStrings((string)$actualAnswers[$i], (string)$existingAnswer[$i])) {
+                    $replace = " <span class='fillgap correct'>$val</span> ";
+                } else {
+                    $replace = " <span class='fillgap incorrect'>$val</span> ";
+                }
 
-				$ans = preg_replace($pattern, $replace, $ans, 1, $x);
+                $ans = preg_replace($pattern, $replace, $ans, 1, $x);
 
-				$i++;
-			}
+                $i++;
+            }
 
-			$page->setVar(array(
-				'ANSWER_ID' => $currentAnswer['answer_id'],
-				'ANSWER' => $ans,
-				'RESPONSE_ID' => $existing['response_id'],
-				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-				'REVIEWED_MARKS' => $existing['mark'],
-			));
-		} else {
-			/* Prepare a special way to show Fillgap answers. This replaces
-				* %%token%% tokens with inputs.
-				*/
-			$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-			$replace = " <span class='fillgap incorrect'>&nbsp;</span> ";
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => $ans,
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                'REVIEWED_MARKS' => $existing['mark'],
+            ));
+        } else {
+            /* Prepare a special way to show Fillgap answers. This replaces
+                * %%token%% tokens with inputs.
+                */
+            $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+            $replace = " <span class='fillgap incorrect'>&nbsp;</span> ";
 
-			$page->setVar(array(
-				'ANSWER_ID' => $currentAnswer['answer_id'],
-				'ANSWER' => preg_replace($pattern, $replace, Scrub::html($decodedAnswer)),
-				'RESPONSE_ID' => $existing['response_id'],
-				'REVIEWED_COMMENT' => '',
-				'REVIEWED_MARKS' => 0,
-			));
-		}
+            $page->setVar(array(
+                'ANSWER_ID' => $currentAnswer['answer_id'],
+                'ANSWER' => preg_replace($pattern, $replace, Scrub::html($decodedAnswer)),
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => '',
+                'REVIEWED_MARKS' => 0,
+            ));
+        }
 
-		/* Show correct answer
-		   */
-		$page->setVar(array(
-			'CORRECT_ANSWER' => $correctResponse
-		));
+        /* Show correct answer
+           */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => $correctResponse
+        ));
 
-		$page->parse('answerOption_block', 'answerOption', true);
-	}
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
 
-	/**
-	 * Show the response someone submitted and also show the correct answer.
-	 * Provide an option for the teacher to review the mark and adjust.
-	 *
-	 * @param SitePage $page
-	 * @param int $attemptId
-	 * @param array $currentQuestion
-	 */
-	public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
-		$existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
+    /**
+     * Show the response someone submitted and also show the correct answer.
+     * Provide an option for the teacher to review the mark and adjust.
+     *
+     * @param SitePage $page
+     * @param int $attemptId
+     * @param array $currentQuestion
+     */
+    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
+    {
+        $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
-		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+        $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
-		/* Pattern match spans to find answers
-		   */
-		$matches = array();
-		$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+        /* Pattern match spans to find answers
+           */
+        $matches = array();
+        $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 
-		preg_match_all($pattern, $currentAnswer['answer'], $matches);
+        preg_match_all($pattern, $currentAnswer['answer'], $matches);
 
-		$actualAnswers = $matches[1];
+        $actualAnswers = $matches[1];
 
-		/* Remember where the answers were, so we can compare between the
-		 * student's reponse and the actual answer
-		 */
-		$replace = " <span class='fillgap correct'>$1</span> ";
-		$correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
+        /* Remember where the answers were, so we can compare between the
+         * student's reponse and the actual answer
+         */
+        $replace = " <span class='fillgap correct'>$1</span> ";
+        $correctResponse = preg_replace($pattern, $replace, $currentAnswer['answer']);
 
-		$page->setVar(array(
-			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
-			'USER_FIRSTNAME' => $currentQuestion['firstname'],
-			'USER_LASTNAME' => $currentQuestion['lastname'],
-			'ANSWER_ID' => $currentAnswer['answer_id'],
-		));
+        $page->setVar(array(
+            'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
+            'USER_FIRSTNAME' => $currentQuestion['firstname'],
+            'USER_LASTNAME' => $currentQuestion['lastname'],
+            'ANSWER_ID' => $currentAnswer['answer_id'],
+        ));
 
-		if ($existing['response']) {
-			$existingAnswer = unserialize($existing['response']);
+        if ($existing['response']) {
+            $existingAnswer = unserialize($existing['response']);
 
-			/* Prepare a special way to show Fillgap answers. This replaces
-			 * %%token%% tokens with inputs and the already-submitted values
-			 */
-			$ans = $currentAnswer['answer'];
+            /* Prepare a special way to show Fillgap answers. This replaces
+             * %%token%% tokens with inputs and the already-submitted values
+             */
+            $ans = $currentAnswer['answer'];
 
-			$i = 0;
+            $i = 0;
 
-			foreach ($existingAnswer as $val) {
-				$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-				$val = Scrub::text($val);
+            foreach ($existingAnswer as $val) {
+                $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+                $val = Scrub::text($val);
 
-				/* Indicate matching/non-matching responses to answers
-					 */
-				if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($existingAnswer[$i]))) {
-					$replace = " <span class='fillgap correct'>$val</span> ";
-				} else {
-					$replace = " <span class='fillgap incorrect'>$val</span> ";
-				}
+                /* Indicate matching/non-matching responses to answers
+                     */
+                if (strtolower(trim($actualAnswers[$i])) == strtolower(trim($existingAnswer[$i]))) {
+                    $replace = " <span class='fillgap correct'>$val</span> ";
+                } else {
+                    $replace = " <span class='fillgap incorrect'>$val</span> ";
+                }
 
-				$ans = preg_replace($pattern, $replace, $ans, 1, $x);
+                $ans = preg_replace($pattern, $replace, $ans, 1, $x);
 
-				$i++;
-			}
+                $i++;
+            }
 
-			$page->setVar(array(
-				'ANSWER' => $ans,
-				'RESPONSE_ID' => $existing['response_id'],
-				'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-				'REVIEWED_MARKS' => $existing['mark'],
-			));
-		}
-		else {
-			/* Prepare a special way to show Fillgap answers. This replaces
-			 * %%token%% tokens with inputs.
-			 */
-			$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
-			$replace = " <span class='submitted-late label'>&nbsp;</span> ";
-
+            $page->setVar(array(
+                'ANSWER' => $ans,
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
+                'REVIEWED_MARKS' => $existing['mark'],
+            ));
+        } else {
+            /* Prepare a special way to show Fillgap answers. This replaces
+             * %%token%% tokens with inputs.
+             */
+            $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+            $replace = " <span class='submitted-late label'>&nbsp;</span> ";
 
 
-			$page->setVar(array(
-				'ANSWER' => preg_replace($pattern, $replace, Scrub::html($currentAnswer['answer'])),
-				'RESPONSE_ID' => $existing['response_id'],
-				'REVIEWED_COMMENT' => '',
-				'REVIEWED_MARKS' => 0,
-			));
-		}
 
-		/* Show correct answer
-		   */
-		$page->setVar(array(
-			'CORRECT_ANSWER' => $correctResponse
-		));
+            $page->setVar(array(
+                'ANSWER' => preg_replace($pattern, $replace, Scrub::html($currentAnswer['answer'])),
+                'RESPONSE_ID' => $existing['response_id'],
+                'REVIEWED_COMMENT' => '',
+                'REVIEWED_MARKS' => 0,
+            ));
+        }
 
-		$page->parse('answerOption_block', 'answerOption', true);
-	}
+        /* Show correct answer
+           */
+        $page->setVar(array(
+            'CORRECT_ANSWER' => $correctResponse
+        ));
 
-	/**
-	 * The answer for a question during horizontal marking, so it appears at the
-	 * top under the question itself, and not repeated for each attempt
-	 *
-	 * @param SitePage $page
-	 * @param array $currentQuestion
-	 * @return void
-	 */
-	public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
-		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
+        $page->parse('answerOption_block', 'answerOption', true);
+    }
 
-		/* Pattern match spans to find answers
-		 */
-		$matches = array();
-		$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
+    /**
+     * The answer for a question during horizontal marking, so it appears at the
+     * top under the question itself, and not repeated for each attempt
+     *
+     * @param SitePage $page
+     * @param array $currentQuestion
+     * @return void
+     */
+    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
+    {
+        $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
-		preg_match_all($pattern, $currentAnswer['answer'], $matches);
+        /* Pattern match spans to find answers
+         */
+        $matches = array();
+        $pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 
-		$page->setVar(array(
-			'ANSWER' => Scrub::html($currentAnswer['answer']),
-		));
+        preg_match_all($pattern, $currentAnswer['answer'], $matches);
 
-		$page->parse('answerTop_block', 'answerTop', true);
-	}
+        $page->setVar(array(
+            'ANSWER' => Scrub::html($currentAnswer['answer']),
+        ));
+
+        $page->parse('answerTop_block', 'answerTop', true);
+    }
 }

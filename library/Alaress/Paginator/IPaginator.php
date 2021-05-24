@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interface for paginator helpers.
  *
@@ -11,7 +12,8 @@ namespace Alaress\Paginator;
 
 use OutOfRangeException;
 
-interface IPaginator {
+interface IPaginator
+{
 
     /**
      * Publicly set properties of paginators: items displayed per page, and
@@ -87,5 +89,4 @@ interface IPaginator {
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
     public function getLastOnPage($pageNumber);
-
 }

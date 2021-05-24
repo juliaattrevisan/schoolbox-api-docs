@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Anyone Foolish Enough To Claim It <everyone@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Schoolbox\Campus as Campus;
@@ -168,8 +170,10 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     ? ''
                     : date($this->config->get('date_time'), strtotime($lesson['endTime']));
 
-            if (isset($periodList[$period]['day'][$day]) &&
-                !isset($periodList[$period]['day'][$day][$lesson['classCode']])) {
+            if (
+                isset($periodList[$period]['day'][$day]) &&
+                !isset($periodList[$period]['day'][$day][$lesson['classCode']])
+            ) {
                 $periodList[$period]['day'][$day][$lesson['classCode']] = [
                     'description' => $lesson['subjectName'],
                     'code'        => $lesson['classCode'],
@@ -326,7 +330,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                     ? ''
                     : date($this->config->get('date_time'), strtotime($lesson['endTime']));
 
-            if (isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['ClassCode']])
+            if (
+                isset($periodList[$period]) && !isset($periodList[$period]['class'][$lesson['ClassCode']])
             ) {
                 $periodList[$period]['class'][$lesson['ClassCode']] = array_merge(
                     $periodList[$period],

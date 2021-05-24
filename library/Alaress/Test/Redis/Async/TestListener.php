@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -41,10 +42,8 @@ class TestListener implements Redis\Async\EventListener
 
         if (isset($known[$signal])) {
             $this->log->info("Received request to $signal, behaving as though signal received");
-
         } else {
             $this->log->info("Unrecognised signal '$signal'");
         }
-
     }
 }

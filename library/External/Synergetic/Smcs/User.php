@@ -1,10 +1,12 @@
 <?php
+
 /**
  *
  * @author      Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Resource\Storage;
@@ -22,7 +24,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
             return [];
         }
 
-        if($this->config->get('external_learning_plans')) {
+        if ($this->config->get('external_learning_plans')) {
             $learningPlanQuery = "(
                             SELECT    COUNT(*)
                             FROM      dbo.IndividualPlans IEP
@@ -40,7 +42,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         uvStudents.StudentGiven1,
                         uvStudents.StudentSurname,
                         '' AS StudentGender,
-                        CONVERT(nvarchar(30), uvStudents.StudentBirthDate, ".self::FORMAT_ISO8601." ) as StudentBirthDate,
+                        CONVERT(nvarchar(30), uvStudents.StudentBirthDate, " . self::FORMAT_ISO8601 . " ) as StudentBirthDate,
                         uvStudents.StudentTutorName,
                         uvStudents.StudentHeadOfHouse,
                         House.HeadOfHouseID,
@@ -107,11 +109,9 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
         $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
 
         foreach ($iteratorStudents as $row) {
-
             // There might be multiple records, if this is the first one populate the bulk of the details
 
             if (empty($student)) {
-
                 $student = $row;
 
                 if ($student['StudentBirthDate'] && $birthDate = strtotime($student['StudentBirthDate'])) {
@@ -123,9 +123,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                 $student['AlertMessage'] = [
                     $student['AlertMessage']
                 ];
-
             } else {
-
                 // Additional records will only different by their alert message, we just append these to the
                 // existing student record
 
@@ -173,14 +171,12 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
 
         // Check if we found a photo in the SIS
         if ($photo = $queryPhoto->fetch()) {
-
             /* If this $user doesn't have an image, or if the SIS picture is more recent than the one we
              * currently have, shank it down and save it into brownhole
              *
              * (the latter occurs when the sis gets updated with a new picture and we need to update our storage)
              */
             if ((null === $user->getPortrait()) || $user->getPortrait()->getCreatedAt()->lt(\Alaress_Date_Format::newFromTimestamp(strtotime($photo['ModifiedDate'])))) {
-
                 // Do a query to retrieve the actual photo data from the database
                 unset($queryPhoto);
 

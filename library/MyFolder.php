@@ -109,7 +109,6 @@ class MyFolder extends DeprecatedModel
             $total = count($folderList);
             for ($i = 0; $i < $total; $i++) {
                 if ($folderList[$i]['id'] != $ignore) {
-
                     $childrenList = $this->getFolderTree($folderList[$i]['id'], $depth + 1, $ignore);
 
                     $output[] = [
@@ -199,7 +198,7 @@ class MyFolder extends DeprecatedModel
     public function delete($folderID)
     {
         // delete files
-        $fileHandler = new MyFile;
+        $fileHandler = new MyFile();
         $fileHandler->deleteByParent($folderID);
 
         $this->logAction($folderID, "delete");

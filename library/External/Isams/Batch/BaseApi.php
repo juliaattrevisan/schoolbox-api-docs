@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base class for queries to the iSAMS Batch API.
  *

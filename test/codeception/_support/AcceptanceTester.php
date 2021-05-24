@@ -64,7 +64,7 @@ class AcceptanceTester extends \Codeception\Actor
         $i = $this;
 
         // if snapshot exists - skipping login
-        $snapshotName = 'login:'.$username;
+        $snapshotName = 'login:' . $username;
         if ($i->loadSessionSnapshot($snapshotName)) {
             return;
         }
@@ -77,7 +77,6 @@ class AcceptanceTester extends \Codeception\Actor
         $i->amOnPage('/');
 
         $i->saveSessionSnapshot($snapshotName);
-
     }
 
     /**
@@ -98,7 +97,7 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $i = $this;
         $i->amOnPage('/user/recoverSession');
-        $i->click(['css'=>'a[title=Schoolbox\ Admin]']);
+        $i->click(['css' => 'a[title=Schoolbox\ Admin]']);
         $i->executeJS("var scrollableDiv = document.getElementById('account-content');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
         $i->waitForText($fullname, 5);
@@ -197,7 +196,7 @@ class AcceptanceTester extends \Codeception\Actor
     {
         $this->executeInSelenium(
             function (\Facebook\WebDriver\Remote\RemoteWebDriver $webDriver)
-            use ($selector, $content) {
+ use ($selector, $content) {
                 $webDriver->switchTo()->frame(
                     $webDriver->findElement($selector)
                 );
@@ -208,7 +207,8 @@ class AcceptanceTester extends \Codeception\Actor
                 );
 
                 $webDriver->switchTo()->defaultContent();
-            });
+            }
+        );
     }
 
     /**
@@ -225,7 +225,7 @@ class AcceptanceTester extends \Codeception\Actor
     {
 
         $this->scrollTo($selector);
-        $this->waitForElementVisible($selector,5);
+        $this->waitForElementVisible($selector, 5);
         $this->click($selector);
     }
 }

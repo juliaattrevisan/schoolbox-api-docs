@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Player;
 
 /**
@@ -19,7 +21,8 @@ class Vimeo extends Player
      *
      * @return string|null
      */
-    public function fetchThumbnail() {
+    public function fetchThumbnail()
+    {
         $matches = array();
 
         preg_match('/vimeo.com\/([0-9]+)/', $this->getUrl(), $matches);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Collector for calls to a MSSQL database.
  *
@@ -85,8 +86,7 @@ class MssqlDatabaseCollector extends DataCollector implements Renderable, AssetP
     {
         if ($result === true) {
             return mssql_rows_affected($this->connection);
-        }
-        elseif (is_resource($result)) {
+        } elseif (is_resource($result)) {
             return mssql_num_rows($result);
         }
         return null;
@@ -167,8 +167,8 @@ class MssqlDatabaseCollector extends DataCollector implements Renderable, AssetP
                 "map"     => $this->widget_name,
                 "default" => "[]"
             ),
-            $this->widget_name.":badge" => array(
-                "map"     => $this->widget_name.".nb_statements",
+            $this->widget_name . ":badge" => array(
+                "map"     => $this->widget_name . ".nb_statements",
                 "default" => 0
             )
         );

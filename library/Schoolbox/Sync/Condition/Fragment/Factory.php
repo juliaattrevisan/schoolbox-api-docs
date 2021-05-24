@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Condition\Fragment;
 
 use Schoolbox\Sync\Condition\Type\Model as ConditionType;
@@ -33,7 +35,8 @@ class Factory
      *
      * @return Fragment
      */
-    public function produce() {
+    public function produce()
+    {
         return new Fragment('@upsCondition/container.twig');
     }
 
@@ -44,7 +47,8 @@ class Factory
      * @param ConditionType $conditionType
      * @return Fragment|null
      */
-    public function produceType(ConditionType $conditionType) {
+    public function produceType(ConditionType $conditionType)
+    {
         if ($conditionType->getId() == self::TYPE_GENERAL) {
             return new Fragment('@upsCondition/general.twig');
         } else if ($conditionType->getId() == self::TYPE_USEREXISTS) {

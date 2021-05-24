@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Section creation.
  *
@@ -35,7 +36,7 @@ if (!empty($_POST)) {
      */
     $sectionHandler = new Assess_Section();
 
-    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?".Redirect::RETURN_URL."={$_POST[Redirect::RETURN_URL]}" : "";
+    $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
     // Have to unset the returnUrl from the POST array, otherwise it tries to shove it in the SQL query when creating
     // the section
@@ -76,8 +77,7 @@ if (!empty($_POST)) {
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($assess['category_id']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(117);
     }
 
@@ -144,5 +144,3 @@ if (!empty($_POST)) {
     // bake in a moderate oven for 40 minutes
     $trail->renderIntoSitePage($this, 'BREADCRUMB', $crumbs);
 }
-
-

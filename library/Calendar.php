@@ -515,9 +515,9 @@ class Calendar extends DeprecatedModel
              */
             if (count($groupList)) {
                 $groupQuery = "OR (access = " . EventModel::ACCESS_GROUP . " AND event_folder.folder_id IN (" . implode(
-                        ',',
-                        $groupList
-                    ) . "))";
+                    ',',
+                    $groupList
+                ) . "))";
             }
         }
 
@@ -660,7 +660,11 @@ class Calendar extends DeprecatedModel
             GROUP BY id
             ORDER BY
                 event.start_datetime, event.end_datetime
-        ", EventModel::ACCESS_PERSONAL, EventModel::ACCESS_GROUP, EventModel::ACCESS_CAMPUS, EventModel::ACCESS_CAMPUS
+        ",
+            EventModel::ACCESS_PERSONAL,
+            EventModel::ACCESS_GROUP,
+            EventModel::ACCESS_CAMPUS,
+            EventModel::ACCESS_CAMPUS
         );
 
         $allEvents = $this->db->getAll($query);

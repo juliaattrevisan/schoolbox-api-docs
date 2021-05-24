@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Twig function for outputting a route.
  *
@@ -12,7 +13,8 @@ namespace Alaress\Twig\Method;
 use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 
-class RouteLookup {
+class RouteLookup
+{
 
     /**
      * @var Router
@@ -44,7 +46,8 @@ class RouteLookup {
      * @param  Router $router
      * @return $this
      */
-    public function setRouter($router) {
+    public function setRouter($router)
+    {
         $this->router = $router;
         return $this;
     }
@@ -52,8 +55,8 @@ class RouteLookup {
     /**
      * @return Router
      */
-    public function getRouter() {
+    public function getRouter()
+    {
         return $this->router;
     }
-
 }

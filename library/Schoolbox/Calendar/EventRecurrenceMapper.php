@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventRecurrenceMapper
  *
@@ -172,7 +173,6 @@ class EventRecurrenceMapper
             } elseif ($efficacy == self::EFFICACY_SELF) {
                 $this->persistSingle($event, $eventRelations, $access, $eventRecurrence);
             }
-
         } else {
             // this is a new object
             $previous = null;

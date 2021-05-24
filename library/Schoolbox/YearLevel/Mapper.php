@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\YearLevel;
@@ -11,6 +13,7 @@ use InvalidArgumentException;
 use PDO;
 use Schoolbox;
 use Schoolbox\Mapper\Exception\CallbackException;
+
 use function array_map;
 use function implode;
 

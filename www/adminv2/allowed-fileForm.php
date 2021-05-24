@@ -1,4 +1,5 @@
 <?php
+
 use Schoolbox\Collection;
 use Schoolbox\File\Extension;
 use Schoolbox\File\ExtensionMapper;
@@ -27,7 +28,6 @@ if (is_numeric($_GET['delete'])) {
 
     try {
         $mimeMapper->delete($mimeMapper->findById($id));
-
     } catch (Schoolbox\Mapper\Exception $e) {
         // invalid ID
         error(8);
@@ -66,7 +66,7 @@ $mime->setInline($_POST["inline"] === 'true');
 $mime->setEnable($_POST["enable"] === 'true');
 $mime->setMaxFileSize($_POST["max_file_size"]);
 
-if(isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId']) ) {
+if (isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId'])) {
     $mime->setId($_POST['fileTypeId']);
 }
 
@@ -82,7 +82,6 @@ try {
     if ($existing->getId() != $mime->getId()) {
         error(105, 'The mime type you have chosen for this file type is already in use.');
     }
-
 } catch (Schoolbox\Mapper\Exception $e) {
     // doesn't exist: noop
 }

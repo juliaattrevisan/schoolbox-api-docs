@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Payload\Resource\Folder;
@@ -36,7 +38,7 @@ class Update extends Modify
         if ($folder->getInherit()) {
             $this->setInherit(true);
         } else {
-            foreach($rolePerms as $roleId => $accessLevel){
+            foreach ($rolePerms as $roleId => $accessLevel) {
                 $this->setRoleAccessLevel($roleId, $accessLevel);
             }
             $this->setClassCodes($folder->getCodeString());

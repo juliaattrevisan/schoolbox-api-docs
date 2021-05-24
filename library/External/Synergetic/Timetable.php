@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 use Alaress\Cache;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Campus;
@@ -611,7 +613,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         // Add classes into it
         foreach ($periodList as $desc) {
             foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+                if (
+                    $desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
                     && !isset($timetable[$x]['class'][$desc['ClassCode']])
                 ) {
@@ -867,7 +870,8 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         while ($desc = $statement->fetch()) {
             foreach ($timetable as $x => $timetablePeriod) {
-                if ($desc['PeriodNumber'] == $timetablePeriod['periodNumber']
+                if (
+                    $desc['PeriodNumber'] == $timetablePeriod['periodNumber']
                     && $timetablePeriod['periodSequence'] != 2
                     && !isset($timetable[$x]['day'][$desc['DayNumber']][$desc['ClassCode']])
                 ) {
@@ -891,7 +895,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             usort($timetable, [$this, 'sortTimetable']);
         }
         return $timetable;
-
     }
 
 
@@ -924,7 +927,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     public function getTotalDays(Campus $campus)
     {
         if (!isset($this->days[$campus->getExtTimetableCode()])) {
-
             $query  = "SELECT CycleDays FROM luTimetableGroup WHERE Code = '{$campus->getExtTimetableCode()}'";
             $result = $this->getDatabase()->getRow($query);
 

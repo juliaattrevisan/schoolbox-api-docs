@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Sync\Condition\Type;
-
 
 class Model
 {
@@ -56,5 +56,4 @@ class Model
         $this->name = $name;
         return $this;
     }
-
 }

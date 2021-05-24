@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -16,8 +17,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper as 
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as DomainObject;
 use Schoolbox\Mapper;
-
-
 
 /**
  * The new (165+) LMS uses IResponses + IFeedback

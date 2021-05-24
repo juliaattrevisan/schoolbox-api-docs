@@ -7,10 +7,11 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
 use Alaress\Date\Interval;
-use \Schoolbox\Learning\Assessment\AbstractResponse;
+use Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Model extends AbstractResponse
 {

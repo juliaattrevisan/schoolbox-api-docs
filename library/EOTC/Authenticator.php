@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authenticator
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace EOTC;
 
 use Schoolbox\Config\Loader as ConfigLoader;
@@ -107,7 +109,7 @@ class Authenticator
             }
         }
         /* Determine whether you are an EOTC administrator, in general
-		 */
+         */
         else {
             if (count($this->getAllPermissions())) {
                 return true;
@@ -283,7 +285,6 @@ class Authenticator
                     return false;
                 }
             } catch (MapperException $e) {
-
                 /* noop
                  */
             }

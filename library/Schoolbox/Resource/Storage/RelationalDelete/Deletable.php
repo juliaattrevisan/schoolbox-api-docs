@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\RelationalDelete;
@@ -53,7 +55,7 @@ class Deletable implements IRelationalDelete
 
         if ($records->count() > 0) {
             if ($performDryRun) {
-                $this->logger->notice('Will delete ['. $records->count() .'] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
+                $this->logger->notice('Will delete [' . $records->count() . '] record(s) in: ' . $this->mapper->getTable(), ['char' => '-']);
             } else {
                 foreach ($records as $record) {
                     try {
@@ -62,7 +64,7 @@ class Deletable implements IRelationalDelete
                         throw new Mapper\Exception($exception->getMessage());
                     }
                 }
-                $this->logger->notice('['. $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
+                $this->logger->notice('[' . $records->count() . '] record(s) deleted in: ' . $this->mapper->getTable(), ['char' => '-']);
             }
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Save side menu dock / undock
  */
@@ -24,8 +25,7 @@ if (\in_array($_POST['state'], ['show', 'hide'], true)) {
 
         // Save setting
         $userMapper->save($user);
-    }
-    catch (Exception $e) {
+    } catch (Exception $e) {
     }
 }
 

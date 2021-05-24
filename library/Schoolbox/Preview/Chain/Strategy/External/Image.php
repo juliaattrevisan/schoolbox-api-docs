@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Image
  *
@@ -9,8 +10,8 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
-
-class Image extends Base {
+class Image extends Base
+{
 
     /**
      * A list of all the file extensions checked here
@@ -29,8 +30,9 @@ class Image extends Base {
      *
      * @return string
      */
-    public function test() {
-        if (preg_match($this->getExtensions(), $this->getUrl() )) {
+    public function test()
+    {
+        if (preg_match($this->getExtensions(), $this->getUrl())) {
             return [
                 'type' => 'image',
                 'src' => $this->getUrl(),

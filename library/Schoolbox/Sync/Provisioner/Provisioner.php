@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -198,7 +199,6 @@ class Provisioner
             }
 
             if ($ruleset->getConfig()->getEnabled() || $roleType == $forRoleType) {
-
                 $this->logger->info("Commencing $roleType user provision: " . ($update ? 'updating' : 'dry run only'));
 
                 $created = $updated = $skipped = $errors = 0;
@@ -212,7 +212,6 @@ class Provisioner
                 }
 
                 foreach ($externalUsers as $externalUser) {
-
                     // No user id? do nothing
                     $externalUserId = $externalUser->getId();
                     if (!$externalUserId) {
@@ -245,7 +244,6 @@ class Provisioner
                         $commonContext['internalUserId'] = $internalUser->getId();
                         $this->logger->debug("Retrieving existing user: " . $internalUser->formatName(), $commonContext);
                         $action = 'update';
-
                     } catch (MapperException $e) {
                         $internalUser = (new User())
                             ->setCampusCollection(new GenericCollection(Campus::class));
@@ -275,7 +273,6 @@ class Provisioner
                         $this->logger->warning("Skipping {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), $commonContext);
                         ++$skipped;
                         continue;
-
                     } catch (\Exception $e) {
                         // something untoward happened - better raise an error
                         $this->logger->error("Error provisioning {$internalUser->formatName()} ({$internalUser->getExternalId()}): " . $e->getMessage(), array_merge($commonContext, ['error' => $e]));
@@ -291,7 +288,6 @@ class Provisioner
                      * Otherwise leave it unchanged from whatever it was
                      */
                     if ($this->config->get('ups_groups_enabled')) {
-
                         /* Figure out what is going on in the userAccess mutations
                          *
                          * UPS Rulesets can have N adds/removes in any order so you need to compute
@@ -327,7 +323,6 @@ class Provisioner
                             $oldLog = [];
 
                             foreach ($existingGroups as $folderId => $accessLevel) {
-
                                 /* Maybe this folder doesn't actually exist at runtime
                                   */
                                 try {
@@ -352,7 +347,6 @@ class Provisioner
                             $newLog = [];
 
                             foreach ($finalGroups as $folderId => $accessLevel) {
-
                                 /* Maybe this folder doesn't actually exist at runtime
                                  */
                                 try {
@@ -421,7 +415,6 @@ class Provisioner
                         } else {
                             ++$created;
                         }
-
                     } catch (UnexpectedValueException $e) {
                         $this->logger->warning(sprintf("{$internalUser->getFullName()} ({$internalUser->getExternalId()}) fails sanity check (%s): skipping", $e->getMessage()), $context);
                         ++$skipped;
@@ -429,7 +422,6 @@ class Provisioner
                     } catch (\Exception $e) {
                         $this->logger->error("User record save failed: {$e->getMessage()}", array_merge($commonContext, ['error' => $e->getMessage()]));
                         ++$skipped;
-
                     }
                 }
 
@@ -529,7 +521,8 @@ class Provisioner
             // Have we already created a new user with this username?
             if (isset($this->newUsernameCache[$internalUser->getUsername()])) {
                 throw new UnexpectedValueException(
-                    sprintf('A new user with username "%s" was already created. Other user external id: "%s"',
+                    sprintf(
+                        'A new user with username "%s" was already created. Other user external id: "%s"',
                         $internalUser->getUsername(),
                         $this->newUsernameCache[$internalUser->getUsername()]
                     )

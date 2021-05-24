@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assess_Question
  *
@@ -9,20 +10,22 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-class Assess_Question extends Evaluation_Question {
+class Assess_Question extends Evaluation_Question
+{
 
-	public function __construct()
+    public function __construct()
     {
-		parent::__construct();
-		$this->setSectionHandler(new Assess_Section());
-	}
+        parent::__construct();
+        $this->setSectionHandler(new Assess_Section());
+    }
 
-	/**
-	 * Get all available question types.
-	 *
-	 * @return array|bool
-	 */
-    public function getAllQuestionTypes() {
+    /**
+     * Get all available question types.
+     *
+     * @return array|bool
+     */
+    public function getAllQuestionTypes()
+    {
         $query = "SELECT *
                   FROM assess_luQuestionType
                   WHERE availability = 'all'
@@ -32,15 +35,16 @@ class Assess_Question extends Evaluation_Question {
         return $this->db->getAll($query);
     }
 
-	/**
-	 * Get the next question in the sequence
-	 *
-	 * @param int $assessId
-	 * @param int $questionId
-	 * @return array|bool
-	 */
-	public function getNextQuestion($assessId, $questionId) {
-		$query = "
+    /**
+     * Get the next question in the sequence
+     *
+     * @param int $assessId
+     * @param int $questionId
+     * @return array|bool
+     */
+    public function getNextQuestion($assessId, $questionId)
+    {
+        $query = "
 			SELECT *
 			FROM assess_question
 			LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
@@ -48,31 +52,32 @@ class Assess_Question extends Evaluation_Question {
 			ORDER BY assess_question.section_id, assess_question.sequence
 		";
 
-		$allQuestions = $this->db->getAll($query);
+        $allQuestions = $this->db->getAll($query);
 
-		/* PHP traversal because assess_question.sequence resets to 1 for each section
-		 * This makes navigation across sections non-trivial with a simple "next" link
-		 */
-		if (is_array($allQuestions) && count($allQuestions)) {
-			for ($i=0; $i < count($allQuestions); $i++) {
-				if (($allQuestions[$i]['question_id'] == $questionId) && isset($allQuestions[$i+1])) {
-					return $allQuestions[$i+1];
-				}
-			}
-		}
+        /* PHP traversal because assess_question.sequence resets to 1 for each section
+         * This makes navigation across sections non-trivial with a simple "next" link
+         */
+        if (is_array($allQuestions) && count($allQuestions)) {
+            for ($i = 0; $i < count($allQuestions); $i++) {
+                if (($allQuestions[$i]['question_id'] == $questionId) && isset($allQuestions[$i + 1])) {
+                    return $allQuestions[$i + 1];
+                }
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Get the previous question in the sequence
-	 *
-	 * @param int $assessId
-	 * @param int $questionId
-	 * @return array|bool
-	 */
-	public function getPreviousQuestion($assessId, $questionId) {
-		$query = "
+    /**
+     * Get the previous question in the sequence
+     *
+     * @param int $assessId
+     * @param int $questionId
+     * @return array|bool
+     */
+    public function getPreviousQuestion($assessId, $questionId)
+    {
+        $query = "
 			SELECT *
 			FROM assess_question
 			LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
@@ -80,19 +85,19 @@ class Assess_Question extends Evaluation_Question {
 			ORDER BY assess_question.section_id, assess_question.sequence
 		";
 
-		$allQuestions = $this->db->getAll($query);
+        $allQuestions = $this->db->getAll($query);
 
-		/* PHP traversal because assess_question.sequence resets to 1 for each section
-		 * This makes navigation across sections non-trivial with a simple "next" link
-		 */
-		if (is_array($allQuestions) && count($allQuestions)) {
-			for ($i=0; $i < count($allQuestions); $i++) {
-				if (($allQuestions[$i]['question_id'] == $questionId) && isset($allQuestions[$i-1])) {
-					return $allQuestions[$i-1];
-				}
-			}
-		}
+        /* PHP traversal because assess_question.sequence resets to 1 for each section
+         * This makes navigation across sections non-trivial with a simple "next" link
+         */
+        if (is_array($allQuestions) && count($allQuestions)) {
+            for ($i = 0; $i < count($allQuestions); $i++) {
+                if (($allQuestions[$i]['question_id'] == $questionId) && isset($allQuestions[$i - 1])) {
+                    return $allQuestions[$i - 1];
+                }
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 }

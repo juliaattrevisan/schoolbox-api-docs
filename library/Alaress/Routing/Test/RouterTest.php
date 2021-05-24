@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Routing\Test;
-
 
 use Alaress\Routing\Dictionary\SubscriptionDictionary;
 use Alaress\Routing\Router;
@@ -147,7 +147,6 @@ class RouterTest extends TestCase
         try {
             $router->get('foo');
             $this->fail('Did not throw ' . InvalidArgumentException::class);
-
         } catch (InvalidArgumentException $e) {
             // good, we got to here
             $router->add('foo:#', 'fooHash', true);

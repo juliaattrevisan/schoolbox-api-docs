@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tests for binary column type - its hydrator and dehydrator don't change
  * anything.
@@ -8,48 +9,52 @@
  * @link      https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Column\Test;
+
 use Schoolbox\Column\Base;
 use Schoolbox\Column\Binary;
 
-class BinaryTest extends TestCase {
+class BinaryTest extends TestCase
+{
 
-	/**
-	 * @var Base
-	 */
-	protected $object;
+    /**
+     * @var Base
+     */
+    protected $object;
 
     /**
      * @inheritdoc
      */
-    public function setupObject() {
-		$this->object = new Binary();
-		return [];
-	}
+    public function setupObject()
+    {
+        $this->object = new Binary();
+        return [];
+    }
 
     /**
      * @inheritdoc
      */
-    public function getTestHydrate() {
-		return array(
-			array(true, true),
-			array(false, false),
-			array(null, null),
-			array('Dumb', 'Dumb'),
-		);
-	}
+    public function getTestHydrate()
+    {
+        return array(
+            array(true, true),
+            array(false, false),
+            array(null, null),
+            array('Dumb', 'Dumb'),
+        );
+    }
 
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate() {
-		return array(
-			array(true, true),
-			array(false, false),
-			array(null, null),
-			array('Dumb', 'Dumb'),
-			array('12'.chr(128).'34', '12'.chr(128).'34'),
-		);
-	}
+    public function getTestDehydrate()
+    {
+        return array(
+            array(true, true),
+            array(false, false),
+            array(null, null),
+            array('Dumb', 'Dumb'),
+            array('12' . chr(128) . '34', '12' . chr(128) . '34'),
+        );
+    }
 }

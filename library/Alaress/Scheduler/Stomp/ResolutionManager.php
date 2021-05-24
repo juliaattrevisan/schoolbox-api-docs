@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Scheduler\Stomp;
-
 
 use Alaress\Async\Broker\IResolver;
 use Alaress\Scheduler\Trigger\TriggerInterface;
@@ -165,5 +165,4 @@ class ResolutionManager
     {
         return $this->resolvers;
     }
-
-} 
+}

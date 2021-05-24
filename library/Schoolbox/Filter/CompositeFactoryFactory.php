@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -33,7 +34,7 @@ class CompositeFactoryFactory implements IFactoryFactory
      *
      * @param IFactoryFactory ...$factoryFactories
      */
-    public function __construct(IFactoryFactory... $factoryFactories)
+    public function __construct(IFactoryFactory ...$factoryFactories)
     {
         $this->factoryFactories = $factoryFactories;
     }

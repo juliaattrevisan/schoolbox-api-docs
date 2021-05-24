@@ -1,22 +1,22 @@
 <?php
+
  /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Realtime\Schedule\Trigger;
-
 
 use Alaress\Scheduler\Event\EventInterface;
 use Alaress\Scheduler\Trigger\OnetimeTrigger;
 use Schoolbox\Realtime\Schedule\Module\ModuleNotifierInterface;
 
-class InstantTrigger extends OnetimeTrigger implements InstantTriggerInterface {
+class InstantTrigger extends OnetimeTrigger implements InstantTriggerInterface
+{
 
-	/** @var ModuleNotifierInterface */
+    /** @var ModuleNotifierInterface */
     protected $notifier;
 
 
@@ -26,10 +26,10 @@ class InstantTrigger extends OnetimeTrigger implements InstantTriggerInterface {
      * @param EventInterface $why           - event that precipitated this trigger's existence
      * @param ModuleNotifierInterface $how  - the notifier providing the callbacks
      */
-    public function __construct($what, $when, $why, $how) {
+    public function __construct($what, $when, $why, $how)
+    {
         parent::__construct($what, $when, $why);
         $this->notifier = $how;
-
     }
 
 
@@ -38,16 +38,16 @@ class InstantTrigger extends OnetimeTrigger implements InstantTriggerInterface {
      *
      * @return callable[]
      */
-    public function getCallbacks() {
+    public function getCallbacks()
+    {
         return $this->notifier->retrieveCallbacks($this->label);
     }
 
-	/**
-	 * @return ModuleNotifierInterface
-	 */
-	public function getModuleNotifier() {
-		return $this->notifier;
-	}
-
-
-} 
+    /**
+     * @return ModuleNotifierInterface
+     */
+    public function getModuleNotifier()
+    {
+        return $this->notifier;
+    }
+}

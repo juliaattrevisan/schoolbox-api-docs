@@ -89,28 +89,30 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer
         }
     }
 
-	/**
-	 * Render answers in the QuestionBank
-	 *
-	 * @param SitePage $page
-	 * @param string $answer
-	 * @return void
-	 */
-	public function modifyInQuestionBank($page, $answer) {
-		$page->setVar(array(
-			'ANSWER' => Scrub::text($answer),
-		));
-	}
+    /**
+     * Render answers in the QuestionBank
+     *
+     * @param SitePage $page
+     * @param string $answer
+     * @return void
+     */
+    public function modifyInQuestionBank($page, $answer)
+    {
+        $page->setVar(array(
+            'ANSWER' => Scrub::text($answer),
+        ));
+    }
 
-	/**
-	 * Serialize for db storage (we shouldn't be using serialize anymore)
-	 *
-	 * @param string $data
-	 * @return string
-	 */
-	public function encodeForQuestionBank($data) {
-		return $data;
-	}
+    /**
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param string $data
+     * @return string
+     */
+    public function encodeForQuestionBank($data)
+    {
+        return $data;
+    }
 
     /**
      * Resets answer tokens so a user can fill them in while actually taking
@@ -229,7 +231,7 @@ abstract class Evaluation_Answer_Signature extends Evaluation_Answer
         $data['comment'] = $response['comment'];
 
         /* Append awarded mark
-	     */
+         */
         $data['mark'] = $response['mark'];
 
         return $data;

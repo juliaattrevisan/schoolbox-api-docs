@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-use \Schoolbox\Permission\Access\UserAccess;
+
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_ImageSliderController extends Component_Dashboard_ControllerAbstract
 {
@@ -29,7 +31,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
      */
     public function execute()
     {
-        if(!$this->isSourceRenderable()){
+        if (!$this->isSourceRenderable()) {
             return false;
         }
 
@@ -112,7 +114,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
             $url = '';
 
             // sanitise url
-            if($currentFile->getDescription()) {
+            if ($currentFile->getDescription()) {
                 $description = $currentFile->getDescription();
                 if (filter_var($description, FILTER_VALIDATE_URL)) {
                     $url = $description;
@@ -131,13 +133,12 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
                 )
             );
 
-            if($url) {
+            if ($url) {
                 $this->parse('linked_image_block', 'linked_image');
-                $this->setVar('unlinked_image_block','');
-            }
-            else {
+                $this->setVar('unlinked_image_block', '');
+            } else {
                 $this->parse('unlinked_image_block', 'unlinked_image');
-                $this->setVar('linked_image_block','');
+                $this->setVar('linked_image_block', '');
             }
 
             $this->parse('image_scroller_block', 'image_scroller', true);
@@ -168,5 +169,4 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         $this->fileMapper = $fileMapper;
         return $this;
     }
-
 }

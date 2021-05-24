@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\v3;
 
 use GuzzleHttp\Client;
@@ -101,7 +103,6 @@ class Connector
         ]);
 
         $this->accessTokenGenerator = new AccessTokenGenerator($this->client, $plagscanClientId, $plagscanApiKey);
-
     }
 
     /**
@@ -203,7 +204,7 @@ class Connector
         $documentExt = $submissionFile->getStorage()->getExtension();
 
         // Sanitise the file name to ensure valid characters and length
-        $name = preg_replace('/[^A-Za-z0-9_\-\. ]/', '',$filename.'_'.$documentName);
+        $name = preg_replace('/[^A-Za-z0-9_\-\. ]/', '', $filename . '_' . $documentName);
         $name = mb_strcut($name, 0, 255 - ($documentExt ? \strlen($documentExt) + 1 : 0));
 
         return "{$name}.{$documentExt}";
@@ -244,18 +245,15 @@ class Connector
         /* As far as I know, the only success state is statusCode 204
          */
         if ($response->getStatusCode() == 204) {
-
             /* noop: need to wait for plagscan to do its thing
              */
             return false;
         } elseif ($response->getStatusCode() == 400) {
-
             /* This document has already been checked
              * Get the latest version of the report and cache it locally
              * Sadly must check error strings, because plagscan
              */
             switch ($content['error']['message']) {
-
                 /* pseudo-errors: nothing actually went wrong, plagscan puts notices here
                  * for you to interpret
                  */
@@ -278,9 +276,7 @@ class Connector
                 default:
                     return false;
             }
-
         } elseif ($response->getStatusCode() == 404) {
-
             /* This document is getting checked; wait for plagscan to do its thing
              * The current string is "The document is on conversion process.",
              * but I'm just going to assume it's still waiting.
@@ -375,7 +371,6 @@ class Connector
         $content = json_decode($response->getBody(), true);
 
         if ($response->getStatusCode() === 200) {
-
             /* json_decode failed for some reason, but it shouldn't have
              * report back whatever was found
              */

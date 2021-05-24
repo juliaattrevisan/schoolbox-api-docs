@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Weather
  *
@@ -9,7 +10,7 @@
 
 namespace Schoolbox\Fixtures\Match;
 
-use \Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Match\Model as Match;
 use Schoolbox\Weather\WeatherstackClient;
 
 class Weather
@@ -104,7 +105,6 @@ class Weather
         /* Only return data if the match hasn't already occurred
          */
         if ($matchDayDiff >= 0) {
-
             /* Extract all the datums
              * Don't bother if the match day is too far into the future (10 days)
              */

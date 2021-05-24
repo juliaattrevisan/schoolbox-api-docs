@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This authorization method checks whether the user is a student in the given
  * class code or combination of.

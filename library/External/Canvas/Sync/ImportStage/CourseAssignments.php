@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync\ImportStage;
@@ -28,6 +30,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_key_exists;
 use function array_keys;
 use function count;
@@ -82,7 +85,12 @@ class CourseAssignments extends CourseAssessmentAbstract
         Folder\Mapper $folderMapper
     ) {
         parent::__construct(
-            $canvasDb, $schoolboxDb, $assessmentMapper, $log, $config, $courseBridge
+            $canvasDb,
+            $schoolboxDb,
+            $assessmentMapper,
+            $log,
+            $config,
+            $courseBridge
         );
         $this->assignmentBridge    = $assignmentBridge;
         $this->submissionBoxMapper = $submissionBoxMapper;

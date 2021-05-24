@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Config\Modules;
-
 
 use Alaress\Application\Kernel;
 use Schoolbox\Blog\Eportfolio\Module as EportfolioBlogModule;
@@ -31,4 +31,4 @@ class Blog implements ModuleConfigInterface
         $eportfolioBlogModule = new EportfolioBlogModule($di);
         $eportfolioBlogModule->init('/eportfolio/blog');
     }
-} 
+}

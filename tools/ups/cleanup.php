@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Usage: ./cleanup.php [-p] [-vvv]
  *
@@ -37,24 +38,23 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $size = 0;
 
         $pb = $logMapper->getPredicateBuilder();
-        $pb->lessThan('created_at', $removeDate->getDatabase() );
+        $pb->lessThan('created_at', $removeDate->getDatabase());
         $removeLogs = $logMapper->findByPredicates($pb);
 
 
-        foreach($removeLogs as $log) {
+        foreach ($removeLogs as $log) {
             /** @var Schoolbox\Sync\Log\Model $log */
-            $this->getLogger()->info('Removing log file created on: '.$log->getCreatedAt()->getDatabase());
+            $this->getLogger()->info('Removing log file created on: ' . $log->getCreatedAt()->getDatabase());
             $count++;
             $size += $log->getStorage()->getSize();
-            $storageDeleter->remove($log->getStorage()->getHash(),!$this->perform());
-            if($this->perform()) {
+            $storageDeleter->remove($log->getStorage()->getHash(), !$this->perform());
+            if ($this->perform()) {
                 $logMapper->delete($log);
             }
         }
         $this->getLogger()->info(sprintf('Removed %d UPS log files, recovering %s of disk space', $count, Alaress_Byte_Format::bytesToString($size)));
         exit(0);
     }
-
 }, [CliTool\Kernel::OPTION_LEVEL => Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);
 
 $kernel->runApp();

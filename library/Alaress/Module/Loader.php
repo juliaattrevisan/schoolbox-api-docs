@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A loader class for loading module's controller dependencies dynamically.
  *
@@ -57,8 +58,8 @@ class Loader implements LoaderInterface
         if (preg_match($this->moduleRegex, $moduleString, $matches)) {
             $moduleName = $matches['module'];
             if (empty($this->loadedModules[$moduleName])) {
-                if ($this->injector->has('module:'.$moduleName)) {
-                    $module = $this->injector->get('module:'.$moduleName);
+                if ($this->injector->has('module:' . $moduleName)) {
+                    $module = $this->injector->get('module:' . $moduleName);
                     if ($module instanceof Module) {
                         $module->initControllerDependencies();
                     }

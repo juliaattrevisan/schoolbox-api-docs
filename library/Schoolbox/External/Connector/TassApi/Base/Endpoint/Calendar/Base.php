@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Calendar;
@@ -17,7 +19,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-
 
 /**
  * Class Base
@@ -187,7 +188,7 @@ class Base
         /* Event source is an arbitrary string that helps identify the thing that imported
          * them into the local event table so you can do a mass remove if needed
          */
-        $className = explode('\\',get_class($this));
+        $className = explode('\\', get_class($this));
 
         $this->source = (string)array_pop($className);
     }
@@ -289,7 +290,6 @@ class Base
         ));
 
         foreach ($tassEvents['events'] as $tassEvent) {
-
             /* Spawn a new Event instance and ensure that we tell it where it came from
              * Set the normal Event data fields from the $tassEvent structure
              */
@@ -331,7 +331,6 @@ class Base
                     'guid' => $guid
                 ]);
             } catch (\Schoolbox\Mapper\Exception $e) {
-
                 /* Couldn't find any event matching $guid so it's a new event
                  * Make a new source and make a new event instance
                  */

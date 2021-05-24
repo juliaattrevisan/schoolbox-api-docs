@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -80,18 +81,20 @@ class Module extends BaseModule
         );
 
         $canDeleteFeedback = new Rule\Any(
-                                new Rule\IsSuperuser(),
-                                new Rule\All(
-                                    new Rule\IsConfigOn('lms_permit_staff_feedback_delete', $this->getConfig()),
-                                    new Rule\HasRole(Role::STAFF),
-                                    new Rule\Callback(static function (array $params, User $user) {
-                                        if ($params['feedback'] instanceof IFeedback
-                                            && $params['feedback']->getReviewer()->getId() === $user->getId()) {
-                                            return;
-                                        }
+            new Rule\IsSuperuser(),
+            new Rule\All(
+                new Rule\IsConfigOn('lms_permit_staff_feedback_delete', $this->getConfig()),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\Callback(static function (array $params, User $user) {
+                    if (
+                                            $params['feedback'] instanceof IFeedback
+                                            && $params['feedback']->getReviewer()->getId() === $user->getId()
+                    ) {
+                        return;
+                    }
                                         throw new Forbidden("Unable to delete feedback you did not create");
-                                    })
-                                )
+                })
+            )
         );
 
         // Preloads

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Configuration for days selector. Guess what? It's exactly the same as the
  * size selector, just with a different name.
@@ -7,7 +8,8 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-class Component_Config_Days extends Component_Config_Size {
+class Component_Config_Days extends Component_Config_Size
+{
 
     protected function getOptions()
     {

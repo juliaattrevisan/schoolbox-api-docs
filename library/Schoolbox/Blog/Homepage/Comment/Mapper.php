@@ -1,7 +1,8 @@
 <?php
+
 /**
  * Mapper for normal (non-eportfolio) blog comments
- * 
+ *
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -54,7 +55,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
         $offset = (int)$offset;
 
         $stmt = $this->database->prepare(
-        "
+            "
 			SELECT
 				{$this->getColumnString('bc')},
 				{$this->getJoinColumnString('owner', 'u')},
@@ -102,7 +103,8 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
      * @param BlogModel $blog
      * @return Collection
      */
-    public function findForBlog(BlogModel $blog) {
+    public function findForBlog(BlogModel $blog)
+    {
         $stmt = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('c')},
@@ -122,7 +124,7 @@ class Mapper extends BaseMapper implements FeedableMapperInterface
 
         $c = $this->createCollection();
 
-        while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
             /** @var User $user */
             $user = $this->hydrateJoin($r, 'owner', 'u');
 

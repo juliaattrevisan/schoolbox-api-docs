@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -102,7 +103,7 @@ abstract class AbstractSubSource implements IFeedbackDataSource
         /** @var Collection|IFeedback[][] $feedbacks */
         $feedbacks = $this->mapperProxy
             ->findByColumnList($columns)
-            ->groupByCallback(function(IFeedback $v) {
+            ->groupByCallback(function (IFeedback $v) {
                 return $v->getAssessable()->getId();
             })
         ;
@@ -174,6 +175,4 @@ abstract class AbstractSubSource implements IFeedbackDataSource
         }
         return null;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ValidEventPhotosAvailableTest
  *
@@ -16,7 +17,6 @@ namespace Schoolbox\Geosnapshot\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Geosnapshot\ValidEventPhotosAvailable;
-
 
 /**
  * Class ValidEventPhotosAvailableTest
@@ -50,7 +50,7 @@ class ValidEventPhotosAvailableTest extends TestCase
      *
      * @return array
      */
-    public function provider_validEventPhotosAvailable() : array
+    public function provider_validEventPhotosAvailable(): array
     {
         return [
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -117,7 +118,6 @@ class Mapper extends BaseMapper
         $descriptorKey = "d.{$this->getJoinMapper('descriptor')->getIdentifierColumn()}";
 
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
-
             $descriptorId = $r[$descriptorKey];
             if (!$descriptors->offsetExists($descriptorId)) {
                 // Descriptor can be null?
@@ -227,5 +227,4 @@ class Mapper extends BaseMapper
     {
         return true;
     }
-
 }

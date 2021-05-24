@@ -45,7 +45,6 @@ if ($count > 0) {
 
 // posting a revision - wiki may or may not exist
 if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
-
     if (strlen($heading) === 0) {
         error(2);
         exit;
@@ -155,7 +154,6 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     $wikiMapper->save($wiki);
 
     SitePage::localRedir('/wiki/' . $wiki->getCategory()->getId() . '/' . $wiki->getSlug());
-
 } elseif (is_numeric($_GET['revert']) && is_numeric($_GET['wikiID'])) {
     // applying a reversion
     $wiki = $wikiHandler->getByID($_GET['wikiID']);
@@ -208,6 +206,7 @@ if (isset($_POST['heading']) && is_numeric($_POST['categoryID'])) {
     error(2);
 }
 
-function is_ascii($str) {
+function is_ascii($str)
+{
     return mb_check_encoding($str, 'ASCII');
 }

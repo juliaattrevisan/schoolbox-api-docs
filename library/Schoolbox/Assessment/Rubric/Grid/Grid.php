@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -306,9 +307,11 @@ class Grid
         // Now we know the capabilities in use are the same.
         // Check each usage is compatible with the usage in the other.
         foreach ($this->capabilityUsages as $thisCapabilityUsage) {
-            if (!$thisCapabilityUsage->isCompatibleWith(
-                $other->retrieveCapabilityUsage($thisCapabilityUsage->getCapability())
-            )) {
+            if (
+                !$thisCapabilityUsage->isCompatibleWith(
+                    $other->retrieveCapabilityUsage($thisCapabilityUsage->getCapability())
+                )
+            ) {
                 return false;
             }
         }

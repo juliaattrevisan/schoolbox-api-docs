@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -30,5 +31,4 @@ class Alert extends AbstractAction
             (new Decorator())->appendInstance($this->getMessageInstance())->renderAsSocketArray(true)
         );
     }
-
 }

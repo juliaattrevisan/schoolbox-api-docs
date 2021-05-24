@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -127,7 +128,7 @@ class CompletionTest extends TestCase
      */
     public function test_getNormalised_withResponse($humanReadable, TaskResponse $response = null)
     {
-        if($response && $response->isMarkedComplete()){
+        if ($response && $response->isMarkedComplete()) {
             $expected = Completion::NORMALISED_MARK_MAX;
         } else {
             $expected = Completion::NORMALISED_MARK_MIN;
@@ -233,8 +234,8 @@ class CompletionTest extends TestCase
 
         $data = [];
 
-        foreach($humanReadableValues as $humanReadable){
-            foreach($responses as $response){
+        foreach ($humanReadableValues as $humanReadable) {
+            foreach ($responses as $response) {
                 $data[] = [$humanReadable[0], $response];
             }
         }
@@ -304,6 +305,5 @@ class CompletionTest extends TestCase
     private function getTeacherAssessedResponseMarkedAsComplete(): TaskResponse
     {
         return $this->getTeacherAssessedResponseMarkedAsIncomplete()->setMarkedComplete(true);
-
     }
 }

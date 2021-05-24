@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Notice class for notifying admin of new leave request.
  *
@@ -7,12 +8,14 @@
  * @link       https://schoolbox.com.au/
  * @copiedfrom Steve Chan <steve.chan@alaress.com.au>
  */
-class Leave_Core_Notice_Admin_Submitted extends Leave_Core_Notice_Admin_Abstract {
+class Leave_Core_Notice_Admin_Submitted extends Leave_Core_Notice_Admin_Abstract
+{
 
     /**
      * Setup
      */
-    public function setup() {
+    public function setup()
+    {
 
         /* Common replacements
          */

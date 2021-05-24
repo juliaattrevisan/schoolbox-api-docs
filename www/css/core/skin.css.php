@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Outputs the value of configured skin variables in a CSS file.
  *
@@ -89,7 +90,7 @@ foreach ($colorConfigMapping as $configKey => $cssVar) {
     $twigVars['colors'][$configKey] = $createTwigVars($baseColor, $cssVar);
 
     // Build contrasts for every color too
-    $twigVars['colors'][$configKey.'_contrast'] = $createTwigVars(
+    $twigVars['colors'][$configKey . '_contrast'] = $createTwigVars(
         $transformer->calculateTextColor($baseColor),
         $cssVar . '-contrast'
     );

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IResponse
  *
@@ -10,8 +11,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
-use \Schoolbox\Collection;
-use \Schoolbox\User;
+use Schoolbox\Collection;
+use Schoolbox\User;
 
 interface IResponse
 {

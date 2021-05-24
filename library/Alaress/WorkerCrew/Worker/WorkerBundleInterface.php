@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker;
-
 
 use OutOfBoundsException;
 
@@ -165,5 +165,4 @@ interface WorkerBundleInterface
      * @return void
      */
     public function signalAll($signal);
-
-} 
+}

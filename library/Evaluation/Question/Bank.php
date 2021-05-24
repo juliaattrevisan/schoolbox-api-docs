@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Question_Bank
  *
@@ -72,7 +73,8 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      * @param int $questionID
      * @return bool
      */
-    public function addQuestion($questionHandler, $questionCategoryID,  $questionID) {
+    public function addQuestion($questionHandler, $questionCategoryID, $questionID)
+    {
 
         /* Raw questionHandler context, to get the question info
          */
@@ -86,13 +88,14 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
             'answer' => $answer['answer'],
             'marks' => $question['marks'],
             'config' => $question['config'],
-        ));
+         ));
     }
 
     /**
      * Make the assess_question_bank table behave like assess_question
      */
-    protected function setContext() {
+    protected function setContext()
+    {
         $this->getQuestionHandler()->_table = 'assess_question_bank';
         $this->getQuestionHandler()->_index = 'question_bank_id';
 
@@ -113,7 +116,8 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      *
      * @param \Evaluation_Question|null $questionHandler
      */
-    protected function setQuestionHandler($questionHandler) {
+    protected function setQuestionHandler($questionHandler)
+    {
         $this->questionHandler = $questionHandler;
     }
 
@@ -122,7 +126,8 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      *
      * @return \Evaluation_Question|null
      */
-    public function getQuestionHandler() {
+    public function getQuestionHandler()
+    {
         return $this->questionHandler;
     }
 
@@ -131,7 +136,8 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      *
      * @param Assess_Answer $answerHandler
      */
-    protected function setAnswerHandler($answerHandler) {
+    protected function setAnswerHandler($answerHandler)
+    {
         $this->answerHandler = $answerHandler;
     }
 
@@ -140,7 +146,8 @@ abstract class Evaluation_Question_Bank extends DeprecatedModel
      *
      * @return Assess_Answer
      */
-    public function getAnswerHandler() {
+    public function getAnswerHandler()
+    {
         return $this->answerHandler;
     }
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace SocialStream\Post\Player;
 
 /**
@@ -11,14 +13,16 @@ namespace SocialStream\Post\Player;
  *
  * @package SocialStream\Post\Player
  */
-class Ted extends Player {
+class Ted extends Player
+{
 
     /**
      * Fetch thumbnail
      *
      * @return string|null
      */
-    public function fetchThumbnail() {
+    public function fetchThumbnail()
+    {
         $matches = array();
 
         preg_match('#www\.ted\.com/talks/([a-zA-Z0-9_]+)\.html#', $this->getUrl(), $matches);

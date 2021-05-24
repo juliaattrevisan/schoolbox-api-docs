@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * createKeys
  *
@@ -8,6 +9,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MapperFactory;
@@ -68,7 +70,7 @@ HELP;
             'localityName' => 'Melbourne',
             'organizationName' => 'Schoolbox Pty Ltd',
             'organizationalUnitName' => 'Schoolbox',
-            'commonName' =>    $conf->get('site_hostname').'.'.$conf->get('site_domain'),
+            'commonName' =>    $conf->get('site_hostname') . '.' . $conf->get('site_domain'),
             'emailAddress' => 'support@schoolbox.com.au',
         ];
 

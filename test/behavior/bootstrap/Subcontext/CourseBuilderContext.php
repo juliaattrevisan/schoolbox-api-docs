@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps for the course builder.
  *
@@ -10,7 +11,8 @@
 use Behat\Mink\Element;
 use Behat\Gherkin\Node\TableNode;
 
-class Subcontext_CourseBuilderContext extends BaseContext {
+class Subcontext_CourseBuilderContext extends BaseContext
+{
 
     /**
      * Adds a task to the course builder component of this homepage.
@@ -23,7 +25,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param  bool   $self_assess
      * @throws Exception if task list or button isn't found
      */
-    public function addTask($name, $url = '', $self_assess = true) {
+    public function addTask($name, $url = '', $self_assess = true)
+    {
         $component = $this->findCourseBuilderComponent();
         $button    = $component->find('css', '.add_buttons a[data-form_class="for_task"]');
         if (!($button instanceof Element\NodeElement)) {
@@ -36,14 +39,13 @@ class Subcontext_CourseBuilderContext extends BaseContext {
         // Somehow be able to use this for file uploads too.
         if ($url) {
             $form->find('css', 'a[data-function="link"]')->click();
-            $form->fillField('link',  $url);
+            $form->fillField('link', $url);
         }
         // Requires confirmation field: now labeled "self-assess", and the other
         // way around (checked = doesn't require confirmation)
         if ($self_assess) {
             $form->checkField('self_assess');
-        }
-        else {
+        } else {
             $form->uncheckField('self_assess');
         }
         $form->find('css', 'input[type="submit"]')->press();
@@ -59,7 +61,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param string $name
      * @param string $url
      */
-    public function addNonSelfAssessTask($name, $url = '') {
+    public function addNonSelfAssessTask($name, $url = '')
+    {
         $this->addTask($name, $url, false);
     }
 
@@ -72,7 +75,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param string $name
      * @throws Exception if task list or button isn't found
      */
-    public function addDueWorkTask($name = '') {
+    public function addDueWorkTask($name = '')
+    {
         $component = $this->findCourseBuilderComponent();
         $button    = $component->find('css', '.add_buttons a[data-form_class="for_due_work"]');
         if (!($button instanceof Element\NodeElement)) {
@@ -93,7 +97,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param string $name
      * @throws Exception if task list or button isn't found
      */
-    public function addOnlineAssessmentTask($name = '') {
+    public function addOnlineAssessmentTask($name = '')
+    {
         $component = $this->findCourseBuilderComponent();
         $button    = $component->find('css', '.add_buttons a[data-form_class="for_assessment"]');
         if (!($button instanceof Element\NodeElement)) {
@@ -117,7 +122,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param int    $position    The position the course component is in -
      *                            defaults to "1"
      */
-    public function selectCourseForImport($course_path, $section = 'left', $position = 1) {
+    public function selectCourseForImport($course_path, $section = 'left', $position = 1)
+    {
         /** @var Subcontext_ComponentContext $context */
         $context   = $this->getMainContext()->getSubcontextByClassName('Subcontext_ComponentContext');
         $component = $context->getComponentInPosition($section, $position);
@@ -137,7 +143,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param  string $date The date to set (as a strtotime-recognised string)
      * @throws Exception if any required element is not found
      */
-    public function setOpenDateForCourseUnit($unit, $date) {
+    public function setOpenDateForCourseUnit($unit, $date)
+    {
         $this->setDateForCourseUnit($unit, $date, 'open_date');
     }
 
@@ -150,7 +157,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param  string $date The date to set (as a strtotime-recognised string)
      * @throws Exception if any required element is not found
      */
-    public function setDueDateForCourseUnit($unit, $date) {
+    public function setDueDateForCourseUnit($unit, $date)
+    {
         $this->setDateForCourseUnit($unit, $date, 'due_date');
     }
 
@@ -162,7 +170,8 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @param  string $name The name of the element to set
      * @throws Exception if any required element is not found
      */
-    public function setDateForCourseUnit($unit, $date, $name) {
+    public function setDateForCourseUnit($unit, $date, $name)
+    {
         $form = $this->getSession()->getPage()->find('css', 'form#importForm');
         if (!($form instanceof Element\NodeElement)) {
             throw new Exception("Course import form not found");
@@ -182,7 +191,7 @@ class Subcontext_CourseBuilderContext extends BaseContext {
             throw new Exception("Unit \"$unit\" not found in course import form");
         }
 
-        $input = $row->find('css', 'input.'.$name);
+        $input = $row->find('css', 'input.' . $name);
         if (!($input instanceof Element\NodeElement)) {
             throw new Exception("Date input for unit \"$unit\" not found in course import form");
         }
@@ -196,32 +205,35 @@ class Subcontext_CourseBuilderContext extends BaseContext {
      * @throws Exception if task list isn't found
      * @return Element\NodeElement
      */
-    protected function findCourseBuilderComponent() {
+    protected function findCourseBuilderComponent()
+    {
         $component = $this->getSession()->getPage()->find('css', '.component.course_task_list');
         if (!($component instanceof Element\NodeElement)) {
             throw new Exception('Course task list component not found');
         }
         return $component;
     }
-    
+
     /**
      * Finds the course instance component on the current homepage.
      *
      * @throws Exception if it isn't found
      * @return Element\NodeElement
      */
-    protected function findCourseInstanceComponent() {
+    protected function findCourseInstanceComponent()
+    {
         $component = $this->getSession()->getPage()->find('css', '.component.course_instance');
         if (!($component instanceof Element\NodeElement)) {
             throw new Exception('Course instance component not found');
         }
         return $component;
     }
-    
+
     /**
      * Finds a course on the page.
      */
-    protected function findCourse($name) {
+    protected function findCourse($name)
+    {
         $component = $this->findCourseInstanceComponent();
         foreach ($component->findAll('css', '.unit') as $unit) {
             $unit_text = trim($unit->find('css', 'h3')->getText());
@@ -229,77 +241,83 @@ class Subcontext_CourseBuilderContext extends BaseContext {
                 return $unit;
             }
         }
-        throw new Exception('Unit "'.$name.'" not found');
+        throw new Exception('Unit "' . $name . '" not found');
     }
-    
-    protected function findTasks(Element\NodeElement $course_element) {
+
+    protected function findTasks(Element\NodeElement $course_element)
+    {
         return $course_element->findAll('css', '.task-list .unit-task');
     }
-    
+
     /**
      * Expands a course definition.
-     * 
+     *
      * @When /^I expand course "(?P<course>[^"]*)"$/
      */
-    public function expandCourse($course) {
+    public function expandCourse($course)
+    {
         $course_element = $this->findCourse($course);
         $toggler = $course_element->find('css', 'a[data-interaction="toggle-expanded"]');
         if (!$toggler) {
-            throw new Exception('Unit "'.$course.'" toggler does not exist');
+            throw new Exception('Unit "' . $course . '" toggler does not exist');
         }
         if ($course_element->hasClass('expanded')) {
-            throw new Exception('Unit "'.$course.'" is already expanded');
+            throw new Exception('Unit "' . $course . '" is already expanded');
         }
         $this->disableAnimation();
         $toggler->click();
     }
-    
+
     /**
      * @Then /^course "(?P<course>[^"]*)" should have closed$/
      */
-    public function courseShouldHaveClosed($course) {
+    public function courseShouldHaveClosed($course)
+    {
         $course_element = $this->findCourse($course);
         $open_date      = $course_element->getAttribute('data-open_date');
         $due_date       = $course_element->getAttribute('data-due_date');
         $now            = date('Y-m-d');
         if ($now <= $due_date) {
-            throw new Exception('Unit "'.$course.'" has not closed');
+            throw new Exception('Unit "' . $course . '" has not closed');
         }
     }
 
     /**
      * @Then /^course "(?P<course>[^"]*)" should still be open$/
      */
-    public function courseShouldStillBeOpen($course) {
+    public function courseShouldStillBeOpen($course)
+    {
         $course_element = $this->findCourse($course);
         $open_date      = $course_element->getAttribute('data-open_date');
         $due_date       = $course_element->getAttribute('data-due_date');
         $now            = date('Y-m-d');
         if ($now > $due_date) {
-            throw new Exception('Unit "'.$course.'" has closed');
+            throw new Exception('Unit "' . $course . '" has closed');
         }
         if ($now < $open_date) {
-            throw new Exception('Unit "'.$course.'" has not opened yet');
+            throw new Exception('Unit "' . $course . '" has not opened yet');
         }
     }
 
     /**
      * @Then /^course "(?P<course>[^"]*)" should not be open yet$/
      */
-    public function courseShouldNotBeOpenYet($course) {
+    public function courseShouldNotBeOpenYet($course)
+    {
         $course_element = $this->findCourse($course);
         $open_date      = $course_element->getAttribute('data-open_date');
         $due_date       = $course_element->getAttribute('data-due_date');
         $now            = date('Y-m-d');
         if ($now >= $open_date) {
-            throw new Exception('Unit "'.$course.'" has opened');
+            throw new Exception('Unit "' . $course . '" has opened');
         }
     }
 
     /**
      * @Then /^course "(?P<course>[^"]*)" should have tasks:$/
      */
-    public function courseShouldHaveTasks($course, TableNode $table) {
+    public function courseShouldHaveTasks($course, TableNode $table)
+    {
         $course_element = $this->findCourse($course);
         $task_list      = $this->findTasks($course_element);
         $expected_tasks = $table->getHash();

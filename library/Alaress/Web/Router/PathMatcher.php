@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Matches a path from a router against a list of regexps and corresponding
  * callbacks, and runs the callback for each regexp the path matches.
@@ -19,7 +20,8 @@ namespace Alaress\Web\Router;
 
 use Alaress\Module\Loader as ModuleLoader;
 
-class PathMatcher {
+class PathMatcher
+{
 
     /**
      * A list of rules that have been defined.
@@ -74,7 +76,8 @@ class PathMatcher {
      *                          Tags to run may be specified in $this->check()
      * @return $this
      */
-    public function add($pathMatch, $action, $tags = array()) {
+    public function add($pathMatch, $action, $tags = array())
+    {
         $this->ruleList[] = array(
             'pathMatch' => $pathMatch,
             'action'    => $action,
@@ -95,7 +98,8 @@ class PathMatcher {
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @return array
      */
-    public function check($path, $params, $tags = array()) {
+    public function check($path, $params, $tags = array())
+    {
         // First load the module
         $this->moduleLoader->loadModule($path);
         if (!is_array($tags)) {
@@ -132,8 +136,8 @@ class PathMatcher {
      * @return array    An array to override $params with, or null to leave
      *                  untouched.
      */
-    protected function getActionResult($callback, $params) {
+    protected function getActionResult($callback, $params)
+    {
         return call_user_func($callback, $params);
     }
-
 }

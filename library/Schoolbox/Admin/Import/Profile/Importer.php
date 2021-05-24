@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Import\Profile;
@@ -224,28 +226,24 @@ class Importer
     private function processOne(Reader $reader): int
     {
         if ($this->mapping->isStudentProfile($this->type)) {
-
             /* Process the Student Profile csv
              */
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STUDENT));
 
             return $this->processStudentProfile($reader);
         } elseif ($this->mapping->isStaffProfile($this->type)) {
-
             /* Process the Staff Profile csv
              */
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_STAFF));
 
             return $this->processStaffProfile($reader);
         } elseif ($this->mapping->isParentProfile($this->type)) {
-
             /* Process the Parent Profile csv
              */
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_PARENT));
 
             return $this->processParentProfile($reader);
         } elseif ($this->mapping->isRelationship($this->type)) {
-
             /* Process the Relationships csv
              */
             $reader->setExpectedColumns(array_keys(Mapping::IMPORT_COLUMNS_RELATIONSHIP));
@@ -433,7 +431,6 @@ class Importer
         $deletions = implode(',', $deletionIds);
 
         if ('' !== $deletions) {
-
             /* Remove relationships that they once held
              */
             $this->database->executeQuery("
@@ -749,7 +746,6 @@ class Importer
         $n = 0;
 
         foreach ($reader as $row) {
-
             /* Check that both relationships exist. They might not exist because the
              * relationship csv may contain data that wasn't in the other three files
              * (probably from human error but who knows)

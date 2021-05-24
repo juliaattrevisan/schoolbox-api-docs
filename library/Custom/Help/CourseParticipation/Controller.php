@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -27,7 +28,6 @@ use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-
 
 class Controller extends Base
 {
@@ -186,7 +186,6 @@ class Controller extends Base
             $this->getResponse()->redirect->afterPost(
                 $this->getRouteIfAuthorized('helpCourseParticipation.getApiTest')
             );
-
         } catch (BadResponseException $e) {
             $response = $e->getResponse();
 
@@ -359,7 +358,7 @@ class Controller extends Base
 
         $fuzzy = $rq->query->getBool('fuzzy', false);
 
-        try{
+        try {
             $users = $this->handler->getUsersBySchool($schoolCode, $fuzzy);
         } catch (ParticipantRolesNotFoundException $e) {
             $this->sendGenericStatus(self::STATUS_SERVER_ERROR);
@@ -416,7 +415,6 @@ class Controller extends Base
             // just blame the client :P
             $this->sendGenericStatus(self::STATUS_BAD_REQUEST);
             $rs->content->set($this->buildJsonOutput($failedUsers));
-
         } else {
             // everything went fine, nothing to respond with
             $this->sendGenericStatus(self::STATUS_NO_CONTENT);
@@ -429,7 +427,7 @@ class Controller extends Base
      * @throws Mapper\Exception\Deleted
      * @return Collection|IFolder[]
      */
-    private function getCoursesBySchool(string $schoolCode) : Collection
+    private function getCoursesBySchool(string $schoolCode): Collection
     {
         // ok, if you're here, you can see the thing.
         $folder = $this->folderMapper->findById(
@@ -528,7 +526,7 @@ class Controller extends Base
      * @return UserMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getUserMapper() : UserMapper
+    private function getUserMapper(): UserMapper
     {
         return $this->userAccessMapper->getJoinMapper('user');
     }
@@ -538,7 +536,7 @@ class Controller extends Base
      * @return RoleMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getRoleMapper() : RoleMapper
+    private function getRoleMapper(): RoleMapper
     {
         return $this->getUserMapper()->getJoinMapper('role');
     }
@@ -548,7 +546,7 @@ class Controller extends Base
      * @return CampusMapper|Mapper
      * @throws Mapper\DefinitionException
      */
-    private function getCampusMapper() : CampusMapper
+    private function getCampusMapper(): CampusMapper
     {
         return $this->getUserMapper()->getJoinMapper('userCampus');
     }

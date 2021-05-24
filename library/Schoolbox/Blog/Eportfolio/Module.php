@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for e-portfolio blog actions
  *
@@ -191,7 +192,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(BlogController::class));
+        $injector->set('controller:' . $this->basename, $injector->lazyNew(BlogController::class));
     }
 
     /**

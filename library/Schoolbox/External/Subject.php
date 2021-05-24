@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Generic subject object for Schoolbox.
  *
@@ -16,7 +17,6 @@ use Schoolbox\Mapper\Traits\Model\CreateCollection;
 
 class Subject implements IModel
 {
-
     use CreateCollection;
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -10,7 +11,6 @@ namespace Schoolbox\MobileApp;
 
 use Alaress\Async\Notification\Instance\Instance;
 
-
 interface IServiceManager
 {
 
@@ -20,5 +20,4 @@ interface IServiceManager
      * @return void
      */
     public function push($userId, Instance $instance);
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -42,5 +43,4 @@ class DispatchStrategy extends DefaultDispatchStrategy
     {
         return [ self::TASK_ROUTE ];
     }
-
 }

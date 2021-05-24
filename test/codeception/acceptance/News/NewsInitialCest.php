@@ -93,8 +93,8 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
         sleep(1);
-        $i->dontSeeElement(['css'=>'div#cke_comment']);
-        $i->click(['css'=> 'label[for=allow-comments]']);
+        $i->dontSeeElement(['css' => 'div#cke_comment']);
+        $i->click(['css' => 'label[for=allow-comments]']);
     }
 
     public function addTwoNewsComments(AcceptanceTester $i)
@@ -106,9 +106,9 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
         //$i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
-        $i->waitForElementVisible(['css'=>'button.btn-show-ckeditor'], 5);
+        $i->waitForElementVisible(['css' => 'button.btn-show-ckeditor'], 5);
         $i->click(['css' => 'button.btn-show-ckeditor']);
-        $i->waitForElementVisible(['css'=>'div#cke_comment'], 5);
+        $i->waitForElementVisible(['css' => 'div#cke_comment'], 5);
         $i->executeJS('CKEDITOR.instances[\'comment\'].setData("indeed this is intresting news");');
         sleep(2);
         $i->click(['css' => 'a[class=button\ submit]']);
@@ -127,8 +127,8 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->click(['css'=>'a.icon-delete.no-text']);
-        $i->waitForElementVisible(['css'=>'ul.flex-list.buttons'], 8);
+        $i->click(['css' => 'a.icon-delete.no-text']);
+        $i->waitForElementVisible(['css' => 'ul.flex-list.buttons'], 8);
         $i->click('#article-threads-delete-button');
     }
 
@@ -140,8 +140,8 @@ class NewsInitialCest
         $element = Locator::contains('div.small-12.card h3 a', 'Test News Title');
         $i->waitForElementVisible($element, 5);
         $i->click($element);
-        $i->waitForElementVisible(['css'=>'button.btn-show-ckeditor'], 1);
-        $i->click(['css'=> 'label[for=allow-comments]']);
+        $i->waitForElementVisible(['css' => 'button.btn-show-ckeditor'], 1);
+        $i->click(['css' => 'label[for=allow-comments]']);
     }
 
     public function deleteNews(AcceptanceTester $i)
@@ -153,13 +153,12 @@ class NewsInitialCest
         $i->waitForElementVisible($element, 5);
         $i->click($element);
 
-        $i->waitForElementVisible(['css'=>'a.icon-more[title=Actions]'], 5);
-        $i->click(['css'=>'a.icon-more[title=Actions]']);
-        $i->click(['css'=>'a.icon-delete']);
+        $i->waitForElementVisible(['css' => 'a.icon-more[title=Actions]'], 5);
+        $i->click(['css' => 'a.icon-more[title=Actions]']);
+        $i->click(['css' => 'a.icon-delete']);
         $i->waitForElementVisible('#confirm-dialog-confirm-button', 8);
         $i->click('#confirm-dialog-confirm-button');
     }
-
 }
 
 //descendant-or-self::button[@class and contains(concat(' ', normalize-space(@class), ' '), ' button-block ')][contains(., 'Year Levels')]

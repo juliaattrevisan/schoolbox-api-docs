@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for default course page permissions
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\Assessment\Course\Config;
 
-class Model {
+class Model
+{
 
     /**
      * @var int
@@ -35,7 +37,8 @@ class Model {
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -43,7 +46,8 @@ class Model {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -51,7 +55,8 @@ class Model {
      * @param  int   $roleId
      * @return $this
      */
-    public function setRoleId($roleId) {
+    public function setRoleId($roleId)
+    {
         $this->roleId = $roleId;
         return $this;
     }
@@ -59,7 +64,8 @@ class Model {
     /**
      * @return int
      */
-    public function getRoleId() {
+    public function getRoleId()
+    {
         return $this->roleId;
     }
 
@@ -67,7 +73,8 @@ class Model {
      * @param  int   $permission
      * @return $this
      */
-    public function setPermission($permission) {
+    public function setPermission($permission)
+    {
         $this->permission = $permission;
         return $this;
     }
@@ -75,7 +82,8 @@ class Model {
     /**
      * @return int
      */
-    public function getPermission() {
+    public function getPermission()
+    {
         return $this->permission;
     }
 
@@ -83,7 +91,8 @@ class Model {
      * @param  string   $page
      * @return $this
      */
-    public function setPage($page) {
+    public function setPage($page)
+    {
         $this->page = $page;
         return $this;
     }
@@ -91,7 +100,8 @@ class Model {
     /**
      * @return string
      */
-    public function getPage() {
+    public function getPage()
+    {
         return $this->page;
     }
 }

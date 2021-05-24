@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey commencement. If the Survey allows people to re-sit the survey,
  * then clear the current attempt_id. Otherwise, remember it so people can't
@@ -8,6 +9,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\UserMapper;
@@ -17,7 +19,6 @@ $sectionHandler = new Survey_Section();
 $attemptHandler = new Survey_Attempt();
 $groupHandler = new Group();
 $userHandler = new User();
-
 if (!is_numeric($this->arg[0])) {
     error(112);
 }
@@ -29,8 +30,6 @@ if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
 /* Get intro summary for the assessment
  */
 $survey = $surveyHandler->getIntro($this->arg[0]);
-
-
 if ($surveyHandler->isDeleted($this->arg[0])) {
     error(112);
 }
@@ -60,17 +59,15 @@ if (!$surveyHandler->isOpen($survey) && ($groupHandler->getPermission($survey['c
  * Set up Attempt vars
  */
 $numAttempts = $attemptHandler->userHasAttempted($survey['assess_id'], $_SESSION['id']);
-
 $attempt = $attemptHandler->getLatestResumableForUser($survey['assess_id'], $_SESSION['id']);
 $attemptStartTime = strtotime($attempt['start']);
 $attemptTimeRemaining = $attemptStartTime + $survey['duration'] - time();
 $attemptEndTime = $attemptStartTime + $survey['duration'];
-
 /* If there is a resumable attempt, resume it.
  * Otherwise start a new attempt if there is a limit
  */
 if (!$attempt) {
-    /* Clear and exit when you attempt to make more than is allowed
+/* Clear and exit when you attempt to make more than is allowed
       */
     if (($survey['max_attempts'] > 0) && ($numAttempts + 1 > $survey['max_attempts'])) {
         error(146);
@@ -87,13 +84,10 @@ if (($attemptTimeRemaining < 0) && ($attemptStartTime > 0) && ($survey['duration
  */
 $author = UserMapper::getInstance()->findByIdWithFallback($survey['user_id']);
 $folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById($survey['category_id']);
-
 $allSummary = $surveyHandler->getIntroSummary($survey['assess_id']);
 $allSections = $sectionHandler->getList($survey['assess_id']);
-
 $assessStartDate = new Alaress_Date_Format(strtotime($survey['start']), 'U');
 $assessFinishDate = new Alaress_Date_Format(strtotime($survey['finish']), 'U');
-
 $this->setFile(TEMPLATE_content, 'survey/intro.html');
 $this->setBlock(TEMPLATE_content, 'section', 'section_block');
 $this->setBlock(TEMPLATE_content, 'startTest', 'startTest_block');
@@ -101,7 +95,6 @@ $this->setBlock(TEMPLATE_content, 'author_link_open', 'author_link_open_block');
 $this->setBlock(TEMPLATE_content, 'author_link_close', 'author_link_close_block');
 $this->setBlock(TEMPLATE_content, 'has_assess_description', 'has_assess_description_block');
 $this->setTitle('Assessment: ' . Scrub::text($survey['title']));
-
 $this->setVar(array(
     'ASSESS_ASSESS_ID' => $survey['assess_id'],
     'ASSESS_TITLE' => Scrub::text($survey['title']),
@@ -113,13 +106,11 @@ $this->setVar(array(
     'ASSESS_AUTHOR_ID' => $author->getId(),
     'ASSESS_AUTHOR_EXT_ID' => $author->getExternalId(),
     'ASSESS_AUTHOR_ROLE' => $author->getRole()->getName(),
-    'ASSESS_FOLDER' => Scrub::text($folder->getName() . ( $folder->getCodeString() ? ' ('.$folder->getCodeString().')': '')),
+    'ASSESS_FOLDER' => Scrub::text($folder->getName() . ( $folder->getCodeString() ? ' (' . $folder->getCodeString() . ')' : '')),
     'ASSESS_FOLDER_ID' => $folder->getId(),
     'ASSESS_DURATION' => $survey['duration'] == Survey_Main::UNLIMITED_DURATION ? 'Unlimited' : $surveyHandler->sec2hms($survey['duration']),
 ));
-
 $survey['description'] = trim($survey['description']);
-
 if (empty($survey['description'])) {
     $this->setVar('has_assess_description_block', '');
 } else {
@@ -127,7 +118,7 @@ if (empty($survey['description'])) {
 }
 
 if ($author->isDeleted()) {
-    // Don't link the authors name if they are deleted
+// Don't link the authors name if they are deleted
     $this->setVar('author_link_open_block', '');
     $this->setVar('author_link_close_block', '');
 } else {
@@ -144,7 +135,6 @@ if (is_array($allSummary) && count($allSummary)) {
             'SECTION_TITLE' => Scrub::text($currentSummary['title']),
             'SECTION_NUMQUESTIONS' => $currentSummary['pool'] > 0 ? $currentSummary['pool'] : $currentSummary['numQuestions'],
         ));
-
         $this->parse('section_block', 'section', 'true');
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -12,10 +13,10 @@ use PDOStatement;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use \Schoolbox\File\Mimetype;
-use \Schoolbox\Resource\Storage\Model as Storage;
+use Schoolbox\File\Mimetype;
+use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
-use \Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
+use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan;
 use Schoolbox\Learning\InlineGrader\Kami;
 
 /**
@@ -127,7 +128,6 @@ class Mapper extends BaseMapper
         $submissionMapper = $this->getJoinMapper('submission');
 
         foreach ($statement as $row) {
-
             /* Sometimes multiple plagscan results per submission file causes dupes
              * Not sure if it continues to happen normally, but have seen it in demo data
              *

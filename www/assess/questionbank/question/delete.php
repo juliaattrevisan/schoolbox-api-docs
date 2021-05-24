@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Remove a question from the Question Bank
  *
@@ -8,13 +9,11 @@
  */
 
 $groupHandler = new Group();
-
 if (!$groupHandler->isStaff()) {
     error(126);
 }
 
 $questionBankHandler = new Assess_Question_Bank();
-
 if (is_numeric($this->arg[0])) {
     $questionBankHandler->update(array(
             'question_bank_id' => $this->arg[0],

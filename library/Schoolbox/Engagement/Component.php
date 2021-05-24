@@ -26,7 +26,8 @@ class Component
         $this->database = Database::getInstance();
     }
 
-    public function componentInstances($module = 'homepage') {
+    public function componentInstances($module = 'homepage')
+    {
         $query = "SELECT component_definition.name, (
                     SELECT COUNT(*)
                     FROM component_instance WHERE component_definition.id = component_instance.`component_definition_id`
@@ -41,5 +42,4 @@ class Component
         $statement->execute();
         return $statement->fetchAll();
     }
-
 }

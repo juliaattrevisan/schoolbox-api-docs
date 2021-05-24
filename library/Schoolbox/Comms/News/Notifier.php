@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -195,9 +196,11 @@ class Notifier extends AbstractModuleNotifier
         /**
          * Draft or no-change
          */
-        if ($diff === null ||                                                     // no change at all
+        if (
+            $diff === null ||                                                     // no change at all
             (\count($diff) === 1 && \array_key_exists('updatedAt', $diff)) ||            // no real changes
-            ($article->isDraft() && (!$previous || $previous->isDraft()))) {      // creation or updating of draft
+            ($article->isDraft() && (!$previous || $previous->isDraft()))
+        ) {      // creation or updating of draft
             return;
         }
 
@@ -561,11 +564,9 @@ class Notifier extends AbstractModuleNotifier
             // self hydration -_-
             /** @var Article $article */
             $article = $this->mapper->findById($article->getId());
-
         } catch (Deleted $e) {
             $this->log->error('Tried to send an article notification, but it has been deleted; ID is ' . $articleId, [$e]);
             return $envelope;
-
         } catch (Exception $e) {
             $this->log->error($e->getMessage(), [$e]);
             return $envelope;
@@ -577,7 +578,6 @@ class Notifier extends AbstractModuleNotifier
             $hash  = $article->getFeatureImage()->getHash();
             $icon  = "/storage/image.php?hash=$hash&size=square64";
             $thumb = "/storage/image.php?hash=$hash&size=square200";
-
         } else {
             $icon  = $this->getUserIcon($author);
             $thumb = $this->prefixGenerator->generate() . '/images/emails/spacer.gif';

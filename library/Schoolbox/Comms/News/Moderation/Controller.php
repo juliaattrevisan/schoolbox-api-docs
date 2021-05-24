@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Moderation;
@@ -164,7 +166,6 @@ class Controller extends Base
         }
 
         if (200 === $httpCode) {
-
             /* Set a flash message to tell people what they can expect to happen to their article next
              */
             $this->generateSubmitFlashMessage($article);
@@ -237,8 +238,10 @@ class Controller extends Base
                 $route = News\Querystring::decode($this->getRequest()->post->get(News\Querystring::RETURN_URL));
             } else {
                 $listRoute = $this->getRouteIfAuthorized('commsNewsModeration.getList');
-                if ($listRoute
-                    && (!$article->getAuthor() || ($article->getAuthor()->getId() !== $this->getUser()->getId()))) {
+                if (
+                    $listRoute
+                    && (!$article->getAuthor() || ($article->getAuthor()->getId() !== $this->getUser()->getId()))
+                ) {
                     $route = $listRoute;
                 } else {
                     $route = $this->getRouter()->generate('commsNews.getDetail', ['articleId' => $article->getId()]);

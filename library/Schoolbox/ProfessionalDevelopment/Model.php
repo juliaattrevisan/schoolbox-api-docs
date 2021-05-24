@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model
  *
@@ -125,6 +126,3 @@ class Model implements ISoftDeletable
         return $this;
     }
 }
-
-
-

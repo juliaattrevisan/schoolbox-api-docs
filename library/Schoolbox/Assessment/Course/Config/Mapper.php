@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for default course and unit page permissions.
  *

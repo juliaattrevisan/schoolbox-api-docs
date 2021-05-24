@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Extends \Aura\Router\RouteCollection with a method for adding POST aliases
  * for REST HTTP methods that aren't supported by most browsers.
@@ -13,7 +14,8 @@
 
 namespace Alaress\Web\Router;
 
-class RouteCollection extends \Aura\Router\RouteCollection {
+class RouteCollection extends \Aura\Router\RouteCollection
+{
 
     /**
      * Adds POST aliases to a route already added with $this->attachResource()
@@ -26,11 +28,12 @@ class RouteCollection extends \Aura\Router\RouteCollection {
      * @param string $name
      * @param string $path
      */
-    public function attachResourcePostAlias($name, $path) {
+    public function attachResourcePostAlias($name, $path)
+    {
         $this->attach(
             $name,
             $path,
-            function($subroute) {
+            function ($subroute) {
                 /** @var \Aura\Router\Router $subroute */
                 $subroute->setTokens(array(
                         'id'     => '\d+',
@@ -48,5 +51,4 @@ class RouteCollection extends \Aura\Router\RouteCollection {
             }
         );
     }
-
 }

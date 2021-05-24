@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ${NAME}
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -17,8 +19,7 @@ if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) &
      */
     if (strlen($groupIds) && strstr($groupIds, ';')) {
         $groupIdArray = explode(';', $groupIds);
-    }
-    else if (is_numeric($_GET['groupID'])) {
+    } else if (is_numeric($_GET['groupID'])) {
         $groupIdArray = array($_GET['groupID']);
     }
 
@@ -27,7 +28,7 @@ if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) &
     $allStudents = $userMapper->findByNameAndGroup($_GET['query'], $groupIdArray);
 
     if ($allStudents->count()) {
-        foreach($allStudents as $currentStudent) {
+        foreach ($allStudents as $currentStudent) {
             $person = $currentStudent->getFullname() . ' - ';
 
             $userYear = $currentStudent->getYear() ? $currentStudent->getYear()->getName() : '';

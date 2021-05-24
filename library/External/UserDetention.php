@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Wrapper class for user detention external connectors.
  *
@@ -10,16 +11,18 @@
 use Alaress\Redis;
 use External\CachingConnectorAbstract;
 
-class External_UserDetention extends CachingConnectorAbstract implements External_UserDetentionInterface {
+class External_UserDetention extends CachingConnectorAbstract implements External_UserDetentionInterface
+{
 
-    
+
     /**
      * Constructor
      *
      * @throws Exception
      * @param String $databaseName
      */
-    public function __construct($databaseName = '') {
+    public function __construct($databaseName = '')
+    {
         // TODO inject dependencies
         parent::__construct(
             (new External_DatabaseFactory())->buildUserDetentionConnector($databaseName),

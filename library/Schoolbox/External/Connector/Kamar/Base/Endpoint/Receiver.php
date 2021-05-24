@@ -1,13 +1,15 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint;
 
-use \RuntimeException;
+use RuntimeException;
 use SimpleXMLElement;
 
 /**
@@ -93,7 +95,6 @@ class Receiver
         /* $data is what the kamar instance sent us
          */
         if ('' === $data) {
-
             /* if $data is empty, send a No Data response payload
              */
             $string = <<<XML
@@ -109,7 +110,6 @@ XML;
 
             echo (new SimpleXMLElement($string))->asXML();
         } else {
-
             $xml = new SimpleXMLElement($data);
 
             /* The value of @sync attribute in SMSDirectoryData
@@ -117,7 +117,6 @@ XML;
             $syncVal = (string)$xml->xpath('/SMSDirectoryData/@sync')[0];
 
             if (self::XML_CHECK === $syncVal) {
-
                 /* If $data contains the sync:check attribute in the SMSDirectoryData node
                  * then it's a check request for when a Kamar instance is enabled (or re-enabled)
                  * We need to treat it specially
@@ -127,9 +126,7 @@ XML;
                  * not sure which is right, if any
                  */
                 $this->processCheck();
-
             } else {
-
                 /* Otherwise presume it's one of the normal data payloads and save it
                  * to a local xml for later processing
                  */

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Import;
 
 use Alaress\Web\Controller\Base;
@@ -318,7 +320,6 @@ class Controller extends Base
 
             /** @var ImportErrors $error */
             foreach ($importErrors as $error) {
-
                 if ($skip > 0) {
                     $render = false;
                     $count++;
@@ -348,9 +349,7 @@ class Controller extends Base
                 'format' => 'json',
                 'data' => $this->buildJsonOutput($result)
             ]);
-
         } catch (MapperException $e) {
-
             // Requested import didn't exist,
 
             $this->getResponse()->content->set([
@@ -390,7 +389,6 @@ class Controller extends Base
         );
 
         return $array;
-
     }
 
     /**
@@ -418,7 +416,6 @@ class Controller extends Base
         // exists in the corresponding table, creating it if it doesn't and updating its details if it does.
 
         if (is_array($post['attachment'])) {
-
             // Do the import in a detached state so it doesn't time out
 
             // Create a log entry
@@ -488,9 +485,7 @@ class Controller extends Base
                             // Success, update the status
 
                             $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import completed", Controller::STATUS_COMPLETED);
-
                         } catch (\Exception $e) {
-
                             // Failed, record the error message
 
                             $this->updateLog(Controller::RESULT_ERROR, null, 0, 0, "Import failed - {$e->getMessage()} {$e->getTraceAsString()}", Controller::STATUS_FAILED);
@@ -502,9 +497,7 @@ class Controller extends Base
             ]);
 
             $this->getResponse()->redirect->afterPost("/fixtures/import/{$this->import->getId()}");
-
         } else {
-
             // Nothing was attached, not much to do but stare at our navels
 
             $this->getResponse()->redirect->afterPost("/fixtures/upload");
@@ -570,7 +563,6 @@ class Controller extends Base
             $row = $reader->current();
 
             if ($this->compareKey($row[0], Controller::TYPE_SPORT)) {
-
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -618,12 +610,10 @@ class Controller extends Base
         $reader = new Reader($storageObject->readStream());
 
         while ($reader->valid()) {
-
             $reader->next();
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_POSITION) {
-
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -680,7 +670,6 @@ class Controller extends Base
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_VENUE) {
-
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -747,7 +736,6 @@ class Controller extends Base
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_SCHOOL) {
-
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -759,7 +747,6 @@ class Controller extends Base
                     try {
                         $this->getSchoolMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPED SCHOOL: School '{$row[1]}' already exists");
-
                     } catch (MapperException $e) {
                         $school = new School();
                         $school->setName($row[1]);
@@ -789,7 +776,6 @@ class Controller extends Base
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_STATUS) {
-
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -801,7 +787,6 @@ class Controller extends Base
                     try {
                         $status = $this->getStatusMapper()->findOneByColumn('name', $row[1], $this->disableCache);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPED STATUS: Status '{$row[1]}' already exists");
-
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Status '{$row[1]}'");
                         $status = new Status();
@@ -830,7 +815,6 @@ class Controller extends Base
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_SEASON) {
-
                 $error = false;
 
                 if (empty(trim($row[1]))) {
@@ -907,12 +891,10 @@ class Controller extends Base
         $reader->setLoadFromFirst(true);
 
         while ($reader->valid()) {
-
             $reader->next();
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_TEAM) {
-
                 $error = false;
                 $season = null;
 
@@ -954,7 +936,6 @@ class Controller extends Base
                 }
 
                 if (!$error) {
-
                     // Find the sport associated with the division, and create if doesn't exist
 
                     try {
@@ -1060,7 +1041,6 @@ class Controller extends Base
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_COACH) {
-
                 $error = false;
                 $season = null;
 
@@ -1092,7 +1072,6 @@ class Controller extends Base
                 }
 
                 if (!$error) {
-
                     // Find the sport associated with the division, and create if doesn't exist
 
                     try {
@@ -1160,9 +1139,7 @@ class Controller extends Base
                                     $this->getTeamCoachMapper()->save($teamCoach);
                                     $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Coach '{$user->getExternalId()}'");
                                 }
-
                             } catch (MapperException $e) {
-
                                 $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED COACH: Unknown ID ({$coach})");
                             }
                         }
@@ -1188,7 +1165,6 @@ class Controller extends Base
             $row = $reader->current();
 
             if (strtolower(trim($row[0])) == Controller::TYPE_FIXTURE) {
-
                 $error = false;
                 $season = null;
 
@@ -1245,7 +1221,6 @@ class Controller extends Base
                 }
 
                 if (!$error) {
-
                     // Find the sport associated with the division, and create if doesn't exist
 
                     try {
@@ -1394,7 +1369,6 @@ class Controller extends Base
                         $colsPerItineraryItem = 3;
 
                         for ($i = $itineraryItemsStart; $i < count($row); $i += $colsPerItineraryItem) {
-
                             /* Be optimistic, presuming everything was done by the book
                              */
                             $itineraryError = false;
@@ -1404,10 +1378,10 @@ class Controller extends Base
                             $itineraryDateIndex = $i;
                             $itineraryDate = trim($row[$itineraryDateIndex]);
 
-                            $itineraryTimeIndex = $i+1;
+                            $itineraryTimeIndex = $i + 1;
                             $itineraryTime = trim($row[$itineraryTimeIndex]);
 
-                            $itineraryDescIndex = $i+2;
+                            $itineraryDescIndex = $i + 2;
                             $itineraryDesc = trim($row[$itineraryDescIndex]);
 
                             /* Only try to spawn itinerary items if all three data exist
@@ -1496,7 +1470,6 @@ class Controller extends Base
                 'season_id' => $season->getId()
             ], $this->disableCache);
         } catch (MapperException $e) {
-
             /* If the division doesn't exist in that particular season
              * Find out if it exists at all in this sport - if it does,
              * update its season and then use it
@@ -1511,9 +1484,7 @@ class Controller extends Base
 
                 $division->setSeason($season);
                 $this->getDivisionMapper()->save($division);
-            }
-            catch (MapperException $e) {
-
+            } catch (MapperException $e) {
                 /* Otherwise the division was never in this sport
                  * nor in this season anywhere - spawn a new division
                  */

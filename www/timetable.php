@@ -1,9 +1,11 @@
 <?php
+
 /************************************************************
  *                                                           *
  *         Copyright (c) 2002-2003 Lektec Consulting         *
  *                                                           *
  ************************************************************/
+
 //timetable object that displays the users timetable
 
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -21,9 +23,9 @@ if (!Config::get('external_enable')) {
     error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
-$groupHandler     = new Group;
-$userHandler      = new User;
-$timetableHandler = new External_Timetable;
+$groupHandler     = new Group();
+$userHandler      = new User();
+$timetableHandler = new External_Timetable();
 $categoryMapper   = new \Schoolbox\Resource\Folder\Mapper();
 $userMapper       = new \Schoolbox\UserMapper();
 
@@ -61,7 +63,6 @@ if ($_SESSION['user']->getRole()->isParent()) {
                 } catch (Schoolbox\Mapper\Exception $e) {
                     //noop, we are getting a list
                 }
-
             }
         }
     }
@@ -93,7 +94,6 @@ foreach ($userList as $user) {
     $checkedCampusList = [];
 
     if (!$user->getHideTimetable()) {
-
         foreach ($user->getCampusCollection() as $campus) {
             $campusCode = $campus->getExtTimetableCode();
             if (isset($checkedCampusList[$campusCode])) {
@@ -285,9 +285,7 @@ foreach ($userList as $user) {
                                     } else {
                                         $this->parse('period_class_block', 'period_class', true);
                                     }
-
                                 }
-
                             } else {
                                 $this->setVar('period_class_link_block', '');
                                 $this->parse('period_class_block', 'period_class');
@@ -330,4 +328,3 @@ if ($numTimetables) {
     $this->setVar('timetable_listing', '');
     $this->parse('no_timetable_block', 'no_timetable');
 }
-

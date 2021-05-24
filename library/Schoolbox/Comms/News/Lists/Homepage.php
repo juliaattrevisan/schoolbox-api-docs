@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Comms\News\Lists;
 
 use Schoolbox\Comms\News\Audience;
@@ -82,7 +84,6 @@ class Homepage extends Base
          */
         if (!(bool)$params->getCompactMode()) {
             foreach ($articles as $article) {
-
                 /* Attach any associated files
                  */
                 $article->setAttachedFiles($this->newsMapper->getJoinMapper('files')->findByColumn('article_id', $article->getId()));

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,11 +9,11 @@
 
 namespace Schoolbox\Resource\Browser\WebDav;
 
-
 use InvalidArgumentException;
 use Schoolbox\Resource\Browser\AbstractNode;
 
-class Node extends AbstractNode {
+class Node extends AbstractNode
+{
 
 
     /**
@@ -49,5 +50,4 @@ class Node extends AbstractNode {
     {
         return true;
     }
-
 }

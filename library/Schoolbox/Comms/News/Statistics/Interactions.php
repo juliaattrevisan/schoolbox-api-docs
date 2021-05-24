@@ -39,7 +39,7 @@ class Interactions
      *
      * Default: you have to wait one day (60*60*24 seconds) between visits for it to start recording more data
      */
-    private const UNIQUE_VISIT_THRESHOLD = 60*60;
+    private const UNIQUE_VISIT_THRESHOLD = 60 * 60;
 
     /**
      * @var IConnector
@@ -154,13 +154,11 @@ class Interactions
          * both views SA-11038 SA-11134
          */
         try {
-
             /* It's a valid referrer and $user hasn't Opened this period
              * so add an Open record and increment the cumulative total
              */
             $this->statisticsCumulativeMapper->incrementOpen($article->getId(), $date, $roleType, $roleId, $referrer);
         } catch (PDOException $e) {
-
             // noop
         }
 
@@ -170,7 +168,6 @@ class Interactions
         try {
             return $this->statisticsMapper->save($open->setOccursAt($date));
         } catch (PDOException $e) {
-
             // nopo
         }
 

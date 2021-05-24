@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -18,7 +19,7 @@ use InvalidArgumentException;
  *
  * @package Schoolbox\Realtime
  */
-class Cronterpreter 
+class Cronterpreter
 {
 
     /** @var string */
@@ -81,15 +82,12 @@ class Cronterpreter
         if (!array_diff(array_keys($test), $days)) {
             // no diff: every day
             $fq = "every day";
-
         } elseif (!array_diff($days, array_slice(array_keys($test), 1, 5))) {
             // matches middle 5: weekdays
             $fq = "on weekdays";
-
         } elseif (!array_diff($days, [0, 6])) {
             // matches first and last: weekend
             $fq = "on weekends";
-
         } else {
             // something else
             $fq = 'on ' . implode(', ', array_intersect_key($test, array_flip($days)));
@@ -100,12 +98,10 @@ class Cronterpreter
         }
 
         $fq .= sprintf(' at %s', date($this->getTimeFormat(), strtotime(
-                $cron->getExpression(CronExpression::HOUR) . ":" .
+            $cron->getExpression(CronExpression::HOUR) . ":" .
                 $cron->getExpression(CronExpression::MINUTE)
-            ))
-        );
+        )));
 
         return $fq;
     }
-
 }

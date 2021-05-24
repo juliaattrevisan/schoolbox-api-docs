@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 declare(strict_types=1);
 
 namespace Alaress\Async\Notification\Instance;
-
 
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
@@ -234,7 +234,6 @@ class Instance implements JsonSerializable
 
         if (preg_match_all('`:([A-Za-z_]\w*)`', $text, $matches)) {
             $this->tokens = $matches[1];
-
         } else {
             $this->tokens = [];
         }
@@ -292,7 +291,6 @@ class Instance implements JsonSerializable
 
             $this->meta[$key] = $value;
         }
-
     }
 
 
@@ -391,7 +389,6 @@ class Instance implements JsonSerializable
             if (is_string($json)) {
                 return $json;
             }
-
         } catch (\Exception $e) {
             // noop
         }

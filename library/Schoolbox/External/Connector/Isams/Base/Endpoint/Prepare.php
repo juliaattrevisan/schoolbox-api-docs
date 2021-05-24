@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
@@ -15,7 +17,6 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriodMapper;
-
 
 /**
  * Class Prepare
@@ -143,7 +144,6 @@ class Prepare implements IStrategy
     public function import(): void
     {
         if ($this->perform) {
-
             /* Set all the updated_at fields to null in all the profiles everywhere
              * Everyone we don't update gets deleted in Cleanup
              */

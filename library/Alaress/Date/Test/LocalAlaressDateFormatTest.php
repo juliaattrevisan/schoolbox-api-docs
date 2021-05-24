@@ -7,7 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class LocalAlaressDateFormatTest extends TestCase
 {
-
     use MockDateObject;
 
     /**

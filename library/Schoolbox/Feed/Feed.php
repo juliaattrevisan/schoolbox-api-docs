@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Feed;
-
 
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\User;
@@ -32,7 +32,6 @@ class Feed extends Decorator
 
         foreach ($sources as $channel) {
             if ($channel instanceof SourceInterface) {
-
                 /* Because each source can't know where its items fall chronologically, every source needs to
                  * retrieve $limit items, so that once combined it can reliably determine that it is returning
                  * the most up-to-date data. As such, there is an inherent (unavoidable?) performance hit, since
@@ -65,5 +64,4 @@ class Feed extends Decorator
         }
         return $context;
     }
-
 }

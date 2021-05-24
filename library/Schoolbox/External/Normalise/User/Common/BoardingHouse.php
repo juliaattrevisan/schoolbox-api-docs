@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BoardingHouse
  *
@@ -11,4 +12,4 @@ namespace Schoolbox\External\Normalise\User\Common;
 
 class BoardingHouse extends House
 {
-} 
+}

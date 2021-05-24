@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -57,7 +58,6 @@ class Codec
 
             /** @var string[]|bool[] $filterSelectionArray */
             foreach ($request as $filterId => $filterSelectionArray) {
-
                 // Create the collection before checking if empty.
                 // This is so the controller can still clear user-selections.
                 $filterSelections      = $this->selectionMapper->createCollection();

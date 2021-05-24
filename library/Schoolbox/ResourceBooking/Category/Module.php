@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for the resource booking category module.
  *
@@ -41,7 +42,7 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '.*',
-            function($params)  {
+            function ($params) {
                 if (array_key_exists('id', $params)) {
                     return [
                         'category' => $this->getMapper()->findById($params['id']),
@@ -55,7 +56,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission(
@@ -79,20 +81,21 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
+    public function initControllers(ContainerInterface $injector)
+    {
         $injector->setters[Controller::class]['setMapper']
             = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->setters[Controller::class]['setPaginator']
             = $injector->lazyNew(
-            'Alaress\\Paginator\\UrlPaginator',
-            array(),
-            array(
+                'Alaress\\Paginator\\UrlPaginator',
+                array(),
+                array(
                 'setPageSize' => 10,
                 'setParam'    => 'page',
-            )
-        );
+                )
+            );
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'itemMapper' => $this->getMapperFactory()->getLazy(ResourceBooking\Item\Mapper::class),
             ])
@@ -109,5 +112,4 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(Mapper::class);
     }
-
 }

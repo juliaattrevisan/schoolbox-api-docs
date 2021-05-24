@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Acquisition
  *
@@ -10,7 +11,6 @@
 namespace Custom\Stk\NCEA;
 
 use Alaress\Database\Connector\IConnector;
-
 
 class Acquisition
 {

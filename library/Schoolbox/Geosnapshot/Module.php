@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Geosnapshot;
@@ -20,7 +22,6 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
-
 
 /**
  * Class Module
@@ -42,7 +43,9 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        $preloadUserAndUrl = function ($params) { return $this->preloadUserAndUrl($params); };
+        $preloadUserAndUrl = function ($params) {
+            return $this->preloadUserAndUrl($params);
+        };
 
         $canGetStudentPhotos = $this->canGetStudentPhotosUrl();
 
@@ -69,7 +72,6 @@ class Module extends BaseModule
                 throw new NotFound();
             }
         } catch (MapperException $e) {
-
             /* User doesn't really exist
              */
             throw new NotFound();

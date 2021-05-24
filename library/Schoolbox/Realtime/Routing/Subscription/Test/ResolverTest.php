@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -147,7 +148,6 @@ class ResolverTest extends TestCase
         $router->add("*.notify.service.1.$guest.1.news.#", "*.notify.service.1.$host.1.#", true);
 
         return $router;
-
     }
 
     /**
@@ -159,8 +159,7 @@ class ResolverTest extends TestCase
      */
     public function testLockSavesMemory()
     {
-        if (PHP_SAPI === 'phpdbg')
-        {
+        if (PHP_SAPI === 'phpdbg') {
             $this->markTestSkipped();
         }
         gc_collect_cycles();
@@ -214,7 +213,8 @@ class ResolverTest extends TestCase
      *
      */
     public function testBasicSelfRecursion()
-    {$this->expectException(OverflowException::class);
+    {
+        $this->expectException(OverflowException::class);
         $topic = 'foo.bar';
 
         $resolver = $this->newResolver(
@@ -247,7 +247,7 @@ class ResolverTest extends TestCase
         $r = self::newRouter();
 
         for ($i = 0, $im = count($stack); $i < $im; ++$i) {
-            $r->add($stack[$i], $stack[($i+1) % $im], true);
+            $r->add($stack[$i], $stack[($i + 1) % $im], true);
         }
 
         $resolver = $this->newResolver($r);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -29,7 +30,7 @@ class Tokenizer extends BaseTokenizer
                     new Token(
                         $term,
                         '',
-                        function() use ($term, $stone) {
+                        function () use ($term, $stone) {
                             return new Word($term, $stone);
                         }
                     )

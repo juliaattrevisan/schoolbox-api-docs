@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Realtime\Pipe;
-
 
 use Alaress\Async\Notification\Instance\InstanceBundle;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
@@ -98,7 +98,11 @@ class WorkerProcess extends AbstractProcess
             // non-fatal
             throw new ErrorException(
                 sprintf('Could not complete `%s`: %s', $command, $e->getMessage()),
-                $e->getCode(), E_NOTICE, $e->getFile(), $e->getLine(), $e
+                $e->getCode(),
+                E_NOTICE,
+                $e->getFile(),
+                $e->getLine(),
+                $e
             );
         }
 
@@ -125,7 +129,6 @@ class WorkerProcess extends AbstractProcess
 
             // wrap in an array to preserve keys during transport
             return [ $decorator->renderAsSocketArray(false, $limit) ];
-
         } catch (PredisException $e) {
             // Redis has gone away -_-;
             throw new PDOException($e->getMessage(), $e->getCode(), $e);
@@ -154,7 +157,6 @@ class WorkerProcess extends AbstractProcess
             // overwrite the serialized thing with a real version
             $callback[0] = $this->getNotifier($callback);
             $callback[0]->enableLogging($this->log, true);
-
         } catch (InvalidArgumentException $e) {
             // ignore this
         }
@@ -196,14 +198,12 @@ class WorkerProcess extends AbstractProcess
     private function getNotifier(callable $callback)
     {
         if (is_array($callback) && isset($callback[0]) && $callback[0] instanceof ModuleNotifierInterface) {
-
             $notifierClassName = get_class($callback[0]);
 
             try {
                 // return a new, shiny instance of this class, correctly configured
                 $this->configurator->configureClass($notifierClassName);
                 return $this->configurator->newInstance($notifierClassName);
-
             } catch (ReflectionFailure $e) {
                 // kennet configure? ok, just return as-is
                 return $callback[0];

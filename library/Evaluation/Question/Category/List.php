@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Question_Category_List
  *
@@ -142,7 +143,6 @@ abstract class Evaluation_Question_Category_List
     {
         if (is_array($allCategories) && count($allCategories)) {
             foreach ($allCategories as $currentCategory) {
-
                 /* Find out if this the category that has been selected
                      */
                 if ($currentCategory['question_category_id'] == $this->getSelectedCategory()) {
@@ -160,10 +160,11 @@ abstract class Evaluation_Question_Category_List
                     'CATEGORY_LIST_ITEM_SELECTED' => $selected,
                 ));
 
-                if ($currentCategory['parent_id'] == '#')
+                if ($currentCategory['parent_id'] == '#') {
                     $this->getPage()->setVar('item_count_block', '');
-                else
+                } else {
                     $this->getPage()->parse('item_count_block', 'item_count');
+                }
 
                 $this->getPage()->parse('category_list_item_block', 'category_list_item', true);
 

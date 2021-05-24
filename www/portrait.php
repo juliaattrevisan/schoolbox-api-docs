@@ -85,17 +85,17 @@ try {
 } catch (ConcurrentTransformationException $e) {
     // This transformation is already being processed.
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], $e->getHttpStatusCode());
- } catch (\RuntimeException $e) {
+} catch (\RuntimeException $e) {
     /* When you cannot access the requested image (access denied)
-     */
+    */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 403);
 } catch (\InvalidArgumentException $e) {
     /* Image/Portrait not found
-     */
+    */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], 404);
 } catch (Exception $e) {
     /* All other exceptions
-     * BadMethodCallException
-     */
+    * BadMethodCallException
+    */
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size']);
 }

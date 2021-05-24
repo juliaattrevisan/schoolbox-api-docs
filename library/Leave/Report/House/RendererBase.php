@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Leave\HostType;
 use Schoolbox\GenericCollection;
 
@@ -81,7 +83,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
         $this->setReportTimespan($data['reportTimespan']);
         $this->setReportStart($data['reportStart']);
         $this->setReportFinish($data['reportFinish']);
-        $this->setRange( $this->getReportFinish()->diffInDays($this->getReportStart(), true) + 1);
+        $this->setRange($this->getReportFinish()->diffInDays($this->getReportStart(), true) + 1);
         $this->setRequestList($data['requestList']);
         $this->setHouseList($data['houseList']);
 
@@ -167,25 +169,23 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
 
             // For each day in our timespan
             for ($j = 0; $j < $this->getRange(); $j++) {
-
                 // Is this person is on leave during the morning section ?
                 if ($request->getOccupancy($morningStart, $dayStart)) {
-
                     $onLeavePreviousNight = $request->getOccupancy($priorNightEnd, $morningStart);
                     $onLeaveThisDay       = $request->getOccupancy($dayStart, $nightStart);
 
                     // Leave continues through this morning
-                    if($onLeavePreviousNight && $onLeaveThisDay){
+                    if ($onLeavePreviousNight && $onLeaveThisDay) {
                         $requestPeriodMorning          = 'L';
                         $requestPeriodMorningDirection = self::AWAY;
                     }
                     // Leave ends this morning
-                    else if($onLeavePreviousNight && !$onLeaveThisDay){
+                    else if ($onLeavePreviousNight && !$onLeaveThisDay) {
                         $requestPeriodMorning          = $request->getFinish()->getTimeOnly();
                         $requestPeriodMorningDirection = self::RETURNING;
                     }
                     // Leave starts this morning
-                    else if(!$onLeavePreviousNight && $onLeaveThisDay){
+                    else if (!$onLeavePreviousNight && $onLeaveThisDay) {
                         $requestPeriodMorning          = $request->getStart()->getTimeOnly();
                         $requestPeriodMorningDirection = self::LEAVING;
                     }
@@ -201,22 +201,21 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
 
                 // Is this person is on leave during the day ?
                 if ($request->getOccupancy($dayStart, $nightStart)) {
-
                     $onLeaveThisMorning = $request->getOccupancy($morningStart, $dayStart);
                     $onLeaveThisNight   = $request->getOccupancy($nightStart, $nightEnd);
 
                     // Leave continues through this day
-                    if($onLeaveThisMorning && $onLeaveThisNight){
+                    if ($onLeaveThisMorning && $onLeaveThisNight) {
                         $requestPeriodDay          = 'L';
                         $requestPeriodDayDirection = self::AWAY;
                     }
                     // Leave ends this day
-                    else if($onLeaveThisMorning && !$onLeaveThisNight){
+                    else if ($onLeaveThisMorning && !$onLeaveThisNight) {
                         $requestPeriodDay          = $request->getFinish()->getTimeOnly();
                         $requestPeriodDayDirection = self::RETURNING;
                     }
                     // Leave starts this day
-                    else if(!$onLeaveThisMorning && $onLeaveThisNight){
+                    else if (!$onLeaveThisMorning && $onLeaveThisNight) {
                         $requestPeriodDay          = $request->getStart()->getTimeOnly();
                         $requestPeriodDayDirection = self::LEAVING;
                     }
@@ -233,22 +232,21 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
                 /* If this person is on leave during the night
                  */
                 if ($request->getOccupancy($nightStart, $nightEnd)) {
-
                     $onLeaveThisDay     = $request->getOccupancy($dayStart, $nightStart);
                     $onLeaveNextMorning = $request->getOccupancy($nightEnd, $nextMorningStart);
 
                     // Leave continues through this night
-                    if($onLeaveThisDay && $onLeaveNextMorning){
+                    if ($onLeaveThisDay && $onLeaveNextMorning) {
                         $requestPeriodNight          = 'L';
                         $requestPeriodNightDirection = self::AWAY;
                     }
                     // Leave ends this night
-                    else if($onLeaveThisDay && !$onLeaveNextMorning){
+                    else if ($onLeaveThisDay && !$onLeaveNextMorning) {
                         $requestPeriodNight          = $request->getFinish()->getTimeOnly();
                         $requestPeriodNightDirection = self::RETURNING;
                     }
                     // Leave starts this night
-                    else if(!$onLeaveThisDay && $onLeaveNextMorning){
+                    else if (!$onLeaveThisDay && $onLeaveNextMorning) {
                         $requestPeriodNight          = $request->getStart()->getTimeOnly();
                         $requestPeriodNightDirection = self::LEAVING;
                     }
@@ -425,7 +423,8 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * The startDate requested by user, may not equal report display start
      * @param string $startDate
      */
-    protected function setReportStartDate($startDate){
+    protected function setReportStartDate($startDate)
+    {
         $this->startDate = $startDate;
     }
 
@@ -433,7 +432,8 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * Start Date requested by user, may not be equal to report's displayed start
      * @return string
      */
-    protected function getReportStartDate(){
+    protected function getReportStartDate()
+    {
         return $this->startDate;
     }
 
@@ -441,7 +441,8 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * The endDate requested by user, may not equal report display finish
      * @param string|null $endDate
      */
-    protected function setReportEndDate($endDate){
+    protected function setReportEndDate($endDate)
+    {
         $this->endDate = $endDate;
     }
 
@@ -449,14 +450,16 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * End Date requested by user, may not be equal to report's displayed finish
      * @return string|null
      */
-    protected function getReportEndDate(){
+    protected function getReportEndDate()
+    {
         return $this->endDate;
     }
 
     /**
      * @param string $reportTimespan Enum from {'day','weekend','range'}
      */
-    protected function setReportTimespan($reportTimespan){
+    protected function setReportTimespan($reportTimespan)
+    {
         $this->reportTimespan = $reportTimespan;
     }
 
@@ -464,37 +467,40 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * Enum from {'day','weekend','range'}
      * @return string
      */
-    protected function getReportTimespan(){
+    protected function getReportTimespan()
+    {
         return $this->reportTimespan;
     }
 
     /**
      * @param Alaress_Date_Format $reportStart
      */
-    protected function setReportStart(Alaress_Date_Format $reportStart){
+    protected function setReportStart(Alaress_Date_Format $reportStart)
+    {
         $this->reportStart = $reportStart;
     }
 
     /**
      * @return Alaress_Date_Format
      */
-    protected function getReportStart(){
+    protected function getReportStart()
+    {
         return $this->reportStart;
     }
 
     /**
      * @param Alaress_Date_Format $reportFinish
      */
-    protected function setReportFinish(Alaress_Date_Format $reportFinish){
+    protected function setReportFinish(Alaress_Date_Format $reportFinish)
+    {
         $this->reportFinish = $reportFinish;
     }
 
     /**
      * @return Alaress_Date_Format
      */
-    protected function getReportFinish(){
+    protected function getReportFinish()
+    {
         return $this->reportFinish;
     }
-
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Unit tests for Schoolbox\Assessment\Component\SubmissionBox class.
  *
@@ -8,35 +9,41 @@
  */
 
 namespace Schoolbox\Assessment\Component\Test;
+
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Test\TestCase;
 
-class SubmissionBoxTest extends TestCase {
+class SubmissionBoxTest extends TestCase
+{
 
-	/**
-	 * @var SubmissionBox
-	 */
-	protected $object;
+    /**
+     * @var SubmissionBox
+     */
+    protected $object;
 
-	public function setUp(): void {
-		parent::setUp();
-		$this->object = new SubmissionBox();
-	}
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->object = new SubmissionBox();
+    }
 
-	public function testRubric() {
-		$this->markTestIncomplete('Rubric model hasn\'t been created yet');
-	}
+    public function testRubric()
+    {
+        $this->markTestIncomplete('Rubric model hasn\'t been created yet');
+    }
 
-	public function testCategory() {
-		$this->markTestIncomplete('Category/Homepage models haven\'t been created yet');
-	}
+    public function testCategory()
+    {
+        $this->markTestIncomplete('Category/Homepage models haven\'t been created yet');
+    }
 
-	public function testWorkType() {
-		$this->markTestIncomplete('Work type model hasn\'t been added yet');
-	}
+    public function testWorkType()
+    {
+        $this->markTestIncomplete('Work type model hasn\'t been added yet');
+    }
 
-	public function testMarkType() {
-		$this->markTestIncomplete('Mark type model hasn\'t been added yet');
-	}
-
+    public function testMarkType()
+    {
+        $this->markTestIncomplete('Mark type model hasn\'t been added yet');
+    }
 }

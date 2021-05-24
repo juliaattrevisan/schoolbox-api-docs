@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Admin\SHAPS;
 
 use Alaress\Web\Controller\Base;
@@ -49,7 +51,7 @@ class Controller extends Base
      *
      * @return Collection
      */
-    private function getAllStaff() : Collection
+    private function getAllStaff(): Collection
     {
         // All the staff in our Schoolbox instance
         return $this->userMapper->findByColumn('g.group_type', \Schoolbox\Role::STAFF, [
@@ -69,7 +71,8 @@ class Controller extends Base
      * @param \Schoolbox\User $user
      * @return array
      */
-    private function getInvalidities(\Schoolbox\User $user) {
+    private function getInvalidities(\Schoolbox\User $user)
+    {
         $errors = [];
         if (empty($user->getId())) {
             $errors[] = 'id';
@@ -114,20 +117,22 @@ class Controller extends Base
 
         $errors = [];
         $allStaff = $this->getAllStaff();
-        foreach($allStaff as $user) {
+        foreach ($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
         }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/provisioning/index.twig', [
+                '@shaps/provisioning/index.twig',
+                [
                 'pageCurrent' => $this->router->generate('shaps.getAll'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
                 'allUsers' => $allStaff,
                 'provisionedUsers' => $provisionedUsers,
                 'errors' => $errors,
                 'errorMessage' => null,
-            ])->setTitle($title)
+                ]
+            )->setTitle($title)
         );
     }
 
@@ -162,20 +167,22 @@ class Controller extends Base
 
         $allStaff = $this->getAllStaff();
         $errors = [];
-        foreach($allStaff as $user) {
+        foreach ($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
         }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/provisioning/provisioned.twig', [
+                '@shaps/provisioning/provisioned.twig',
+                [
                 'pageCurrent' => $this->router->generate('shaps.getAll'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
                 'allUsers' => $provisionedUsers,
                 'provisionedUsers' => $provisionedUsers,
                 'errors' => $errors,
                 'errorMessage' => null,
-            ])->setTitle($title)
+                ]
+            )->setTitle($title)
         );
     }
 
@@ -207,19 +214,21 @@ class Controller extends Base
 
         $allStaff = $this->getAllStaff();
         $errors = [];
-        foreach($allStaff as $user) {
+        foreach ($allStaff as $user) {
             $errors[$user->getId()] = $this->getInvalidities($user);
         }
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/provisioning/unprovisioned.twig', [
+                '@shaps/provisioning/unprovisioned.twig',
+                [
                 'pageCurrent' => $this->router->generate('shaps.getAll'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
                 'allUsers' => $allStaff->diff($provisionedUsers),
                 'errors' => $errors,
                 'errorMessage' => null,
-            ])->setTitle($title)
+                ]
+            )->setTitle($title)
         );
     }
 
@@ -235,12 +244,14 @@ class Controller extends Base
     {
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
-                '@shaps/provisioning/search.twig', [
+                '@shaps/provisioning/search.twig',
+                [
                 'pageCurrent' => $this->router->generate('shaps.getAll'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
                 'allUsers' => [],
                 'errorMessage' => null,
-            ])->setTitle('Search - Schoolbox Help Staff Provisioning')
+                ]
+            )->setTitle('Search - Schoolbox Help Staff Provisioning')
         );
     }
 
@@ -301,9 +312,9 @@ class Controller extends Base
     public function getUsersInCourses(): void
     {
         $errorMessage = null;
-        try{
+        try {
             $courses = $this->helpRequest->findEnrolments();
-        } catch (GuzzleException $e){
+        } catch (GuzzleException $e) {
             $courses      = [];
             $errorMessage = $this->getReasonPhrase($e);
         }
@@ -324,7 +335,8 @@ class Controller extends Base
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    public function getUserEnrolmentSearch() {
+    public function getUserEnrolmentSearch()
+    {
         $this->getResponse()->content->set($this->buildHtmlOutput('@shaps/courses/search.twig', [
             'pageCurrent' => $this->router->generate('shaps.getAll'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('shaps.getAll')),
@@ -396,7 +408,7 @@ class Controller extends Base
         ];
 
         // If the user we searched for has sample data in the array above, render it out
-        foreach($coursesForUser as $user) {
+        foreach ($coursesForUser as $user) {
             if ($user['externalID'] == $userID) {
                 $userCourses = $user['courses'];
                 $this->getResponse()->content->set($this->buildJsonOutput($userCourses));
@@ -431,8 +443,8 @@ class Controller extends Base
      */
     private function getReasonPhrase(GuzzleException $e): string
     {
-        if($e instanceof RequestException){
-            switch ($e->getCode()){
+        if ($e instanceof RequestException) {
+            switch ($e->getCode()) {
                 case CourseParticipation\Controller::STATUS_BAD_REQUEST:
                 case CourseParticipation\Controller::STATUS_UNAUTHENTICATED:
                 case CourseParticipation\Controller::STATUS_UNAUTHORISED:

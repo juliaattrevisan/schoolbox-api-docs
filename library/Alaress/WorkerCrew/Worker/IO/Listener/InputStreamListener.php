@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\WorkerCrew\Worker\IO\Listener;
-
 
 use Alaress\Async\Listener\Stream\StreamEvent;
 use Alaress\Exception\IO\IOException;
@@ -122,28 +122,27 @@ class InputStreamListener extends AbstractIOStreamListener
             $this->log->warning($msg);
             // throwing to let scheduler re-schedule
             throw $e;
-        } catch(IOException $e) {
+        } catch (IOException $e) {
             // this means the pipe or connection to an external service has been broken
             // no point logging, no point carrying on. everything is meaningless.
             $this->loop->stop();
-        } catch(ErrorException $e) {
+        } catch (ErrorException $e) {
             $msg = sprintf("Error encountered: '%s' in %s:%s", $e->getMessage(), $e->getFile(), $e->getLine());
             $this->log->warning($msg);
             $this->writer->write($this->proto->cancel());
-        } catch(PDOException $e) {
-            $this->log->emergency("PDOException: " . $e->getMessage(), ['exception'=>$e]);
+        } catch (PDOException $e) {
+            $this->log->emergency("PDOException: " . $e->getMessage(), ['exception' => $e]);
             $this->writer->write($this->proto->reject(), true);
             $this->loop->stop();
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             // all exceptions must be caught, otherwise the react loop explodes and this worker dies
             $msg = sprintf("Worker exception: %s - '%s'", get_class($e), $e->getMessage());
-            $this->log->critical($msg, ['exception'=>$e]);
+            $this->log->critical($msg, ['exception' => $e]);
             $this->writer->write($this->proto->cancel());
         }
 
         $this->resetBuffer();
         ob_end_clean();
-
     }
 
 
@@ -157,5 +156,4 @@ class InputStreamListener extends AbstractIOStreamListener
         $this->buffer    = '';
         $this->buffering = $isBuffering;
     }
-
 }

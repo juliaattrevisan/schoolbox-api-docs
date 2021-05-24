@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -86,8 +87,7 @@ class CapabilityUsage extends TestCase
         RubricGrid\CapabilityUsage $capabilityUsage,
         RowSet\Indicator $indicator,
         ?RubricGrid\IndicatorUsage $expected
-    ): void
-    {
+    ): void {
         $this->assertSame($expected, $capabilityUsage->retrieveIndicatorUsage($indicator));
     }
 
@@ -237,8 +237,7 @@ class CapabilityUsage extends TestCase
     public function testCalculateMaxValueFromIndicators(
         RubricGrid\CapabilityUsage $capabilityUsage,
         float $expected
-    ): void
-    {
+    ): void {
         $this->assertSame($expected, $capabilityUsage->calculateMaxValueFromIndicators());
     }
 
@@ -320,8 +319,7 @@ class CapabilityUsage extends TestCase
     public function testContainsDescriptorsWithValue(
         RubricGrid\CapabilityUsage $capabilityUsage,
         bool $expected
-    ): void
-    {
+    ): void {
         $this->assertSame($expected, $capabilityUsage->containsDescriptorsWithValue());
     }
 
@@ -342,7 +340,7 @@ class CapabilityUsage extends TestCase
         );
         return $testGrid->retrieveCapabilityUsage($testGrid->getRowSet()->retrieveCapability(1));
     }
-    
+
     /**
      * Data provider for `testIsCapabilityMarkShown`.
      *

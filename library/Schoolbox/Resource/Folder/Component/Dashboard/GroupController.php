@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Show a list of the users groups on the dashboard
  *
@@ -63,11 +64,11 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         /* Get Timetable colours to use as random colours for null set folders */
         $colourList = Timetable_ColourMapper::getInstance()->findAll();
         $colourIndex = 0;
-        $userAccess  = Array();
+        $userAccess  = array();
 
         $allFolders = FolderMapper::getInstance()->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true);
         $filteredFolders = new Collection();
-        foreach($allFolders as $folder) {
+        foreach ($allFolders as $folder) {
             $muted = RerouteOverrideMapper::getInstance()->isRouteMuted((string)$folder->getId(), $this->getUser()->getId());
             if (!$muted) {
                 $filteredFolders->add($folder);
@@ -76,7 +77,7 @@ class GroupController extends Component_Dashboard_ControllerAbstract
 
         $colourFactory = new ColorFactory();
         $colourCache   = new GenericCollection(Color::class);
-        foreach($filteredFolders->sortBy('name', 'asc') as $folder) {
+        foreach ($filteredFolders->sortBy('name', 'asc') as $folder) {
             if (!$folder->getColour()) {
                 /* Apply colour from list if no colour exists */
                 $hexColour = $colourList[$colourIndex]->getHexColour();
@@ -89,16 +90,16 @@ class GroupController extends Component_Dashboard_ControllerAbstract
             $accessType = $this->getAccess()->getFolderAccess($this->getUser(), $folder->getId());
             switch ($accessType) {
                 case UserAccess::ACCESS_READ:
-                    $userAccess[$folder->getId()] = Array('read' => true);
+                    $userAccess[$folder->getId()] = array('read' => true);
                     break;
                 case UserAccess::ACCESS_WRITE:
-                    $userAccess[$folder->getId()] = Array('write' => true);
+                    $userAccess[$folder->getId()] = array('write' => true);
                     break;
                 case UserAccess::ACCESS_FULL:
-                    $userAccess[$folder->getId()] = Array('admin' => true);
+                    $userAccess[$folder->getId()] = array('admin' => true);
                     break;
                 default:
-                    $userAccess[$folder->getId()] = Array();
+                    $userAccess[$folder->getId()] = array();
                     break;
             }
             $this->getGroupList()->add($folder);
@@ -144,7 +145,6 @@ class GroupController extends Component_Dashboard_ControllerAbstract
                     'userAccess'          => $this->getUserAccess()
                 ]
             );
-
         }
 
         return false;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -28,7 +29,6 @@ $this->setAjax();
 $filenames = [];
 
 try {
-
     /* Folders have a specific icon
      */
     if ($this->arg === ['folder']) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Mail;
-
 
 use Alaress\Html\ToText as Html2Text;
 use Schoolbox\Cdn\PrefixGenerator;
@@ -160,6 +160,4 @@ class TwigMailer extends AbstractMailer
         $converter = new Html2Text($this->composeHTML());
         return $converter->getText();
     }
-
-
 }

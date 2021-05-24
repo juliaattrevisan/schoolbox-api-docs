@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tutor
  *
@@ -9,7 +10,8 @@
 
 namespace Schoolbox\External\Normalise\User;
 
-class Tutor extends Staff {
+class Tutor extends Staff
+{
 
     /**
      * Tutor group

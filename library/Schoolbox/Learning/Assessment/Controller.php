@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Exception as ControllerException;
@@ -251,7 +253,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
 
-        $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment,$this->getUser())->add([$assessment->getTitle()]);
+        $data['breadcrumbs'] = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
         $data['returnUrlName'] = Redirect::RETURN_URL;
         $data['returnUrl'] = $this->getRequest()->query->get(Redirect::RETURN_URL);
 
@@ -437,8 +439,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $this->getResponse()->content->set($this->buildJsonOutput([
                 Redirect::RETURN_URL => $returnUrl
             ]));
-        }
-        else {
+        } else {
             $this->redirect($returnUrl);
         }
     }
@@ -583,7 +584,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function deriveSchemeName(IMarkScheme $scheme): string
     {
         $c = get_class($scheme);
-        return substr($c, strrpos($c, '\\')+1);
+        return substr($c, strrpos($c, '\\') + 1);
     }
 
 

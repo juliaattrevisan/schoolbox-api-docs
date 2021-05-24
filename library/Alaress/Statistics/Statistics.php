@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -126,13 +127,13 @@ class Statistics
             return (float)array_pop($values);
         }
 
-        $midpointIndex = (int)floor($count/2);
+        $midpointIndex = (int)floor($count / 2);
         if ($count % 2 === 1) {
             // Odd number of values: use midpoint value
             $median = $values[$midpointIndex];
         } else {
             // Even number of values: use average of two midpoint values
-            $median = ($values[$midpointIndex-1] + $values[$midpointIndex])/2;
+            $median = ($values[$midpointIndex - 1] + $values[$midpointIndex]) / 2;
         }
 
         return (float)$median;

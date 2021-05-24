@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Fixtures\Component\Homepage;
 
 use Aura\Di\Exception\ServiceNotFound;
@@ -13,7 +15,7 @@ use RuntimeException;
 use Schoolbox\Collection;
 use Schoolbox\Fixtures\Component\ComponentDelegate;
 use Schoolbox\User;
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 use SitePage;
 use Alaress\Database\Connector\Base;
 use Twig\Error\LoaderError;

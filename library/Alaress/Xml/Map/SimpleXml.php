@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Map iterator for Alaress\Xml\ReaderIterator - creates a SimpleXML document.
  *

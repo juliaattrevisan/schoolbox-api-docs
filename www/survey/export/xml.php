@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Survey export. Uses the handlers to export their question types into a
  * Moodle format.
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Permission\Access\UserAccess;
 
 $factory       = new Survey_Factory();
@@ -24,11 +26,11 @@ if (!$surveyHandler->isValidUrlAccess($this->arg[0])) {
 $survey = $surveyHandler->getByID($this->arg[0]);
 
 if ($surveyHandler->isDeleted($this->arg[0])) {
-	error(112);
+    error(112);
 }
 
 if (!$surveyHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($survey['category_id']) < UserAccess::ACCESS_WRITE)) {
-	error(125);
+    error(125);
 }
 
 /* Export xml

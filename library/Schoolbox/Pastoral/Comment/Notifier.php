@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Comment;
@@ -138,8 +140,10 @@ class Notifier extends AbstractModuleNotifier
         /** @var PastoralAccess $pastoralAccess */
         foreach ($accessRecords as $pastoralAccess) {
             // If the comment is private, and they don't have private, fail
-            if ($pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY ||
-                ($model->getPrivate() && ($pastoralAccess->getAccess() < PastoralAccessMapper::ACCESS_PRIVATE))) {
+            if (
+                $pastoralAccess->getAccess() === PastoralAccessMapper::ACCESS_DENY ||
+                ($model->getPrivate() && ($pastoralAccess->getAccess() < PastoralAccessMapper::ACCESS_PRIVATE))
+            ) {
                 // do not send any notification
                 continue;
             }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Determine if a pastoral record should be viewable by the logged in user based on audienced roles/users/groups
  *

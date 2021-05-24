@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mapper for the curriculum source description.
  *

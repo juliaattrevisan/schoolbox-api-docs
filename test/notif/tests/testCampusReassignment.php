@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -11,7 +12,6 @@ use Schoolbox\Comms\News;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-
 
 /**
  * This class tests whether routed respects users moving from one campus to another.
@@ -150,7 +150,6 @@ class CampusReassignment extends AbstractNotificationTest
     {
         try {
             $message = $this->fetchMessageInstance($messageId)->jsonSerialize();
-
         } catch (OutOfBoundsException $e) {
             $this->log->warning("Bad message ID: $messageId, skipping");
             return;
@@ -207,7 +206,9 @@ class CampusReassignment extends AbstractNotificationTest
         $article = clone $am->findById(1);
 
         // forcibly remove guests in all cases
-        $roles = RoleMapper::getInstance()->findByColumnList($roleFilter)->filter(function (Role $role) { return !$role->isGuest(); });
+        $roles = RoleMapper::getInstance()->findByColumnList($roleFilter)->filter(function (Role $role) {
+            return !$role->isGuest();
+        });
 
         $this->log->info("{$roles->count()} roles to notify");
 
@@ -232,5 +233,4 @@ class CampusReassignment extends AbstractNotificationTest
         $this->currentCampus = $destinationId;
         $this->log->notice("Everyone is now in campus $destinationId");
     }
-
 }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Diocesan\AchievementReport;
@@ -50,11 +52,13 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
                 new Authorizer\Rule\IsExternalUser('externalUserId'),
-                new Authorizer\Rule\IsParentOfExternalUser($this->getExternalUser(), $this->getUserMapper(),'externalUserId')
+                new Authorizer\Rule\IsParentOfExternalUser($this->getExternalUser(), $this->getUserMapper(), 'externalUserId')
             )
         );
 
-        $preload = function ($params) { return $this->preloadUser($params); };
+        $preload = function ($params) {
+            return $this->preloadUser($params);
+        };
 
         $this->register('GET', '/{externalUserId}', 'getSelector', $getPerms, $preload);
         $this->register('GET', '/schoolGrades/{externalUserId}{/year}', 'getSchoolGrades', $getPerms, $preload);
@@ -83,7 +87,6 @@ class Module extends BaseModule
     private function preloadUser(array $params): array
     {
         try {
-
             /* Check that the selected user exists in external db
              */
             $externalUser = $this->getExternalUser()->getStudent($params['externalUserId']);
@@ -92,7 +95,6 @@ class Module extends BaseModule
              */
             $user = $this->getUserMapper()->findByExternalId($params['externalUserId'], Role::STUDENT);
         } catch (MapperException $e) {
-
             /* If they weren't found in either, exit
              */
             throw new NotFound();

@@ -8,7 +8,8 @@
  *
  */
 
-class Component_Dashboard_ActivityController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_ActivityController extends Component_Dashboard_ControllerAbstract
+{
 
     protected $group;
 
@@ -17,7 +18,8 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
     /** @var  array */
     private $catList;
 
-    public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Activity $activity) {
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Activity $activity)
+    {
         parent::__construct($instance, $user, $sitepage);
 
         $this->group = $group;
@@ -29,13 +31,15 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute () {
+    public function execute()
+    {
         $this->catList = $this->group->involvedInCategoryList($_SESSION['id']);
         return true;
     }
 
-    public function renderTemplate ($templateHandle) {
-        if ( !$this->loadTemplate($templateHandle, 'activity') ) {
+    public function renderTemplate($templateHandle)
+    {
+        if (!$this->loadTemplate($templateHandle, 'activity')) {
             return false;
         }
 
@@ -128,11 +132,9 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
                     $this->parse("new_category", "category_block", true);
                     $flag = 1;
                 }
-
             }
         }
 
         return $flag ? true : false;
     }
-
 }

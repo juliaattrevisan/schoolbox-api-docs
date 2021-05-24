@@ -17,7 +17,7 @@ use PDO;
 use PDOException;
 use PDOStatement;
 
-abstract Class Base implements IStatement
+abstract class Base implements IStatement
 {
     /** @var IBroker */
     protected $broker;
@@ -53,7 +53,8 @@ abstract Class Base implements IStatement
     /**
      * @inheritdoc
      */
-    public function close() {
+    public function close()
+    {
         return $this->statement->closeCursor();
     }
 
@@ -163,7 +164,7 @@ abstract Class Base implements IStatement
     /**
      * The should be completed in the statement class to bind the appropriate values
      */
-    protected abstract function bindStatement();
+    abstract protected function bindStatement();
 
     /**
      * Prepare a statement for execution and bind input parameters
@@ -239,7 +240,6 @@ abstract Class Base implements IStatement
     public static function getDataTypeName($value, $type = null)
     {
         if (empty($type)) {
-
             // Type is being automatically derived- display the name of the derived type
 
             switch (true) {
@@ -253,7 +253,6 @@ abstract Class Base implements IStatement
                     return 'PARAM_STR';
             }
         } else {
-
             // Type was overidden- display the name of the override type
 
             switch ($type) {

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
@@ -38,4 +40,3 @@ class Specification extends BaseSpecification
         '/SMSDirectoryData/timetables/timetable/week/days/day/slots/subjects/subject/rooms',
     ];
 }
-

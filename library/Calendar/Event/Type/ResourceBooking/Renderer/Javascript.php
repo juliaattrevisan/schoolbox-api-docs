@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Calendar_Event_Type_ResourceBooking_Renderer_Javascript
  *
@@ -15,7 +16,7 @@ namespace Calendar\Event\Type\ResourceBooking\Renderer;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\User;
-use \Scrub;
+use Scrub;
 
 class Javascript extends Base
 {

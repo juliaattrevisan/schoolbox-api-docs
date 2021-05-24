@@ -1,15 +1,16 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Course\Import;
 
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\Learning\Assessment\Component\Homepage\Outline\Controller;
-
 
 /**
  * Class ExistingImports

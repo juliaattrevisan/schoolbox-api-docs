@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization method - checks whether the user has certain permissions on a
  * given homepage through the given role.

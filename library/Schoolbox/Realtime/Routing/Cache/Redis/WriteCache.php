@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -16,7 +17,6 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Realtime\Routing\Cache\WritableCache;
 use Schoolbox\Realtime\Routing\Subscription;
 use UnderflowException;
-
 
 class WriteCache extends ReadCache implements WritableCache
 {
@@ -63,9 +63,9 @@ class WriteCache extends ReadCache implements WritableCache
     public function flushCacheUsersQueue($instanceId)
     {
         $this->buildSynchroniser()->flush(
-             $this->buildSynchroniserCallback($this->getCacheKey($instanceId)),
-             $this->buildSynchroniserDoneCallback($instanceId)
-         );
+            $this->buildSynchroniserCallback($this->getCacheKey($instanceId)),
+            $this->buildSynchroniserDoneCallback($instanceId)
+        );
     }
 
 
@@ -98,7 +98,7 @@ class WriteCache extends ReadCache implements WritableCache
             foreach ($pathData as $key => $value) {
                 if (!is_int($key)) {
                     // if it's not an integer, remove it
-                    unset ($cachedRoutes[$path][$key]);
+                    unset($cachedRoutes[$path][$key]);
                 }
             }
         }
@@ -162,7 +162,7 @@ class WriteCache extends ReadCache implements WritableCache
      */
     private function buildSynchroniserDoneCallback($instanceId)
     {
-        return function() use ($instanceId) {
+        return function () use ($instanceId) {
             $this->broadcastReload($instanceId);
         };
     }
@@ -219,7 +219,7 @@ class WriteCache extends ReadCache implements WritableCache
         foreach ($allRoutes as $path => $pathData) {
             if (isset($pathData[$userId]) && empty($userRoutes[$path])) {
                 $this->log->info("User $userId - `$path`", [ 'char' => '-' ]);
-                unset ($allRoutes[$path][$userId]);
+                unset($allRoutes[$path][$userId]);
                 ++$changeCount;
             }
         }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Sentral\Base\Endpoint\Profile;
@@ -540,7 +542,6 @@ class Profile implements IStrategy
         $emergencyContacts = [];
 
         foreach ($contacts as $contact) {
-
             /* Derived Ids have no chance of succeeding despite their api
              * providing you links containing these ids (must be ints)
              */
@@ -797,7 +798,6 @@ class Profile implements IStrategy
          * Some are Emergency Contacts, some are not
          */
         foreach ($contacts as $contact) {
-
             /* Derived Ids have no chance of succeeding despite their api
              * providing you links containing these ids (must be ints)
              */

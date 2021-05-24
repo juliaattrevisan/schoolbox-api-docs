@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Section modification.
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -72,8 +74,7 @@ if (!empty($_POST)) {
     try {
         $folderMapper = new FolderMapper();
         $folder = $folderMapper->findById($survey['category_id']);
-    }
-    catch (\Exception $e) {
+    } catch (\Exception $e) {
         error(13);
     }
 

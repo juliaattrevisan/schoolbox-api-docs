@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Factory class for creating a DAV authenticator.
  *

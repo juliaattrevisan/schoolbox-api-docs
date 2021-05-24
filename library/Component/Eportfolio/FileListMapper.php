@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component_Eportfolio_FileListMapper
  *
@@ -6,7 +7,9 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Component\Eportfolio;
+
 use Alaress\Database\Predicate\Builder;
 use PDOStatement;
 use Schoolbox;
@@ -27,92 +30,94 @@ class FileListMapper extends Schoolbox\Mapper
 
 
     /**
-	 * Define column/property mapping
-	 *
-	 * @return Bool|void
-	 */
-	protected function mapping() {
-		$this->hasTable('eportfolio_component_filelist_item');
-		$this->hasModel(FileList::class);
+     * Define column/property mapping
+     *
+     * @return Bool|void
+     */
+    protected function mapping()
+    {
+        $this->hasTable('eportfolio_component_filelist_item');
+        $this->hasModel(FileList::class);
 
-		$this->hasMap(array(
-			'column'     => 'id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true
-		));
+        $this->hasMap(array(
+            'column'     => 'id',
+            'property'   => 'id',
+            'type'       => self::TYPE_INTEGER,
+            'identifier' => true
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'page_id',
-			'property'   => 'pageId',
-			'type'       => self::TYPE_INTEGER,
-		));
+        $this->hasMap(array(
+            'column'     => 'page_id',
+            'property'   => 'pageId',
+            'type'       => self::TYPE_INTEGER,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'file_id',
-			'property'   => 'fileId',
-			'type'       => self::TYPE_INTEGER,
-		));
+        $this->hasMap(array(
+            'column'     => 'file_id',
+            'property'   => 'fileId',
+            'type'       => self::TYPE_INTEGER,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'created_at',
-			'property'   => 'createdAt',
-			'type'       => self::TYPE_DATETIME,
-		));
+        $this->hasMap(array(
+            'column'     => 'created_at',
+            'property'   => 'createdAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'updated_at',
-			'property'   => 'updatedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
+        $this->hasMap(array(
+            'column'     => 'updated_at',
+            'property'   => 'updatedAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 
-		$this->hasMap(array(
-			'column'     => 'deleted_at',
-			'property'   => 'deletedAt',
-			'type'       => self::TYPE_DATETIME,
-		));
+        $this->hasMap(array(
+            'column'     => 'deleted_at',
+            'property'   => 'deletedAt',
+            'type'       => self::TYPE_DATETIME,
+        ));
 
-		$this->hasJoin($this->myFileJoin, array(
+        $this->hasJoin($this->myFileJoin, array(
             'multiple'  => false,
-			'mapper'    => Schoolbox\Resource\My\File\Mapper::class,
-			'this_key'  => 'file_id',
-			'other_key' => 'id',
-		));
+            'mapper'    => Schoolbox\Resource\My\File\Mapper::class,
+            'this_key'  => 'file_id',
+            'other_key' => 'id',
+        ));
 
-		$this->hasJoin('pages', array(
+        $this->hasJoin('pages', array(
             'multiple'  => false,
-			'mapper'    => '\\Eportfolio\\PageMapper',
-			'this_key'  => 'page_id',
-			'other_key' => 'page_id',
-		));
+            'mapper'    => '\\Eportfolio\\PageMapper',
+            'this_key'  => 'page_id',
+            'other_key' => 'page_id',
+        ));
 
-		$this->hasJoin('myfile', array(
-			'mapper'    => Schoolbox\Resource\My\File\Mapper::class,
-			'this_key'  => 'file_id',
-			'other_key' => 'id',
-		));
-	}
+        $this->hasJoin('myfile', array(
+            'mapper'    => Schoolbox\Resource\My\File\Mapper::class,
+            'this_key'  => 'file_id',
+            'other_key' => 'id',
+        ));
+    }
 
-	/**
-	 * Find all published image files on a particular page
-	 *
-	 * @param int $pageId
-	 * @return Collection
-	 */
-	public function findAllImagesByPage($pageId) {
+    /**
+     * Find all published image files on a particular page
+     *
+     * @param int $pageId
+     * @return Collection
+     */
+    public function findAllImagesByPage($pageId)
+    {
         // no need to make it any harder than it needs to be
         return $this->findByColumn('page_id', $pageId, [ 'mime' => 'image/*' ]);
-	}
+    }
 
 
-	/**
-	 * Retrieves a list of recently-published images
-	 *
-	 * @param int $uid
-	 * @param int $limit
-	 * @return Collection
-	 */
-	public function findRecent($uid, $limit)
+    /**
+     * Retrieves a list of recently-published images
+     *
+     * @param int $uid
+     * @param int $limit
+     * @return Collection
+     */
+    public function findRecent($uid, $limit)
     {
         return $this->findByColumnList([
             "{$this->myFileAlias}.owner" => $uid,
@@ -123,7 +128,7 @@ class FileListMapper extends Schoolbox\Mapper
                 'created_at' => 'DESC'
             ]
         ]);
-	}
+    }
 
 
     /**
@@ -208,7 +213,7 @@ class FileListMapper extends Schoolbox\Mapper
             $mime = $mimeMapper->hydrate($row, $this->mimeAlias);
 
             // aaaaaand rewind...
-            if($storage instanceof Schoolbox\Resource\Storage\Model) {
+            if ($storage instanceof Schoolbox\Resource\Storage\Model) {
                 $storage->setMimetype($mime);
                 $file->setStorage($storage);
             }
@@ -221,5 +226,4 @@ class FileListMapper extends Schoolbox\Mapper
 
         return $collection;
     }
-
 }

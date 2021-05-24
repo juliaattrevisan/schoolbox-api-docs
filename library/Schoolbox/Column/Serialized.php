@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Serialized value column type.
  *
@@ -6,30 +7,33 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
- 
+
 namespace Schoolbox\Column;
 
-class Serialized implements IColumnType {
+class Serialized implements IColumnType
+{
 
-	/**
-	 * @param string            $value
-	 * @param \Schoolbox\Mapper $mapper
-	 *
-	 * @return mixed
-	 */
-	public function hydrate($value, $mapper = null) {
-		return unserialize($value);
-	}
+    /**
+     * @param string            $value
+     * @param \Schoolbox\Mapper $mapper
+     *
+     * @return mixed
+     */
+    public function hydrate($value, $mapper = null)
+    {
+        return unserialize($value);
+    }
 
-	/**
-	 * @param mixed             $value
-	 * @param \Schoolbox\Mapper $mapper
-	 *
-	 * @return string
-	 */
-	public function dehydrate($value, $mapper = null) {
-		return serialize($value);
-	}
+    /**
+     * @param mixed             $value
+     * @param \Schoolbox\Mapper $mapper
+     *
+     * @return string
+     */
+    public function dehydrate($value, $mapper = null)
+    {
+        return serialize($value);
+    }
 
 
     /**

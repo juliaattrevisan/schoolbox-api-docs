@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -287,7 +288,7 @@ class NonFreedom implements IQueryHelper
                 F.CGIVE_STATUS
             FROM FAMILY AS F
             INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
-            WHERE S.STUDKEY IN ('. $ids .')
+            WHERE S.STUDKEY IN (' . $ids . ')
         ';
 
         return [ $sql, [] ];
@@ -373,6 +374,4 @@ class NonFreedom implements IQueryHelper
     {
         return $rows[0] ?? [];
     }
-
-
 }

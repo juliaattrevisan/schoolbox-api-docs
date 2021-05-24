@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Complex;
@@ -63,7 +65,7 @@ class Mapper extends \Schoolbox\Mapper implements IHomepageCleanable
      * @return void
      * @throws InvalidColumnException
      */
-    public function homepageClean($cid) :void
+    public function homepageClean($cid): void
     {
         $entityType = Segment\Strategy\Folder::getEntityType();
 

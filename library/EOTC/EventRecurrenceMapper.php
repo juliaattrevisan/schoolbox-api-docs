@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventRecurrenceMapper
  *
@@ -8,18 +9,19 @@
  */
 
 namespace EOTC;
+
 use Schoolbox\Calendar;
 
+class EventRecurrenceMapper extends Calendar\EventRecurrenceMapper
+{
 
-class EventRecurrenceMapper extends Calendar\EventRecurrenceMapper {
-
-	/**
-	 * @param Event $seriesEvent
-	 * @param Event $coreEvent
-	 */
-	protected function setSeriesEventData($seriesEvent, $coreEvent) {
-		parent::setSeriesEventData($seriesEvent, $coreEvent);
-		$seriesEvent->setMetadata($coreEvent->getMetadata());
-	}
-
+    /**
+     * @param Event $seriesEvent
+     * @param Event $coreEvent
+     */
+    protected function setSeriesEventData($seriesEvent, $coreEvent)
+    {
+        parent::setSeriesEventData($seriesEvent, $coreEvent);
+        $seriesEvent->setMetadata($coreEvent->getMetadata());
+    }
 }

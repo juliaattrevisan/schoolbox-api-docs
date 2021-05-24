@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -49,22 +50,18 @@ $provider = new Alaress\OAuth2\Client\Provider\Office365([
 ]);
 
 if (!isset($_GET['code'])) {
-
     // If we don't have an authorization code then get one
     $authUrl = $provider->getAuthorizationUrl();
     $_SESSION[$sesskey] = $provider->getState();
-    header('Location: '.$authUrl);
+    header('Location: ' . $authUrl);
     exit;
 
 // Check given state against previously stored one to mitigate CSRF attack
 } elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION[$sesskey])) {
-
     unset($_SESSION[$sesskey]);
     http_response_code(400);
     exit;
-
 } else {
-
     $tenant = new Tenant($clientName);
 
     // Try to get an access token (using the authorization code grant)

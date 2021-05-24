@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -8,7 +9,9 @@
 namespace Schoolbox\Filter;
 
 use Alaress\Database\Predicate\InvalidColumnException;
+
 use function array_map;
+
 use Schoolbox\Collection;
 use Schoolbox\IMapper;
 use UnderflowException;

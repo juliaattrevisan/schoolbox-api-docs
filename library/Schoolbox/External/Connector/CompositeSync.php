@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -27,7 +28,7 @@ class CompositeSync implements ISync
      * @param ISync $sync
      * @return self
      */
-    public function addSubSync(ISync $sync) : self
+    public function addSubSync(ISync $sync): self
     {
         $this->subSyncs[] = $sync;
         return $this;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Parameters
  *
@@ -69,7 +70,7 @@ class Parameters
      *
      * @return array
      */
-    public function generate() : array
+    public function generate(): array
     {
         /* Query params that we need to provide in every request to ensure we're who we say we are
          */

@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\ParticipationReport;
@@ -122,7 +124,6 @@ class PreviousClassIdCache
         $type = $roleTypeOverride ?? ($viewer ? $viewer->getRole()->getType() : null);
 
         switch ($type) {
-
             /* If the report is being viewed by a student
              */
             case Role::STUDENT:

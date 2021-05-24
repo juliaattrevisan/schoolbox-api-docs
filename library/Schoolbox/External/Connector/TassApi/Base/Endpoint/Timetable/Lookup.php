@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
@@ -69,13 +71,14 @@ class Lookup
      */
     private function initStaffLookup(): array
     {
-        $userStatement = $this->timetablePeriodMapper->getDatabase()->query('
+        $userStatement = $this->timetablePeriodMapper->getDatabase()->query(
+            '
             SELECT external_id, firstname, lastname
             FROM sis_user_profile sup
             INNER JOIN sis_user_profile_staff sups ON sup.id = sups.sis_user_profile_id
             WHERE external_id IS NOT NULL AND category = :category
         ',
-        [':category' => Profile::TEACHER]
+            [':category' => Profile::TEACHER]
         );
 
         $staff = [];

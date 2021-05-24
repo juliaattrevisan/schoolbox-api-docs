@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A singleton DebugBar instance. Anyone have any better idea on how to do this?
  *

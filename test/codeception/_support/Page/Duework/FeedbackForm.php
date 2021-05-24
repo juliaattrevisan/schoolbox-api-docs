@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -98,5 +99,4 @@ class FeedbackForm
         $i->waitForText('PUBLISH AND CONTINUE'); // for next student
         return $this;
     }
-
 }

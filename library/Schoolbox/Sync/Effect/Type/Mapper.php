@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Effect\Type;
 
 use Schoolbox;
@@ -56,7 +58,8 @@ class Mapper extends Schoolbox\Mapper
      * @param int $type
      * @return bool
      */
-    public function isMap($type) {
+    public function isMap($type)
+    {
         return $type == self::EFFECT_TYPE_MAP;
     }
 
@@ -67,7 +70,8 @@ class Mapper extends Schoolbox\Mapper
      * @param int $type
      * @return bool
      */
-    public function isSkip($type) {
+    public function isSkip($type)
+    {
         return $type == self::EFFECT_TYPE_SKIP;
     }
 
@@ -88,7 +92,6 @@ class Mapper extends Schoolbox\Mapper
         $statement  = $this->database->prepare("UPDATE ups_effect SET arguments = :arguments WHERE id = :effect_id");
 
         foreach ($upsEffects as $upsEffectJson) {
-
             $isArrOfArr = true;
 
             $key = 0;
@@ -114,7 +117,6 @@ class Mapper extends Schoolbox\Mapper
 
             // Check if anything changed, then execute the query
             if ($filteredValues !== $upsEffect[$key]) {
-
                 if ($isArrOfArr) {
                     $upsEffect[$key] = $filteredValues;
                 } else {

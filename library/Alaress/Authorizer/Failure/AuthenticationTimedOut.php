@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization failure - user was authenticated, but their session has timed
  * out.
@@ -10,4 +11,6 @@
 
 namespace Alaress\Authorizer\Failure;
 
-class AuthenticationTimedOut extends Unauthenticated {}
+class AuthenticationTimedOut extends Unauthenticated
+{
+}

@@ -1,14 +1,15 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder;
-
 
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
@@ -86,9 +87,14 @@ class Notifier extends ResourceNotifier
     public function notifyCreated($roleType, $category, $creator, $diff = null): Envelope
     {
         return $this->notify(
-            LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_CREATED,
+            LogMapper::KIND_FOLDER,
+            $category->getId(),
+            self::TRIGGER_CREATED,
             new Param($category->getName(), "/homepage/" . $category->getId(), ParameterInterface::STACKING_APPEND),
-            $creator, $category->getParent(), $roleType, UserAccess::ACCESS_READ
+            $creator,
+            $category->getParent(),
+            $roleType,
+            UserAccess::ACCESS_READ
         );
     }
 
@@ -99,9 +105,14 @@ class Notifier extends ResourceNotifier
     public function notifyDeleted($roleType, $category, $effector, $diff = null): Envelope
     {
         return $this->notify(
-            LogMapper::KIND_FOLDER, $category->getId(), self::TRIGGER_DELETED,
+            LogMapper::KIND_FOLDER,
+            $category->getId(),
+            self::TRIGGER_DELETED,
             new Param($category->getName(), null, ParameterInterface::STACKING_APPEND),
-            $effector, $category->getParent(), $roleType, UserAccess::ACCESS_READ
+            $effector,
+            $category->getParent(),
+            $roleType,
+            UserAccess::ACCESS_READ
         );
     }
 

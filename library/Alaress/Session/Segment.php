@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A session segmenter that allows access to $_SESSION directly.
  *
@@ -12,20 +13,22 @@
  */
 
 namespace Alaress\Session;
+
 use Aura\Session\Segment as BaseSegment;
 
-class Segment extends BaseSegment {
+class Segment extends BaseSegment
+{
 
     /**
      * Overrides Aura's session segments to work with base $_SESSION.
      *
      * @return void
      */
-    protected function load() {
+    protected function load()
+    {
         if (isset($this->name)) {
             parent::load();
-        }
-        else {
+        } else {
             if (!isset($_SESSION)) {
                 $_SESSION = array();
             }
@@ -33,5 +36,4 @@ class Segment extends BaseSegment {
             $this->data = &$_SESSION;
         }
     }
-
 }

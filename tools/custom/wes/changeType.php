@@ -32,7 +32,7 @@ $app = new class extends CliTool\App {
 
         $inputCsv = $this->getOpt(self::OPT_LONG_FILE);
 
-        if (($handle = fopen($inputCsv, "r")) !== FALSE) {
+        if (($handle = fopen($inputCsv, "r")) !== false) {
         } else {
             $this->getLogger()->info("no input file");
             exit;
@@ -43,8 +43,7 @@ $app = new class extends CliTool\App {
 
 
         /* Iterate over each csv row */
-        while(($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
-
+        while (($row = fgetcsv($handle, 1000, ",")) !== false) {
             /* First lets make sure that the types and subtypes exist and match*/
 
             $currentTypeName = $row[$headers['Current Type']];
@@ -52,7 +51,7 @@ $app = new class extends CliTool\App {
 
             $currentIds = $this->getTypeIdFromName($currentTypeName, $currentSubtypeName, $db);
 
-            if($currentIds == NULL) {
+            if ($currentIds == null) {
                 continue;
             }
 
@@ -63,13 +62,13 @@ $app = new class extends CliTool\App {
 
             $newIds = $this->getTypeIdFromName($newTypeName, $newSubtypeName, $db);
 
-            if($newIds == NULL) {
+            if ($newIds == null) {
                 continue;
             }
 
-            $this->getLogger()->info("Migrating records with type '".$currentTypeName."' and subtype '".$currentSubtypeName."' to type '".$newTypeName."' and subtype '".$newSubtypeName."'");
+            $this->getLogger()->info("Migrating records with type '" . $currentTypeName . "' and subtype '" . $currentSubtypeName . "' to type '" . $newTypeName . "' and subtype '" . $newSubtypeName . "'");
 
-            if(self::OPT_LONG_RUN){
+            if (self::OPT_LONG_RUN) {
                 $query = 'UPDATE pastoral
                         SET type_id = :newTypeId,
                         subtype_id = :newSubtypeId,
@@ -77,7 +76,7 @@ $app = new class extends CliTool\App {
                         WHERE type_id = :currentTypeId
                        AND ';
 
-                if($currentIds[0]['subtype_id'] == NULL) {
+                if ($currentIds[0]['subtype_id'] == null) {
                     $query .=  "subtype_id IS :currentSubtypeId";
                 } else {
                     $query .=  "subtype_id = :currentSubtypeId";
@@ -90,7 +89,7 @@ $app = new class extends CliTool\App {
                     'currentSubtypeId' => $currentIds[0]['subtype_id']
                 ];
 
-                $db->executeQuery($query,$params)->getSql();
+                $db->executeQuery($query, $params)->getSql();
             }
         }
     }
@@ -104,15 +103,15 @@ $app = new class extends CliTool\App {
 
         $ids =  $db->executeQuery($query, ['typeName' => $typeName, 'subtypeName' => $subtypeName])->fetchAll();
 
-        if(count($ids) == 0) {
-            $this->getLogger()->info("Invalid Type/Subtype, type "."'".$typeName."' and subtype '".$subtypeName."'");
-            return NULL;
+        if (count($ids) == 0) {
+            $this->getLogger()->info("Invalid Type/Subtype, type " . "'" . $typeName . "' and subtype '" . $subtypeName . "'");
+            return null;
         } else if (count($ids) > 1) {
-            $this->getLogger()->info("More than 1 combination of"."'".$typeName."' and subtype '".$subtypeName."'");
-            return NULL;
+            $this->getLogger()->info("More than 1 combination of" . "'" . $typeName . "' and subtype '" . $subtypeName . "'");
+            return null;
         }
 
-        $this->getLogger()->info("Found combination of"."'".$typeName."' and subtype '".$subtypeName."'");
+        $this->getLogger()->info("Found combination of" . "'" . $typeName . "' and subtype '" . $subtypeName . "'");
         return $ids;
     }
 
@@ -127,7 +126,6 @@ $app = new class extends CliTool\App {
 
         return $db->executeQuery($query, ['typeName' => $typeName, 'subtypeName' => $subtypeName])->fetchAll();
     }
-
 };
 
 $kernel = new CliTool\Kernel($app);

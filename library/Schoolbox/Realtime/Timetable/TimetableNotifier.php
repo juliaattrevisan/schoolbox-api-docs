@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Schoolbox\Realtime\Timetable;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Date\Clock;
@@ -25,7 +25,8 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 use Schoolbox\Realtime\WorkNotifier;
 
-class TimetableNotifier extends WorkNotifier {
+class TimetableNotifier extends WorkNotifier
+{
 
     /** @var IPublisher */
     private $publisher;
@@ -151,7 +152,7 @@ class TimetableNotifier extends WorkNotifier {
         try {
             $handler = new \External_Timetable();
         } catch (\Exception $e) {
-            $this->log()->critical('Failed to connect to external timetable, no alerts sent', ['exception'=>$e]);
+            $this->log()->critical('Failed to connect to external timetable, no alerts sent', ['exception' => $e]);
             return 0;
         }
 
@@ -266,7 +267,7 @@ class TimetableNotifier extends WorkNotifier {
                     ->setTitle($body)
                     ->setTopics([ "notify.campus.$campusId" ])
                     ->putMeta('title', $title ?: 'Timetable')
-                    ->setIcon($icon ?: '/images/icon.php?size=64&icon='.NSMapper::NS_TIMETABLE); // {$this->iconSize}
+                    ->setIcon($icon ?: '/images/icon.php?size=64&icon=' . NSMapper::NS_TIMETABLE); // {$this->iconSize}
 
         $instance = $bob->build();
 
@@ -290,5 +291,4 @@ class TimetableNotifier extends WorkNotifier {
 
         return $i;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * External_Schoolpro_Class
  *
@@ -66,7 +67,6 @@ class External_Schoolpro_Class implements External_ClassInterface
         // Move medical result to outside the result iteration
         // Otherwise second iterator clobbers the first
         foreach ($allStudents as &$student) {
-
             /* Get the medical data for him too
              */
             $medicalResult = $this->getConnector()->getStoredProcedureIterator(
@@ -81,7 +81,6 @@ class External_Schoolpro_Class implements External_ClassInterface
             /* These arrive in a variety of formats
              */
             foreach ($medicalResult as $currentCondition) {
-
                 /* Only include medical issues that are Applicable == 1
                  * Just use a basic message to hide the sensitive data,
                  * and bust out of the loop after the first positive result

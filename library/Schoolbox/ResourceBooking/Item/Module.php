@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module definition for the resource booking item module.
  *
@@ -44,7 +45,7 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '.*',
-            function($params) {
+            function ($params) {
                 if (array_key_exists('id', $params)) {
                     return array(
                         'item' => $this->getMapper()->findById($params['id']),
@@ -58,7 +59,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission(
@@ -83,7 +85,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
+    public function initControllers(ContainerInterface $injector)
+    {
         $injector->setters[Controller::class]['setMapper']
             = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->setters[Controller::class]['setUserMapper']
@@ -101,9 +104,9 @@ class Module extends BaseModule
                     'setPageSize' => 10,
                     'setParam'    => 'page',
                 )
-        );
+            );
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
     }
@@ -118,5 +121,4 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(Mapper::class);
     }
-
 }

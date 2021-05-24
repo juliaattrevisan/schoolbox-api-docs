@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -54,5 +55,4 @@ class ReviewForm
         $i->click('Yes');
         $i->waitForText('Status of ' . $this->quizTitle);
     }
-
 }

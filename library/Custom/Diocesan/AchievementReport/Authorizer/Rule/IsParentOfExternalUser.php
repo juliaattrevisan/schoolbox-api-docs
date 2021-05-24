@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Validates whether the user is the parent of the given user.
  *
@@ -6,6 +7,7 @@
  * @copyright Copyright 2020, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
+
 namespace Custom\Diocesan\AchievementReport\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Base;

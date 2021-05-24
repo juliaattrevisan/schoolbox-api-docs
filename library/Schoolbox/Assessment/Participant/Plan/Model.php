@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Natalie Bakhtadze <natalie.bakhtadze@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -23,7 +24,6 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
  */
 class Model implements ISoftDeletable
 {
-
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;

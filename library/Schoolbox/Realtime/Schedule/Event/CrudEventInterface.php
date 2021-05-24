@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -18,5 +19,4 @@ interface CrudEventInterface extends EventInterface
      * @return Mapper
      */
     public function getMapper();
-
 }

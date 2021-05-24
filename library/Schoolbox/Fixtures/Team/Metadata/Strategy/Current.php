@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Metadata - Current
  * Strategy Class
@@ -13,13 +14,13 @@
 
 namespace Schoolbox\Fixtures\Team\Metadata\Strategy;
 
-use \Schoolbox\UserMapper;
-use \Schoolbox\Collection;
-use \Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
-use \Schoolbox\Fixtures\Coach\TagCloud as CoachTagCloud;
-use \Schoolbox\Fixtures\Team\Model as Team;
-use \Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
+use Schoolbox\UserMapper;
+use Schoolbox\Collection;
+use Schoolbox\Fixtures\Coach\Mapper as CoachMapper;
+use Schoolbox\Fixtures\Coach\TagCloud as CoachTagCloud;
+use Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Fixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\Fixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\Fixtures\Match\Model as Match;
 
 class Current implements IMetadataStrategy

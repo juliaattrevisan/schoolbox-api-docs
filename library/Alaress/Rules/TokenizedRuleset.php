@@ -1,13 +1,13 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
 namespace Alaress\Rules;
-
 
 use Alaress\Rules\Token\Filter;
 use Alaress\Rules\Token\Token;
@@ -46,5 +46,4 @@ abstract class TokenizedRuleset extends Ruleset
     {
         return $this->tokenizer->getFilters();
     }
-
-} 
+}

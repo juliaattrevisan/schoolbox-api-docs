@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Browser;
 
 use Schoolbox\Collection;
@@ -104,9 +106,7 @@ abstract class AbstractTreeBuilder
                     $this->buildChildNodes($parentCategoryId, $parentList)
                 );
             }
-        }
-        else {
-
+        } else {
             $found = false;
             foreach ($parentList as $parentCategoryId) {
                 $nodes = $this->buildChildNodes($parentCategoryId, $parentList);
@@ -185,12 +185,10 @@ abstract class AbstractTreeBuilder
                     'data-type' => 'folder'
                 ]
             );
-
         } else {
             // Child nodes
             foreach ($this->getNodeFolders($folderId) as $folder) {
-
-                if($this->filterFolder($folder, $parentList)) {
+                if ($this->filterFolder($folder, $parentList)) {
                     try {
                         $output[] = $this->buildFolderNode($folder, $parentList);
                     } catch (Resource\Exception $e) {
@@ -373,8 +371,7 @@ abstract class AbstractTreeBuilder
          */
         if ($file->getFolder() instanceof IFolder) {
             $folderId = $file->getFolder()->getId();
-        }
-        else {
+        } else {
             $folderId = null;
         }
 
@@ -545,7 +542,6 @@ abstract class AbstractTreeBuilder
     {
         // Check if the mime filter passed is a wildcard
         if ($mimes != '*/*') {
-
             $filesFiltered = new Collection();
 
             // Split allowed mime types
@@ -554,7 +550,6 @@ abstract class AbstractTreeBuilder
             // Iterate all files in the collection
             /** @var \Schoolbox\Resource\File\Model $file */
             foreach ($files as $file) {
-
                 if (method_exists($file, 'getMime')) {
                     $match = true;
 
@@ -563,20 +558,17 @@ abstract class AbstractTreeBuilder
 
                     // Loop through each mime type allowed
                     foreach ($allowedMimes as $allowedMime) {
-
                         // Split the allowed mime type into two parts
                         $allowedMimeParts = explode('/', $allowedMime);
 
                         // Loop twice and check both parts against each other
                         for ($i = 0; $i < 2; $i++) {
-
                             // If current filter is wildcard, dont need to test
                             if ($allowedMimeParts[$i] != '*') {
                                 if (strtolower($fileMimeParts[$i] != strtolower($allowedMimeParts[$i]))) {
                                     $match = false;
                                 }
                             }
-
                         }
 
                         // If both sides of the mime filter matched, we want to return this file
@@ -603,7 +595,7 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @return string
      */
-    protected abstract function getFolderHref(IFolder $folder);
+    abstract protected function getFolderHref(IFolder $folder);
 
 
     /**
@@ -612,14 +604,14 @@ abstract class AbstractTreeBuilder
      * @param Resource\AbstractFile $file
      * @return string
      */
-    protected abstract function getFileHref(Resource\AbstractFile $file);
+    abstract protected function getFileHref(Resource\AbstractFile $file);
 
 
     /**
      * @param int $nodeId
      * @return Collection|IFolder[]
      */
-    protected abstract function getNodeFolders($nodeId);
+    abstract protected function getNodeFolders($nodeId);
 
 
     /**
@@ -627,7 +619,7 @@ abstract class AbstractTreeBuilder
      * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected abstract function getNodeFiles($nodeId, $mime = '*/*');
+    abstract protected function getNodeFiles($nodeId, $mime = '*/*');
 
 
     /**
@@ -645,7 +637,7 @@ abstract class AbstractTreeBuilder
      * @param IFolder $folder
      * @return string
      */
-    protected abstract function getFolderCoverImage(IFolder $folder);
+    abstract protected function getFolderCoverImage(IFolder $folder);
 
 
     /**

@@ -2,7 +2,6 @@
 
 use Schoolbox\Admin\Navigation\Subnav;
 
-
 SitePage::extendExecutionTime(300);
 
 if (!$_SESSION['user']->isSuperuser()) {
@@ -22,7 +21,6 @@ $this->setBlock(TEMPLATE_content, 'event', 'event_block');
 /* Two types of upload.. either single user.. or via csv file..
  */
 if (isset($_FILES['bulkadd']['tmp_name']) && $_FILES['bulkadd']['tmp_name'] && (isset($_POST['userGroup']) && isset($_POST['campusList']))) {
-
     $extension = strtolower(pathinfo($_FILES['bulkadd']['name'], PATHINFO_EXTENSION));
     /* Must have the correct .csv or .ics extension
      */

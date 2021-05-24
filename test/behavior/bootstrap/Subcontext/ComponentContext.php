@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Contains test steps that relate to dashboards, homepages and eportfolios, and
  * the components on them.
@@ -10,7 +11,8 @@
 
 use Behat\Mink\Element;
 
-class Subcontext_ComponentContext extends BaseContext {
+class Subcontext_ComponentContext extends BaseContext
+{
 
     /**
      * Creates a new template on either the homepage, eportfolio or dashboard
@@ -19,7 +21,8 @@ class Subcontext_ComponentContext extends BaseContext {
      * @Given /^I create a template "([^"]*)"$/
      * @param string $name The name of the template.
      */
-    public function createTemplate($name) {
+    public function createTemplate($name)
+    {
         $form = $this->getSession()->getPage()->findById('template-action');
         $form->findField('name')->setValue($name);
         $form->findButton('New')->press();
@@ -44,7 +47,8 @@ class Subcontext_ComponentContext extends BaseContext {
      * @throws Exception if the context to add the component to, or the
      *                   component, couldn't be defined
      */
-    public function addComponentToTemplate($component, $section, $position) {
+    public function addComponentToTemplate($component, $section, $position)
+    {
         //
         // Forge a post request
         // context: from URL
@@ -129,7 +133,8 @@ class Subcontext_ComponentContext extends BaseContext {
      * @param string $name
      * @throws Exception if the component couldn't be found
      */
-    public function addComponentToHomepage($type, $name) {
+    public function addComponentToHomepage($type, $name)
+    {
         // Show the component list
         $custom_button = $this->getSession()->getPage()->find('css', '.customise');
         if (!$custom_button) {
@@ -154,7 +159,7 @@ class Subcontext_ComponentContext extends BaseContext {
         }
 
         /** @var Element\NodeElement[] $component_list */
-        $component_list = $this->getSession()->getPage()->findAll('css', '#tabs-homepage #'.$section_id.' .add-component');
+        $component_list = $this->getSession()->getPage()->findAll('css', '#tabs-homepage #' . $section_id . ' .add-component');
         foreach ($component_list as $component) {
             $component_name = $this->getBeginningText($component->find('css', 'h4'));
             if ($component_name === $name) {
@@ -177,10 +182,11 @@ class Subcontext_ComponentContext extends BaseContext {
      * @return Element\NodeElement
      * @throws Exception if the form wasn't found
      */
-    protected function getComponentForm($section, $position) {
+    protected function getComponentForm($section, $position)
+    {
         foreach ($this->getSession()->getPage()->findAll('css', "#position-$section .component") as $i => $base_component) {
             /** @var Element\NodeElement $base_component */
-            if ($i+1 == $position) {
+            if ($i + 1 == $position) {
                 //
                 // Selenium throws a wobbley if you try to use an invisible
                 // element. Show it, then.
@@ -203,7 +209,8 @@ class Subcontext_ComponentContext extends BaseContext {
      * @param string $position  The position to load the component into
      * @param string $new_name  The name of the new component
      */
-    public function renameComponent($section, $position, $new_name) {
+    public function renameComponent($section, $position, $new_name)
+    {
         $form = $this->getComponentForm($section, $position);
         $form->findField('componentname')->setValue($new_name);
         $form->findButton('Update')->press();
@@ -216,7 +223,8 @@ class Subcontext_ComponentContext extends BaseContext {
      * @param string $position    The position to load the component into
      * @param string $new_purpose The new purpose of the component
      */
-    public function repurposeComponent($section, $position, $new_purpose) {
+    public function repurposeComponent($section, $position, $new_purpose)
+    {
         $form = $this->getComponentForm($section, $position);
         $form->findField('description')->setValue($new_purpose);
         $form->findButton('Update')->press();
@@ -232,9 +240,10 @@ class Subcontext_ComponentContext extends BaseContext {
      * @throws Exception if no component at $section and $position
      * @return Element\NodeElement The box that contains the component.
      */
-    public function getComponentInPosition($section, $position) {
+    public function getComponentInPosition($section, $position)
+    {
         foreach ($this->getSession()->getPage()->findAll('css', "#content .homepage .$section .box") as $i => $box) {
-            if ($i+1 == $position) {
+            if ($i + 1 == $position) {
                 return $box;
             }
         }
@@ -246,17 +255,20 @@ class Subcontext_ComponentContext extends BaseContext {
      *
      * @Then /^I see component "([^"]*)" on "([^"]*)" in position "([^"]*)"$/
      */
-    public function verifyComponentInPosition($name, $section, $position) {
+    public function verifyComponentInPosition($name, $section, $position)
+    {
         $box         = $this->getComponentInPosition($section, $position);
         $actual_name = $box->find('css', 'h2')->getText();
         if (trim($actual_name) !== trim($name)) {
             throw new Exception(
                 sprintf(
                     'Component at position "%s:%d" is named "%s" instead of "%s"',
-                    $section, $position, $actual_name, $name
+                    $section,
+                    $position,
+                    $actual_name,
+                    $name
                 )
             );
         }
     }
-
 }

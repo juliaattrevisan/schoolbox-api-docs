@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Node
  *
@@ -11,7 +12,6 @@
  */
 
 namespace Schoolbox\Resource\Browser\MyFiles;
-
 
 use Schoolbox\Mapper;
 use Schoolbox\Resource\My\File\Mapper as MyFileMapper;
@@ -49,5 +49,4 @@ class Node extends AbstractNode
     {
         return true;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -43,7 +44,8 @@ class ValidationMeetingUrlTest extends TestCase
      *
      * @return array
      */
-    public function provider_validMeetingUrl() : array {
+    public function provider_validMeetingUrl(): array
+    {
         return [
 
             /* Add other cases that you expect to be valid

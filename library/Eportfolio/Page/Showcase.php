@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eportfolio_Page_Showcase
  *
@@ -8,7 +9,6 @@
  */
 
 use Schoolbox\Config\ConfigMapper;
-
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\Model as Response;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -63,7 +63,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
         /* Intro text
          */
-        if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']
+        if (
+            $this->getEportfolioHandler()->getUserId() == $_SESSION['id']
             && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
         ) {
             $this->getPage()->parse('has_intro_block', 'has_intro');
@@ -131,7 +132,6 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $currentUser = $_SESSION['user'];
         if (count($allSubjects)) {
             foreach ($allSubjects as $currentSubject) {
-
                 /* Subject name
                  */
                 $this->getPage()->setVar(
@@ -168,7 +168,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                         /* Show submitted work information (if available)
                          */
                         if ($submission) {
-                            foreach($submission->getAllFiles() as $currentFile) {
+                            foreach ($submission->getAllFiles() as $currentFile) {
                                 $this->getPage()->setVar(
                                     array(
                                         'SHOWCASED_WORK_SUBMISSION_ID'        => $submission->getId(),
@@ -181,9 +181,8 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                                     )
                                 );
 
-                                $this->getPage()->parse('submission_file_list_block', 'submission_file_list',true);
+                                $this->getPage()->parse('submission_file_list_block', 'submission_file_list', true);
                             }
-
                         }
 
                         /* Show returned work information (if available)
@@ -217,8 +216,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                         /* Clear children after parsing out the parent
                          */
                         $this->getPage()->setVar('has_modify_form_block', '');
-                        $this->getPage()->setVar('submission_file_list_block','');
-
+                        $this->getPage()->setVar('submission_file_list_block', '');
                     }
                 }
 

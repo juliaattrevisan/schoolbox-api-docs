@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -9,7 +10,6 @@
 namespace Schoolbox\Di;
 
 use Aura\Di\Exception\ReflectionFailure;
-
 
 class Configurator
 {

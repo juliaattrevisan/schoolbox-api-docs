@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      dbaker <dorothea.baker@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Admin\SHAPS\Auth;
-
 
 class Digest
 {
@@ -38,7 +38,7 @@ class Digest
      * @param int $timestamp
      * @return string
      */
-    public function generate(int $timestamp) : string
+    public function generate(int $timestamp): string
     {
         return sha1(sprintf(':%s-%s-%s:', $timestamp, $this->schoolCode, $this->accessToken));
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Resource\Attachment;
-
 
 use SitePage;
 
@@ -59,5 +59,4 @@ interface ControllerInterface
      * @return string
      */
     public function getRenderMethod();
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Component_Eportfolio_ImageController
  *
@@ -7,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 /**
  * @method \Schoolbox\Resource\My\File\Mapper getMapper()

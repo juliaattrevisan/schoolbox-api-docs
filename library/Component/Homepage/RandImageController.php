@@ -7,7 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RandImageController extends Component_Homepage_ControllerAbstract
 {

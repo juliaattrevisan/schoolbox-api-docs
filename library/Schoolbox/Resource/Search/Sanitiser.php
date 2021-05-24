@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Search;
 
 use Schoolbox\Mapper;
@@ -235,7 +237,7 @@ class Sanitiser
     {
         $sortBy = $this->getSortBy();
         if ($this->getSortOnTableColumn()) {
-            return $alias.'.'.$sortBy;
+            return $alias . '.' . $sortBy;
         } else {
             return $sortBy;
         }

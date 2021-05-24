@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -28,7 +29,7 @@ class Vcal
 
 
     // Cache expiry: 8 hours?
-    private const CACHE_EXPIRY = (60*60*8);
+    private const CACHE_EXPIRY = (60 * 60 * 8);
 
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -258,7 +259,6 @@ class Controller extends Base\Base
         $data = [];
 
         foreach ($folders as $folder) {
-
             // Ignore folders with CourseSpecs
             if ($folder->getCourseSpecification() instanceof CourseSpecification\Model) {
                 continue;
@@ -413,7 +413,6 @@ class Controller extends Base\Base
         $unitImpls = $this->unitImplementationMapper->createCollection();
         foreach ($units as $unit) {
             if (isset($unit['import'])) {
-
                 // Are we modifying an already imported Unit?
                 if ($unit['unit_impl_id']) {
                     $countImportedUnits++;
@@ -653,9 +652,9 @@ class Controller extends Base\Base
         $compInstances = $this->componentInstanceMapper->findByContextAndClass($module, $folderId, $class);
         $compInstances->sortBy('sequence', 'ASC');
         foreach ($compInstances as $component) {
-
             // If this component has no associated Course, or the course is not valid
-            if (!$component->getConfigArray()['importedCourse'] ||
+            if (
+                !$component->getConfigArray()['importedCourse'] ||
                 !$component->getConfigArray()['importedCourse']['value']
             ) {
                 // Conclude the Component is available, and use it
@@ -948,7 +947,6 @@ class Controller extends Base\Base
             $this->componentInstanceMapper->delete($componentsForCourse);
 
             $this->getResponse()->content->set($this->buildJsonOutput(['data' => true]));
-
         } catch (\Exception $e) {
             $this->sendError($e->getMessage(), [], 500);
             return;
@@ -975,8 +973,7 @@ class Controller extends Base\Base
         $this->getResponse()->content->set($this->buildJsonOutput([
                 'result'        => 'success',
                 'componentName' => $componentName,
-            ]
-        ));
+            ]));
     }
 
 
@@ -993,8 +990,7 @@ class Controller extends Base\Base
         foreach ($unitSpecs as $spec) {
             $unitImpls->add($this->unitImplementationMapper->createModel()
                                                            ->setTitle($spec->getFolder()->getName())
-                                                           ->setSpecification($spec)
-            );
+                                                           ->setSpecification($spec));
         }
         return $unitImpls;
     }
@@ -1181,7 +1177,6 @@ class Controller extends Base\Base
 
         // For each Class we are importing the Course to:
         foreach ($courseImpls as $classFolderId => $courseImpl) {
-
             // Traverse pre-existing course import, deleting any unitImpls not in POST
             // Deleting a UnitImpl automatically cascades the deletion to enclosed Assessments
             // This loop will be skipped during a new-import (CourseImpl will not yet contain Units)
@@ -1201,7 +1196,6 @@ class Controller extends Base\Base
         // Create any un-imported AssessmentImpls from corresponding AssessmentSpec
         // Update any already-imported AssessmentImpls
         foreach ($courseImpls as $classFolderId => $courseImpl) {
-
             // Even if an import-modify, we need to explicitly save to update timestamps (and possibly the folderId)
             $this->courseImplementationMapper->save($courseImpl);
 

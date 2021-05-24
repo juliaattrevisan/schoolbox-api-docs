@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -12,7 +13,6 @@ use Alaress\Async\Broker\DuplicateResolutionException;
 use Alaress\Async\Broker\IResolver;
 use Alaress\Async\Stomp\IAckResolver;
 use RuntimeException;
-
 
 /**
  * STOMP-Redis resolver. Conveniently it can just wrap around the STOMP AckResolver and passthru.
@@ -62,5 +62,4 @@ class Resolver implements IResolver
             throw new DuplicateResolutionException($e->getMessage(), $e->getCode(), $e);
         }
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -23,5 +24,4 @@ interface IDecorator
      * @return array         - the mutated payload
      */
     public function decorate(array $json, $model): array;
-
 }

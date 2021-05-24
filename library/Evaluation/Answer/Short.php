@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Answer_Short
  *
@@ -8,7 +9,8 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-abstract class Evaluation_Answer_Short extends Evaluation_Answer {
+abstract class Evaluation_Answer_Short extends Evaluation_Answer
+{
 
     /**
      * Javascript class to use when creating UI
@@ -25,7 +27,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param int|string $question_id
      * @return bool|int
      */
-    public function create($object, $question_id = '') {
+    public function create($object, $question_id = '')
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
         $answer['question_id'] = $question_id;
 
@@ -49,7 +52,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param array $object
      * @return void
      */
-    public function update($object) {
+    public function update($object)
+    {
         $answer = array_intersect_key($object, array_flip($this->allowedFields));
 
         parent::update($answer);
@@ -64,7 +68,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param int|string $question_id
      * @return void
      */
-    public function modify($page, $question_id = '') {
+    public function modify($page, $question_id = '')
+    {
         if (is_numeric($question_id)) {
             $currentAnswer = parent::getForQuestion($question_id);
 
@@ -91,7 +96,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param string $answer
      * @return void
      */
-    public function modifyInQuestionBank($page, $answer) {
+    public function modifyInQuestionBank($page, $answer)
+    {
         $page->setVar(array(
             'ANSWER' => Scrub::text($answer),
         ));
@@ -103,7 +109,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param string $data
      * @return string
      */
-    public function encodeForQuestionBank($data) {
+    public function encodeForQuestionBank($data)
+    {
         return $data;
     }
 
@@ -153,7 +160,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param SitePage $page
      * @return void
      */
-    public function cleanupParse($page) {
+    public function cleanupParse($page)
+    {
     }
 
     /**
@@ -192,11 +200,12 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param int $question_id
      * @return bool|int
      */
-    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id) {
+    public function importMoodleAnswer(SimpleXMLElement $xmlObj, $question_id)
+    {
         $object = array(
             'question_id' => $question_id,
             'sequence' => 1,
-            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE|ENT_QUOTES),
+            'answer' => html_entity_decode(trim((string)$xmlObj->answer->text), ENT_IGNORE | ENT_QUOTES),
         );
 
         return $this->create($object, $question_id);
@@ -209,7 +218,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param int $question_id
      * @return array
      */
-    public function exportResponseToCSV($attempt_id, $question_id) {
+    public function exportResponseToCSV($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         /* Remove tab characters
@@ -234,7 +244,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param int $question_id
      * @return array
      */
-    public function exportResponseToArray($attempt_id, $question_id) {
+    public function exportResponseToArray($attempt_id, $question_id)
+    {
         $response = $this->getResponseHandler()->getByAttemptAndQuestion($attempt_id, $question_id);
 
         $data = $response['response'];
@@ -293,7 +304,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param array $currentQuestion
      * @return void
      */
-    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion) {
+    public function reviewResponseHorizontal($page, $attemptId, $currentQuestion)
+    {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $currentQuestion['question_id']);
 
         /* Removed this check because it was wrongly matching a blank saved
@@ -321,7 +333,8 @@ abstract class Evaluation_Answer_Short extends Evaluation_Answer {
      * @param array $currentQuestion
      * @return void
      */
-    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion) {
+    public function reviewResponseHorizontalAnswerForQuestion($page, $currentQuestion)
+    {
         $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
         /* Show correct answer

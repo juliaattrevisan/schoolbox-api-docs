@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Wraps a HTML fragment in a full HTML document.
  *
@@ -8,10 +9,12 @@
  */
 
 namespace Alaress\Html;
+
 use Schoolbox\IConfigLoader;
 use Scrub;
 
-class Wrapper {
+class Wrapper
+{
 
     /**
      * The value of the title tag for the HTML document.
@@ -40,7 +43,8 @@ class Wrapper {
      * @param string $title
      * @param string $body
      */
-    public function __construct($title = '', $body = '') {
+    public function __construct($title = '', $body = '')
+    {
         $this->setTitle($title)->setBody($body);
     }
 
@@ -49,7 +53,8 @@ class Wrapper {
      *
      * @return string
      */
-    public function render() {
+    public function render()
+    {
         $contents = <<<HTML
 <html>
 <head>
@@ -80,13 +85,14 @@ HTML
      * @param  array $serverVars Global vars from $_SERVER
      * @return $this
      */
-    public function loadBaseHrefFromServerVars($serverVars) {
+    public function loadBaseHrefFromServerVars($serverVars)
+    {
         $protocol = !empty($serverVars['HTTPS']) ? 'https' : 'http';
         $host     = $serverVars['HTTP_X_FORWARDED_HOST'] ?? $serverVars['HTTP_HOST'];
         $baseHref = "$protocol://$host";
         // Don't set port if it's a standard port
         if (!in_array($serverVars['SERVER_PORT'], array(80, 443))) {
-            $baseHref .= ':'.$serverVars['SERVER_PORT'];
+            $baseHref .= ':' . $serverVars['SERVER_PORT'];
         }
         $this->setBaseHref($baseHref);
         return $this;
@@ -98,7 +104,8 @@ HTML
      * @param  IConfigLoader $configLoader A config loader object
      * @return $this
      */
-    public function loadBaseHrefFromConfig(IConfigLoader $configLoader) {
+    public function loadBaseHrefFromConfig(IConfigLoader $configLoader)
+    {
         $host      = $configLoader->get('site_domain');
         $subdomain = $configLoader->get('site_hostname');
         $baseHref  = (strlen($subdomain) > 0) ? ($subdomain . '.' . $host) : $host;
@@ -110,7 +117,8 @@ HTML
      * @param  string $body
      * @return $this
      */
-    public function setBody($body) {
+    public function setBody($body)
+    {
         $this->body = $body;
         return $this;
     }
@@ -118,7 +126,8 @@ HTML
     /**
      * @return string
      */
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
@@ -126,7 +135,8 @@ HTML
      * @param  string $title
      * @return $this
      */
-    public function setTitle($title) {
+    public function setTitle($title)
+    {
         $this->title = $title;
         return $this;
     }
@@ -134,7 +144,8 @@ HTML
     /**
      * @return string
      */
-    public function getTitle() {
+    public function getTitle()
+    {
         return $this->title;
     }
 
@@ -142,7 +153,8 @@ HTML
      * @param  string $baseHref
      * @return $this
      */
-    public function setBaseHref($baseHref) {
+    public function setBaseHref($baseHref)
+    {
         $this->baseHref = $baseHref;
         return $this;
     }
@@ -150,8 +162,8 @@ HTML
     /**
      * @return string
      */
-    public function getBaseHref() {
+    public function getBaseHref()
+    {
         return $this->baseHref;
     }
-
 }

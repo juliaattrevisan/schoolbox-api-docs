@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,12 +9,12 @@
 
 namespace Alaress\Mail;
 
-
 use Schoolbox\IConfigLoader;
 use Psr\Log\LoggerInterface;
 use Swift_Transport;
 
-interface IMailer {
+interface IMailer
+{
 
     /**
      * @param IConfigLoader $conf
@@ -56,7 +57,7 @@ interface IMailer {
 
     public function addFile($file, $mime = 'text/plain', $filename = '', $isFile = true);
 
-    public function addImage($file, $type='application/octet');
+    public function addImage($file, $type = 'application/octet');
 
     public function send($to = '');
 

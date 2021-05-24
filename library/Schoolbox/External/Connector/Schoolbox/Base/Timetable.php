@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schoolbox implementation of timetable connector
  *

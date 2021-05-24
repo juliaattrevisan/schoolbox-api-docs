@@ -382,5 +382,4 @@ class Calendar_Api_EventType_Timetable_ExternalConstrained_Default extends Calen
         // No events in this strat, just return empty.
         return new Collection();
     }
-
 }

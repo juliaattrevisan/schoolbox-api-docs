@@ -1,4 +1,5 @@
 <?php
+
 /**
  * File
  *
@@ -8,7 +9,6 @@
  */
 
 namespace Schoolbox\Learning\Assessment\DueWork;
-
 
 use Alaress_Date_Format;
 use Schoolbox\Resource\File\StorableTrait;

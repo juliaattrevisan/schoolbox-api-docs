@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Implementation of Edumate User Connection
  * For schema information, see http://wiki.schoolbox.com.au/index.php/Interface_Calls
@@ -7,6 +8,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
@@ -164,7 +166,6 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // parse rows into student - it will be replicated by being joined to parent rows, so need to flatten
         // populate emergency contacts by stacking
         for ($i = $start; $i < 4, $row = $stmt->fetch(PDO::FETCH_ASSOC); ++$i) {
-
             // logic to compensate for Edumate returning blank emergency contact
             if (isset($row['STUDENTEMERGENCYNAME']) && !strlen($row['STUDENTEMERGENCYNAME'])) {
                 --$i;

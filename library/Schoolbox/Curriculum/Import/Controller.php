@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller for curriculum importing.
  *
@@ -120,8 +121,7 @@ class Controller extends Base
             /** @var Node\Model $rootNode */
             try {
                 $rootNode = $this->getNodeMapper()->findOneByColumn('reference', $thisArea->getReference(), ["deleted" => false]);
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 $rootNode = $this->getNodeMapper()->createModel();
                 $rootNode
                     ->setLearningLevel($thisLevel)
@@ -135,7 +135,6 @@ class Controller extends Base
             $outcomes->add($rootNode);
             // All the handling code cares about is the root node's ID
             $data['outcomes'][0] = ['id' => $rootNode->getId()];
-
         } else {
             $code = 400;
             $data['message'] = 'Area or level not found';

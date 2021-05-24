@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Repair script for repairing articles that were truncated in the migration
  * from homepage and school news to comms articles.

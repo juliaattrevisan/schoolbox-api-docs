@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -60,7 +61,8 @@ class FixtureCest
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
                 Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
-            ]);
+            ]
+        );
 
         $fixturePage->assertNotifNotExists('You have an upcoming AFL match ' . $matchName1);
 
@@ -78,7 +80,8 @@ class FixtureCest
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
                 Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
-            ]);
+            ]
+        );
 
         $fixturePage->assertNotifExists('You have an upcoming AFL match ' . $matchName2);
 
@@ -108,7 +111,8 @@ class FixtureCest
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
                 Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
-            ]);
+            ]
+        );
         $fixturePage->addItinerary($matchId4);
         $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName4 . ' itinerary has been changed');
 
@@ -126,7 +130,8 @@ class FixtureCest
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
                 Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
-            ]);
+            ]
+        );
         $fixturePage->deleteItinerary($matchId5);
         $fixturePage->assertNotifExists('Your upcoming AFL match ' . $matchName5 . ' itinerary has been changed');
 
@@ -143,7 +148,8 @@ class FixtureCest
                 Fixture::SELECTOR_JS_VENUE => Fixture::VENUE_HAILEYBURY,
                 Fixture::SELECTOR_JS_HOME_TEAM => Fixture::TEAM_FIRST_XVIII,
                 Fixture::SELECTOR_JS_AWAY_TEAM => Fixture::TEAM_SECOND_XVIII
-            ]);
+            ]
+        );
 
         $fixturePage->assertNotifNotExists('You have an upcoming AFL match ' . $matchName1);
 
@@ -160,5 +166,4 @@ class FixtureCest
         $fixturePage->assertNotifExists('You have an upcoming AFL match ' . $matchName2);
         $fixturePage->assertNotifNotExists('Your upcoming AFL match ' . $matchName2 . ' has been updated');
     }
-
 }

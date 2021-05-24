@@ -1,14 +1,13 @@
 <?php
+
  /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-
 namespace Schoolbox\Realtime\Schedule\Event;
-
 
 use JsonSerializable;
 use RuntimeException;
@@ -18,7 +17,8 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Serializable;
 
-class Event implements CrudEventInterface, Serializable, JsonSerializable {
+class Event implements CrudEventInterface, Serializable, JsonSerializable
+{
 
     /** @var User */
     protected $effector;
@@ -29,8 +29,8 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
     /** @var object */
     protected $object;
 
-	/** @var Mapper */
-	protected $mapper;
+    /** @var Mapper */
+    protected $mapper;
 
     /** @var array|null */
     protected $diff;
@@ -43,11 +43,12 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
      * @param Mapper $mapper
      * @param array $diff
      */
-    function __construct($subject, $verb, $object, $mapper, $diff = null) {
+    function __construct($subject, $verb, $object, $mapper, $diff = null)
+    {
         $this->effector = $subject;
         $this->action   = $verb;
         $this->object   = $object;
-	    $this->mapper   = $mapper;
+        $this->mapper   = $mapper;
         $this->diff     = $diff;
     }
 
@@ -57,7 +58,8 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
      *
      * @return User
      */
-    public function getEffector() {
+    public function getEffector()
+    {
         return $this->effector;
     }
 
@@ -67,7 +69,8 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
      *
      * @return string
      */
-    public function getAction() {
+    public function getAction()
+    {
         return $this->action;
     }
 
@@ -77,12 +80,13 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
      *
      * @return object
      */
-    public function getObject() {
+    public function getObject()
+    {
         return $this->object;
     }
 
 
-	/**
+    /**
      * @param object $object
      * @return self
      */
@@ -94,11 +98,12 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
 
 
     /**
-	 * @return Mapper
-	 */
-	public function getMapper() {
-		return $this->mapper;
-	}
+     * @return Mapper
+     */
+    public function getMapper()
+    {
+        return $this->mapper;
+    }
 
 
     /**
@@ -107,7 +112,8 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
      *
      * @return array|null
      */
-    public function getDiff() {
+    public function getDiff()
+    {
         return $this->diff;
     }
 
@@ -118,9 +124,10 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
      * @throws Mapper\Exception
      * @return string the string representation of the object or null
      */
-	public function serialize() {
-		return serialize($this->jsonSerialize());
-	}
+    public function serialize()
+    {
+        return serialize($this->jsonSerialize());
+    }
 
 
     /**
@@ -131,17 +138,18 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
      * @throws RuntimeException
      * @return void
      */
-	public function unserialize($serialized) {
-		$array = unserialize($serialized);
+    public function unserialize($serialized)
+    {
+        $array = unserialize($serialized);
 
         // urgh. more safety checks
         if (!class_exists($array['o']['c'])) {
             throw new RuntimeException("Could not unserialize non-existent mapper");
         }
 
-		$this->effector = UserMapper::getInstance()->hydrate($array['u']);
-		$this->action   = $array['a'];
-		$this->mapper   = $array['o']['c']::getInstance();
+        $this->effector = UserMapper::getInstance()->hydrate($array['u']);
+        $this->action   = $array['a'];
+        $this->mapper   = $array['o']['c']::getInstance();
 
         // The hydrate cache must be invalidated for this object,
         // because this object could have already been hydrated in this request.
@@ -149,8 +157,8 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
 
         $this->object = $this->hydrate($array['o']['i'], $this->mapper);
 
-		$this->diff     = $array['d'];
-	}
+        $this->diff     = $array['d'];
+    }
 
 
     /**
@@ -198,10 +206,9 @@ class Event implements CrudEventInterface, Serializable, JsonSerializable {
             // Overlay serialized values
             foreach ($instanceData as $column => $value) {
                 // Check the serialised column still exists on the model (eg submission_box.deleted no longer exists in 18.0)
-                if($mapsByColumn->keyExists($column)){
+                if ($mapsByColumn->keyExists($column)) {
                     $mapper->setModelProperty($object, $mapsByColumn[$column]['property'], $value);
                 }
-
             }
             return $object;
         }

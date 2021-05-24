@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Notif\Queue\Bindings;
-
 
 use External_User;
 use External_UserInterface;
@@ -303,9 +303,7 @@ class Generator implements GeneratorInterface
             foreach ($roles as $rType => $roleCollection) {
                 $this->roleCache[$rType] = $roleCollection->getColumnValues('id');
             }
-
         }
         return $this->roleCache;
     }
-
 }

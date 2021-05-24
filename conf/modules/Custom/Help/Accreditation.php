@@ -1,4 +1,5 @@
 <?php
+
 /**
  * help.schoolbox.com.au
  *
@@ -13,7 +14,8 @@ use Alaress\Application\Kernel;
 use Config\ModuleLoader;
 use Custom\Help\Nesa\Module as NesaModule;
 
-class Accreditation extends ModuleLoader {
+class Accreditation extends ModuleLoader
+{
 
     /**
      * Run configuration for the given module
@@ -21,7 +23,8 @@ class Accreditation extends ModuleLoader {
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel) {
+    public function configure($kernel)
+    {
         $this->loadModule($kernel, NesaModule::class, '/accreditation');
     }
 }

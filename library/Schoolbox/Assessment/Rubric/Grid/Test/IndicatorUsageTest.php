@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -197,8 +198,7 @@ class IndicatorUsageTest extends TestCase
     public function testContainsDescriptorsWithValue(
         RubricGrid\IndicatorUsage $indicatorUsage,
         bool $expected
-    ): void
-    {
+    ): void {
         $this->assertSame($expected, $indicatorUsage->containsDescriptorsWithValue());
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * JSON-encoded value column type.
  *

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * The Routing Daemon.
  *
@@ -32,7 +33,7 @@ require __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Routing', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 
 // ROUTING APP
-$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
 
     $di->get('stomp')->connect()->then(function (IClient $client) use ($di, $loop, $log, $opts, $flags) {
         try {
@@ -69,7 +70,10 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
 
                 $cache->readIntoRouter($instance, $router);
 
-                $transaction = new DispatchTransaction($loop, $dispatcher, DispatchStrategy::TASK_ROUTE,
+                $transaction = new DispatchTransaction(
+                    $loop,
+                    $dispatcher,
+                    DispatchStrategy::TASK_ROUTE,
                     Subscription\Handler::TRANSACTION_CACHE_TIMEOUT,
                     Subscription\Handler::TRANSACTION_COUNT_LIMIT
                 );
@@ -84,7 +88,7 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
             }
         } catch (\Throwable $e) {
             $loop->stop();
-            $log->alert($e->getMessage(), [ 'exception'=>$e ]);
+            $log->alert($e->getMessage(), [ 'exception' => $e ]);
             throw $e;
         }
     });

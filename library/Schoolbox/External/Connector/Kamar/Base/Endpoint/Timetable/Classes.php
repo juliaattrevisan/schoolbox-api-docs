@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
@@ -264,7 +266,6 @@ class Classes implements IStrategy
                 $subjects = new SubjectIterator($this->log, $this->registry, $studentId, $day);
 
                 foreach ($subjects as $subject) {
-
                     /* Subject doesn't exist in this slot
                      */
                     if (null === $subject) {
@@ -301,7 +302,7 @@ class Classes implements IStrategy
                      */
                     try {
                         $timetableClass = $this->createTimetableClass($subject);
-                    } catch(UnexpectedValueException $e) {
+                    } catch (UnexpectedValueException $e) {
                         $this->log->info(sprintf(
                             'No classes found for student %s, day %s, period with sequence %s',
                             $studentId,
@@ -330,7 +331,6 @@ class Classes implements IStrategy
                             $timetableClass->getCode()
                         ));
                     } else {
-
                         /* Nonexistent users get a warning, but assign their external ids anyway
                          */
                         if (!isset($users[$student['username']])) {
@@ -351,7 +351,6 @@ class Classes implements IStrategy
                     array_shift($subject['teachers']);
 
                     foreach ($subject['teachers'] as $teacher) {
-
                         /* Throw warning, but assign them anyway
                          */
                         if (null === $teacher || !isset($users[$teacher['username']])) {

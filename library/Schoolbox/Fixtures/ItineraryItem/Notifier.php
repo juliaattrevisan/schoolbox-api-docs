@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -74,7 +75,7 @@ class Notifier extends AbstractModuleNotifier
         $notifyTime->addHours(-24);
         $now = \Alaress_Date_Format::now();
 
-        if($now->between($notifyTime, $itineraryItem->getStartAt())) {
+        if ($now->between($notifyTime, $itineraryItem->getStartAt())) {
             switch ($method) {
                 // Create will always notify
                 case Mapper::METHOD_CREATE:

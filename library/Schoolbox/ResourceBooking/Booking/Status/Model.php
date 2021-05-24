@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Model for resource moderation types.
  *
@@ -11,7 +12,8 @@ namespace Schoolbox\ResourceBooking\Booking\Status;
 
 use JsonSerializable;
 
-class Model implements JsonSerializable {
+class Model implements JsonSerializable
+{
 
     /**
      * Pending booking
@@ -42,7 +44,8 @@ class Model implements JsonSerializable {
      * @param  int   $id
      * @return $this
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -50,7 +53,8 @@ class Model implements JsonSerializable {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -58,7 +62,8 @@ class Model implements JsonSerializable {
      * @param  string $name
      * @return $this
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -66,28 +71,32 @@ class Model implements JsonSerializable {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
     /**
      * @return bool
      */
-    public function isPending() {
+    public function isPending()
+    {
         return $this->getId() == self::STATUS_PENDING;
     }
 
     /**
      * @return bool
      */
-    public function isApproved() {
+    public function isApproved()
+    {
         return $this->getId() == self::STATUS_APPROVED;
     }
 
     /**
      * @return bool
      */
-    public function isRejected() {
+    public function isRejected()
+    {
         return $this->getId() == self::STATUS_REJECTED;
     }
 
@@ -96,7 +105,8 @@ class Model implements JsonSerializable {
      *
      * @return array
      */
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return array(
             'id'         => $this->getId(),
             'name'       => $this->getName(),
@@ -105,5 +115,4 @@ class Model implements JsonSerializable {
             'isRejected' => $this->isRejected(),
         );
     }
-
 }

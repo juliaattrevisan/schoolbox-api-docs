@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -23,6 +24,7 @@ use Schoolbox\Learning\MarkScheme\Factory;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
+
 use function func_get_args;
 
 class Controller extends Base
@@ -139,7 +141,6 @@ class Controller extends Base
                     'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
                 ])->getAsString(),
             ]));
-
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);
             $data = [

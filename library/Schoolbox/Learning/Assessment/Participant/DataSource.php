@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -213,7 +214,7 @@ class DataSource
         $dynamicPlans = new GenericCollection(PlanObject::class);
         foreach ($assessments as $assessment) {
             // Projects do not have persisted plans and participants.
-            if($assessment instanceof Project){
+            if ($assessment instanceof Project) {
                 continue;
             }
             $dynamicPlan = $assessment->getDynamicPlan();
@@ -321,7 +322,6 @@ class DataSource
             }
 
             foreach ($assessmentResponses as $response) {
-
                 //Ensure response user is fully hydrated
                 $responseUser = $this->userMapper->findByIdWithFallback($response->getSubmittedOnBehalfOf()->getId());
 
@@ -367,7 +367,6 @@ class DataSource
                 continue;
             }
             foreach ($assessmentFeedback as $feedback) {
-
                 //Ensure response user is fully hydrated
                 $feedbackUser    = $this->userMapper->findByIdWithFallback($feedback->getReviewee()->getId());
                 // participants for assessment are no longer hydrated for deleted user.
@@ -455,7 +454,6 @@ class DataSource
                 // Class members: convert to list of users
                 $classCodes = $this->externalDb->getStudents($folder->getCodeString());
                 if (!empty($classCodes)) {
-
                     $pb = $this->userMapper->getPredicateBuilder()
                         ->in('synergy_id', array_column($classCodes, 'synergy_id'))
                         ->equals('g.group_type', Role::STUDENT);
@@ -472,7 +470,6 @@ class DataSource
             )->indexBy('id');
 
             $this->cacheForFolder[$folder->getId()] = $students;
-
         }
         return $this->cacheForFolder[$folder->getId()];
     }

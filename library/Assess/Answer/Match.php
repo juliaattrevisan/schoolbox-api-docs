@@ -13,7 +13,7 @@ use Assess\IAutomarkable;
  */
 class Assess_Answer_Match extends Evaluation_Answer_Match implements IAutomarkable
 {
-	/**
+    /**
      * Automatically marks a response. Customised to be applicable to the way in
      * which the response is actually stored.
      *

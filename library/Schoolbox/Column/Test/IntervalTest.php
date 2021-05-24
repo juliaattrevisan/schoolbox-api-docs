@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Interval (stored as integer) column test
  *
@@ -8,11 +9,13 @@
  */
 
 namespace Schoolbox\Column\Test;
+
 use Schoolbox\Column\Interval;
 use DateInterval;
 use Alaress\Date\Interval as IntervalObject;
 
-class IntervalTest extends TestCase {
+class IntervalTest extends TestCase
+{
 
     /**
      * @var Interval
@@ -22,14 +25,16 @@ class IntervalTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function setupObject() {
+    public function setupObject()
+    {
         $this->object = new Interval();
     }
 
     /**
      * @inheritdoc
      */
-    public function getTestHydrate() {
+    public function getTestHydrate()
+    {
         $invertedInterval1 = new DateInterval('PT23H59M59S');
         $invertedInterval1->invert = 1;
         $invertedInterval2 = new DateInterval('PT24H0M0S');
@@ -56,7 +61,8 @@ class IntervalTest extends TestCase {
     /**
      * @inheritdoc
      */
-    public function getTestDehydrate() {
+    public function getTestDehydrate()
+    {
         $invertedInterval = new DateInterval('PT27H15M');
         $invertedInterval->invert = 1;
         return array(
@@ -100,7 +106,8 @@ class IntervalTest extends TestCase {
      * @param null|string $input
      * @param null|IntervalObject $expected_output
      */
-    public function testHydrate($input = null, $expected_output = null) {
+    public function testHydrate($input = null, $expected_output = null)
+    {
         $this->assertEquals($expected_output, $this->object->hydrate($input));
     }
 
@@ -109,7 +116,8 @@ class IntervalTest extends TestCase {
      * @param IntervalObject|DateInterval|int|string $input
      * @param null|int $expected_output
      */
-    public function testDehydrate($input = null, $expected_output = null) {
+    public function testDehydrate($input = null, $expected_output = null)
+    {
         $this->assertEquals($expected_output, $this->object->dehydrate($input));
     }
 }

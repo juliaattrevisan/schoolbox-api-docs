@@ -1,4 +1,5 @@
 <?php
+
 /**
  * IMetadataStrategy
  *
@@ -9,9 +10,9 @@
 
 namespace Schoolbox\Fixtures\Team\Metadata\Strategy;
 
-use \Schoolbox\Collection;
-use \Schoolbox\Fixtures\Match\Model as Match;
-use \Schoolbox\Fixtures\Team\Model as Team;
+use Schoolbox\Collection;
+use Schoolbox\Fixtures\Match\Model as Match;
+use Schoolbox\Fixtures\Team\Model as Team;
 
 interface IMetadataStrategy
 {

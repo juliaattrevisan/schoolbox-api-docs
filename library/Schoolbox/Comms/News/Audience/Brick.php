@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience;
@@ -10,6 +12,7 @@ namespace Schoolbox\Comms\News\Audience;
 use InvalidArgumentException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\CreateCollection;
+
 use function array_diff;
 use function array_map;
 use function array_merge;

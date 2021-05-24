@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -31,7 +32,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
     $framework = new Framework($di, $loop, $log, $opts['env'] ?? null, $opts['logdir'] ?? null);
 
@@ -51,18 +52,14 @@ $kernel->run(function(Di\Container $di, LoopInterface $loop, LoggerInterface $lo
 
         // punch it.
         $framework->launch($testCase);
-
     } catch (UnderflowException $e) {
-        $log->critical($e->getMessage(), [ 'exception'=>$e ]);
+        $log->critical($e->getMessage(), [ 'exception' => $e ]);
         return;
-
     } catch (OutOfBoundsException $e) {
-        $log->error($e->getMessage(), [ 'exception'=>$e ]);
+        $log->error($e->getMessage(), [ 'exception' => $e ]);
         return;
-
     } catch (InvalidArgumentException $e) {
-        $log->error($e->getMessage(), [ 'exception'=>$e ]);
+        $log->error($e->getMessage(), [ 'exception' => $e ]);
         return;
     }
-
 });

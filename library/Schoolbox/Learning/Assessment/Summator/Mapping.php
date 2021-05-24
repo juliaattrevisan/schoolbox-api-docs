@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Map
  *
@@ -14,10 +15,10 @@
 
 namespace Schoolbox\Learning\Assessment\Summator;
 
-use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
-use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
-use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
+use Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
+use Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 use Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 
 class Mapping
@@ -53,14 +54,11 @@ class Mapping
     {
         if ($summator instanceof WeightedAverage) {
             return SummatorFactory::WEIGHTED_AVERAGE;
-        }
-        elseif ($summator instanceof Average) {
+        } elseif ($summator instanceof Average) {
             return SummatorFactory::AVERAGE;
-        }
-        elseif ($summator instanceof Maximum) {
+        } elseif ($summator instanceof Maximum) {
             return SummatorFactory::MAXIMUM;
-        }
-        elseif ($summator instanceof Minimum) {
+        } elseif ($summator instanceof Minimum) {
             return SummatorFactory::MINIMUM;
         }
 

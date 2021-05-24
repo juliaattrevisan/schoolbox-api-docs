@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable;
@@ -173,7 +175,6 @@ class Classes implements IStrategy
             $classes = new ScheduleIterator($this->batchxml, $currentTimetable);
 
             foreach ($classes as $class) {
-
                 /* Look up the period instance by (name, day)
                  *
                  * If the period doesn't correspond to something in our timetable definition,
@@ -207,7 +208,6 @@ class Classes implements IStrategy
                 /* Process students
                  */
                 foreach ($class['students'] as $student) {
-
                     /* Throw warning, but assign them anyway
                      */
                     if (!isset($users[$student['username']])) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -7,13 +8,11 @@
 
 namespace Schoolbox\Filter;
 
-
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 class Model
 {
-
     use Id;
 
     /**

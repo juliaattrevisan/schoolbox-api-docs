@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Matthew
@@ -25,7 +26,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function($di, $loop, $log, $opts) {
+$kernel->run(function ($di, $loop, $log, $opts) {
     /**
      * @var Di\Container $di
      * @var LoopInterface $loop
@@ -81,7 +82,7 @@ $kernel->run(function($di, $loop, $log, $opts) {
         // sleeeeeeeep...
         wait($log);
 
-        stateCheck($log, $redis, $drhodes, $prhodes, $i-1);
+        stateCheck($log, $redis, $drhodes, $prhodes, $i - 1);
 
         $log->info("Set Work visibility to $i");
         $work->setMarkVisibility($i);
@@ -92,7 +93,6 @@ $kernel->run(function($di, $loop, $log, $opts) {
     wait($log);
 
     stateCheck($log, $redis, $drhodes, $prhodes, 2);
-
 });
 
 
@@ -152,7 +152,6 @@ function assertMessageReceipt(LoggerInterface $log, Redis $redis, User $user, ar
         if ($expectedCount == 0) {
             // don't interrogate contents for correctness
             $log->info("$str has no messages, as expected");
-
         } else {
             // check we actually received what we expected
             $log->info("$str has $actualCount message(s), as expected: checking contents");
@@ -161,21 +160,17 @@ function assertMessageReceipt(LoggerInterface $log, Redis $redis, User $user, ar
                 // show the difference between the arrays
                 $log->warning("Messages received did not meet expectation:");
                 $log->warning("Diff: " . json_encode($diff));
-
             } else {
                 $log->info("All ok!", ['char' => '+']);
             }
         }
-
     } elseif ($actualCount == 0) {
         // nothing received; courtesy of the elseif we know this is a mismatch
         $log->error("$str received no messages; $expectedCount expected");
-
     } elseif ($actualCount > $expectedCount) {
         // ...too many messages..? -_-'
         $log->error("$str somehow has $actualCount message(s); $expectedCount expected");
         $log->warning("Diff: " . json_encode($diff));
-
     } else {
         // most likely bug scenario: not all expected messages received
         $log->error("$str only received $actualCount message(s); $expectedCount expected: checking contents");

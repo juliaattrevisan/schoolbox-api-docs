@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -14,7 +15,6 @@ use Schoolbox\Database\Factory;
  */
 class External_Synergetic_Class implements External_ClassInterface
 {
-
     use External_Synergetic_ClearInvalidValuesTrait;
 
     /**

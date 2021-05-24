@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Schoolbox\Permission\Access;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
@@ -73,20 +73,16 @@ class UserAccessNotifier extends AbstractModuleNotifier
             if ($group->isFree() && $userAccess->getUser()->getId() == $bundle->getEvent()->getEffector()->getId()) {
                 // if user added themselves
                 $bundle->attach(self::TRIGGER_JOINED, self::IMMEDIATELY);
-
             } elseif ($userAccess->getAccessLevel() == UserAccess::ACCESS_DENY) {
                 // if this is a request to join a moderated group
                 $bundle->attach(self::TRIGGER_REQUESTED, self::IMMEDIATELY);
-
             } else {
                 // if the user was added by someone else
                 $bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
             }
-
         } elseif ($method == Mapper::METHOD_DELETE) {
             // useraccess revoked
             $bundle->attach(self::TRIGGER_LEFT, self::IMMEDIATELY);
-
         } elseif ($method == Mapper::METHOD_UPDATE) {
             // access level changed (usually moderation)
             $bundle->attach(self::TRIGGER_APPROVED, self::IMMEDIATELY);
@@ -246,7 +242,6 @@ class UserAccessNotifier extends AbstractModuleNotifier
         $envelope->targetToUser($userAccess->getUser(), $bob->build());
 
         return $envelope;
-
     }
 
 
@@ -342,14 +337,14 @@ class UserAccessNotifier extends AbstractModuleNotifier
         }
 
         // TODO uncomment these bits of the method to make it more informative once the Mapper can handle composite IDs
-//		// no diff in access level, this isn't something we're interested in
-//		if(!isset($diff['accessLevel'])) {
-//			return $msgr;
-//		}
+//      // no diff in access level, this isn't something we're interested in
+//      if(!isset($diff['accessLevel'])) {
+//          return $msgr;
+//      }
 //
-//		// new is [0], old is [1]
-//		$newAccess = $diff['accessLevel'][0];
-//		$oldAccess = $diff['accessLevel'][1];
+//      // new is [0], old is [1]
+//      $newAccess = $diff['accessLevel'][0];
+//      $oldAccess = $diff['accessLevel'][1];
 
         try {
             $cat = FolderMapper::getInstance()->findById($userAccess->getServiceIdentifier());
@@ -432,5 +427,4 @@ class UserAccessNotifier extends AbstractModuleNotifier
     {
         return $this->notifyApproved($userAccess, $user, $diff);
     }
-
 }

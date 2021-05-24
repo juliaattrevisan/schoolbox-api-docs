@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Decorator;
 
 use Aura\Di\Exception\ServiceNotFound;
@@ -105,11 +107,9 @@ class Decorator implements DecoratorInterface
     {
         if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_NONE) {
             $assessment->setAcceptsNone();
-        }
-        else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
+        } else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
             $assessment->setAcceptsSingle();
-        }
-        else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
+        } else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
             $assessment->setAcceptsMultiple();
         }
 

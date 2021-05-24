@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -20,10 +21,9 @@ use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 
-
 /**
  * Class QuizNotifications
- * 
+ *
  * It checks quiz notifications.
  */
 class QuizNotifications extends AbstractNotificationTest
@@ -147,8 +147,8 @@ class QuizNotifications extends AbstractNotificationTest
         $quizzes = [];
 
         // set these up 5 seconds apart
-        $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_PRIVATE,        '1 second',  '5 second');
-        $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_STUDENT,        '6 second',  '10 second');
+        $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_PRIVATE, '1 second', '5 second');
+        $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_STUDENT, '6 second', '10 second');
         $quizzes[] = $this->generateQuiz(IAssessable::MARK_VISIBILITY_PARENT_STUDENT, '11 second', '15 second');
 
         foreach ($quizzes as $quiz) {
@@ -170,7 +170,6 @@ class QuizNotifications extends AbstractNotificationTest
 
         if (preg_match('`/assess/[A-Za-z]+/(\d+)`', $message['href'], $matches)) {
             list (, $quizId) = $matches;
-
         } else {
             // This message is targeted to the parent, and therefore doesn't reference the quiz.
             // Extract quiz ID out of topics
@@ -185,13 +184,11 @@ class QuizNotifications extends AbstractNotificationTest
                 $this->log->notice("For some reason, href '{$message['href']}' doesn't match expectation");
                 return;
             }
-
         }
 
         switch ($message['title']['text']) {
             // new quiz
             case ':username opened a Quiz, :quizname, in :catname':
-
                 // if the recipient is a student, attempt the quiz, otherwise ignore
                 if (!$recipient->getRole()->isStudent()) {
                     $this->log->info('Not student; ignoring');
@@ -203,7 +200,6 @@ class QuizNotifications extends AbstractNotificationTest
 
             // new attempt
             case ':student attempted :quiz in :category':
-
                 // if you staff, you handle this
                 if (!$recipient->getRole()->isStaff()) {
                     $this->log->info('Not staff; ignoring');
@@ -262,7 +258,6 @@ class QuizNotifications extends AbstractNotificationTest
                 $this->log->error("Don't know how to handle: '{$message['title']['text']}'", [ 'char' => '?' ]);
                 return;
         }
-
     }
 
 
@@ -292,7 +287,6 @@ class QuizNotifications extends AbstractNotificationTest
         $this->log->debug(sprintf("Quiz %d -> %s: %d / %d", $quizId, $roletype, $a[$roletype], $tgt), [ 'char' => '<' ]);
 
         if (isset($a['parent']) && isset($a['student']) && $a['student'] == $a['parent'] && $a['student'] == $tgt) {
-
             // at this point, all the marks have been given.
 
             // drop the cache for this quiz
@@ -450,7 +444,8 @@ class QuizNotifications extends AbstractNotificationTest
             ->setMaxAttempts(1)
             ->setNotifyAuthor(false)
             ->setTitle(
-                sprintf('TEST QUIZ: visibility=%d; open=%s~%s; created=%s',
+                sprintf(
+                    'TEST QUIZ: visibility=%d; open=%s~%s; created=%s',
                     $visibility,
                     str_replace(' ', '_', $start->getDatabase()),
                     str_replace(' ', '_', $finish->getDatabase()),
@@ -537,5 +532,4 @@ class QuizNotifications extends AbstractNotificationTest
         $mapper->create($ob);
         return $ob;
     }
-
 }

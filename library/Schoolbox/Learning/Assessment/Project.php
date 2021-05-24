@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Project
  *
@@ -21,8 +22,8 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
-use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\User;
+use Schoolbox\Learning\Assessment\Summator\ISummator;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class Project extends AbstractAssessment implements AssessmentContext
@@ -619,7 +620,7 @@ class Project extends AbstractAssessment implements AssessmentContext
         $participatingUsers = parent::getParticipantUsers();
 
         // Recursive case
-        foreach($this->assessables as $subAssessable){
+        foreach ($this->assessables as $subAssessable) {
             $participatingUsers = $participatingUsers->mergeUnique($subAssessable->getParticipantUsers(), 'id');
         }
         return $participatingUsers;

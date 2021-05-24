@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -17,7 +18,6 @@ use Schoolbox\Learning\Quiz\Section\Question\Solution\Mapper as QuizSolutionMapp
 use Schoolbox\Learning\Quiz\Attempt\Mapper as QuizAttemptMapper;
 use Schoolbox\Learning\Quiz\Attempt\Answer\Mapper as QuizAnswerMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-
 
 /**
  * Placeholder for the ~170 Quiz Re-write
@@ -60,8 +60,7 @@ class Controller extends AbstractController
         QuizSolutionMapper $quizSolutionMapper,
         QuizAttemptMapper $quizAttemptMapper,
         QuizAnswerMapper $quizAnswerMapper
-    )
-    {
+    ) {
         parent::__construct($quizMapper);
         $this->errorMapper = $errorMapper;
         $this->quizSectionMapper = $quizSectionMapper;
@@ -103,7 +102,7 @@ class Controller extends AbstractController
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
-        $redirect = $returnUrl ? '?'.Redirect::RETURN_URL."=$returnUrl" : '';
+        $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
         $this->getResponse()->redirect->to("/assess/summary/$assessId{$redirect}");
     }
 
@@ -121,7 +120,7 @@ class Controller extends AbstractController
     {
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
         $returnUrl = $this->getRequest()->query->get(Redirect::RETURN_URL);
-        $redirect = $returnUrl ? '?'.Redirect::RETURN_URL."=$returnUrl" : '';
+        $redirect = $returnUrl ? '?' . Redirect::RETURN_URL . "=$returnUrl" : '';
         $this->getResponse()->redirect->to("/assess/section/create/$assessId{$redirect}");
     }
 
@@ -156,7 +155,7 @@ class Controller extends AbstractController
         $returnUrlSuffix = "?returnUrl=" . $this->getRequest()->query->get('returnUrl') ?: Redirect::encode($this->getRequest()->query->get('page'));
 
         $assessId = $this->getQuizForAssessmentId($assessmentId)->getId();
-        $this->getResponse()->redirect->to("/assess/intro/$assessId".$returnUrlSuffix);
+        $this->getResponse()->redirect->to("/assess/intro/$assessId" . $returnUrlSuffix);
     }
 
     /**
@@ -181,7 +180,7 @@ class Controller extends AbstractController
     public function getExportAttempts($assessmentId)
     {
         $format = strtolower($this->getRequest()->query->get('format'));
-        if(!in_array($format, ['csv', 'xml'])){
+        if (!in_array($format, ['csv', 'xml'])) {
             throw new \InvalidArgumentException("Unsupported export format: $format");
         }
         $quiz = $this->getQuizForAssessmentId($assessmentId);
@@ -200,7 +199,7 @@ class Controller extends AbstractController
         /** @var Model $quiz */
         $quiz = $this->mapper->findByColumn('assessment_id', $assessmentId)->first();
 
-        if(!$quiz){
+        if (!$quiz) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
 
@@ -229,7 +228,7 @@ class Controller extends AbstractController
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }
 
-        if($this->getRequest()->isXhr()) {
+        if ($this->getRequest()->isXhr()) {
             $this->getResponse()->content->set($this->buildJsonOutput(['status' => 200]));
         } else {
             $this->getResponse()->redirect->to(Redirect::decode($get['returnUrl']));
@@ -364,8 +363,7 @@ class Controller extends AbstractController
         try {
             $attempt = $this->quizAttemptMapper->findById($this->getRequest()->post['attemptId']);
             $this->quizAttemptMapper->delete($attempt);
-        }
-        catch (MapperException $e) {
+        } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_ATTEMPT_NOT_FOUND);
         }
     }

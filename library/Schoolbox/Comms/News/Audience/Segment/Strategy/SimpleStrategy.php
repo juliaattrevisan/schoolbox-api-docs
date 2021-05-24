@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Comms\News\Audience\Segment\Strategy;
@@ -17,6 +19,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\User;
 use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
+
 use function array_intersect;
 use function count;
 
@@ -219,7 +222,8 @@ abstract class SimpleStrategy implements ISimpleStrategy
                 $this->newPb($uniquePrefix)
                      ->equals("{$userTableAlias}.id", 1)
                      ->equals("{$userTableAlias}.id", 2)
-            ));
+            )
+        );
     }
 
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -149,7 +150,6 @@ class Notifier extends AbstractModuleNotifier
             $diff = $bundle->getEvent()->getDiff();
             if (isset($diff['finish'])) {
                 $bundle->attach(self::TRIGGER_ATTEMPTED, self::IMMEDIATELY);
-
             } else {
                 $bundle->attach(self::TRIGGER_MARKED, self::IMMEDIATELY);
             }
@@ -280,9 +280,11 @@ class Notifier extends AbstractModuleNotifier
 
         $restrictGrades = $this->conf->get('restrict_parent_grades')
             || !$this->conf->get(ConfigMapper::NAME_GRADES_ENABLED);
-        if ($this->conf->get('restrict_parent_duework_access')
+        if (
+            $this->conf->get('restrict_parent_duework_access')
             || ($restrictGrades && $this->conf->get('restrict_student_submissions'))
-            || !$assess->isMarkShownToParents()) {
+            || !$assess->isMarkShownToParents()
+        ) {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'parent'));
             return $envelope;
         } else {

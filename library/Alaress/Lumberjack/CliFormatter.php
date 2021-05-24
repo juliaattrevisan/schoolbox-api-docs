@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,12 +9,11 @@
 
 namespace Alaress\Lumberjack;
 
-
-
 use Monolog\Formatter\NormalizerFormatter;
 use Monolog;
 
-class CliFormatter extends NormalizerFormatter {
+class CliFormatter extends NormalizerFormatter
+{
 
     // fg colourings
     const black        = '0;30';
@@ -79,7 +79,8 @@ class CliFormatter extends NormalizerFormatter {
      * @param bool $porcelain
      * @param bool $outputContext
      */
-    public function __construct($porcelain = false, $outputContext = false) {
+    public function __construct($porcelain = false, $outputContext = false)
+    {
         $this->porcelain = $porcelain;
         $this->contextualise = $outputContext;
     }
@@ -110,38 +111,37 @@ class CliFormatter extends NormalizerFormatter {
         ];
 
         // if this is already formatted like a log, don't reformat it
-        if(preg_match("`\[.\].* => `", $record['message'])) {
+        if (preg_match("`\[.\].* => `", $record['message'])) {
             return $record['message'];
         }
 
         /** @var \DateTime $datetime */
         $datetime = $record['datetime'];
         $date = $datetime->format('Y-m-d H:i:s');
-        if(isset($record['extra']['microtime'])) {
+        if (isset($record['extra']['microtime'])) {
             $date .= substr($record['extra']['microtime'], 1, self::TIME_RESOLUTION + 1);
             unset($record['extra']['microtime']);
         }
 
         $pieces = array("[$date]");
 
-        foreach($record['extra'] as $key => $value) {
-            if($this->porcelain) {
-                if(isset($map[$key])) {
+        foreach ($record['extra'] as $key => $value) {
+            if ($this->porcelain) {
+                if (isset($map[$key])) {
                     $key = $map[$key];
                 }
                 $pieces[] = "[$key:$value]";
-            }
-            else {
+            } else {
                 $pieces[] = "[$value]";
             }
         }
 
         $pieces[] = " => {$record['message']}";
 
-        if($this->contextualise) {
+        if ($this->contextualise) {
             $context = $record['context'];
             unset($context['char']);
-            foreach($context as $key => $value) {
+            foreach ($context as $key => $value) {
                 $pieces[] = "\n   $key => $value";
             }
         }
@@ -174,17 +174,17 @@ class CliFormatter extends NormalizerFormatter {
      */
     protected function decorate($string, $level, $context)
     {
-        if($level <= Monolog\Logger::NOTICE && $level >= Monolog\Logger::INFO && isset($context['char'])) {
+        if ($level <= Monolog\Logger::NOTICE && $level >= Monolog\Logger::INFO && isset($context['char'])) {
             $char = $context['char'][0];
-            if(array_key_exists($char, self::$formats)) {
+            if (array_key_exists($char, self::$formats)) {
                 $level = $char;
             }
         }
 
         $string = $this->prependSeverity($string, $level);
 
-        if(!$this->porcelain) {
-            if($level >= Monolog\Logger::ALERT) {
+        if (!$this->porcelain) {
+            if ($level >= Monolog\Logger::ALERT) {
                 $string = "\n$string\n";
             }
             $string = $this->applyFormat($string, self::$formats[$level][1], self::$formats[$level][2]);
@@ -200,20 +200,21 @@ class CliFormatter extends NormalizerFormatter {
      * @param string $bg
      * @return string
      */
-    protected function applyFormat($string, $fg = null, $bg = null) {
+    protected function applyFormat($string, $fg = null, $bg = null)
+    {
         // default to reset
         $colouring = "\033[0m";
 
         // going to apply *something*
-        if($fg || $bg) {
+        if ($fg || $bg) {
             $colouring = "";
         }
         // apply fg
-        if($fg) {
+        if ($fg) {
             $colouring .= "\033[{$fg}m";
         }
         // apply bg
-        if($bg) {
+        if ($bg) {
             $colouring .= "\033[{$bg}m";
         }
 
@@ -230,10 +231,9 @@ class CliFormatter extends NormalizerFormatter {
     public function formatBatch(array $records)
     {
         $result = array();
-        foreach($records as $record) {
+        foreach ($records as $record) {
             $result[] = $this->format($record);
         }
         return $result;
     }
-
 }

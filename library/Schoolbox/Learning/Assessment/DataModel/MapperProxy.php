@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -668,7 +669,7 @@ class MapperProxy
         }
 
         //If a participant has been provided make sure we hydrate CAP
-        if($user instanceof User) {
+        if ($user instanceof User) {
             return $this->translateToDomainModelCollection($this->baseMapper->findByPredicatesForParticipant($builder, $user, $options));
         }
 
@@ -990,7 +991,6 @@ class MapperProxy
                 $boxMapper->save($subObject);
 
                 if ($dueWork->getRubricGrid()) {
-
                     /* Disregard grid changes if CourseManaged is on
                      */
                     $courseManagedFields = new CourseManagedFields($currentUser, $assessable);
@@ -1005,12 +1005,10 @@ class MapperProxy
             }
 
             $boxMapper->saveFiles($subObject);
-
         } elseif ($subObject instanceof Quiz) {
             // Legacy Quiz SitePage Controllers require that we preserve this field
             $subObject->setCategory($assessable->getBaseContext()->getFolder());
             QuizMapper::getInstance()->save($subObject);
-
         } elseif ($subObject instanceof Project) {
             ProjectMapper::getInstance()->save($subObject);
             // Save sub-projects
@@ -1063,13 +1061,10 @@ class MapperProxy
         if ($assessmentId) {
             if ($subObject instanceof Task) {
                 $mapper = TaskMapper::getInstance();
-
             } elseif ($subObject instanceof SubmissionBox) {
                 $mapper = SubmissionBoxMapper::getInstance();
-
             } elseif ($subObject instanceof Quiz) {
                 $mapper = QuizMapper::getInstance();
-
             } elseif ($subObject instanceof Project) {
                 $mapper = ProjectMapper::getInstance();
             } else {
@@ -1309,7 +1304,8 @@ class MapperProxy
         }
 
         // Window before / after filter (an ADF)
-        if (isset($options['window_open']) && $options['window_open'] instanceof \Alaress_Date_Format
+        if (
+            isset($options['window_open']) && $options['window_open'] instanceof \Alaress_Date_Format
             && isset($options['window_close']) && $options['window_close'] instanceof \Alaress_Date_Format
             && !$options['window_open']->isNull()
             && !$options['window_close']->isNull()

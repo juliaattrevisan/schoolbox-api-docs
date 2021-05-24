@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\WebDav\SubjectServer;
 
 use Sabre\DAV;
@@ -191,12 +193,11 @@ class Server extends DAV\Collection
                 }
                 return $visibility->isVisibleToUser($assessment, $this->retrieveUserFromSource(), false);
             })
-            ->groupByCallback(function(IAssessable $assessment) {
+            ->groupByCallback(function (IAssessable $assessment) {
                 return $assessment->getBaseContext()->getFolder()->getId();
             });
 
         foreach ($groupedAssessments as $folderId => $assessments) {
-
             $assessment = $assessments->first();
             if ($assessment instanceof IAssessable) {
                 // /Subject/
@@ -218,7 +219,6 @@ class Server extends DAV\Collection
             }
 
             foreach ($assessments as $assessment) {
-
                 // /Subject/Assessment/
                 try {
                     $assessmentNode = new Assessment(
@@ -240,7 +240,6 @@ class Server extends DAV\Collection
                 $participant = $assessment->getParticipantIfExtant($this->retrieveUserFromSource());
                 if ($participant instanceof Participant) {
                     foreach ($participant->getAllResponses() as $response) {
-
                         // /Subject/Assessment/Response/
                         try {
                             $responseNode = new DAV\SimpleCollection(
@@ -257,9 +256,7 @@ class Server extends DAV\Collection
                         }
 
                         if ($response instanceof DueWorkResponse && $response->isSubmitted()) {
-
                             foreach ($response->getAllFiles() as $file) {
-
                                 // /Subject/Assessment/Response/File/
                                 try {
                                     $responseNode->addChild(

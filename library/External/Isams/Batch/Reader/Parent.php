@@ -1,4 +1,5 @@
 <?php
+
 /**
  * XML reader for finding parent contacts in iSAMS' batch API response.
  *

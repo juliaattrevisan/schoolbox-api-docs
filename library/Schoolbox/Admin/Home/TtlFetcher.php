@@ -1,13 +1,16 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Home;
 
 use UnexpectedValueException;
+
 use function escapeshellarg;
 use function exec;
 use function preg_match;
@@ -60,7 +63,7 @@ class TtlFetcher
         //  ; <<>> DiG 9.11.3-1ubuntu1.12-Ubuntu <<>> @ns-1894.awsdns-44.co.uk. vagrant.dev.schoolbox.cloud +noall +answer
         //  ; (2 servers found)
         //  ;; global options: +cmd
-        //  vagrant.dev.schoolbox.cloud. 3600 IN	A	192.168.36.10
+        //  vagrant.dev.schoolbox.cloud. 3600 IN    A   192.168.36.10
 
         foreach ($output as $line) {
             $trimmed = trim($line);
@@ -98,13 +101,13 @@ class TtlFetcher
         //  ; <<>> DiG 9.11.3-1ubuntu1.12-Ubuntu <<>> @8.8.8.8 vagrant.dev.schoolbox.cloud SOA +noall +authority +nostats
         //  ; (1 server found)
         //  ;; global options: +cmd
-        //  dev.schoolbox.cloud.	301	IN	SOA	ns-1894.awsdns-44.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400
+        //  dev.schoolbox.cloud.    301 IN  SOA ns-1894.awsdns-44.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400
 
         // ; <<>> DiG 9.11.3-1ubuntu1.14-Ubuntu <<>> andie.standrewscc.qld.edu.au SOA +noall +answer +authority
         // ;; global options: +cmd
-        // andie.standrewscc.qld.edu.au. 51290 IN	CNAME	stacc.schoolbox.cloud.
-        // stacc.schoolbox.cloud.	68	IN	CNAME	sbox-nlb-public-aa2a5eec300b979b.elb.ap-southeast-2.amazonaws.com.
-        // elb.ap-southeast-2.amazonaws.com. 2 IN	SOA	ns-527.awsdns-01.net. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 60
+        // andie.standrewscc.qld.edu.au. 51290 IN   CNAME   stacc.schoolbox.cloud.
+        // stacc.schoolbox.cloud.   68  IN  CNAME   sbox-nlb-public-aa2a5eec300b979b.elb.ap-southeast-2.amazonaws.com.
+        // elb.ap-southeast-2.amazonaws.com. 2 IN   SOA ns-527.awsdns-01.net. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 60
 
         // If domain is a CNAME, output will have CNAME records
         // In this case, we want to strip the leading URL fragment and recurse

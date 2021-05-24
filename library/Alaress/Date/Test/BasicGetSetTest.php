@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that get and set of parts of time work as expected.
  *

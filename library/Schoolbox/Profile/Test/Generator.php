@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Used to generate a truth table of all possible combinations
  *
@@ -56,13 +57,10 @@ $outcomes[] = 'ValidDetailsVisible';
 // every viewer meets every viewee, including meeting themselves
 foreach ($viewees as $vieweeKey => $viewee) {
     foreach ($viewers as $viewerKey => $viewer) {
-
         // ReportStaffAccess config option
         foreach ($configOptions as $reportStaffAccessKey => $reportStaffAccess) {
-
             // RestrictParentEmails config option
             foreach ($configOptions as $restrictParentEmailsKey => $restrictParentEmails) {
-
                 // Modified the signature of isSatisfiedBy() so that it didn't rely on the current
                 // configuration values to speculatively explore the possible outcomes
                 $outcome = (new \Schoolbox\Profile\ValidDetailsVisible(new \External_User(), $this->getDi()->get('config')))

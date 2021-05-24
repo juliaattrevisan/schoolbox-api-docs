@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Course builder admin page
  *
@@ -38,7 +39,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer) {
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
 
         $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
              ->addRoutePermission($authorizer, '.*', new Rule\IsSuperuser());
@@ -47,9 +49,10 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initControllers(ContainerInterface $injector) {
+    public function initControllers(ContainerInterface $injector)
+    {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(
                 Controller::class,
                 [
@@ -66,7 +69,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initTemplatePaths(IChainLoader $templateLoader) {
+    public function initTemplatePaths(IChainLoader $templateLoader)
+    {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -370,7 +371,6 @@ abstract class Base extends CliTool\App
                 $this->log->notice('Dry-run complete - no changes would have needed to be written');
             }
         }
-
     }
 
 

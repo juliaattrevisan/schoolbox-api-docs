@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Assess_Import_Xml
  *
@@ -12,8 +13,8 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizAssessable;
-use \Schoolbox\Learning\Assessment\AssessmentContextType;
-use \Evaluation\Import\Parser\IParser;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
+use Evaluation\Import\Parser\IParser;
 use Assess\Import\Parser\IParser as AssessParser;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpec;
@@ -23,7 +24,6 @@ use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\WorkType;
 use Schoolbox\Mapper\Exception as MapperException;
-
 
 /**
  * Quiz-specific import-logic extension
@@ -109,7 +109,7 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
      */
     protected function getParser(SimpleXMLElement $xml, $fileFormatVersion)
     {
-        switch($fileFormatVersion){
+        switch ($fileFormatVersion) {
             case IParser::FORMAT_VERSION_160:
                 return new \Assess\Import\Parser\V160($xml);
             case IParser::FORMAT_VERSION_165:
@@ -193,7 +193,7 @@ class Assess_Import_Xml extends Evaluation_Import_Xml
      */
     protected function getAssessmentContext()
     {
-        switch($this->contextType){
+        switch ($this->contextType) {
             case AssessmentContextType::TYPE_FOLDER:
                 return FolderMapper::getInstance()->findById($this->contextId);
             case AssessmentContextType::TYPE_UNIT_SPECIFICATION:

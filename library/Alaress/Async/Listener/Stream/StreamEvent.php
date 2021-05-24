@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,7 +8,6 @@
  */
 
 namespace Alaress\Async\Listener\Stream;
-
 
 class StreamEvent
 {
@@ -115,5 +115,4 @@ class StreamEvent
     {
         return $this->meta['eof'];
     }
-
 }

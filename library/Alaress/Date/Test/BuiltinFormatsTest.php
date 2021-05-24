@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Test for verifying that built in formats work as expected.
  *

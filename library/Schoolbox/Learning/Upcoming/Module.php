@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Upcoming;
 
 use Alaress\Authorizer\Rule;
@@ -49,7 +51,7 @@ class Module extends BaseModule
         );
         // parents may view their child's work only if config.restrict_parent_duework_access is off
         if (!$this->getConfig()->get('restrict_parent_duework_access')) {
-            $access->addRule( new Rule\LazyCallback(function () {
+            $access->addRule(new Rule\LazyCallback(function () {
                 return new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId');
             }));
         }
@@ -97,10 +99,10 @@ class Module extends BaseModule
             return $preload;
         };
 
-        $this->register('GET',  '',                        'getUpcoming', $basicAccess);
-        $this->register('GET',  '/events/{studentId:\d+}', 'getEvents', $access, $preloadStudent);
-        $this->register('GET',  '/{studentId:\d+}{/date}', 'getUpcomingForStudent',  $access, $preloadStudentAndDate);
-        $this->register('POST', '/{studentId:\d+}',        'postUpcomingForStudent', $access, $preloadStudent);
+        $this->register('GET', '', 'getUpcoming', $basicAccess);
+        $this->register('GET', '/events/{studentId:\d+}', 'getEvents', $access, $preloadStudent);
+        $this->register('GET', '/{studentId:\d+}{/date}', 'getUpcomingForStudent', $access, $preloadStudentAndDate);
+        $this->register('POST', '/{studentId:\d+}', 'postUpcomingForStudent', $access, $preloadStudent);
     }
 
     /**

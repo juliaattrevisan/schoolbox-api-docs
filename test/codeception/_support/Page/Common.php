@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: tomoko.tanaka
@@ -7,7 +8,6 @@
  */
 
 namespace Page;
-
 
 class Common
 {

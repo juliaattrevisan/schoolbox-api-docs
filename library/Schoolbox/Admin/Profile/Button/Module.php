@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Schoolbox\Admin\Profile\Button;
@@ -43,11 +44,13 @@ class Module extends BaseModule
             ]
         ];
 
-        foreach ($routes['GET'] as $path => $alias)
+        foreach ($routes['GET'] as $path => $alias) {
             $this->addGetRoute($router, $alias, $basePath, $path);
+        }
 
-        foreach ($routes['POST'] as $path => $alias)
+        foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
+        }
     }
 
     /**

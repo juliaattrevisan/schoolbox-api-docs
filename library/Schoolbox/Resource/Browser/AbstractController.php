@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Resource\Browser;
 
 use Alaress\Web\Controller\Base as BaseController;
@@ -146,7 +148,6 @@ abstract class AbstractController extends BaseController
             $tree = $node->render();
 
             return $tree['breadcrumbs'];
-
         } catch (InvalidArgumentException $e) {
             return [];
         }
@@ -176,8 +177,7 @@ abstract class AbstractController extends BaseController
             $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
             $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
             $data['namespace'] = $this->namespace;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             //Reset folderid to try and avoid error
             $folderId = 0;
             $this->getSession()->set('resourcesID', $folderId, $this->namespace);
@@ -187,7 +187,6 @@ abstract class AbstractController extends BaseController
             $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
             $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
             $data['namespace'] = $this->namespace;
-
         }
 
         $data['site_location'] = \Config::get('site_location');
@@ -234,8 +233,7 @@ abstract class AbstractController extends BaseController
             $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
             $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
             $data['namespace'] = $this->namespace;
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             //Reset folderid to try and avoid error
             $folderId = 0;
             $this->getSession()->set('resourcesID', $folderId, $this->namespace);
@@ -245,7 +243,6 @@ abstract class AbstractController extends BaseController
             $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
             $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
             $data['namespace'] = $this->namespace;
-
         }
 
         $data['attachzone'] = $this->getFolderAttachzoneData();
@@ -340,7 +337,7 @@ abstract class AbstractController extends BaseController
             'host'   => sprintf('http%s://%s', $server->get('HTTPS') ? 's' : '', $server->get('HTTP_X_FORWARDED_HOST') ?? $server->get('HTTP_HOST')),
             'access' => $this->getAccess($folderId),
             'namespace' => $this->namespace,
-            'RETURN_URL'=> Redirect::RETURN_URL . '=' . Redirect::encode("/resources/$folderId"),
+            'RETURN_URL' => Redirect::RETURN_URL . '=' . Redirect::encode("/resources/$folderId"),
             'error' => \Schoolbox\Video\QueueMapper::getInstance()->hasError($file),
         ];
 
@@ -480,14 +477,11 @@ abstract class AbstractController extends BaseController
     {
         try {
             return $this->getFolder($folderId);
-
         } catch (Mapper\Exception\Deleted $e) {
             // Deleted: load the parent (recursively)
             return $this->findFolder($e->getDeletedObject()->getParent()->getId());
-
         } catch (Mapper\Exception $e) {
             return $this->folderMapper->createModel()->setId(0);
-
         }
     }
 

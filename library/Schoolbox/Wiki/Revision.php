@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -8,135 +9,146 @@
 
 namespace Schoolbox\Wiki;
 
-
 use Schoolbox\User;
 
-class Revision {
+class Revision
+{
 
-	/** @var int */
-	protected $id;
+    /** @var int */
+    protected $id;
 
-	/** @var Wiki */
-	protected $wiki;
+    /** @var Wiki */
+    protected $wiki;
 
-	/** @var string */
-	protected $heading;
+    /** @var string */
+    protected $heading;
 
-	/** @var string */
-	protected $body;
+    /** @var string */
+    protected $body;
 
-	/** @var User */
-	protected $user;
+    /** @var User */
+    protected $user;
 
-	/** @var \Alaress_Date_Format */
-	protected $created;
-
-
-	/**
-	 * @param int $id
-	 * @return self
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /** @var \Alaress_Date_Format */
+    protected $created;
 
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @param int $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
 
-	/**
-	 * @param Wiki $wiki
-	 * @return self
-	 */
-	public function setWiki($wiki) {
-		$this->wiki = $wiki;
-		return $this;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
 
-	/**
-	 * @return Wiki
-	 */
-	public function getWiki() {
-		return $this->wiki;
-	}
+    /**
+     * @param Wiki $wiki
+     * @return self
+     */
+    public function setWiki($wiki)
+    {
+        $this->wiki = $wiki;
+        return $this;
+    }
 
 
-	/**
-	 * @param string $heading
-	 * @return self
-	 */
-	public function setHeading($heading) {
-		$this->heading = $heading;
-		return $this;
-	}
+    /**
+     * @return Wiki
+     */
+    public function getWiki()
+    {
+        return $this->wiki;
+    }
 
 
-	/**
-	 * @return string
-	 */
-	public function getHeading() {
-		return $this->heading;
-	}
+    /**
+     * @param string $heading
+     * @return self
+     */
+    public function setHeading($heading)
+    {
+        $this->heading = $heading;
+        return $this;
+    }
 
 
-	/**
-	 * @param string $body
-	 * @return self
-	 */
-	public function setBody($body) {
-		$this->body = $body;
-		return $this;
-	}
+    /**
+     * @return string
+     */
+    public function getHeading()
+    {
+        return $this->heading;
+    }
 
 
-	/**
-	 * @return string
-	 */
-	public function getBody() {
-		return $this->body;
-	}
+    /**
+     * @param string $body
+     * @return self
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+        return $this;
+    }
 
 
-	/**
-	 * @param User $user
-	 * @return self
-	 */
-	public function setUser($user) {
-		$this->user = $user;
-		return $this;
-	}
+    /**
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
 
 
-	/**
-	 * @return User
-	 */
-	public function getUser() {
-		return $this->user;
-	}
+    /**
+     * @param User $user
+     * @return self
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+        return $this;
+    }
 
 
-	/**
-	 * @param \Alaress_Date_Format $created
-	 * @return self
-	 */
-	public function setCreated($created) {
-		$this->created = $created;
-		return $this;
-	}
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
 
-	/**
-	 * @return \Alaress_Date_Format
-	 */
-	public function getCreated() {
-		return $this->created;
-	}
+    /**
+     * @param \Alaress_Date_Format $created
+     * @return self
+     */
+    public function setCreated($created)
+    {
+        $this->created = $created;
+        return $this;
+    }
 
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
 }

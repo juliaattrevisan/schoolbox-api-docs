@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base mapper specific to objects stored outside of the Schoolbox database,
  * such as timetables, subjects and class lists.
@@ -9,22 +10,25 @@
  */
 
 namespace Schoolbox\External;
+
 use Schoolbox;
 
-abstract class Mapper extends Schoolbox\Mapper {
+abstract class Mapper extends Schoolbox\Mapper
+{
 
-	/**
-	 * Interface for connecting to external database.
-	 *
-	 * @var \External_User()
-	 */
-	protected $external_user;
+    /**
+     * Interface for connecting to external database.
+     *
+     * @var \External_User()
+     */
+    protected $external_user;
 
-	/**
-	 * Creates mapper, and sets up external database interface.
-	 */
-	public function __construct() {
-		parent::__construct();
-		$this->external_user = new \External_User();
-	}
+    /**
+     * Creates mapper, and sets up external database interface.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->external_user = new \External_User();
+    }
 }

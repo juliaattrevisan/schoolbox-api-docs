@@ -176,8 +176,7 @@ class External_Maze_Helper
                 $allClassCodes[] = "'{$classCode}'";
                 $allClassNumbers[] = "'{$classNumber}'";
             }
-        }
-        else {
+        } else {
             [$classCode, $classNumber] = explode('-', $schoolboxClassCode);
 
             $allClassCodes[] = "'{$classCode}'";
@@ -195,7 +194,8 @@ class External_Maze_Helper
      *
      * @return bool
      */
-    public function isBetweenSemesters() {
+    public function isBetweenSemesters()
+    {
         return $this->getBetweenSemesters();
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Image
  *
@@ -9,14 +10,16 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\Internal;
 
-class Image extends Base {
+class Image extends Base
+{
 
     /**
      * Image files
      *
      * @return mixed
      */
-    public function test() {
+    public function test()
+    {
         if ($this->getItem()->getMimetype()->isImage()) {
             return [
                 'type' => 'image',

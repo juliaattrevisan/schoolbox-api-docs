@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * This script will take plagscan documents in an queued state and attempt to transmit them to
  * plagscan so they can be processed. Use this if you have lots of files in the queued state.
@@ -7,6 +8,7 @@
  * @author           James Leckie <jleckie@alaress.com.au>
  * @copyright        Copyright 2019, Schoolbox Pty Ltd
  */
+
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as StudentSubmissionFileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as StudentSubmissionFile;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
@@ -50,7 +52,6 @@ HELP;
         $mapper = PlagscanMapper::getInstance();
 
         if (!$mapper->getConnector()) {
-
             /* Plagscan not configured - nothing to do
              */
             $log->warning('Plagscan scan did not run: username, api key and/or access token is not configured correctly');
@@ -86,7 +87,6 @@ HELP;
                 $filename = $mapper->plagscanFilename($studentSubmissionFile);
 
                 if ($filename !== null) {
-
                     /* Privatise all previous incarnations of this (assessment, student) tuple to
                      * prevent documents from being scanned against older versions of themselves
                      */
@@ -116,8 +116,7 @@ HELP;
                         } else {
                             $log->warning("{$prefix}: transmission did not return a plagscanId for submission file {$currentDocument->getStudentSubmissionFileId()}");
                         }
-                    } catch (\RuntimeException|\InvalidArgumentException $e) {
-
+                    } catch (\RuntimeException | \InvalidArgumentException $e) {
                         /* Transient errors can get logged; transmit() retry is allowed later
                          *
                          * These are fixable things like plagscan being unavailable temporarily,
@@ -129,7 +128,6 @@ HELP;
                          */
                         $log->error($e->getMessage());
                     }
-
                 } else {
                     $log->warning("{$prefix}: unknown join criteria for file/assessment/user");
                 }
@@ -147,14 +145,12 @@ HELP;
                 $log->error("{$prefix}: PlagScan API needs to be updated. {$e->getMessage()}; exiting immediately");
                 exit(1);
             } catch (\DomainException $e) {
-
                 /* Could not transmit this file to plagscan for some reason so remove it from the queue
                  */
                 $currentDocument->setStatus(Plagscan::STATUS_UNSCANNABLE);
                 $mapper->save($currentDocument);
                 $log->error("{$prefix}: could not transmit student_submission_file_id {$currentDocument->getStudentSubmissionFileId()}. {$e->getMessage()}");
             } catch (\RuntimeException $e) {
-
                 /* Could not transmit this file to plagscan for some reason
                  * RuntimeException = Plagscan is unusable = immediate exit
                  */

@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * Finds plagscan documents for similarity check enabled assessment but not in plagscan_document and inserts them
  *

@@ -26,7 +26,8 @@ class News
         $this->database = Database::getInstance();
     }
 
-    public function schoolCreated(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function schoolCreated(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM comms_news_article
                   WHERE created_at >= :start AND created_at <= :end";
 
@@ -38,7 +39,8 @@ class News
         return $statement->fetchColumn(0);
     }
 
-    public function groupCreated(\Alaress_Date_Format $start, \Alaress_Date_Format $end) {
+    public function groupCreated(\Alaress_Date_Format $start, \Alaress_Date_Format $end)
+    {
         $query = "SELECT COUNT(*) FROM comms_news_article
                   JOIN comms_news_audience cna on comms_news_article.id = cna.comms_news_article_id AND entity_type = 'folder'
                   WHERE created_at >= :start AND created_at <= :end";

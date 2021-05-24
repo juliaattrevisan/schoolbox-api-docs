@@ -1,4 +1,5 @@
 <?php
+
 /**
  * House
  *
@@ -11,7 +12,8 @@ namespace Schoolbox\External\Normalise\User\Common;
 
 use Schoolbox\External\Normalise\User\Staff;
 
-class House {
+class House
+{
 
     /**
      * Identifier
@@ -47,7 +49,8 @@ class House {
      * House constructor.
      * @param bool $housemaster Flag indicating if housemaster should be setup, causes recursion when adding house to staff member
      */
-    public function __construct($housemaster = true) {
+    public function __construct($housemaster = true)
+    {
         $this->setup($housemaster);
     }
 
@@ -55,7 +58,8 @@ class House {
      * Hook method
      * @param bool $housemaster Flag indicating if housemaster should be setup, causes recursion when adding house to staff member
      */
-    protected function setup($housemaster) {
+    protected function setup($housemaster)
+    {
         if ($housemaster) {
             $this->setHousemaster(new Staff());
         }

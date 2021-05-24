@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -158,7 +159,7 @@ TEST;
         ];
 
 
-        $test3= <<<TEST
+        $test3 = <<<TEST
 "capabilityMarkType: percent","useMarkRange: Off",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
@@ -177,7 +178,7 @@ TEST;
         ];
 
 
-        $test4= <<<TEST
+        $test4 = <<<TEST
 "capabilityMarkType: letter:1","useMarkRange: Off",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
@@ -196,7 +197,7 @@ TEST;
         ];
 
 
-        $test5= <<<TEST
+        $test5 = <<<TEST
 "capabilityMarkType: letter : 1","useMarkRange: Off",,,,,
 "Test Capability 1","Indicator 1",a,b,c,d,e
 9,,15,10,5,1,0
@@ -486,7 +487,7 @@ TEST;
      */
     private function buildStream(string $content)
     {
-        $stream = fopen('php://memory','rb+');
+        $stream = fopen('php://memory', 'rb+');
         fwrite($stream, $content);
         rewind($stream);
         return $stream;

@@ -1,5 +1,6 @@
 
 <?php
+
 /**
  * Translator from ASC Timetables XML export to Schoolbox CSV enrolment import.
  *

@@ -1,13 +1,15 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Sync\Effect\Fragment;
 
-use \Schoolbox\Collection;
-use \Schoolbox\ValueLabelInterface;
+use Schoolbox\Collection;
+use Schoolbox\ValueLabelInterface;
 
 /**
  * Class Lookup
@@ -47,7 +49,7 @@ class Lookup
      */
     public function findData(string $userField, ?string $roleType = null): Collection
     {
-        $stack = new Collection;
+        $stack = new Collection();
 
         if (array_key_exists($userField, $this->allLookups)) {
             $mapperName = $this->allLookups[$userField];
@@ -58,13 +60,11 @@ class Lookup
                 $mapper = new $mapperName();
 
                 if ($userField === 'role') {
-
                     /* Special Case for Role Mapper: this mapper should restrict
                      * possibilities to those appropriate for the current Ruleset
                      */
                     $allResults = $mapper->findByColumn('group_type', $roleType);
                 } elseif (in_array($userField, ['userAccessRead', 'userAccessWrite', 'userAccessRemove'])) {
-
                     /* Special case for userAccess* options, which need folder selection
                      * in the ui
                      */

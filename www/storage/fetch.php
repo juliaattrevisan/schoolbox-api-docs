@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Returns objects from the storage engine as plain files
  *
@@ -72,12 +73,12 @@ try {
         header("Cache-control: private");
         header("Content-Ranges: none");
         header("Content-Disposition: $attachmentType filename=\"$basename\"");
-        header("Content-Length: ".$resource->getSize());
+        header("Content-Length: " . $resource->getSize());
         fpassthru($resource->readStream());
         exit;
     }
+} catch (Exception $ex) {
 }
-catch (Exception $ex) {}
 //
 // File not found error
 error(Error\Mapper::ERROR_FILE_NOT_FOUND);

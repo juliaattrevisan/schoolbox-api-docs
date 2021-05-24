@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au
  */
+
 declare(strict_types=1);
 
 namespace External\Canvas\Sync;
@@ -88,8 +90,7 @@ class BridgeFactory
         Folder\Mapper $folderMapper,
         Course $courseBridge,
         LoggerInterface $log
-    ): CourseSection
-    {
+    ): CourseSection {
         $className = $this->getClassName('CourseSection');
         return new $className($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
     }

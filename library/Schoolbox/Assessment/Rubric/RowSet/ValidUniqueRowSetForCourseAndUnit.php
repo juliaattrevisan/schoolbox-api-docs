@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Rubric\RowSet;
@@ -129,7 +131,8 @@ class ValidUniqueRowSetForCourseAndUnit extends Base
                 foreach ($units as $unit) {
                     $unitName = $unit['unitName'];
                     $folderId = $unit['folderId'];
-                    $errorMessage .= sprintf("<li><a href='/rubric/manager/%s'>%s</a></li>",
+                    $errorMessage .= sprintf(
+                        "<li><a href='/rubric/manager/%s'>%s</a></li>",
                         \Scrub::text($folderId),
                         \Scrub::text($unitName)
                     );

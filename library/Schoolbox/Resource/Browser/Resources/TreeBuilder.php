@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -17,7 +18,6 @@ use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\User;
-
 
 class TreeBuilder extends AbstractTreeBuilder
 {
@@ -138,7 +138,8 @@ class TreeBuilder extends AbstractTreeBuilder
         $folderPerm = $this->getFolderPermission($file->getFolder()->getId());
 
         // if read and hidden, cast to none; otherwise leave as-is
-        if ($folderPerm == $this->getPermissionString(UserAccess::ACCESS_READ)
+        if (
+            $folderPerm == $this->getPermissionString(UserAccess::ACCESS_READ)
             && $file->isHidden()
         ) {
             $folderPerm = $this->getPermissionString(UserAccess::ACCESS_DENY);

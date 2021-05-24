@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -16,7 +17,7 @@ require_once __DIR__ . '/../conf/core/require.php';
 /**
  * Reset a user's password.
  */
-$app = new class($argv[1] ?? '') extends CliTool\App
+$app = new class ($argv[1] ?? '') extends CliTool\App
 {
     // --help: print help
     private const OPT_LONG_HELP = 'help';
@@ -110,7 +111,6 @@ HELP;
         $this->username = $this->readLine('Enter a schoolbox username: ');
         if ($this->username) {
             return $this->username;
-
         }
         $this->getLogger()->error('A username must be provided');
         exit(1);
@@ -119,4 +119,3 @@ HELP;
 
 $kernel = new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO]);
 $kernel->runApp();
-

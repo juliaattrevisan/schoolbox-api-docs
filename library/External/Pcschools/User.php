@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PCSchools user connector
  *
@@ -6,6 +7,7 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Alaress\Database\Connector\IConnector;
@@ -75,7 +77,6 @@ class External_Pcschools_User implements External_UserInterface
         // squash the result down into a single row
         $row = $this->queryHelper->processGetStudentResult($rows);
         if (!empty($row)) {
-
             $row = $this->getDatabase()->trimRow($row);
             // Get boarder codes and munge student boarder status in
             $boarderCodes = array_map(
@@ -233,7 +234,7 @@ class External_Pcschools_User implements External_UserInterface
         foreach ($externalUserIds as $id) {
             $whereParts[] = "S.STUDKEY = {$this->getDatabase()->legacyQuote($id)}";
         }
-        $query .= ' AND ('.implode(' OR ', $whereParts) . ')';
+        $query .= ' AND (' . implode(' OR ', $whereParts) . ')';
 
         /* PCSchools comes in two flavours: Freedom, and Non Freedom
          * They do things slightly differently
@@ -331,9 +332,10 @@ class External_Pcschools_User implements External_UserInterface
         return date('Y');
     }
 
-    public function findPeriod() {
+    public function findPeriod()
+    {
         $query = "SELECT TIME_PERIOD, SUB_PERIOD FROM dbo.CALENDAR WHERE DATE = :now";
-        $period = $this->getDatabase()->getRow($query, [':now'=>date('ymd')]);
+        $period = $this->getDatabase()->getRow($query, [':now' => date('ymd')]);
         if ($period['TIME_PERIOD'] == 0 || $period['SUB_PERIOD'] == 0) {
             $query = "SELECT TIME_PERIOD, SUBJECT_PD FROM dbo.SYSFILE";
             $altPeriod = $this->getDatabase()->getRow($query);
@@ -372,7 +374,6 @@ class External_Pcschools_User implements External_UserInterface
         $period = $this->findPeriod();
 
         if ($user->getRole()->isStudent()) {
-
             $query = "SELECT DISTINCT tf.TIME_PERIOD, tf.YEAR, tf.ABBREV, tf.CLASS, s.[DESC]
             FROM TIMEFILE tf
                         INNER JOIN SUB su ON tf.[YEAR] = su.[YEAR] AND tf.SUBJECT = su.SUBJECT_NO AND tf.CLASS = su.CLASS
@@ -419,11 +420,10 @@ class External_Pcschools_User implements External_UserInterface
             return [];
         }
 
-        $classArray =$this->getDatabase()->getAll($query, $params);
+        $classArray = $this->getDatabase()->getAll($query, $params);
 
-        foreach ($classArray as $class)
-        {
-            $code = $period['TIME_PERIOD']. '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
+        foreach ($classArray as $class) {
+            $code = $period['TIME_PERIOD'] . '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
             $classes[$code] = [
                 'code'       => $code,
                 'name'       => $class['DESC'],
@@ -593,7 +593,7 @@ class External_Pcschools_User implements External_UserInterface
         }
 
         // Assumption: if $mainPrefix.'_LMS' isn't full, don't build this record
-        if ($row[$mainPrefix.'_LMS'] !== self::CONTACT_LEVEL_FULL) {
+        if ($row[$mainPrefix . '_LMS'] !== self::CONTACT_LEVEL_FULL) {
             return [];
         }
 
@@ -625,12 +625,12 @@ class External_Pcschools_User implements External_UserInterface
         }
 
         // Suffix contact ID with type
-        $result['StudentContactID'] .= '-'.$type;
+        $result['StudentContactID'] .= '-' . $type;
 
         // Build fullname too if I can
-        if (array_key_exists($mainPrefix.'_FIRSTNAME', $row) || array_key_exists($mainPrefix.'_SURNAME', $row)) {
+        if (array_key_exists($mainPrefix . '_FIRSTNAME', $row) || array_key_exists($mainPrefix . '_SURNAME', $row)) {
             $result['StudentContactLegalFullName']
-                = $row[$mainPrefix.'_FIRSTNAME'] . ' ' . $row[$mainPrefix.'_SURNAME'];
+                = $row[$mainPrefix . '_FIRSTNAME'] . ' ' . $row[$mainPrefix . '_SURNAME'];
         }
         // Build contact relation default value
         if (array_key_exists('StudentContactRelation', $result)) {

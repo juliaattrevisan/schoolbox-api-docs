@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -56,6 +57,4 @@ class Model
         $this->accessToken = $accessToken;
         return $this;
     }
-
-
 }

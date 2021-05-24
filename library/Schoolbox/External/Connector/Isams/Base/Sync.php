@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Isams Sync Implementation
  *
@@ -125,4 +126,3 @@ class Sync extends Base implements ISync
         return new Iterator\Staff($this->databaseExternal->getQueryIterator($query));
     }
 }
-

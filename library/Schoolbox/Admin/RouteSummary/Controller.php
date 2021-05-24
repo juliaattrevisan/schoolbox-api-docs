@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -27,10 +28,10 @@ class Controller extends Base
         foreach ($this->getRouter()->getRoutes() as $route) {
             /** @var Route $route */
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
-            $module = $di->get('module:'.$parsedName['controller']);
+            $module = $di->get('module:' . $parsedName['controller']);
             $module->initControllerDependencies();
             $module->initControllers($di);
-            $controller = $di->get('controller:'.$parsedName['controller']);
+            $controller = $di->get('controller:' . $parsedName['controller']);
 
             // method is publicly available, despite what the red worms say
             foreach ($route->method as $method) {

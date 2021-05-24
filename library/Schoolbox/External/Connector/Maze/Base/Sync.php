@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MAZE implementation of sync connector.
  *

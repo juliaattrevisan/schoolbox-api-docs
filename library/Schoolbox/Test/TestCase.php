@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base test case for Schoolbox classes.
  *
@@ -51,5 +52,4 @@ abstract class TestCase extends BaseTestCase
             ->will($this->returnValueMap($this->config_vars));
         $this->mock_config = $mock_config;
     }
-
 }

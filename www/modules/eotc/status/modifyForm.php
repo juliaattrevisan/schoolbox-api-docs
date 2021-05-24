@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Update an event's status
  *
@@ -6,6 +7,7 @@
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
@@ -74,7 +76,6 @@ if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->is
 } /* EOTC Administrators and event authors can edit this event
  */
 elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
-
     /* Remember original states so we know which obs to spawn
      */
     $originalStatus = $event->getMetadata()->getStatus()->getId();
@@ -128,7 +129,6 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
     $externalDb = $kernel->get('databaseExternal');
 
     if ((int)$externalDbSync->getValue() == 1 && $externalDb instanceof \Alaress\Database\Connector\IConnector) {
-
         /* Sync to External DB only when:
          * - the current status is Approved and
          * - its previous status was not Approved
@@ -159,7 +159,6 @@ elseif ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
                 try {
                     $excursionConnector->sync($currentEvent);
                 } catch (\DomainException $e) {
-
                     /* Occurs when trying to create a new EOTC event, but a Synweb id
                      * already exists for it. This can happen if
                      *  - you mangle the Back button in the browser

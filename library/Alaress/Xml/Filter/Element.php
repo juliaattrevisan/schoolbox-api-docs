@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Filter iterator for Alaress\Xml\Reader - filters out things that aren't
  * elements.
@@ -30,7 +31,8 @@ class Element extends Base
     {
         $state  = $this->current();
         $reader = $state->getReader();
-        if ($reader->nodeType === XMLReader::ELEMENT
+        if (
+            $reader->nodeType === XMLReader::ELEMENT
             || ($reader->nodeType === XMLReader::END_ELEMENT && $reader->isEmptyElement)
         ) {
             return true;

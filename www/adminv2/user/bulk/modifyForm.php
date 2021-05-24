@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -80,7 +81,7 @@ try {
     /** @var WritableCache $cache */
     $cache = $this->getDi()->get('subscriptionCache');
     $cache->cacheUsers(INSTANCE_ID, $userIds);
-} catch (\RuntimeException|\Aura\Di\Exception $e) {
+} catch (\RuntimeException | \Aura\Di\Exception $e) {
     $userMapper->log($e->getMessage());
 }
 

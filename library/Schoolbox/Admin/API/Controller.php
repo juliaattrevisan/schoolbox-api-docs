@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -132,7 +133,6 @@ class Controller extends Web\Controller\Base
         $key  = $this->getRequest()->post->get('key');
 
         try {
-
             if (!$key) {
                 throw new InvalidArgumentException('No authentication token was supplied.', 401);
             }
@@ -157,7 +157,6 @@ class Controller extends Web\Controller\Base
 
             $responseJson['success'] = true;
             $responseJson['file'] = $storage->getHash();
-
         } catch (InvalidArgumentException $e) {
             $responseJson['error'] = $e->getMessage();
             $rs->status->setCode($e->getCode());
@@ -188,7 +187,6 @@ class Controller extends Web\Controller\Base
         $key  = $post->get('key');
 
         try {
-
             if (!$key) {
                 throw new InvalidArgumentException('No authentication token was supplied.', 401);
             }
@@ -204,7 +202,6 @@ class Controller extends Web\Controller\Base
             $files = [];
 
             foreach (array_merge(self::REQUIRED_USER_PROFILE_CSVS, array_keys(self::REQUIRED_CSVS)) as $requiredCsv) {
-
                 $hash = $post->get($requiredCsv);
 
                 if (!$hash) {
@@ -219,7 +216,6 @@ class Controller extends Web\Controller\Base
                     } else {
                         $files[$requiredCsv] = $this->storageMapper->findByHash($hash);
                     }
-
                 } catch (Mapper\Exception $e) {
                     $errors[] = "Invalid file hash given for '$requiredCsv'.";
                     continue;
@@ -229,7 +225,6 @@ class Controller extends Web\Controller\Base
             if (isset($errors)) {
                 $responseJson['error'] = $errors;
                 $rs->status->set(400);
-
             } else {
                 // valid files found and loaded, we're good to attempt processing
 
@@ -265,15 +260,12 @@ class Controller extends Web\Controller\Base
                     rewind($write);
 
                     $responseJson['summary'] = array_filter(explode("\n", trim(stream_get_contents($write))));
-
                 } catch (\Exception $e) {
                     // one of those times where you really need to catch EVERYTHING
                     $responseJson['error'] = $e->getMessage();
                     $rs->status->setCode(500);
                 }
-
             }
-
         } catch (InvalidArgumentException $e) {
             $responseJson['error'] = $e->getMessage();
             $rs->status->setCode($e->getCode());

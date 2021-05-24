@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Review assessment. The marks for each submitted question can be modified here
  * but the actual answers cannot be changed, only seen. Structurally, this is
@@ -26,7 +27,7 @@ $assessHandler   = new Assess_Main();
 $attemptHandler  = new Assess_Attempt();
 $responseHandler = new Assess_Response();
 $sectionHandler  = new Assess_Section();
-$groupHandler    = new Group;
+$groupHandler    = new Group();
 
 /**
  * @var SitePage $this
@@ -76,8 +77,7 @@ $attempt['totalAvailableMarks'] = $attemptHandler->getTotalMarks($quizId, $attem
  */
 try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
-}
-catch (Mapper\Exception $e) {
+} catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
 }
 
@@ -96,12 +96,14 @@ $assessment  = $assessmentDataSource->findByQuizId($assess['assess_id'], $sessio
 // Check access rights
 // Rules are the same as seeing an attempt
 $actionValidator = new ActionValidator(Alaress_Date_Format::now(), Access::getInstance());
-if (!$actionValidator->canReviewAttemptsReadonly(
-    $sessionUser,
-    $user,
-    $assessment,
-    $config->get('restrict_student_submissions')
-)) {
+if (
+    !$actionValidator->canReviewAttemptsReadonly(
+        $sessionUser,
+        $user,
+        $assessment,
+        $config->get('restrict_student_submissions')
+    )
+) {
     $this->pageNotFound();
 }
 
@@ -161,8 +163,7 @@ $this->setVar(
 if (Access::getInstance()->getFolderAccess($_SESSION['user'], $folder->getId()) >= UserAccess::ACCESS_READ) {
     $this->parse('homepageLinkOpen_block', 'homepageLinkOpen');
     $this->parse('homepageLinkClose_block', 'homepageLinkClose');
-}
-else {
+} else {
     $this->setVar('homepageLinkOpen_block', '');
     $this->setVar('homepageLinkClose_block', '');
 }

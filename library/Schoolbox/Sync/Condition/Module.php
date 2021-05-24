@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Module
  *
@@ -27,7 +28,8 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
+    public function initRoutes(Router $router, $basePath)
+    {
         $this->addPostRoute($router, 'add', $basePath, "/add/{ruleId}/{conditionType}");
         $this->addPostRoute($router, 'delete', $basePath, "/delete");
     }
@@ -37,11 +39,12 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher) {
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
         $this->addRoutePreload(
             $matcher,
             '(?:add|delete)',
-            function($params) {
+            function ($params) {
                 return array(
                     'params' => $params,
                 );
@@ -77,7 +80,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
     }

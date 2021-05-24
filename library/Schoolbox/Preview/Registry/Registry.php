@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Registry
  *
@@ -73,5 +74,4 @@ class Registry
 
         return '';
     }
-
 }

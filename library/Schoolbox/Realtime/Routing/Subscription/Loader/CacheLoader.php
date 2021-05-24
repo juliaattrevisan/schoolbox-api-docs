@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -14,7 +15,6 @@ use InvalidArgumentException;
 use Predis\ClientInterface;
 use Psr\Log\LoggerInterface;
 use Traversable;
-
 
 /**
  * Class CacheLoader
@@ -86,7 +86,9 @@ class CacheLoader implements ILoader
      */
     public function getUserSubscriptions($userId)
     {
-        return $this->getRoutes(function ($key) use ($userId) { return $key == $userId; });
+        return $this->getRoutes(function ($key) use ($userId) {
+            return $key == $userId;
+        });
     }
 
 
@@ -95,7 +97,9 @@ class CacheLoader implements ILoader
      */
     public function getRedirects()
     {
-        return new ArrayIterator($this->getRoutes(function ($key) { return !is_int($key); }));
+        return new ArrayIterator($this->getRoutes(function ($key) {
+            return !is_int($key);
+        }));
     }
 
 
@@ -120,5 +124,4 @@ class CacheLoader implements ILoader
 
         return $routes;
     }
-
 }

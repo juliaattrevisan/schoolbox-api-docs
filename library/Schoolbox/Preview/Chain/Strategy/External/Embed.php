@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Embed
  *
@@ -9,9 +10,10 @@
 
 namespace Schoolbox\Preview\Chain\Strategy\External;
 
-use \Embera\Embera;
+use Embera\Embera;
 
-class Embed extends Base {
+class Embed extends Base
+{
 
     /**
      * Test the oEmbed capability
@@ -19,7 +21,8 @@ class Embed extends Base {
      *
      * @return string
      */
-    public function test() {
+    public function test()
+    {
         $embera = new Embera();
         $embedCode = $embera->autoEmbed($this->getUrl());
 
@@ -39,4 +42,4 @@ class Embed extends Base {
 
         return $this->testNext();
     }
-} 
+}

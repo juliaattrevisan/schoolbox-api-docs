@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Review completion. Marks when an assessment review is finished.
  *
@@ -26,10 +27,8 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 $assessHandler = new Assess_Main();
 $attemptHandler = false;
 $groupHandler = new Group();
-
 /** @var \Schoolbox\User $sessionUser */
 $sessionUser = $_SESSION['user'];
-
 if (!is_numeric($this->arg[0])) {
     error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
 }
@@ -39,28 +38,25 @@ if (!is_numeric($this->arg[1])) {
 }
 
 if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
-	$this->pageNotFound();
+    $this->pageNotFound();
 }
 
 $assessMapper = QuizMapper::getInstance();
 $attemptMapper = QuizAttemptMapper::getInstance();
+try {
+/** @var Quiz $assess */
+    $assess = $assessMapper->findById($this->arg[0]);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
+    exit;
+}
 
 try {
-	/** @var Quiz $assess */
-	$assess = $assessMapper->findById($this->arg[0]);
-}
-catch(\Schoolbox\Mapper\Exception $e) {
-	error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
-	exit;
-}
-
-try {
-	/** @var QuizAttempt $attempt */
-	$attempt = $attemptMapper->findById($this->arg[1]);
-}
-catch(\Schoolbox\Mapper\Exception $e) {
-	error(Error\Mapper::ERROR_ATTEMPT_NOT_FOUND);
-	exit;
+/** @var QuizAttempt $attempt */
+    $attempt = $attemptMapper->findById($this->arg[1]);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(Error\Mapper::ERROR_ATTEMPT_NOT_FOUND);
+    exit;
 }
 
 /** @var Assessment\MapperProxy $assessmentMapperProxy */
@@ -72,14 +68,11 @@ if (!$actionValidator->canReviewAttempts($sessionUser, $attempt->getUser(), $qui
 }
 
 
-if($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < UserAccess::ACCESS_WRITE) {
-	error(Error\Mapper::ERROR_PERM_TEST_REVIEW);
+if ($assess->getUser()->getId() != $sessionUser->getId() && $groupHandler->getPermission($assess->getCategory()->getId()) < UserAccess::ACCESS_WRITE) {
+    error(Error\Mapper::ERROR_PERM_TEST_REVIEW);
 }
 
 $attemptMapper->finalizeReview($attempt, $sessionUser);
-
 $assessmentId = $assess->getAssessmentModel()->getId();
-
 $this->localRedir($this->routeLookup('learningAssessment.getStatus', [ 'assessmentId' => $assessmentId ]));
-
 die();

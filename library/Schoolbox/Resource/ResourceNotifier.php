@@ -1,14 +1,15 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource;
-
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Instance\Instance;
@@ -153,13 +154,12 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         try {
             $logs = LogMapper::getInstance()->findForFeed($context, $filter, $limit, $offset, 0, $currentPermission > UserAccess::ACCESS_READ);
-        } catch (Mapper\Exception|\Error $e) {
+        } catch (Mapper\Exception | \Error $e) {
             return $c;
             // mute failures where things were logged about resources that no longer exist
         }
 
         foreach ($logs as $log) {
-
             $resource = $log->getObject();
             $user     = $log->getUser();
             $time     = $log->getTimestamp()->getUnixTimeStamp();
@@ -197,9 +197,16 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param int                   $accessLevel
      * @return Envelope
      */
-    protected function notify(string $kind, int $id, string $action, ParameterInterface $param, User $effector,
-                              $category, string $roletype, int $accessLevel): Envelope
-    {
+    protected function notify(
+        string $kind,
+        int $id,
+        string $action,
+        ParameterInterface $param,
+        User $effector,
+        $category,
+        string $roletype,
+        int $accessLevel
+    ): Envelope {
         $envelope = new Envelope();
 
         $categoryId    = $category->getId();
@@ -376,8 +383,14 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         // if changed in some other way...
         if (!isset($diff) || count($diff) > 0) {
             $instances = $this->notify(
-                $resourceKind, $resourceId, self::TRIGGER_UPDATED,
-                new Param($resourceName, $resourceHref), $effector, $category, $roleType, $accessLevel
+                $resourceKind,
+                $resourceId,
+                self::TRIGGER_UPDATED,
+                new Param($resourceName, $resourceHref),
+                $effector,
+                $category,
+                $roleType,
+                $accessLevel
             )->getAll();
 
             foreach ($instances as $inst) {
@@ -393,7 +406,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param Folder|File|Link|Textbox $resource
      * @return string
      */
-    protected abstract function getResourceName($resource): string;
+    abstract protected function getResourceName($resource): string;
 
 
     /**
@@ -401,25 +414,25 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @throws Exception
      * @return Folder
      */
-    protected abstract function getResourceCategory($resource): Folder;
+    abstract protected function getResourceCategory($resource): Folder;
 
 
     /**
      * @return string
      */
-    protected abstract function getResourceKind(): string;
+    abstract protected function getResourceKind(): string;
 
 
     /**
      * @return string
      */
-    protected abstract function getResourceNameProperty(): string;
+    abstract protected function getResourceNameProperty(): string;
 
 
     /**
      * @return string
      */
-    protected abstract function getResourceCategoryProperty(): string;
+    abstract protected function getResourceCategoryProperty(): string;
 
 
     /**
@@ -429,7 +442,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array|null               $diff
      * @return Envelope
      */
-    public abstract function notifyCreated($roletype, $resource, $author, $diff = null): Envelope;
+    abstract public function notifyCreated($roletype, $resource, $author, $diff = null): Envelope;
 
 
     /**
@@ -439,7 +452,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
      * @param array|null               $diff
      * @return Envelope
      */
-    public abstract function notifyDeleted($roletype, $resource, $author, $diff = null): Envelope;
+    abstract public function notifyDeleted($roletype, $resource, $author, $diff = null): Envelope;
 
 
     /* ASYNC METHODS */

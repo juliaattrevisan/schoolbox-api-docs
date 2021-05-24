@@ -1,6 +1,7 @@
 <?php
+
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -63,7 +64,6 @@ class Module extends BaseModule
             '.*',
             function ($params) {
                 if (array_key_exists('box_id', $params)) {
-
                     $box = $this->getSubmissionBoxMapper()->findById($params['box_id']);
 
                     // yeah... sure... doing this manually isn't outrageous at all...
@@ -85,7 +85,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'submissionFileMapper' => $this->getMapperFactory()->getLazy(SubmissionFileMapper::class)
             ])
@@ -112,4 +112,4 @@ class Module extends BaseModule
     {
         return $this->getMapperFactory()->get(FolderMapper::class);
     }
-} 
+}

@@ -1,11 +1,12 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ChatController extends Component_Homepage_ControllerAbstract
 {
@@ -36,7 +37,6 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
         ]);
 
         if ($this->getConfig('state') != 'Active') {
-
             $this->setBlock('empty_state', 'empty_read', 'empty_read_block');
             $this->setBlock('empty_state', 'empty_write', 'empty_write_block');
 
@@ -54,9 +54,7 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
             }
 
             $this->parse('empty_state_block', 'empty_state');
-
         } else {
-
             $this->setVar([
                 'empty_state_block' => '',
                 'chat_staff_js_block' => ''

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -226,7 +227,7 @@ class Mapper extends BaseMapper
         $sourceQuiz = $this->findOneByColumn('assessment_id', $sourceAssessmentId);
         $sourceQuiz->setSections($sectionMapper->findByColumn('assess_id', $sourceQuiz->getId()));
 
-        foreach($sourceQuiz->getSections() as $section){
+        foreach ($sourceQuiz->getSections() as $section) {
             $questions = $questionMapper->findByColumn('section_id', $section->getId());
             $section->setQuestions($questions);
         }
@@ -236,21 +237,20 @@ class Mapper extends BaseMapper
 
         // Ensure that we don't clobber destination Sections
         $destinationQuiz->setSections($sectionMapper->findByColumn('assess_id', $destinationQuiz->getId()));
-        if($destinationQuiz->getSections()->count()){
+        if ($destinationQuiz->getSections()->count()) {
             throw new \InvalidArgumentException("Destination Quiz (ID: {$destinationQuiz->getId()}) already has Sections.");
         }
 
         // Clone and Save Sections, Questions + Solutions
-        foreach($sourceQuiz->getSections() as $section){
-
+        foreach ($sourceQuiz->getSections() as $section) {
             $clonedSection = clone $section;
             $clonedSection->setQuiz($destinationQuiz);
             $destinationQuiz->getSections()->add($clonedSection);
             $sectionMapper->save($clonedSection);
 
-            foreach($clonedSection->getQuestions() as $clonedQuestion){
+            foreach ($clonedSection->getQuestions() as $clonedQuestion) {
                 $questionMapper->save($clonedQuestion);
-                if($clonedQuestion->getSolution() instanceof QuizSolution){
+                if ($clonedQuestion->getSolution() instanceof QuizSolution) {
                     $solutionMapper->save($clonedQuestion->getSolution());
                 }
             }
@@ -361,7 +361,6 @@ class Mapper extends BaseMapper
         $stmt->execute(array('assess_id' => $assess_id));
 
         return $stmt->fetch(PDO::FETCH_ASSOC);
-
     }
 
 
@@ -476,7 +475,7 @@ class Mapper extends BaseMapper
                 'section_id',
                 $quiz->getSections()->getPropertyValues('id')
             )
-            ->groupByCallback(function(QuizQuestionModel $q) {
+            ->groupByCallback(function (QuizQuestionModel $q) {
                 return $q->getSection()->getId();
             });
         foreach ($quiz->getSections() as $section) {
@@ -518,7 +517,7 @@ class Mapper extends BaseMapper
                 'attempt_id',
                 $quiz->getAttempts()->getPropertyValues('id')
             )
-            ->groupByCallback(function(QuizAnswerModel $a) {
+            ->groupByCallback(function (QuizAnswerModel $a) {
                 return $a->getAttempt()->getId();
             });
         foreach ($quiz->getAttempts() as $attempt) {

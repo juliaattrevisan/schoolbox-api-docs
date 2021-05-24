@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -30,6 +31,7 @@ use Schoolbox\Permission\Access\RoleAccessMapper;
 use External_UserInterface;
 use UnderflowException;
 use UnexpectedValueException;
+
 use function array_intersect;
 use function array_map;
 use function array_merge;
@@ -305,7 +307,7 @@ class Folder extends SimpleStrategy
             // Other users can moderate if folder exists, and user has WRITE+ perm
             return $this->getAccess()->getFolderAccess($user, (int)$entityValue) >= UserAccess::ACCESS_WRITE;
         } /** @noinspection BadExceptionsProcessingInspection */
-        catch (Mapper\Exception\Deleted|Mapper\Exception\NotFound $e) {
+        catch (Mapper\Exception\Deleted | Mapper\Exception\NotFound $e) {
             // If deleted or not found, then cannot be moderated
             return false;
         }
@@ -731,7 +733,8 @@ class Folder extends SimpleStrategy
         $folderCodesPerFolderId = [];
 
         $bindings = Builder::getBindings($folderIds, 'fid');
-        $query    = $this->folderMapper->getDatabase()->query("
+        $query    = $this->folderMapper->getDatabase()->query(
+            "
             SELECT f.id folder_id, code
             FROM folder_code fc
             JOIN folder f ON fc.folder_id = f.id AND fc.deleted_at IS NULL AND f.deleted_at IS NULL
@@ -757,6 +760,4 @@ class Folder extends SimpleStrategy
         }
         return $this->externalClass;
     }
-
-
 }

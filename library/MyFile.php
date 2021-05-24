@@ -58,7 +58,6 @@ class MyFile extends DeprecatedModel
         }
 
         if (!empty($config['filter']) && $config['filter'][0] != 'all') {
-
             $config['filter'] = is_array($config['filter']) ? $config['filter'] : [$config['filter']];
 
             $query .= " AND ( 1=2 ";

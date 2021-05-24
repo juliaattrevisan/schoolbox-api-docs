@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -11,7 +12,6 @@ namespace Alaress\Async\Notification\Cloud\Test;
 use Alaress\Async\Notification\Cloud\AbstractService;
 use Psr\Log\LoggerInterface;
 use Schoolbox\MobileApp\RegistryMapper;
-
 
 /**
  * Class TestService
@@ -65,5 +65,4 @@ class TestService extends AbstractService
     {
         return 'TEST';
     }
-
 }

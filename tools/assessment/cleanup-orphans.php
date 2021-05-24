@@ -1,5 +1,6 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -7,11 +8,9 @@
 
 declare(strict_types=1);
 
-
 use Alaress\Database\Statement\Query\IQuery;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
-
 
 require_once __DIR__ . '/../../conf/core/require.php';
 

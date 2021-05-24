@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This mapper created objects of type HomepageTemplate
  * The table contains a list of all the homepage components
@@ -7,7 +8,6 @@
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
-
 
 namespace Schoolbox\Resource;
 

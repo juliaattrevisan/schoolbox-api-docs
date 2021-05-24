@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Kamar\Base\Endpoint\Profile;
@@ -445,7 +447,6 @@ class Profile implements IStrategy
 
         /** @var SimpleXMLElement $parent */
         foreach ($student->caregivers->caregiver as $parent) {
-
             /* Parents don't have an external unique identifier; therefore we manufacture them
              * Parents also don't have separate first/last names, just a fullname
              * Reassign an existing parent id for a sibling if we encountered them previously
@@ -462,7 +463,6 @@ class Profile implements IStrategy
                 ));
             } else {
                 if ('' !== $siblingLink) {
-
                     /* Derive externalId from siblinglink value
                      *
                      * siblingLink comes in the format "201800016039" where the first four digits
@@ -479,7 +479,6 @@ class Profile implements IStrategy
 
                     $this->siblingLinks[$siblingLink][$caregiverIndex] = $externalId;
                 } else {
-
                     /* Derive externalId from the student external id value
                      * For students who don't have siblings, their siblingLink value will be empty:
                      */

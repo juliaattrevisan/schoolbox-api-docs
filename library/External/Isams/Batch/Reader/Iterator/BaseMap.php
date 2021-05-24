@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Base mapping iterator for a list of results from iSAMS batch.
  *

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Authorization class: verifies that the user can moderate an item.
  *

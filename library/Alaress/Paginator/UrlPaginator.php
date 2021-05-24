@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A paginator object that contains a URL, and knows how to modify that URL to
  * point to a page within that URL.
@@ -13,7 +14,8 @@ namespace Alaress\Paginator;
 use OutOfRangeException;
 use Zend\Uri\Uri;
 
-class UrlPaginator implements IUrlPaginator {
+class UrlPaginator implements IUrlPaginator
+{
 
     /**
      * The URL to use to generate page URLs.
@@ -43,7 +45,8 @@ class UrlPaginator implements IUrlPaginator {
      * @param  int $page
      * @return string
      */
-    public function getUrlForPage($page) {
+    public function getUrlForPage($page)
+    {
         // Building a URL using PHP builtins is a complete pain!
         // (There's no http_build_str equivalent for parse_str)
         // That's why I use Zend\Uri internally.
@@ -57,7 +60,8 @@ class UrlPaginator implements IUrlPaginator {
     /**
      * @return array|string[]
      */
-    public function getPageUrls() {
+    public function getPageUrls()
+    {
         return $this->getPageUrlsBetween(1, $this->getPageCount());
     }
 
@@ -67,9 +71,10 @@ class UrlPaginator implements IUrlPaginator {
      *
      * @return array|string[]
      */
-    public function getPageUrlsBetween($from, $to) {
+    public function getPageUrlsBetween($from, $to)
+    {
         $from   = max($from, 1);
-        $to     = min($to,   $this->getPageCount());
+        $to     = min($to, $this->getPageCount());
         $result = array();
         if ($to > 0) {
             foreach (range($from, $to) as $page) {
@@ -84,7 +89,8 @@ class UrlPaginator implements IUrlPaginator {
      * @param  IPaginator $paginator
      * @return $this
      */
-    public function setPaginator($paginator) {
+    public function setPaginator($paginator)
+    {
         $this->paginator = $paginator;
         return $this;
     }
@@ -92,7 +98,8 @@ class UrlPaginator implements IUrlPaginator {
     /**
      * @return IPaginator
      */
-    public function getPaginator() {
+    public function getPaginator()
+    {
         return $this->paginator;
     }
 
@@ -100,7 +107,8 @@ class UrlPaginator implements IUrlPaginator {
      * @param  string $param
      * @return $this
      */
-    public function setParam($param) {
+    public function setParam($param)
+    {
         $this->param = $param;
         return $this;
     }
@@ -108,7 +116,8 @@ class UrlPaginator implements IUrlPaginator {
     /**
      * @return string
      */
-    public function getParam() {
+    public function getParam()
+    {
         return $this->param;
     }
 
@@ -116,7 +125,8 @@ class UrlPaginator implements IUrlPaginator {
      * @param  string $url
      * @return $this
      */
-    public function setUrl($url) {
+    public function setUrl($url)
+    {
         $this->url = $url;
         return $this;
     }
@@ -124,7 +134,8 @@ class UrlPaginator implements IUrlPaginator {
     /**
      * @return string
      */
-    public function getUrl() {
+    public function getUrl()
+    {
         return $this->url;
     }
 
@@ -140,7 +151,8 @@ class UrlPaginator implements IUrlPaginator {
      * @return int
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
-    public function getOffset($pageNumber) {
+    public function getOffset($pageNumber)
+    {
         return $this->paginator->getOffset($pageNumber);
     }
 
@@ -151,7 +163,8 @@ class UrlPaginator implements IUrlPaginator {
      * @return int
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
-    public function getFirstOnPage($pageNumber) {
+    public function getFirstOnPage($pageNumber)
+    {
         return $this->paginator->getFirstOnPage($pageNumber);
     }
 
@@ -162,7 +175,8 @@ class UrlPaginator implements IUrlPaginator {
      * @return int
      * @throws OutOfRangeException if $pageNumber is outside valid page range
      */
-    public function getLastOnPage($pageNumber) {
+    public function getLastOnPage($pageNumber)
+    {
         return $this->paginator->getLastOnPage($pageNumber);
     }
 
@@ -171,14 +185,16 @@ class UrlPaginator implements IUrlPaginator {
      *
      * @return int
      */
-    public function getPageCount() {
+    public function getPageCount()
+    {
         return $this->paginator->getPageCount();
     }
 
     /**
      * @return int
      */
-    public function getPageSize() {
+    public function getPageSize()
+    {
         return $this->paginator->getPageSize();
     }
 
@@ -187,7 +203,8 @@ class UrlPaginator implements IUrlPaginator {
      * @return $this
      * @throws OutOfRangeException if $pageSize <= 0
      */
-    public function setPageSize($pageSize) {
+    public function setPageSize($pageSize)
+    {
         $this->paginator->setPageSize($pageSize);
         return $this;
     }
@@ -197,9 +214,9 @@ class UrlPaginator implements IUrlPaginator {
      * @return $this
      * @throws OutOfRangeException if $total <= 0
      */
-    public function setTotal($total) {
+    public function setTotal($total)
+    {
         $this->paginator->setTotal($total);
         return $this;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Exception that is thrown when a user requests a deleted object.
  *
@@ -12,7 +13,8 @@ namespace Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as BaseException;
 use Schoolbox\ISoftDeletable;
 
-class Deleted extends BaseException {
+class Deleted extends BaseException
+{
     protected $message = 'Object was deleted';
 
     /**
@@ -33,7 +35,8 @@ class Deleted extends BaseException {
     /**
      * @return ISoftDeletable
      */
-    public function getDeletedObject() {
+    public function getDeletedObject()
+    {
         return $this->deleted_object;
     }
 }

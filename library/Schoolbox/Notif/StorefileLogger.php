@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
@@ -248,5 +249,4 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
             $log->log($level, $message, $context);
         }
     }
-
 }

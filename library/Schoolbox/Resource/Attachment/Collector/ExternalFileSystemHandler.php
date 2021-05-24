@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -8,12 +9,12 @@
 
 namespace Schoolbox\Resource\Attachment\Collector;
 
-
 use Alaress\File\Remote\FetcherInterface;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource;
 
-class ExternalFileSystemHandler extends FileSystemHandler {
+class ExternalFileSystemHandler extends FileSystemHandler
+{
 
     /** @var FetcherInterface */
     protected $fetcher;
@@ -64,5 +65,4 @@ class ExternalFileSystemHandler extends FileSystemHandler {
 
         return $storage;
     }
-
 }

@@ -15,23 +15,22 @@ use Alaress_Date_NullDate;
 use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use \Schoolbox\Collection;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 use Schoolbox\Role;
-use \Schoolbox\User;
-use \Schoolbox\Mapper\Traits\Model\Id;
-use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\User;
+use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
 use Schoolbox\Curriculum\Node;
 
 abstract class AbstractAssessment implements IAssessable
 {
-
     use Id;
     use CreatedAtDate;
     use UpdatedAtDate;
@@ -623,7 +622,6 @@ abstract class AbstractAssessment implements IAssessable
         try {
             $this->assertValidDates();
             return true;
-
         } catch (InvalidArgumentException $e) {
             return false;
         }

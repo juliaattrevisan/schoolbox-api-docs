@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\Test;
@@ -666,7 +668,6 @@ class StudentAttributesTest extends TestCase
             ['0',  false],
             ['1',  true],
         ];
-
     }
 
 

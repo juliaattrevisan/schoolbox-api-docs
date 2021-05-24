@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LinkIcon
  *
@@ -9,22 +10,22 @@
 
 namespace SocialStream\Post\Thumbnail;
 
+class GoogleFavIcon extends Thumbnail
+{
 
-class GoogleFavIcon extends Thumbnail {
+    public function fetchThumbnail()
+    {
 
-	public function fetchThumbnail() {
+        $url = parse_url($this->getUrl());
 
-		$url = parse_url($this->getUrl());
+        if ($url) {
+            $thumb = 'http://www.google.com/s2/favicons?domain=' . $url['host'];
 
-		if($url){
-			$thumb = 'http://www.google.com/s2/favicons?domain=' . $url['host'];
+            return $thumb;
+        }
 
-			return $thumb;
-		}
-
-		if ($this->getNext()) {
-			return $this->getNext()->fetchThumbnail();
-		}
-
-	}
+        if ($this->getNext()) {
+            return $this->getNext()->fetchThumbnail();
+        }
+    }
 }

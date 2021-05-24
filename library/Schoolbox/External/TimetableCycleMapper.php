@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
+
 namespace Schoolbox\External;
 
 use Schoolbox;
@@ -22,7 +24,8 @@ class TimetableCycleMapper extends Schoolbox\Mapper
     /**
      * {@inheritdoc}
      */
-    protected function mapping() {
+    protected function mapping()
+    {
         $this->hasTable('sis_timetable_cycle');
         $this->hasModel(TimetableCycle::class);
         $this->hasMap([

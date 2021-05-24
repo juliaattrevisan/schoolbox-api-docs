@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Filter\Filters\Assessment\NullableContext;
@@ -12,7 +14,6 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Filters\Assessment\NullableContext\UnitImportSpec\Definition;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-
 
 /**
  * Specialised logic to deal with the 'KEY_NONE' semantics.
@@ -102,8 +103,10 @@ class KeyConverter extends Filter\AbstractKeyConverter
 
         // todo this is different to parent logic
         // Was either just the '(none)' option selected, or the only option available is '(none)' ?
-        if ((1 === $selectedItems->count() && $selectedItems->keyExists(Definition::KEY_NONE)) ||
-            (1 === $availableItems->count() && $availableItems->keyExists(Definition::KEY_NONE))) {
+        if (
+            (1 === $selectedItems->count() && $selectedItems->keyExists(Definition::KEY_NONE)) ||
+            (1 === $availableItems->count() && $availableItems->keyExists(Definition::KEY_NONE))
+        ) {
             // return an empty set. ie assessments not in this context
             return new Collection();
         }

@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Schoolbox\Learning\Assessment\DueWork\Response;
 
 use Alaress\Authorizer\Failure\Unauthorized;
@@ -58,9 +60,15 @@ class Module extends BaseModule
      */
     protected function registerRoutes()
     {
-        $preloadParticipant     = function (array $params) { return $this->preloadParticipant($params); };
-        $preloadPlagscanWithAss = function (array $params) { return $this->preloadPlagscanWithAssessment($params); };
-        $preloadKami            = function (array $params) { return $this->preloadKami($params); };
+        $preloadParticipant     = function (array $params) {
+            return $this->preloadParticipant($params);
+        };
+        $preloadPlagscanWithAss = function (array $params) {
+            return $this->preloadPlagscanWithAssessment($params);
+        };
+        $preloadKami            = function (array $params) {
+            return $this->preloadKami($params);
+        };
 
         $hasWriteAccess = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -99,13 +107,13 @@ class Module extends BaseModule
         $participantPattern = $assessmentPattern . '/{studentId:\d+}';
         $responsePattern    = $assessmentPattern . '/responses/{responseId:\d+}';
 
-        $this->register('DELETE', $responsePattern, 'deleteParticularResponse',  $hasWriteAccess, $preloadParticipant); // a || r
+        $this->register('DELETE', $responsePattern, 'deleteParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
 
         $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasWriteAccess, $preloadParticipant); // a || r
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasWriteAccess, $preloadParticipant); // a || r
         $this->register('GET', $participantPattern . '/responses/self/{responseId:\d+}', 'getParticularResponseForSelfReflection', $hasSelfAccess, $preloadParticipant); // a || r
 
-        $this->register('GET', $plagscanPattern,             'getPlagscanReport',         $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
+        $this->register('GET', $plagscanPattern, 'getPlagscanReport', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
         $this->register('GET', $plagscanPattern . '/iframe', 'getPlagscanReportContents', $hasPlagscanAccess, $preloadPlagscanWithAss); // a || r
 
         // For now, same auth rules as crocodoc.
@@ -125,7 +133,7 @@ class Module extends BaseModule
                 throw new Unauthorized();
             })
         );
-        $this->register('GET', '/kami/{kamiId:\d+}' . '',        'getKamiView',   $canAccessKami, $preloadKami);
+        $this->register('GET', '/kami/{kamiId:\d+}' . '', 'getKamiView', $canAccessKami, $preloadKami);
         $this->register('GET', '/kami/{kamiId:\d+}' . '/export', 'getKamiExport', $canExportKami, $preloadKami);
     }
 
@@ -202,8 +210,7 @@ class Module extends BaseModule
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
-        }
-        catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (\Schoolbox\Mapper\Exception $e) {
             throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
         }
 
@@ -235,8 +242,7 @@ class Module extends BaseModule
             try {
                 $response = null;
                 $student  = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
-            }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            } catch (\Schoolbox\Mapper\Exception $e) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
         }

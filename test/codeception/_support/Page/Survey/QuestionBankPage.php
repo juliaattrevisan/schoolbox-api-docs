@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -68,7 +69,7 @@ class QuestionBankPage
         $i = $this->tester;
         $numQuestionBank = $i->grabNumRecords('assess_question_bank');
         $position = 0;
-        for ($j = 1; $j <= $numQuestionBank ; $j++) {
+        for ($j = 1; $j <= $numQuestionBank; $j++) {
             $q = $i->grabTextFrom('#questionBankForm > section > ul > li:nth-child(' . $j . ')');
             if (strpos($q, $question) !== false) {
                 $position = $j;
@@ -81,5 +82,4 @@ class QuestionBankPage
 
         return new QuestionForm($i);
     }
-
 }

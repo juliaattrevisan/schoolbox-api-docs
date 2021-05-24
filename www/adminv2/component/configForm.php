@@ -1,14 +1,15 @@
 <?php
+
 // The kernel contains the dependency injection engine.
 // If you inject the dependency injection engine into Sitepage,
 // it can use Twig to generate component content.
 
 use Schoolbox\Application\WebRequest\Kernel;
 use Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\User;
+use Schoolbox\User;
 
 /** @var Kernel $kernel */
-require_once __DIR__. '/../../../conf/core/require.php';
+require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new Kernel();
 
 /** @var SitePage $page */
@@ -131,7 +132,8 @@ if ($_POST['type'] == 'components') {
         $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
 
         $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
-            'component_definition_id', $instance->getDefinitionId()
+            'component_definition_id',
+            $instance->getDefinitionId()
         );
 
         unset($config['cid'], $config['type'], $config['component']);
@@ -169,7 +171,6 @@ if ($_POST['type'] == 'components') {
                 $confI->setValue($value);
 
                 $componentConfigInstanceMapper->save($confI);
-
             }
         }
         if (SitePage::detectAjax()) {

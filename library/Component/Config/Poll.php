@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -26,22 +27,21 @@ class Component_Config_Poll extends Component_Config_Abstract
         if (is_array($pollList)) {
             foreach ($pollList as $poll) {
                 $page->setVar(array(
-                    'COMPONENT_CONFIG_POLLSELECT_NAME' 		=> TextFormatter::cutString(Scrub::text($poll['question']), 30),
-                    'COMPONENT_CONFIG_POLLSELECT_VALUE' 	=> $poll['id'],
-                    'COMPONENT_CONFIG_POLLSELECT_SELECTED'	=> $poll['id'] == $configValue ? 'selected="selected"' : '',
+                    'COMPONENT_CONFIG_POLLSELECT_NAME'      => TextFormatter::cutString(Scrub::text($poll['question']), 30),
+                    'COMPONENT_CONFIG_POLLSELECT_VALUE'     => $poll['id'],
+                    'COMPONENT_CONFIG_POLLSELECT_SELECTED'  => $poll['id'] == $configValue ? 'selected="selected"' : '',
                 ));
 
                 $page->parse("poll_select_block", "poll_select", true);
             }
         } else {
             $page->setVar(array(
-                'COMPONENT_CONFIG_POLLSELECT_NAME' 		=> Scrub::text(' (none) '),
-                'COMPONENT_CONFIG_POLLSELECT_VALUE' 	=> '0',
-                'COMPONENT_CONFIG_POLLSELECT_SELECTED'	=> 'disabled="disabled"',
+                'COMPONENT_CONFIG_POLLSELECT_NAME'      => Scrub::text(' (none) '),
+                'COMPONENT_CONFIG_POLLSELECT_VALUE'     => '0',
+                'COMPONENT_CONFIG_POLLSELECT_SELECTED'  => 'disabled="disabled"',
             ));
 
             $page->parse("poll_select_block", "poll_select", true);
         }
-
     }
 }
