@@ -55,7 +55,7 @@ class Controller extends UserAccount\Controller
     /**
      * Export the Timetable Definition back into the csv format
      */
-    public function getExport()
+    public function getExport(): void
     {
 
         /* TODO Inject these as dependencies
@@ -66,18 +66,53 @@ class Controller extends UserAccount\Controller
         $cycles = $cycleMapper->findAll()->indexBy('id');
         $periods = $periodMapper->findAll();
 
-        /* Manually match the periods to their cycles.
-         *
-         * I don't really think we need to hydrate cycles normally, because we've never really
-         * needed it outside of this one usage.
-         *
-         * It adds extra hydration that's never used effectively -except- in this one context.
-         * Even then we just need it to generate a csv; we don't obtain cycle data via a period
-         * in most (if not all) usages thus far
-         */
+        $fp = fopen('php://temp', 'w');
 
         /* Export properties into the same format as the csv
          */
+        foreach ($periods as $period) {
 
+            /* Manually match the periods to their cycles.
+             *
+             * I don't really think we need to hydrate cycles normally, because we've never really
+             * needed it outside of this one usage.
+             *
+             * It adds extra hydration that's never used effectively -except- in this one context.
+             * Even then we just need it to generate a csv; we don't obtain cycle data via a period
+             * in most (if not all) usages thus far
+             */
+            $period->setCycle($cycles[$period->getCycle()->getId()]);
+
+            $row = [
+                $period->getCycle()->getCycleIdentifier(),
+                $period->getCycle()->getTitle(),
+                $period->getCycle()->getStart()->getDatabaseDate(),
+                $period->getCycle()->getFinish()->getDatabaseDate(),
+                $period->getCycle()->getStartDay(),
+                $period->getDay(),
+                $period->getTitle(),
+                $period->getStart()->getDatabaseTime(),
+                $period->getFinish()->getDatabaseTime()
+            ];
+
+            fputcsv($fp, $row);
+        }
+
+        rewind($fp);
+        $contents = stream_get_contents($fp);
+        fclose($fp);
+
+        $headers  = $this->getResponse()->headers;
+
+        $headers->set('Pragma', ' ');
+        $headers->set('Cache-Control', ' ');
+        $headers->set('Content-Type', 'text/csv');
+        $headers->set('Content-Length', strlen($contents));
+        $headers->set('Content-Disposition', "attachment; filename=\"timetableStructure.csv\"");
+
+        $this->getResponse()->content->set([
+            'format' => 'file',
+            'data'   => $contents,
+        ]);
     }
 }
