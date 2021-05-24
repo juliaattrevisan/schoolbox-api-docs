@@ -16,6 +16,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
+use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\Import\ImporterFactory;
 
 /**
@@ -49,6 +51,7 @@ class Module extends BaseModule
         $this->register('GET', '', 'getUpload', $perms);
         $this->register('POST', '/preview', 'postPreview', $perms);
         $this->register('POST', '/import', 'postImport', $perms);
+        $this->register('GET', '/export', 'getExport', $perms);
     }
 
 
@@ -85,6 +88,8 @@ class Module extends BaseModule
         $injector->params[Controller::class] = [
             'importerFactory' => $injector->lazyNew(ImporterFactory::class),
             'configLoader' => $injector->lazyGet('config'),
+            'timetableCycleMapper' => $this->getMapperFactory()->getLazy(TimetableCycleMapper::class),
+            'classPeriodMapper' => $this->getMapperFactory()->getLazy(ClassPeriodMapper::class),
         ];
     }
 }
