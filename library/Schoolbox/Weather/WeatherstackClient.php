@@ -218,37 +218,39 @@ class WeatherstackClient
             return $twigData;
         }
 
-        /* Iterate only if possible to do so
+        /* If forecast is not an array, or if forecast is empty, exit early
          */
-        if (is_array($responseData['forecast']) && \count($responseData['forecast'])) {
-            foreach ($responseData['forecast'] as $date => $data) {
-                // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
-                if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
-                    $twigData['today']['lowTemp']  = $data['mintemp'];
-                    $twigData['today']['highTemp'] = $data['maxtemp'];
-                    continue;
-                }
-
-                $dayForecast = [
-                    'day'            => $this->getDayOfWeek($data['date_epoch']),
-
-                    /* Forecast is now broken down hourly
-                     * Just get the midday value (fifth in the stack)
-                     * and the usual first in the stack for description/icon
-                     */
-                    'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
-                    'weatherIcon'    => str_replace('http:', '', $data['hourly'][4]['weather_icons'][0]),
-
-                    /* Basic facts
-                     */
-                    'lowTemp'        => $data['mintemp'],
-                    'highTemp'       => $data['maxtemp'],
-                ];
-
-                $twigData['forecastDays'][] = $dayForecast;
-            }
-        } else {
+        if (!is_array($responseData['forecast']) || !\count($responseData['forecast'])) {
             return $twigData;
+        }
+
+        /* Iterate only when it's meaningful to do so
+         */
+        foreach ($responseData['forecast'] as $date => $data) {
+            // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
+            if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
+                $twigData['today']['lowTemp']  = $data['mintemp'];
+                $twigData['today']['highTemp'] = $data['maxtemp'];
+                continue;
+            }
+
+            $dayForecast = [
+                'day'            => $this->getDayOfWeek($data['date_epoch']),
+
+                /* Forecast is now broken down hourly
+                 * Just get the midday value (fifth in the stack)
+                 * and the usual first in the stack for description/icon
+                 */
+                'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
+                'weatherIcon'    => str_replace('http:', '', $data['hourly'][4]['weather_icons'][0]),
+
+                /* Basic facts
+                 */
+                'lowTemp'        => $data['mintemp'],
+                'highTemp'       => $data['maxtemp'],
+            ];
+
+            $twigData['forecastDays'][] = $dayForecast;
         }
 
         // If we've reached this code path, we successfully retrieved the weather data.
