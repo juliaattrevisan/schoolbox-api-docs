@@ -16,7 +16,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getAudioOnlyRecordOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
-import { isOfMimeType, dataURLtoBlob } from '@shared/util/fileUtils';
+import { isOfMimeType } from '@shared/util/fileUtils';
 
 
 export default {
@@ -101,10 +101,19 @@ export default {
          *
          */
         onVideojsReady () {
-            this.initVideojsRecordRecordListeners();
-            setTimeout(() => { //dodgy, trying to wait until 'VIDEOJS: wavesurfer.js microphone plugin enabled.' but can't see any event to track this...
+            this.onWaveReadyInterval = window.setInterval(this.onWaveReadyCheck, 100);
+        },
+
+        /**
+         * ensure the wave is ready prior to enabling the microphone, there's no event to track this otherwise
+         *
+         */
+        onWaveReadyCheck () {
+            if (this.player.wavesurfer().waveReady) {
+                window.clearInterval(this.onWaveReadyInterval);
+                this.initVideojsRecordRecordListeners();
                 this.player.record().getDevice(); //request the device to avoid needing to click the activate button
-            }, 500);    
+            }
         },
 
         /**
@@ -118,6 +127,15 @@ export default {
             this.player.on('error', this.onError);
             this.player.on('deviceError', this.onDeviceError);
         },
+
+        /**
+         * onWaveReady, Audio is loaded, decoded and the waveform is drawn.
+         *
+         */
+        // onWaveReady () {
+        //     console.warn('waveReady');
+        //     // this.player.record().getDevice(); //request the device to avoid needing to click the activate button
+        // },
 
         /**
          * onDeviceReady, dispatch to anyone listening, maybe the parent
