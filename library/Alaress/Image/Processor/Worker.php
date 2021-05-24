@@ -115,6 +115,12 @@ class Worker extends CliTool\App
         $this->attemptsPerTransform    = $attemptsPerTransform;
     }
 
+    /** @inheritDoc */
+    public function getRequiredProcessUser(): ?string
+    {
+        return 'www-data';
+    }
+
 
     /** @inheritDoc */
     public function setup(array $appOptions, Di\Container $di, $outStream, LoggerInterface $logger, bool $perform): CliTool\App
