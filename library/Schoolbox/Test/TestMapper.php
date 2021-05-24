@@ -10,6 +10,9 @@
 
 namespace Schoolbox\Test;
 
+/**
+ * @method TestModel createModel($idValue = null)
+ */
 class TestMapper extends AbstractTestMapper
 {
 

@@ -70,6 +70,17 @@ class CollectionTest extends TestCase
     }
 
     /**
+     * @param mixed      $input
+     * @param array|null $expected_output
+     * @dataProvider getTestDehydrate
+     */
+    public function testDehydrate($input = null, $expected_output = null)
+    {
+        $actual = $this->object->dehydrate($input, $this->testMapper);
+        self::assertSame($expected_output, $actual);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getTestHydrate()
@@ -88,14 +99,14 @@ class CollectionTest extends TestCase
             'one'  => [
                 [1],
                 $this->testMapper->createCollection([
-                    (new TestModel())->setId(1),
+                    $this->testMapper->createModel()->setId(1),
                 ]),
             ],
             'two'  => [
                 [1, 3],
                 $this->testMapper->createCollection([
-                    (new TestModel())->setId(1),
-                    (new TestModel())->setId(3),
+                    $this->testMapper->createModel()->setId(1),
+                    $this->testMapper->createModel()->setId(3),
                 ]),
             ],
         ];
@@ -107,7 +118,20 @@ class CollectionTest extends TestCase
     public function getTestDehydrate()
     {
         return [
-            [null, null],
+            'null'                  => [null, null],
+            'empty array'           => [[], []],
+            'empty collection'      => [$this->testMapper->createCollection(), []],
+            'collection of IDs'     => [
+                new \Schoolbox\Collection([1, 2]),
+                [1, 2],
+            ],
+            'collection of objects' => [
+                $this->testMapper->createCollection([
+                    $this->testMapper->createModel()->setId(1),
+                    $this->testMapper->createModel()->setId(3),
+                ]),
+                [1, 3],
+            ],
         ];
     }
 }
