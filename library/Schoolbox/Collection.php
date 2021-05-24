@@ -392,6 +392,15 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
             $method = [$item, $methodName];
             if (is_callable($method)) {
                 $parts[] = $method();
+            } else {
+                trigger_error(
+                    sprintf(
+                        'Method "%s" is not callable on %s',
+                        $methodName,
+                        (is_object($item) ? get_class($item) : 'non-object'),
+                    ),
+                    E_USER_WARNING
+                );
             }
         }
         return $parts;
