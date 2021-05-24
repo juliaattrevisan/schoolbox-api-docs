@@ -68,6 +68,20 @@ class Controller extends UserAccount\Controller
 
         $fp = fopen('php://temp', 'w');
 
+        /* Set up header row
+         */
+        fputcsv($fp, [
+            'Term Identifier',
+            'Term Title',
+            'Term STart',
+            'Term Finish',
+            'Term Start Day Number',
+            'Period Day',
+            'Period Title',
+            'Period Start',
+            'Period Finish',
+        ]);
+
         /* Export properties into the same format as the csv
          */
         foreach ($periods as $period) {
