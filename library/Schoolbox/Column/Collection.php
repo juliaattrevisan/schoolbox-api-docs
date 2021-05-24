@@ -77,12 +77,14 @@ class Collection implements IColumnType
 
 
     /**
-     * Important! This is called by diff() as well as dehydrate(), so we do need to retain it.
+     * Important! This is called by diff() as well as dehydrate(), so we do need
+     * to retain it.
      *
-     * @param \Schoolbox\Collection $value
+     * @param mixed $value
      * @param \Schoolbox\Mapper $mapper
      *
-     * @return array
+     * @return mixed An array of the identifier properties from `$value`, or
+     *               null if `$value` isn't set
      */
     public function dehydrate($value, $mapper = null)
     {
@@ -92,11 +94,11 @@ class Collection implements IColumnType
         if (is_scalar($value) || is_array($value)) {
             return $value;
         }
-        if (!($id_property = $this->getIdentifierProperty())) {
+        if (!($idProperty = $this->getIdentifierProperty())) {
             $prop = $mapper->getIdentifier();
-            $id_property = $prop['property'];
+            $idProperty = $prop['property'];
         }
-        return $value->getColumnValues($id_property);
+        return $value->getPropertyValues($idProperty);
     }
 
 
