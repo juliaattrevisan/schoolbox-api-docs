@@ -49,6 +49,7 @@ class Module extends BaseModule
         $this->register('GET', '', 'getUpload', $perms);
         $this->register('POST', '/preview', 'postPreview', $perms);
         $this->register('POST', '/import', 'postImport', $perms);
+        $this->register('GET', '/export', 'getExport', $perms);
     }
 
 
