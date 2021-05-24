@@ -160,7 +160,7 @@ class Controller extends UserAccount\Controller
         $headers->set('Cache-Control', ' ');
         $headers->set('Content-Type', 'text/csv');
         $headers->set('Content-Length', strlen($contents));
-        $headers->set('Content-Disposition', "attachment; filename=\"timetableTemplate.csv\"");
+        $headers->set('Content-Disposition', "attachment; filename=\"timetable.csv\"");
 
         $this->getResponse()->content->set([
             'format' => 'file',
