@@ -86,8 +86,13 @@ class ValidHasReadMoreTest extends TestCase
 
         /* Article with comment enabled
          */
-        $commentOnlyArticle = (new Model())
-            ->setDiscussionThread(new \Schoolbox\Discussion\Thread\Model());
+        $commentOnlyOnArticle = (new Model())
+            ->setDiscussionThread((new \Schoolbox\Discussion\Thread\Model())->setOpen(true));
+
+        /* Article with comment enabled, then disabled
+         */
+        $commentOnlyOffArticle = (new Model())
+            ->setDiscussionThread((new \Schoolbox\Discussion\Thread\Model())->setOpen(false));
 
         /* Article with comments and files
          */
@@ -160,10 +165,16 @@ class ValidHasReadMoreTest extends TestCase
                 true
             ],
             'Article with comment enabled' => [
-                $commentOnlyArticle,
+                $commentOnlyOnArticle,
                 'Read more by clicking here',
                 true,
                 true
+            ],
+            'Article with comment disabled' => [
+                $commentOnlyOffArticle,
+                'Read more by clicking here',
+                true,
+                false
             ],
             'Article with comments and files' => [
                 $filesAndCommentsArticle,
