@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2020, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades\Cohort;
@@ -70,8 +72,7 @@ class Progression
     public function __construct(
         Connector\Base $database,
         AssessmentMapperProxy $assessmentMapperProxy,
-        GenericCollection
-        $assessments,
+        GenericCollection $assessments,
         bool $includeComparison
     ) {
         $this->database = $database;

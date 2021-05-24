@@ -195,8 +195,7 @@ class AcceptanceTester extends \Codeception\Actor
     private function fillRteEditor($selector, $content)
     {
         $this->executeInSelenium(
-            function (\Facebook\WebDriver\Remote\RemoteWebDriver $webDriver)
- use ($selector, $content) {
+            function (\Facebook\WebDriver\Remote\RemoteWebDriver $webDriver) use ($selector, $content) {
                 $webDriver->switchTo()->frame(
                     $webDriver->findElement($selector)
                 );

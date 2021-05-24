@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -228,23 +229,22 @@ class Controller extends BaseController
         $routeKeyRegex = "/service\\.$service\\.([0-9]+)/";
         foreach ($muted as $k => $id) {
             $muted[$k] = $this->getRerouteOverrideMapper()
-                              ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
-                              ->map(
-                                  function ($override) use ($routeKeyRegex) {
-                                      /** @var RerouteOverride $override */
-                                      preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
-                                      return is_array($matches) ? $matches[1] : null;
-                                  },
-                                  false
-                              )
-                              ->getAll();
+                ->getMatchingRoutes("service.$service", RoutePermission::MUTE, $id)
+                ->map(
+                    function ($override) use ($routeKeyRegex) {
+                        /** @var RerouteOverride $override */
+                        preg_match($routeKeyRegex, $override->getRouteKey(), $matches);
+                        return is_array($matches) ? $matches[1] : null;
+                    },
+                    false
+                )
+                ->getAll();
         }
 
         $followment = [];
 
         // following
         foreach ($folders as $folder) {
-
             $forced = false;
 
             // forced hydration
@@ -263,7 +263,6 @@ class Controller extends BaseController
                 'follow' => $follow,
                 'force'  => $forced,
             ];
-
         }
 
         return $followment;
@@ -378,5 +377,4 @@ class Controller extends BaseController
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('messages.configure'));
         }
     }
-
 }

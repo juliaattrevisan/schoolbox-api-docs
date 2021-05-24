@@ -971,21 +971,22 @@ class Event implements ISoftDeletable
      *
      * @param Collection $folderCollection
      * @return $this
-     */    public function setFolderCollection(Collection $folderCollection): self
-{
+     */
+    public function setFolderCollection(Collection $folderCollection): self
+    {
         $this->folderCollection = $folderCollection;
         return $this;
-}
+    }
 
     /**
      * Get folder collection
      *
      * @return Collection
      */
-public function getFolderCollection(): Collection
-{
-    return $this->folderCollection;
-}
+    public function getFolderCollection(): Collection
+    {
+        return $this->folderCollection;
+    }
 
     /**
      * Set user collection
@@ -993,21 +994,21 @@ public function getFolderCollection(): Collection
      * @param Collection|Relation\Personal[] $userCollection
      * @return $this
      */
-public function setUserCollection($userCollection): self
-{
-    $this->userCollection = $userCollection;
-    return $this;
-}
+    public function setUserCollection($userCollection): self
+    {
+        $this->userCollection = $userCollection;
+        return $this;
+    }
 
     /**
      * Get user collection
      *
      * @return Collection|Relation\Personal[]
      */
-public function getUserCollection()
-{
-    return $this->userCollection;
-}
+    public function getUserCollection()
+    {
+        return $this->userCollection;
+    }
 
     /**
      * Stub for event metadata. EOTC uses this, but base event's dont.
@@ -1016,67 +1017,67 @@ public function getUserCollection()
      *
      * @return null
      */
-public function getMetadata()
-{
-    return null;
-}
+    public function getMetadata()
+    {
+        return null;
+    }
 
     /**
      * @return string
      */
-public function getSource(): ?string
-{
-    return $this->source;
-}
+    public function getSource(): ?string
+    {
+        return $this->source;
+    }
 
 
     /**
      * @param string $source
      * @return $this
      */
-public function setSource(?string $source): self
-{
-    $this->source = $source;
-    return $this;
-}
+    public function setSource(?string $source): self
+    {
+        $this->source = $source;
+        return $this;
+    }
 
 
     /**
      * @return int|null
      */
-public function getMaxAttendees(): ?int
-{
-    return $this->maxAttendees;
-}
+    public function getMaxAttendees(): ?int
+    {
+        return $this->maxAttendees;
+    }
 
 
     /**
      * @param int|null $maxAttendees
      * @return $this
      */
-public function setMaxAttendees(?int $maxAttendees): self
-{
-    $this->maxAttendees = $maxAttendees;
-    return $this;
-}
+    public function setMaxAttendees(?int $maxAttendees): self
+    {
+        $this->maxAttendees = $maxAttendees;
+        return $this;
+    }
 
 
     /**
      * @return bool|null
      */
-public function getShowAttendees(): ?bool
-{
-    return $this->showAttendees;
-}
+    public function getShowAttendees(): ?bool
+    {
+        return $this->showAttendees;
+    }
 
 
     /**
      * @param bool|null $showAttendees
      * @return $this;
      */
-public function setShowAttendees(?bool $showAttendees): self
-{
-    $this->showAttendees = $showAttendees;
-    return $this;
-}
+    public function setShowAttendees(?bool $showAttendees): self
+    {
+        $this->showAttendees = $showAttendees;
+        return $this;
+    }
 }

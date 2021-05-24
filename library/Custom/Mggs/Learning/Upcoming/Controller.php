@@ -1,9 +1,11 @@
 <?php
+
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 namespace Custom\Mggs\Learning\Upcoming;
 
 use Alaress\Database\Connector\IConnector;
@@ -97,7 +99,7 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
             ->findAllByStudent($student, true, $term)
             ->sortBy('dueAt', 'asc');
 
-        $data = $allWork->map(function(IAssessable $assessable) {
+        $data = $allWork->map(function (IAssessable $assessable) {
             return [
                 'id'          => $assessable->getId(),
                 'title'       => $assessable->getTitle(),
@@ -144,13 +146,13 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
             if (\count($folder->getCodes()) > 0) {
                 // Actual teachers only
                 $teacherCodes = $this->externalClass->getTeachers($folder->getCodeString());
-                if(\is_array($teacherCodes) && \count($teacherCodes) > 1) {
+                if (\is_array($teacherCodes) && \count($teacherCodes) > 1) {
                     $teachers = $this->userMapper->findByColumn('synergy_id', $teacherCodes)
-                                                 ->filter(
-                                                     function (User $teacher) {
-                                                         return $teacher->getRole()->isStaff();
-                                                     }
-                                                 );
+                        ->filter(
+                            function (User $teacher) {
+                                return $teacher->getRole()->isStaff();
+                            }
+                        );
                 }
             }
 
@@ -169,7 +171,7 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
                 $subjects[$folder->getId()] = [
                     'teachers' => $teachers,
                     'folder'   => $folder,
-                    'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()]: '',
+                    'grade'    => $this->getConfigLoader()->get('show_overall_grade') ? $markbook->getStudentStatistics()[$student->getId()] : '',
                     'hasPerms'    => Access::getInstance()->getFolderAccess($this->getUser(), $folder->getId()) > UserAccess::ACCESS_DENY,
                 ];
             }
@@ -211,7 +213,7 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
         $namespace = Module::BASENAME . 'Mggs';
         $this->getResponse()->content->set(
             $this->buildHtmlOutput("@$namespace/upcoming.twig", $payload)
-                 ->setTitle('Upcoming Work for '.$student->formatName())
+                 ->setTitle('Upcoming Work for ' . $student->formatName())
                  ->setTab('submission')
         );
     }
@@ -273,7 +275,6 @@ class Controller extends \Schoolbox\Learning\Upcoming\Controller
         $selectedSemester = null;
 
         foreach (array_reverse($semesters) as $semester) {
-
             if ($now < $semester['end']) {
                 $selectedSemester = $semester;
             }
