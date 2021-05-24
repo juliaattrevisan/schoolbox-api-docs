@@ -19,27 +19,32 @@ use UnexpectedValueException;
 class CollectionMethodsTest extends TestCase
 {
     /**
-     * @dataProvider provider_slice_once
+     * @dataProvider providerSliceOnce
      * @param Collection $input
      * @param Collection $expected
      * @param int        $offset
      * @param int        $count
      * @param bool       $preserveKeys
      */
-    public function test_slice_once(Collection $input, Collection $expected, $offset, $count, $preserveKeys)
-    {
+    public function testSliceOnce(
+        Collection $input,
+        Collection $expected,
+        $offset,
+        $count,
+        $preserveKeys
+    ): void {
         $beforeSlice = new Collection($input->getAll());
 
         $actual = $input->slice($offset, $count, $preserveKeys);
-        $this->assertEquals($expected->getAll(), $actual->getAll());
+        self::assertEquals($expected->getAll(), $actual->getAll());
 
         // Ensure we didn't mutate operand collections
-        $this->assertEquals($beforeSlice->getAll(), $input->getAll());
+        self::assertEquals($beforeSlice->getAll(), $input->getAll());
     }
 
 
     /**
-     * @dataProvider provider_slice_once
+     * @dataProvider providerSliceOnce
      * @param Collection $input
      * @param Collection $expected
      * @param int        $offset
@@ -47,38 +52,36 @@ class CollectionMethodsTest extends TestCase
      * @param bool       $preserveKeys
      * @throws \PHPUnit\Framework\SkippedTestError
      */
-    public function test_slice_invert_key_preservation(
+    public function testSliceInvertKeyPreservation(
         Collection $input,
         Collection $expected,
         $offset,
         $count,
         $preserveKeys
-    ) {
+    ): void {
         // Ignore 0 length arrays or arrays starting from first index (these do not give different keys)
         if (!$offset || !$count) {
-            $this->markTestSkipped();
-            return;
+            self::markTestSkipped();
         }
         $beforeSlice = new Collection($input->getAll());
         $actual = $input->slice($offset, $count, !$preserveKeys);
-        $this->assertNotEquals($expected->getAll(), $actual->getAll());
+        self::assertNotEquals($expected->getAll(), $actual->getAll());
 
         // Ensure we didn't mutate operand collections
-        $this->assertEquals($beforeSlice->getAll(), $input->getAll());
+        self::assertEquals($beforeSlice->getAll(), $input->getAll());
     }
 
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider provider_slice_multiple
+     * @dataProvider providerSliceMultiple
      * @param Collection $input
      * @param Collection[] $expectedSlices
      * @param int[] $offsets
      * @param int[] $counts
      */
-    public function test_slice_multi(Collection $input, $expectedSlices, $offsets, $counts)
+    public function testSliceMulti(Collection $input, $expectedSlices, $offsets, $counts): void
     {
-
         // Ensure our test data is correct
         if (count($expectedSlices) != count($offsets)) {
             throw new LogicException("Argument count mismatch.");
@@ -94,21 +97,21 @@ class CollectionMethodsTest extends TestCase
             $count = isset($counts[$i]) ? $counts[$i] : null;
 
             $actual = $input->slice($offset, $count);
-            $this->assertEquals($expected->getAll(), $actual->getAll());
+            self::assertEquals($expected->getAll(), $actual->getAll());
         }
 
         $afterSlice = $input->getAll();
-        $this->assertEquals($beforeSlice, $afterSlice);
+        self::assertEquals($beforeSlice, $afterSlice);
     }
 
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider provider_merge
+     * @dataProvider providerMerge
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
-    public function test_merge($inputs, Collection $expected)
+    public function testMerge($inputs, Collection $expected): void
     {
         $beforeMerge = [];
         foreach ($inputs as $input) {
@@ -120,21 +123,21 @@ class CollectionMethodsTest extends TestCase
             $actual = $actual->merge($input);
         }
 
-        $this->assertEquals($expected, $actual);
+        self::assertEquals($expected, $actual);
 
         for ($i = 0; $i < count($inputs); $i++) {
-            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+            self::assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
 
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider provider_merge_unique
+     * @dataProvider providerMergeUnique
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
-    public function test_merge_unique($inputs, Collection $expected)
+    public function testMergeUnique($inputs, Collection $expected): void
     {
         $beforeMerge = [];
         foreach ($inputs as $input) {
@@ -146,21 +149,21 @@ class CollectionMethodsTest extends TestCase
             $actual = $actual->mergeUnique($input);
         }
 
-        $this->assertEquals($expected->getAll(), $actual->getAll());
+        self::assertEquals($expected->getAll(), $actual->getAll());
 
         for ($i = 0; $i < count($inputs); $i++) {
-            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+            self::assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
 
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider provider_merge_unique_objects
+     * @dataProvider providerMergeUniqueObjects
      * @param Collection[] $inputs
      *
      */
-    public function test_merge_unique_objects($inputs)
+    public function testMergeUniqueObjects($inputs): void
     {
         $this->expectException(UnexpectedValueException::class);
         $actual = new Collection();
@@ -172,11 +175,11 @@ class CollectionMethodsTest extends TestCase
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider provider_merge
+     * @dataProvider providerMerge
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
-    public function test_merge_not_unique($inputs, Collection $expected)
+    public function testMergeNotUnique($inputs, Collection $expected): void
     {
         $beforeMerge = [];
         foreach ($inputs as $input) {
@@ -188,21 +191,21 @@ class CollectionMethodsTest extends TestCase
             $actual = $actual->mergeUnique($input);
         }
 
-        $this->assertNotEquals($expected->getAll(), $actual->getAll());
+        self::assertNotEquals($expected->getAll(), $actual->getAll());
 
         for ($i = 0; $i < count($inputs); $i++) {
-            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+            self::assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
 
     /**
      * Ensure result is correct and operand collections not mutated
      *
-     * @dataProvider provider_merge_empty
+     * @dataProvider providerMergeEmpty
      * @param Collection[] $inputs
      * @param Collection   $expected
      */
-    public function test_merge_empty($inputs, Collection $expected)
+    public function testMergeEmpty($inputs, Collection $expected): void
     {
         $beforeMerge = [];
         foreach ($inputs as $input) {
@@ -215,22 +218,22 @@ class CollectionMethodsTest extends TestCase
         }
 
         //var_dump($actual);
-        $this->assertEquals($expected->getAll(), $actual->getAll());
+        self::assertEquals($expected->getAll(), $actual->getAll());
 
         for ($i = 0; $i < count($inputs); $i++) {
-            $this->assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
+            self::assertEquals($beforeMerge[$i], $inputs[$i]->getAll());
         }
     }
 
     /**
      * Limit should NOT mutate the collection
      *
-     * @dataProvider provider_limit
+     * @dataProvider providerLimit
      * @param Collection $input
      * @param Collection $expected
      * @param int        $count
      */
-    public function test_limit(Collection $input, Collection $expected, $count)
+    public function testLimit(Collection $input, Collection $expected, $count): void
     {
         $beforeLimit = $input->getAll();
 
@@ -238,9 +241,9 @@ class CollectionMethodsTest extends TestCase
 
         $message = "Failed asserting that two arrays are equal. \$count: $count";
 
-        $this->assertEquals($expected->getAll(), $actual->getAll(), $message);
+        self::assertEquals($expected->getAll(), $actual->getAll(), $message);
 
-        $this->assertEquals($beforeLimit, $input->getAll());
+        self::assertEquals($beforeLimit, $input->getAll());
     }
 
 
@@ -249,11 +252,11 @@ class CollectionMethodsTest extends TestCase
      *
      * @param Collection $input
      * @param mixed      $expected
-     * @dataProvider provider_last_indexed
+     * @dataProvider providerLastIndexed
      */
-    public function test_last_indexed(Collection $input, $expected): void
+    public function testLastIndexed(Collection $input, $expected): void
     {
-        $this->assertSame($expected, $input->last());
+        self::assertSame($expected, $input->last());
     }
 
 
@@ -262,11 +265,11 @@ class CollectionMethodsTest extends TestCase
      *
      * @param Collection $input
      * @param mixed      $expected
-     * @dataProvider provider_last_indexed_sparse
+     * @dataProvider providerLastIndexedSparse
      */
-    public function test_last_indexed_sparse(Collection $input, $expected): void
+    public function testLastIndexedSparse(Collection $input, $expected): void
     {
-        $this->assertSame($expected, $input->last());
+        self::assertSame($expected, $input->last());
     }
 
 
@@ -275,11 +278,11 @@ class CollectionMethodsTest extends TestCase
      *
      * @param Collection $input
      * @param mixed      $expected
-     * @dataProvider provider_last_associative
+     * @dataProvider providerLastAssociative
      */
-    public function test_last_associative(Collection $input, $expected): void
+    public function testLastAssociative(Collection $input, $expected): void
     {
-        $this->assertSame($expected, $input->last());
+        self::assertSame($expected, $input->last());
     }
 
 
@@ -290,11 +293,11 @@ class CollectionMethodsTest extends TestCase
      * @param Collection    $second
      * @param callable|null $compare
      * @param Collection    $expected
-     * @dataProvider provider_intersect
+     * @dataProvider providerIntersect
      */
     public function testIntersect(Collection $first, Collection $second, ?callable $compare, Collection $expected): void
     {
-        $this->assertSame($expected->getAll(), $first->intersect($second, $compare)->getAll());
+        self::assertSame($expected->getAll(), $first->intersect($second, $compare)->getAll());
     }
 
 
@@ -309,7 +312,7 @@ class CollectionMethodsTest extends TestCase
      */
     public function testGetPropertyValues(Collection $collection, string $property, array $expected): void
     {
-        $this->assertSame($expected, $collection->getPropertyValues($property));
+        self::assertSame($expected, $collection->getPropertyValues($property));
     }
 
     /**
@@ -329,7 +332,7 @@ class CollectionMethodsTest extends TestCase
 
     // ============= Data Providers =============
 
-    public function provider_limit()
+    public function providerLimit(): iterable
     {
         $array = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         $data = [];
@@ -341,7 +344,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function provider_merge()
+    public function providerMerge(): iterable
     {
         $data = [];
 
@@ -364,7 +367,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function provider_merge_unique()
+    public function providerMergeUnique(): iterable
     {
         $data = [];
 
@@ -388,7 +391,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function provider_merge_unique_objects()
+    public function providerMergeUniqueObjects(): iterable
     {
         $data = [];
 
@@ -417,7 +420,7 @@ class CollectionMethodsTest extends TestCase
     }
 
 
-    public function provider_merge_empty()
+    public function providerMergeEmpty(): iterable
     {
         $data = [];
 
@@ -454,7 +457,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function provider_slice_once()
+    public function providerSliceOnce(): iterable
     {
         $array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         $input = new Collection($array);
@@ -470,7 +473,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function provider_slice_multiple()
+    public function providerSliceMultiple(): iterable
     {
         $array = [1, 2, 3, 4, 5, 6, 7, 8, 9];
         $input = new Collection($array);
@@ -528,7 +531,7 @@ class CollectionMethodsTest extends TestCase
         return $data;
     }
 
-    public function provider_last_indexed(): array
+    public function providerLastIndexed(): array
     {
         return [
             [new Collection(), null],
@@ -539,7 +542,7 @@ class CollectionMethodsTest extends TestCase
         ];
     }
 
-    public function provider_last_indexed_sparse(): array
+    public function providerLastIndexedSparse(): array
     {
         $c1 = new Collection();
         $c1[0] = 1;
@@ -555,7 +558,7 @@ class CollectionMethodsTest extends TestCase
         ];
     }
 
-    public function provider_last_associative(): array
+    public function providerLastAssociative(): array
     {
         return [
             [new Collection(), null],
@@ -566,7 +569,7 @@ class CollectionMethodsTest extends TestCase
         ];
     }
 
-    public function provider_intersect(): iterable
+    public function providerIntersect(): iterable
     {
         // Set notation refresher:
         // ∅:     Empty set
