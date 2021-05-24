@@ -667,6 +667,10 @@ else
 		# Backup Source, set the file location of the db backup
 		sourcedb="$backup_dir/$sourcep2/schoolbox-$sourcep2.sql";
 	fi
+
+  # Truncate storage_transform table if it is a DB only sync
+	echo "Truncating 'storage_transform' table";
+  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE storage_transform";
 fi
 
 if [ -z $sourcedb ];
