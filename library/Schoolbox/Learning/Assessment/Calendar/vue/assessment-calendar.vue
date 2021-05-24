@@ -585,6 +585,7 @@ export default {
 
                 return result;
             }).then((result) => {
+                this.viewDidMount({view: this.calendarApi.view})
                 this.$_fullCalendarHelper_onLoading(false);
 
                 return result;
