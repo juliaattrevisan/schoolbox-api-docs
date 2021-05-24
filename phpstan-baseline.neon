@@ -1646,48 +1646,8 @@ parameters:
 			path: library/DeprecatedDatabase.php
 
 		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 33$#"
-			count: 2
-			path: library/DeprecatedModel.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$field\\)\\: Unexpected token \"\\$field\", expected type at offset 33$#"
-			count: 2
-			path: library/DeprecatedModel.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$id\\)\\: Unexpected token \"\\$id\", expected type at offset 52$#"
-			count: 2
-			path: library/DeprecatedModel.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$fieldList\\)\\: Unexpected token \"\\$fieldList\", expected type at offset 33$#"
-			count: 1
-			path: library/DeprecatedModel.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$name\\)\\: Unexpected token \"\\$name\", expected type at offset 33$#"
-			count: 1
-			path: library/DeprecatedModel.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\<type\\> \\$fields\\)\\: Unexpected token \"\\<\", expected type at offset 106$#"
-			count: 1
-			path: library/DeprecatedModel.php
-
-		-
-			message: "#^PHPDoc tag @return has invalid value \\(\\<type\\>\\)\\: Unexpected token \"\\<\", expected type at offset 137$#"
-			count: 1
-			path: library/DeprecatedModel.php
-
-		-
 			message: "#^Variable \\$subquery might not be defined\\.$#"
 			count: 1
-			path: library/DeprecatedModel.php
-
-		-
-			message: "#^PHPDoc tag @param has invalid value \\(\\$object\\)\\: Unexpected token \"\\$object\", expected type at offset 33$#"
-			count: 2
 			path: library/DeprecatedModel.php
 
 		-
@@ -9141,17 +9101,12 @@ parameters:
 			path: library/ZipFileUpload.php
 
 		-
-			message: "#^Method class@anonymous/tools/assessment/cleanup\\-orphans\\.php\\:20\\:\\:buildDeleteQueryParams\\(\\) should return array\\<int\\> but returns array\\<string, int\\|string\\>\\.$#"
-			count: 1
-			path: tools/assessment/cleanup-orphans.php
-
-		-
 			message: "#^Variable \\$assessmentDataSource in PHPDoc tag @var does not exist\\.$#"
 			count: 1
 			path: tools/assessment/csv.php
 
 		-
-			message: "#^Method class@anonymous/tools/custom/dcc/pastoral\\-import\\.php\\:27\\:\\:getFilename\\(\\) never returns false so it can be removed from the return typehint\\.$#"
+			message: "#^Method class@anonymous/tools/custom/dcc/pastoral\\-import\\.php\\:29\\:\\:getFilename\\(\\) never returns false so it can be removed from the return typehint\\.$#"
 			count: 1
 			path: tools/custom/dcc/pastoral-import.php
 

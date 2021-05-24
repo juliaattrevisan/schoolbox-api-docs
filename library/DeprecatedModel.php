@@ -15,9 +15,9 @@ class DeprecatedModel
 
     var $_table;
     var $_index;
-/** @var DeprecatedDatabase */
+    /** @var DeprecatedDatabase */
     var $db;
-/**
+    /**
      * @deprecated
      */
     public function __construct()
@@ -27,7 +27,7 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $id
+     * @param mixed $id
      * @return array|bool|null
      */
     public function getByID($id)
@@ -39,8 +39,8 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $field
-     * @param $id
+     * @param string $field
+     * @param mixed  $id
      * @return array|bool|null
      */
     public function getByField($field, $id)
@@ -52,7 +52,7 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $fieldList
+     * @param mixed $fieldList
      * @param string $termOp
      * @return array|bool
      */
@@ -82,8 +82,8 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $field
-     * @param $id
+     * @param string $field
+     * @param mixed  $id
      * @param string $orderBy
      * @param string $orderDir
      * @return array|bool
@@ -116,7 +116,7 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $name
+     * @param string $name
      * @return mixed
      */
     public function getIDByName($name)
@@ -130,8 +130,8 @@ class DeprecatedModel
      * Get all the rows matching multiple key/value pairs
      *
      * @deprecated
-     * @param <type> $fields
-     * @return <type>
+     * @param mixed $fields
+     * @return array|bool
      */
     public function getAllByFields($fields, $type = 'AND')
     {
@@ -152,7 +152,7 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $object
+     * @param mixed $object
      * @return bool
      */
     public function update($object)
@@ -162,7 +162,7 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $id
+     * @param mixed $id
      * @return bool
      */
     public function delete($id)
@@ -172,7 +172,7 @@ class DeprecatedModel
 
     /**
      * @deprecated
-     * @param $object
+     * @param mixed $object
      * @return int|string
      */
     public function create($object)

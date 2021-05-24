@@ -225,7 +225,7 @@ HELP;
      *
      * @param int                 $id
      * @param Alaress_Date_Format $now
-     * @return int[]
+     * @return array<string, int|string>
      */
     private function buildDeleteQueryParams(int $id, Alaress_Date_Format $now): array
     {
