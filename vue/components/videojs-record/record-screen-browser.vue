@@ -104,7 +104,10 @@ export default {
          */
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
-            this.player.record().getDevice(); //request the device to avoid needing to click the activate button
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            if (!isSafari) { //Safari requires a direct click on the request (for screen only, not video)
+                this.player.record().getDevice(); //request the device to avoid needing to click the activate button
+            }
         },
 
         /**
