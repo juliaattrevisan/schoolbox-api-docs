@@ -170,6 +170,7 @@ class WeatherstackClient
         $lastUpdatedTimestamp = $this->calculateLastUpdated($responseData['location']['localtime'], $responseData['location']['utc_offset']);
 
         $twigData = [
+            'weatherAvailable' => false,
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
             'today' => [
                 'day'            => $this->getDayOfWeek($lastUpdatedTimestamp),
@@ -195,31 +196,48 @@ class WeatherstackClient
             ]
         ];
 
-        foreach ($responseData['forecast'] as $date => $data) {
-            // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
-            if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
-                $twigData['today']['lowTemp']  = $data['mintemp'];
-                $twigData['today']['highTemp'] = $data['maxtemp'];
-                continue;
+        /* Sometimes Weatherstack doesn't send us a payload of usable data.
+         * See https://sentry.io/organizations/alaress/issues/1926347951/?project=231649&referrer=jira_integration
+         *
+         * With the absence of $responseData['forecast'] the only conclusion we can draw is that
+         * Weatherstack is unavailable for some reason (they broke something, changed something)
+         * so it requires us to avoid trying to render it
+         */
+        if (!isset($responseData['forecast'])) {
+            return $twigData;
+        }
+
+        /* Iterate only if possible to do so
+         */
+        if (is_array($responseData['forecast']) && \count($responseData['forecast'])) {
+            foreach ($responseData['forecast'] as $date => $data) {
+                // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
+                if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
+                    $twigData['today']['lowTemp']  = $data['mintemp'];
+                    $twigData['today']['highTemp'] = $data['maxtemp'];
+                    continue;
+                }
+
+                $dayForecast = [
+                    'day'            => $this->getDayOfWeek($data['date_epoch']),
+
+                    /* Forecast is now broken down hourly
+                     * Just get the midday value (fifth in the stack)
+                     * and the usual first in the stack for description/icon
+                     */
+                    'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
+                    'weatherIcon'    => str_replace('http:', '', $data['hourly'][4]['weather_icons'][0]),
+
+                    /* Basic facts
+                     */
+                    'lowTemp'        => $data['mintemp'],
+                    'highTemp'       => $data['maxtemp'],
+                ];
+
+                $twigData['forecastDays'][] = $dayForecast;
             }
-
-            $dayForecast = [
-                'day'            => $this->getDayOfWeek($data['date_epoch']),
-
-                /* Forecast is now broken down hourly
-                 * Just get the midday value (fifth in the stack)
-                 * and the usual first in the stack for description/icon
-                 */
-                'weatherSummary' => $data['hourly'][4]['weather_descriptions'][0],
-                'weatherIcon'    => str_replace('http:', '', $data['hourly'][4]['weather_icons'][0]),
-
-                /* Basic facts
-                 */
-                'lowTemp'        => $data['mintemp'],
-                'highTemp'       => $data['maxtemp'],
-            ];
-
-            $twigData['forecastDays'][] = $dayForecast;
+        } else {
+            return $twigData;
         }
 
         // If we've reached this code path, we successfully retrieved the weather data.
