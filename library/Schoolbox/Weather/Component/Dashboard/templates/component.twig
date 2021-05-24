@@ -6,68 +6,62 @@
  # @param array forecastDays
 #}
 
-            {% if weatherAvailable %}
-
-                <section>
-                    <ul class="weather-list">
-                        <li class="highlighted-day" data-equalizer>
-                            <div class="list-item">
-                                <div class="row">
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center current-value">Now</p>
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center">
-                                            <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}" />
-                                        </p>
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center current-value">{{ today.currentTemp }}&deg;C</p>
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center current-value">UV Index {{ today.uvIndex}}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-
-                        {% for forecastDay in forecastDays %}
-                        <li>
-                            <div class="list-item">
-                                <div class="row">
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center current-value">{{ forecastDay.day }}</p>
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center">
-                                            <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
-                                        </p>
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center cold">{{ forecastDay.lowTemp }}&deg;C</p>
-                                    </div>
-                                    <div class="small-12 medium-3 columns">
-                                        <p class="text-center hot">{{ forecastDay.highTemp }}&deg;C</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        {% endfor %}
-                    </ul>
-
-                    <div class="component-action">
-                        <section>
-                            <a href="{{ routeLookup('weather.getWeatherDetails') }}?location={{ weeklyForecastLocation }}" title="View Weekly Forecast" class="button">View Weekly Forecast</a>
-                        </section>
-                    </div>
-                </section>
-
-            {% else %}
-
-                <div class="content">
-                    <div data-alert="" class="alert-box alert">
-                        Weather forecast is temporarily unavailable.
+{% if weatherAvailable %}
+    <section>
+        <ul class="weather-list">
+            <li class="highlighted-day" data-equalizer>
+                <div class="list-item">
+                    <div class="row">
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center current-value">Now</p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center">
+                                <img src="{{ today.weatherIcon }}" title="{{ today.weatherSummary }}" alt="{{ today.weatherSummary }}" />
+                            </p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center current-value">{{ today.currentTemp }}&deg;C</p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center current-value">UV Index {{ today.uvIndex}}</p>
+                        </div>
                     </div>
                 </div>
+            </li>
 
-            {% endif %}
+            {% for forecastDay in forecastDays %}
+            <li>
+                <div class="list-item">
+                    <div class="row">
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center current-value">{{ forecastDay.day }}</p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center">
+                                <img src="{{ forecastDay.weatherIcon }}" title="{{ forecastDay.weatherSummary }}" alt="{{ forecastDay.weatherSummary }}"/>
+                            </p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center cold">{{ forecastDay.lowTemp }}&deg;C</p>
+                        </div>
+                        <div class="small-12 medium-3 columns">
+                            <p class="text-center hot">{{ forecastDay.highTemp }}&deg;C</p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <div class="component-action">
+            <section>
+                <a href="{{ routeLookup('weather.getWeatherDetails') }}?location={{ weeklyForecastLocation }}" title="View Weekly Forecast" class="button">View Weekly Forecast</a>
+            </section>
+        </div>
+    </section>
+{% else %}
+    <div data-alert="" class="alert-box alert no-margin">
+        Weather forecast is temporarily unavailable.
+    </div>
+{% endif %}
