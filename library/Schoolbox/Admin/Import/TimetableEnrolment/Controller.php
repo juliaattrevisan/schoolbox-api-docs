@@ -94,7 +94,6 @@ class Controller extends UserAccount\Controller
         /* Export properties into the same format as the csv
          */
         foreach ($classInvolvements as $classInvolvement) {
-
             /* Manually match the class involvements to their classes.
              *
              * I don't really think we need to hydrate these normally, because we've never really
