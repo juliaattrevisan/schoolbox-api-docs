@@ -153,7 +153,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         puppet.options = "--verbose --debug"
     end
     puppet.facter = {
-      "is_vagrant_puppet_provision" => true
+      "suppress_instance_configuration" => true
     }
   end
 
