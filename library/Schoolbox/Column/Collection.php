@@ -10,6 +10,9 @@
 
 namespace Schoolbox\Column;
 
+use Schoolbox\Mapper;
+use TypeError;
+
 class Collection implements IColumnType
 {
 
@@ -44,29 +47,39 @@ class Collection implements IColumnType
     /**
      * Creates an Collection of the specified type.
      *
-     * @param array             $value
-     * @param \Schoolbox\Mapper $mapper
+     * @param iterable|null $value
+     * @param Mapper        $mapper
      *
      * @return \Schoolbox\Collection
+     * @throws TypeError if `$value` is set and not iterable
+     * @throws TypeError if `$mapper` is not a mapper
      */
     public function hydrate($value, $mapper = null)
     {
-        $collection = $mapper
-            ? $mapper->createCollection()
-            : new \Schoolbox\Collection();
+        if (!$mapper instanceof Mapper) {
+            throw new TypeError(sprintf('$mapper must be a "%s"', Mapper::class));
+        }
+        $collection = $mapper->createCollection();
 
-        if (is_array($value)) {
-            // Figure out the identifier property to set on the model.
-            $id_property = $this->getIdentifierProperty();
-            $identifier_method  = isset($id_property) ?
-                $mapper->getSetMethodName($id_property) :
-                $mapper->getSetIdentifierMethodName();
+        if (!isset($value)) {
+            return $collection;
+        }
+        if (!is_iterable($value)) {
+            throw new TypeError('$value must be iterable');
+        }
 
-            foreach ($value as $v) {
-                $model = $mapper->createModel();
-                $model->$identifier_method($v);
-                $collection->add($model);
-            }
+        // Figure out the identifier property to set on the model.
+        if (!($idProperty = $this->getIdentifierProperty())) {
+            $idProperty = $mapper->getIdentifierProperty();
+        }
+        $setIdMethod = $idProperty
+            ? $mapper->getSetMethodName($idProperty)
+            : $mapper->getSetIdentifierMethodName();
+
+        foreach ($value as $v) {
+            $model = $mapper->createModel();
+            $model->$setIdMethod($v);
+            $collection->add($model);
         }
 
         return $collection;
@@ -77,8 +90,8 @@ class Collection implements IColumnType
      * Important! This is called by diff() as well as dehydrate(), so we do need
      * to retain it.
      *
-     * @param mixed $value
-     * @param \Schoolbox\Mapper $mapper
+     * @param mixed  $value
+     * @param Mapper $mapper
      *
      * @return mixed An array of the identifier properties from `$value`, or
      *               null if `$value` isn't set
@@ -96,8 +109,7 @@ class Collection implements IColumnType
             return $value;
         }
         if (!($idProperty = $this->getIdentifierProperty())) {
-            $prop = $mapper->getIdentifier();
-            $idProperty = $prop['property'];
+            $idProperty = $mapper->getIdentifierProperty();
         }
 
         // Handle the case where `$value` may contain scalars:

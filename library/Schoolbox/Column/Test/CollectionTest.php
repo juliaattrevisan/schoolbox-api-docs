@@ -11,6 +11,7 @@ use ICollection;
 use Schoolbox\Column\Collection;
 use Schoolbox\Test\TestMapper;
 use Schoolbox\Test\TestModel;
+use TypeError;
 
 /**
  * Test for the collection column type.
@@ -70,6 +71,17 @@ class CollectionTest extends TestCase
     }
 
     /**
+     * @param mixed           $input
+     * @param TestMapper|null $mapper
+     * @dataProvider getTestHydrateErrorCases
+     */
+    public function testHydrateErrorCases($input, TestMapper $mapper = null): void
+    {
+        $this->expectException(TypeError::class);
+        $this->object->hydrate($input, $mapper);
+    }
+
+    /**
      * @param mixed      $input
      * @param array|null $expected_output
      * @dataProvider getTestDehydrate
@@ -109,6 +121,20 @@ class CollectionTest extends TestCase
                     $this->testMapper->createModel()->setId(3),
                 ]),
             ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTestHydrateErrorCases()
+    {
+        // Error cases:
+        // mapper isn't set
+        // input is not an array
+        return [
+            'not array' => ['', $this->testMapper],
+            'no mapper' => [[], null],
         ];
     }
 
