@@ -103,10 +103,13 @@
                         {% set data = setting.data %}
                         {% if not data.hidden %}
                             <div class="small-12 columns">
-                            <label id="{{ data.name }}" for="{{ data.name }}-field" {{ data.required and data.editable ? 'class="required"' }}>{{ data.title }}</label>
-                            <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
+                                <label id="{{ data.name }}" for="{{ data.name }}-field">
+                                    <span {{ data.required and data.editable ? 'class="required-with-tip"' }}>{{ data.title }}</span>
+                                    <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="{{ data.description|replace({'<': '&lt;'}) }}">?</span>
+                                </label>
                                 {% include '@settings/fieldType/' ~ setting.template with data only %}
                             </div>
+                            
                         {% endif %}
                     {% endfor %}
             </fieldset>
