@@ -103,25 +103,15 @@ class Collection implements IColumnType
             $idProperty = $prop['property'];
         }
 
-        // Handle the case where `$value` may contain scalars
+        // Handle the case where `$value` may contain scalars:
+        // This can happen if someone just set a collection of ID values into
+        // the model
         $result = [];
         foreach ($value as $item) {
             if (is_scalar($item)) {
                 $result[] = $item;
             } else {
-                $callable = [$item, $idProperty];
-                if (is_callable($callable)) {
-                    $result[] = $callable();
-                } else {
-                    trigger_error(
-                        sprintf(
-                            'Method "%s" is not callable on %s',
-                            $idProperty,
-                            (is_object($item) ? get_class($item) : 'non-object'),
-                        ),
-                        E_USER_WARNING
-                    );
-                }
+                $result[] = $mapper->getModelProperty($item, $idProperty);
             }
         }
 
