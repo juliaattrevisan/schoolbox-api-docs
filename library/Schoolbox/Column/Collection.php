@@ -65,20 +65,17 @@ class Collection implements IColumnType
             return $collection;
         }
         if (!is_iterable($value)) {
-            throw new TypeError('$value must be iterable');
+            throw new TypeError('If set, $value must be iterable');
         }
 
         // Figure out the identifier property to set on the model.
         if (!($idProperty = $this->getIdentifierProperty())) {
             $idProperty = $mapper->getIdentifierProperty();
         }
-        $setIdMethod = $idProperty
-            ? $mapper->getSetMethodName($idProperty)
-            : $mapper->getSetIdentifierMethodName();
 
         foreach ($value as $v) {
             $model = $mapper->createModel();
-            $model->$setIdMethod($v);
+            $mapper->setModelProperty($model, $idProperty, $v);
             $collection->add($model);
         }
 
