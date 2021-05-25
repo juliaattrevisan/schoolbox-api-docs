@@ -106,8 +106,8 @@ class Collection implements IColumnType
         // It should always be a collection, because that's what it always
         // hydrates to.
         // Not sure if this will cause issues though?
-        if (!$value instanceof \Schoolbox\Collection) {
-            throw new TypeError(sprintf('If set, $value must be a "%s"', \Schoolbox\Collection::class));
+        if (!is_iterable($value)) {
+            throw new TypeError('If set, $value must be iterable');
         }
         if (!($idProperty = $this->getIdentifierProperty())) {
             $idProperty = $mapper->getIdentifierProperty();

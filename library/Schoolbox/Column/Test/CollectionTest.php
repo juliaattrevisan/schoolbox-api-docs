@@ -156,6 +156,7 @@ class CollectionTest extends TestCase
     {
         return [
             'null'                  => [null, null],
+            'empty array'           => [[], []],
             'empty collection'      => [$this->testMapper->createCollection(), []],
             'collection of IDs'     => [
                 new \Schoolbox\Collection([1, 2]),
@@ -168,12 +169,31 @@ class CollectionTest extends TestCase
                 ]),
                 [1, 3],
             ],
-            'mixed collection' => [
+            'mixed collection'      => [
                 new \Schoolbox\Collection([
                     $this->testMapper->createModel()->setId(1),
                     2,
                     $this->testMapper->createModel()->setId(3),
                 ]),
+                [1, 2, 3],
+            ],
+            'array of IDs'          => [
+                [1, 2],
+                [1, 2],
+            ],
+            'array of objects'      => [
+                [
+                    $this->testMapper->createModel()->setId(1),
+                    $this->testMapper->createModel()->setId(3),
+                ],
+                [1, 3],
+            ],
+            'mixed array'           => [
+                [
+                    $this->testMapper->createModel()->setId(1),
+                    2,
+                    $this->testMapper->createModel()->setId(3),
+                ],
                 [1, 2, 3],
             ],
         ];
@@ -190,7 +210,6 @@ class CollectionTest extends TestCase
         // any item in the collection doesn't support the ID finder
         return [
             'no mapper' => [$this->testMapper->createCollection(), null],
-            'array'     => [[], $this->testMapper],
             'string'    => ['string', $this->testMapper],
         ];
     }
