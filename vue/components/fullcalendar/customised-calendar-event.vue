@@ -7,6 +7,7 @@
 
 import tinycolor from 'tinycolor2';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
+import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
 
 export default {
     
@@ -71,6 +72,21 @@ export default {
             }
         },
 
+        /**
+         * to update the display of the event depending on whether the event has attendance
+         * and if so the status of that attendance
+         * 
+         * @returns { String }
+         */
+        getAttendanceClass () {
+            const attendanceStatus = this.content.event?.extendedProps?.data?.attendance?.status?.current;
+            if (attendanceStatus === ATTENDANCE_STATUS.DECLINED) {
+                return 'declined';
+            } else if (attendanceStatus === ATTENDANCE_STATUS.PENDING) {
+                return 'pending';
+            } 
+        },
+
     },
 
     mounted () {
@@ -90,6 +106,7 @@ export default {
                     this.$refs.timeText.style.color = readableTextColor;
                 }
                 this.$refs.titleText.style.color = readableTextColor;
+                this.$refs.eventContainer.style.color = readableTextColor; 
             }
         },
 
@@ -110,7 +127,7 @@ export default {
 </script>
 
 <template>
-    <div class="event-container" ref="eventContainer">
+    <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
         <b v-if="content.timeText" ref="timeText">{{ content.timeText }}</b>
         <input v-if="isTask" type="checkbox" class="checkbox plain" id="completd" name="completed" v-model="isTaskComplete">
         <span ref="titleText" v-html="lineBreakedTitleText" :class="{ strike : isTaskComplete }"></span>
@@ -129,5 +146,16 @@ export default {
 .checkbox { 
     pointer-events: none;
 }
+
+//to show that the user has rejected the attedence
+.declined {
+    text-decoration: line-through;
+}
+
+//show that the event is pending
+.pending {
+    opacity: 0.5;
+}
+
 
 </style>

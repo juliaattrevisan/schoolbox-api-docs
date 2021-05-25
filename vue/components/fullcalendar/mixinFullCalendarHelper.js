@@ -81,28 +81,14 @@ export const mixinFullCalendarHelper = {
                 calEvent.setProp('display', 'none');
                 return false;
             }
-
-            const element = eventRenderInfo.el;
-
-            if (calEvent?.extendedProps?.data?.attendance?.hasAttendance) {
-                // Add a style depending on attendability
-                element.classList.add('has-attendance');
-                const attendanceStatus = calEvent?.extendedProps?.data?.attendance?.status?.current;
-                if (attendanceStatus === ATTENDANCE_STATUS.DECLINED) {
-                    element.classList.add('declined');
-                } else if (attendanceStatus === ATTENDANCE_STATUS.PENDING) {
-                    element.classList.add('pending');
-                } else if (attendanceStatus === ATTENDANCE_STATUS.ACCEPTED) {
-                    element.classList.add('accepted');
-                }
-            }
             
             // Apply the visible class?
             if (calEvent?.extendedProps?.data?.styles?.visible) {
-                element.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
+                eventRenderInfo.el.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
             
             calEvent.setProp('display', 'block');
+            
             return true;
         },
 

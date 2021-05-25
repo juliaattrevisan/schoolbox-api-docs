@@ -19,7 +19,7 @@
   time.icon * {
     display: block;
     width: 100%;
-    font-size: .875rem;
+    font-size: 0.875rem;
     font-weight: 600;
     text-align: center;
     line-height: 1.2;
@@ -65,7 +65,7 @@
   .detail .meta {
     border-bottom: 1px solid $gainsboro;
     margin: 0 0 1rem;
-    padding-bottom: .5rem;
+    padding-bottom: 0.5rem;
   }
   section.attending {
     margin-bottom: 2px;
@@ -74,14 +74,13 @@
 
 // Attendance Guest list
 .attendance-guest-list {
-
   // Special style for removing attendance records
-  .actions-small-1>nav a[class^="icon-"] {
+  .actions-small-1 > nav a[class^="icon-"] {
     line-height: 3.1;
   }
 
   [class^="icon-"]:before {
-    font-size: .5rem;
+    font-size: 0.5rem;
   }
 
   // Status icons
@@ -103,7 +102,7 @@
     .status-icon:after {
       background-color: tint($success-color, 74%);
       color: $success-color;
-      content: '\e604';
+      content: "\e604";
     }
   }
 
@@ -111,7 +110,7 @@
     .status-icon:after {
       background-color: tint($alert-color, 74%);
       color: $alert-color;
-      content: '\e60d';
+      content: "\e60d";
     }
   }
 }
@@ -156,18 +155,5 @@
 
   .declined {
     color: $alert-color;
-  }
-}
-
-// RSVP styles
-.fc-event.has-attendance, .fc-list-item.has-attendance {
-  &.declined {
-    text-decoration: line-through;
-  }
-  &.pending {
-    opacity: 0.5;
-  }
-  &.accepted {
-    // No special styles for events where attendance is confirmed
   }
 }
