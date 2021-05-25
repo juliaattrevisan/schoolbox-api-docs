@@ -59,8 +59,6 @@ class ValidHasReadMore
          *
          * Note that the presence of comments in discussion_thread determines
          * whether Allow Comments was ticked; comments_allowed does not do anything
-         *
-         * Show the link
          */
         if ($article->getDiscussionThread()) {
             /* But, if the global admin config Enable Comments On News Articles
@@ -70,12 +68,20 @@ class ValidHasReadMore
              * This can manifest when your article once upon a time had comments, but
              * the system has now disabled it; nothing to see anymore at the moment
              * Hide the link
-             *
-             * Otherwise your article has comment thread and your instance allows
-             * people to witness and interact with its contents
-             * Show the link
              */
-            return $commentsAllowed;
+            if (!$commentsAllowed) {
+                return false;
+            }
+
+            /* Otherwise your article has comment thread and your instance allows
+             * people to witness and interact with its contents
+             *
+             * If the comments are enabled,
+             * Show the link
+             *
+             * Otherwise, hide the link
+             */
+            return $article->getDiscussionThread()->getOpen();
         }
 
         /* If the article has a body content, there's something to read
