@@ -118,7 +118,7 @@ class Collection implements IColumnType
         // the model
         $result = [];
         foreach ($value as $item) {
-            if (is_scalar($item)) {
+            if (!isset($item) || is_scalar($item)) {
                 $result[] = $item;
             } else {
                 $result[] = $mapper->getModelProperty($item, $idProperty);

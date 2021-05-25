@@ -123,25 +123,31 @@ class CollectionTest extends TestCase
         // I don't think that a collection can ever be dehydrated as `null`:
         // it will always be an array
         return [
-            'null' => [
+            'null'          => [
                 null,
                 $this->testMapper->createCollection(),
             ],
-            'none' => [
+            'none'          => [
                 [],
                 $this->testMapper->createCollection(),
             ],
-            'one'  => [
+            'one'           => [
                 [1],
                 $this->testMapper->createCollection([
                     $this->testMapper->createModel()->setId(1),
                 ]),
             ],
-            'two'  => [
+            'two'           => [
                 [1, 3],
                 $this->testMapper->createCollection([
                     $this->testMapper->createModel()->setId(1),
                     $this->testMapper->createModel()->setId(3),
+                ]),
+            ],
+            'array of null' => [
+                [null],
+                $this->testMapper->createCollection([
+                    $this->testMapper->createModel(),
                 ]),
             ],
         ];
@@ -170,6 +176,7 @@ class CollectionTest extends TestCase
             'null'                  => [null, null],
             'empty array'           => [[], []],
             'empty collection'      => [$this->testMapper->createCollection(), []],
+            'collection of null'    => [new \Schoolbox\Collection([null]), [null]],
             'collection of IDs'     => [
                 new \Schoolbox\Collection([1, 2]),
                 [1, 2],
@@ -189,6 +196,7 @@ class CollectionTest extends TestCase
                 ]),
                 [1, 2, 3],
             ],
+            'array of null'         => [[null], [null]],
             'array of IDs'          => [
                 [1, 2],
                 [1, 2],
