@@ -44,7 +44,7 @@ class Collection implements IColumnType
     /**
      * Creates an Collection of the specified type.
      *
-     * @param array|string      $value Mapper infrastructure always passes a string.
+     * @param array             $value
      * @param \Schoolbox\Mapper $mapper
      *
      * @return \Schoolbox\Collection
@@ -55,9 +55,6 @@ class Collection implements IColumnType
             ? $mapper->createCollection()
             : new \Schoolbox\Collection();
 
-        /* In the current mapper infrastructure, $value is always a string, never an array - so this code
-         * is never executed. It is however retained to make in symmetrical with dehydrate()
-         */
         if (is_array($value)) {
             // Figure out the identifier property to set on the model.
             $id_property = $this->getIdentifierProperty();
