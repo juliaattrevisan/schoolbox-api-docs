@@ -95,15 +95,19 @@ class Collection implements IColumnType
      */
     public function dehydrate($value, $mapper = null)
     {
+        if (!$mapper instanceof Mapper) {
+            throw new TypeError(sprintf('$mapper must be a "%s"', Mapper::class));
+        }
         if (!isset($value)) {
             return null;
         }
 
         // $value shouldn't ever be scalar or an array?
         // It should always be a collection, because that's what it always
-        // hydrates to
-        if (is_scalar($value) || is_array($value)) {
-            return $value;
+        // hydrates to.
+        // Not sure if this will cause issues though?
+        if (!$value instanceof \Schoolbox\Collection) {
+            throw new TypeError(sprintf('If set, $value must be a "%s"', \Schoolbox\Collection::class));
         }
         if (!($idProperty = $this->getIdentifierProperty())) {
             $idProperty = $mapper->getIdentifierProperty();

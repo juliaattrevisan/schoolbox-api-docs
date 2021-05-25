@@ -93,6 +93,17 @@ class CollectionTest extends TestCase
     }
 
     /**
+     * @param mixed           $input
+     * @param TestMapper|null $mapper
+     * @dataProvider getTestDehydrateErrorCases
+     */
+    public function testDehydrateErrorCases($input, TestMapper $mapper = null): void
+    {
+        $this->expectException(TypeError::class);
+        $this->object->dehydrate($input, $mapper);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getTestHydrate()
@@ -145,7 +156,6 @@ class CollectionTest extends TestCase
     {
         return [
             'null'                  => [null, null],
-            'empty array'           => [[], []],
             'empty collection'      => [$this->testMapper->createCollection(), []],
             'collection of IDs'     => [
                 new \Schoolbox\Collection([1, 2]),
@@ -166,6 +176,22 @@ class CollectionTest extends TestCase
                 ]),
                 [1, 2, 3],
             ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getTestDehydrateErrorCases()
+    {
+        // Error cases:
+        // no mapper is passed in
+        // input is something other than a collection, or null
+        // any item in the collection doesn't support the ID finder
+        return [
+            'no mapper' => [$this->testMapper->createCollection(), null],
+            'array'     => [[], $this->testMapper],
+            'string'    => ['string', $this->testMapper],
         ];
     }
 }
