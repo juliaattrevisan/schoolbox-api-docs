@@ -289,6 +289,21 @@
                             </div>
 
                             <div class="small-12 medium-6 columns">
+                                <label for="apply_house">
+                                    House
+                                    <span data-tooltip class="hint has-tip tip-top" title="Leave blank if you don't want to update their house.">?</span>
+                                </label>
+                                <select name="apply_house_id">
+                                    <option value="-1" selected="selected">Unchanged</option>
+                                    <option value="">Not set</option>
+
+                                    <!-- BEGIN apply_house -->
+                                    <option value="{APPLY_HOUSE_ID}">{APPLY_HOUSE_NAME}</option>
+                                    <!-- END apply_house -->
+                                </select>
+                            </div>
+
+                            <div class="small-12 medium-6 columns">
                                 <label for="apply_eportfolio">ePortfolio</label>
                                 <select id="apply_eportfolio" name="apply_eportfolio" {APPLY_EPORTFOLIO_DISABLED}>
                                     <option value="-1">Unchanged</option>

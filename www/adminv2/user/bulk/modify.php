@@ -35,6 +35,7 @@ $this->setBlock('has_results', 'user', 'user_block');
 $this->setBlock('has_results', 'apply_campus', 'apply_campus_block');
 $this->setBlock('has_results', 'apply_role', 'apply_role_block');
 $this->setBlock('has_results', 'apply_year', 'apply_year_block');
+$this->setBlock('has_results', 'apply_house', 'apply_house_block');
 $this->setBlock('has_results', 'apply_eportfolio', 'apply_eportfolio_block');
 $this->setBlock('has_results', 'apply_webmail', 'apply_webmail_block');
 $this->setBlock('has_results', 'apply_accountenabled', 'apply_accountenabled_block');
@@ -117,6 +118,20 @@ foreach ($yearLevels as $yearLevel) {
 
     $this->parse('apply_year_block', 'apply_year', true);
 }
+
+/* Houses
+ */
+$houses = \HouseMapper::getInstance()->findAll();
+
+foreach ($houses as $house) {
+    $this->setVar([
+        'APPLY_HOUSE_ID' => $house->getId(),
+        'APPLY_HOUSE_NAME' => $house->getHouse(),
+    ]);
+
+    $this->parse('apply_house_block', 'apply_house', true);
+}
+
 
 /* Boolean options
  */

@@ -821,6 +821,12 @@ class Subnav
                         'children'    => [],
                         'description' => 'Access recent CMS actions like delete, create and modify of files, folders and links.',
                     ],
+                    '/adminv2/import/userAccount'   => [
+                        'name'        => 'Import CSV',
+                        'visible'     => true,
+                        'children'    => [],
+                        'description' => 'Make changes to user accounts on bulk by uploading a CSV file.',
+                    ],
                     '/adminv2/user/bulk/modify'     => [
                         'name'        => 'Bulk Modify',
                         'visible'     => true,
