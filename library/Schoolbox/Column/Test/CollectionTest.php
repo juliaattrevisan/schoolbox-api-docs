@@ -132,6 +132,14 @@ class CollectionTest extends TestCase
                 ]),
                 [1, 3],
             ],
+            'mixed collection' => [
+                new \Schoolbox\Collection([
+                    $this->testMapper->createModel()->setId(1),
+                    2,
+                    $this->testMapper->createModel()->setId(3),
+                ]),
+                [1, 2, 3],
+            ],
         ];
     }
 }

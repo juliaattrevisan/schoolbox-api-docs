@@ -91,6 +91,10 @@ class Collection implements IColumnType
         if (!isset($value)) {
             return null;
         }
+
+        // $value shouldn't ever be scalar or an array?
+        // It should always be a collection, because that's what it always
+        // hydrates to
         if (is_scalar($value) || is_array($value)) {
             return $value;
         }
@@ -98,7 +102,30 @@ class Collection implements IColumnType
             $prop = $mapper->getIdentifier();
             $idProperty = $prop['property'];
         }
-        return $value->getPropertyValues($idProperty);
+
+        // Handle the case where `$value` may contain scalars
+        $result = [];
+        foreach ($value as $item) {
+            if (is_scalar($item)) {
+                $result[] = $item;
+            } else {
+                $callable = [$item, $idProperty];
+                if (is_callable($callable)) {
+                    $result[] = $callable();
+                } else {
+                    trigger_error(
+                        sprintf(
+                            'Method "%s" is not callable on %s',
+                            $idProperty,
+                            (is_object($item) ? get_class($item) : 'non-object'),
+                        ),
+                        E_USER_WARNING
+                    );
+                }
+            }
+        }
+
+        return $result;
     }
 
 
