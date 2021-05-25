@@ -10,13 +10,13 @@
 
 namespace Schoolbox\Column\Test;
 
-use Schoolbox\Column\Integer;
+use Schoolbox\Column\Integer as IntegerColumn;
 
 class IntegerTest extends TestCase
 {
 
     /**
-     * @var Integer
+     * @var IntegerColumn
      */
     protected $object;
 
@@ -25,7 +25,7 @@ class IntegerTest extends TestCase
      */
     public function setupObject()
     {
-        $this->object = new Integer();
+        $this->object = new IntegerColumn();
     }
 
     /**
