@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Column\Test;
 
+use Error;
 use ICollection;
 use Schoolbox\Column\Collection;
 use Schoolbox\Test\TestMapper;
@@ -95,11 +96,22 @@ class CollectionTest extends TestCase
     /**
      * @param mixed           $input
      * @param TestMapper|null $mapper
-     * @dataProvider getTestDehydrateErrorCases
+     * @dataProvider getTestDehydrateTypeErrorCases
      */
-    public function testDehydrateErrorCases($input, TestMapper $mapper = null): void
+    public function testDehydrateTypeErrorCases($input, TestMapper $mapper = null): void
     {
         $this->expectException(TypeError::class);
+        $this->object->dehydrate($input, $mapper);
+    }
+
+    /**
+     * @param mixed           $input
+     * @param TestMapper|null $mapper
+     * @dataProvider getTestDehydrateGetterNotDefinedErrorCases
+     */
+    public function testDehydrateGetterNotDefinedErrorCases($input, TestMapper $mapper = null): void
+    {
+        $this->expectException(Error::class);
         $this->object->dehydrate($input, $mapper);
     }
 
@@ -200,17 +212,29 @@ class CollectionTest extends TestCase
     }
 
     /**
-     * @inheritdoc
+     * Data provider for `testDehydrateTypeErrorCases`
      */
-    public function getTestDehydrateErrorCases()
+    public function getTestDehydrateTypeErrorCases(): iterable
     {
-        // Error cases:
-        // no mapper is passed in
-        // input is something other than a collection, or null
-        // any item in the collection doesn't support the ID finder
         return [
             'no mapper' => [$this->testMapper->createCollection(), null],
             'string'    => ['string', $this->testMapper],
+        ];
+    }
+
+    /**
+     * Data provider for `testDehydrateGetterNotDefinedErrorCases`
+     */
+    public function getTestDehydrateGetterNotDefinedErrorCases(): iterable
+    {
+        $dummy = new class {
+            public function getName()
+            {
+                return 'name';
+            }
+        };
+        return [
+            'getter not defined' => [[$dummy], $this->testMapper],
         ];
     }
 }
