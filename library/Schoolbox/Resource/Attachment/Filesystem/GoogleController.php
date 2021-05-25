@@ -24,14 +24,14 @@ class GoogleController extends AbstractController
     const VIEW_PREFIX    = 'google.picker.ViewId.';
     const FEATURE_PREFIX = 'google.picker.Feature.';
 
-    /** @var array  */
-    protected $scopes   = array();
+    /** @var array */
+    protected array $scopes = [];
 
-    /** @var array  */
-    protected $views    = array();
+    /** @var array */
+    protected array $views = [];
 
-    /** @var array  */
-    protected $features = array();
+    /** @var array */
+    protected array $features = [];
 
     /** @var string */
     protected $gAppsApiKey;
@@ -53,9 +53,7 @@ class GoogleController extends AbstractController
     {
         parent::__construct($multi, $mimeFilter);
         $this->addScope('drive.readonly')
-             ->addFeature('NAV_HIDDEN')
-             ->addFeature('SUPPORT_TEAM_DRIVES')
-             ->addView('setEnableTeamDrives');
+             ->addFeature('SUPPORT_TEAM_DRIVES');
 
         $this->setViewsFromMimeFilter($mimeFilter);
 
@@ -67,43 +65,39 @@ class GoogleController extends AbstractController
 
         if (!$this->gDriveEnabled) {
             throw new OutOfRangeException("Google Drive not enabled");
-        } else if (!($this->gAppsApiKey && $this->gAppsClientId)) {
+        } elseif (!($this->gAppsApiKey && $this->gAppsClientId)) {
             throw new OutOfRangeException("Google Apps credentials not specified");
         }
     }
 
 
     /**
+     * Sets appropriate views from the mimeFilter
      * @param string $mimeFilter
      */
-    public function setViewsFromMimeFilter($mimeFilter)
+    private function setViewsFromMimeFilter(string $mimeFilter): void
     {
-        $this->views = array();
+        $this->views = [];
 
         // no filter = all regular documents and files
         if (is_null($mimeFilter)) {
-            $this->addView('DOCS');
+            // $this->views being empty will fall back to DOCS with all files
             return;
         }
 
         // explode on common delimiters
         $xpl = preg_split('[ ,;]', $mimeFilter);
 
-        $map = array(
+        $map = [
             'application/pdf' => 'PDFS',
             'image/*'         => 'DOCS_IMAGES',
             'video/*'         => 'DOCS_VIDEOS',
-        );
+        ];
 
         foreach ($xpl as $mime) {
             if (isset($map[$mime])) {
                 $this->addView($map[$mime]);
             }
-        }
-
-        // ensure we have *some* kind of view
-        if (empty($this->views)) {
-            $this->addView('DOCS');
         }
     }
 
@@ -117,13 +111,15 @@ class GoogleController extends AbstractController
             $this->addFeature('MULTISELECT_ENABLED');
         }
 
-        $page->setVar(array(
-            'API_KEY'   => $this->gAppsApiKey,
-            'CLIENT_ID' => $this->gAppsClientId,
-            'SCOPES'    => implode("','", array_keys($this->scopes)),
-            'VIEWS'     => implode(',', array_keys($this->views)),
-            'FEATURES'  => implode(',', array_keys($this->features)),
-        ));
+        $page->setVar(
+            [
+                'API_KEY'   => $this->gAppsApiKey,
+                'CLIENT_ID' => $this->gAppsClientId,
+                'SCOPES'    => implode("','", array_keys($this->scopes)),
+                'VIEWS'     => implode(',', array_keys($this->views)),
+                'FEATURES'  => implode(',', array_keys($this->features)),
+            ]
+        );
     }
 
 
@@ -131,63 +127,34 @@ class GoogleController extends AbstractController
      * @param string $scope
      * @return self
      */
-    public function addScope($scope)
+    private function addScope(string $scope): self
     {
         $this->scopes[self::SCOPE_PREFIX . $scope] = true;
         return $this;
     }
 
-    /**
-     * @param string $scope
-     * @return self
-     */
-    public function removeScope($scope)
-    {
-        unset($this->scopes[self::SCOPE_PREFIX . $scope]);
-        return $this;
-    }
-
 
     /**
      * @param string $view
      * @return self
      */
-    public function addView($view)
+    private function addView(string $view): self
     {
         $this->views[self::VIEW_PREFIX . $view] = true;
         return $this;
     }
 
-    /**
-     * @param string $view
-     * @return self
-     */
-    public function removeView($view)
-    {
-        unset($this->views[self::VIEW_PREFIX . $view]);
-        return $this;
-    }
-
 
     /**
      * @param string $feature
      * @return self
      */
-    public function addFeature($feature)
+    private function addFeature(string $feature): self
     {
         $this->features[self::FEATURE_PREFIX . $feature] = true;
         return $this;
     }
 
-    /**
-     * @param string $feature
-     * @return self
-     */
-    public function removeFeature($feature)
-    {
-        unset($this->features[self::FEATURE_PREFIX . $feature]);
-        return $this;
-    }
 
     /**
      * @return string

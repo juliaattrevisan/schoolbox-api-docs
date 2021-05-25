@@ -150,6 +150,7 @@ class GDriveFetcher implements FetcherInterface
                            'name',
                            'capabilities',
                            self::CONTEXT_EXPORTLINKS,
+                           'fileExtension',
                            'mimeType',
                            'id',
                            'webViewLink',
