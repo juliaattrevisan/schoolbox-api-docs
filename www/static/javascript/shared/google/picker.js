@@ -3,9 +3,8 @@
     /**
      * Google Picker
      *
-     * Pick files from Google, save their links locally, share
-     * it on a homepage
-     * TODO: we may want to merge this with gpick at some point
+     * Pick files from Google, and do something with them: generally, they will
+     * be uploaded to Schoolbox's file system.
      *
      * @param options
      */
