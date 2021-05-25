@@ -3,7 +3,7 @@
  * @link        https://schoolbox.com.au/
  */
 ;(function ($, Dropzone, window, document, undefined) {
-    
+
     var pluginName = 'resourceAttach',
         singletonModal = null,
         modalCache = {},
@@ -63,7 +63,7 @@
     function ResourceAttach(element, options)
     {
         var self, opt, azone, dzone, prompt = '';
-        
+
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
         this.tpl = this.options.tplOverride || $(this.element).find('[data-template]').detach();
@@ -87,14 +87,14 @@
             var li = $(this).closest(opt.attachmentTag);
             self.detach(li);
             e.preventDefault();
-            
+
             //will not be a function if the file has been prevented from uploading
-            //for example if the file limit is 1, and the user dragged 2 files in, 
+            //for example if the file limit is 1, and the user dragged 2 files in,
             //the 2nd would error when its remove is selected
             if (typeof opt.onDetach === 'function') {
                 opt.onDetach();
             }
-            
+
         });
 
         if (opt.dictDefaultMessage) {
@@ -152,7 +152,7 @@
                 });
 
                 this.on('success', function (file, response) {
-                    
+
                     var data, inputValue;
 
                     try {
@@ -172,9 +172,9 @@
                         .find('input[data-az-attachment]')
                         .val(inputValue);
                     self.attach(data);
-                    
+
                     azone.trigger('success.attachzone', [data]);
-                    
+
                 });
 
                 this.on('error', function (file, errMsg, xhr) {
@@ -200,8 +200,8 @@
                         azone.trigger('removedfile.attachzone', [_file]);
                     }
                 );
-                //manually ensure the file has been removed, as it seems files 
-                //added via the modal aren't notifying DropZone properly even though 
+                //manually ensure the file has been removed, as it seems files
+                //added via the modal aren't notifying DropZone properly even though
                 //the 'removedfile' event is still called
                 if (_file.status !== 'error') {
                     var dropZone = this;
@@ -220,7 +220,7 @@
             },
 
             accept: function (file, done) {
-                
+
                 // no hash yet: treat as normal dz upload
                 if (file.hash === undefined) {
                     done();
@@ -237,7 +237,7 @@
 
                 this._updateMaxFilesReachedClass();
                 azone.trigger('accept.attachzone', [file]);
-                
+
             }
         });
 
@@ -278,7 +278,7 @@
         } else {
             this.fallbackMaxFilesReached();
         }
-          
+
         // cache the content for this reveal modal
         this.cacheModal();
 
@@ -353,7 +353,7 @@
 
 
     ResourceAttach.prototype.cacheModal = function (callback) {
-        
+
         var key = this.getCacheKey(),
             self = this;
 
@@ -414,7 +414,7 @@
 
 
     ResourceAttach.prototype.open = function () {
-        
+
         var self = this;
 
         if (singletonModal == null) {
@@ -435,11 +435,11 @@
                 .off('closed.fndtn.reveal.attach')
                 .on('closed.fndtn.reveal.attach', self.reopenParentReveal.bind(self));
         }
-        
+
         this.initAttachmentBrowser();
 
         // for iframe communication
-        
+
         $(window).unbind('message').on('message', function (e) {
             var message,
                 modal = singletonModal,
@@ -462,7 +462,7 @@
                 });
 
                 // Trigger attachzone success event
-                
+
                 $(self.element).trigger('success.attachzone', [message]);
             }
         });
@@ -472,13 +472,13 @@
     /**
      * There can be several DropZone instances on a page, one could allow multi uploads, another just single.
      * Due to the use of singletonModal, this is an issue. Refer to SA-1464 for further details.
-     * Essentially though, both the relevant menu ('#attachment-browser-filesystems') and panel ('#attachment-browser-panel-container') 
-     * are injected into the modal window when the Modal Window is clicked. 
+     * Essentially though, both the relevant menu ('#attachment-browser-filesystems') and panel ('#attachment-browser-panel-container')
+     * are injected into the modal window when the Modal Window is clicked.
      * This ensures that the appropriate upload count / mime types are respected
      * The relevant code/events are then set up once again - these being pulled out of templates/core/resources/attach-browser.html
      */
     ResourceAttach.prototype.initAttachmentBrowser = function () {
-        
+
         singletonModal.find('#attachment-browser-filesystems')[0].innerHTML = this.attachmentBrowserFilesystemsInnerHTML;
         singletonModal.find('#attachment-browser-panel-container')[0].innerHTML = this.attachmentBrowserPanelContainerInnerHTML;
 
@@ -503,10 +503,10 @@
         $(document).foundation();
 
         let filesystems = $('#attachment-browser-filesystems');
-        const MAX_IFRAME_HEIGHT = 350;
+        const MAX_IFRAME_HEIGHT = 500;
 
         filesystems.find('[data-source]').on('click', function(event) {
-        
+
             let source = $(this).attr('data-source');
             let panel = $('#' + source + '-panel');
 
@@ -572,32 +572,32 @@
 
 
     ResourceAttach.prototype.attach = function (list) {
-        
+
         var i, data, elems = [], self = this;
 
         this.close();
-           
+
         for (i = 0; i < list.length; ++i) {
-            
+
             data = {
                 name: list[i].title,
                 type: list[i].mimeType,
                 size: list[i].filesize,
                 hash: list[i].hash
             };
-             
+
             if (this.dropzone) { //from the Upload files modal option
-                    
-                if (list[i].status === 'error') { //otherwise dummy up the error display that occurs when using straight drag n drop without the modal 
-                    
+
+                if (list[i].status === 'error') { //otherwise dummy up the error display that occurs when using straight drag n drop without the modal
+
                     let fileName = list[i].name;
                     let errorMessage = list[i].errorMessage;
                     let failedFileItem = document.createRange().createContextualFragment('<li class="actions-small-1 dz-error"><div class="list-item"><div class="card small-12"><p class="filename" data-dz-name="" title="' + errorMessage + '">' + fileName + ' failed: ' + errorMessage + '</p></div></div><nav><a href="#" data-dz-remove="" title="Remove" class="icon-close"></a></nav></li>');
                     this.element.querySelector('.az-error-list').appendChild(failedFileItem);
-                
+
                 } else { //only display those files that were succesfully uploaded from the modal window
 
-                    //if the file was attached using 'Upload file(s)' it's been uploaded, 
+                    //if the file was attached using 'Upload file(s)' it's been uploaded,
                     //so we can display the image in the drop zone when we return to the page
                     let getExistingFileUrl = function () {
                         if (list[i].file && list[i].file.imageUrl) { //this file prop is set within templates/core/resources/filesystem/upload.html - onQueueComplete()
@@ -606,7 +606,7 @@
                             return '/ajax/mime/' + data.type;
                         }
                     }
-                    
+
                     //once the files displayed, ensure the drop zone window and progress view are hidden depending on max uploads
                     let onExistingFileDisplayed = function () {
                         let elementDOM = $(self.element)[0];
@@ -620,14 +620,14 @@
                         if (elementDOM.querySelector('.progress')) {
                             elementDOM.querySelector('.progress').style.display = 'none';
                         }
-                        
+
                     }
 
                     //to display an existing file within the drop zone view, as the file has already been loaded
                     //https://gitlab.com/meno/dropzone/-/wikis/FAQ#how-to-show-files-already-stored-on-server
                     this.dropzone.displayExistingFile(data, getExistingFileUrl(), onExistingFileDisplayed);
-                    
-                    //as this.on('success') is not called when using the modal window upload, 
+
+                    //as this.on('success') is not called when using the modal window upload,
                     //need to also add the attachment vars in so the files are added on form submit
                     let inputValue = data.hash + ':' + data.name;
                     $(data.previewElement)
@@ -647,10 +647,10 @@
                         this.rejectFile(data, data);
                     }
 
-                }        
+                }
 
             } else { //all others excluding Upload files option
-                
+
                 data.previewElement = $(this.tpl.html());
 
                 this.renderFile(data);
@@ -689,14 +689,14 @@
         //noinspection AssignmentToFunctionParameterJS
         elem = $(elem);
         elem.addClass(this.options.detachClass);
-        
+
         if (this.dropzone) {
             this.dropzone._updateMaxFilesReachedClass();
 
         } else {
             this.fallbackMaxFilesReached();
         }
-        
+
         setTimeout(function () {
             elem.remove();
             if ($.isFunction(then)) {
@@ -707,7 +707,7 @@
 
 
     ResourceAttach.prototype.renderFile = function (file) {
-        
+
         var elem;
 
         if (!file.previewElement) {
@@ -729,7 +729,7 @@
             }
             elem.find('input[data-az-attachment]').val(hash);
         }
-        
+
         if (file.type) {
             elem.find('img[data-dz-thumbnail]').attr('src', '/ajax/mime/' + file.type);
         }
@@ -737,7 +737,7 @@
 
 
     ResourceAttach.prototype.fallbackMaxFilesReached = function () {
-        
+
         // if we accept multi, there's no limit to check
         if (this.options.multi) {
             return;

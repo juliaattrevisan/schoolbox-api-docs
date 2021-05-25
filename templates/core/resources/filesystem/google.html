@@ -53,18 +53,18 @@
       loadGoogleApi(['auth2', 'picker'], function () {
           jQuery
           .ajax({
-              url: '{CDN_PREFIX}/javascript/resource/jquery.gpick.js',
+              url: '{CDN_PREFIX}/javascript/shared/google/picker.js',
               dataType: 'script',
               cache: true
           })
           .then(function () {
-              $('#content').gpick({
-                  developerKey: '{API_KEY}',
+              $('#content').googlePicker({
+                  modules: [], // already loaded
+                  modalId: null,
                   clientId: '{CLIENT_ID}',
                   scopes: ['{SCOPES}'],
                   views: [{VIEWS}],
                   features: [{FEATURES}],
-                  title: null,
                   authBtn: '#auth-btn',
                   authNeededClass: 'need-auth',
 

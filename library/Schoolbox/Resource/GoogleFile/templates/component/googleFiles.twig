@@ -52,11 +52,11 @@
         </ul>
     {% endfor %}
     {% if routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) %}
-    <div class="component-action">
-        <section>
-            <a id="find-files" class="button">Add</a>
-        </section>
-    </div>
+        <div class="component-action">
+            <section>
+                <a id="find-files" class="button">Add</a>
+            </section>
+        </div>
     {% endif %}
 {% endif %}
 <div id="gfile" class="modal-backdrop" data-reveal aria-labelledby="Google Files" aria-hidden="true"
@@ -131,6 +131,15 @@
     $(function () {
         $('#find-files').googlePicker({
             clientId: '{{ clientId }}',
+            modules: ['auth2', 'picker'],
+            mimeTypes: [
+                'application/msword',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.ms-excel',
+                'application/vnd.google-apps.document',
+                'application/vnd.google-apps.presentation',
+                'application/vnd.google-apps.spreadsheet'
+            ],
             onSelect: function (docs) {
                 let selected = docs.map(function (v) {
                     return {
@@ -143,8 +152,10 @@
                 $('#gfile-permission').foundation('reveal', 'open');
                 $('#gfile-google-ids').val(JSON.stringify(selected));
             },
+            onLoaded: function (picker) {
+                picker.setVisible(true);
+            }
         });
-
         let $permModal = $('#gfile-permission');
         let $step1 = $('#gfile-step1');
         let $step2 = $('#gfile-step2');
