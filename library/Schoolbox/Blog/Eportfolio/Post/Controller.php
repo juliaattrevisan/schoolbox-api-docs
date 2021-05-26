@@ -163,9 +163,22 @@ class Controller extends Base
 
         if (is_array($this->getRequest()->post["attachment"])) {
             $storages = (new CollectorFactory())->build($this->getRequest()->post['attachment'])->getAll();
+
+            /* Dedupe files that existed concurrently - you dragged file A into the dropzone
+             * then (without having saved anything yet) dragged file A and B into the dropzone
+             * You'll end up with files [A, A, B] instead of just [A, B] at the end.
+             */
+            $temp = [];
+
+            foreach ($storages as $storage) {
+                $temp[$storage->getHash()] = $storage;
+            }
+
+            $storages = array_values($temp);
         } else {
             $storages = [];
         }
+
         foreach ($attachments as $attachment) {
             $foundAttachment = false;
             foreach ($storages as $storage) {
