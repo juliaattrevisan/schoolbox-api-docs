@@ -113,8 +113,12 @@ class Controller extends Base
         // Authenticate, and if so register app
         $sessionUser = $this->authenticate($this->request->post->getArrayCopy());
         if ($sessionUser) {
-            // token may be absent or blank, in which case we don't store anything in the registry
-            $token = $this->request->post->get('token');
+            // For Digistorm: token is always the user's username
+            // Otherwise: token may be absent or blank, in which case we don't
+            // store anything in the registry
+            $token = $provider === Registry::PROVIDER_DIGISTORM
+                ? $sessionUser->getUsername()
+                : $this->request->post->get('token');
             if (!empty($token)) {
                 $now = \Alaress_Date_Format::now();
 
