@@ -130,7 +130,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
          * ever have been alt-sourced at all but should still appear in the list.
          */
         $homepageUsageQuery = "
-            SELECT 
+            SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('category', 'f')}
             FROM component_definition cd
@@ -167,7 +167,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         /* Find dashboard usages too
          */
         $dashboardUsageQuery = "
-            SELECT 
+            SELECT
                 {$this->getColumnString()},
                 groups.id, groups.name
             FROM component_definition cd
@@ -176,9 +176,10 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
             INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
             INNER JOIN textBox textBox ON cci.value = textBox.textBoxID
             INNER JOIN groups ON groups.id = ci.identifier
-            WHERE cd.`class` = :controller 
+            WHERE cd.`class` = :controller
             AND ccd.`key` = :key
             AND textBox.deleted IS NULL
+            AND textBox.categoryID = :folderId
             AND groups.deleted_at IS NULL
             GROUP BY groups.id, textBox.textBoxID
         ";
@@ -188,6 +189,7 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $dashboardUsageStatement->execute([
             'controller' => self::DASHBOARD_COMPONENT_CONTROLLER,
             'key' => self::DASHBOARD_COMPONENT_KEY,
+            'folderId' => $folderId,
         ]);
 
         while ($row = $dashboardUsageStatement->fetch(\PDO::FETCH_ASSOC)) {
