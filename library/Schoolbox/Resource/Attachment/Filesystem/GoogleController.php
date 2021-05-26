@@ -45,7 +45,7 @@ class GoogleController extends AbstractController
 
     /**
      * @param bool          $multi
-     * @param string        $mimeFilter
+     * @param string|null   $mimeFilter
      * @param IConfigLoader $conf
      * @throws OutOfRangeException
      */
@@ -73,9 +73,9 @@ class GoogleController extends AbstractController
 
     /**
      * Sets appropriate views from the mimeFilter
-     * @param string $mimeFilter
+     * @param string|null $mimeFilter
      */
-    private function setViewsFromMimeFilter(string $mimeFilter): void
+    private function setViewsFromMimeFilter(?string $mimeFilter): void
     {
         $this->views = [];
 
