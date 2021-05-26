@@ -1,33 +1,19 @@
 {% extends '@core/user/student.twig' %}
 
-{% if showDetails %}
-    {% block details_studentId %}
-    {% endblock details_studentId %}
+{% block details_studentId %}
+{% endblock details_studentId %}
 
-    {% block details_dob %}
-        {% if  externalUser.StudentBirthDate|date  %}
-        {% endif %}
-    {% endblock details_dob %}
+{% block details_dob %}
+{% endblock details_dob %}
 
-    {% block details_tutorTeacher %}
-        {% if showClasses %}
-            {% if tutorTeacher %}
-            {% endif %}
-        {% endif %}
-    {% endblock details_tutorTeacher %}
+{% block details_tutorTeacher %}
+{% endblock details_tutorTeacher %}
 
-    {% block details_hohTeacher %}
-        {% if showClasses %}
-            {% if hohTeacher %}
-            {% endif %}
-        {% endif %}
-    {% endblock details_hohTeacher %}
+{% block details_hohTeacher %}
+{% endblock details_hohTeacher %}
 
-    {% block details_studentType %}
-        {% if boarderType %}
-        {% endif %}
-    {% endblock details_studentType %}
-{% endif %}
+{% block details_studentType %}
+{% endblock details_studentType %}
 
 {% block buttons_miscellaneous %}
     <li>
