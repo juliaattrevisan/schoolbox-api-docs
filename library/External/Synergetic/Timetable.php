@@ -900,11 +900,10 @@ class External_Synergetic_Timetable implements External_TimetableInterface
              */
             foreach ($timetable as &$periodData) {
                 foreach ($periodData['day'] as $day => &$dayData) {
-
                     /* Sort the concurrent classes by their sequence field
                      * Assume ascending order is the way it should display
                      */
-                    uasort($dayData, static function(array $a, array $b) {
+                    uasort($dayData, static function (array $a, array $b) {
                         return $a['sequence'] < $b['sequence'] ? -1 : 1;
                     });
                 }
