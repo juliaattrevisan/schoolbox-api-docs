@@ -282,7 +282,9 @@ abstract class Base
      */
     public function getConfigLoader()
     {
-        return $this->getDi()->get('config');
+        /** @var IConfigLoader $config */
+        $config = $this->getDi()->get('config');
+        return $config;
     }
 
     /**
@@ -449,6 +451,8 @@ abstract class Base
         /** @var Output\ThemedHtml $output */
         $output = $this->getDi()->get('webOutput:html');
         $output = $this->injectCurrentUserGlobal($output);
+
+        /** @var Output\ThemedHtml $tpl */
         $tpl = $output->setTemplate($template)->setData($data);
 
         if ($title) {
