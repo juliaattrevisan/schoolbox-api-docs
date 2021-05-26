@@ -35,16 +35,20 @@
   });
 
   $('#ab-{SOURCE_SLUG}').on('click', 'a[data-gettoken]', function (e) {
-    e.preventDefault();
+      e.preventDefault();
+      var w = window.open(this.href, '1396330261396', 'width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=1,left=0,top=0');
 
-    var w = window.open(this.href,'1396330261396','width=720,height=500,toolbar=0,menubar=0,location=0,status=1,scrollbars=1,resizable=1,left=0,top=0');
-
-    $(w).on('unload', function (e) {
-      var ab = $('#attachment-browser'),
-          li = ab.children('dd.active');
-      ab.data(li.data('source'), false);
-      ab.foundation('accordion', 'close');
-    });
+      var winClosed = setInterval(function () {
+                  if (w.closed) {
+                      clearInterval(winClosed);
+                      var ab = $('#attachment-browser'),
+                              li = ab.children('dd.active');
+                      ab.data(li.data('source'), false);
+                      ab.foundation('accordion', 'close');
+                      $('a.icon-office-365').click();
+                  }
+              },500
+      )
 
     return false;
 
