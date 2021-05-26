@@ -785,7 +785,7 @@
                                             {% endif %}
                                         </div>
                                         {% block folderListItemActions %}
-                                        {% if hasTeachersWithEmail %}
+                                        {% if hasTeachersWithEmail and canEmailStaff %}
                                             <nav>
                                                 <a class="icon-more" data-dropdown="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" title="Actions"></a>
                                             </nav>
