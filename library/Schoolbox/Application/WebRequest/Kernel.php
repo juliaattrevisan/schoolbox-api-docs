@@ -267,7 +267,9 @@ class Kernel extends WebKernelAbstract
 
         // Did token auth fail to find a user?
         $session = null;
-        if (!$user) {
+        if ($user) {
+            $this->authenticateUserForThisRequestOnly($user);
+        } else {
             /** @var \Alaress\Session\Session $session */
             $session = $this->di->get('session');
 
@@ -441,27 +443,7 @@ class Kernel extends WebKernelAbstract
         // you aren't making requests with a JWT when you are already logged in.
         $user = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
         if ($user) {
-            // Is there someone in the session already?
-            // If so store their data, and restore it once this request is over:
-            // otherwise destory the session we created just for this request.
-            /** @var \Alaress\Session\Session $sessionDataStore */
-            $sessionDataStore   = $this->di->get('session');
-            $currentSessionData = null;
-            $currentUser        = $sessionDataStore->getAuthUser();
-            if ($currentUser->getId()) {
-                $currentSessionData = $_SESSION;
-            }
-
-            // Now authenticate the JWT user
-            $sessionHandler = new \Session();
-            $sessionHandler->create($user->getUsername());
-            register_shutdown_function(function () use ($sessionHandler, $currentSessionData) {
-                if (isset($currentSessionData)) {
-                    $_SESSION = $currentSessionData;
-                } else {
-                    $sessionHandler->destroy();
-                }
-            });
+            $this->authenticateUserForThisRequestOnly($user);
         }
 
         /** @var \SitePage $sitePage */
@@ -652,5 +634,42 @@ class Kernel extends WebKernelAbstract
             }
         }
         return $user;
+    }
+
+    /**
+     * Authenticate the user for this request only, storing their data in the
+     * session.
+     *
+     * After this request finishes: restore the original session if somebody was
+     * logged in, or destroy the session completely if nobody was logged in.
+     *
+     * @param User $user
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function authenticateUserForThisRequestOnly(User $user): void
+    {
+        // Determine who was logged in, and preserve their data
+        /** @var \Alaress\Session\Session $sessionDataStore */
+        $sessionDataStore   = $this->di->get('session');
+        $currentSessionData = null;
+        $currentUser        = $sessionDataStore->getAuthUser();
+        if ($currentUser->getId()) {
+            $currentSessionData = $_SESSION;
+        }
+
+        // Now authenticate the given user
+        $sessionHandler = new \Session();
+        $sessionHandler->create($user->getUsername());
+
+        // Restore or destroy the session when all is done
+        register_shutdown_function(
+            function () use ($sessionHandler, $currentSessionData) {
+                if (isset($currentSessionData)) {
+                    $_SESSION = $currentSessionData;
+                } else {
+                    $sessionHandler->destroy();
+                }
+            }
+        );
     }
 }
