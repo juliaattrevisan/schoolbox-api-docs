@@ -321,7 +321,7 @@ class Gateway
                 AND eu.ref_code = '2'
         ";
 
-        $pb = new PredicateBuilder($this->database, 'ecactivity');
+        $pb = new PredicateBuilder($this->database->getQuoter(), 'ecactivity');
         $pb = $pb->equals('se.stud_code', $externalId)
                  ->equals('se.act_year', $year)
                  ->in('ea.act_type', self::ACTIVITY_TYPES_COCURRICULAR)
