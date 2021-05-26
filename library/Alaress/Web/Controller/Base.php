@@ -411,7 +411,7 @@ abstract class Base
     {
         /** @var Output\Html $output */
         $output = $this->getDi()->get('webOutput:nochrome');
-        $output = $this->injectCurrentUserIntoOutput($output);
+        $output = $this->injectCurrentUserGlobal($output);
         return $output->setTemplate($template)->setData($data);
     }
 
@@ -429,7 +429,7 @@ abstract class Base
     {
         /** @var Output\Xml $output */
         $output = $this->getDi()->get('webOutput:xml');
-        $output = $this->injectCurrentUserIntoOutput($output);
+        $output = $this->injectCurrentUserGlobal($output);
         return $output->setTemplate($template)->setData($data);
     }
 
@@ -448,7 +448,7 @@ abstract class Base
     {
         /** @var Output\ThemedHtml $output */
         $output = $this->getDi()->get('webOutput:html');
-        $output = $this->injectCurrentUserIntoOutput($output);
+        $output = $this->injectCurrentUserGlobal($output);
         $tpl = $output->setTemplate($template)->setData($data);
 
         if ($title) {
@@ -626,12 +626,15 @@ abstract class Base
     }
 
     /**
-     * Inject the currently authenticated user into the output class.
+     * Inject the controller's current user into the output object as a global
+     * variable.
+     *
+     * This overrides any previous value which the global might have had.
      *
      * @param Output\Html $output
      * @return Output\Html
      */
-    private function injectCurrentUserIntoOutput(Output\Html $output): Output\Html
+    private function injectCurrentUserGlobal(Output\Html $output): Output\Html
     {
         $output->getTemplateEngine()->addGlobal('USER', $this->getUser());
         return $output;
