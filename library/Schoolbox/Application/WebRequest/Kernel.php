@@ -134,7 +134,7 @@ class Kernel extends WebKernelAbstract
             if ($route instanceof Route) {
                 $this->outputAuraContent($route, $server);
             } else {
-                $this->outputSitepageContent($_GET['page'] ?? null);
+                $this->outputSitepageContent($_GET['page'] ?? null, $server);
             }
         } catch (Unauthenticated $e) {
             // Unauthenticated response - redirect to a login page.
@@ -421,10 +421,11 @@ class Kernel extends WebKernelAbstract
     /**
      * Renders Sitepage-based content.
      *
-     * @param string|null $path the base path that was requested
+     * @param string|null $path  the base path that was requested
+     * @param array       $server Vars from $_SERVER
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    private function outputSitepageContent(?string $path): void
+    private function outputSitepageContent(?string $path, array $server): void
     {
         // we shall assume that if a specific page is requested,
         // the user just be sent to that page regardless of device
@@ -432,6 +433,19 @@ class Kernel extends WebKernelAbstract
             $pageName = $path;
         } else {
             $pageName = 'dashboard';
+        }
+
+        // Was an auth header received?
+        // If so: auth the user for only this request.
+        // Currently, this destroys all previous session data: but we presume
+        // you aren't making requests with a JWT when you are already logged in.
+        $user = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
+        if ($user) {
+            $sessionHandler = new \Session();
+            $sessionHandler->create($user->getUsername());
+            register_shutdown_function(function () use ($sessionHandler) {
+                $sessionHandler->destroy();
+            });
         }
 
         /** @var \SitePage $sitePage */
