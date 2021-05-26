@@ -1,8 +1,7 @@
 <script>
 
 /**
- * To record, playback and upload a camera/screen recording into SB 
- * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
+ * To record, playback and upload a screen recording into SB 
  *
  */
 
@@ -13,13 +12,12 @@ import 'webrtc-adapter';
 import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import TsEBMLEngine from 'videojs-record/dist/plugins/videojs.record.ts-ebml.js';
-import { gsap } from 'gsap/all';
 import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
-import { getRecordOptions } from '@shared/videojs/videojsOptions';
+import { getRecordScreenOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
-import { isOfFileType, isOfMimeType, dataURLtoBlob } from '@shared/util/fileUtils';
+import { isOfMimeType } from '@shared/util/fileUtils';
 
 
 export default {
@@ -30,13 +28,6 @@ export default {
     },
 
     props: {
-        recordMediaType: { //currently should either be AUDIO_ONLY, CAMERA or SCREEN
-            type: String,
-            required: true,
-            validator: function (value) {
-                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN, recordMediaTypes.PHOTO].indexOf(value) !== -1 // The value must match one of these strings
-            }
-        },
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
@@ -103,7 +94,7 @@ export default {
          *
          */
         initVideojsRecord () {
-            this.player = videojs(this.$refs.recordingVideo, getRecordOptions(this.recordMediaType), this.onVideojsReady);
+            this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(), this.onVideojsReady);
         },
 
         /**
@@ -112,9 +103,10 @@ export default {
          */
         onVideojsReady () {
             this.initVideojsRecordRecordListeners();
-            setTimeout(() => { //dodgy, trying to wait until 'VIDEOJS: wavesurfer.js microphone plugin enabled.' but can't see any event to track this...
+            const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+            if (!isSafari) { //Safari requires a direct click on the request (for screen only, not video)
                 this.player.record().getDevice(); //request the device to avoid needing to click the activate button
-            }, 200);    
+            }
         },
 
         /**
@@ -135,7 +127,8 @@ export default {
          */
         onDeviceReady () {
             this.isDeviceReady = true;
-            this.$emit(recordMediaEvents.DEVICE_READY, this.player.record().stream.getVideoTracks()[0]);
+            const currentDeviceSettings = this.player.record().stream.getVideoTracks()[0].getSettings(); 
+            this.$emit(recordMediaEvents.DEVICE_READY, currentDeviceSettings.width, currentDeviceSettings.height);
         },
 
         /**
@@ -174,13 +167,7 @@ export default {
         async recordedVideoReady (mediaData) {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
             this.$emit(recordMediaEvents.PROCCESS_STOPPED); //notify any UI to re-enable
-            if (this.recordMediaType === recordMediaTypes.PHOTO) { //the recorded photo is just a DataURL, so need to set up a Blob
-                this.recordedData = await dataURLtoBlob(mediaData); 
-                this.recordedData.name = 'photo.jpeg'
-                this.recordedData.src = mediaData; 
-            } else {
-                this.recordedData = mediaData; // the blob object contains the recorded data 
-            }
+            this.recordedData = mediaData; // the blob object contains the recorded data 
 			this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
         },
@@ -282,7 +269,7 @@ export default {
             v-if="hasPreRecordedData || hasNewRecording"
             key="media-container-playback"
             class="media-container media-container-playback"
-            :record-media-type="recordMediaType"
+            :record-media-type="recordMediaTypes.SCREEN"
             :has-pre-recorded-data="hasPreRecordedData"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             :recorded-data="recordedData"
@@ -292,11 +279,15 @@ export default {
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
             <template v-if="hasDeviceAlreadyInUseError">
-                    <div class="alert-box warning">The camera appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
+                <div class="alert-box warning">Screen sharing appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>
             </template>
             <template v-else-if="hasPermissionDeniedError">
-                <div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
+                <div class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
+                <button @click.prevent="onCloseErrorModalSelected">Close</button>
+            </template>
+            <template v-else>
+                <div class="alert-box alert">Sorry, an unknown error has occured.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>
             </template>
         </over-media-modal>

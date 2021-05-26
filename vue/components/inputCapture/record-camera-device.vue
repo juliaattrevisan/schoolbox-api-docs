@@ -1,9 +1,8 @@
 <script>
 
-/*
- * To use the devices native tools to capture a CAMERA or PHOTO
- * SCREEN capture is currently not supported
- * And neither is AUDIO_ONLY as it's not producing excpected results - ie ios Safari just loads a video, some Androids seem to do nothing
+/** 
+ * To use the devices native tools to capture a CAMERA,
+ * to easier allow toggling between device cameras
  *
  */
 
@@ -11,7 +10,6 @@ import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
-import { blobToDataURL } from '@shared/util/fileUtils';
 
 
 export default {
@@ -22,13 +20,6 @@ export default {
     },
 
     props: {
-        recordMediaType: { //currently should either be AUDIO_ONLY, CAMERA or SCREEN
-            type: String,
-            required: true,
-            validator: function (value) {
-                return [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.PHOTO, recordMediaTypes.SCREEN].indexOf(value) !== -1 // The value must match one of these strings
-            }
-        },
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
@@ -49,18 +40,12 @@ export default {
 
     created () {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
-        if (this.recordMediaType === recordMediaTypes.PHOTO || this.recordMediaType === recordMediaTypes.CAMERA) { //otherwise just displays no support note
-            this.checkForPreRecordedData();
-            this.captureOptions = this.getCaptureOptions();
-        }
+        this.checkForPreRecordedData();
+        this.captureOptions = this.getCaptureOptions();
     },
 
     mounted () {
-        if (this.recordMediaType === recordMediaTypes.PHOTO || this.recordMediaType === recordMediaTypes.CAMERA) { //completely block functionality for screen
-            this.initInputCaptureElement();
-        } else { //and just ensure that the entire message is visible
-            this.$emit(recordMediaEvents.RATIO_READY, this.$refs.noScreenNote.offsetWidth, this.$refs.noScreenNote.offsetHeight);
-        }
+        this.initInputCaptureElement();
     },
 
     methods: {
@@ -83,20 +68,11 @@ export default {
          * @returns { Object }
          */
         getCaptureOptions () {
-            if (this.recordMediaType === recordMediaTypes.PHOTO) {
-                return {
-                    accept: 'image/*',
-                    capture: 'user',
-                    attachPrompt: 'take a picture',
-                    iconClass: 'icon-camera'
-                }
-            } else if (this.recordMediaType === recordMediaTypes.CAMERA) {
-                return {
-                    accept: 'video/*',
-                    capture: 'user',
-                    attachPrompt: 'record video',
-                    iconClass: 'icon-video'
-                }
+            return {
+                accept: 'video/*',
+                capture: 'user',
+                attachPrompt: 'record video',
+                iconClass: 'icon-video'
             }
         },
 
@@ -118,9 +94,6 @@ export default {
          */ 
         async onFileAdded (mediaData) {
             this.recordedData = mediaData; // the blob object contains the recorded data 
-            if (this.recordMediaType === recordMediaTypes.PHOTO) { //set up a .src in order to display the image
-                this.recordedData.src = await blobToDataURL(this.recordedData);
-            }
             this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
             this.$refs.recorder.value = ''; //prevent the input capture element showing the preview
@@ -155,45 +128,25 @@ export default {
 <template>
 
     <div class="container">
-
-        <template v-if="recordMediaType === recordMediaTypes.SCREEN">
-
-            <div class="media-container media-container-record">
-                <div class="alert-box warn" ref="noScreenNote">Sorry, screen recording is not currently possible on this device. To record your screen, please use a desktop computer or laptop.</div>
-            </div>
-
-        </template>
-
-        <template v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY">
-
-            <div class="media-container media-container-record">
-                <div class="alert-box warn" ref="noScreenNote">Sorry, audio only recording is not currently possible on this device. To record audio only, please use a desktop computer or laptop.</div>
-            </div>
-
-        </template>
-
-        <template v-else>
             
-            <div class="media-container media-container-record">
-                <div class="file-input-container">
-                    <input ref="recorder" class="dzone" type="file" :accept="captureOptions.accept" :capture="captureOptions.capture">
-                    <span :class="'file-input-note ' + captureOptions.iconClass">Tap here to {{ captureOptions.attachPrompt }}</span>
-                </div>
+        <div class="media-container media-container-record">
+            <div class="file-input-container">
+                <input ref="recorder" class="dzone" type="file" :accept="captureOptions.accept" :capture="captureOptions.capture">
+                <span :class="'file-input-note ' + captureOptions.iconClass">Tap here to {{ captureOptions.attachPrompt }}</span>
             </div>
-            
-            <recorded-media 
-                v-if="hasPreRecordedData || hasNewRecording"
-                key="media-container-playback"
-                class="media-container media-container-playback"
-                :record-media-type="recordMediaType"
-                :has-pre-recorded-data="hasPreRecordedData"
-                :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-                :recorded-data="recordedData"
-                @on-recorded-media-deleted="onRecordedMediaDeleted"
-                @on-ratio-ready="onRatioReady"
-            />
-
-        </template>
+        </div>
+        
+        <recorded-media 
+            v-if="hasPreRecordedData || hasNewRecording"
+            key="media-container-playback"
+            class="media-container media-container-playback"
+            :record-media-type="recordMediaType"
+            :has-pre-recorded-data="hasPreRecordedData"
+            :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
+            :recorded-data="recordedData"
+            @on-recorded-media-deleted="onRecordedMediaDeleted"
+            @on-ratio-ready="onRatioReady"
+        />
 
     </div>
 

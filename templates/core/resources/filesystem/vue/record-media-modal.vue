@@ -7,8 +7,9 @@
 
 import RecordMediaModalMenu from './record-media-modal-menu';
 import RecordMediaModalUnset from './record-media-modal-unset';
-import BrowserCaptureMedia from '@schoolbox/videojs-record/browser-capture-media';
-import DeviceCaptureMedia from '@schoolbox/inputCapture/device-capture-media';
+import RecordAudioOnly from '@schoolbox/record/record-audio-only';
+import RecordCamera from '@schoolbox/record/record-camera';
+import RecordScreen from '@schoolbox/record/record-screen';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
@@ -21,8 +22,9 @@ export default {
     components: {
         RecordMediaModalMenu, //top menu appears after unset menu selection
         RecordMediaModalUnset, //the initial big menu
-        BrowserCaptureMedia, //to use the browser when input capture isn't supported
-        DeviceCaptureMedia, //for mobile devices to use instead of browser-media-capture
+        RecordAudioOnly,
+        RecordCamera,
+        RecordScreen,
         OverMediaModal //to slot in upload modal
     },
 
@@ -141,13 +143,11 @@ export default {
         /**
          * currently to update the container ratio to match the dimensions of the recording device
          *
-         * @params { MediaStreamTrack }
+         * @params { Number }
+         * @params { Number }
          */
-        onDeviceReady (mediaStreamTrack) {
-            if (this.currentRecordMediaType !== recordMediaTypes.AUDIO_ONLY) { //audio doesn't need to change from 16:9
-                const currentDeviceSettings = mediaStreamTrack.getSettings(); 
-                this.updateCurrentRatio(currentDeviceSettings.width, currentDeviceSettings.height);
-            }
+        onDeviceReady (width, height) {
+            this.updateCurrentRatio(width, height);
         },
 
         /**
@@ -361,28 +361,39 @@ export default {
                 />
 
                 <keep-alive><!-- to maintain recordings etc https://vuejs.org/v2/api/#keep-alive -->
-                    <template v-for="recordMediaType in recordMediaTypeList">
-                        <device-capture-media
-                            v-if="currentRecordMediaType === recordMediaType && hasDeviceCapture"
-                            :record-media-type="recordMediaType"
-                            :key="recordMediaType+'-device'"
-                            @on-recorded-media-ready="onRecordedMediaReady"
-                            @on-recorded-media-deleted="onRecordedMediaDeleted"
-                            @on-ratio-ready="onRatioReady"
-                        />
-                        <browser-capture-media
-                            v-else-if="currentRecordMediaType === recordMediaType"
-                            :record-media-type="recordMediaType"
-                            :key="recordMediaType+'-browser'"
-                            :is-keep-alive="true"
-                            @on-device-ready="onDeviceReady"
-                            @on-process-started="onProcessStarted"
-                            @on-process-stopped="onProcessStopped"
-                            @on-recorded-media-ready="onRecordedMediaReady"
-                            @on-recorded-media-deleted="onRecordedMediaDeleted"
-                            @on-ratio-ready="onRatioReady"
-                        />
-                    </template>
+                    <record-audio-only
+                        v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
+                        :record-media-type="recordMediaTypes.AUDIO_ONLY"
+                        :is-keep-alive="true"
+                        @on-device-ready="onDeviceReady"
+                        @on-process-started="onProcessStarted"
+                        @on-process-stopped="onProcessStopped"
+                        @on-recorded-media-ready="onRecordedMediaReady"
+                        @on-recorded-media-deleted="onRecordedMediaDeleted"
+                        @on-ratio-ready="onRatioReady"
+                    />
+                    <record-camera
+                        v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
+                        :record-media-type="recordMediaTypes.CAMERA"
+                        :is-keep-alive="true"
+                        @on-device-ready="onDeviceReady"
+                        @on-process-started="onProcessStarted"
+                        @on-process-stopped="onProcessStopped"
+                        @on-recorded-media-ready="onRecordedMediaReady"
+                        @on-recorded-media-deleted="onRecordedMediaDeleted"
+                        @on-ratio-ready="onRatioReady"
+                    />
+                    <record-screen
+                        v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
+                        :record-media-type="recordMediaTypes.SCREEN"
+                        :is-keep-alive="true"
+                        @on-device-ready="onDeviceReady"
+                        @on-process-started="onProcessStarted"
+                        @on-process-stopped="onProcessStopped"
+                        @on-recorded-media-ready="onRecordedMediaReady"
+                        @on-recorded-media-deleted="onRecordedMediaDeleted"
+                        @on-ratio-ready="onRatioReady"
+                    />
                 </keep-alive>
 
                 <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
