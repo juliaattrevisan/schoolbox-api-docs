@@ -453,7 +453,7 @@ class Kernel extends WebKernelAbstract
             }
 
             // Now authenticate the JWT user
-            $sessionHandler     = new \Session();
+            $sessionHandler = new \Session();
             $sessionHandler->create($user->getUsername());
             register_shutdown_function(function () use ($sessionHandler, $currentSessionData) {
                 if (isset($currentSessionData)) {
