@@ -327,9 +327,10 @@ class Controller extends Base
     private function buildAuthenticatedJsonOutput(User $user): Output\Json
     {
         return $this->buildJsonOutput([
-            'id'   => $user->getId(),
-            'key'  => $user->getKey(),
-            'role' => $user->getRole()->getType()
+            'id'       => $user->getId(),
+            'key'      => $user->getKey(),
+            'role'     => $user->getRole()->getType(),
+            'username' => $user->getUsername(),
         ]);
     }
 }
