@@ -8076,11 +8076,6 @@ parameters:
 			path: library/Schoolbox/Resource/Attachment/Collector/StorageHandler.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Attachment/Filesystem/GoogleController.php
-
-		-
 			message: "#^Constructor of class Schoolbox\\\\Resource\\\\Attachment\\\\Filesystem\\\\MyfileController has an unused parameter \\$useFolder\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Attachment/Filesystem/MyfileController.php
