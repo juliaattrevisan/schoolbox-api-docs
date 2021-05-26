@@ -441,10 +441,26 @@ class Kernel extends WebKernelAbstract
         // you aren't making requests with a JWT when you are already logged in.
         $user = $this->extractUserFromAuthHeader($server['HTTP_AUTHORIZATION'] ?? null);
         if ($user) {
-            $sessionHandler = new \Session();
+            // Is there someone in the session already?
+            // If so store their data, and restore it once this request is over:
+            // otherwise destory the session we created just for this request.
+            /** @var \Alaress\Session\Session $sessionDataStore */
+            $sessionDataStore   = $this->di->get('session');
+            $currentSessionData = null;
+            $currentUser        = $sessionDataStore->getAuthUser();
+            if ($currentUser->getId()) {
+                $currentSessionData = $_SESSION;
+            }
+
+            // Now authenticate the JWT user
+            $sessionHandler     = new \Session();
             $sessionHandler->create($user->getUsername());
-            register_shutdown_function(function () use ($sessionHandler) {
-                $sessionHandler->destroy();
+            register_shutdown_function(function () use ($sessionHandler, $currentSessionData) {
+                if (isset($currentSessionData)) {
+                    $_SESSION = $currentSessionData;
+                } else {
+                    $sessionHandler->destroy();
+                }
             });
         }
 
