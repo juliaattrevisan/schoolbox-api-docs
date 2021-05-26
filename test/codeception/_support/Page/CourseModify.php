@@ -20,7 +20,7 @@ class CourseModify
     public const URL_ID_FRAGMENT = '{course_id}';
 
     public const SELECTOR_LOCATION = '[data-course-parent-selector]';
-    public const SELECTOR_USE_FOLDER = '#parent-select [data-selection] [data-select]';
+    public const SELECTOR_USE_FOLDER = '[data-selection] [data-select]';
     public const SELECTOR_SAVE_COURSE = '#update-course-form [type=submit][value="Save Course"]';
 
 
