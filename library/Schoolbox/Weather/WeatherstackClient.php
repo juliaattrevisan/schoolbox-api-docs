@@ -170,6 +170,7 @@ class WeatherstackClient
         $lastUpdatedTimestamp = $this->calculateLastUpdated($responseData['location']['localtime'], $responseData['location']['utc_offset']);
 
         $twigData = [
+            'weatherAvailable' => false,
             'weatherLocation' => $responseData['location']['name'] . ', ' . $responseData['location']['country'],
             'today' => [
                 'day'            => $this->getDayOfWeek($lastUpdatedTimestamp),
@@ -192,9 +193,39 @@ class WeatherstackClient
                 'windSpeed'      => $responseData['current']['wind_speed'],
                 'windDirection'  => $responseData['current']['wind_dir'],
                 'lastUpdated'    => Alaress_Date_Format::newFromTimestamp($lastUpdatedTimestamp)->getRelativeTime(),
+
+                /* Forecasts for multiple days
+                 */
+                'forecastDays'   => [],
+
+                /* Today's forecast
+                 */
+                'today'          => [
+                    'lowTemp' => null,
+                    'highTemp' => null
+                ],
             ]
         ];
 
+        /* Sometimes Weatherstack doesn't send us a payload of usable data.
+         * See https://sentry.io/organizations/alaress/issues/1926347951/?project=231649&referrer=jira_integration
+         *
+         * With the absence of $responseData['forecast'] the only conclusion we can draw is that
+         * Weatherstack is unavailable for some reason (they broke something, changed something)
+         * so it requires us to avoid trying to render it
+         */
+        if (!isset($responseData['forecast'])) {
+            return $twigData;
+        }
+
+        /* If forecast is not an array, or if forecast is empty, exit early
+         */
+        if (!is_array($responseData['forecast']) || !\count($responseData['forecast'])) {
+            return $twigData;
+        }
+
+        /* Iterate only when it's meaningful to do so
+         */
         foreach ($responseData['forecast'] as $date => $data) {
             // Get the min and max temp from today's forecast, then move on to tomorrow's forecast
             if ($this->getDayOfWeek($data['date_epoch']) === self::NOW) {
