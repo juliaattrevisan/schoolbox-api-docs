@@ -2,7 +2,9 @@
     <script type="text/javascript">
         $(function(){
             var component    = $("#component{COMPONENT_INSTANCE_ID}");
-            var videoElement = component.find('[data-videocomponent]').mediaelementplayer();
+            var videoElement = component.find('[data-videocomponent]').mediaelementplayer({
+                stretching: 'responsive'
+            });
             var video        = videoElement.data('mediaelementplayer');
             component.on('click', 'a[data-videolink]', function(event) {
                 event.preventDefault();
