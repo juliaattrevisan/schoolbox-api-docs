@@ -84,7 +84,9 @@ export default {
                 return 'declined';
             } else if (attendanceStatus === ATTENDANCE_STATUS.PENDING) {
                 return 'pending';
-            } 
+            } else { //otherwise just return blank
+                return '';
+            }
         },
 
     },
