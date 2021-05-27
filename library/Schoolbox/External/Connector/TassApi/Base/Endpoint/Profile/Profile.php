@@ -789,7 +789,7 @@ class Profile implements IStrategy
              */
             $employeeSetReformatted[] = [
                 'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
-                'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
+                'salutation' => $employee['salutation'] ?: $employee['title'],
                 'first_name' => $employee['first_name'],
                 'preferred_name' => $employee['preferred_name'],
                 'surname' => $employee['surname'],
@@ -827,7 +827,7 @@ class Profile implements IStrategy
             /* Find the first non-empty email address for staff; it seems that there's a business
              * email address and a home email address concept going on here
              */
-            $email = trim((string)(array_values(array_filter([$staff['school_email_address'], $staff['email_address']]))[0] ?? ''));
+            $email = trim((string) ($staff['school_email_address'] ?: $staff['email_address']));
 
             /* For some reason, first_name and preferred_name might not actually be in the payload
                     Array

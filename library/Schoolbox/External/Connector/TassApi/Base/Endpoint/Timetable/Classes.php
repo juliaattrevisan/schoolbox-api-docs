@@ -280,7 +280,7 @@ class Classes implements IStrategy
                      * If the period doesn't correspond to something in our timetable definition,
                      * we can't process it anyway, so skip it
                      */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
+                    $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], (string)$class['period']['name']);
 
                     $this->log->info(sprintf(
                         'Looking for ext_timetable_code %s, day %s, period %s',
