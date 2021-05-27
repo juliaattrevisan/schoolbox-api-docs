@@ -1472,12 +1472,8 @@ class Controller extends Assessment\Controller
         $request->setScale(0.75);
 
         // Generate, download and store the PDF
-        $pdfGenerator = new Gotenberg\Client(
-            $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
-            GuzzleAdapter::createWithConfig(
-                ['curl' => (new ProxyServer($this->getConfigLoader()))->buildCurlOptions()]
-            ),
-        );
+        /** @var Gotenberg\Client $pdfGenerator */
+        $pdfGenerator = $this->getDi()->get('pdfGenerator');
 
         $tempfile = sb_tempnam();
         try {

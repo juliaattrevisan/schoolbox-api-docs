@@ -144,12 +144,8 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object
-        $pdfGenerator = new Gotenberg\Client(
-            $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_HOST),
-            GuzzleAdapter::createWithConfig(
-                ['curl' => (new ProxyServer($this->getConfig()))->buildCurlOptions()]
-            ),
-        );
+        /** @var Gotenberg\Client $pdfGenerator */
+        $pdfGenerator = $this->getDi()->get('pdfGenerator');
 
 
         // Generate all PDFs
