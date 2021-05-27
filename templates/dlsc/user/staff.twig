@@ -1,11 +1,11 @@
 {% extends '@core/user/staff.twig' %}
 
-{% if showDetails %}
-    {% block details %}
+{% block details %}
+    {% if showDetails %}
     {{ parent() }}
         {% block details_house %}
             <dt class="small-12 medium-3">House:</dt>
             <dd class="small-12 medium-9">{{ user.schoolHouse.house }}</dd>
         {% endblock details_house %}
-    {% endblock %}
-{% endif %}
+    {% endif %}
+{% endblock %}
