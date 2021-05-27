@@ -76,7 +76,6 @@ HELP;
             exit;
         }
 
-
         $this->instanceId = INSTANCE_ID;
 
         /* @var IConnector $db */
@@ -85,27 +84,38 @@ HELP;
         /** @var IConfigLoader $config */
         $config = $this->getDi()->get('config');
         $backupFileName = $config->get('storage_dir') . '/modules.json';
-        $components     = "'" . implode("','", $this->dashboardComponentsToDisable) . "'";
 
-        $query = "SELECT * FROM component_definition WHERE name IN (" . $components . ") AND module = 'dashboard'";
+        $answer = 'y';
 
-        $this->getLogger()->notice('Saving dashboard components settings backup to: ' . $backupFileName);
-
-        try {
-            file_put_contents($backupFileName, json_encode($db->executeQuery($query)->fetchAll(), JSON_THROW_ON_ERROR));
-        } catch (\Schoolbox\File\Exception $e) {
-            $this->getLogger()->critical($e->getMessage());
-            exit(1);
+        if (file_exists($backupFileName)) {
+            $answer = strtolower(trim($this->readLine("Back-up found in: " . $backupFileName . ", do you wish to overwrite it? [y/N]: ")));
         }
 
-        // Disable modules
-        try {
-            $this->getLogger()->notice('Disable dashboard components: ' . implode(",", $this->dashboardComponentsToDisable));
-            $query = "UPDATE component_definition SET enabled = false WHERE name IN (" . $components . ") AND module = 'dashboard'";
-            $db->execute($query);
-        } catch (\Alaress\Database\Exception $e) {
-            $this->getLogger()->critical($e->getMessage());
-            exit(1);
+        if ($answer === 'y') {
+            $components     = "'" . implode("','", $this->dashboardComponentsToDisable) . "'";
+
+            $query = "SELECT * FROM component_definition WHERE name IN (" . $components . ") AND module = 'dashboard'";
+
+            $this->getLogger()->notice('Saving dashboard components settings backup to: ' . $backupFileName);
+
+            try {
+                file_put_contents($backupFileName, json_encode($db->executeQuery($query)->fetchAll(), JSON_THROW_ON_ERROR));
+            } catch (\Schoolbox\File\Exception $e) {
+                $this->getLogger()->critical($e->getMessage());
+                exit(1);
+            }
+
+            // Disable modules
+            try {
+                $this->getLogger()->notice('Disable dashboard components: ' . implode(",", $this->dashboardComponentsToDisable));
+                $query = "UPDATE component_definition SET enabled = false WHERE name IN (" . $components . ") AND module = 'dashboard'";
+                $db->execute($query);
+            } catch (\Alaress\Database\Exception $e) {
+                $this->getLogger()->critical($e->getMessage());
+                exit(1);
+            }
+        } else {
+            $this->getLogger()->notice('Bye bye...');
         }
     }
 };
