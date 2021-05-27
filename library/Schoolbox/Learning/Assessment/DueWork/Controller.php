@@ -15,10 +15,12 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Web\Exception\InvalidStatusCode;
 use DomainException;
 use Eportfolio\ShowcaseMapper;
+use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use ICollection;
 use InvalidArgumentException;
 use LogicException;
 use PDOException;
+use Proxy\Server as ProxyServer;
 use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Gotenberg\RequestFactory;
@@ -1470,7 +1472,12 @@ class Controller extends Assessment\Controller
         $request->setScale(0.75);
 
         // Generate, download and store the PDF
-        $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
+        $pdfGenerator = new Gotenberg\Client(
+            $this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+            GuzzleAdapter::createWithConfig(
+                ['curl' => (new ProxyServer($this->getConfigLoader()))->buildCurlOptions()]
+            ),
+        );
 
         $tempfile = sb_tempnam();
         try {

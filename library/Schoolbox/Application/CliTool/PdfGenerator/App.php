@@ -13,7 +13,9 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Aura\Di\Exception\ServiceNotFound;
 use GuzzleHttp\Client;
+use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Predis\ClientInterface as RedisClient;
+use Proxy\Server as ProxyServer;
 use RuntimeException;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool\App as BaseApp;
@@ -142,7 +144,12 @@ abstract class App extends BaseApp
 
 
         // Build a PDF generator object
-        $pdfGenerator = new Gotenberg\Client($this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_HOST));
+        $pdfGenerator = new Gotenberg\Client(
+            $this->getConfig()->get(ConfigMapper::NAME_GOTENBERG_HOST),
+            GuzzleAdapter::createWithConfig(
+                ['curl' => (new ProxyServer($this->getConfig()))->buildCurlOptions()]
+            ),
+        );
 
 
         // Generate all PDFs
