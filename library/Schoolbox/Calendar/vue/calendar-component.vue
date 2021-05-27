@@ -10,6 +10,7 @@ import adaptivePlugin     from "@fullcalendar/adaptive";
 import axios              from "axios";
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
+import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
@@ -24,6 +25,7 @@ export default {
         ViewEventModal,
         FullCalendar,
         ExportUrlModal,
+        CustomisedCalendarEvent
     },
 
     mixins: [
@@ -198,7 +200,11 @@ export default {
         <full-calendar
             ref="fullCalendar"
             :options="calendarOptions"
-        />
+        >
+            <template v-slot:eventContent="arg">
+                <customised-calendar-event :content="arg" />
+            </template>
+        </full-calendar>
 
         <!-- Loading state -->
         <div ref="loadingState" class="loader" v-if="!eventsLoaded">
