@@ -359,6 +359,7 @@ class Module extends BaseModule
         $dc['submissionFileMapper'] = $injector->lazyNew(SingleFile\Mapper::class);
         $dc['kamiConnector'] = $injector->lazyGet('kamiConnector');
         $dc['kamiMapper'] = $this->getMapperFactory()->getLazy(Kami\Mapper::class);
+        $dc['pdfGenerator'] = $injector->lazyGet('pdfGenerator');
 
         // project specific
         // $pc =& $injector->params[Assessment\Project\Controller::class];
