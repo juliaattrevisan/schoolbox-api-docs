@@ -784,12 +784,24 @@ class Profile implements IStrategy
          */
         $employeeCodec = new Codec\EmployeeExternalId();
 
+        /* Decide salutation
+         * These fields could exist, but be null or empty strings
+         * Find the first meaningful value
+         */
+        $salutation = '';
+
+        if (isset($employee['salutation']) && '' !== trim((string)$employee['salutation'])) {
+            $salutation = trim((string)$employee['salutation']);
+        } elseif (isset($employee['title']) && '' !== trim((string)$employee['title'])) {
+            $salutation = trim((string)$employee['title']);
+        }
+
         foreach ($employeeSetDedupe as $employee) {
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
                 'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
-                'salutation' => $employee['salutation'] ?: $employee['title'],
+                'salutation' => $salutation,
                 'first_name' => $employee['first_name'],
                 'preferred_name' => $employee['preferred_name'],
                 'surname' => $employee['surname'],
@@ -827,7 +839,13 @@ class Profile implements IStrategy
             /* Find the first non-empty email address for staff; it seems that there's a business
              * email address and a home email address concept going on here
              */
-            $email = trim((string) ($staff['school_email_address'] ?: $staff['email_address']));
+            $email = '';
+
+            if (isset($employee['school_email_address']) && '' !== trim((string)$employee['school_email_address'])) {
+                $email = trim((string)$employee['school_email_address']);
+            } elseif (isset($employee['email_address']) && '' !== trim((string)$employee['email_address'])) {
+                $email = trim((string)$employee['email_address']);
+            }
 
             /* For some reason, first_name and preferred_name might not actually be in the payload
                     Array
