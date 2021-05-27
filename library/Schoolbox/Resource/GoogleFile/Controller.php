@@ -18,7 +18,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -138,7 +137,7 @@ class Controller extends Base
 
         $existingGFiles      = $this->googleFileMapper->findByColumn('folder_id', $folder->getId())
                                                       ->indexBy('googleId');
-        $email2accessRoleMap = $this->getEmail2AccessRoleMap($folder->getId(), $editAccessLevel, $commentAccessLevel);
+        $email2accessRoleMap = $this->getEmail2AccessRoleMap($folder, $editAccessLevel, $commentAccessLevel);
         $errors              = [];
         foreach ($selectedFiles as $selectedFile) {
             // if this file is already associated with this folder, get it
@@ -196,23 +195,26 @@ class Controller extends Base
     }
 
     /**
-     * Generates a map of email to google role type
-     * @param int $folderId
-     * @param int $editAccessLevel
-     * @param int $commentAccessLevel
+     * Generates a map of "email of folder users" to "google role type"
+     *   If a folder user does not have any email address, the user will be skipped
+     *   If multiple users have the same email address, the google role type will be given in the following order
+     *      - If the user is explicitly given access via Group Membership, the google role type will be of the Group Access
+     *      - If a student and a teacher share the same email address, the google role type will be of Write Access
+     * @param Folder $folder
+     * @param int    $editAccessLevel
+     * @param int    $commentAccessLevel
      * @return array
      */
-    private function getEmail2AccessRoleMap(int $folderId, int $editAccessLevel, int $commentAccessLevel): array
+    private function getEmail2AccessRoleMap(Folder $folder, int $editAccessLevel, int $commentAccessLevel): array
     {
         $accesses             = $this->userAccessMapper->findByColumnList(
-            ['sid' => $folderId, 'service' => UserAccess::SERVICE_HOMEPAGE]
+            ['sid' => $folder->getId(), 'service' => UserAccess::SERVICE_HOMEPAGE]
         );
         $users                = $this->userMapper->hydrateCollection(new Collection($accesses->getPropertyValues('user')))->indexBy('id');
         $userAccess2GFileRole = $this->getUserAccessToRoleMap($editAccessLevel, $commentAccessLevel);
 
         $map = [];
         foreach ($accesses as $access) {
-            /** @var User $currentUser */
             $currentUser = $users->getOffset($access->getUser()->getId());
             if (!$currentUser->getEmail()) {
                 // this user doesn't have email, ignore
@@ -220,6 +222,29 @@ class Controller extends Base
             }
             $map[$currentUser->getEmail()] = $userAccess2GFileRole[$access->getAccessLevel()];
         }
+
+        if ($folder->isClass()) {
+            $externalClassHandler = new \External_Class();
+            $externalStudents     = $externalClassHandler->getStudents($folder->getCodeString());
+            $classStudents        = $this->userMapper->findByColumn('synergy_id', array_column($externalStudents, 'synergy_id'));
+            $teacherExternalIds   = $externalClassHandler->getTeachers($folder->getCodeString());
+            $classTeachers        = $this->userMapper->findByColumn('synergy_id', $teacherExternalIds);
+            foreach ($classTeachers as $teacher) {
+                // if the same email address is already used for a group member, using it
+                if (!$teacher->getEmail() || key_exists($teacher->getEmail(), $map)) {
+                    continue;
+                }
+                $map[$teacher->getEmail()] = $userAccess2GFileRole[UserAccess::ACCESS_WRITE];
+            }
+
+            foreach ($classStudents as $student) {
+                if (!$student->getEmail() || key_exists($student->getEmail(), $map)) {
+                    continue;
+                }
+                $map[$student->getEmail()] = $userAccess2GFileRole[UserAccess::ACCESS_READ];
+            }
+        }
+
         return $map;
     }
 

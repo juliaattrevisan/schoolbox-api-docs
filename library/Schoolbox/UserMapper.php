@@ -38,6 +38,7 @@ use UnexpectedValueException;
  * @method GenericCollection|User[] createCollection($contents = [])
  * @method GenericCollection|User[] findByColumn($columnName, $columnValue, $options = [])
  * @method GenericCollection|User[] findByPredicates(Builder $pb, array $options = [])
+ * @method GenericCollection|User[] hydrateCollection($collection, $identifier = null)
  */
 class UserMapper extends Mapper
 {
