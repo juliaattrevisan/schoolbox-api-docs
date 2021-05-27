@@ -36,6 +36,7 @@ use External_Timetable;
 use External_User;
 use External_UserInterface;
 use GuzzleHttp;
+use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Predis;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
@@ -130,6 +131,7 @@ use Scrub;
 use SitePage;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
+use TheCodingMachine\Gotenberg\Client as GotenbergClient;
 use Throwable;
 use Twig\Environment;
 use Twig\Extension\DebugExtension;
@@ -1275,14 +1277,43 @@ abstract class Kernel
             $di->lazyGet('router')
         ]));
 
+        // TODO this should be used wherever a HTTP client is used
+        $di->set(
+            'httpClient',
+            $di->lazy(
+                static function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config      = $di->get('config');
+                    $proxyServer = new \Proxy\Server($config);
+                    return new GuzzleHttp\Client(['curl' => $proxyServer->buildCurlOptions()]);
+                }
+            ),
+        );
+
+        // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
-            'client'         => $di->lazy(static function () {
-                return new GuzzleHttp\Client(['curl' => \Proxy\Server::getInstance()->buildCurlOptions()]);
-            }),
+            'client'         => $di->lazyGet('httpClient'),
             'enabled'        => $di->get('config')->get('kami_enabled'),
             'apiKey'         => $di->get('config')->get('kami_api_key'),
             'siteSchoolCode' => $di->get('config')->get('site_school_code'),
         ]));
+
+        // PDF generator
+        $di->set(
+            'pdfGenerator',
+            $di->lazy(
+                static function () use ($di) {
+                    /** @var IConfigLoader $config */
+                    $config = $di->get('config');
+                    /** @var GuzzleHttp\Client $httpClient */
+                    $httpClient = $di->get('httpClient');
+                    return new GotenbergClient(
+                        $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
+                        new GuzzleAdapter($httpClient),
+                    );
+                }
+            )
+        );
 
         // injectable module auth rules
         $di->set('rule:isLoggedIn', $di->lazyNew(Rule\IsLoggedIn::class));

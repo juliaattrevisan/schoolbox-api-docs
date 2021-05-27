@@ -114,7 +114,8 @@
         "ext-intl": "^7.4",
         "guzzlehttp/guzzle": "^7.3",
         "thecodingmachine/gotenberg-php-client": "^6.3",
-        "phpoffice/phpspreadsheet": "^1.17"
+        "phpoffice/phpspreadsheet": "^1.17",
+        "php-http/guzzle7-adapter": "^1.0"
     },
     "require-dev": {
         "lox/xhprof": "dev-master",

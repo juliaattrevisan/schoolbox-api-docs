@@ -63,7 +63,6 @@ use Schoolbox\Learning\InlineGrader\StudentCarousel;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Url\Factory;
@@ -103,6 +102,11 @@ class Controller extends Assessment\Controller
     private $kamiMapper;
 
     /**
+     * PDF generator, as used by the `downloadSubmissions` method.
+     */
+    private Gotenberg\Client $pdfGenerator;
+
+    /**
      * @param UserMapper                    $userMapper
      * @param Error\Mapper                  $errorMapper
      * @param AssessmentDataSource          $assessmentMapper
@@ -122,6 +126,7 @@ class Controller extends Assessment\Controller
      * @param CourseSpecificationMapper     $courseSpecificationMapper
      * @param UnitSpecificationMapper       $unitSpecificationMapper
      * @param Replicator                    $replicator
+     * @param Gotenberg\Client              $pdfGenerator
      */
     public function __construct(
         UserMapper $userMapper,
@@ -142,7 +147,8 @@ class Controller extends Assessment\Controller
         Participant\DataSource $participantDataSource,
         CourseSpecificationMapper $courseSpecificationMapper,
         UnitSpecificationMapper $unitSpecificationMapper,
-        Replicator $replicator
+        Replicator $replicator,
+        Gotenberg\Client $pdfGenerator
     ) {
         parent::__construct(
             $userMapper,
@@ -165,6 +171,7 @@ class Controller extends Assessment\Controller
         $this->submissionFileMapper  = $submissionFileMapper;
         $this->kamiConnector         = $kamiConnector;
         $this->kamiMapper            = $kamiMapper;
+        $this->pdfGenerator          = $pdfGenerator;
     }
 
 
@@ -1470,11 +1477,9 @@ class Controller extends Assessment\Controller
         $request->setScale(0.75);
 
         // Generate, download and store the PDF
-        $pdfGenerator = new Gotenberg\Client($this->getConfigLoader()->get(ConfigMapper::NAME_GOTENBERG_HOST));
-
         $tempfile = sb_tempnam();
         try {
-            $pdfGenerator->store($request, $tempfile);
+            $this->pdfGenerator->store($request, $tempfile);
             $zipFilename = sprintf(
                 "%s/submissionHistory.pdf",
                 $baseFolderName,
