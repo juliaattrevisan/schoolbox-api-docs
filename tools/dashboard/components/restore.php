@@ -61,7 +61,7 @@ $app = new class extends CliTool\App
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
-This tool will restore the modules that was disabled by selectiveDisable.php
+This tool will restore the modules that was disabled by disableSelectedDashboardComponents.php
 
 Usage: INSTANCE_ID=vagrantx(optional) restore.php
 
