@@ -273,7 +273,7 @@ class Kernel extends WebKernelAbstract
                     $twig->addFilter(
                         new TwigFilter(
                             'column',
-                            [ Collection::class, 'array_column' ]
+                            [Collection::class, 'arrayColumn']
                         )
                     );
 

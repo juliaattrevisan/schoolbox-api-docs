@@ -24,7 +24,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Creates the column type object that is being tested..
      *
-     * @return array
+     * @return void
      */
     abstract public function setupObject();
 

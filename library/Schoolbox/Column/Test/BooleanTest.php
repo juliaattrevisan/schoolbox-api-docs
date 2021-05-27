@@ -10,12 +10,12 @@
 
 namespace Schoolbox\Column\Test;
 
-use Schoolbox\Column\Boolean;
+use Schoolbox\Column\Boolean as BooleanColumn;
 
 class BooleanTest extends TestCase
 {
     /**
-     * @var Boolean
+     * @var BooleanColumn
      */
     protected $object;
 
@@ -24,7 +24,7 @@ class BooleanTest extends TestCase
      */
     public function setupObject()
     {
-        $this->object = new Boolean();
+        $this->object = new BooleanColumn();
     }
 
     /**

@@ -18,7 +18,7 @@ class BinaryTest extends TestCase
 {
 
     /**
-     * @var Base
+     * @var Binary
      */
     protected $object;
 
@@ -28,7 +28,6 @@ class BinaryTest extends TestCase
     public function setupObject()
     {
         $this->object = new Binary();
-        return [];
     }
 
     /**

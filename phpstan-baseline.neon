@@ -3771,16 +3771,6 @@ parameters:
 			path: library/Schoolbox/Collection.php
 
 		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 2
-			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^Instanceof between array and Schoolbox\\\\Collection will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Collection.php
-
-		-
 			message: "#^Parameter \\$callback of method Schoolbox\\\\Collection\\:\\:map\\(\\) has invalid typehint type Schoolbox\\\\callback\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
@@ -3794,36 +3784,6 @@ parameters:
 			message: "#^Parameter \\$callback of method Schoolbox\\\\Collection\\:\\:filter\\(\\) has invalid typehint type Schoolbox\\\\callback\\.$#"
 			count: 1
 			path: library/Schoolbox/Collection.php
-
-		-
-			message: "#^Variable \\$id_property in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Collection.php
-
-		-
-			message: "#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Collection.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Collection\\:\\:dehydrate\\(\\) should return array but returns null\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Collection.php
-
-		-
-			message: "#^Call to function is_array\\(\\) with Schoolbox\\\\Collection will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Collection.php
-
-		-
-			message: "#^Call to function is_scalar\\(\\) with Schoolbox\\\\Collection will always evaluate to false\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Collection.php
-
-		-
-			message: "#^Result of \\|\\| is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Collection.php
 
 		-
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
@@ -3859,81 +3819,6 @@ parameters:
 			message: "#^Variable \\$id_property in isset\\(\\) always exists and is not nullable\\.$#"
 			count: 3
 			path: library/Schoolbox/Column/Model.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\BaseTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/BaseTest.php
-
-		-
-			message: "#^Property Schoolbox\\\\Column\\\\Test\\\\BinaryTest\\:\\:\\$object \\(Schoolbox\\\\Column\\\\Base\\) does not accept Schoolbox\\\\Column\\\\Binary\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/BinaryTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\BooleanTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/BooleanTest.php
-
-		-
-			message: "#^Property Schoolbox\\\\Column\\\\Test\\\\BooleanTest\\:\\:\\$object \\(bool\\) does not accept Schoolbox\\\\Column\\\\Boolean\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/BooleanTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\DateTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/DateTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\DatetimeTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/DatetimeTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\DecimalTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/DecimalTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\IntegerTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/IntegerTest.php
-
-		-
-			message: "#^Property Schoolbox\\\\Column\\\\Test\\\\IntegerTest\\:\\:\\$object \\(int\\) does not accept Schoolbox\\\\Column\\\\Integer\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/IntegerTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\IntervalTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/IntervalTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\ModelTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/ModelTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\SerializedTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/SerializedTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\TimeTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/TimeTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\TimespanTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/TimespanTest.php
-
-		-
-			message: "#^Method Schoolbox\\\\Column\\\\Test\\\\TimestampTest\\:\\:setupObject\\(\\) should return array but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Column/Test/TimestampTest.php
 
 		-
 			message: "#^Property DateInterval\\:\\:\\$invert \\(int\\) does not accept true\\.$#"
@@ -8744,11 +8629,6 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: library/Schoolbox/TagCloud/Mapper.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: library/Schoolbox/Test/CollectionMethodsTest.php
 
 		-
 			message: "#^Parameter \\#1 \\$name \\(null\\) of method Schoolbox\\\\Test\\\\MockDatabase\\:\\:lastInsertId\\(\\) should be compatible with parameter \\$name \\(string\\) of method Alaress\\\\IDatabase\\:\\:lastInsertId\\(\\)$#"

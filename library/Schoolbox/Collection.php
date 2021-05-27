@@ -270,7 +270,6 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
     {
         foreach ($this as $item) {
             return $item;
-            break;
         }
         return null;
     }
@@ -345,17 +344,19 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
 
 
     /**
-     * This is a Collection-aware wrapper around array_column, for use in the Twig filter {{ | column($column) }}
+     * This is a Collection-aware wrapper around array_column, for use in the
+     * Twig filter {{ | column($column) }}
      *
-     * @param array $input
+     * @param mixed  $input  Should either be a Collection instance, or an array
      * @param string $column
-     * @throws InvalidArgumentException if the input given is not traversable
      * @return array
+     * @throws InvalidArgumentException if the input given is neither a
+     *                                  Collection nor an array
      */
-    public static function array_column($input, $column)
+    public static function arrayColumn($input, $column): array
     {
         if ($input instanceof self) {
-            return $input->getColumnValues($column);
+            return $input->getPropertyValues($column);
         }
         if (is_array($input)) {
             return array_column($input, $column);
@@ -392,6 +393,15 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
             $method = [$item, $methodName];
             if (is_callable($method)) {
                 $parts[] = $method();
+            } else {
+                trigger_error(
+                    sprintf(
+                        'Method "%s" is not callable on %s',
+                        $methodName,
+                        (is_object($item) ? get_class($item) : 'non-object'),
+                    ),
+                    E_USER_WARNING
+                );
             }
         }
         return $parts;
