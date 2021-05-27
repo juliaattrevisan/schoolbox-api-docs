@@ -69,7 +69,7 @@ $components
 
 that we can restore later.
 
-Usage: INSTANCE_ID=vagrantx(optional) selectiveDisabler.php
+Usage: INSTANCE_ID=vagrantx(optional) selectiveDisable.php
 
 
 HELP;
