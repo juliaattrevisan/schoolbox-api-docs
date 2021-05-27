@@ -18,7 +18,6 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -196,7 +195,11 @@ class Controller extends Base
     }
 
     /**
-     * Generates a map of email to google role type
+     * Generates a map of "email of folder users" to "google role type"
+     *   If a folder user does not have any email address, the user will be skipped
+     *   If multiple users have the same email address, the google role type will be given in the following order
+     *      - If the user is explicitly given access via Group Membership, the google role type will be of the Group Access
+     *      - If a student and a teacher share the same email address, the google role type will be of Write Access
      * @param Folder $folder
      * @param int    $editAccessLevel
      * @param int    $commentAccessLevel
@@ -212,7 +215,6 @@ class Controller extends Base
 
         $map = [];
         foreach ($accesses as $access) {
-            /** @var User $currentUser */
             $currentUser = $users->getOffset($access->getUser()->getId());
             if (!$currentUser->getEmail()) {
                 // this user doesn't have email, ignore
@@ -229,7 +231,6 @@ class Controller extends Base
             $classTeachers        = $this->userMapper->findByColumn('synergy_id', $teacherExternalIds);
             foreach ($classTeachers as $teacher) {
                 // if the same email address is already used for a group member, using it
-                /** @var User $teacher */
                 if (!$teacher->getEmail() || key_exists($teacher->getEmail(), $map)) {
                     continue;
                 }
@@ -237,7 +238,6 @@ class Controller extends Base
             }
 
             foreach ($classStudents as $student) {
-                /** @var User $student */
                 if (!$student->getEmail() || key_exists($student->getEmail(), $map)) {
                     continue;
                 }
