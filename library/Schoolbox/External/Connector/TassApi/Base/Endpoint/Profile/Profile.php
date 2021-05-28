@@ -902,9 +902,9 @@ class Profile implements IStrategy
              * default to empty string
              */
             $firstname = (new FirstMeaningfulValue())->find([
-                $staff['preferred_name'],
-                $staff['first_name'],
-                $staff['given_names']
+                $staff['preferred_name'] ?? null,
+                $staff['first_name'] ?? null,
+                $staff['given_names'] ?? null
             ]);
 
             $lastname = trim((string)$staff['surname']);
