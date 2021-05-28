@@ -133,8 +133,9 @@ form {
 }
 
 label {
-  display: initial;
-  &.required:after {
+  display: block;
+  &.required:after,
+  span.required-with-tip:after {
     content: " *";
     color: $alert-color;
   }
@@ -296,7 +297,7 @@ td {
 }
 %fancy-check-selector {
   position: relative;
-  display: block;
+  display: inline-block;
 }
 %fancy-check-before {
   position: absolute;
@@ -341,8 +342,6 @@ td {
     padding: 0 0 0 ($checkbox-size + $checkbox-margin);
     font-weight: $font-weight-normal;
     margin: 0 0 $checkbox-margin 0;
-    width: max-content;
-
     &:before,
     &:after {
       @include transition(color, 360ms, cubic-bezier(0.2, 1, 0, 1));
