@@ -105,7 +105,7 @@ class Phone
                  * m_ are fields about the mother, specifically
                  * f_ are fields about the father, specifically
                  *
-                 * The third data set don't have prefixes. These are fields that correspond to
+                 * The third data set doesn't have prefixes. These are fields that correspond to
                  * the person designated by address_description: this field will tell you whether
                  * it's for the mother or father, but a school can configure its value to whatever
                  * they want; that means we need a config var so the school can tell us which data
