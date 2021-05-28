@@ -4926,21 +4926,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Api.php
 
 		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Profile\\\\Profile\\:\\:\\$api \\(Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\) does not accept array\\<Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Profile/Profile.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Timetable\\\\AdditionalSubjects\\:\\:\\$api \\(Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\) does not accept array\\<Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/AdditionalSubjects.php
-
-		-
-			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Timetable\\\\Definition\\:\\:\\$api \\(Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\) does not accept array\\<Schoolbox\\\\External\\\\Connector\\\\TassApi\\\\Base\\\\Endpoint\\\\Api\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
-
-		-
 			message: "#^Negated boolean expression is always false\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/TassApi/Base/Endpoint/Timetable/Definition.php
