@@ -179,6 +179,11 @@
                         <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
                         <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
                         <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+
+
+                        <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
+                        <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
+                        <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
                     </section>
                 </div>
             </div>

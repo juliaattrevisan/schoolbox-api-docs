@@ -1,10 +1,6 @@
 <?php
 
 /**
- * Mapper for class objects.
- *
- * This is only used by the Schoolbox connector.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -13,7 +9,18 @@
 namespace Schoolbox\External;
 
 use Schoolbox;
+use Schoolbox\Collection;
 
+/**
+ * Class ClassPeriodMapper
+ *
+ * Mapper for class objects.
+ *
+ * This is only used by the Schoolbox connector.
+ *
+ * @method Collection|ClassPeriod[] findAll()
+ * @package Schoolbox\External
+ */
 class ClassPeriodMapper extends Schoolbox\Mapper
 {
 
