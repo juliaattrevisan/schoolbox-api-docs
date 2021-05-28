@@ -93,14 +93,19 @@
          * @param val
          */
         function switchIslands(dataSource) {
-console.log(dataSource);
+
             {# If you chose a non-isams/kamar/sentral/etc option, hide both csv and config islands
              # This prompts the user to hit Save instead of distracting them with options
              #}
-            if (dataSource == '' || dataSource == 'csv') {
+            if (dataSource == '') {
                 $('#csv-island').hide();
-                $('#config-island').hide();
                 hideConfig(configElements);
+            } else if (dataSource == 'csv') {
+                $('#csv-island').show();
+                hideConfig(configElements);
+            } else  {
+                $('#csv-island').hide();
+                showConfig(configElements);
             }
         }
 
