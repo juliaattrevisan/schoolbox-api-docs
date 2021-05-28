@@ -16,6 +16,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
+
 
 /**
  * Class FirstMeaningfulValueTest
@@ -42,17 +44,7 @@ class FirstMeaningfulValueTest extends TestCase
      */
     public function testValidMeaningfulValue(array $input, string $expected)
     {
-        /* Substitute this with a spec pattern or other conditional
-         */
-        $outcome = false;
-
-        if (is_numeric($input)) {
-            $outcome = true;
-        }
-
-        /* There are other assertions that you can try (ctrl-click to follow)
-         */
-        $this->assertEquals($expected, $outcome);
+        $this->assertEquals($expected, (new FirstMeaningfulValue())->find($input));
     }
 
 
@@ -83,12 +75,17 @@ class FirstMeaningfulValueTest extends TestCase
             ],
 
             'Valid Example 4' => [
-                [ null, null, '', '     ', 0, 'cat', 'horse', '0'],
+                [ null, null, '', '     ', 0, 'cat', 'horse', '0' ],
                 '0'
             ],
 
             'Valid Example 5' => [
                 [ null, null, '', '     ', 'cat', 'horse', 19478 ],
+                'cat'
+            ],
+
+            'Valid Example 6' => [
+                [ 'cat', 'blue russian cat', 'horse', 19478 ],
                 'cat'
             ],
         ];
