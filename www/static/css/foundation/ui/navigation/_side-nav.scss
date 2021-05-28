@@ -26,7 +26,7 @@ $border-bottom-width: 2px;
       padding: 0.5rem 0.75rem;
       display: block;
       border-left: $border-bottom-width solid transparent;
-      @media (min-width: 950px) {
+      @media #{$mediumwide-up} {
         //ensure isn't applied on mobile
         &:hover {
           border-left: $border-bottom-width solid $content-ui-hover;
@@ -70,7 +70,7 @@ $border-bottom-width: 2px;
         }
       }
     }
-    @media (min-width: 950px) {
+    @media #{$mediumwide-up} {
       //ensure isn't applied on mobile
       &:hover > ul.flyout {
         display: block;
