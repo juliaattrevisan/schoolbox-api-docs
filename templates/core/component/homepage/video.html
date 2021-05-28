@@ -2,9 +2,7 @@
     <script type="text/javascript">
         $(function(){
             var component    = $("#component{COMPONENT_INSTANCE_ID}");
-            var videoElement = component.find('[data-videocomponent]').mediaelementplayer({
-                stretching: 'responsive'
-            });
+            var videoElement = component.find('[data-videocomponent]').mediaelementplayer();
             var video        = videoElement.data('mediaelementplayer');
             component.on('click', 'a[data-videolink]', function(event) {
                 event.preventDefault();
@@ -108,9 +106,9 @@
                        data-videocomponent
                        preload="none"
                        poster="/cms/videoThumb.php?type=sbfs&id={DEFAULT_VIDEO_ID}&size=poster"
-                       height="400px"
                        width="100%"
-                       style="max-width: 100%; height:400px"
+                       height="400px"
+                       style="max-width: 100%; height: 400px;"
                        >
                   <source src="/cms/sendVideo.php?type=sbfs&id={DEFAULT_VIDEO_ID}" type='video/mp4'>
                 </video>

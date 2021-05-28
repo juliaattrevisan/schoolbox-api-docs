@@ -62,8 +62,10 @@ These are its args, which is given for you
                controls
                preload="none"
                poster="/cms/videoThumb.php?type={{ type }}&id={{ file.id }}&size=poster"
+               width="100%"
                height="200"
-               width="100%">
+               style="max-width: 100%; height: 200px;"
+               >
             <source src="/cms/sendVideo.php?type={{ type }}&id={{ file.id }}" type='video/mp4'>
         </video>
     {% else %}
