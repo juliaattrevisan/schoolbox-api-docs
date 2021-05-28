@@ -28,6 +28,10 @@ export default {
     },
 
     props: {
+        maxFileSize: {
+            type: Number, 
+            required: true
+        },
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
@@ -44,6 +48,7 @@ export default {
             hasError: false, //to manage UI elements
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
+            isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
         }
@@ -83,7 +88,7 @@ export default {
          *
          */
         initVideojsRecord () {
-            this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(), this.onVideojsReady);
+            this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(this.maxFileSize), this.onVideojsReady);
         },
 
         /**
@@ -133,7 +138,43 @@ export default {
          *
          */
         onFinishRecord () {
-            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //video webm's are converted so they are seekable on playback
+            if (this.isRecordingAboveMaxFileSize()) {
+                this.onRecordingAboveMaxFileSize();
+            } else {
+                this.checkForConverting();
+            }
+        },
+
+        /**
+         * ensure the recording size is not above the max allowed
+         *
+         */
+        isRecordingAboveMaxFileSize () {
+            if (this.player.recordedData.size > this.maxFileSize) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        /**
+         * display over limit error and reset for another possible recording
+         *
+         */
+        onRecordingAboveMaxFileSize () {
+            this.isRecordingOverMaxFileSize = true;
+            this.hasError = true;
+            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
+            this.$emit(recordMediaEvents.PROCCESS_STOPPED); //notify any UI to re-enable
+            this.player.record().getDevice(); 
+        },
+
+        /**
+         * video webm's are converted so they are seekable on playback, otherwise the video is ready to use
+         *
+         */
+        checkForConverting () {
+            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //if it's a webm
                 this.player.on('finishConvert', this.onFinishConvert);
             } else {
                 this.recordedVideoReady(this.player.recordedData);
@@ -211,6 +252,7 @@ export default {
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
+            this.isRecordingOverMaxFileSize = false;
         },
 
         /**
@@ -271,6 +313,10 @@ export default {
             </template>
             <template v-else-if="hasPermissionDeniedError">
                 <div class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
+                <button @click.prevent="onCloseErrorModalSelected">Close</button>
+            </template>
+            <template v-else-if="isRecordingOverMaxFileSize">
+                <div class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>
             </template>
             <template v-else>

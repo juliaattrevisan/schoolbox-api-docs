@@ -42,7 +42,7 @@ const getDefaultVideojsRecordOptions = () => {
 * 
 * @returns { Object }
 */ 
-export const getAudioOnlyRecordOptions = () => {
+export const getAudioOnlyRecordOptions = (maxFileSize) => {
 	const options = getDefaultVideojsRecordOptions();
     options.plugins = {
 		wavesurfer: { // this plugin is only needed when recording audio-only
@@ -73,6 +73,8 @@ export const getAudioOnlyRecordOptions = () => {
             audioMimeType: 'audio/webm;codecs=opus',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
 			debug: IS_DEBUG_MODE,
+            maxFileSize: maxFileSize,
+            timeSlice: 1000, //to enable the maxFileSize restriction
 		}
 	}
 	applyAudioWorkarounds(options);
@@ -108,7 +110,7 @@ const applyAudioWorkarounds = (options) => {
 * 
 * @returns { Object }
 */ 
-export const getRecordCameraOptions = () => {
+export const getRecordCameraOptions = (maxFileSize) => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
         record: {
@@ -121,6 +123,8 @@ export const getRecordCameraOptions = () => {
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: RECORDING_LENGTH, 
             debug: IS_DEBUG_MODE,
+            maxFileSize: maxFileSize,
+            timeSlice: 1000, //to enable the maxFileSize restriction
         }
     }
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -135,7 +139,7 @@ export const getRecordCameraOptions = () => {
 * 
 * @returns { Object }
 */ 
-export const getRecordScreenOptions = () => {
+export const getRecordScreenOptions = (maxFileSize) => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
         record: {
@@ -145,6 +149,8 @@ export const getRecordScreenOptions = () => {
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             debug: IS_DEBUG_MODE,
+            maxFileSize: maxFileSize,
+            timeSlice: 1000, //to enable the maxFileSize restriction
         }
     }
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);

@@ -15,7 +15,11 @@ export default {
     },
 
     props: {
-       preRecordedData: { //to display an already existing recording on startup
+        maxFileSize: {
+            type: Number, 
+            required: true
+        },
+        preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
         },
@@ -27,6 +31,7 @@ export default {
 <template>
         
     <record-audio-only-browser
+        :max-file-size="maxFileSize"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
         v-on="$listeners"
     />

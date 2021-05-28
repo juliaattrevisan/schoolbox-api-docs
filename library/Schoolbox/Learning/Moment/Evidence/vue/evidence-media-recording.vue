@@ -13,6 +13,7 @@ import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
 import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
+// import filesize from 'filesize.es6.js';
 
 
 export default {
@@ -32,10 +33,14 @@ export default {
                 return ['video', 'audio', 'photo'].indexOf(value) !== -1 // The value must match one of these strings
             }
         },
+        maxFileSize: {
+            type: Number, 
+            required: true
+        },
         preRecordedData: {  //to display an already existing recording on startup, should contain hash, size, and mime
             type: Object,
             required: false
-        },
+        }
     },
 
     data () {
@@ -55,6 +60,7 @@ export default {
     },
 
     created () { //these vars are created so they can be accessed within the template
+        // debugger;
         this.hasDeviceCapture = hasDeviceCapture();
         this.initRatios();
         this.recordMediaTypes = recordMediaTypes;
@@ -160,7 +166,10 @@ export default {
                 this.displayUploadSuccessful();
                 document.dispatchEvent(new CustomEvent('evidence-media-recording__onUploadComplete')); //dispach to form.twig to continue form submit
             } catch (error) {
+                console.warn('in onFormSubmit');
                 console.warn(error);
+                this.isUploading = false;
+                this.hasUploadError = true; //to show the error modal
             }
         },
 
@@ -189,9 +198,10 @@ export default {
                 this.isUploading = false; //hide the upload modal
                 return response.data;
             } catch (error) {
+                console.warn('in uploadMediaAndReturnResponse');
+                console.warn(error);
                 this.isUploading = false; //hide the upload modal
                 this.hasUploadError = true; //to show the error modal
-                console.warn(error);
             }
         },
 
@@ -280,6 +290,7 @@ export default {
 
         <record-photo
             v-if="recordMediaType === recordMediaTypes.PHOTO"
+            :max-file-size="maxFileSize"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
@@ -288,6 +299,7 @@ export default {
         />
         <record-camera
             v-else-if="recordMediaType === recordMediaTypes.CAMERA"
+            :max-file-size="maxFileSize"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
@@ -296,6 +308,7 @@ export default {
         />
         <record-audio-only
             v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
+            :max-file-size="maxFileSize"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
@@ -303,7 +316,10 @@ export default {
             @on-ratio-ready="onRatioReady"
         />
 
-        <over-media-modal v-if="isUploading" key="isUploadingModal">
+        <over-media-modal v-if="hasUploadError" key="isUploadingModal">
+            <div class="alert-box alert">Sorry, there was an error while uploading.</div>
+        </over-media-modal>
+        <over-media-modal v-else-if="isUploading" key="isUploadingModal">
             <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
             <p><em>Uploading media, please wait...</em></p>
         </over-media-modal>
