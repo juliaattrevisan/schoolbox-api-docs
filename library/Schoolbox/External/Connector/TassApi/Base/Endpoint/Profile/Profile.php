@@ -869,10 +869,10 @@ class Profile implements IStrategy
              */
             $email = '';
 
-            if (isset($employee['school_email_address']) && '' !== trim((string)$employee['school_email_address'])) {
-                $email = trim((string)$employee['school_email_address']);
-            } elseif (isset($employee['email_address']) && '' !== trim((string)$employee['email_address'])) {
-                $email = trim((string)$employee['email_address']);
+            if (isset($staff['school_email_address']) && '' !== trim((string)$staff['school_email_address'])) {
+                $email = trim((string)$staff['school_email_address']);
+            } elseif (isset($staff['email_address']) && '' !== trim((string)$staff['email_address'])) {
+                $email = trim((string)$staff['email_address']);
             }
 
             /* For some reason, first_name and preferred_name might not actually be in the payload
