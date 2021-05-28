@@ -51,7 +51,7 @@ class FirstMeaningfulValue
          * Use a custom callback so 0 is a valid outcome
          */
         $temp = array_filter($temp, static function ($val) {
-            return !is_null($val) && '' !== $val;
+            return '' !== $val;
         });
 
         /* Reindex the resultant array because the
