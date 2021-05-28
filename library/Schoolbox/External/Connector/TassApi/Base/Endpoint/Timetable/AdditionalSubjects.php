@@ -292,7 +292,9 @@ class AdditionalSubjects implements IStrategy
                         ->setName($additionalSubject['sub_long'])
                         ->setCode($code);
 
-                    $this->classEntryMapper->save($nonUnitisedClass);
+                    if ($this->perform) {
+                        $this->classEntryMapper->save($nonUnitisedClass);
+                    }
 
                     $this->log->info(sprintf(
                         "Additional subject %s (%s) added for %s (user %s)",
@@ -335,7 +337,9 @@ class AdditionalSubjects implements IStrategy
                                 ->setExternalId((string)$externalId)
                                 ->setClass($class);
 
-                            $this->classInvolvementMapper->save($classInvolvement);
+                            if ($this->perform) {
+                                $this->classInvolvementMapper->save($classInvolvement);
+                            }
 
                             $this->log->info(sprintf(
                                 "Additional subject involvement in %s (%s) added for %s (user %s)",
