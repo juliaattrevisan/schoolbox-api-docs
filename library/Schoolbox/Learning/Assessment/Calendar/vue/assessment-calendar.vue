@@ -914,8 +914,8 @@ export default {
          * @param date
          */
         viewWeek(date) {
-            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, false);
             this.calendarApi.gotoDate(date);
+            this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, false);
         },
     }
 }
