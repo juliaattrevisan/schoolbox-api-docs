@@ -120,83 +120,103 @@ export default {
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist sources">
                             <legend>Sources</legend>
-                            <input type="checkbox"
-                                   id="sourceSelectAll"
-                                   :checked="allSelected('source')"
-                                   @change="toggleSelectAll($event, 'source')" />
-                            <label for="sourceSelectAll">Select all</label>
-
-                            <template v-for="source in sources">
-                                <input type="checkbox"
-                                       name="source"
-                                       :id="'source' + String(source.ids)"
-                                       :key="'input-' + source.id"
-                                       :value="source.ids"
-                                       v-model="selected.source" />
-                                <label :for="'source' + String(source.ids)" :key="'label' + source.id">{{ source.name }}</label>
-                            </template>
+                            <ul>
+                                <li>
+                                    <input type="checkbox"
+                                        id="sourceSelectAll"
+                                        :checked="allSelected('source')"
+                                        @change="toggleSelectAll($event, 'source')" />
+                                    <label for="sourceSelectAll">Select all</label>
+                                </li>
+                                <template v-for="source in sources">
+                                <li :key="'input-' + source.id">
+                                    <input type="checkbox"
+                                        name="source"
+                                        :id="'source' + String(source.ids)"
+                                        :key="'input-' + source.id"
+                                        :value="source.ids"
+                                        v-model="selected.source" />
+                                    <label :for="'source' + String(source.ids)" :key="'label' + source.id">{{ source.name }}</label>
+                                </li>
+                                </template>
+                            </ul>
                         </fieldset>
                     </div>
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist groups">
                             <legend>Groups</legend>
-                            <input type="checkbox"
-                                   id="groupsSelectAll"
-                                   :checked="allSelected('group')"
-                                   @change="toggleSelectAll($event, 'group')"/>
-                            <label for="groupsSelectAll">Select all</label>
-
-                            <template v-for="group in groups">
-                                <input type="checkbox"
-                                       name="group"
-                                       :id="'group' + String(group.id)"
-                                       :key="'input-' + group.id"
-                                       :value="group.id"
-                                       v-model="selected.group" />
-                                <label :for="'group' + String(group.id)" :key="'label-' + group.id">{{ group.name }}</label>
-                            </template>
+                            <ul>
+                                <li>
+                                    <input type="checkbox"
+                                        id="groupsSelectAll"
+                                        :checked="allSelected('group')"
+                                        @change="toggleSelectAll($event, 'group')"/>
+                                    <label for="groupsSelectAll">Select all</label>
+                                </li>
+                                <template v-for="group in groups">
+                                <li :key="'input-' + group.id">    
+                                    <input type="checkbox"
+                                        name="group"
+                                        :id="'group' + String(group.id)"
+                                        :key="'input-' + group.id"
+                                        :value="group.id"
+                                        v-model="selected.group" />
+                                    <label :for="'group' + String(group.id)" :key="'label-' + group.id">{{ group.name }}</label>
+                                </li>
+                                </template>
+                            </ul>    
                         </fieldset>
                     </div>
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist campus">
                             <legend>Campus</legend>
-                            <input type="checkbox"
-                                   id="campusSelectAll"
-                                   :checked="allSelected('campus')"
-                                   @change="toggleSelectAll($event, 'campus')"/>
-                            <label for="campusSelectAll">Select all</label>
-
-                            <template v-for="campus in campuses">
-                                <input type="checkbox"
-                                       name="group"
-                                       :id="'campus' + String(campus.id)"
-                                       :key="'input-' + campus.id"
-                                       :value="campus.id"
-                                       v-model="selected.campus" />
-                                <label :for="'campus' + String(campus.id)" :key="'label-' + campus.id">{{ campus.name }}</label>
-                            </template>
+                            <ul>
+                                <li>
+                                    <input type="checkbox"
+                                        id="campusSelectAll"
+                                        :checked="allSelected('campus')"
+                                        @change="toggleSelectAll($event, 'campus')"/>
+                                    <label for="campusSelectAll">Select all</label>
+                                </li>
+                                <template v-for="campus in campuses">
+                                <li :key="'input-' + campus.id">    
+                                    <input type="checkbox"
+                                        name="group"
+                                        :id="'campus' + String(campus.id)"
+                                        :key="'input-' + campus.id"
+                                        :value="campus.id"
+                                        v-model="selected.campus" />
+                                    <label :for="'campus' + String(campus.id)" :key="'label-' + campus.id">{{ campus.name }}</label>
+                                </li>    
+                                </template>
+                            </ul>        
                         </fieldset>
                     </div>
                     <div class="small-6 large-3 columns">
                         <fieldset class="checklist events">
                             <legend>Event</legend>
-                            <input type="checkbox"
-                                   id="eventTypeSelectAll"
-                                   :checked="allSelected('eventType')"
-                                   @change="toggleSelectAll($event, 'eventType')" />
-                            <label for="eventTypeSelectAll">Select all</label>
-
-                            <template v-for="eventType in eventTypes">
-                                <input type="checkbox"
-                                       name="group"
-                                       :id="'eventType' + String(eventType.id)"
-                                       :key="'input-' + eventType.id"
-                                       :value="eventType.id"
-                                       v-model="selected.eventType" />
-                                <label :for="'eventType' + String(eventType.id)"
-                                       :style="{backgroundColor: eventType.color}" 
-                                       :key="'label-' + eventType.id">{{ eventType.name }}</label>
-                            </template>
+                            <ul>
+                                <li>
+                                    <input type="checkbox"
+                                        id="eventTypeSelectAll"
+                                        :checked="allSelected('eventType')"
+                                        @change="toggleSelectAll($event, 'eventType')" />
+                                    <label for="eventTypeSelectAll">Select all</label>
+                                </li>
+                                <template v-for="eventType in eventTypes">
+                                <li :key="'input-' + eventType.id">    
+                                    <input type="checkbox"
+                                        name="group"
+                                        :id="'eventType' + String(eventType.id)"
+                                        :key="'input-' + eventType.id"
+                                        :value="eventType.id"
+                                        v-model="selected.eventType" />
+                                    <label :for="'eventType' + String(eventType.id)"
+                                        :style="{backgroundColor: eventType.color}" 
+                                        :key="'label-' + eventType.id">{{ eventType.name }}</label>
+                                </li>        
+                                </template>
+                            </ul>     
                         </fieldset>
                     </div>
                 </fieldset>
@@ -205,3 +225,13 @@ export default {
         </form>
     </reveal-modal>
 </template>
+
+<style lang="scss" scoped>
+ul {
+    margin: 0px;
+    list-style: none;
+}
+label::v-deep {
+    padding-right: 1rem !important;
+}
+</style>
