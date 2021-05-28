@@ -56,7 +56,7 @@ class Family
      *
      * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
@@ -65,7 +65,7 @@ class Family
      *
      * @var string
      */
-    private $spousePrefix;
+    private string $spousePrefix;
 
 
     /**
@@ -73,7 +73,7 @@ class Family
      *
      * @var int
      */
-    private $addnumFather;
+    private int $addnumFather;
 
 
     /**
@@ -81,7 +81,7 @@ class Family
      *
      * @var int
      */
-    private $addnumMother;
+    private int $addnumMother;
 
 
     /**
@@ -89,7 +89,7 @@ class Family
      *
      * @var array
      */
-    private $phones;
+    private array $phones;
 
 
     /**
@@ -97,7 +97,7 @@ class Family
      *
      * @var array
      */
-    private $lookup = [];
+    private array $lookup = [];
 
 
     /**

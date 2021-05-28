@@ -24,7 +24,7 @@ class Watchlist
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
@@ -32,7 +32,7 @@ class Watchlist
      *
      * @var string
      */
-    private $dsn;
+    private string $dsn;
 
 
     /**

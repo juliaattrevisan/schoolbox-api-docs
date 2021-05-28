@@ -35,7 +35,7 @@ class Token
     /**
      * @var string
      */
-    private $decodedToken;
+    private string $decodedToken;
 
 
     /**

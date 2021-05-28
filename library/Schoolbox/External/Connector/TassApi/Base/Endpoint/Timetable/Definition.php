@@ -42,13 +42,13 @@ class Definition implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
-     * @var Api
+     * @var array
      */
-    private $api;
+    private array $api;
 
 
     /**
@@ -56,37 +56,37 @@ class Definition implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Registry
      */
-    private $timetableRegistry;
+    private Registry $timetableRegistry;
 
 
     /**
      * @var Registry
      */
-    private $cycleRegistry;
+    private Registry $cycleRegistry;
 
 
     /**
      * @var TimetableCycleMapper
      */
-    private $timetableCycleMapper;
+    private TimetableCycleMapper $timetableCycleMapper;
 
 
     /**
      * @var TimetablePeriodMapper
      */
-    private $timetablePeriodMapper;
+    private TimetablePeriodMapper $timetablePeriodMapper;
 
 
     /**
      * @var Lookup
      */
-    private $lookup;
+    private Lookup $lookup;
 
 
     /**
