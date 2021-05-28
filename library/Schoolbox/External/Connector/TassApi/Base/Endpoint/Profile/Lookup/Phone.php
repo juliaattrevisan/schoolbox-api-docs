@@ -33,15 +33,37 @@ class Phone
 
 
     /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a father specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $fatherAddressDescription;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a mother specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $motherAddressDescription;
+
+
+    /**
      * Phone constructor.
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
      *
-     * @param IApi $api
+     * @param IApi   $api
+     * @param string $fatherAddressDescription
+     * @param string $motherAddressDescription
      */
-    public function __construct(IApi $api)
+    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription)
     {
         $this->api = $api;
+        $this->fatherAddressDescription = $fatherAddressDescription;
+        $this->motherAddressDescription = $motherAddressDescription;
     }
 
 
@@ -131,7 +153,7 @@ class Phone
 
                 /* Relationship is actually a two-part tuple:
                  *
-                 * A "relationshiop" value like we all know, such as a mother or a father
+                 * A "relationship" value like we all know, such as a mother or a father
                  * and a "relationship type" which is typically "Biological" or "Guardian"
                  * so you can tell who's a biological mum and who is a stepmum
                  *
@@ -154,7 +176,7 @@ class Phone
 
                 /* Split fam: non-prefixed fields are for a specific guy
                  */
-                if ($address['address_description'] === $config->get('tass_mother_address_description')) {
+                if ($address['address_description'] === $this->motherAddressDescription) {
                     $stack[$address['parent_code']][Family::MOTHER_NODE] = [
                         'firstname' => trim((string)$address['m_preferred_name']),
                         'surname' => trim((string)$address['m_surname']),
@@ -164,7 +186,7 @@ class Phone
                         'email' => $email1 ?: $email2,
                         'relationship' => $relationshipM,
                     ];
-                } elseif ($address['address_description'] === $config->get('tass_father_address_description')) {
+                } elseif ($address['address_description'] === $this->fatherAddressDescription) {
                     $stack[$address['parent_code']][Family::FATHER_NODE] = [
                         'firstname' => trim((string)$address['f_preferred_name']),
                         'surname' => trim((string)$address['f_surname']),

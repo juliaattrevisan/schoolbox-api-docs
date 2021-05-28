@@ -112,6 +112,24 @@ class Profile implements IStrategy
 
 
     /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a father specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $fatherAddressDescription;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a mother specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $motherAddressDescription;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private $baseProfileMapper;
@@ -150,6 +168,8 @@ class Profile implements IStrategy
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
      * @param int                             $addnumMother
+     * @param string                          $fatherAddressDescription
+     * @param string                          $motherAddressDescription
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -163,6 +183,8 @@ class Profile implements IStrategy
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
+        string $fatherAddressDescription,
+        string $motherAddressDescription,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -175,6 +197,8 @@ class Profile implements IStrategy
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
+        $this->fatherAddressDescription = $fatherAddressDescription;
+        $this->motherAddressDescription = $motherAddressDescription;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -218,7 +242,11 @@ class Profile implements IStrategy
             $this->spousePrefix,
             $this->addnumFather,
             $this->addnumMother,
-            (new Phone($this->api[Codec\DSN::MODULE_STUDENT_DETAILS]))->generate()
+            (new Phone(
+                $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
+                $this->fatherAddressDescription,
+                $this->motherAddressDescription
+            ))->generate()
         ))->generate();
 
         /* Also alert any broken tass api payloads that we detected in lookups
