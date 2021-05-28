@@ -38,6 +38,7 @@ use External_UserInterface;
 use GuzzleHttp;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Predis;
+use Proxy\Server as ProxyServer;
 use RuntimeException;
 use Schoolbox\Admin\Navigation\Renderer as AdminNavigationRenderer;
 use Schoolbox\API\Token\Jwt;
@@ -1277,14 +1278,21 @@ abstract class Kernel
             $di->lazyGet('router')
         ]));
 
+        $di->set(
+            'proxyServer',
+            $di->lazyNew(
+                ProxyServer::class,
+                ['conf' => $di->lazyGet('config')]
+            )
+        );
+
         // TODO this should be used wherever a HTTP client is used
         $di->set(
             'httpClient',
             $di->lazy(
                 static function () use ($di) {
-                    /** @var IConfigLoader $config */
-                    $config      = $di->get('config');
-                    $proxyServer = new \Proxy\Server($config);
+                    /** @var ProxyServer $proxyServer */
+                    $proxyServer = $di->get('proxyServer');
                     return new GuzzleHttp\Client(['curl' => $proxyServer->buildCurlOptions()]);
                 }
             ),
