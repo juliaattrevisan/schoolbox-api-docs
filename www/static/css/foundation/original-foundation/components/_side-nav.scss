@@ -77,13 +77,16 @@ $side-nav-divider-color: scale-color($white, $lightness: -10%) !default;
       display: block;
       margin: $side-nav-link-margin;
       padding: $side-nav-link-padding;
-      &:hover,
-      &:focus {
-        background: $link-bg-hover;
-        color: $link-color-hover;
-      }
-      &:active {
-        color: $link-color-active;
+      @media #{$mediumwide-up} {
+        //ensure isn't applied on mobile
+        &:hover,
+        &:focus {
+          background: $link-bg-hover;
+          color: $link-color-hover;
+        }
+        &:active {
+          color: $link-color-active;
+        }
       }
     }
 

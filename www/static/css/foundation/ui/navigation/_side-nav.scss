@@ -26,10 +26,12 @@ $border-bottom-width: 2px;
       padding: 0.5rem 0.75rem;
       display: block;
       border-left: $border-bottom-width solid transparent;
-
-      &:hover {
-        border-left: $border-bottom-width solid $content-ui-hover;
-        color: $side-nav-link-color-hover;
+      @media #{$mediumwide-up} {
+        //ensure isn't applied on mobile
+        &:hover {
+          border-left: $border-bottom-width solid $content-ui-hover;
+          color: $side-nav-link-color-hover;
+        }
       }
     }
 
@@ -58,7 +60,7 @@ $border-bottom-width: 2px;
         z-index: 2;
 
         @media #{$mediumwide-up} {
-          @include box-shadow(2px, 0, 4px, rgba(0,0,0,0.3));
+          @include box-shadow(2px, 0, 4px, rgba(0, 0, 0, 0.3));
           position: absolute;
           margin-top: -35px;
           right: -100%;
@@ -68,8 +70,11 @@ $border-bottom-width: 2px;
         }
       }
     }
-    &:hover > ul.flyout {
-      display: block;
+    @media #{$mediumwide-up} {
+      //ensure isn't applied on mobile
+      &:hover > ul.flyout {
+        display: block;
+      }
     }
     &.parent-item > a:after {
       font-family: $font-family-icon;
@@ -94,7 +99,7 @@ $border-bottom-width: 2px;
       overflow: auto;
     }
     // flyout menus near bottom of the nav - 'drop up'
-    > li:nth-last-child(-n+5) {
+    > li:nth-last-child(-n + 5) {
       position: relative;
 
       .flyout {
@@ -106,12 +111,12 @@ $border-bottom-width: 2px;
   .dropdown-btn {
     width: 100%;
     background-color: $white;
-    padding: .75rem;
+    padding: 0.75rem;
     display: none;
 
     &:after {
       font-family: $font-family-icon;
-      content: '\e621';
+      content: "\e621";
       float: right;
     }
   }

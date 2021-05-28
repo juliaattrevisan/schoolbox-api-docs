@@ -9,24 +9,10 @@
  # @param array $adminSubnav      A set of tuples for each node in the menu
  # @param string $pageCurrent     A string corresponding to url in a tuple
  #}
+<script src="{{ CDN_PREFIX }}/javascript/admin/menu.js"></script>
 <script type="text/javascript">
     $(function() {
-        const mq = window.matchMedia( "(max-width: 950px)" );
-        if (mq.matches) {
-            $("[data-parent-item] > a").on('click', function(event) {
-                event.preventDefault();
-
-                let $target = $(this).closest('[data-parent-item]').find("[data-admin-subnav-flyout]").slideToggle();
-
-                $('[data-admin-subnav-flyout]').not($target).slideUp();
-            });
-        }
-
-        $('[data-admin-subnav-dropdown]').on('click', function(event) {
-            event.preventDefault();
-
-            $('[data-admin]').toggle();
-        });
+        $('#admin-nav').adminMenu();
     });
 </script>
 
@@ -87,7 +73,7 @@
                 {% set parentSelectedCss = 'active' %}
             {% endif %}
 
-            <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" data-parent-item>
+            <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" {% if parentData.children|length %}data-parent-item{% endif %}>
 
                 {# Only link parent nodes if they have no children
                  # Otherwise rely entirely on the children
