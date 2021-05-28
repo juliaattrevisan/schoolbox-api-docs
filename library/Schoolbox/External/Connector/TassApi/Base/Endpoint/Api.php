@@ -225,7 +225,7 @@ class Api implements IApi
             /* Successful response from server, but it might not send a valid data payload back
              * so try to decode it. If it can't decode properly, return null
              */
-            if ((int)$response->getStatusCode() === 200) {
+            if ($response->getStatusCode() === 200) {
                 return json_decode($response->getBody()->getContents(), true);
             }
 
