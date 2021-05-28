@@ -123,21 +123,21 @@ class Phone
                  * "Value X"
                  * When the address_description is not one of the configured values, then assume
                  * it's for a nuclear family and it should apply to both in the same way it has
-                 * always done (mobile_1 for mother, mobile_2 for father, etc.) using that
+                 * always done (mobile_phone_1 for mother, mobile_phone_2 for father, etc.) using that
                  * numeric suffix assumption.
                  *
                  *
                  * Comm Rules
                  * -----------
                  * When this occurs for a split family, assume that the fields
-                 * [mobile_1, mobile_2, email_1, email_2]
+                 * [mobile_phone_1, mobile_phone_2, email_1, email_2]
                  * actually belong to one person (e.g. a guy has two phone numbers/two email addresses)
                  * and should be assigned to the guy specified by address_description
                  *
                  * For a nuclear family,
-                 * [mobile_1, mobile_2, email_1, email_2]
+                 * [mobile_phone_1, mobile_phone_2, email_1, email_2]
                  * are actually shared/distributed among the family so continue with the previous assumption
-                 * ("convention") that mobile_1 and email_1 belonged to mother and mobile_2 and email_2
+                 * ("convention") that mobile_phone_1 and email_1 belonged to mother and mobile_phone_2 and email_2
                  * belonged to father, and carry on like we used to do
                  */
 
