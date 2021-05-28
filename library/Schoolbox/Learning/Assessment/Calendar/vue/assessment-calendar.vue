@@ -13,7 +13,7 @@ import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalend
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
-import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@schoolbox/fullcalendar/customised-calendar-event';
 
 
 // Various URLs this calendar can make use of
@@ -75,7 +75,7 @@ export default {
             selectedFilters: null,
             eventTypeResources: [],
             folderResources: [],
-            currentView: null,
+            // currentView: null,
             termStartDate: null,
             termEndDate: null,
             cursor: 0,
@@ -121,6 +121,9 @@ export default {
                 displayDatetime: FORMAT_DISPLAY_DATETIME,
                 displayWeekDay: FORMAT_DISPLAY_WEEK_DAY,
             };
+        },
+        currentView() {
+            return this.$refs.fullCalendar.getApi().view.type;
         },
     },
 
@@ -457,7 +460,7 @@ export default {
             const eventSource = calendarApi.getEventSourceById('events');
             const groupedEventSource = calendarApi.getEventSourceById('groupedEvents');
 
-            this.currentView = info.view.type;
+            // this.currentView = info.view.type;
 
             this.destroyPopOver();
 
@@ -919,12 +922,10 @@ export default {
          * @param date
          */
         viewWeek(date) {
-            this.calendarApi.gotoDate(date);
             this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, false);
+            this.calendarApi.gotoDate(date);
         },
-
     }
-
 }
 
 </script>
