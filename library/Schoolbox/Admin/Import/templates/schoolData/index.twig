@@ -31,7 +31,7 @@
         {# On dataSource change, decide which island to show:
          # it's one of either csv island or config island
          #}
-        $('#schooldata_import_data_source').on('change', function(event) {
+        $('#schooldata_import_data_source-field').on('change', function(event) {
             switchIslands($(this).val());
         });
 
@@ -93,11 +93,11 @@
          * @param val
          */
         function switchIslands(dataSource) {
-
+console.log(dataSource);
             {# If you chose a non-isams/kamar/sentral/etc option, hide both csv and config islands
              # This prompts the user to hit Save instead of distracting them with options
              #}
-            if (dataSource == '') {
+            if (dataSource == '' || dataSource == 'csv') {
                 $('#csv-island').hide();
                 $('#config-island').hide();
                 hideConfig(configElements);
