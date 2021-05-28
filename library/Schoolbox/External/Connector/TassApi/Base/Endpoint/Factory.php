@@ -197,17 +197,13 @@ class Factory
         int $addnumMother,
         string $fatherAddressDescription,
         string $motherAddressDescription,
-
-        /* Profile pieces
-        */
+        /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
         UserProfile\Relationship\Mapper $relationshipMapper,
-
-        /* Timetable pieces
-        */
+        /* Timetable pieces */
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper,
         ClassEntryMapper $classEntryMapper,
