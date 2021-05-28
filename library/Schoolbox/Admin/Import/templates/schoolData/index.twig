@@ -97,7 +97,7 @@
             {# If you chose a non-isams/kamar/sentral/etc option, hide both csv and config islands
              # This prompts the user to hit Save instead of distracting them with options
              #}
-            if (dataSource == '' || dataSource == 'csv') {
+            if (dataSource == '') {
                 $('#csv-island').hide();
                 $('#config-island').hide();
                 hideConfig(configElements);
@@ -135,66 +135,69 @@
 
     {{ renderAdminNavigation(pageCurrent) }}
 
-    <div class="admin-content hide" id='option-container'>
-        <div class="small-12 columns">
-            <h2 class="subheader">School Data Import</h2>
-        </div>
+    <div class="admin-content">
+        <div id='option-container' class="hide">
+            <div class="small-12 columns">
+                <h2 class="subheader">School Data Import</h2>
+            </div>
 
-        {% include '@settings/moduleConfig.twig' with configContext only %}
+            {% include '@settings/moduleConfig.twig' with configContext only %}
 
-        <div class="small-12 island" id="config-island">
-            <div class="row">
-                {% if hasIndicator %}
-                <div class="small-12 medium-6 island">
-                    <h3 class="subheader">Status</h3>
+            <div class="small-12 island" id="config-island">
+                <div class="row">
+                    {% if hasIndicator %}
+                        <div class="small-12 medium-6 island">
+                            <h3 class="subheader">Status</h3>
 
-                    <section class="content">
-                        <div id="status-indicator-container">
-                            <div class="loader"></div>
+                            <section class="content">
+                                <div id="status-indicator-container">
+                                    <div class="loader"></div>
+                                </div>
+
+                                <script>
+                                    $(function() {
+                                        $.get('{{ statusIndicatorRoute }}', function(response) {
+                                            $('#status-indicator-container').html(response);
+                                        });
+                                    });
+                                </script>
+
+                                <p>
+                                    Find out more about your
+                                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status</a>.
+                                </p>
+                            </section>
                         </div>
-
-                        <script>
-                            $(function() {
-                                $.get('{{ statusIndicatorRoute }}', function(response) {
-                                    $('#status-indicator-container').html(response);
-                                });
-                            });
-                        </script>
-
-                        <p>
-                            Find out more about your
-                            <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status</a>.
-                        </p>
-                    </section>
-                </div>
-                {% endif %}
-
-                <div class="small-12 {% if hasIndicator %}medium-6{% endif %} island">
-                    <h3 class="subheader">Your Data</h3>
-
-                    <section class="content">
-                        <p>You can download the current state of your data below.</p>
-
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
-
-
-                        <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
-                    </section>
+                    {% endif %}
                 </div>
             </div>
-        </div>
-        <div class="small-12 island" id="csv-island">
-            <h3 class="subheader">Import from csv files</h3>
 
-            {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
+            <div class="small-12 island" id="csv-island">
+                <h3 class="subheader">Import from csv files</h3>
+
+                {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
+
+                <section class="content">
+                    <p>From this page you can import different data into Schoolbox via CSV import files.  Please note if you are using a live connection you may only load users, all other data will be loaded automatically via your SIS connector.</p>
+                </section>
+            </div>
+        </div>
+
+        <div class="small-12 {% if hasIndicator %}medium-6{% endif %} island">
+            <h3 class="subheader">Your Data</h3>
 
             <section class="content">
-                <p>From this page you can import different data into Schoolbox via CSV import files.  Please note if you are using a live connection you may only load users, all other data will be loaded automatically via your SIS connector.</p>
+                <p>You can download the current state of your data below.</p>
+
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+
+
+                <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
             </section>
         </div>
     </div>
