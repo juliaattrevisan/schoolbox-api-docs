@@ -18,7 +18,6 @@ namespace Schoolbox\External\Connector\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 
-
 /**
  * Class FirstMeaningfulValueTest
  *

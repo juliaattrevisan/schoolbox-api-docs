@@ -108,7 +108,9 @@ class ValidationTest extends TestCase
         $this->expectException(\TypeError::class);
 
         // Substitute this with the method call that is supposed to fail.
-        $test = function (int $b) { return $b + 1; };
+        $test = static function (int $b) {
+            return $b + 1;
+        };
 
         $test($input);
     }

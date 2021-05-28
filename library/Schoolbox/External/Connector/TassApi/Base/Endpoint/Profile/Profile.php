@@ -818,7 +818,7 @@ class Profile implements IStrategy
          */
         $employeeCodec = new Codec\EmployeeExternalId();
 
-         foreach ($employeeSetDedupe as $employee) {
+        foreach ($employeeSetDedupe as $employee) {
              /* Decide salutation
               * These fields could exist, but be null or empty strings
               * Find the first meaningful value
