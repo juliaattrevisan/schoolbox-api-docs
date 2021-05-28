@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup;
 
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\IApi;
 
 /**
@@ -388,10 +389,10 @@ class Family
          *
          * Could be anything.
          */
-        $person['email'] = array_values(array_filter([
-            $family['address'][$addnum]['email1'] ?? '',
-            $family['address'][$addnum]['email2'] ?? '',
-        ]))[0] ?? '';
+        $person['email'] = (new FirstMeaningfulValue())->find([
+            $family['address'][$addnum]['email1'],
+            $family['address'][$addnum]['email2'],
+        ]);
 
         /* Assign an externalId to this person
          */

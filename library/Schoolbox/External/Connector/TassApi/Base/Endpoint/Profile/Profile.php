@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Api;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Profile\Lookup\Phone;
@@ -511,7 +512,10 @@ class Profile implements IStrategy
 
                 /* Find first non-empty mobile phone number (null !== '')
                  */
-                $mobilePhone = array_values(array_filter([$emergencyContact['mobile_phone_1'], $emergencyContact['mobile_phone_2']]))[0] ?? '';
+                $mobilePhone = (new FirstMeaningfulValue())->find([
+                    $emergencyContact['mobile_phone_1'],
+                    $emergencyContact['mobile_phone_2']
+                ]);
 
                 /* Dedupe anybody being listed twice with the same name
                  * If you have two Tim Smiths who are different humans, they'll be deduped
@@ -814,19 +818,16 @@ class Profile implements IStrategy
          */
         $employeeCodec = new Codec\EmployeeExternalId();
 
-        /* Decide salutation
-         * These fields could exist, but be null or empty strings
-         * Find the first meaningful value
-         */
-        $salutation = '';
+         foreach ($employeeSetDedupe as $employee) {
+             /* Decide salutation
+              * These fields could exist, but be null or empty strings
+              * Find the first meaningful value
+              */
+             $salutation = (new FirstMeaningfulValue())->find([
+                 $employee['salutation'],
+                 $employee['title']
+             ]);
 
-        if (isset($employee['salutation']) && '' !== trim((string)$employee['salutation'])) {
-            $salutation = trim((string)$employee['salutation']);
-        } elseif (isset($employee['title']) && '' !== trim((string)$employee['title'])) {
-            $salutation = trim((string)$employee['title']);
-        }
-
-        foreach ($employeeSetDedupe as $employee) {
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
@@ -869,13 +870,10 @@ class Profile implements IStrategy
             /* Find the first non-empty email address for staff; it seems that there's a business
              * email address and a home email address concept going on here
              */
-            $email = '';
-
-            if (isset($staff['school_email_address']) && '' !== trim((string)$staff['school_email_address'])) {
-                $email = trim((string)$staff['school_email_address']);
-            } elseif (isset($staff['email_address']) && '' !== trim((string)$staff['email_address'])) {
-                $email = trim((string)$staff['email_address']);
-            }
+            $email = (new FirstMeaningfulValue())->find([
+                $staff['school_email_address'],
+                $staff['email_address']
+            ]);
 
             /* For some reason, first_name and preferred_name might not actually be in the payload
                     Array
@@ -903,15 +901,11 @@ class Profile implements IStrategy
              * given_names, if it exists
              * default to empty string
              */
-            if (isset($staff['preferred_name']) && '' !== (string)$staff['preferred_name']) {
-                $firstname = trim((string)$staff['preferred_name']);
-            } elseif (isset($staff['first_name']) && '' !== (string)$staff['first_name']) {
-                $firstname = trim((string)$staff['first_name']);
-            } elseif (isset($staff['given_names']) && '' !== (string)$staff['given_names']) {
-                $firstname = trim((string)$staff['given_names']);
-            } else {
-                $firstname = '';
-            }
+            $firstname = (new FirstMeaningfulValue())->find([
+                $staff['preferred_name'],
+                $staff['first_name'],
+                $staff['given_names']
+            ]);
 
             $lastname = trim((string)$staff['surname']);
             $phone = '';
