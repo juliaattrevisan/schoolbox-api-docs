@@ -94,17 +94,24 @@
          */
         function switchIslands(dataSource) {
 
-            {# If you chose a non-isams/kamar/sentral/etc option, hide both csv and config islands
-             # This prompts the user to hit Save instead of distracting them with options
+            {# Show ui elements that are relevant to your choice
+             # (the config island contains the status indicator, relevant only to actual api connectivities)
+             #
+             # Select An Option: hide the csv island, hide the config island, hide the endpoint config fields
+             # CSV: show the csv island, hide the config island, hide the endpoint config fields
+             # Anything else: hide the csv island, show the config island, show the config fields
              #}
             if (dataSource === '') {
                 $('#csv-island').hide();
+                $('#config-island').hide();
                 hideConfig(configElements);
             } else if (dataSource === 'csv') {
                 $('#csv-island').show();
+                $('#config-island').hide();
                 hideConfig(configElements);
             } else  {
                 $('#csv-island').hide();
+                $('#config-island').show();
                 showConfig(configElements);
             }
         }
