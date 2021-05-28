@@ -31,6 +31,7 @@ class FirstMeaningfulValue
      * Returns a trimmed string, ready for ramming into suds
      *
      * @param array $values
+     * @return string
      */
     public function find(array $values): string
     {
