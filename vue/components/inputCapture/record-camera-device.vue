@@ -36,6 +36,7 @@ export default {
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
             hasRecordPlayerError: false, //error with the record player
+            isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
             captureOptions: null //to distinguish between different media types
@@ -92,15 +93,68 @@ export default {
         },
 
         /**
-         * get the correct options depending on the selected media type
+         * ensure the recording doesn't exceed the max file size otherwise allow upload
          *
-         * @returns { Blob }
          */ 
-        async onFileAdded (mediaData) {
+        onFileAdded (mediaData) {
+            this.$refs.recorder.value = ''; //prevent the input capture element showing the preview
+            if (this.isRecordingAboveMaxFileSize(mediaData)) {
+                this.onRecordingAboveMaxFileSize();
+            } else {
+                this.addRecording(mediaData);
+            }
+        },
+
+        /**
+         * ensure the recording size is not above the max allowed
+         *
+         * @return { Boolean }
+         */
+        isRecordingAboveMaxFileSize (mediaData) {
+            if (mediaData.size > this.maxFileSize) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        /**
+         * display over limit error and reset for another possible recording
+         *
+         */
+        onRecordingAboveMaxFileSize () {
+            this.isRecordingOverMaxFileSize = true;
+            this.hasError = true;
+        },
+
+        /**
+         * add recording to be able to preview prior to uploading
+         *
+         */
+        addRecording (mediaData) {
             this.recordedData = mediaData; // the blob object contains the recorded data 
             this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
-            this.$refs.recorder.value = ''; //prevent the input capture element showing the preview
+        },
+
+        /**
+         * close the error modal, animating out
+         *
+         */
+        onCloseErrorModalSelected () {
+            this.isOverMediaModalClosing = true;
+        },
+
+        /**
+         * it's closed now, so disable the errors to allow trying again
+         *
+         */
+        onErrorModalClosed () {
+            this.hasError = false;
+            this.isOverMediaModalClosing = false;
+            this.hasDeviceAlreadyInUseError = false;
+            this.hasPermissionDeniedError = false;
+            this.isRecordingOverMaxFileSize = false;
         },
 
         /**
@@ -144,13 +198,24 @@ export default {
             v-if="hasPreRecordedData || hasNewRecording"
             key="media-container-playback"
             class="media-container media-container-playback"
-            :record-media-type="recordMediaType"
+            :record-media-type="recordMediaTypes.CAMERA"
             :has-pre-recorded-data="hasPreRecordedData"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
             @on-ratio-ready="onRatioReady"
         />
+
+        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
+            <template v-if="isRecordingOverMaxFileSize">
+                <div class="alert-box alert">Sorry, the recording is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
+                <button @click.prevent="onCloseErrorModalSelected">Close</button>
+            </template>
+            <template v-else>
+                <div class="alert-box alert">Sorry, an unknown error has occured.</div>
+                <button @click.prevent="onCloseErrorModalSelected">Close</button>
+            </template>
+        </over-media-modal>
 
     </div>
 

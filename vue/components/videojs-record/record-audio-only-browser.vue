@@ -154,6 +154,7 @@ export default {
         /**
          * ensure the recording size is not above the max allowed
          *
+         * @return { Boolean }
          */
         isRecordingAboveMaxFileSize () {
             if (this.player.recordedData.size > this.maxFileSize) {
