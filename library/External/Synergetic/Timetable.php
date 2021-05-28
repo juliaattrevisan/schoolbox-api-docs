@@ -796,7 +796,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $query = "SELECT
                         Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
                         Timetable.ClassCampus, Timetable.ClassCode, Timetable.StaffID, vStaff.StaffTitle, vStaff.StaffPreferredName,
-                        vStaff.StaffSurname
+                        vStaff.StaffSurname, Timetable.TimetableSeq AS sequence
                     FROM
                         dbo.StudentClasses StudentClasses,
                         dbo.SubjectClasses SubjectClasses,
@@ -830,7 +830,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
             $query = "SELECT
                         Timetable.Room, SubjectClasses.Description, Timetable.DayNumber, Timetable.PeriodNumber,
-                        Timetable.ClassCampus, Timetable.ClassCode
+                        Timetable.ClassCampus, Timetable.ClassCode, Timetable.TimetableSeq AS sequence
                     FROM
                         dbo.SubjectClasses SubjectClasses,
                         dbo.Timetable Timetable
@@ -884,6 +884,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                         'staffFirstname' => $desc['StaffPreferredName'],
                         'staffSurname'   => $desc['StaffSurname'],
                         'staffTitle'     => $desc['StaffTitle'],
+                        'sequence'       => (int)$desc['sequence']
                     ];
 
                     break;
@@ -893,6 +894,20 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         if (is_array($timetable)) {
             usort($timetable, [$this, 'sortTimetable']);
+
+            /* Sort each of the classes occurring in each (day, period) tuple
+             * Sorted uniquely in synergetic by the sequence field
+             */
+            foreach ($timetable as &$periodData) {
+                foreach ($periodData['day'] as $day => &$dayData) {
+                    /* Sort the concurrent classes by their sequence field
+                     * Assume ascending order is the way it should display
+                     */
+                    uasort($dayData, static function (array $a, array $b) {
+                        return $a['sequence'] < $b['sequence'] ? -1 : 1;
+                    });
+                }
+            }
         }
         return $timetable;
     }
