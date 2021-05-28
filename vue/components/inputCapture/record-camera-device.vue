@@ -32,6 +32,7 @@ export default {
 
     data () {
         return {
+            recordedData: null, //the recorded data that will be passed through to #recored-media
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
@@ -125,6 +126,9 @@ export default {
         onRecordingAboveMaxFileSize () {
             this.isRecordingOverMaxFileSize = true;
             this.hasError = true;
+            this.$nextTick(() => {
+                this.$emit(recordMediaEvents.RATIO_READY, this.$refs.errorModal.$el.offsetWidth, this.$refs.errorModal.$el.firstChild.offsetHeight + 40); //just ensure that the entire message is visible
+            });
         },
 
         /**
@@ -206,7 +210,7 @@ export default {
             @on-ratio-ready="onRatioReady"
         />
 
-        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
+        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal" ref="errorModal">
             <template v-if="isRecordingOverMaxFileSize">
                 <div class="alert-box alert">Sorry, the recording is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
                 <button @click.prevent="onCloseErrorModalSelected">Close</button>

@@ -38,12 +38,6 @@ export default {
 <template>
 
     <record-camera-device
-        :max-file-size="maxFileSize"
-        :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
-        v-on="$listeners"
-    />
-
-    <!-- <record-camera-device
         v-if="hasDeviceCapture"
         :max-file-size="maxFileSize"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
@@ -54,6 +48,6 @@ export default {
         :max-file-size="maxFileSize"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
         v-on="$listeners"
-    /> -->
+    />
 
 </template>
