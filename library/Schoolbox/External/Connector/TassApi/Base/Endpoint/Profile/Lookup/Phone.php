@@ -159,19 +159,18 @@ class Phone
                  *
                  * We can combine this representation
                  */
-                $relationshipSuffixM = trim((string)$address['m_relationship']);
-                $relationshipSuffixF = trim((string)$address['f_relationship']);
+                $relationshipSuffix = trim((string)$address['relationship']);
 
                 $relationshipM = sprintf(
                     '%s %s',
                     trim((string)$address['m_description']),
-                    $relationshipSuffixM ? "({$relationshipSuffixM})" : ''
+                    $relationshipSuffix ? "({$relationshipSuffix})" : ''
                 );
 
                 $relationshipF = sprintf(
                     '%s %s',
                     trim((string)$address['f_description']),
-                    $relationshipSuffixF ? "({$relationshipSuffixF})" : ''
+                    $relationshipSuffix ? "({$relationshipSuffix})" : ''
                 );
 
                 /* Split fam: non-prefixed fields are for a specific guy
