@@ -59,6 +59,7 @@ use Schoolbox\External\Connector\CustomSync;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
 use Schoolbox\External\Connector\ICommunityPortal;
 use Schoolbox\Filter;
+use Schoolbox\Gotenberg\RequestFactory;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Instance;
 use Schoolbox\L10n\Mapper as L10nMapper;
@@ -1313,8 +1314,11 @@ abstract class Kernel
                 static function () use ($di) {
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    /** @var GuzzleHttp\Client $httpClient */
-                    $httpClient = $di->get('httpClient');
+                    /** @var ProxyServer $proxyServer */
+                    $proxyServer = $di->get('proxyServer');
+                    $httpClient  = new GuzzleHttp\Client(
+                        ['curl' => $proxyServer->buildCurlOptions(RequestFactory::DEFAULT_WAIT_TIMEOUT)]
+                    );
                     return new GotenbergClient(
                         $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         new GuzzleAdapter($httpClient),
