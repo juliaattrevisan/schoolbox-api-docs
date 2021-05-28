@@ -26,7 +26,7 @@ class FirstMeaningfulValue
 {
 
     /**
-     * Find the first meaningful value from a given set
+     * Find the first meaningful value from a given set of scalars
      *
      * Returns a trimmed string, ready for ramming into suds
      *
