@@ -95,7 +95,7 @@ class Watchlist
          */
         $commRules = $api[Endpoint\Codec\DSN::MODULE_STUDENT_DETAILS]->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => 'gen'
+            'commtype' => 'tkco'
         ]);
 
         $addresses = [];
