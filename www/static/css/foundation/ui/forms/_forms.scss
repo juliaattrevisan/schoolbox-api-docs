@@ -421,6 +421,15 @@ td {
   }
 }
 
+//to ensure the foundation checkboxes are displayed block
+.filter-list {
+  margin: 0px;
+  li:hover {
+    cursor: default;
+    background-color: $ghost !important;
+  }
+}
+
 // Radio button blocks
 .button-block {
   display: block;

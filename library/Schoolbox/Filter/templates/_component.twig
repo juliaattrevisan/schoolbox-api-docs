@@ -48,7 +48,7 @@
                  tabindex="-1"
                  aria-autoclose="false"
             >
-
+                <ul class="filter-list">
                 {% block userOptions %}
                     {% for selection in roleSelections %}
                         {% include '@filters/_selectionCheckbox.twig' with {
@@ -59,6 +59,7 @@
                         } only %}
                     {% endfor %}
                 {% endblock userOptions %}
+                </ul>
             </div>
         {% endif %}
     {% endblock filterComponent %}
