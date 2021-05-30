@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;
 
@@ -34,9 +36,12 @@ class UsermediaController extends AbstractController
             $mime = "'{$this->mimeFilter}'";
         }
 
+        /** @var IConfigLoader $config */
+        $config = $page->getDi()->get('config');
         $page->setVar(
             array(
                 'MAX_FILES'      => $this->multi ? '32' : '1',
+                'MAX_FILE_SIZE'  => $config->get(ConfigMapper::NAME_MAX_FILE_SIZE),
                 'ACCEPTED_FILES' => $mime
             )
         );

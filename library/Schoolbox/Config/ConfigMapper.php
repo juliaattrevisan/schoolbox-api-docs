@@ -152,6 +152,7 @@ class ConfigMapper extends Mapper
     public const NAME_GOOGLEDRIVE_EXPORT_PDF = 'googledrive_export_pdf';
     public const NAME_GOOGLEAPPS_API_KEY     = 'googleapps_api_key';
     public const NAME_GOOGLEAPPS_CLIENT_ID   = 'googleapps_client_id';
+    public const NAME_MAX_FILE_SIZE = 'max_file_size';
 
     /**
      * @throws \InvalidArgumentException
