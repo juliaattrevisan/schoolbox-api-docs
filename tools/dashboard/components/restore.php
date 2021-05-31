@@ -85,19 +85,25 @@ HELP;
             exit(1);
         }
 
+        $updateQuery = [];
+
         foreach ($records as $record) {
             $updateQuery[] = "UPDATE component_definition SET enabled = " . $record['enabled'] . " WHERE id = " . $record['id'];
         }
 
-        try {
-            $this->getLogger()->notice('Restoring disabled dashboard components');
-            $db->execute(implode(";", $updateQuery));
-        } catch (\Alaress\Database\Exception $e) {
-            $this->getLogger()->critical($e->getMessage());
-            exit(1);
-        }
+        if (!empty($updateQuery)) {
+            try {
+                $this->getLogger()->notice('Restoring disabled dashboard components');
+                $db->execute(implode(";", $updateQuery));
+            } catch (\Alaress\Database\Exception $e) {
+                $this->getLogger()->critical($e->getMessage());
+                exit(1);
+            }
 
-        $this->getLogger()->notice('Restored');
+            $this->getLogger()->notice('Restored');
+        } else {
+            $this->getLogger()->notice('Nothing to restore');
+        }
     }
 };
 
