@@ -138,8 +138,7 @@ class Factory extends FolderFilter\Factory
             $selections,
             $folderOverrides,
             $this->getSelectionMapper(),
-            $folders->sortBy('codeString', Collection::ORDER_ASCENDING)
-                    ->sortNaturally('name', Collection::ORDER_ASCENDING, true)
+            $folders->sortNaturally('title', Collection::ORDER_ASCENDING, true)
         );
     }
 
