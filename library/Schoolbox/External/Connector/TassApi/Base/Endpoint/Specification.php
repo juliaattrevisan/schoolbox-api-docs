@@ -71,7 +71,6 @@ class Specification implements ISpecification
             try {
                 $api[$module] = new Api($this->host, $this->dsn, $module);
             } catch (\DomainException $e) {
-
                 /* noop
                  * occurs when a module doesn't exist but you tried to access its methods anyway
                  * such as Student Calendar And Notices (an optional module)
