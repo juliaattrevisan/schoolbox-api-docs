@@ -17,7 +17,7 @@
 
         {# These config elements can be either hidden or shown, contextually
          #}
-        var configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours');
+        let configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field');
 
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
@@ -31,21 +31,13 @@
         {# On dataSource change, decide which island to show:
          # it's one of either csv island or config island
          #}
-        $('#schooldata_import_data_source').on('change', function(event) {
+        $('#schooldata_import_data_source-field').on('change', function(event) {
             switchIslands($(this).val());
         });
 
-        {# On import frequence change, show/hide the custom hours field #}
-        let $fieldImportFrequency = $('#schooldata_import_frequency-field');
-        let $fieldCustomHours = $('#schooldata_import_managed_hours').parent();
-        $fieldImportFrequency.on('change', function () {
-            if ($(this).val() === 'sb' && ['','csv'].indexOf('{{ dataSource }}') === -1) {
-                $fieldCustomHours.show();
-            } else {
-                $fieldCustomHours.hide();
-            }
+        $('#schooldata_import_frequency-field').on('change', function(event) {
+            toggleCustomHours();
         });
-        $fieldImportFrequency.trigger('change');
 
         /**
          * Switch configuration options
@@ -57,28 +49,21 @@
          * @param {string} dataSource
          */
         function initIslands(dataSource) {
+            if (['', 'csv'].indexOf(dataSource) !== -1) {
 
-            {# If you haven't chosen anything, hide both csv and config islands
-             #}
-            if (dataSource == '') {
-                $('#csv-island').hide();
-                $('#config-island').hide();
-                hideConfig(configElements);
-            } else if (dataSource == 'csv') {
-
-                {# If it's csv island, just show that
-                 # Hide the config island
+                {# If you haven't chosen anything,
+                 # or if Data Source is csv,
+                 #
+                 # Hide Status Island and Hide config fields
                  #}
-                $('#csv-island').show();
-                $('#config-island').hide();
+                 $('#status-island').hide();
                 hideConfig(configElements);
             } else {
 
                 {# Otherwise, show the config island and hide the csv island
                  # Show the host/key/frequency input elements
                  #}
-                $('#csv-island').hide();
-                $('#config-island').show();
+                $('#status-island').show();
                 showConfig(configElements);
             }
         }
@@ -87,20 +72,56 @@
          * Switch configuration options
          *
          * If you haven't chosen anything, hide both csv and config islands
-         * If you chose csv island, just show that and hide config island
+         * If you chose csv, just show that and hide config island
          * Otherwise show config island and hide the csv island
          *
-         * @param val
+         * @param dataSource string
          */
         function switchIslands(dataSource) {
 
-            {# If you chose a non-isams/kamar/sentral/etc option, hide both csv and config islands
-             # This prompts the user to hit Save instead of distracting them with options
+            {# Show ui elements that are relevant to your choice
+             # (the config island contains the status indicator, relevant only to actual api connectivities)
+             #
+             # Select An Option: hide the config island, hide the endpoint config fields
+             # CSV: hide the config island, hide the endpoint config fields
+             # Anything else: show the config island, show the config fields
              #}
-            if (dataSource == '' || dataSource == 'csv') {
-                $('#csv-island').hide();
-                $('#config-island').hide();
+            if (dataSource === '') {
+                $('#status-island').hide();
                 hideConfig(configElements);
+            } else if (dataSource === 'csv') {
+                $('#status-island').hide();
+                hideConfig(configElements);
+            } else  {
+                $('#status-island').show();
+                showConfig(configElements);
+            }
+        }
+
+
+        /**
+         * Decide if Custom Import Hours should be made available
+         *
+         * You only need it when you've got a non-csv Data Source and when
+         * the Import Frequency is something other than None
+         */
+        function toggleCustomHours() {
+            const dataSource = $('#schooldata_import_data_source-field').val();
+            const importFrequency = $('#schooldata_import_frequency-field').val();
+            const importFrequencyContainer = $('#schooldata_import_managed_hours-field').parent('div');
+
+            /* Hide it by default
+             */
+            importFrequencyContainer.hide();
+
+            /* If your data source is not Select An Option and not None,
+             * And the import frequency is sb,
+             * Show the options
+             */
+            if (['', 'csv'].indexOf(dataSource) === -1) {
+                if ('sb' === importFrequency) {
+                    importFrequencyContainer.show();
+                }
             }
         }
 
@@ -113,7 +134,10 @@
             $.each(elements, function (index, element) {
                 $(element).parent('div').hide();
             });
+
+            toggleCustomHours();
         }
+
 
         /**
          * Show config island elements in a special way
@@ -124,6 +148,8 @@
             $.each(elements, function (index, element) {
                 $(element).parent('div').show();
             });
+
+            toggleCustomHours();
         }
     });
 </script>
@@ -135,66 +161,59 @@
 
     {{ renderAdminNavigation(pageCurrent) }}
 
-    <div class="admin-content hide" id='option-container'>
-        <div class="small-12 columns">
-            <h2 class="subheader">School Data Import</h2>
-        </div>
+    <div class="admin-content">
+        <div id='option-container' class="hide">
+            <div class="small-12 columns">
+                <h2 class="subheader">School Data Import</h2>
+            </div>
 
-        {% include '@settings/moduleConfig.twig' with configContext only %}
+            {% include '@settings/moduleConfig.twig' with configContext only %}
 
-        <div class="small-12 island" id="config-island">
-            <div class="row">
-                {% if hasIndicator %}
-                <div class="small-12 medium-6 island">
-                    <h3 class="subheader">Status</h3>
+            <div class="small-12 island" id="status-island">
+                <div class="row">
+                    {% if hasIndicator %}
+                        <div class="small-12 island">
+                            <h3 class="subheader">Status</h3>
 
-                    <section class="content">
-                        <div id="status-indicator-container">
-                            <div class="loader"></div>
+                            <section class="content">
+                                <div id="status-indicator-container">
+                                    <div class="loader"></div>
+                                </div>
+
+                                <script>
+                                    $(function() {
+                                        $.get('{{ statusIndicatorRoute }}', function(response) {
+                                            $('#status-indicator-container').html(response);
+                                        });
+                                    });
+                                </script>
+
+                                <p>
+                                    Find out more about your
+                                    <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status</a>.
+                                </p>
+                            </section>
                         </div>
-
-                        <script>
-                            $(function() {
-                                $.get('{{ statusIndicatorRoute }}', function(response) {
-                                    $('#status-indicator-container').html(response);
-                                });
-                            });
-                        </script>
-
-                        <p>
-                            Find out more about your
-                            <a href="{{ routeLookupIfAuthorized('adminImportIndex.getStatusReport') }}">current endpoint status</a>.
-                        </p>
-                    </section>
-                </div>
-                {% endif %}
-
-                <div class="small-12 {% if hasIndicator %}medium-6{% endif %} island">
-                    <h3 class="subheader">Your Data</h3>
-
-                    <section class="content">
-                        <p>You can download the current state of your data below.</p>
-
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
-
-
-                        <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
-                        <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
-                    </section>
+                    {% endif %}
                 </div>
             </div>
         </div>
-        <div class="small-12 island" id="csv-island">
-            <h3 class="subheader">Import from csv files</h3>
 
-            {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
+        <div class="small-12 island">
+            <h3 class="subheader">Your Data</h3>
 
             <section class="content">
-                <p>From this page you can import different data into Schoolbox via CSV import files.  Please note if you are using a live connection you may only load users, all other data will be loaded automatically via your SIS connector.</p>
+                <p>You can download the current state of your data below.</p>
+
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'staff'}) }}" class="icon-download button">Export Staff Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'student'}) }}" class="icon-download button">Export Student Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'parent'}) }}" class="icon-download button">Export Parent Data</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportProfile.getExport', {type: 'relationship'}) }}" class="icon-download button">Export Relationship Data</a>
+
+
+                <a href="{{ routeLookupIfAuthorized('adminImportTimetableStructure.getExport') }}" class="icon-download button">Export Timetable Structure</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportTimetable.getExport') }}" class="icon-download button">Export Timetable</a>
+                <a href="{{ routeLookupIfAuthorized('adminImportTimetableEnrolment.getExport') }}" class="icon-download button">Export Timetable Enrolments</a>
             </section>
         </div>
     </div>
