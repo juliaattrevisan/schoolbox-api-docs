@@ -555,6 +555,17 @@ function renderStudent(
             $user
         );
 
+    /* Decide whether the current user can email staff members
+     *
+     * This is controlled by the config report_staff_access "Allow Parents Access to Staff Details"
+     * and applies when you're a parent
+     */
+    $canEmailStaff = true;
+
+    if (!$config->get('report_staff_access') && $sessionUser->getRole()->isParent()) {
+        $canEmailStaff = false;
+    }
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -588,7 +599,8 @@ function renderStudent(
                 'showEmail'                => $showEmails,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,
-                'isGeosnapshotAvailable'   => $isGeosnapshotAvailable
+                'isGeosnapshotAvailable'   => $isGeosnapshotAvailable,
+                'canEmailStaff'            => $canEmailStaff
             ]
         )
     );

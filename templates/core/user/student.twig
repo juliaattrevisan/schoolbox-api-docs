@@ -765,11 +765,13 @@
                                     {% endif %}
 
                                     {% set hasTeachersWithEmail = false %}
-                                    {% for teacher in subject.teachers %}
-                                        {% if not teacher.email is empty %}
-                                            {% set hasTeachersWithEmail = true %}
-                                        {% endif %}
-                                    {% endfor %}
+                                    {% if canEmailStaff  %}
+                                        {% for teacher in subject.teachers %}
+                                            {% if not teacher.email is empty %}
+                                                {% set hasTeachersWithEmail = true %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                     <div class="card-content classes actions-small-{{ hasTeachersWithEmail ? '1' : '0'}} {% block folderListItemClasses %}{% endblock %}">
                                         <div class="list-item">
                                             {% set subjectCode = subject.campusCode|default('') is same as('') ? subject.code : subject.campusCode ~ '/' ~ subject.code %}
@@ -785,7 +787,7 @@
                                             {% endif %}
                                         </div>
                                         {% block folderListItemActions %}
-                                        {% if hasTeachersWithEmail %}
+                                        {% if hasTeachersWithEmail and canEmailStaff %}
                                             <nav>
                                                 <a class="icon-more" data-dropdown="class-options-{{ groupIdentifier }}-{{ subjectIdentifier }}" title="Actions"></a>
                                             </nav>
@@ -864,7 +866,7 @@
                                 {% endif %}
 
                                 {% set hasOwnersWithEmail = false %}
-                                {% if group.owners is defined %}
+                                {% if group.owners is defined and canEmailStaff %}
                                     {% for owner in group.owners %}
                                         {% if not owner.email is empty %}
                                             {% set hasOwnersWithEmail = true %}
@@ -881,7 +883,7 @@
                                             <h3>{{ group.name }}</h3>
                                         {% endif %}
                                     </div>
-                                    {% if hasOwnersWithEmail %}
+                                    {% if hasOwnersWithEmail and canEmailStaff %}
                                         <nav>
                                             <a class="icon-more" data-dropdown="group-options-{{ groupKey }}" title="Actions"></a>
                                         </nav>
