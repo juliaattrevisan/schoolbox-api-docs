@@ -203,9 +203,14 @@ class Server
      *
      * Does not set `CURLOPT_RETURNTRANSFER` or `CURLOPT_HEADER`
      *
+     * @param int $timeout If using the proxy, set this timeout.
+     *                     In most cases: the default of
+     *                     `self::PROXY_DEFAULT_TIMEOUT` will be sufficient,
+     *                     but long-running requests may require a longer
+     *                     timeout.
      * @return array
      */
-    public function buildCurlOptions()
+    public function buildCurlOptions(int $timeout = self::PROXY_DEFAULT_TIMEOUT)
     {
         $guzzle = [];
 
@@ -215,7 +220,7 @@ class Server
                 CURLOPT_PROXYAUTH       => self::PROXY_AUTH_METHOD,
                 CURLOPT_PROXYTYPE       => self::PROXY_TYPE,
                 CURLOPT_FOLLOWLOCATION  => 1,
-                CURLOPT_TIMEOUT         => self::PROXY_DEFAULT_TIMEOUT,
+                CURLOPT_TIMEOUT         => $timeout,
                 CURLOPT_PROXY           => $this->getHost(),
                 CURLOPT_PROXYPORT       => $this->getPort(),
             ];
