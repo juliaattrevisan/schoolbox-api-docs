@@ -1,0 +1,123 @@
+.container {
+  position: absolute;
+  width: 100%;
+  height: 100%; //will be updated by the parent container, keeping it inline with the video dimensions
+  background: black;
+  overflow: hidden;
+  h2,
+  h3 {
+    max-width: none;
+  }
+}
+
+.media-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.media-container-record {
+  z-index: 1;
+}
+
+.media-container-playback {
+  z-index: 2;
+}
+
+.vjs-record-skin::v-deep {
+  .vjs-device-button.vjs-control {
+    //not in the centre of the frame, something from SB css is probably getting in the way
+    top: 42%;
+    margin-left: -2.6em;
+  }
+  .vjs-control-bar {
+    //fatten up the bottom control panel
+    height: 5em;
+    padding: 0px;
+  }
+  .vjs-control {
+    width: 5em;
+  }
+  .vjs-icon-record-start,
+  .vjs-icon-record-stop,
+  .vjs-icon-photo-camera {
+    //make the start/stop record buttons big and fat and put in the middle
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    margin-left: -20px;
+    bottom: 0px;
+    transform-origin: center;
+    transform: scale(3.1);
+    color: #f03;
+    transition: color 0.2s, transform 0.2s;
+    &:hover {
+      transform: scale(2.8);
+    }
+  }
+  .vjs-icon-photo-camera {
+    //shrink a bit, bit big compared to the other icons
+    transform: scale(2.3);
+    color: #fff;
+    &:hover {
+      transform: scale(2.1);
+    }
+  }
+  .vjs-control:focus::before,
+  .vjs-control:hover::before,
+  .vjs-control:focus {
+    text-shadow: none;
+  }
+  .vjs-time-control {
+    //make the time stand out a bit more
+    width: auto;
+    min-width: 0;
+    padding: 0px 2px;
+    font-size: 1.1rem;
+    transition: background-color 0.3s;
+  }
+  .vjs-current-time {
+    //and pull the time of from the side
+    padding-left: 10px;
+  }
+  .vjs-duration {
+    padding-right: 10px;
+  }
+  .vjs-fullscreen-control {
+    //currently if the user re-records in full screen, this will not be reflected, so prevent for now
+    display: none;
+  }
+  .vjs-button > .vjs-icon-placeholder::before {
+    //make all the buttons bigger
+    color: white;
+    font-size: 4em;
+    line-height: 1.25;
+  }
+  .vjs-play-control {
+    //it'll never be shown, as once recored moves to another player
+    display: none;
+  }
+  .vjs-control.vjs-record-indicator {
+    //move the record note further down
+    top: 20px;
+  }
+  .vjs-control.vjs-record-indicator,
+  .vjs-control.vjs-record-indicator:before,
+  .vjs-control.vjs-record-indicator:after {
+    //and make the record note stand out more
+    transform: scale(1.8);
+  }
+  .vjs-control.vjs-record-indicator:before {
+    //provide a bit more padding to the recording dot
+    left: -1.8rem;
+  }
+  @media screen and (max-width: 640px) {
+    //shrink down a bit
+    .vjs-time-control {
+      font-size: 0.9rem;
+      line-height: 3.3rem;
+    }
+  }
+}

@@ -127,7 +127,7 @@ export default {
             this.isRecordingOverMaxFileSize = true;
             this.hasError = true;
             this.$nextTick(() => {
-                this.$emit(recordMediaEvents.RATIO_READY, this.$refs.errorModal.$el.offsetWidth, this.$refs.errorModal.$el.firstChild.offsetHeight + 40); //just ensure that the entire message is visible
+                this.$emit(recordMediaEvents.RESIZE, this.$refs.errorModal.$el.offsetWidth, this.$refs.errorModal.$el.firstChild.offsetHeight + 40); //just ensure that the entire message is visible
             });
         },
 
@@ -178,8 +178,8 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onRatioReady (width, height) {
-            this.$emit(recordMediaEvents.RATIO_READY, width, height);
+        onResize (width, height) {
+            this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
     }
@@ -207,7 +207,7 @@ export default {
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal" ref="errorModal">

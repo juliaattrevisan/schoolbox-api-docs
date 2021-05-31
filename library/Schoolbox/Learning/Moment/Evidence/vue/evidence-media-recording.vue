@@ -275,7 +275,7 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onRatioReady (width, height) {
+        onResize (width, height) {
             this.updateCurrentRatio(width, height);
         },
 
@@ -295,7 +295,7 @@ export default {
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
         <record-camera
             v-else-if="recordMediaType === recordMediaTypes.CAMERA"
@@ -304,7 +304,7 @@ export default {
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
         <record-audio-only
             v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
@@ -313,7 +313,7 @@ export default {
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
 
         <over-media-modal v-if="hasUploadError" key="isUploadingModal">

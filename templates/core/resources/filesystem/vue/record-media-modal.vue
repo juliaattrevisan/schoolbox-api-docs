@@ -336,7 +336,7 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onRatioReady (width, height) {
+        onResize (width, height) {
             this.updateCurrentRatio(width, height);
         },
 

@@ -11,7 +11,7 @@ import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 export default {
 
     mounted () {
-        this.$emit(recordMediaEvents.RATIO_READY, this.$refs.noScreenNote.offsetWidth, this.$refs.noScreenNote.offsetHeight); //just ensure that the entire message is visible
+        this.$emit(recordMediaEvents.RESIZE, this.$refs.noScreenNote.offsetWidth, this.$refs.noScreenNote.offsetHeight); //just ensure that the entire message is visible
     },
 
 }

@@ -209,7 +209,7 @@ export default {
          * @params { Number }
          */
         onMediaDimensionsReady (width, height) {
-            this.$emit(recordMediaEvents.RATIO_READY, width, height);
+            this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
         /**
