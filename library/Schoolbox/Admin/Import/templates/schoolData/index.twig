@@ -17,7 +17,7 @@
 
         {# These config elements can be either hidden or shown, contextually
          #}
-        var configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours');
+        let configElements = $('#schooldata_import_endpoint_host, #schooldata_import_endpoint_key, #schooldata_import_frequency, #schooldata_import_managed_hours, #schooldata_import_managed_hours-field');
 
         {# On document.ready, using dataSource, decide which island to show:
          # it's one of either csv island or config island
@@ -35,17 +35,9 @@
             switchIslands($(this).val());
         });
 
-        {# On import frequence change, show/hide the custom hours field #}
-        let $fieldImportFrequency = $('#schooldata_import_frequency-field');
-        let $fieldCustomHours = $('#schooldata_import_managed_hours').parent();
-        $fieldImportFrequency.on('change', function () {
-            if ($(this).val() === 'sb' && ['','csv'].indexOf('{{ dataSource }}') === -1) {
-                $fieldCustomHours.show();
-            } else {
-                $fieldCustomHours.hide();
-            }
+        $('#schooldata_import_frequency-field').on('change', function(event) {
+            toggleCustomHours();
         });
-        $fieldImportFrequency.trigger('change');
 
         /**
          * Switch configuration options
@@ -94,9 +86,9 @@
             {# Show ui elements that are relevant to your choice
              # (the config island contains the status indicator, relevant only to actual api connectivities)
              #
-             # Select An Option: hide the csv island, hide the config island, hide the endpoint config fields
-             # CSV: show the csv island, hide the config island, hide the endpoint config fields
-             # Anything else: hide the csv island, show the config island, show the config fields
+             # Select An Option: hide the config island, hide the endpoint config fields
+             # CSV: hide the config island, hide the endpoint config fields
+             # Anything else: show the config island, show the config fields
              #}
             if (dataSource === '') {
                 $('#config-island').hide();
@@ -110,6 +102,33 @@
             }
         }
 
+
+        /**
+         * Decide if Custom Import Hours should be made available
+         *
+         * You only need it when you've got a non-csv Data Source and when
+         * the Import Frequency is something other than None
+         */
+        function toggleCustomHours() {
+            const dataSource = $('#schooldata_import_data_source-field').val();
+            const importFrequency = $('#schooldata_import_frequency-field').val();
+            const importFrequencyContainer = $('#schooldata_import_managed_hours-field').parent('div');
+
+            /* Hide it by default
+             */
+            importFrequencyContainer.hide();
+
+            /* If your data source is not Select An Option and not None,
+             * And the import frequency is sb,
+             * Show the options
+             */
+            if (['', 'csv'].indexOf(dataSource) === -1) {
+                if ('sb' === importFrequency) {
+                    importFrequencyContainer.show();
+                }
+            }
+        }
+
         /**
          * Hide config island elements in a special way
          *
@@ -119,7 +138,10 @@
             $.each(elements, function (index, element) {
                 $(element).parent('div').hide();
             });
+
+            toggleCustomHours();
         }
+
 
         /**
          * Show config island elements in a special way
@@ -130,6 +152,8 @@
             $.each(elements, function (index, element) {
                 $(element).parent('div').show();
             });
+
+            toggleCustomHours();
         }
     });
 </script>
