@@ -13,7 +13,7 @@ import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalend
 import {stringify}        from 'qs';
 import resourceTimelinePlugin     from '@fullcalendar/resource-timeline';
 import ViewGroupedEventsModal     from './view-grouped-events-modal';
-import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@schoolbox/fullcalendar/customised-calendar-event';
 
 
 // Various URLs this calendar can make use of
@@ -75,7 +75,6 @@ export default {
             selectedFilters: null,
             eventTypeResources: [],
             folderResources: [],
-            currentView: null,
             termStartDate: null,
             termEndDate: null,
             cursor: 0,
@@ -448,16 +447,12 @@ export default {
          * Callback for when the calendar view changes: preserve the
          * newly selected view for this user.
          * @see https://fullcalendar.io/docs/view-render-hooks
-         *
-         * @param info
          */
-        viewDidMount(info) {
+        viewDidMount() {
 
             const calendarApi = this.$refs.fullCalendar.getApi(); //runs before the nextTick, so need api here
             const eventSource = calendarApi.getEventSourceById('events');
             const groupedEventSource = calendarApi.getEventSourceById('groupedEvents');
-
-            this.currentView = info.view.type;
 
             this.destroyPopOver();
 
@@ -585,7 +580,7 @@ export default {
 
                 return result;
             }).then((result) => {
-                this.viewDidMount({view: this.calendarApi.view})
+                this.viewDidMount()
                 this.$_fullCalendarHelper_onLoading(false);
 
                 return result;
@@ -723,7 +718,7 @@ export default {
          * @returns {boolean}
          */
         currentViewIsSemester() {
-            return this.currentView === VIEW_RESOURCE_TIMELINE_SEMESTER;
+            return this.$refs.fullCalendar.getApi().view.type === VIEW_RESOURCE_TIMELINE_SEMESTER;
         },
 
         /**
@@ -731,7 +726,7 @@ export default {
          * @returns {boolean}
          */
         currentViewIsWeek() {
-            return this.currentView === VIEW_RESOURCE_TIMELINE_WEEK;
+            return this.$refs.fullCalendar.getApi().view.type === VIEW_RESOURCE_TIMELINE_WEEK;
         },
 
         /**
@@ -922,9 +917,7 @@ export default {
             this.calendarApi.gotoDate(date);
             this.switchView(VIEW_RESOURCE_TIMELINE_WEEK, false);
         },
-
     }
-
 }
 
 </script>
