@@ -24,7 +24,7 @@ class ApiUsage
      *
      * @var string
      */
-    private $module;
+    private string $module;
 
 
     /**
@@ -32,7 +32,7 @@ class ApiUsage
      *
      * @var array
      */
-    private $usage = [];
+    private array $usage = [];
 
 
     /**

@@ -44,7 +44,7 @@ class BrokenPayload
     /**
      * @var array
      */
-    private $api;
+    private array $api;
 
 
     /**

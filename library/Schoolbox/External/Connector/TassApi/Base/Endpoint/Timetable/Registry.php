@@ -22,7 +22,7 @@ class Registry
     /**
      * @var array
      */
-    private $registry = [];
+    private array $registry = [];
 
 
     /**

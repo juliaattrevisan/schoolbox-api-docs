@@ -194,6 +194,8 @@ class Factory implements IFactory
                     trim((string)Loader::getInstance()->get('external_tass_spouse_prefix')),
                     (int)Loader::getInstance()->get('external_tass_addnum_father'),
                     (int)Loader::getInstance()->get('external_tass_addnum_mother'),
+                    (string)Loader::getInstance()->get('external_tass_address_description_father'),
+                    (string)Loader::getInstance()->get('external_tass_address_description_mother'),
                     /* Profile pieces
                     */
                     UserProfile\Mapper::getInstance(),

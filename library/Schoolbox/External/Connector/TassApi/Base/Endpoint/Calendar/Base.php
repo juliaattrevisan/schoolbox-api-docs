@@ -229,7 +229,7 @@ class Base
             $query = "
                 UPDATE
                 {$this->eventSourceMapper->getTable()}
-                INNER JOIN {$this->eventSourceMapper->getJoinSql('event')} 
+                INNER JOIN {$this->eventSourceMapper->getJoinSql('event')}
                 AND {$this->eventSourceMapper->getTable()}.`deleted_at` IS NULL
                 SET {$this->eventMapper->getTable()}.updated_at = '0000-00-00 00:00:00',
                 {$this->eventSourceMapper->getTable()}.updated_at = '0000-00-00 00:00:00'
@@ -278,15 +278,18 @@ class Base
             $this->endpoint
         ));
 
-        $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument($this->endpoint, [
-            'start_date' => $this->from->getUsingFormat('d/m/Y'),
-            'end_date' => $this->to->getUsingFormat('d/m/Y')
-        ], Api::VERSION_2);
+        $tassEvents = $this->api[DSN::MODULE_SCHOOL_CALENDAR_AND_NOTICES]->retrieveDocument(
+            $this->endpoint,
+            ['start_date' => $this->from->getUsingFormat('d/m/Y'), 'end_date' => $this->to->getUsingFormat('d/m/Y')],
+            Api::VERSION_2
+        );
 
         $this->log->info(sprintf(
-            'Found %s events at endpoint %s',
+            'Found %s events at endpoint %s between %s and %s',
             \count($tassEvents['events']),
-            $this->endpoint
+            $this->endpoint,
+            $this->from->getUsingFormat('d/m/Y'),
+            $this->to->getUsingFormat('d/m/Y')
         ));
 
         foreach ($tassEvents['events'] as $tassEvent) {

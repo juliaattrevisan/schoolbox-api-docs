@@ -38,7 +38,7 @@ class Factory
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -46,19 +46,19 @@ class Factory
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
      * @var string
      */
-    private $key;
+    private string $key;
 
 
     /**
@@ -67,7 +67,7 @@ class Factory
      *
      * @var string
      */
-    private $spousePrefix;
+    private string $spousePrefix;
 
 
     /**
@@ -75,7 +75,7 @@ class Factory
      *
      * @var int
      */
-    private $addnumFather;
+    private int $addnumFather;
 
 
     /**
@@ -83,67 +83,85 @@ class Factory
      *
      * @var int
      */
-    private $addnumMother;
+    private int $addnumMother;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a father specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $fatherAddressDescription;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a mother specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $motherAddressDescription;
 
 
     /**
      * @var UserProfile\Mapper
      */
-    private $baseProfileMapper;
+    private UserProfile\Mapper $baseProfileMapper;
 
 
     /**
      * @var UserProfile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private UserProfile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var UserProfile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private UserProfile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var UserProfile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
     /**
      * @var TimetableCycleMapper
      */
-    private $timetableCycleMapper;
+    private TimetableCycleMapper $timetableCycleMapper;
 
 
     /**
      * @var TimetablePeriodMapper
      */
-    private $timetablePeriodMapper;
+    private TimetablePeriodMapper $timetablePeriodMapper;
 
 
     /**
      * @var ClassEntryMapper
      */
-    private $classEntryMapper;
+    private ClassEntryMapper $classEntryMapper;
 
 
     /**
      * @var ClassInvolvementMapper
      */
-    private $classInvolvementMapper;
+    private ClassInvolvementMapper $classInvolvementMapper;
 
 
     /**
      * @var ClassPeriodMapper
      */
-    private $classPeriodMapper;
+    private ClassPeriodMapper $classPeriodMapper;
 
 
     /**
@@ -156,6 +174,8 @@ class Factory
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
      * @param int                             $addnumMother
+     * @param string                          $fatherAddressDescription
+     * @param string                          $motherAddressDescription
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -175,6 +195,8 @@ class Factory
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
+        string $fatherAddressDescription,
+        string $motherAddressDescription,
         /* Profile pieces */
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
@@ -195,6 +217,8 @@ class Factory
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
+        $this->fatherAddressDescription = $fatherAddressDescription;
+        $this->motherAddressDescription = $motherAddressDescription;
 
         /* Profile pieces
          */
@@ -279,6 +303,8 @@ class Factory
                 $this->spousePrefix,
                 $this->addnumFather,
                 $this->addnumMother,
+                $this->fatherAddressDescription,
+                $this->motherAddressDescription,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,

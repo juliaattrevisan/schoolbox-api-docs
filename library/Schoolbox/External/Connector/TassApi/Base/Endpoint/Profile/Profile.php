@@ -60,16 +60,18 @@ class Profile implements IStrategy
      */
     private const EMPLOYEE_PREFIX = 'E';
 
+
     /**
      * Used in the profile category field to identify teacher or employee users coming from TASS into the staff table
      */
     public const EMPLOYEE = 'employee';
     public const TEACHER = 'teacher';
 
+
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -77,13 +79,13 @@ class Profile implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
-     * @var Api
+     * @var array
      */
-    private $api;
+    private array $api;
 
 
     /**
@@ -92,7 +94,7 @@ class Profile implements IStrategy
      *
      * @var string
      */
-    private $spousePrefix;
+    private string $spousePrefix;
 
 
     /**
@@ -100,7 +102,7 @@ class Profile implements IStrategy
      *
      * @var int
      */
-    private $addnumFather;
+    private int $addnumFather;
 
 
     /**
@@ -108,37 +110,55 @@ class Profile implements IStrategy
      *
      * @var int
      */
-    private $addnumMother;
+    private int $addnumMother;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a father specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $fatherAddressDescription;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a mother specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $motherAddressDescription;
 
 
     /**
      * @var UserProfile\Mapper
      */
-    private $baseProfileMapper;
+    private UserProfile\Mapper $baseProfileMapper;
 
 
     /**
      * @var UserProfile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private UserProfile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var UserProfile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private UserProfile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var UserProfile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
     /**
@@ -150,6 +170,8 @@ class Profile implements IStrategy
      * @param string                          $spousePrefix
      * @param int                             $addnumFather
      * @param int                             $addnumMother
+     * @param string                          $fatherAddressDescription
+     * @param string                          $motherAddressDescription
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -163,6 +185,8 @@ class Profile implements IStrategy
         string $spousePrefix,
         int $addnumFather,
         int $addnumMother,
+        string $fatherAddressDescription,
+        string $motherAddressDescription,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -175,6 +199,8 @@ class Profile implements IStrategy
         $this->spousePrefix = $spousePrefix;
         $this->addnumFather = $addnumFather;
         $this->addnumMother = $addnumMother;
+        $this->fatherAddressDescription = $fatherAddressDescription;
+        $this->motherAddressDescription = $motherAddressDescription;
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
         $this->parentProfileMapper = $parentProfileMapper;
@@ -218,7 +244,11 @@ class Profile implements IStrategy
             $this->spousePrefix,
             $this->addnumFather,
             $this->addnumMother,
-            (new Phone($this->api[Codec\DSN::MODULE_STUDENT_DETAILS]))->generate()
+            (new Phone(
+                $this->api[Codec\DSN::MODULE_STUDENT_DETAILS],
+                $this->fatherAddressDescription,
+                $this->motherAddressDescription
+            ))->generate()
         ))->generate();
 
         /* Also alert any broken tass api payloads that we detected in lookups
@@ -784,12 +814,24 @@ class Profile implements IStrategy
          */
         $employeeCodec = new Codec\EmployeeExternalId();
 
+        /* Decide salutation
+         * These fields could exist, but be null or empty strings
+         * Find the first meaningful value
+         */
+        $salutation = '';
+
+        if (isset($employee['salutation']) && '' !== trim((string)$employee['salutation'])) {
+            $salutation = trim((string)$employee['salutation']);
+        } elseif (isset($employee['title']) && '' !== trim((string)$employee['title'])) {
+            $salutation = trim((string)$employee['title']);
+        }
+
         foreach ($employeeSetDedupe as $employee) {
             /* Apparently there's both title and salutation for some bizarre reason
              */
             $employeeSetReformatted[] = [
                 'teacher_code' => $employeeCodec->encode((string)$employee['user_code']),
-                'salutation' => array_values(array_filter([$employee['title'], $employee['salutation']]))[0],
+                'salutation' => $salutation,
                 'first_name' => $employee['first_name'],
                 'preferred_name' => $employee['preferred_name'],
                 'surname' => $employee['surname'],
@@ -827,7 +869,13 @@ class Profile implements IStrategy
             /* Find the first non-empty email address for staff; it seems that there's a business
              * email address and a home email address concept going on here
              */
-            $email = trim((string)(array_values(array_filter([$staff['school_email_address'], $staff['email_address']]))[0] ?? ''));
+            $email = '';
+
+            if (isset($staff['school_email_address']) && '' !== trim((string)$staff['school_email_address'])) {
+                $email = trim((string)$staff['school_email_address']);
+            } elseif (isset($staff['email_address']) && '' !== trim((string)$staff['email_address'])) {
+                $email = trim((string)$staff['email_address']);
+            }
 
             /* For some reason, first_name and preferred_name might not actually be in the payload
                     Array

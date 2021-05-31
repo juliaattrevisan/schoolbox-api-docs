@@ -27,13 +27,13 @@ class Status implements IStatus
     /**
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
      * @var string
      */
-    private $key;
+    private string $key;
 
 
     /**

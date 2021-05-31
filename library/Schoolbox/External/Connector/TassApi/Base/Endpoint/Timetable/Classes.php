@@ -46,7 +46,7 @@ class Classes implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -54,37 +54,37 @@ class Classes implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Registry
      */
-    private $timetableRegistry;
+    private Registry $timetableRegistry;
 
 
     /**
      * @var ClassEntryMapper
      */
-    private $classEntryMapper;
+    private ClassEntryMapper $classEntryMapper;
 
 
     /**
      * @var ClassInvolvementMapper
      */
-    private $classInvolvementMapper;
+    private ClassInvolvementMapper $classInvolvementMapper;
 
 
     /**
      * @var ClassPeriodMapper
      */
-    private $classPeriodMapper;
+    private ClassPeriodMapper $classPeriodMapper;
 
 
     /**
      * @var Lookup
      */
-    private $lookup;
+    private Lookup $lookup;
 
 
     /**
@@ -280,7 +280,7 @@ class Classes implements IStrategy
                      * If the period doesn't correspond to something in our timetable definition,
                      * we can't process it anyway, so skip it
                      */
-                    $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
+                    $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], (string)$class['period']['name']);
 
                     $this->log->info(sprintf(
                         'Looking for ext_timetable_code %s, day %s, period %s',

@@ -29,7 +29,25 @@ class Phone
      *
      * @var IApi
      */
-    private $api;
+    private IApi $api;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a father specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $fatherAddressDescription;
+
+
+    /**
+     * The address_description field in the getCommunicationRulesDetails payload
+     * that refers to a mother specifically, as determined by schools' instances
+     *
+     * @var string
+     */
+    private string $motherAddressDescription;
 
 
     /**
@@ -37,11 +55,15 @@ class Phone
      *
      * $api uses the credentials for DSNCodec::MODULE_STUDENT_DETAILS
      *
-     * @param IApi $api
+     * @param IApi   $api
+     * @param string $fatherAddressDescription
+     * @param string $motherAddressDescription
      */
-    public function __construct(IApi $api)
+    public function __construct(IApi $api, string $fatherAddressDescription, string $motherAddressDescription)
     {
         $this->api = $api;
+        $this->fatherAddressDescription = $fatherAddressDescription;
+        $this->motherAddressDescription = $motherAddressDescription;
     }
 
 
@@ -58,7 +80,7 @@ class Phone
          */
         $addresses = $this->api->retrieveDocument('getCommunicationRulesDetails', [
             'currentstatus' => 'current',
-            'commtype' => 'gen'
+            'commtype' => 'tkco'
         ]);
 
         /* Inspect each element from the returned data. Family code is stored in
@@ -73,35 +95,129 @@ class Phone
                  * Look in each and use the first non-empty mobile number
                  * Look in each and use the first non-empty home phone number
                  *
-                 * Work phone can't be determined from these fields, we can't tell which parent
-                 * owns that number due to the nature of the data struct
-                 *
                  * Note that '' !== null
-                 *
-                 * + Assumption: Parents share phone numbers
-                 * Note also that there's no obvious and objective way to tell which
-                 * number(s) belong to each parent. This could be a significant hazard
-                 * for split families.
                  */
-                $stack[$address['parent_code']][Family::MOTHER_NODE] = [
-                    'firstname' => trim((string)$address['m_preferred_name']),
-                    'surname' => trim((string)$address['m_surname']),
-                    'mobile' => trim((string)$address['mobile_phone_1']),
-                    'home' => trim((string)$address['home_phone']),
-                    'work' => '',
-                    'email' => trim((string)$address['email']),
-                    'relationship' => trim((string)$address['m_description']),
-                ];
 
-                $stack[$address['parent_code']][Family::FATHER_NODE] = [
-                    'firstname' => trim((string)$address['f_preferred_name']),
-                    'surname' => trim((string)$address['f_surname']),
-                    'mobile' => trim((string)$address['mobile_phone_2']),
-                    'home' => trim((string)$address['home_phone']),
-                    'work' => '',
-                    'email' => trim((string)$address['email_2']),
-                    'relationship' => trim((string)$address['f_description']),
-                ];
+                /* There are actually three sets of data in this payload
+                 *
+                 * Two data sets ars described by prefixes m_ and f_
+                 *
+                 * m_ are fields about the mother, specifically
+                 * f_ are fields about the father, specifically
+                 *
+                 * The third data set doesn't have prefixes. These are fields that correspond to
+                 * the person designated by address_description: this field will tell you whether
+                 * it's for the mother or father, but a school can configure its value to whatever
+                 * they want; that means we need a config var so the school can tell us which data
+                 * set corresponds to each address_description.
+                 *
+                 * When address_description doesn't match one of the schoolbox-configured values
+                 * it conveys a special meaning. A school might map this setup:
+                 *
+                 * address_description   meaning   schoolbox config var
+                 * ---------------------------------------------------------------
+                 * "big mama"            Mother    tass_mother_address_description
+                 * "papa joel"           Father    tass_father_address_description
+                 * "Value X"             --        --
+                 *
+                 * "Value X"
+                 * When the address_description is not one of the configured values, then assume
+                 * it's for a nuclear family and it should apply to both in the same way it has
+                 * always done (mobile_phone_1 for mother, mobile_phone_2 for father, etc.) using that
+                 * numeric suffix assumption.
+                 *
+                 *
+                 * Comm Rules
+                 * -----------
+                 * When this occurs for a split family, assume that the fields
+                 * [mobile_phone_1, mobile_phone_2, email_1, email_2]
+                 * actually belong to one person (e.g. a guy has two phone numbers/two email addresses)
+                 * and should be assigned to the guy specified by address_description
+                 *
+                 * For a nuclear family,
+                 * [mobile_phone_1, mobile_phone_2, email_1, email_2]
+                 * are actually shared/distributed among the family so continue with the previous assumption
+                 * ("convention") that mobile_phone_1 and email_1 belonged to mother and mobile_phone_2 and email_2
+                 * belonged to father, and carry on like we used to do
+                 */
+
+                /* Set up some of the data fields
+                 */
+                $mobilePhone1 = trim((string)$address['mobile_phone_1']);
+                $mobilePhone2 = trim((string)$address['mobile_phone_2']);
+
+                /* Annoyingly not following the convention
+                 */
+                $email1 = trim((string)$address['email']);
+                $email2 = trim((string)$address['email_2']);
+
+                /* Relationship is actually a two-part tuple:
+                 *
+                 * A "relationship" value like we all know, such as a mother or a father
+                 * and a "relationship type" which is typically "Biological" or "Guardian"
+                 * so you can tell who's a biological mum and who is a stepmum
+                 *
+                 * We can combine this representation
+                 */
+                $relationshipSuffix = trim((string)$address['relationship']);
+
+                $relationshipM = sprintf(
+                    '%s %s',
+                    trim((string)$address['m_description']),
+                    $relationshipSuffix ? "({$relationshipSuffix})" : ''
+                );
+
+                $relationshipF = sprintf(
+                    '%s %s',
+                    trim((string)$address['f_description']),
+                    $relationshipSuffix ? "({$relationshipSuffix})" : ''
+                );
+
+                /* Split fam: non-prefixed fields are for a specific guy
+                 */
+                if ($address['address_description'] === $this->motherAddressDescription) {
+                    $stack[$address['parent_code']][Family::MOTHER_NODE] = [
+                        'firstname' => trim((string)$address['m_preferred_name']),
+                        'surname' => trim((string)$address['m_surname']),
+                        'mobile' => $mobilePhone1 ?: $mobilePhone2,
+                        'home' => trim((string)$address['home_phone']),
+                        'work' => '',
+                        'email' => $email1 ?: $email2,
+                        'relationship' => $relationshipM,
+                    ];
+                } elseif ($address['address_description'] === $this->fatherAddressDescription) {
+                    $stack[$address['parent_code']][Family::FATHER_NODE] = [
+                        'firstname' => trim((string)$address['f_preferred_name']),
+                        'surname' => trim((string)$address['f_surname']),
+                        'mobile' => $mobilePhone1 ?: $mobilePhone2,
+                        'home' => trim((string)$address['home_phone']),
+                        'work' => '',
+                        'email' => $email1 ?: $email2,
+                        'relationship' => $relationshipF,
+                    ];
+                } else {
+                    /* Nukular family: fields are distributed among the guys in the fam
+                     */
+                    $stack[$address['parent_code']][Family::MOTHER_NODE] = [
+                        'firstname' => trim((string)$address['m_preferred_name']),
+                        'surname' => trim((string)$address['m_surname']),
+                        'mobile' => $mobilePhone1,
+                        'home' => trim((string)$address['home_phone']),
+                        'work' => '',
+                        'email' => $email1,
+                        'relationship' => $relationshipM,
+                    ];
+
+                    $stack[$address['parent_code']][Family::FATHER_NODE] = [
+                        'firstname' => trim((string)$address['f_preferred_name']),
+                        'surname' => trim((string)$address['f_surname']),
+                        'mobile' => $mobilePhone2,
+                        'home' => trim((string)$address['home_phone']),
+                        'work' => '',
+                        'email' => $email2,
+                        'relationship' => $relationshipF,
+                    ];
+                }
             }
         }
 

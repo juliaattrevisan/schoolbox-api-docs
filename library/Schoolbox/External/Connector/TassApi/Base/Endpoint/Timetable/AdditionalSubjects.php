@@ -42,7 +42,7 @@ class AdditionalSubjects implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -50,37 +50,37 @@ class AdditionalSubjects implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
-     * @var Api
+     * @var array
      */
-    private $api;
+    private array $api;
 
 
     /**
      * @var ClassEntryMapper
      */
-    private $classEntryMapper;
+    private ClassEntryMapper $classEntryMapper;
 
 
     /**
      * @var ClassInvolvementMapper
      */
-    private $classInvolvementMapper;
+    private ClassInvolvementMapper $classInvolvementMapper;
 
 
     /**
      * @var ClassPeriodMapper
      */
-    private $classPeriodMapper;
+    private ClassPeriodMapper $classPeriodMapper;
 
 
     /**
      * @var Lookup
      */
-    private $lookup;
+    private Lookup $lookup;
 
 
     /**
@@ -292,7 +292,9 @@ class AdditionalSubjects implements IStrategy
                         ->setName($additionalSubject['sub_long'])
                         ->setCode($code);
 
-                    $this->classEntryMapper->save($nonUnitisedClass);
+                    if ($this->perform) {
+                        $this->classEntryMapper->save($nonUnitisedClass);
+                    }
 
                     $this->log->info(sprintf(
                         "Additional subject %s (%s) added for %s (user %s)",
@@ -335,7 +337,9 @@ class AdditionalSubjects implements IStrategy
                                 ->setExternalId((string)$externalId)
                                 ->setClass($class);
 
-                            $this->classInvolvementMapper->save($classInvolvement);
+                            if ($this->perform) {
+                                $this->classInvolvementMapper->save($classInvolvement);
+                            }
 
                             $this->log->info(sprintf(
                                 "Additional subject involvement in %s (%s) added for %s (user %s)",

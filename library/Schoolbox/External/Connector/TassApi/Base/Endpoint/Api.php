@@ -63,7 +63,7 @@ class Api implements IApi
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
@@ -72,32 +72,32 @@ class Api implements IApi
      *
      * @var string
      */
-    private $module;
+    private string $module;
 
 
     /**
      * @var ApiUsage
      */
-    private $apiUsage;
+    private ApiUsage $apiUsage;
 
 
     /**
      * @var Codec\Token
      */
-    private $tokenCodec;
+    private Codec\Token $tokenCodec;
 
 
     /**
      *
      * @var array
      */
-    private $credentials;
+    private array $credentials;
 
 
     /**
      * @var Client
      */
-    private $client;
+    private Client $client;
 
 
     /**
@@ -225,7 +225,7 @@ class Api implements IApi
             /* Successful response from server, but it might not send a valid data payload back
              * so try to decode it. If it can't decode properly, return null
              */
-            if ((int)$response->getStatusCode() === 200) {
+            if ($response->getStatusCode() === 200) {
                 return json_decode($response->getBody()->getContents(), true);
             }
 

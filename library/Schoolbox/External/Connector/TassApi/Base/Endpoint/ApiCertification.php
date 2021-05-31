@@ -25,13 +25,13 @@ class ApiCertification implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private ?LoggerInterface $log;
 
 
     /**
      * @var IApi[]
      */
-    private $api;
+    private array $api;
 
 
     /**
