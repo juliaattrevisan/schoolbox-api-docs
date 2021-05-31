@@ -167,7 +167,7 @@ export default {
             this.hasError = true;
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
             this.$emit(recordMediaEvents.PROCCESS_STOPPED); //notify any UI to re-enable
-            this.player.record().getDevice(); 
+            this.player.record().reset(); 
         },
 
         /**
@@ -187,6 +187,7 @@ export default {
          *
          */
         onFinishConvert () {
+            this.player.off('finishConvert', this.onFinishConvert);
             this.recordedVideoReady(this.player.convertedData);
         },
 
@@ -194,7 +195,7 @@ export default {
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
          *
          */
-        async recordedVideoReady (mediaData) {
+        recordedVideoReady (mediaData) {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
             this.recordedData = mediaData; // the blob object contains the recorded data 
 			this.hasNewRecording = true; //show the <player></player>
@@ -308,22 +309,11 @@ export default {
         />
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
-            <template v-if="hasDeviceAlreadyInUseError">
-                <div class="alert-box warning">Screen sharing appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
-            <template v-else-if="hasPermissionDeniedError">
-                <div class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
-            <template v-else-if="isRecordingOverMaxFileSize">
-                <div class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
-            <template v-else>
-                <div class="alert-box alert">Sorry, an unknown error has occured.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
+            <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">Screen sharing appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
+            <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
+            <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter screen recording or request your administrator(s) to increase the allowed file size limit.</div>
+            <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
+            <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
 
     </div>

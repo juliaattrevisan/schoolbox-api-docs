@@ -26,6 +26,13 @@ export default {
         OverMediaModal //to slot in upload modal
     },
 
+    props: {
+        maxFileSize: {
+            type: Number, 
+            required: true
+        }
+    },
+    
     data () {
         return {
             currentRecordMediaType: recordMediaTypes.UNSET, //the currently selected media recording
