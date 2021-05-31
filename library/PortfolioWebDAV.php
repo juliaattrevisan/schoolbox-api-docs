@@ -478,24 +478,37 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             ];
             return $temp;
         }
+
+        $url = $_SESSION['portfolioIdPathMap'][$id] ?? null;
+
+        // Maybe for whatever reason this thing doesn't exist in the session?
+        // Return false. As noted below on 404:
+        // "Instead of reacting badly just return false and get on with life"
+        if (!isset($url)) {
+            return false;
+        }
         try {
-            $response = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], [
-                '{DAV:}getcontentlength',
-                '{DAV:}resourcetype',
-                '{DAV:}getlastmodified',
-                '{DAV:}creationdate',
-            ], 1);
+            $response = $this->client->propFind(
+                $url,
+                [
+                    '{DAV:}getcontentlength',
+                    '{DAV:}resourcetype',
+                    '{DAV:}getlastmodified',
+                    '{DAV:}creationdate',
+                ],
+                1
+            );
 
             $response = array_shift($response);
 
             $parentID = $this->getParent($id);
 
-            $filename = basename($_SESSION['portfolioIdPathMap'][$id]);
+            $filename = basename($url);
 
             $temp = [
                 'id' => $id,
                 'parent' => $parentID,
-                'path' => $_SESSION['portfolioIdPathMap'][$id],
+                'path' => $url,
                 'name' => $filename,
                 'description' => $filename,
                 'type' => $this->parseResourceType($response['{DAV:}resourcetype']),
@@ -506,9 +519,9 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             ];
 
             return $temp;
-        } /* Handle Sabre_DAV_Exception specifically
-         */
-        catch (Sabre\DAV\Exception\NotAuthenticated $e) {
+        } catch (Sabre\DAV\Exception\NotAuthenticated $e) {
+            /* Handle Sabre_DAV_Exception specifically
+             */
             SitePage::localRedir('/cms/networkLogin' . ($this->lite ? '/lite' : ''));
         } catch (Sabre\DAV\Exception\NotFound $e) {
             /* In some cases we are told that something exists, only to be thrown a 404 error
