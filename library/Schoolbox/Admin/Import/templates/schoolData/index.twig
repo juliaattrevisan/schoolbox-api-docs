@@ -61,7 +61,6 @@
             {# If you haven't chosen anything, hide both csv and config islands
              #}
             if (dataSource === '') {
-                $('#csv-island').hide();
                 $('#config-island').hide();
                 hideConfig(configElements);
             } else if (dataSource === 'csv') {
@@ -69,7 +68,6 @@
                 {# If it's csv island, just show that
                  # Hide the config island
                  #}
-                $('#csv-island').show();
                 $('#config-island').hide();
                 hideConfig(configElements);
             } else {
@@ -77,7 +75,6 @@
                 {# Otherwise, show the config island and hide the csv island
                  # Show the host/key/frequency input elements
                  #}
-                $('#csv-island').hide();
                 $('#config-island').show();
                 showConfig(configElements);
             }
@@ -87,7 +84,7 @@
          * Switch configuration options
          *
          * If you haven't chosen anything, hide both csv and config islands
-         * If you chose csv island, just show that and hide config island
+         * If you chose csv, just show that and hide config island
          * Otherwise show config island and hide the csv island
          *
          * @param dataSource string
@@ -102,15 +99,12 @@
              # Anything else: hide the csv island, show the config island, show the config fields
              #}
             if (dataSource === '') {
-                $('#csv-island').hide();
                 $('#config-island').hide();
                 hideConfig(configElements);
             } else if (dataSource === 'csv') {
-                $('#csv-island').show();
                 $('#config-island').hide();
                 hideConfig(configElements);
             } else  {
-                $('#csv-island').hide();
                 $('#config-island').show();
                 showConfig(configElements);
             }
@@ -182,16 +176,6 @@
                         </div>
                     {% endif %}
                 </div>
-            </div>
-
-            <div class="small-12 island" id="csv-island">
-                <h3 class="subheader">Import from csv files</h3>
-
-                {% include '@adminImportIndex/subnavigation.twig' with { allNodes: allNavigation } %}
-
-                <section class="content">
-                    <p>From this page you can import different data into Schoolbox via CSV import files.  Please note if you are using a live connection you may only load users, all other data will be loaded automatically via your SIS connector.</p>
-                </section>
             </div>
         </div>
 
