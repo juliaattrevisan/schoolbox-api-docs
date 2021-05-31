@@ -53,21 +53,21 @@
             {# If you haven't chosen anything, hide both csv and config islands
              #}
             if (dataSource === '') {
-                $('#config-island').hide();
+                $('#status-island').hide();
                 hideConfig(configElements);
             } else if (dataSource === 'csv') {
 
                 {# If it's csv island, just show that
                  # Hide the config island
                  #}
-                $('#config-island').hide();
+                $('#status-island').hide();
                 hideConfig(configElements);
             } else {
 
                 {# Otherwise, show the config island and hide the csv island
                  # Show the host/key/frequency input elements
                  #}
-                $('#config-island').show();
+                $('#status-island').show();
                 showConfig(configElements);
             }
         }
@@ -91,13 +91,13 @@
              # Anything else: show the config island, show the config fields
              #}
             if (dataSource === '') {
-                $('#config-island').hide();
+                $('#status-island').hide();
                 hideConfig(configElements);
             } else if (dataSource === 'csv') {
-                $('#config-island').hide();
+                $('#status-island').hide();
                 hideConfig(configElements);
             } else  {
-                $('#config-island').show();
+                $('#status-island').show();
                 showConfig(configElements);
             }
         }
@@ -173,7 +173,7 @@
 
             {% include '@settings/moduleConfig.twig' with configContext only %}
 
-            <div class="small-12 island" id="config-island">
+            <div class="small-12 island" id="status-island">
                 <div class="row">
                     {% if hasIndicator %}
                         <div class="small-12 island">
