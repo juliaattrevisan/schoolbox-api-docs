@@ -49,18 +49,14 @@
          * @param {string} dataSource
          */
         function initIslands(dataSource) {
+            if (['', 'csv'].indexOf(dataSource) !== -1) {
 
-            {# If you haven't chosen anything, hide both csv and config islands
-             #}
-            if (dataSource === '') {
-                $('#status-island').hide();
-                hideConfig(configElements);
-            } else if (dataSource === 'csv') {
-
-                {# If it's csv island, just show that
-                 # Hide the config island
+                {# If you haven't chosen anything,
+                 # or if Data Source is csv,
+                 #
+                 # Hide Status Island and Hide config fields
                  #}
-                $('#status-island').hide();
+                 $('#status-island').hide();
                 hideConfig(configElements);
             } else {
 
