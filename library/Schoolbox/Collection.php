@@ -417,10 +417,11 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @param string $field
      * @param string $order
+     * @param bool   $maintainIndexAssociation
      * @return $this
      * @throws InvalidArgumentException
      */
-    public function sortNaturally(string $field, string $order = self::ORDER_ASCENDING): Collection
+    public function sortNaturally(string $field, string $order = self::ORDER_ASCENDING, bool $maintainIndexAssociation = false): Collection
     {
         $getter = $this->getGetMethodName($field);
 
@@ -440,7 +441,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
             }
 
             return strnatcasecmp($a->$getter(), $b->$getter()) < 1;
-        });
+        }, $maintainIndexAssociation);
     }
 
 

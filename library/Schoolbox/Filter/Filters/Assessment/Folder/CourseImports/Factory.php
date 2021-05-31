@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Filter\Filters\Assessment\Folder\CourseImports;
 
 use Alaress\Authorizer\Failure\Unauthorized;
+use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
@@ -137,7 +138,8 @@ class Factory extends FolderFilter\Factory
             $selections,
             $folderOverrides,
             $this->getSelectionMapper(),
-            $folders->sortBy('name', 'ASC', null, true)
+            $folders->sortBy('codeString', Collection::ORDER_ASCENDING)
+                    ->sortNaturally('name', Collection::ORDER_ASCENDING, true)
         );
     }
 
