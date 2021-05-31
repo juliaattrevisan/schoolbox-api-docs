@@ -294,34 +294,38 @@ class PipeManager implements MessageComponentInterface, TaskResponseHandlerInter
             return;
         }
 
-        $request   = each($data);
-        $command   = $request['key'];
-        $arguments = [ $userId, $request['value'] ];
+        foreach ($data as $command => $value) {
+            $arguments = [$userId, $value];
 
-        if ($pipe->isLocked()) {
-            // pipe has a command active: don't permit another until this one is finished
-            $this->sendToPipe($pipe, json_encode([ $command => self::PIPE_METHOD_WAIT ]));
+            if ($pipe->isLocked()) {
+                // pipe has a command active: don't permit another until this one is finished
+                $this->sendToPipe($pipe, json_encode([ $command => self::PIPE_METHOD_WAIT ]));
+                return;
+            }
 
+            // set the pipe to "busy"
+            $pipe->lock($command);
+
+            // flag the user as active
+            $this->refreshUser($userId);
+
+            try {
+                // don't flatly spawn a new worker: add the request to a queue
+                $this->enqueue($pipe, $command, $arguments);
+            } catch (QueueingException $e) {
+                $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage(), ['exception' => $e]);
+                // since a full queue constitutes service unavailable, probably best to kick this pipe
+                $this->sendHeader($pipe, 503, true);
+
+                // cleanup
+                $this->pipes->unregisterPipe($socketKey);
+                $pipe->close();
+            }
+
+            // Return after processing the first command.
+            // This maintains fidelity with the previous version, which used
+            // `each()` once.
             return;
-        }
-
-        // set the pipe to "busy"
-        $pipe->lock($command);
-
-        // flag the user as active
-        $this->refreshUser($userId);
-
-        try {
-            // don't flatly spawn a new worker: add the request to a queue
-            $this->enqueue($pipe, $command, $arguments);
-        } catch (QueueingException $e) {
-            $this->log->critical("Failed to enqueue, task '$command' lost: " . $e->getMessage(), ['exception' => $e]);
-            // since a full queue constitutes service unavailable, probably best to kick this pipe
-            $this->sendHeader($pipe, 503, true);
-
-            // cleanup
-            $this->pipes->unregisterPipe($socketKey);
-            $pipe->close();
         }
     }
 
