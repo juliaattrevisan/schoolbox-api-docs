@@ -282,7 +282,9 @@ abstract class Base
      */
     public function getConfigLoader()
     {
-        return $this->getDi()->get('config');
+        /** @var IConfigLoader $config */
+        $config = $this->getDi()->get('config');
+        return $config;
     }
 
     /**
@@ -411,6 +413,7 @@ abstract class Base
     {
         /** @var Output\Html $output */
         $output = $this->getDi()->get('webOutput:nochrome');
+        $output = $this->injectCurrentUserGlobal($output);
         return $output->setTemplate($template)->setData($data);
     }
 
@@ -428,6 +431,7 @@ abstract class Base
     {
         /** @var Output\Xml $output */
         $output = $this->getDi()->get('webOutput:xml');
+        $output = $this->injectCurrentUserGlobal($output);
         return $output->setTemplate($template)->setData($data);
     }
 
@@ -446,6 +450,9 @@ abstract class Base
     {
         /** @var Output\ThemedHtml $output */
         $output = $this->getDi()->get('webOutput:html');
+        $output = $this->injectCurrentUserGlobal($output);
+
+        /** @var Output\ThemedHtml $tpl */
         $tpl = $output->setTemplate($template)->setData($data);
 
         if ($title) {
@@ -493,6 +500,8 @@ abstract class Base
     /**
      * Just a raw template render
      *
+     * @deprecated Use `buildHtmlOutput` or `buildUnthemedHtmlOuptut` instead
+     *
      * @param string $namespace
      * @param string $template
      * @param array  $data
@@ -500,10 +509,7 @@ abstract class Base
      */
     protected function tpl($namespace, $template, $data = [], $tab = '')
     {
-        $content = $this->buildContent(
-            "@$namespace/$template.twig",
-            array_merge($data, ['currentUser' => $this->getUser()])
-        );
+        $content = $this->buildContent("@$namespace/$template.twig", $data);
 
         if ($content instanceof Output\ThemedHtml) {
             $content->setTab($tab);
@@ -514,6 +520,9 @@ abstract class Base
 
 
     /**
+     * @deprecated Use one of the `build*Output` methods instead, to build
+     *             exactly the type of content you specify
+     *
      * @param string $template
      * @param array  $data
      * @return \Alaress\Web\Output\Base
@@ -618,5 +627,20 @@ abstract class Base
         }
         $this->sentry->captureException($e);
         return true;
+    }
+
+    /**
+     * Inject the controller's current user into the output object as a global
+     * variable.
+     *
+     * This overrides any previous value which the global might have had.
+     *
+     * @param Output\Html $output
+     * @return Output\Html
+     */
+    private function injectCurrentUserGlobal(Output\Html $output): Output\Html
+    {
+        $output->getTemplateEngine()->addGlobal('USER', $this->getUser());
+        return $output;
     }
 }
