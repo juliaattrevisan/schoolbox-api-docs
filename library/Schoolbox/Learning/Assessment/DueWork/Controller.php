@@ -437,6 +437,7 @@ class Controller extends Assessment\Controller
 
         // Stream the zip archive
         $zipStream->finish();
+        exit;
     }
 
 
