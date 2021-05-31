@@ -7,7 +7,7 @@ SUDS TASS is a little more complex than the other SUDS connectors. TASS is a coa
    https://github.com/TheAlphaSchoolSystemPTYLTD/student-details
 3. Identify Management
    https://github.com/TheAlphaSchoolSystemPTYLTD/IdM
-4. Student Calendar And Notices
+4. School Calendar And Notices
    https://github.com/TheAlphaSchoolSystemPTYLTD/school-calendar-and-notices/blob/master/getStudentNotices.md
 
 # 1. Connector Setup
