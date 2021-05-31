@@ -124,3 +124,231 @@ The default UPS rulesets are also somewhat incompatible with TASS and you'll nee
 1. arbitrarily put everyone in a campus of your choice, 
 2. arbitrarily put everyone in a role of your choice, 
 3. give everyone an arbitrary username. I just give them the username `{:id}` in the General Information section.
+
+# 3. Data
+
+There are some idiosyncracies in the TASS universe that we had to manage surgically. This relates to treatment of Families, their contact details; and also Teaching Staff and how they relate to Non-Teaching Staff.
+
+## 3.1 Families and Split Families
+
+Since TASS operates on the concept of *families*, and schoolbox operates on the concept of *people*, we've had to do some micromanagement to identify individuals inside a family such that we can import them into schoolbox from TASS.
+
+### 3.1.1 Parent and Spouse prefixes
+Parents and their Spouses share the same identifier in TASS. However, in schoolbox, we don't allow that. To deconflict individuals we prefix a parent's externalId with a `P` and their spouse with an `S`. 
+
+> This is not user-configurable, though the spouse prefix exists as constant `DEFAULT_SPOUSE_PREFIX` in case that ever needed to be changed. A school did try once, but eventually it got too hard and we just went back to this scheme.
+
+#### 3.1.1.1 Example
+
+If a TASS Family had the externalId `FAM001`, the primary parent - typically the Father, but not always - would have the externalId `PFAM001`. Their spouse, if they exist, would have the externalId `SFAM001`.
+
+### 3.1.2 Split Family Suffix
+
+There's this idea in the TASS endpoints called an `sfa_num`. As far as I can tell, this is applicable only to split families and probably stands for *split family number*.
+
+In addition to the prefixes for parents, in a split family, we also append a suffix.
+
+#### 3.1.2.1 Example
+
+Let's take our `FAM001` and pretend it's a split family. One of the parents has an `sfa_num` of `1`.
+
+The primary parent has the externalId `PFAM001` and when we add the `sfa_num` suffix, it becomes `PFAM0011`.
+
+The same applies to the spouse.
+
+
+### 3.1.3 Email Addresses
+
+The contact information is contained in an `address` array in specific indexes. The indexes are configurable by the school in their TASS. To make it work with schoolbox, they need to set the following two fields in https://vagrant.dev.schoolbox.cloud/adminv2/setting/External%20DB
+
+1. TASS Address Number for Mother
+2. TASS Address Number for Father
+
+#### 3.1.3.1 Example
+
+For a family, address data is returned in this array. This example will **illustrate** the concept. It's not *exactly* like this, but this will communicate the idea. The address array typically contains the email addresses for each of the parents.
+
+A family record is returned from the `getParents` endpoint like this:
+
+```
+family = [
+   externalId = FAM001,
+   father [
+      address[1] = aaaa
+      address[2] = bbbb
+      address[3] = cccc
+      address[4] = dddd
+      address[5] = eeee
+   ],
+   mother [
+      address[1] = aaaa
+      address[2] = bbbb
+      address[3] = cccc
+      address[4] = dddd
+      address[5] = eeee
+   ]
+]
+
+```
+
+This `address` array contains all the contact information for all the relevant people. It (mostly) exists in the same way for both mother and fathers ia family.
+
+To identify a Mother's contact information, we can set the *TASS Address Number for Mother* to `4`. This makes her email address `dddd` when it imports.
+
+We can do the same for the Father, setting *TASS Address Number for Father* to `5`, making his email address `eeee` when it imports.
+
+> For more specific tech implementation details, see Family.php. Though the above illustrates the concepts, it turns out the data structure is actually a bit different when you come to coding it out when you encounter a split family. It's too technical to describe here, but there is a giant docblock in Family.php which explains it.
+
+> To make things even stranger, one set of email addresses can come from `gehParents` endpoint while another can exist in `getCommunicationRulesDetails` endpoint.
+
+---
+
+!TODO Can we just...get rid of tass_addnum_* altogether and rely solely on getCommunicationRulesDetails to get the email addresses?
+
+---
+
+### 3.1.4 Phone Numbers in a Nuclear Family vs a Split Family
+
+Bear with me on this one. It's a weird setup, so it'll take some time to explain and for you to understand. 
+
+Phone Numbers are derived from the `getCommunicationRulesDetails` endpoint. This endpoint returns a special mixed data structure containing a smooshing-together of:
+
+1. Mother fields, each of which are prefixed with `m_`
+2. Father fields, each of which are prefixed with `f_`
+3. "Misc fields", whose fields aren't prefixed at all
+
+There are two fields in `/adminv2/setting/External%20DB`. These fields correspond to the `address_description` in TASS and you'll see it in the `getCommunicationRulesDetails` endpoint.
+
+1. TASS Address Description for Mother
+2. TASS Address Description for Father
+
+Let's elaborate how these two concepts meet by listing some axioms.
+
+1. When a family record matches the *TASS Address Description for Mother* the misc fields are considered relevant to the Mother in a split family.
+2. When a family record matches the *TASS Address Description for Father* the misc fields are considered relevant to the Father in a split family.
+3. When a family record matches neither of these fields, the misc fields are distributed among the family's members and you're in a nuclear family. 
+   
+In a nuclear family, the "Misc fields" are shared among the parents. It is presumed that any field ending in `_1` belongs to the Mother while anything ending in `_2` belongs to the Father.
+
+#### 3.1.4.1 Example, Nuclear Family
+
+Let's say the `getCommunicationRulesDetails` endpoint returned this family record:
+
+```
+"mobile_phone_2": "",
+"adressee": "Paula Clark",
+"sms_flg_2": "N",
+"m_initials": "P",
+"m_suffix": "suf",
+"m_surname": "Clark",
+"m_description": "Mother/Parent 1",
+"m_preferred_name": "Paula",
+"m_other_name": "PauOth",
+"m_title": "Mrs",
+"m_first_name": "Paula",
+"address_description": "xxxxxxxxxxxxx",
+"email_2": "",
+"mobile_phone_1": "0427203657",
+"f_initials": "E",
+"f_suffix": "",
+"f_surname": "Clark",
+"f_description": "Father/Parent 2",
+"f_preferred_name": "Edward",
+"f_other_name": "",
+"f_title": "",
+"f_first_name": "Edward",
+"addressee": "Paula Clark",
+"email": "peterr@tassweb.com.au; realripper@tpg.com.au",
+"business_phone": "3201 1302",
+"parent_code": "000055",
+"salutation": "Mr and Mrs Clark",
+"home_phone": "3870 9987",
+"relationship": "Step",
+```
+
+...and that the following settings were applied:
+
+1. TASS Address Description for Mother = 'mum'
+2. TASS Address Description for Father = 'dad'
+
+These two admin fields don't match `address_description` at all, therefore you're looking at a nuclear family.
+
+* `mobile_phone_1` belongs to the Mother
+* `mobile_phone_2` belongs to the Father
+* `email` belongs to the Mother
+* `email_2` belongs to the Father
+* They both live in the same place
+
+#### 3.1.4.2 Example, Split Family
+Let's say the `getCommunicationRulesDetails` endpoint returned this structure:
+
+```
+
+"mobile_phone_2": "",
+"adressee": "Paula Clark",
+"sms_flg_2": "N",
+"m_initials": "P",
+"m_suffix": "suf",
+"m_surname": "Clark",
+"m_description": "Mother/Parent 1",
+"m_preferred_name": "Paula",
+"m_other_name": "PauOth",
+"m_title": "Mrs",
+"m_first_name": "Paula",
+"address_description": "mum",
+"email_2": "",
+"mobile_phone_1": "0427203657",
+"f_initials": "E",
+"f_suffix": "",
+"f_surname": "Clark",
+"f_description": "Father/Parent 2",
+"f_preferred_name": "Edward",
+"f_other_name": "",
+"f_title": "",
+"f_first_name": "Edward",
+"addressee": "Paula Clark",
+"email": "peterr@tassweb.com.au; realripper@tpg.com.au",
+"business_phone": "3201 1302",
+"parent_code": "000055",
+"salutation": "Mr and Mrs Clark",
+"home_phone": "3870 9987",
+"relationship": "Step",
+```
+
+...and that the following settings were applied:
+
+1. TASS Address Description for Mother = 'mum'
+2. TASS Address Description for Father = 'dad'
+
+The *TASS Address Description for Mother* matches the `address_description` value. Therefore you're looking at a mum in a spilt family.
+
+* `mobile_phone_1` belongs to the Mother
+* `mobile_phone_2` also belongs to the Mother
+* `email` belongs to the Mother
+* `email_2` also belongs to the Mother
+* `home_phone, business_phone` belongs to the Mother
+
+...and we have to pick the first meaningful value of the mobile phones and email addresses.
+
+The father would get the same treatment for his data.
+
+## 3.2 Teaching Staff and Employees
+
+All Teaching Staff members are Employees.
+Not all Employees are Teaching Staff.
+
+Employees that aren't teaching students - "non-teaching staff" - consist of humans such as Librarians, Tech Support, Administrators, Counsellors, etc. who will utilise schoolbox in some way but they aren't necessarily teachers of students in a classroom setting.
+
+To distinguish between them, we give non-teaching staff a special prefix `E`.
+
+> It was possible to have an Employee's externalId conflict with a Student's externalId (they are typically numeric as far as we have seen) and thus we used this prefix to deconflict.
+
+Non-teaching staff will never have a timetable.
+Only teaching staff have a timetable.
+
+### 3.2.1 Example
+
+Let's say there was an Employee with the identifier `123`.  When we import them into schoolbox, their externalId will be `E123`. This deconflicts them with a student whose externalId is also `123`. 
+
+
+
