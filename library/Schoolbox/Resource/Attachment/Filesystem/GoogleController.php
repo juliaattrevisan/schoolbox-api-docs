@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
 use SitePage;
@@ -58,14 +59,13 @@ class GoogleController extends AbstractController
         $this->setViewsFromMimeFilter($mimeFilter);
 
         if ($conf) {
-            $this->gDriveEnabled = $conf->get('googledrive_enabled');
-            $this->gAppsApiKey   = $conf->get('googleapps_api_key');
-            $this->gAppsClientId = $conf->get('googleapps_client_id');
+            $this->gDriveEnabled = $conf->get(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED);
+            $this->gAppsClientId = $conf->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID);
         }
 
         if (!$this->gDriveEnabled) {
             throw new OutOfRangeException("Google Drive not enabled");
-        } elseif (!($this->gAppsApiKey && $this->gAppsClientId)) {
+        } elseif (!$this->gAppsClientId) {
             throw new OutOfRangeException("Google Apps credentials not specified");
         }
     }

@@ -12,6 +12,7 @@ namespace Schoolbox\Fixtures\Result;
 
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -322,7 +323,7 @@ class Controller extends AbstractController
                     'team'           => $team,
                     'teamMetadata'   => $teamMetadata,
                     'result'         => $context,
-                    'googleApiKey'   => $this->getConfigLoader()->get('googleapps_api_key'),
+                    'googleApiKey'   => $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEAPPS_API_KEY),
                     'forecast'       => $forecast,
                     'hasMatchModify' => $hasMatchModify
                 ]

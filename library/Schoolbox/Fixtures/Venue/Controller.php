@@ -12,6 +12,7 @@ namespace Schoolbox\Fixtures\Venue;
 
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Fixtures\Venue\Model as Venue;
@@ -120,7 +121,7 @@ class Controller extends AbstractController
         $data = [
             'venue'  => $entity,
             'action' => $entity->getId() ? 'Modify' : 'Create',
-            'googleApiKey' => $this->getConfigLoader()->get('googleapps_api_key'),
+            'googleApiKey' => $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEAPPS_API_KEY),
         ];
 
         // compensate for failed API call
