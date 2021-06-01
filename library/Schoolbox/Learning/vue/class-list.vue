@@ -108,6 +108,7 @@ export default {
             actionsPlaceholder: true,
             loadingText: 'Please Wait...',
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
+            currentClassCode: null,
         }
     },
     mounted: function () {
@@ -246,6 +247,16 @@ export default {
             }
             return parts;
         },
+
+        /**
+         * Sets the current class code: students will be filtered out of the
+         * displayed list depending on this value.
+         *
+         * @param {String|null} classCode
+         */
+        setClassCode(classCode) {
+            this.currentClassCode = classCode;
+        },
     },
     computed: {
         replyTo: function () {
@@ -330,11 +341,11 @@ export default {
             <h1>{{ subjectTitle }}</h1>
 
             <dl class="sub-nav" v-if="classCodeList.length > 1">
-                <dd class="active">
-                    <a href="#">All class codes</a>
+                <dd :class="{active: currentClassCode === null}">
+                    <a href="#" @click="setClassCode(null)">All class codes</a>
                 </dd>
-                <dd class="active" v-for="classCode in classCodeList">
-                    <a href="#">{{ classCode }}</a>
+                <dd v-for="classCode in classCodeList" :key="classCode" :class="{active: currentClassCode === classCode}">
+                    <a :href="'#' + classCode" @click="setClassCode(classCode)">{{ classCode }}</a>
                 </dd>
             </dl>
 
