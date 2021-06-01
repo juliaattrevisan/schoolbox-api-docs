@@ -21,8 +21,15 @@
                 </thead>
                 <tbody>
                 {% for route in controllerRoutes %}
-                    <tr>
-                        <td>{{ route.name }}</td>
+                    <tr {% if route.error %}class="alert"{% endif %}>
+                        <td>
+                            {% if route.error %}
+                                <span data-tooltip
+                                      class="has-tip tip-top hint"
+                                      title="An error was raised whilst building this controller: &quot;{{ route.error.message }}&quot;">?</span>
+                            {% endif %}
+                            {{ route.name }}
+                        </td>
                         <td>{{ route.method }} {{ route.path }}</td>
                         <td>{{ route.controller }}::{{ route.action }}</td>
                     </tr>
