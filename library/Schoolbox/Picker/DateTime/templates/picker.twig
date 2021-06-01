@@ -127,10 +127,16 @@
                             <div data-adtp-tt-time-controls>
                                 <div class="radiolist" data-adtp-tt-time>
                                     <label>Time:</label>
-                                    <input type="radio" name="periodTime{{ id }}" value="start" id="periodStart{{ id }}" checked data-adtp-tt-period-start>
-                                    <label for="periodStart{{ id }}">Period start (<span data-start-time></span>)</label>
-                                    <input type="radio" name="periodTime{{ id }}" value="end" id="periodEnd{{ id }}" data-adtp-tt-period-end>
-                                    <label for="periodEnd{{ id }}">Period end (<span data-end-time></span>)</label>
+                                    <ul class="option-list">
+                                        <li>
+                                            <input type="radio" name="periodTime{{ id }}" value="start" id="periodStart{{ id }}" checked data-adtp-tt-period-start>
+                                            <label for="periodStart{{ id }}">Period start (<span data-start-time></span>)</label>
+                                        </li>
+                                        <li>
+                                            <input type="radio" name="periodTime{{ id }}" value="end" id="periodEnd{{ id }}" data-adtp-tt-period-end>
+                                            <label for="periodEnd{{ id }}">Period end (<span data-end-time></span>)</label>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
 

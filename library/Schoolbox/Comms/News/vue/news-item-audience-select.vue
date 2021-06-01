@@ -720,18 +720,20 @@ export default {
                             </div>
                         </div>
                         <fieldset class="checklist border-none" v-show="showModifierCheckboxes">
-                            <template v-if="showModifierSelfCheckbox">
-                                <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
-                                <label for="audience-select-users">{{ selectedAudienceOption.selfModifier }}</label>
-                            </template>
-                            <template v-if="showModifierParentsCheckbox">
-                                <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
-                                <label for="audience-select-parents">Parents of students</label>
-                            </template>
-                            <template v-if="showModifierTeachersCheckbox">
-                                <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
-                                <label for="audience-select-teachers">Teachers of students</label>
-                            </template>
+                            <ul class="option-list">
+                                <li v-if="showModifierSelfCheckbox">
+                                    <input type="checkbox" id="audience-select-users" v-model="includeUsers" />
+                                    <label for="audience-select-users">{{ selectedAudienceOption.selfModifier }}</label>
+                                </li>
+                                <li v-if="showModifierParentsCheckbox">
+                                    <input type="checkbox" id="audience-select-parents" v-model="includeParents" />
+                                    <label for="audience-select-parents">Parents of students</label>
+                                </li>
+                                <li v-if="showModifierTeachersCheckbox">
+                                    <input type="checkbox" id="audience-select-teachers" v-model="includeTeachers" />
+                                    <label for="audience-select-teachers">Teachers of students</label>
+                                </li>
+                            </ul>
                         </fieldset>
                         <button class="button submit" @click.prevent="addAudienceSimple" :disabled="!submitEnable">Add</button>
                     </div>
@@ -760,10 +762,12 @@ export default {
                                     </template>
                                 </select>
                             </legend>
-                            <slot v-for="(item, key2) in audienceListItemsIntersect[key]">
-                                <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]" :key="key2 + '-input'">
-                                <label :for="key + '-' + key2" class="checkbox-label" :key="key2 + '-label'">{{ item }}</label>
-                            </slot>
+                            <ul class="option-list" v-for="(item, key2) in audienceListItemsIntersect[key]" :key="key2">
+                                <li>
+                                    <input type="checkbox" :id="key + '-' + key2" :value="key2" v-model="intersectList[key]" :key="key2 + '-input'">
+                                    <label :for="key + '-' + key2" class="checkbox-label" :key="key2 + '-label'">{{ item }}</label>
+                                </li>
+                            </ul>
                         </div>
                     </template>
                 </div>

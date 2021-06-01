@@ -108,12 +108,18 @@
                                         Visible Campus
                                         <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these campus will see the tab, remember users can be in multiple campus">?</span>
                                     </legend>
-                                    <input id="campus-all" type="checkbox">
-                                    <label for="campus-all">Select All</label>
-                                    {% for campus in campuses %}
-                                        <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
-                                        <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
-                                    {% endfor %}
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="campus-all" type="checkbox">
+                                            <label for="campus-all">Select All</label>
+                                        </li>
+                                        {% for campus in campuses %}
+                                            <li>
+                                                <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
+                                                <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </fieldset>
                             </div>
                             <div class="small-12 medium-6 columns">
@@ -122,12 +128,18 @@
                                         Visible Roles
                                         <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="Users in these roles will see the tab">?</span>
                                     </legend>
-                                    <input id="role-all" type="checkbox">
-                                    <label for="role-all">Select All</label>
-                                    {% for role in roles %}
-                                        <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
-                                        <label for="role-{{ role.id }}">{{ role.name }}</label>
-                                    {% endfor %}
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="role-all" type="checkbox">
+                                            <label for="role-all">Select All</label>
+                                        </li>
+                                        {% for role in roles %}
+                                            <li>
+                                                <input name="roles[]" data-role id="role-{{ role.id }}" type="checkbox" {% if rolesSelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
+                                                <label for="role-{{ role.id }}">{{ role.name }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </fieldset>
                             </div>
                         </fieldset>

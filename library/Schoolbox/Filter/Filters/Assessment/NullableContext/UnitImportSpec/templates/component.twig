@@ -26,15 +26,17 @@
     {% for course in courseSpecs %}
         {% if isUserConfigurable and not hideCourseTitle %}<p class="course-title">{{ course.title }}</p>{% endif %}
         <div class="checklist">
-        {% for unit in course.units %}
-            {% set roleSelection = roleSelections[unit.id] %}
-            {% include '@filters/_selectionCheckbox.twig' with {
-                roleSelection:      roleSelection,
-                userSelection:      userSelections[unit.id],
-                label:              unit.title,
-                disabled:           isDisabled
-            } only %}
-        {% endfor %}
+            <ul class="option-list">
+            {% for unit in course.units %}
+                {% set roleSelection = roleSelections[unit.id] %}
+                {% include '@filters/_selectionCheckbox.twig' with {
+                    roleSelection:      roleSelection,
+                    userSelection:      userSelections[unit.id],
+                    label:              unit.title,
+                    disabled:           isDisabled
+                } only %}
+            {% endfor %}
+        </ul>
         </div>
     {% endfor %}
 {% endblock %}

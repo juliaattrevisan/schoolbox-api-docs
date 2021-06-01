@@ -132,14 +132,18 @@ Data:
 
         <fieldset class="checklist">
             <legend>Recipients</legend>
-            <template v-for="(group, index) in groups">
-                <input :id="group.label"
-                       name="groups[]"
-                       type="checkbox"
-                       :value="group.value"
-                       v-model="group.isChecked" />
-                <label :for="group.label">${ group.label }</label>
-            </template>
+            <ul class="option-list">
+                <template v-for="(group, index) in groups">
+                    <li :key="index">
+                        <input :id="group.label"
+                            name="groups[]"
+                            type="checkbox"
+                            :value="group.value"
+                            v-model="group.isChecked" />
+                        <label :for="group.label">${ group.label }</label>
+                    </li>
+                </template>
+            </ul>
         </fieldset>
 
         <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">

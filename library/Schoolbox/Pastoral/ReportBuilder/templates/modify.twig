@@ -140,56 +140,66 @@
             <section>
                 <div class="small-12 columns content">
                     <div class="checklist">
-                        <input id="type-all" type="checkbox" data-check-all-type>
-                        <label for="type-all">Select All</label>
-                        {% for type in types %}
-                            <div class="pastoral-types">
-                                <input id="type-{{ type.id }}"
-                                       name="types[]"
-                                       value="{{ type.id }}"
-                                       type="checkbox"
-                                       {% for typeSelected in (report.types ?? []) | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
-                                       data-check-type
-                                >
+                        <ul class="option-list">
+                            <li>
+                                <input id="type-all" type="checkbox" data-check-all-type>
+                                <label for="type-all">Select All</label>
+                            </li>
+                            {% for type in types %}
+                                <li>
+                                    <div class="pastoral-types">
+                                        <input id="type-{{ type.id }}"
+                                            name="types[]"
+                                            value="{{ type.id }}"
+                                            type="checkbox"
+                                            {% for typeSelected in (report.types ?? []) | filter(typeSelected => typeSelected.id == type.id ) %}checked{% endfor %}
+                                            data-check-type
+                                        >
 
-                                {% set hasSubTypes = false %}
-                                {% for subtype in subTypes %}
-                                    {% if subtype.pastoralType.id == type.id %}
-                                        {% set hasSubTypes = true %}
-                                    {% endif %}
-                                {% endfor %}
+                                        {% set hasSubTypes = false %}
+                                        {% for subtype in subTypes %}
+                                            {% if subtype.pastoralType.id == type.id %}
+                                                {% set hasSubTypes = true %}
+                                            {% endif %}
+                                        {% endfor %}
 
-                                {% if hasSubTypes %}
-                                    <label for="type-{{ type.id }}" title="Select to reveal sub-types">
-                                        {{ type.name }}
-                                        <i class="icon-click-view size-8"></i>
-                                    </label>
-                                {% else %}
-                                    <label for="type-{{ type.id }}">
-                                        {{ type.name }}
-                                    </label>
-                                {% endif %}
-
-                                <div class="checklist" data-pastoral-subtype>
-                                    {% for subtype in subTypes %}
-
-                                        {% if subtype.pastoralType.id == type.id %}
-                                            <input id="subtype-{{ subtype.id }}"
-                                                   name="subtypes[]"
-                                                   value="{{ subtype.id }}"
-                                                   type="checkbox"
-                                                   {% for subtypeSelected in (report.subtypes ?? []) | filter(subtypeSelected => subtypeSelected.id == subtype.id ) %}checked{% endfor %}
-                                                   data-check-subtype
-                                            >
-                                            <label for="subtype-{{ subtype.id }}">
-                                                {{ subtype.name }}
+                                        {% if hasSubTypes %}
+                                            <label for="type-{{ type.id }}" title="Select to reveal sub-types">
+                                                {{ type.name }}
+                                                <i class="icon-click-view size-8"></i>
+                                            </label>
+                                        {% else %}
+                                            <label for="type-{{ type.id }}">
+                                                {{ type.name }}
                                             </label>
                                         {% endif %}
 
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        {% endfor %}
+                                        <div class="checklist" data-pastoral-subtype>
+                                            <ul class="option-list">
+                                            {% for subtype in subTypes %}
+
+                                                {% if subtype.pastoralType.id == type.id %}
+                                                    <li>
+                                                        <input id="subtype-{{ subtype.id }}"
+                                                            name="subtypes[]"
+                                                            value="{{ subtype.id }}"
+                                                            type="checkbox"
+                                                            {% for subtypeSelected in (report.subtypes ?? []) | filter(subtypeSelected => subtypeSelected.id == subtype.id ) %}checked{% endfor %}
+                                                            data-check-subtype
+                                                        >
+                                                        <label for="subtype-{{ subtype.id }}">
+                                                            {{ subtype.name }}
+                                                        </label>
+                                                    </li>
+                                                {% endif %}
+
+                                            {% endfor %}
+                                            </li>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </section>
@@ -230,26 +240,34 @@
                     <section>
                         <div class="small-12 columns content">
                             <div class="checklist">
-                                <input id="year-all" type="checkbox" data-check-all-year>
-                                <label for="year-all">Select All</label>
-                                <input id="includeStudentsWithoutYear"
-                                       name="includeStudentsWithoutYear"
-                                       value="1"
-                                       type="checkbox"
-                                       {% if report.includeStudentsWithoutYear %}checked{% endif %}
-                                       data-check-year
-                                >
-                                <label for="includeStudentsWithoutYear">(No Year Level)</label>
-                                {% for year in years %}
-                                    <input id="year-{{ year.id }}"
-                                           name="years[]"
-                                           value="{{ year.id }}"
-                                           type="checkbox"
-                                           {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected == year.id ) %}checked{% endfor %}
-                                           data-check-year
-                                    >
-                                    <label for="year-{{ year.id }}">{{ year.name }}</label>
+                                <ul class="option-list">
+                                    <li>
+                                        <input id="year-all" type="checkbox" data-check-all-year>
+                                        <label for="year-all">Select All</label>
+                                    </li>
+                                    <li>
+                                        <input id="includeStudentsWithoutYear"
+                                            name="includeStudentsWithoutYear"
+                                            value="1"
+                                            type="checkbox"
+                                            {% if report.includeStudentsWithoutYear %}checked{% endif %}
+                                            data-check-year
+                                        >
+                                        <label for="includeStudentsWithoutYear">(No Year Level)</label>
+                                    </li>
+                                    {% for year in years %}
+                                        <li>
+                                            <input id="year-{{ year.id }}"
+                                                name="years[]"
+                                                value="{{ year.id }}"
+                                                type="checkbox"
+                                                {% for yearSelected in (report.years ?? []) |filter(yearSelected => yearSelected == year.id ) %}checked{% endfor %}
+                                                data-check-year
+                                            >
+                                            <label for="year-{{ year.id }}">{{ year.name }}</label>
+                                        </li>
                                 {% endfor %}
+                                </ul>
                             </div>
                         </div>
                     </section>
@@ -262,26 +280,34 @@
                     <section>
                         <div class="small-12 columns content">
                             <div class="checklist">
-                                <input id="house-all" type="checkbox" data-check-all-house>
-                                <label for="house-all">Select All</label>
-                                <input id="includeStudentsWithoutHouse"
-                                       name="includeStudentsWithoutHouse"
-                                       value="1"
-                                       type="checkbox"
-                                       {% if report.includeStudentsWithoutHouse %}checked{% endif %}
-                                       data-check-house
-                                >
-                                <label for="includeStudentsWithoutHouse">(No House)</label>
-                                {% for house in houses %}
-                                    <input id="house-{{ house.id }}"
-                                           name="houses[]"
-                                           value="{{ house.id }}"
-                                           type="checkbox"
-                                           {% for houseSelected in (report.houses ?? []) | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
-                                           data-check-house
-                                    >
-                                    <label for="house-{{ house.id }}">{{ house.house }}</label>
-                                {% endfor %}
+                                <ul class="option-list">
+                                    <li>
+                                        <input id="house-all" type="checkbox" data-check-all-house>
+                                        <label for="house-all">Select All</label>
+                                    </li>
+                                    <li>
+                                        <input id="includeStudentsWithoutHouse"
+                                            name="includeStudentsWithoutHouse"
+                                            value="1"
+                                            type="checkbox"
+                                            {% if report.includeStudentsWithoutHouse %}checked{% endif %}
+                                            data-check-house
+                                        >
+                                        <label for="includeStudentsWithoutHouse">(No House)</label>
+                                    </li>
+                                    {% for house in houses %}
+                                        <li>
+                                            <input id="house-{{ house.id }}"
+                                                name="houses[]"
+                                                value="{{ house.id }}"
+                                                type="checkbox"
+                                                {% for houseSelected in (report.houses ?? []) | filter(houseSelected => houseSelected == house) %}checked{% endfor %}
+                                                data-check-house
+                                            >
+                                            <label for="house-{{ house.id }}">{{ house.house }}</label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         </div>
                     </section>

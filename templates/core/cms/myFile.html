@@ -47,14 +47,18 @@ $(function() {
                                 Publishing
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Your file will also be published on the selected ePortfolio pages">?</span>
                             </legend>
-                            <!-- BEGIN publish_page -->
-                            <input id="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}"
-                                   type="checkbox"
-                                   value="true"
-                                   name="published[{PUBLISH_PAGE_PAGE_OWNER_ID}][{PUBLISH_PAGE_PAGE_ID}]"
-                                   {PUBLISHED} />
-                            <label for="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}">{PUBLISH_PAGE_PAGE_NAME}</label>
-                            <!-- END publish_page -->
+                            <ul class="option-list">
+                                <!-- BEGIN publish_page -->
+                                <li>
+                                    <input id="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}"
+                                        type="checkbox"
+                                        value="true"
+                                        name="published[{PUBLISH_PAGE_PAGE_OWNER_ID}][{PUBLISH_PAGE_PAGE_ID}]"
+                                        {PUBLISHED} />
+                                    <label for="published-{PUBLISH_PAGE_PAGE_OWNER_ID}-{PUBLISH_PAGE_PAGE_ID}">{PUBLISH_PAGE_PAGE_NAME}</label>
+                                </li>
+                                <!-- END publish_page -->
+                            </ul>
                         </fieldset>
                     </div>
                 </fieldset>

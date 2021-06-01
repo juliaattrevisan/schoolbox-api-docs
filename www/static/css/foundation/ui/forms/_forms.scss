@@ -365,6 +365,10 @@ td {
       line-height: $checkbox-size - $input-border-width;
       font-size: $icon-size;
     }
+
+    &:hover {
+      cursor: pointer;
+    }
   }
 
   &:checked {
@@ -421,12 +425,13 @@ td {
   }
 }
 
-//to ensure the foundation checkboxes are displayed block
-.filter-list {
+//to ensure the foundation checkboxes/radio boxes are displayed block
+.option-list {
   margin: 0px;
+  list-style-type: none;
   li:hover {
     cursor: default;
-    background-color: $ghost !important;
+    background-color: transparent !important;
   }
 }
 
@@ -569,6 +574,7 @@ input[type="checkbox"].plain {
       }
 
       &:hover {
+        cursor: pointer;
         background: $content-ui-background;
 
         &:after,

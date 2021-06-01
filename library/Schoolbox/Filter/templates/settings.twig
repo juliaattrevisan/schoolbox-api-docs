@@ -361,10 +361,14 @@
                 <fieldset class="checklist">
                     <legend>{{ roleType | capitalize }}</legend>
                     <section>
+                        <ul class="option-list">
                         {% for role in roles %}
-                            <input id="push-selection-role-{{ role.id }}" name="role[]" value="{{ role.id }}" type="checkbox" />
-                            <label for="push-selection-role-{{ role.id }}">{{ role.name }}</label>
+                            <li>
+                                <input id="push-selection-role-{{ role.id }}" name="role[]" value="{{ role.id }}" type="checkbox" />
+                                <label for="push-selection-role-{{ role.id }}">{{ role.name }}</label>
+                            </li>
                         {% endfor %}
+                        </ul>
                     </section>
                 </fieldset>
             {% endif %}

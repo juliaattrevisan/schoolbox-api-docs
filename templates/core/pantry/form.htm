@@ -61,13 +61,20 @@
                         </p>
                     </div>
                     <div class="small-12 columns">
-                        <label class="required" for="text">Input Label</label>
-                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
+                        <label for="text">
+                            <span class="required-with-tip">Input Label</span>
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                                title="I'm here to display the description of the current field.">?</span>
+                        </label>
+                        
                         <input type="text" name="text" id="text" placeholder="Put some text here" required />
                     </div>
                     <div class="small-12 columns">
-                        <label class="required">Input Number</label>
-                        <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This field only allows numbers">?</span>
+                        <label>
+                            <span class="required-with-tip">Input Number</span>
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="This field only allows numbers">?</span>
+                        </label>
+                        
                         <input type="number" name="number" id="number" value="20" required />
                     </div>
                     <div class="small-12 columns">
@@ -152,9 +159,11 @@
                     <div class="small-12 medium-6 columns">
                         <fieldset class="radiolist" data-equalizer-watch>
                             <legend>Radio Button Group</legend>
-                            <input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label for="pokemonRed">Red</label>
-                            <input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label for="pokemonBlue">Blue</label>
-                            <input type="radio" name="pokemon" value="Yellow" id="pokemonYellow" disabled><label for="pokemonYellow">Yellow</label>
+                            <ul class="option-list">
+                                <li><input type="radio" name="pokemon" value="Red" id="pokemonRed" checked><label for="pokemonRed">Red</label></li>
+                                <li><input type="radio" name="pokemon" value="Blue" id="pokemonBlue"><label for="pokemonBlue">Blue</label></li>
+                                <li><input type="radio" name="pokemon" value="Yellow" id="pokemonYellow" disabled><label for="pokemonYellow">Yellow</label></li>
+                            </ul>
                             <p>
                                 Did you realise you're inside a double-nested <code>&lt;fieldset/&gt;</code> here? (yes, that is perfectly acceptable!)
                                 The inner fieldset is used for grouping radio or checklists, like this example suggests.
@@ -168,10 +177,12 @@
                                 Check These Out
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you want a tooltip for your checkbox list, put the tooltip in the legend, like this.">?</span>
                             </legend>
-                            <input id="checkbox1" type="checkbox"><label for="checkbox1">Checkbox 1</label>
-                            <input id="checkbox2" type="checkbox"><label for="checkbox2">Checkbox 2</label>
-                            <input id="checkbox3" type="checkbox" disabled><label for="checkbox3">Checkbox 3</label>
-                            <input id="checkbox4" type="checkbox" checked disabled><label for="checkbox4">Checkbox 4</label>
+                            <ul class="option-list">
+                                <li><input id="checkbox1" type="checkbox"><label for="checkbox1">Checkbox 1</label></li>
+                                <li><input id="checkbox2" type="checkbox"><label for="checkbox2">Checkbox 2</label></li>
+                                <li><input id="checkbox3" type="checkbox" disabled><label for="checkbox3">Checkbox 3</label></li>
+                                <li><input id="checkbox4" type="checkbox" checked disabled><label for="checkbox4">Checkbox 4</label></li>
+                            </ul>
                         </fieldset>
                     </div>
 
@@ -180,19 +191,24 @@
                     <div id="ordinaryCheckboxes" class="small-12 medium-6 columns">
                         <fieldset class="checklist">
                             <legend>Select All - ordinary checkboxes</legend>
-
-                            <input id="selectAllOrdinary" type="checkbox">
-                            <label for="selectAllOrdinary">Select All</label>
-
-                            <input id="ordinaryCheckbox1" type="checkbox" data-ordinary-checkbox>
-                            <label for="ordinaryCheckbox1">
-                                A Checkbox
-                            </label>
-
-                            <input id="ordinaryCheckbox2" type="checkbox" data-ordinary-checkbox>
-                            <label for="ordinaryCheckbox2">
-                                Another Checkbox
-                            </label>
+                            <ul class="option-list">
+                                <li>
+                                    <input id="selectAllOrdinary" type="checkbox">
+                                    <label for="selectAllOrdinary">Select All</label>
+                                </li>
+                                <li>
+                                    <input id="ordinaryCheckbox1" type="checkbox" data-ordinary-checkbox>
+                                    <label for="ordinaryCheckbox1">
+                                        A Checkbox
+                                    </label>
+                                </li>
+                                <li>
+                                    <input id="ordinaryCheckbox2" type="checkbox" data-ordinary-checkbox>
+                                    <label for="ordinaryCheckbox2">
+                                        Another Checkbox
+                                    </label>
+                                </li>
+                            </ul>
                         </fieldset>
                         <script>
                             $("#selectAllOrdinary").selectAllBasic({
@@ -205,30 +221,39 @@
                     <div id="nestedCheckboxes" class="small-12 medium-6 columns">
                         <fieldset class="checklist">
                             <legend>Select All - nested checkboxes</legend>
-
-                            <input id="selectAllNested" type="checkbox">
-                            <label for="selectAllNested">Select All</label>
-
-                            <input id="parentCheckbox1" type="checkbox" data-parent-checkbox>
-                            <label for="parentCheckbox1" title="Select to reveal children">
-                                Parent Checkbox
-                                <i class="icon-click-view size-8"></i>
-                            </label>
-
-                            <div class="checklist" data-child-group>
-                                <input id="childCheckbox1" type="checkbox" data-child-checkbox>
-                                <label for="childCheckbox1">A Child Checkbox</label>
-
-                                <input id="childCheckbox2" type="checkbox" data-child-checkbox>
-                                <label for="childCheckbox2">Another Child Checkbox</label>
-                            </div>
+                            <ul class="option-list">
+                                <li>
+                                    <input id="selectAllNested" type="checkbox">
+                                    <label for="selectAllNested">Select All</label>
+                                </li>
+                                <li>
+                                    <input id="parentCheckbox1" type="checkbox" data-parent-checkbox>
+                                    <label for="parentCheckbox1" title="Select to reveal children">
+                                        Parent Checkbox
+                                        <i class="icon-click-view size-8"></i>
+                                    </label>
+                                    <div class="checklist" data-child-group>
+                                        <ul class="option-list">
+                                            <li>
+                                                <input id="childCheckbox1" type="checkbox" data-child-checkbox>
+                                                <label for="childCheckbox1">A Child Checkbox</label>
+                                            </li>
+                                            <li>
+                                                <input id="childCheckbox2" type="checkbox" data-child-checkbox>
+                                                <label for="childCheckbox2">Another Child Checkbox</label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
                         </fieldset>
                         <script>
                             $(function() {
+                                
                                 var parentCheckboxSelector = "[data-parent-checkbox]";
                                 var childCheckboxSelector = "[data-child-checkbox]";
                                 var childGroupSelector = "[data-child-group]";
-
+                                  
                                 // Initial setup: if any parent types are already checked (from saved data), show their subtypes
                                 // otherwise hide the subtypes to save space
                                 $(parentCheckboxSelector).each(function(index, parentCheckbox) {
@@ -527,7 +552,8 @@
                         <p>Note <code>&lt;fieldset class="collapsible"/&gt;</code></p>
                     </div>
                     <div class="small-12 columns hide" data-collapsable="optional-section" data-collapse-state="collapsed">
-                        <label>Input Label
+                        <label>
+                            <span class="required-with-tip">Input Label</span>
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="I'm here to display the description of the current field.">?</span>
                             <input type="text" placeholder="Put some text here" />
                         </label>

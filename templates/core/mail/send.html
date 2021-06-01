@@ -220,9 +220,11 @@ $(function() {
 <div id="email-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true" role="dialog">
     <p>Use this to copy the addresses to your clipboard for use in other email programs.</p>
     <textarea readonly id="copy-email-text" rows="6"></textarea>
-    <fieldset class="radiolist" >
-        <input type="radio" name="separator" value="comma" id="commaSep" checked><label for="commaSep" >Comma Separated</label>
-        <input type="radio" name="separator" value="colon" id="colonSep"><label for="colonSep" >Semi-Colon Separated</label>
+    <fieldset class="radiolist">
+        <ul class="option-list">
+            <li><input type="radio" name="separator" value="comma" id="commaSep" checked><label for="commaSep" >Comma Separated</label></li>
+            <li><input type="radio" name="separator" value="colon" id="colonSep"><label for="colonSep" >Semi-Colon Separated</label></li>
+        </ul>
     </fieldset>
     <div class="component-action">
         <section>

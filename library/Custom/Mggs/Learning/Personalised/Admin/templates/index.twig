@@ -8,16 +8,20 @@
                         <div class="column small-12">
                             <fieldset class="checklist">
                                 <legend>Roles Enabled</legend>
+                                <ul class="option-list">
                                 {% for role in roles %}
-                                    <input
-                                            id="role[{{ role.id }}]"
-                                            name="role[{{ role.id }}]"
-                                            type="checkbox"
-                                            value="{{ role.id }}"
-                                            {% if role.id in enabled %}checked{% endif %}
-                                    />
-                                    <label for="role[{{ role.id }}]">{{ role.name }}</label>
+                                    <li>
+                                        <input
+                                                id="role[{{ role.id }}]"
+                                                name="role[{{ role.id }}]"
+                                                type="checkbox"
+                                                value="{{ role.id }}"
+                                                {% if role.id in enabled %}checked{% endif %}
+                                        />
+                                        <label for="role[{{ role.id }}]">{{ role.name }}</label>
+                                    </li>
                                 {% endfor %}
+                                </ul>
                             </fieldset>
                         </div>
                     </div>

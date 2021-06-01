@@ -61,11 +61,16 @@
                             <div class="small-12 medium-6 columns">
 
                                 <fieldset class="radiolist" id="chooseBadge" data-badge-avatar-options>
-                                    <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon-selector checked />
-                                    <label for="badge-icon">Choose an existing icon</label>
-
-                                    <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image-selector/>
-                                    <label for="badge-image">Upload from your device</label>
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="badge-icon" type="radio" name="badge-avatar-selector" value="icon" data-icon-selector checked />
+                                            <label for="badge-icon">Choose an existing icon</label>
+                                        </li>
+                                        <li>
+                                            <input id="badge-image" type="radio" name="badge-avatar-selector" value="image" data-image-selector/>
+                                            <label for="badge-image">Upload from your device</label>
+                                        </li>
+                                    </ul>
                                 </fieldset>
 
                                 <script src="{{ CDN_PREFIX }}/javascript/shared/badges/jquery.icon-modal.js"></script>

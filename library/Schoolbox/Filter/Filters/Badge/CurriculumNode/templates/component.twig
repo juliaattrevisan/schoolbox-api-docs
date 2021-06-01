@@ -8,6 +8,7 @@
 {% endblock filterComponent %}
 
 {% block userOptions %}
+    <li>
     {# Empty input is required so that filter works if not user-configurable, or
        nothing is selected #}
     <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
@@ -57,4 +58,5 @@
     {% else %}
         {{ parent() }}
     {% endif %}
+    </li>
 {% endblock userOptions %}
