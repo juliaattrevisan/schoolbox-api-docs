@@ -417,7 +417,7 @@ class Collection implements ICollection, \Alaress\Json\Serializable, ArrayAccess
      *
      * @param string $field
      * @param string $order
-     * @param bool   $maintainIndexAssociation
+     * @param bool   $maintainIndexAssociation Should we preserve key association?
      * @return $this
      * @throws InvalidArgumentException
      */

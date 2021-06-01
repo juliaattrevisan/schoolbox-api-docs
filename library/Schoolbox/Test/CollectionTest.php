@@ -75,13 +75,17 @@ class CollectionTest extends TestCase
     /**
      * @dataProvider provider_sortNaturallyAscending
      * @param mixed $input
-     * @param int   $expected
+     * @param mixed $expectedNoIndex
+     * @param mixed $expectedWithIndex
      */
-    public function testSortNaturallyAscending($input, $expected)
+    public function testSortNaturallyAscending($input, $expectedNoIndex, $expectedWithIndex)
     {
-        $outcome = $input->sortNaturally('firstname');
+        $inputWithIndex = clone $input;
+        $outcomeNoIndex = $input->sortNaturally('firstname');
+        $this->assertEquals($expectedNoIndex, $outcomeNoIndex);
 
-        $this->assertEquals($expected, $outcome);
+        $outcomeWithIndex = $inputWithIndex->sortNaturally('firstname', Collection::ORDER_ASCENDING, true);
+        $this->assertEquals($expectedWithIndex, $outcomeWithIndex);
     }
 
 
@@ -95,29 +99,41 @@ class CollectionTest extends TestCase
         return [
             'Firstnames 1, Ascending' => [
                 (new Collection())
-                    ->add((new \Schoolbox\User())->setFirstname('robert'))
-                    ->add((new \Schoolbox\User())->setFirstname('JOSEPH'))
-                    ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
-                    ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
+                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS'))
                     ->add((new \Schoolbox\User())->setFirstname('JOSEPH'))
                     ->add((new \Schoolbox\User())->setFirstname('robert'))
-                    ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD')),
+
+                (new Collection())
+                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS'))
+                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD')),
             ],
             'Firstnames 2, Ascending' => [
                 (new Collection())
-                    ->add((new \Schoolbox\User())->setFirstname('  Alfred'))
-                    ->add((new \Schoolbox\User())->setFirstname(' is'))
-                    ->add((new \Schoolbox\User())->setFirstname('   The Butler'))
-                    ->add((new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
+                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('  Alfred'))
                     ->add((new \Schoolbox\User())->setFirstname(' is'))
                     ->add((new \Schoolbox\User())->setFirstname('  of Wayne Mansion'))
-                    ->add((new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->add((new \Schoolbox\User())->setFirstname('   The Butler')),
+
+                (new Collection())
+                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
             ],
             'Firstnames 3, Ascending' => [
                 (new Collection())
@@ -130,7 +146,13 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('# Cannot Reproduce'))
                     ->add((new \Schoolbox\User())->setFirstname('# Let me make my point'))
                     ->add((new \Schoolbox\User())->setFirstname('1. please do not'))
-                    ->add((new \Schoolbox\User())->setFirstname('there were seven cockatoos'))
+                    ->add((new \Schoolbox\User())->setFirstname('there were seven cockatoos')),
+
+                (new Collection())
+                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('# Cannot Reproduce'))
+                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname('# Let me make my point'))
+                    ->offsetSet(0, (new \Schoolbox\User())->setFirstname('1. please do not'))
+                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('there were seven cockatoos')),
             ]
         ];
     }
@@ -139,13 +161,17 @@ class CollectionTest extends TestCase
     /**
      * @dataProvider provider_sortNaturallyDescending
      * @param mixed $input
-     * @param int   $expected
+     * @param mixed $expectedNoIndex
+     * @param mixed $expectedWithIndex
      */
-    public function testSortNaturallyDescending($input, $expected)
+    public function testSortNaturallyDescending($input, $expectedNoIndex, $expectedWithIndex)
     {
-        $outcome = $input->sortNaturally('firstname', Collection::ORDER_DESCENDING);
+        $inputWithIndex = clone $input;
+        $outcomeNoIndex = $input->sortNaturally('firstname', Collection::ORDER_DESCENDING);
+        $this->assertEquals($expectedNoIndex, $outcomeNoIndex);
 
-        $this->assertEquals($expected, $outcome);
+        $outcomeWithIndex = $inputWithIndex->sortNaturally('firstname', Collection::ORDER_DESCENDING, true);
+        $this->assertEquals($expectedWithIndex, $outcomeWithIndex);
     }
 
 
@@ -159,29 +185,41 @@ class CollectionTest extends TestCase
         return [
             'Firstnames 1, Descending' => [
                 (new Collection())
-                    ->add((new \Schoolbox\User())->setFirstname('robert'))
-                    ->add((new \Schoolbox\User())->setFirstname('JOSEPH'))
-                    ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
-                    ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
+                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
                     ->add((new \Schoolbox\User())->setFirstname('robert'))
                     ->add((new \Schoolbox\User())->setFirstname('JOSEPH'))
-                    ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS'))
+                    ->add((new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
+
+                (new Collection())
+                    ->offsetSet('C', (new \Schoolbox\User())->setFirstname('RoNAld mcDonAlD'))
+                    ->offsetSet('A', (new \Schoolbox\User())->setFirstname('robert'))
+                    ->offsetSet('B', (new \Schoolbox\User())->setFirstname('JOSEPH'))
+                    ->offsetSet('D', (new \Schoolbox\User())->setFirstname('a STABLE GENIUS')),
             ],
             'Firstnames 2, Descending' => [
                 (new Collection())
-                    ->add((new \Schoolbox\User())->setFirstname('  Alfred'))
-                    ->add((new \Schoolbox\User())->setFirstname(' is'))
-                    ->add((new \Schoolbox\User())->setFirstname('   The Butler'))
-                    ->add((new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
+                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion')),
 
                 (new Collection())
                     ->add((new \Schoolbox\User())->setFirstname('   The Butler'))
                     ->add((new \Schoolbox\User())->setFirstname('  of Wayne Mansion'))
                     ->add((new \Schoolbox\User())->setFirstname(' is'))
-                    ->add((new \Schoolbox\User())->setFirstname('  Alfred'))
+                    ->add((new \Schoolbox\User())->setFirstname('  Alfred')),
+
+                (new Collection())
+                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('   The Butler'))
+                    ->offsetSet(4, (new \Schoolbox\User())->setFirstname('  of Wayne Mansion'))
+                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname(' is'))
+                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('  Alfred')),
             ],
             'Firstnames 3, Descending' => [
                 (new Collection())
@@ -194,7 +232,13 @@ class CollectionTest extends TestCase
                     ->add((new \Schoolbox\User())->setFirstname('there were seven cockatoos'))
                     ->add((new \Schoolbox\User())->setFirstname('1. please do not'))
                     ->add((new \Schoolbox\User())->setFirstname('# Let me make my point'))
-                    ->add((new \Schoolbox\User())->setFirstname('# Cannot Reproduce'))
+                    ->add((new \Schoolbox\User())->setFirstname('# Cannot Reproduce')),
+
+                (new Collection())
+                    ->offsetSet(1, (new \Schoolbox\User())->setFirstname('there were seven cockatoos'))
+                    ->offsetSet(0, (new \Schoolbox\User())->setFirstname('1. please do not'))
+                    ->offsetSet(2, (new \Schoolbox\User())->setFirstname('# Let me make my point'))
+                    ->offsetSet(3, (new \Schoolbox\User())->setFirstname('# Cannot Reproduce')),
             ]
         ];
     }
