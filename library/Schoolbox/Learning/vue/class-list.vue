@@ -234,10 +234,7 @@ export default {
   },
   computed: {
     replyTo: function() {
-      return '"' + this.subject + '"' + ' <' + this.replyToEmail + '>';
-    },
-    subject: function() {
-      return this.subjectName + ' (' + this.classCode + ')';
+      return '"' + this.subjectTitle + '"' + ' <' + this.replyToEmail + '>';
     },
     showCheckboxes: function() {
       return this.learningMomentsEnabled || this.mailEnabled;
