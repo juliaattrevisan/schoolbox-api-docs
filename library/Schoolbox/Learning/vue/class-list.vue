@@ -111,8 +111,7 @@ export default {
         }
     },
     mounted: function () {
-        var self = this;
-
+        let self = this;
         new Promise(function () {
             self.getStudents();
         });
@@ -121,10 +120,7 @@ export default {
     },
     methods: {
         getStudents: function () {
-            var self = this;
-
-            var studentLists;
-
+            let self     = this,
             studentLists = new Promise(function (resolve) {
                 axios.get(self.getStudentListsEndpoint)
                     .then(function (response) {
@@ -138,21 +134,24 @@ export default {
                     })
                     .catch(function (error) {
                         console.log(error);
-                    }).finally(function () {
-                    self.showSkeletonLoader = false; // Hide skeleton loader and show class list table
-                });
+                    })
+                    .finally(function () {
+                        // Hide skeleton loader and show class list table
+                        self.showSkeletonLoader = false;
+                    });
             });
 
             studentLists.then(function () {
                 setTimeout(function () {
                     self.studentsCheckboxElements = document.getElementsByName('students[]');
                     self.groupsCheckboxElements = document.getElementsByName('groups[]');
-                    self.actionsPlaceholder = false; // Remove actions placeholder once everything is ready
+                    // Remove actions placeholder once everything is ready
+                    self.actionsPlaceholder = false;
                 }, 100);
             });
         },
         sendEmail: function () {
-            var self = this;
+            let self = this;
 
             // While the system is preparing the email lists, disable the button
             self.enableSendEmailButton = false;
@@ -379,7 +378,6 @@ export default {
 
             <table id="contact-table" v-if="!showSkeletonLoader && studentLists.length">
                 <thead>
-                <!--      {% block table_header %}-->
                 <tr>
                     <th v-if="showCheckboxes">
                         <input type="checkbox" id="select-all" v-model="allSelected"/>
@@ -394,7 +392,6 @@ export default {
                     <th class="show-for-medium-up">Last Visited</th>
                     <th></th>
                 </tr>
-                <!--      {% endblock %}-->
                 </thead>
                 <tbody>
                 <template v-if="studentLists.length > 0">
@@ -421,18 +418,18 @@ export default {
 
                             <p class="meta">
                                 <slot name="studentMeta" v-bind:student="student">
-                  <span v-if="Number(student.EnglishSecondFlag) === 1"
-                        class="icon-eng-second-lang highlight"
-                        title="English as an Additional Language">
-                  </span>
+                                    <span v-if="Number(student.EnglishSecondFlag) === 1"
+                                          class="icon-eng-second-lang highlight"
+                                          title="English as an Additional Language">
+                                    </span>
                                     <span v-if="showMedicalAlerts && Number(student.StudentSpecialNeedsFlag) === 1"
                                           class="icon-bell warning"
                                           :title="specialNeeds">
-                  </span>
+                                    </span>
                                     <span v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
                                           class="icon-alert alert"
                                           :title="'Medical Alert: ' + student.StudentMedicalAlert">
-                  </span>
+                                    </span>
                                 </slot>
                             </p>
 
@@ -448,18 +445,14 @@ export default {
                             </ul>
                         </td>
                         <td class="show-for-large-up">{{ student.yearlevel }}</td>
-                        <td class="show-for-medium-up" v-if="showTutorGroupColumn">{{
-                                student.StudentTutorDescription
-                            }}
-                        </td>
+                        <td class="show-for-medium-up" v-if="showTutorGroupColumn">{{ student.StudentTutorDescription }}</td>
                         <td class="show-for-medium-up" v-if="showCoreGroupColumn">{{ student.StudentForm }}</td>
                         <td class="show-for-medium-up" v-if="showHouseColumn">{{ student.house }}</td>
                         <td class="show-for-medium-up">{{ student.lastAccessTime }}</td>
                         <td class="no-pad">
                             <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                                 <nav>
-                                    <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more"
-                                       title="Actions"></a>
+                                    <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
                                 </nav>
                             </div>
                         </td>
