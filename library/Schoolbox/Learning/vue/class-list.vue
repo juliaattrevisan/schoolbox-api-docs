@@ -1,5 +1,7 @@
 <script>
 
+import axios from 'axios'
+
 export default {
   name: 'class-list',
   props: {
@@ -47,29 +49,59 @@ export default {
     showMedicalAlerts: {
       type: Boolean,
       default: false,
-    }
+    },
+    emailGroups: {
+      type: Array,
+      required: true,
+    },
+    returnUrlName: {
+      type: String,
+      required: true,
+    },
+    getStudentListsEndpoint: {
+      type: String,
+      required: true,
+    },
+    encodedReturnUrl: {
+      type: String,
+      required: true,
+    },
+    getAwardAsAchievementFormEndpoint: {
+      type: String,
+      required: true,
+    },
+    getSetAsGoalFormEndpoint: {
+      type: String,
+      required: true,
+    },
+    getCreateEvidenceFormEndpoint: {
+      type: String,
+      required: true,
+    },
   },
   data() {
     return {
         studentLists: [],
         showSkeletonLoader: true,
-      //   selectedStudents: [],
-      //   studentsCheckboxElements: undefined,
-      //   groups: {{ emailGroups | raw }},
-      //   groupsCheckboxElements: [],
-      //   sendEmailButtonDefaultText: 'Compose Email',
-      //   sendEmailButtonText: null,
-      //   getStudentListsEndpoint: '{{ routeLookup('learning.getStudentListByClassId', {folderId: folder.getId, folder: folder}) }}',
-      //   formIsReady: false,
-      //   actionsPlaceholder: true,
-      //   loadingText: 'Please Wait...',
-      //   noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
-      //   returnUrlName: '{{ returnUrlName }}',
-      //   encodedReturnUrl: '{{ encodedReturnUrl }}',
-      //   getAwardAsAchievementFormEndpoint: '{{ routeLookup('learningBadgeAward.redirectToAwardAsAchievementForm') }}',
-      //   getSetAsGoalFormEndpoint: '{{ routeLookup('learningBadgeAward.redirectToSetAsGoalForm') }}',
-      //   getCreateEvidenceFormEndpoint: '{{ routeLookup('learningMomentEvidence.redirectToCreateForm') }}'}
+        selectedStudents: [],
+        studentsCheckboxElements: undefined,
+        groupsCheckboxElements: [],
+        sendEmailButtonDefaultText: 'Compose Email',
+        sendEmailButtonText: null,
+        formIsReady: false,
+        actionsPlaceholder: true,
+        loadingText: 'Please Wait...',
+        noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
     }
+  },
+  mounted: function() {
+    var self = this;
+
+    new Promise(function () {
+      self.getStudents();
+    });
+
+    self.sendEmailButtonText = self.sendEmailButtonDefaultText;
   },
   methods: {
     getStudents: function () {
@@ -256,7 +288,7 @@ export default {
     selectedGroups: function () {
       let groups = [],
           self   = this;
-      self.groups.forEach(function (group) {
+      self.emailGroups.forEach(function (group) {
         if (group.isChecked) {
           groups.push(group.value);
         }
@@ -367,7 +399,7 @@ export default {
               <span class="meta">(${ student.synergy_id })</span>
               <span class="show-for-print"><br>${ student.email }</span>
 
-              {% block meta %}
+<!--              {% block meta %}-->
               <p class="meta">
                                   <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
                                         title="English as an Additional Language">
@@ -379,22 +411,22 @@ export default {
                       :title="'Medical Alert: ' + student.StudentMedicalAlert">
                                   </span>
               </p>
-              {% endblock %}
+<!--              {% endblock %}-->
 
               <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id"
                   v-if="student.id && Object.keys(student.routes).length">
-                {% block data_dropdown_content %}
+<!--                {% block data_dropdown_content %}-->
                 <li v-for="element in student.routes">
                   <a :href="element.href" :class="element.class" :title="element.title">${ element.label }</a>
                 </li>
-                {% endblock %}
+<!--                {% endblock %}-->
               </ul>
             </td>
             <td class="show-for-large-up">${ student.yearlevel }</td>
-            {% block tutor_group %}
+<!--            {% block tutor_group %}-->
             <td class="show-for-medium-up">${ student.house }</td>
-            {% endblock %}
-            {% block core_group %}{% endblock %}
+<!--            {% endblock %}-->
+<!--            {% block core_group %}{% endblock %}-->
             <td class="show-for-medium-up">${ student.lastAccessTime }</td>
             <td class="no-pad">
               <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
@@ -418,7 +450,7 @@ export default {
 
 <!--      <fieldset class="checklist">-->
 <!--        <legend>Recipients</legend>-->
-<!--        <template v-for="(group, index) in groups">-->
+<!--        <template v-for="(group, index) in emailGroups">-->
 <!--          <input :id="group.label"-->
 <!--                 name="groups[]"-->
 <!--                 type="checkbox"-->
