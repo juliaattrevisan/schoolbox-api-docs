@@ -110,11 +110,34 @@ class StudentLists
      */
     public function getStudentLists(): array
     {
-        $students = $this->externalClass->getStudents($this->folder->getCodeString());
-
-        foreach ($students as $key => $studentSisRecord) {
-            $students[$key] = $this->augmentStudentSisRecord($studentSisRecord);
+        // Fetch class list for each class code separately,
+        // so that the kids also have their class code(s) added
+        $students = [];
+        if ($this->folder->getCodes()) {
+            foreach ($this->folder->getCodes() as $code) {
+                foreach ($this->externalClass->getStudents($code->getCode()) as $studentSisRecord) {
+                    // No external ID: there is nothing that can sensibly be shown
+                    $externalId = $studentSisRecord['synergy_id'] ?? null;
+                    if (isset($externalId)) {
+                        $students[$externalId] ??= $this->augmentStudentSisRecord($studentSisRecord);
+                        $students[$externalId]['classCodes'][] = $code->getCode();
+                    }
+                }
+            }
         }
+
+        // Now order the students by surname, then given name
+        $students = array_values($students);
+        usort(
+            $students,
+            static function (array $a, array $b) {
+                $cmp = strnatcasecmp($a['lastname'], $b['lastname']);
+                if ($cmp !== 0) {
+                    return $cmp;
+                }
+                return strnatcasecmp($a['firstname'], $b['firstname']);
+            }
+        );
 
         return $students;
     }
@@ -147,6 +170,7 @@ class StudentLists
         $studentSisRecord['lastAccessTime']         = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
         $studentSisRecord['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();
         $studentSisRecord['routes']                 = [];
+        $studentSisRecord['classCodes']             = [];
 
         // Upcoming assessments
         if ($this->upcomingAssessmentsEnabled) {
