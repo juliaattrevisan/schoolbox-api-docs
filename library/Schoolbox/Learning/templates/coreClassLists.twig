@@ -21,6 +21,9 @@ Data:
         :mail-enabled="Boolean({{ mailEnabled }})"
         :current-user-can-email="Boolean({{ USER.hasEmail }})"
         locale-pastoral-care="{{ locale.pastoralCare.proper }}"
+        reply-to-email="{{ replyTo }}"
+        special-needs="{{ specialNeeds }}"
+        :show-medical-alerts="!Boolean({{ config.protect_medicalspecial }})"
     ></class-list>
 </div>
 

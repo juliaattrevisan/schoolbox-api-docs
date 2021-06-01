@@ -34,18 +34,23 @@ export default {
     },
     localePastoralCare: {
       type: String,
-      default: 'Pastoral',
+      default: 'Pastoral Care',
+    },
+    replyToEmail: {
+      type: String,
+      default: ''
+    },
+    specialNeeds: {
+      type: String,
+      default: ''
+    },
+    showMedicalAlerts: {
+      type: Boolean,
+      default: false,
     }
   },
   data() {
     return {
-      //   subjectName: '{{ folder.name }}',
-      //   subjectTitle: '{{ folder.title }}',
-      //   classCode: '{{ folder.codeString }}',
-      //   classCodeList: {{ folder.codes | keys | json_encode | raw }},
-      // replyToEmail: '{{ replyTo }}',
-      //   specialNeeds: '{{ specialNeeds }}',
-      //   hideMedicalAlerts: Boolean({{ config.protect_medicalspecial }}),
         studentLists: [],
         showSkeletonLoader: true,
       //   selectedStudents: [],
@@ -367,10 +372,10 @@ export default {
                                   <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
                                         title="English as an Additional Language">
                                   </span>
-                <span v-if="!hideMedicalAlerts && student.StudentSpecialNeedsFlag == '1'" class="icon-bell warning"
+                <span v-if="showMedicalAlerts && student.StudentSpecialNeedsFlag == '1'" class="icon-bell warning"
                       :title="specialNeeds">
                                   </span>
-                <span v-if="!hideMedicalAlerts && student.StudentMedicalAlert != ''" class="icon-alert alert"
+                <span v-if="showMedicalAlerts && student.StudentMedicalAlert != ''" class="icon-alert alert"
                       :title="'Medical Alert: ' + student.StudentMedicalAlert">
                                   </span>
               </p>
