@@ -1,5 +1,7 @@
 {% extends '@learning/coreClassLists.twig' %}
 
+{# SCC: show different student alerts #}
+
 {% block meta %}
 <p class="meta">
     <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" :title="specialNeeds"></span>
