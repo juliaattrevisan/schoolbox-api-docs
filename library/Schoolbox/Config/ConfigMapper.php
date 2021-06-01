@@ -146,7 +146,7 @@ class ConfigMapper extends Mapper
     public const NAME_COURSE_MARKBOOK_ENABLED = 'course_markbook_enable';
     public const NAME_RUBRIC_MARKBOOK_ENABLED = 'rubric_markbook_enable';
     public const NAME_PASTORAL_ENABLED = 'pastoral_enabled';
-    public const NAME_NOTIFICATIONS_ENABLED = 'push_notifications_enabled';
+    public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
 
 
     /**
