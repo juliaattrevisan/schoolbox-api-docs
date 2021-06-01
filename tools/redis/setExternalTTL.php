@@ -33,6 +33,10 @@ $app = new class extends CliTool\App {
         }
 
         $externalDbCacheTimeout = $this->getExternalDbCacheTTL();
+        if ($externalDbCacheTimeout === null) {
+            $this->getLogger()->info("'external_cache_timeout' is unset. Exiting");
+            exit(CliTool\Kernel::EXIT_STATUS_OK);
+        }
 
         $cursor  = null;
 
@@ -48,11 +52,12 @@ $app = new class extends CliTool\App {
     }
 
     /**
-     * @return int
+     * @return null|int
      */
-    public function getExternalDbCacheTTL(): int
+    public function getExternalDbCacheTTL(): ?int
     {
-        return (int) $this->getConfig()->get('external_cache_timeout');
+        $value = $this->getConfig()->get('external_cache_timeout');
+        return $value === null ? null : (int)$value;
     }
 };
 
