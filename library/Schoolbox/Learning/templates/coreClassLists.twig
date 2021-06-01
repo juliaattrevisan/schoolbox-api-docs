@@ -14,7 +14,7 @@ Data:
 <div class="row class-list" id="email-class-lists">
     <div class="small-12 island">
         {% block header %}
-        <h1>${ subject }</h1>
+        <h1>${ subjectTitle }</h1>
         <section class="content">
             <ul class="flex-list flex-wrap buttons">
                 {% if learningMomentsEnabled %}
@@ -186,7 +186,9 @@ Data:
         delimiters: ['${', '}'],
         data: {
             subjectName: '{{ folder.name }}',
+            subjectTitle: '{{ folder.title }}',
             classCode: '{{ folder.codeString }}',
+            classCodeList: {{ folder.codes | keys | json_encode | raw }},
             replyToEmail: '{{ replyTo }}',
             mailEnabled: Boolean({{ mailEnabled }}),
             learningMomentsEnabled: Boolean({{ learningMomentsEnabled }}),
