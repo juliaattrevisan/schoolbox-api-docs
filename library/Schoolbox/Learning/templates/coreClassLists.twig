@@ -12,6 +12,12 @@ Data:
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
 
 <div class="row class-list" id="email-class-lists">
+
+    <class-list
+        subject-title="{{ folder.title }}"
+        class-code-list=""{{ folder.codes | keys | json_encode }}"
+    />
+
     <div class="small-12 island">
         {% block header %}
         <h1>${ subjectTitle }</h1>
@@ -178,6 +184,8 @@ Data:
         <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>
     </template>
 </div>
+
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/classList.bundle.js?v={{ config.site_version }}"></script>
 
 <div id="toaster" class="toast" data-toast></div>
 
@@ -448,3 +456,9 @@ Data:
         allowDynamicUsers: true,
     } only %}
 {% endif %}
+<script>
+    import ClassList from "../vue/class-list";
+    export default {
+        components: {ClassList}
+    }
+</script>

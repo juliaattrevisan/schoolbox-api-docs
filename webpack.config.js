@@ -196,6 +196,8 @@ module.exports = {
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
         editor: './www/static/css/foundation/editor.scss'
 
+        // Class List
+        classList: './library/Schoolbox/Learning/vue/init-class-list.js'
     },
     output: {
         path: path.resolve(__dirname, 'www/static/javascript/components'),
