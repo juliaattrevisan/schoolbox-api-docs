@@ -48,6 +48,10 @@ class StudentLists
     /** @var bool */
     private $mailIsEnabled;
 
+    private bool $upcomingAssessmentsEnabled;
+
+    private bool $gradesEnabled;
+
     /** @var string */
     private $mailHandle;
 
@@ -59,11 +63,13 @@ class StudentLists
      *
      * @param External_ClassInterface $externalClass
      * @param UserMapper              $userMapper
-     * @param Folder\Model            $folder
+     * @param Model                   $folder
      * @param LogMapper               $logMapper
      * @param Router                  $router
      * @param bool                    $pastoralIsEnabled
      * @param bool                    $mailIsEnabled
+     * @param bool                    $upcomingAssessmentsEnabled
+     * @param bool                    $gradesEnabled
      * @param string                  $mailHandle
      * @param RosettaStone            $rosettaStone
      */
@@ -75,19 +81,23 @@ class StudentLists
         Router $router,
         bool $pastoralIsEnabled,
         bool $mailIsEnabled,
+        bool $upcomingAssessmentsEnabled,
+        bool $gradesEnabled,
         string $mailHandle,
         RosettaStone $rosettaStone
     ) {
 
-        $this->externalClass        = $externalClass;
-        $this->userMapper           = $userMapper;
-        $this->logMapper            = $logMapper;
-        $this->folder               = $folder;
-        $this->router               = $router;
-        $this->pastoralIsEnabled    = $pastoralIsEnabled;
-        $this->mailIsEnabled        = $mailIsEnabled;
-        $this->mailHandle           = $mailHandle;
-        $this->rosettaStone         = $rosettaStone;
+        $this->externalClass              = $externalClass;
+        $this->userMapper                 = $userMapper;
+        $this->logMapper                  = $logMapper;
+        $this->folder                     = $folder;
+        $this->router                     = $router;
+        $this->pastoralIsEnabled          = $pastoralIsEnabled;
+        $this->mailIsEnabled              = $mailIsEnabled;
+        $this->upcomingAssessmentsEnabled = $upcomingAssessmentsEnabled;
+        $this->gradesEnabled              = $gradesEnabled;
+        $this->mailHandle                 = $mailHandle;
+        $this->rosettaStone               = $rosettaStone;
     }
 
     /**
@@ -115,23 +125,27 @@ class StudentLists
                 $students[$key]['email'] = $user->getEmail();
                 $students[$key]['lastAccessTime'] = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
                 $students[$key]['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();
+                $students[$key]['routes'] = [];
 
-                $students[$key]['routes'] = [
-                    // Due work
-                    'dueWork' => [
+                // Upcoming assessments
+                if ($this->upcomingAssessmentsEnabled) {
+                    $students[$key]['routes']['dueWork'] = [
                         'label' => $this->rosettaStone->translate('dueWork', false, true),
                         'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
                         'class' => 'icon-due-work',
                         'title' => '',
-                    ],
-                    // Grades
-                    'grades' => [
+                    ];
+                }
+
+                // Grades
+                if ($this->gradesEnabled) {
+                    $students[$key]['routes']['grades'] = [
                         'label' => $this->rosettaStone->translate('grades', true, true),
                         'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
                         'class' => 'icon-approve',
                         'title' => '',
-                    ],
-                ];
+                    ];
+                }
 
                 // ePortfolio
                 if ($user->getEportfolioEnable()) {
