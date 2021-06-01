@@ -43,8 +43,9 @@ $app = new class extends CliTool\App {
         while ($cursor !== '0') {
             [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => self::EXTERNAL_DB_KEY_PATTERN]);
             foreach ($elements as $cacheKey) {
-                if ($redis->ttl($cacheKey) > $externalDbCacheTimeout) {
-                    $this->getLogger()->info('Set cache TTL for ' . $cacheKey . ' to ' . $externalDbCacheTimeout . ' seconds');
+                $currentTtl = $redis->ttl($cacheKey);
+                if ($currentTtl > $externalDbCacheTimeout) {
+                    $this->getLogger()->info("Set cache TTL for $cacheKey from $currentTtl to $externalDbCacheTimeout seconds");
                     $redis->expire($cacheKey, $externalDbCacheTimeout);
                 }
             }
