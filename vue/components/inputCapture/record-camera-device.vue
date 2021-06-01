@@ -211,14 +211,9 @@ export default {
         />
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal" ref="errorModal">
-            <template v-if="isRecordingOverMaxFileSize">
-                <div class="alert-box alert">Sorry, the recording is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
-            <template v-else>
-                <div class="alert-box alert">Sorry, an unknown error has occured.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
+            <div v-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
+            <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
+            <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
 
     </div>
@@ -227,54 +222,6 @@ export default {
 
 <style lang="scss" scoped>
 
-.container {
-    position: absolute;
-    width: 100%;
-    height: 100%; //will be updated by the parent container, keeping it inline with the parent
-    background: white;
-    overflow: hidden;
-}
-
-.media-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-}
-
-    .media-container-record {
-        z-index: 1;
-    }
-
-    .media-container-playback {
-        z-index: 2;
-    }
-
-.file-input-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-}    
-
-.dzone::v-deep { //piggy back on the existing dropzone styles, and update as needed
-    position: absolute;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    font-size: 0px;
-    text-indent: -999px; //hide the text, just leaving the dzone like border/display
-}
-
-.file-input-note {
-    display: block;
-    position: relative;
-    z-index: 2;
-    padding: 20px;
-    font-size: 0.8rem;
-    pointer-events: none;
-}
-
+@import '@schoolbox/inputCapture/input-capture';
 
 </style>
