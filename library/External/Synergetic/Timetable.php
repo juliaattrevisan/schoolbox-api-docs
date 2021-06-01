@@ -162,13 +162,6 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
         }
         $params = [
-            'fileSemester'   => $this->externalUser->getCurrentSemester($externalUserId),
-            'fileYear'       => $this->externalUser->getCurrentYear($externalUserId),
-            'timetableGroup' => $campus->getExtTimetableCode(),
-            'day'            => $day,
-        ];
-
-        $params = [
             'fileSemester'   => $this->getFileSemester($externalUserId, $dateObject),
             'fileYear'       => $this->getFileYear($externalUserId, $dateObject),
             'timetableGroup' => $campus->getExtTimetableCode(),
@@ -178,15 +171,9 @@ class External_Synergetic_Timetable implements External_TimetableInterface
         $allowedFileTypes    = $this->getAllowedFileTypes();
         $allowedFileTypesSql = '';
         if (!empty($allowedFileTypes)) {
-<<<<<<< HEAD
-            $allowedFileTypeBindings = Builder::getArrayBindings($allowedFileTypes, 'ft');
-            $params                  = array_merge($params, $allowedFileTypeBindings['bindings']);
-            $allowedFileTypesSql     = " TimetableDefinition.FileType IN ({$allowedFileTypeBindings['placeholders']}) AND ";
-=======
             $fileTypeBindings = Builder::getBindings($allowedFileTypes, 'fileType');
             $allowedFileTypesSql = " TimetableDefinition.FileType IN ({$fileTypeBindings->getPlaceholder()}) AND ";
             $params = array_merge($params, $fileTypeBindings->getParams());
->>>>>>> 9877a3e02f... Quote filetypes in a readable way. [SA-11663]
         }
 
         $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
