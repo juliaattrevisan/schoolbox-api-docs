@@ -12,6 +12,13 @@ Data:
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
 
 <div class="row class-list" id="email-class-lists">
+    {% set houseLabel = "House" %}
+    {% set showHouseColumn = true %}
+    {% set showTutorGroupColumn = false %}
+    {% set showCoreGroupColumn = false %}
+    {% block classListVars %}
+    {% endblock classListVars %}
+
     <class-list
         subject-title="{{ folder.title }}"
         :class-code-list="{{ folder.codes | keys | json_encode }}"
@@ -23,6 +30,10 @@ Data:
         locale-pastoral-care="{{ locale.pastoralCare.proper }}"
         reply-to-email="{{ replyTo }}"
         special-needs="{{ specialNeeds }}"
+        :show-house-column="Boolean({{ showHouseColumn }})"
+        :show-tutor-group-column="Boolean({{ showTutorGroupColumn }})"
+        :show-core-group-column="Boolean({{ showCoreGroupColumn }})"
+        house-label="{{ houseLabel }}"
         :show-medical-alerts="!Boolean({{ config.protect_medicalspecial }})"
         :email-groups="{{ emailGroups }}"
         return-url-name="{{ returnUrlName }}"

@@ -2,17 +2,6 @@
 
 {# SA-9915: Rename "House" to "Service" for OTCS #}
 
-            {% block table_header %}
-            <tr>
-                <th v-if="showCheckboxes">
-                    <input type="checkbox" id="select-all" v-model="allSelected"/>
-                    <label for="select-all" class="checkbox-label"></label>
-                </th>
-                <th></th>
-                <th>Name</th>
-                <th class="show-for-large-up">Year Level</th>
-                <th class="show-for-medium-up">Service</th>
-                <th class="show-for-medium-up">Last Visited</th>
-                <th></th>
-            </tr>
-            {% endblock %}
+{% block classListVars %}
+    {% set houseLabel = "Service" %}
+{% endblock classListVars %}

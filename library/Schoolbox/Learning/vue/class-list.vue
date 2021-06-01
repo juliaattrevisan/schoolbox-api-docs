@@ -38,6 +38,22 @@ export default {
       type: String,
       default: 'Pastoral Care',
     },
+    houseLabel: {
+      type: String,
+      default: 'House',
+    },
+    showHouseColumn: {
+      type: Boolean,
+      default: true,
+    },
+    showTutorGroupColumn: {
+      type: Boolean,
+      default: false,
+    },
+    showCoreGroupColumn: {
+      type: Boolean,
+      default: false,
+    },
     replyToEmail: {
       type: String,
       default: ''
@@ -321,7 +337,6 @@ export default {
         </dd>
       </dl>
 
-      <!--    {% block header %}-->
       <section class="content">
         <ul class="flex-list flex-wrap buttons">
           <li v-if="learningMomentsEnabled">
@@ -356,7 +371,6 @@ export default {
           </div>
         </div>
       </template>
-      <!--    {% endblock %}-->
 
       <table id="contact-table" v-if="!showSkeletonLoader && studentLists.length">
         <thead>
@@ -369,7 +383,9 @@ export default {
           <th></th>
           <th>Name</th>
           <th class="show-for-large-up">Year Level</th>
-          <th class="show-for-medium-up">House</th>
+          <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
+          <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
+          <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>
           <th class="show-for-medium-up">Last Visited</th>
           <th></th>
         </tr>
@@ -427,10 +443,9 @@ export default {
               </ul>
             </td>
             <td class="show-for-large-up">{{ student.yearlevel }}</td>
-<!--            {% block tutor_group %}-->
-            <td class="show-for-medium-up">{{ student.house }}</td>
-<!--            {% endblock %}-->
-<!--            {% block core_group %}{% endblock %}-->
+            <td class="show-for-medium-up" v-if="showTutorGroupColumn">{{ student.StudentTutorDescription }}</td>
+            <td class="show-for-medium-up" v-if="showCoreGroupColumn">{{ student.StudentForm }}</td>
+            <td class="show-for-medium-up" v-if="showHouseColumn">{{ student.house }}</td>
             <td class="show-for-medium-up">{{ student.lastAccessTime }}</td>
             <td class="no-pad">
               <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">

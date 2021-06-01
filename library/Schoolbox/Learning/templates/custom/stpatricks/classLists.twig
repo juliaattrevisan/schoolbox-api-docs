@@ -5,27 +5,8 @@ St. Patricks:
 * show Tutor Group and Core Group
 #}
 
-{% block table_header %}
-    <tr>
-        <th v-if="showCheckboxes">
-            <input type="checkbox" id="select-all" v-model="allSelected"/>
-            <label for="select-all" class="checkbox-label"></label>
-        </th>
-        <th></th>
-        <th>Name</th>
-        <th class="show-for-large-up">Year Level</th>
-        <th class="show-for-large-up">Tutor Group</th>
-        <th class="show-for-medium-up">Core Group</th>
-        <th class="show-for-medium-up">Last Visited</th>
-        <th></th>
-    </tr>
-{% endblock %}
-
-{% block tutor_group %}
-    <td class="show-for-medium-up">${ student.StudentTutorDescription }</td>
-{% endblock %}
-
-{% block core_group %}
-    <td class="show-for-medium-up">${ student.StudentForm }</td>
-{% endblock %}
-
+{% block classListVars %}
+    {% set showHouseColumn = false %}
+    {% set showTutorGroupColumn = true %}
+    {% set showCoreGroupColumn = true %}
+{% endblock classListVars %}
