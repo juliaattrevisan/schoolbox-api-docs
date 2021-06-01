@@ -391,13 +391,13 @@ export default {
             </td>
             <td>
               <template v-if="student.id">
-                <a :href="'/search/user/' + student.id">${ student.lastname + ', ' + student.firstname }</a>
+                <a :href="'/search/user/' + student.id">{{ student.lastname + ', ' + student.firstname }}</a>
               </template>
               <template v-else>
-                ${ student.lastname + ', ' + student.firstname }
+                {{ student.lastname + ', ' + student.firstname }}
               </template>
-              <span class="meta">(${ student.synergy_id })</span>
-              <span class="show-for-print"><br>${ student.email }</span>
+              <span class="meta">({{ student.synergy_id }})</span>
+              <span class="show-for-print"><br>{{ student.email }}</span>
 
 <!--              {% block meta %}-->
               <p class="meta">
@@ -417,17 +417,17 @@ export default {
                   v-if="student.id && Object.keys(student.routes).length">
 <!--                {% block data_dropdown_content %}-->
                 <li v-for="element in student.routes">
-                  <a :href="element.href" :class="element.class" :title="element.title">${ element.label }</a>
+                  <a :href="element.href" :class="element.class" :title="element.title">{{ element.label }}</a>
                 </li>
 <!--                {% endblock %}-->
               </ul>
             </td>
-            <td class="show-for-large-up">${ student.yearlevel }</td>
+            <td class="show-for-large-up">{{ student.yearlevel }}</td>
 <!--            {% block tutor_group %}-->
-            <td class="show-for-medium-up">${ student.house }</td>
+            <td class="show-for-medium-up">{{ student.house }}</td>
 <!--            {% endblock %}-->
 <!--            {% block core_group %}{% endblock %}-->
-            <td class="show-for-medium-up">${ student.lastAccessTime }</td>
+            <td class="show-for-medium-up">{{ student.lastAccessTime }}</td>
             <td class="no-pad">
               <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
                 <nav>
@@ -456,7 +456,7 @@ export default {
 <!--                 type="checkbox"-->
 <!--                 :value="group.value"-->
 <!--                 v-model="group.isChecked"/>-->
-<!--          <label :for="group.label">${ group.label }</label>-->
+<!--          <label :for="group.label">{{ group.label }}</label>-->
 <!--        </template>-->
 <!--      </fieldset>-->
 
@@ -464,8 +464,8 @@ export default {
 <!--        <input type="hidden" name="replyto" :value="replyTo"/>-->
 <!--        <input type="hidden" id="selectedIds" name="selectedIds" :value="selectedStudentExternalIds.join(',')"/>-->
 <!--        <input type="hidden" id="selectedGroups" name="selectedGroups" :value="selectedGroups.join(',')"/>-->
-<!--        <button type="submit" class="button" :disabled="!enableSendEmailButton" @click="sendEmail">${-->
-<!--          sendEmailButtonText }-->
+<!--        <button type="submit" class="button" :disabled="!enableSendEmailButton" @click="sendEmail">{{-->
+<!--          sendEmailButtonText }}-->
 <!--        </button>-->
 <!--      </form>-->
 <!--    </div>-->
