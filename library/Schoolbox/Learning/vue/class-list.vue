@@ -391,7 +391,9 @@ export default {
             </td>
             <td>
               <template v-if="student.id">
-                <a :href="'/search/user/' + student.id">{{ student.lastname + ', ' + student.firstname }}</a>
+                <a :href="'/search/user/' + student.id">
+                  {{ student.lastname + ', ' + student.firstname }}
+                </a>
               </template>
               <template v-else>
                 {{ student.lastname + ', ' + student.firstname }}
@@ -401,13 +403,16 @@ export default {
 
 <!--              {% block meta %}-->
               <p class="meta">
-                <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
+                <span v-if="Number(student.EnglishSecondFlag) === 1"
+                      class="icon-eng-second-lang highlight"
                       title="English as an Additional Language">
                 </span>
-                <span v-if="showMedicalAlerts && student.StudentSpecialNeedsFlag == '1'" class="icon-bell warning"
+                <span v-if="showMedicalAlerts && Number(student.StudentSpecialNeedsFlag) === 1"
+                      class="icon-bell warning"
                       :title="specialNeeds">
                 </span>
-                <span v-if="showMedicalAlerts && student.StudentMedicalAlert != ''" class="icon-alert alert"
+                <span v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
+                      class="icon-alert alert"
                       :title="'Medical Alert: ' + student.StudentMedicalAlert">
                 </span>
               </p>
@@ -417,7 +422,9 @@ export default {
                   v-if="student.id && Object.keys(student.routes).length">
 <!--                {% block data_dropdown_content %}-->
                 <li v-for="element in student.routes">
-                  <a :href="element.href" :class="element.class" :title="element.title">{{ element.label }}</a>
+                  <a :href="element.href" :class="element.class" :title="element.title">
+                    {{ element.label }}
+                  </a>
                 </li>
 <!--                {% endblock %}-->
               </ul>
@@ -450,7 +457,7 @@ export default {
 
       <fieldset class="checklist">
         <legend>Recipients</legend>
-        <template v-for="(group, index) in emailGroups">
+        <template v-for="group in emailGroups">
           <input :id="group.label"
                  name="groups[]"
                  type="checkbox"
