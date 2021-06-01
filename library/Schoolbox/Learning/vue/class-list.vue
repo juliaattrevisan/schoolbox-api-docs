@@ -401,15 +401,15 @@ export default {
 
 <!--              {% block meta %}-->
               <p class="meta">
-                                  <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
-                                        title="English as an Additional Language">
-                                  </span>
+                <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
+                      title="English as an Additional Language">
+                </span>
                 <span v-if="showMedicalAlerts && student.StudentSpecialNeedsFlag == '1'" class="icon-bell warning"
                       :title="specialNeeds">
-                                  </span>
+                </span>
                 <span v-if="showMedicalAlerts && student.StudentMedicalAlert != ''" class="icon-alert alert"
                       :title="'Medical Alert: ' + student.StudentMedicalAlert">
-                                  </span>
+                </span>
               </p>
 <!--              {% endblock %}-->
 
@@ -441,49 +441,48 @@ export default {
       </table>
     </div>
 
-<!--    <div v-if="mailEnabled" id="classList-email" data-reveal aria-hidden="true" class="reveal-modal small">-->
-<!--      <h2>Compose Email</h2>-->
+    <div v-if="mailEnabled" id="classList-email" data-reveal aria-hidden="true" class="reveal-modal small">
+      <h2>Compose Email</h2>
 
-<!--      <ul class="meta">-->
-<!--        <li>Composing for <span data-relation="dynamicUsersSlot"></span></li>-->
-<!--      </ul>-->
+      <ul class="meta">
+        <li>Composing for <span data-relation="dynamicUsersSlot"></span></li>
+      </ul>
 
-<!--      <fieldset class="checklist">-->
-<!--        <legend>Recipients</legend>-->
-<!--        <template v-for="(group, index) in emailGroups">-->
-<!--          <input :id="group.label"-->
-<!--                 name="groups[]"-->
-<!--                 type="checkbox"-->
-<!--                 :value="group.value"-->
-<!--                 v-model="group.isChecked"/>-->
-<!--          <label :for="group.label">{{ group.label }}</label>-->
-<!--        </template>-->
-<!--      </fieldset>-->
+      <fieldset class="checklist">
+        <legend>Recipients</legend>
+        <template v-for="(group, index) in emailGroups">
+          <input :id="group.label"
+                 name="groups[]"
+                 type="checkbox"
+                 :value="group.value"
+                 v-model="group.isChecked"/>
+          <label :for="group.label">{{ group.label }}</label>
+        </template>
+      </fieldset>
 
-<!--      <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">-->
-<!--        <input type="hidden" name="replyto" :value="replyTo"/>-->
-<!--        <input type="hidden" id="selectedIds" name="selectedIds" :value="selectedStudentExternalIds.join(',')"/>-->
-<!--        <input type="hidden" id="selectedGroups" name="selectedGroups" :value="selectedGroups.join(',')"/>-->
-<!--        <button type="submit" class="button" :disabled="!enableSendEmailButton" @click="sendEmail">{{-->
-<!--          sendEmailButtonText }}-->
-<!--        </button>-->
-<!--      </form>-->
-<!--    </div>-->
+      <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
+        <input type="hidden" name="replyto" :value="replyTo"/>
+        <input type="hidden" id="selectedIds" name="selectedIds" :value="selectedStudentExternalIds.join(',')"/>
+        <input type="hidden" id="selectedGroups" name="selectedGroups" :value="selectedGroups.join(',')"/>
+        <button type="submit" class="button" :disabled="!enableSendEmailButton" @click="sendEmail">{{ sendEmailButtonText }}
+        </button>
+      </form>
+    </div>
 
-<!--    <div class="small-12 island" v-if="! showSkeletonLoader && !studentLists.length">-->
-<!--      <div class="empty-state">-->
-<!--        <i class="icon-class-list"></i>-->
-<!--        <p>Sorry, the system is unable to find any student in this class.</p>-->
-<!--      </div>-->
-<!--    </div>-->
+    <div class="small-12 island" v-if="!showSkeletonLoader && !studentLists.length">
+      <div class="empty-state">
+        <i class="icon-class-list"></i>
+        <p>Sorry, the system is unable to find any student in this class.</p>
+      </div>
+    </div>
 
-<!--    <template v-if="actionsPlaceholder">-->
-<!--      &lt;!&ndash;-->
-<!--        Just a place holder. Cause currently when we remove this line, the actions doesn't work.-->
-<!--        Seems like when the page has loaded, foundation JS looks for this element right-away.-->
-<!--      &ndash;&gt;-->
-<!--      <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>-->
-<!--    </template>-->
+    <template v-if="actionsPlaceholder">
+      <!--
+        Just a place holder. Cause currently when we remove this line, the actions doesn't work.
+        Seems like when the page has loaded, foundation JS looks for this element right-away.
+      -->
+      <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>
+    </template>
 
   </div>
 </template>
