@@ -12,95 +12,103 @@ Data:
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
 
 <div class="row class-list" id="email-class-lists">
-
     <class-list
         subject-title="{{ folder.title }}"
-        class-code-list=""{{ folder.codes | keys | json_encode }}"
-    />
+        :class-code-list="{{ folder.codes | keys | json_encode }}"
+        :learning-moments-enabled="Boolean({{ learningMomentsEnabled }})"
+        :badges-enabled="Boolean({{ badgesEnabled }})"
+        :pastoral-enabled="Boolean({{ pastoralEnabled }})"
+        :mail-enabled="Boolean({{ mailEnabled }})"
+        :current-user-can-email="Boolean({{ USER.hasEmail }})"
+        locale-pastoral-care="{{ locale.pastoralCare.proper }}"
+    ></class-list>
+</div>
+
+<div>
 
     <div class="small-12 island">
         {% block header %}
-        <h1>${ subjectTitle }</h1>
+            <h1>${ subjectTitle }</h1>
 
-        <dl class="sub-nav" v-if="classCodeList.length > 1">
-            <dd class="active">
-                <a href="#">All class codes</a>
-            </dd>
-            <dd class="active" v-for="classCode in classCodeList">
-                <a href="#">${ classCode }</a>
-            </dd>
-        </dl>
+            <dl class="sub-nav" v-if="classCodeList.length > 1">
+                <dd class="active">
+                    <a href="#">All class codes</a>
+                </dd>
+                <dd class="active" v-for="classCode in classCodeList">
+                    <a href="#">${ classCode }</a>
+                </dd>
+            </dl>
 
-        <section class="content">
-            <ul class="flex-list flex-wrap buttons">
-                {% if learningMomentsEnabled %}
-                    <li><a @click.prevent="openShareLearningMomentDialog"
-                           :class="{disabled: selectedStudentLearningMomentsEnabledIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
-                {% endif %}
-                {% if badgesEnabled %}
-                    <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set Goals</a></li>
-                    <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award Achievements</a></li>
-                {% endif %}
-                {% if pastoralEnabled %}
-                    <li><a @click.prevent="addPastoralRecord"
-                           :class="{disabled: selectedStudentIds.length === 0, 'icon-user': true}">Add {{ locale.pastoralCare.proper }} Record</a></li>
-                {% endif %}
-                {% if mailEnabled and USER.hasEmail %}
-                    <li><a @click.prevent="openMailDialog"
-                           :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}">Compose Email</a></li>
-                {% endif %}
-            </ul>
-        </section>
-        <template v-if="showSkeletonLoader" v-for="n in 3">
-            <div class="list-item">
-                <div class="small-12 card skeleton">
-                    <div class="img"></div>
-                    <h3></h3>
-                    <p class="meta"></p>
+            <section class="content">
+                <ul class="flex-list flex-wrap buttons">
+                    {% if learningMomentsEnabled %}
+                        <li><a @click.prevent="openShareLearningMomentDialog"
+                               :class="{disabled: selectedStudentLearningMomentsEnabledIds.length === 0, 'icon-share': true}">Share Learning Moment</a></li>
+                    {% endif %}
+                    {% if badgesEnabled %}
+                        <li><a :href="buildSetGoalUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set Goals</a></li>
+                        <li><a :href="buildAwardAchievementUrl()" :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award Achievements</a></li>
+                    {% endif %}
+                    {% if pastoralEnabled %}
+                        <li><a @click.prevent="addPastoralRecord"
+                               :class="{disabled: selectedStudentIds.length === 0, 'icon-user': true}">Add {{ locale.pastoralCare.proper }} Record</a></li>
+                    {% endif %}
+                    {% if mailEnabled and USER.hasEmail %}
+                        <li><a @click.prevent="openMailDialog"
+                               :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}">Compose Email</a></li>
+                    {% endif %}
+                </ul>
+            </section>
+            <template v-if="showSkeletonLoader" v-for="n in 3">
+                <div class="list-item">
+                    <div class="small-12 card skeleton">
+                        <div class="img"></div>
+                        <h3></h3>
+                        <p class="meta"></p>
+                    </div>
                 </div>
-            </div>
-        </template>
+            </template>
         {% endblock %}
 
         <table id="contact-table" v-if="!showSkeletonLoader && studentLists.length">
             <thead>
             {% block table_header %}
-            <tr>
-                <th v-if="showCheckboxes">
-                    <input type="checkbox" id="select-all" v-model="allSelected"/>
-                    <label for="select-all" class="checkbox-label"></label>
-                </th>
-                <th></th>
-                <th>Name</th>
-                <th class="show-for-large-up">Year Level</th>
-                <th class="show-for-medium-up">House</th>
-                <th class="show-for-medium-up">Last Visited</th>
-                <th></th>
-            </tr>
+                <tr>
+                    <th v-if="showCheckboxes">
+                        <input type="checkbox" id="select-all" v-model="allSelected"/>
+                        <label for="select-all" class="checkbox-label"></label>
+                    </th>
+                    <th></th>
+                    <th>Name</th>
+                    <th class="show-for-large-up">Year Level</th>
+                    <th class="show-for-medium-up">House</th>
+                    <th class="show-for-medium-up">Last Visited</th>
+                    <th></th>
+                </tr>
             {% endblock %}
             </thead>
             <tbody>
-                <template v-if="studentLists.length > 0">
-                    <tr v-for="(student, index) in studentLists">
-                        <td v-if="showCheckboxes">
-                            <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked" />
-                            <label :for="'id-' + index" class="checkbox-label"></label>
-                        </td>
-                        <td>
-                            <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
-                                 :alt="student.lastname + ', ' + student.firstname">
-                        </td>
-                        <td>
-                            <template v-if="student.id">
-                                <a :href="'/search/user/' + student.id">${ student.lastname + ', ' + student.firstname }</a>
-                            </template>
-                            <template v-else>
-                                ${ student.lastname + ', ' + student.firstname }
-                            </template>
-                            <span class="meta">(${ student.synergy_id })</span>
-                            <span class="show-for-print"><br>${ student.email }</span>
+            <template v-if="studentLists.length > 0">
+                <tr v-for="(student, index) in studentLists">
+                    <td v-if="showCheckboxes">
+                        <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked" />
+                        <label :for="'id-' + index" class="checkbox-label"></label>
+                    </td>
+                    <td>
+                        <img :src="'/portrait.php?id=' + student.id + '&size=square64'"
+                             :alt="student.lastname + ', ' + student.firstname">
+                    </td>
+                    <td>
+                        <template v-if="student.id">
+                            <a :href="'/search/user/' + student.id">${ student.lastname + ', ' + student.firstname }</a>
+                        </template>
+                        <template v-else>
+                            ${ student.lastname + ', ' + student.firstname }
+                        </template>
+                        <span class="meta">(${ student.synergy_id })</span>
+                        <span class="show-for-print"><br>${ student.email }</span>
 
-                            {% block meta %}
+                        {% block meta %}
                             <p class="meta">
                                 <span v-if="student.EnglishSecondFlag == '1'" class="icon-eng-second-lang highlight"
                                       title="English as an Additional Language">
@@ -112,29 +120,29 @@ Data:
                                       :title="'Medical Alert: ' + student.StudentMedicalAlert">
                                 </span>
                             </p>
-                            {% endblock %}
+                        {% endblock %}
 
-                            <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id && Object.keys(student.routes).length">
-                                {% block data_dropdown_content %}
+                        <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id" v-if="student.id && Object.keys(student.routes).length">
+                            {% block data_dropdown_content %}
                                 <li v-for="element in student.routes">
                                     <a :href="element.href" :class="element.class" :title="element.title">${ element.label }</a>
                                 </li>
-                                {% endblock %}
-                            </ul>
-                        </td>
-                        <td class="show-for-large-up">${ student.yearlevel }</td>
-                        {% block tutor_group %}<td class="show-for-medium-up">${ student.house }</td>{% endblock %}
-                        {% block core_group %}{% endblock %}
-                        <td class="show-for-medium-up">${ student.lastAccessTime }</td>
-                        <td class="no-pad">
-                            <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
-                                <nav>
-                                    <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
-                                </nav>
-                            </div>
-                        </td>
-                    </tr>
-                </template>
+                            {% endblock %}
+                        </ul>
+                    </td>
+                    <td class="show-for-large-up">${ student.yearlevel }</td>
+                    {% block tutor_group %}<td class="show-for-medium-up">${ student.house }</td>{% endblock %}
+                    {% block core_group %}{% endblock %}
+                    <td class="show-for-medium-up">${ student.lastAccessTime }</td>
+                    <td class="no-pad">
+                        <div class="actions-small-1" v-if="student.id && Object.keys(student.routes).length">
+                            <nav>
+                                <a href="#" :data-dropdown="'overflow' + student.id" class="icon-more" title="Actions"></a>
+                            </nav>
+                        </div>
+                    </td>
+                </tr>
+            </template>
             </tbody>
         </table>
     </div>
@@ -180,7 +188,7 @@ Data:
     <template v-if="actionsPlaceholder">
         {#  Just a place holder. Cause currently when we remove this line, the actions doesn't work.
             Seems like when the page has loaded, foundation JS looks for this element right-away.
-         #}
+        #}
         <a href="#" data-dropdown="overflow" class="icon-more" title="Actions" style="display: none"></a>
     </template>
 </div>
@@ -456,9 +464,9 @@ Data:
         allowDynamicUsers: true,
     } only %}
 {% endif %}
-<script>
-    import ClassList from "../vue/class-list";
-    export default {
-        components: {ClassList}
-    }
-</script>
+{#<script>#}
+{#    import ClassList from "../vue/class-list";#}
+{#    export default {#}
+{#        components: {ClassList}#}
+{#    }#}
+{#</script>#}
