@@ -10,10 +10,13 @@ import WaveSurfer from 'wavesurfer.js';
 import Wavesurfer from 'videojs-wavesurfer/dist/videojs.wavesurfer.js';
 import MicrophonePlugin from 'wavesurfer.js/dist/plugin/wavesurfer.microphone.js';
 WaveSurfer.microphone = MicrophonePlugin;
-import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 
 
-/*
+const RECORDING_LENGTH = 180; //3 minutes
+const IS_DEBUG_MODE = true;
+
+
+/**
 * The videojs options all camera/screen setups share
 * 
 * @returns { Object }
@@ -34,7 +37,7 @@ const getDefaultVideojsRecordOptions = () => {
     }
 }
 
-/*
+/** 
 * The options for an audio only videojs-record
 * 
 * @returns { Object }
@@ -46,7 +49,7 @@ export const getAudioOnlyRecordOptions = () => {
 			backend: 'WebAudio',
 			waveColor: '#ccc',
 			progressColor: '#ccc',
-			debug: true,
+			debug: IS_DEBUG_MODE,
 			cursorWidth: 1,
 			displayMilliseconds: false,
             hideScrollbar: true,
@@ -66,16 +69,17 @@ export const getAudioOnlyRecordOptions = () => {
 		record: {
 			audio: true,
 			video: false,
-            maxLength: 180, //3 minutes
+            maxLength: RECORDING_LENGTH, //3 minutes
+            audioMimeType: 'audio/webm',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-			debug: true,
+			debug: IS_DEBUG_MODE,
 		}
 	}
 	applyAudioWorkarounds(options);
 	return options;
 }
 
-/*
+/** 
 * few audio fixes for safari/edge audio
 * see https://github.com/collab-project/videojs-record/blob/master/examples/browser-workarounds.js
 * 
@@ -99,7 +103,7 @@ const applyAudioWorkarounds = (options) => {
     }
 }
 
-/*
+/**
 * set up a camera recording
 * 
 * @returns { Object }
@@ -115,8 +119,8 @@ export const getRecordCameraOptions = () => {
             },
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-            maxLength: 180, //three minutes
-            debug: true,
+            maxLength: RECORDING_LENGTH, 
+            debug: IS_DEBUG_MODE,
         }
     }
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -126,7 +130,7 @@ export const getRecordCameraOptions = () => {
     return options;
 }
 
-/*
+/** 
 * set up a screen recording
 * 
 * @returns { Object }
@@ -137,10 +141,10 @@ export const getRecordScreenOptions = () => {
         record: {
             audio: true,
             screen: true,
-            maxLength: 180, //three minutes
+            maxLength: RECORDING_LENGTH,
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
-            debug: true,
+            debug: IS_DEBUG_MODE,
         }
     }
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -150,7 +154,7 @@ export const getRecordScreenOptions = () => {
     return options;
 }
 
-/*
+/** 
 * set up a screen recording
 * 
 * @returns { Object }
@@ -168,13 +172,13 @@ export const getRecordPhotoOptions = () => {
                 width: { min: 320, ideal: 720, max: 1280 }, // video media constraints: set resolution of camera
                 height: { min: 240, ideal: 540, max: 920 }
             },
-            debug: true,
+            debug: IS_DEBUG_MODE,
         }
     }
     return options;
 }
 
-/*
+/** 
 * the default playback options
 * 
 * @returns { Object }
@@ -193,7 +197,7 @@ const getVideoPlayerOptions = () => {
     }
 }
 
-/*
+/** 
 * Once a video has been recorded, need to pass to another videojs component to be able to use the progress controls
 * 
 * @params { Blob }
@@ -209,7 +213,7 @@ export const getVideoPlayerOptionsWithBlob = (recordedData) => {
     return options;
 }
 
-/*
+/**
 * Show an existing video with src
 * 
 * @params { Object: src, type }
@@ -227,7 +231,7 @@ export const getVideoPlayerOptionsWithSrc = (recordedData) => {
 }
 
 
-/*
+/**
 * add in the wavesurfer to visulise the order
 * 
 * @returns { Object }
@@ -239,7 +243,7 @@ const getAudioPlayerOptions = () => {
             backend: 'MediaElement',
             waveColor: '#ccc',
             progressColor: '#ccc',
-            debug: true,
+            debug: IS_DEBUG_MODE,
             cursorWidth: 1,
             displayMilliseconds: false,
             hideScrollbar: true,
@@ -251,7 +255,7 @@ const getAudioPlayerOptions = () => {
     return options;
 }
 
-/*
+/**
 * Once a audio has been recorded, need to pass to another videojs component to be able to use the progress controls
 * 
 * @params { Blob }
@@ -265,7 +269,7 @@ export const getAudioPlayerOptionsWithBlob = (recordedData) => {
     return options;
 }
 
-/*
+/**
 * Show an existing audio with src
 * 
 * @params { Object: src, type }

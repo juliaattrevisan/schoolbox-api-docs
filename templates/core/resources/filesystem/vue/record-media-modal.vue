@@ -51,7 +51,7 @@ export default {
 
     computed: {
 
-        /*
+        /**
          * To know whether to show the upload button
          *
          * @returns { Boolean }
@@ -64,7 +64,7 @@ export default {
             }
         },
 
-        /*
+        /** 
          * grab the new filename with the relevant extension (can be webm/mp4/mp3)
          *
          * @returns { String }
@@ -78,12 +78,20 @@ export default {
 
     watch: {
 
-        /*
+        /** 
          * ensure no invalid chars are added to the user added filename
          *
          */
         newFilename (newValue) {
             this.newFilename = newValue.replace(/[\\/:"*?<>|]+/g, "");
+        },
+
+        /** 
+         * ensure no invalid chars are added to the user added filename
+         *
+         */
+        currentRecordMediaType () {
+
         }
 
     },
@@ -207,7 +215,7 @@ export default {
             }
         },
 
-        /*
+        /**
          * present the save file name modal to name the file
          *
          */
@@ -215,7 +223,7 @@ export default {
             this.isFilenameModalActive = true;
         },
 
-        /*
+        /**
          * close the filename modal
          *
          */
@@ -223,7 +231,7 @@ export default {
             this.isOverMediaModalClosing = true;
         },
 
-        /*
+        /**
          * close the filename modal, cancel has been selected rather than save
          *
          */
@@ -232,7 +240,7 @@ export default {
             this.isFilenameModalActive = false;
         },
 
-        /*
+        /**
          * the user has set a file name and selected save
          *
          */
@@ -259,7 +267,7 @@ export default {
             }
         },
 
-        /*
+        /** 
          * the video is ready, so upload it up to SchoolBox
          *
          */
@@ -280,7 +288,7 @@ export default {
             }
         },
 
-        /*
+        /** 
          * What to send in the upload
          *
          * @returns { FormData }
@@ -291,7 +299,7 @@ export default {
             return formData;
         },
 
-        /*
+        /**
          * To visualise the upload progress
          *
          * @params {ProgressEvent}
@@ -303,7 +311,7 @@ export default {
             }
         },
 
-        /*
+        /**
          * inform any listeners that a file was uploaded.
          * put it in the dropzone, and inform the dropzone opener
          * that a file was posted to it.
@@ -319,7 +327,7 @@ export default {
             };
             this.hasUploaded = true;
             this.canUpload = false;
-            setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
+            setTimeout(() => { //put a slight delay so user sees the upload successfull modal
                 window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
                 this.isProcessActive = false;
                 this.hasUploaded = false;
@@ -345,11 +353,11 @@ export default {
 
     <div>
         
-        <record-media-modal-menu
+        <!-- <record-media-modal-menu
             @on-record-media-type-selected="onRecordMediaTypeSelected"
             :current-record-media-type="currentRecordMediaType"
             :is-process-active="isProcessActive"
-        />
+        /> -->
 
         <div class="ab-pane">
             
@@ -364,7 +372,7 @@ export default {
                     <record-audio-only
                         v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
                         :record-media-type="recordMediaTypes.AUDIO_ONLY"
-                        :is-keep-alive="true"
+                        :is-keep-alive="false"
                         @on-device-ready="onDeviceReady"
                         @on-process-started="onProcessStarted"
                         @on-process-stopped="onProcessStopped"
@@ -375,7 +383,7 @@ export default {
                     <record-camera
                         v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
                         :record-media-type="recordMediaTypes.CAMERA"
-                        :is-keep-alive="true"
+                        :is-keep-alive="false"
                         @on-device-ready="onDeviceReady"
                         @on-process-started="onProcessStarted"
                         @on-process-stopped="onProcessStopped"
@@ -386,7 +394,7 @@ export default {
                     <record-screen
                         v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
                         :record-media-type="recordMediaTypes.SCREEN"
-                        :is-keep-alive="true"
+                        :is-keep-alive="false"
                         @on-device-ready="onDeviceReady"
                         @on-process-started="onProcessStarted"
                         @on-process-stopped="onProcessStopped"
