@@ -60,5 +60,3 @@ $app = new class extends CliTool\App {
 };
 
 (new CliTool\Kernel($app, [CliTool\Kernel::OPTION_LEVEL => Logger::NOTICE]))->runApp();
-
-
