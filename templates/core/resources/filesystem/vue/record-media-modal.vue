@@ -6,7 +6,6 @@
  */
 
 import RecordMediaModalMenu from './record-media-modal-menu';
-import RecordMediaModalUnset from './record-media-modal-unset';
 import RecordAudioOnly from '@schoolbox/record/record-audio-only';
 import RecordCamera from '@schoolbox/record/record-camera';
 import RecordScreen from '@schoolbox/record/record-screen';
@@ -20,8 +19,7 @@ import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
 export default {
 
     components: {
-        RecordMediaModalMenu, //top menu appears after unset menu selection
-        RecordMediaModalUnset, //the initial big menu
+        RecordMediaModalMenu, //the initial big menu
         RecordAudioOnly,
         RecordCamera,
         RecordScreen,
@@ -333,37 +331,35 @@ export default {
             
             <div class="record-media-container" ref="container" :style="{ height: targetHeight }">
             
-                <record-media-modal-unset
+                <record-media-modal-menu
                     v-if="currentRecordMediaType === recordMediaTypes.UNSET"
                     @on-record-media-type-selected="onRecordMediaTypeSelected"
                 />
 
-                <keep-alive><!-- to maintain recordings etc https://vuejs.org/v2/api/#keep-alive -->
-                    <record-audio-only
-                        v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
-                        :record-media-type="recordMediaTypes.AUDIO_ONLY"
-                        @on-device-ready="onDeviceReady"
-                        @on-recorded-media-ready="onRecordedMediaReady"
-                        @on-recorded-media-deleted="onRecordedMediaDeleted"
-                        @on-ratio-ready="onRatioReady"
-                    />
-                    <record-camera
-                        v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
-                        :record-media-type="recordMediaTypes.CAMERA"
-                        @on-device-ready="onDeviceReady"
-                        @on-recorded-media-ready="onRecordedMediaReady"
-                        @on-recorded-media-deleted="onRecordedMediaDeleted"
-                        @on-ratio-ready="onRatioReady"
-                    />
-                    <record-screen
-                        v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
-                        :record-media-type="recordMediaTypes.SCREEN"
-                        @on-device-ready="onDeviceReady"
-                        @on-recorded-media-ready="onRecordedMediaReady"
-                        @on-recorded-media-deleted="onRecordedMediaDeleted"
-                        @on-ratio-ready="onRatioReady"
-                    />
-                </keep-alive>
+                <record-audio-only
+                    v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
+                    :record-media-type="recordMediaTypes.AUDIO_ONLY"
+                    @on-device-ready="onDeviceReady"
+                    @on-recorded-media-ready="onRecordedMediaReady"
+                    @on-recorded-media-deleted="onRecordedMediaDeleted"
+                    @on-ratio-ready="onRatioReady"
+                />
+                <record-camera
+                    v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
+                    :record-media-type="recordMediaTypes.CAMERA"
+                    @on-device-ready="onDeviceReady"
+                    @on-recorded-media-ready="onRecordedMediaReady"
+                    @on-recorded-media-deleted="onRecordedMediaDeleted"
+                    @on-ratio-ready="onRatioReady"
+                />
+                <record-screen
+                    v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
+                    :record-media-type="recordMediaTypes.SCREEN"
+                    @on-device-ready="onDeviceReady"
+                    @on-recorded-media-ready="onRecordedMediaReady"
+                    @on-recorded-media-deleted="onRecordedMediaDeleted"
+                    @on-ratio-ready="onRatioReady"
+                />
 
                 <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
                     <h3><em>Please add a filename prior to continuing.</em></h3>
