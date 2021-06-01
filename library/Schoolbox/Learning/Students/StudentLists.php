@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Students;
 
+use Alaress_Date_Format;
 use Aura\Router\Router;
 use External_ClassInterface;
 use Schoolbox\L10n\RosettaStone;
@@ -16,6 +17,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Model;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Log\Mapper as LogMapper;
 use Schoolbox\Resource\Folder\Log\Model as Log;
@@ -110,96 +112,115 @@ class StudentLists
     {
         $students = $this->externalClass->getStudents($this->folder->getCodeString());
 
-        foreach ($students as $key => $student) {
-            if (!empty($student['synergy_id'])) {
-                try {
-                    $user = $this->userMapper->findByExternalId($student['synergy_id'], Role::STUDENT);
-                } catch (Exception $e) {
-                    //no user found
-                    continue;
-                }
-
-                $lastVisit = $this->logMapper->lastVisit($this->folder, $user)->first();
-
-                $students[$key]['id'] = $user->getId();
-                $students[$key]['email'] = $user->getEmail();
-                $students[$key]['lastAccessTime'] = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
-                $students[$key]['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();
-                $students[$key]['routes'] = [];
-
-                // Upcoming assessments
-                if ($this->upcomingAssessmentsEnabled) {
-                    $students[$key]['routes']['dueWork'] = [
-                        'label' => $this->rosettaStone->translate('dueWork', false, true),
-                        'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
-                        'class' => 'icon-due-work',
-                        'title' => '',
-                    ];
-                }
-
-                // Grades
-                if ($this->gradesEnabled) {
-                    $students[$key]['routes']['grades'] = [
-                        'label' => $this->rosettaStone->translate('grades', true, true),
-                        'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
-                        'class' => 'icon-approve',
-                        'title' => '',
-                    ];
-                }
-
-                // ePortfolio
-                if ($user->getEportfolioEnable()) {
-                    $students[$key]['routes']['ePortfolio'] = [
-                        'label' => 'ePortfolio',
-                        'href'  => '/eportfolio/' . $user->getId() . '/profile',
-                        'class' => 'icon-eportfolio',
-                        'title' => '',
-                    ];
-                }
-
-                // Pastoral
-                if ($this->pastoralIsEnabled) {
-                    $students[$key]['routes']['pastoral'] = [
-                        'label' => $this->rosettaStone->translate('pastoralCare', false, true),
-                        'href'  => $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
-                        'class' => 'icon-pastoral',
-                        'title' => '',
-                    ];
-                }
-
-                // Calendar
-                $students[$key]['routes']['calendar'] = [
-                    'label' => $this->rosettaStone->translate('calendar', false, true),
-                    'href'  => $this->router->generate('calendar.getCalendar', [
-                        'selectedDate' => \Alaress_Date_Format::now()->getURLDate(),
-                        'userId' => $user->getId()
-                    ]),
-                    'class' => 'icon-calendar',
-                    'title' => '',
-                ];
-
-                // Timetable
-                if (!$user->getHideTimetable()) {
-                    $students[$key]['routes']['timetable'] = [
-                        'label' => 'Timetable',
-                        'href'  => '/timetable/' .  $user->getId(),
-                        'class' => 'icon-timetable',
-                        'title' => '',
-                    ];
-                }
-
-                // Email
-                if ($this->mailIsEnabled && $user->getEmail()) {
-                    $students[$key]['routes']['email'] = [
-                        'label' => 'Email',
-                        'href'  => $this->mailHandle . $user->getEmail(),
-                        'class' => 'icon-email',
-                        'title' => 'Send Email',
-                    ];
-                }
-            }
+        foreach ($students as $key => $studentSisRecord) {
+            $students[$key] = $this->augmentStudentSisRecord($studentSisRecord);
         }
 
         return $students;
+    }
+
+    /**
+     * Augments student's SIS record with data required by the class list.
+     *
+     * @param array $studentSisRecord
+     * @return array
+     * @throws Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function augmentStudentSisRecord(array $studentSisRecord): array
+    {
+        // No external ID: show the SIS data only
+        if (empty($studentSisRecord['synergy_id'])) {
+            return $studentSisRecord;
+        }
+        try {
+            $user = $this->userMapper->findByExternalId($studentSisRecord['synergy_id'], Role::STUDENT);
+        } catch (Exception $e) {
+            // no user found: show the SIS data only
+            return $studentSisRecord;
+        }
+
+        $lastVisit = $this->logMapper->lastVisit($this->folder, $user)->first();
+
+        $studentSisRecord['id']                     = $user->getId();
+        $studentSisRecord['email']                  = $user->getEmail();
+        $studentSisRecord['lastAccessTime']         = $lastVisit instanceof Log ? $lastVisit->getLastAccessTime()->getShort() : 'Never';
+        $studentSisRecord['learningMomentsEnabled'] = $user->getLearningMomentsEnabled();
+        $studentSisRecord['routes']                 = [];
+
+        // Upcoming assessments
+        if ($this->upcomingAssessmentsEnabled) {
+            $studentSisRecord['routes']['dueWork'] = [
+                'label' => $this->rosettaStone->translate('dueWork', false, true),
+                'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
+                'class' => 'icon-due-work',
+                'title' => '',
+            ];
+        }
+
+        // Grades
+        if ($this->gradesEnabled) {
+            $studentSisRecord['routes']['grades'] = [
+                'label' => $this->rosettaStone->translate('grades', true, true),
+                'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),
+                'class' => 'icon-approve',
+                'title' => '',
+            ];
+        }
+
+        // ePortfolio
+        if ($user->getEportfolioEnable()) {
+            $studentSisRecord['routes']['ePortfolio'] = [
+                'label' => 'ePortfolio',
+                'href'  => '/eportfolio/' . $user->getId() . '/profile',
+                'class' => 'icon-eportfolio',
+                'title' => '',
+            ];
+        }
+
+        // Pastoral
+        if ($this->pastoralIsEnabled) {
+            $studentSisRecord['routes']['pastoral'] = [
+                'label' => $this->rosettaStone->translate('pastoralCare', false, true),
+                'href'  => $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
+                'class' => 'icon-pastoral',
+                'title' => '',
+            ];
+        }
+
+        // Calendar
+        $studentSisRecord['routes']['calendar'] = [
+            'label' => $this->rosettaStone->translate('calendar', false, true),
+            'href'  => $this->router->generate(
+                'calendar.getCalendar',
+                [
+                    'selectedDate' => Alaress_Date_Format::now()->getURLDate(),
+                    'userId'       => $user->getId()
+                ]
+            ),
+            'class' => 'icon-calendar',
+            'title' => '',
+        ];
+
+        // Timetable
+        if (!$user->getHideTimetable()) {
+            $studentSisRecord['routes']['timetable'] = [
+                'label' => 'Timetable',
+                'href'  => '/timetable/' . $user->getId(),
+                'class' => 'icon-timetable',
+                'title' => '',
+            ];
+        }
+
+        // Email
+        if ($this->mailIsEnabled && $user->getEmail()) {
+            $studentSisRecord['routes']['email'] = [
+                'label' => 'Email',
+                'href'  => $this->mailHandle . $user->getEmail(),
+                'class' => 'icon-email',
+                'title' => 'Send Email',
+            ];
+        }
+        return $studentSisRecord;
     }
 }
