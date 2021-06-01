@@ -5,9 +5,7 @@
  *
  */
 
-// import RecordPhotoDevice from '@schoolbox/inputCapture/record-photo-device';
 import RecordAudioOnlyBrowser from '@schoolbox/videojs-record/record-audio-only-browser';
-// import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
 
 
 export default {
@@ -21,16 +19,7 @@ export default {
             type: Object,
             required: false,
         },
-        isKeepAlive: { //whether the component has to exist between DOM display/redisplay https://vuejs.org/v2/api/#keep-alive - determines whether initiates on mounted() or activated(), keep-alive is used within record-media-modal.vue
-            type: Boolean,
-            required: false, 
-            default: false
-        }
     },
-
-    // created () { //these vars are created so they can be accessed within the template
-    //     this.hasDeviceCapture = hasDeviceCapture();
-    // },
 
 }
 </script>

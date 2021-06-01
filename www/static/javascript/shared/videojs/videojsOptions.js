@@ -69,8 +69,8 @@ export const getAudioOnlyRecordOptions = () => {
 		record: {
 			audio: true,
 			video: false,
-            maxLength: RECORDING_LENGTH, //3 minutes
-            audioMimeType: 'audio/webm',
+            maxLength: RECORDING_LENGTH, 
+            audioMimeType: 'audio/webm;codecs=opus',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
 			debug: IS_DEBUG_MODE,
 		}

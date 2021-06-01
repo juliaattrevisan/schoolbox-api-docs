@@ -86,14 +86,6 @@ export default {
             this.newFilename = newValue.replace(/[\\/:"*?<>|]+/g, "");
         },
 
-        /** 
-         * ensure no invalid chars are added to the user added filename
-         *
-         */
-        currentRecordMediaType () {
-
-        }
-
     },
 
     created () {
@@ -179,28 +171,12 @@ export default {
         },
 
         /**
-         * to be able to disable certain behavour when conversions/uploads are taking place
-         *
-         */
-        onProcessStarted () {
-            this.isProcessActive = true;
-        },
-
-        /**
-         * to be able to re-enable certain behavour when conversions/uploads are taking place
-         *
-         */
-        onProcessStopped () {
-            this.isProcessActive = false;
-        },
-
-        /**
          * to upload the recorded data
          *
          */
         onRecordedMediaReady (recordedData) {
             this.recordedData = recordedData;
-            this.canUpload = true; //show the upload button
+            this.canUpload = true; //to show the upload button
         },
 
         /**
@@ -352,12 +328,6 @@ export default {
 <template>
 
     <div>
-        
-        <!-- <record-media-modal-menu
-            @on-record-media-type-selected="onRecordMediaTypeSelected"
-            :current-record-media-type="currentRecordMediaType"
-            :is-process-active="isProcessActive"
-        /> -->
 
         <div class="ab-pane">
             
@@ -372,10 +342,7 @@ export default {
                     <record-audio-only
                         v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
                         :record-media-type="recordMediaTypes.AUDIO_ONLY"
-                        :is-keep-alive="false"
                         @on-device-ready="onDeviceReady"
-                        @on-process-started="onProcessStarted"
-                        @on-process-stopped="onProcessStopped"
                         @on-recorded-media-ready="onRecordedMediaReady"
                         @on-recorded-media-deleted="onRecordedMediaDeleted"
                         @on-ratio-ready="onRatioReady"
@@ -383,10 +350,7 @@ export default {
                     <record-camera
                         v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
                         :record-media-type="recordMediaTypes.CAMERA"
-                        :is-keep-alive="false"
                         @on-device-ready="onDeviceReady"
-                        @on-process-started="onProcessStarted"
-                        @on-process-stopped="onProcessStopped"
                         @on-recorded-media-ready="onRecordedMediaReady"
                         @on-recorded-media-deleted="onRecordedMediaDeleted"
                         @on-ratio-ready="onRatioReady"
@@ -394,10 +358,7 @@ export default {
                     <record-screen
                         v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
                         :record-media-type="recordMediaTypes.SCREEN"
-                        :is-keep-alive="false"
                         @on-device-ready="onDeviceReady"
-                        @on-process-started="onProcessStarted"
-                        @on-process-stopped="onProcessStopped"
                         @on-recorded-media-ready="onRecordedMediaReady"
                         @on-recorded-media-deleted="onRecordedMediaDeleted"
                         @on-ratio-ready="onRatioReady"

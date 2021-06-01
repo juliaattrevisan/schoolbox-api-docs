@@ -30,11 +30,6 @@ export default {
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
-        },
-        isKeepAlive: { //whether the component has to exist between DOM display/redisplay https://vuejs.org/v2/api/#keep-alive - determines whether initiates on mounted() or activated(), keep-alive is used within record-media-modal.vue
-            type: Boolean,
-            required: false, 
-            default: false
         }
     },
 
@@ -59,13 +54,7 @@ export default {
 	},
 
     mounted () {
-        if (!this.isKeepAlive && !this.hasPreRecordedData) { //only if no pre recording available
-            this.initVideojsRecord();
-        }
-    },
-
-    activated () {
-        if (this.isKeepAlive && !this.hasPreRecordedData) { //only if no pre recording available
+        if (!this.hasPreRecordedData) { //only if no pre recording available
             this.initVideojsRecord();
         }
     },
@@ -132,7 +121,7 @@ export default {
          *
          */
         onStartRecord () {
-            this.$emit(recordMediaEvents.PROCCESS_STARTED);
+            // 
         },
 
         /**
@@ -148,7 +137,6 @@ export default {
          *
          */
         async recordedVideoReady (mediaData) {
-            this.$emit(recordMediaEvents.PROCCESS_STOPPED); //notify any UI to re-enable
             this.recordedData = await dataURLtoBlob(mediaData); //the recorded photo is just a DataURL, so need to set up a Blob 
             this.recordedData.name = 'photo.jpeg'
             this.recordedData.src = mediaData; 
