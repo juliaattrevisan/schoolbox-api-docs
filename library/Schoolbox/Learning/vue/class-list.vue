@@ -398,22 +398,22 @@ export default {
               <span class="meta">({{ student.synergy_id }})</span>
               <span class="show-for-print"><br>{{ student.email }}</span>
 
-<!--              {% block meta %}-->
               <p class="meta">
-                <span v-if="Number(student.EnglishSecondFlag) === 1"
-                      class="icon-eng-second-lang highlight"
-                      title="English as an Additional Language">
-                </span>
-                <span v-if="showMedicalAlerts && Number(student.StudentSpecialNeedsFlag) === 1"
-                      class="icon-bell warning"
-                      :title="specialNeeds">
-                </span>
-                <span v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
-                      class="icon-alert alert"
-                      :title="'Medical Alert: ' + student.StudentMedicalAlert">
-                </span>
+                <slot name="studentMeta" v-bind:student="student">
+                  <span v-if="Number(student.EnglishSecondFlag) === 1"
+                        class="icon-eng-second-lang highlight"
+                        title="English as an Additional Language">
+                  </span>
+                  <span v-if="showMedicalAlerts && Number(student.StudentSpecialNeedsFlag) === 1"
+                        class="icon-bell warning"
+                        :title="specialNeeds">
+                  </span>
+                  <span v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
+                        class="icon-alert alert"
+                        :title="'Medical Alert: ' + student.StudentMedicalAlert">
+                  </span>
+                </slot>
               </p>
-<!--              {% endblock %}-->
 
               <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id"
                   v-if="student.id && Object.keys(student.routes).length">

@@ -2,16 +2,15 @@
 
 {# SCC: show different student alerts #}
 
-{% block meta %}
-<p class="meta">
-    <span v-if="student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" :title="specialNeeds"></span>
-    <span v-if="student.StudentMedicalAlert != ''" class="icon-alert alert" :title="'Medical Alert: ' + student.StudentMedicalAlert"></span>
-    <span v-if="student.StudentNonResidentFlag != 0" class="icon-international-student" title="International Student"></span>
-    <span v-if="student.StudentIBFlag != 0" class="icon-international-baccalaureate" title="International Baccalaureate Student"></span>
-    <span v-if="student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight" title="English as an Additional Language"></span>
-    <span v-if="student.StudentTSIFlag != 0" class="icon-boarder-leave" title="Boarder"></span>
-    <span v-if="student.IntegrationFlag != 0" class="icon-integration-student" title="SAC"></span>
-    <span v-if="student.EMAFlag != 0" class="icon-education-mainentance" title="Ed Psych"></span>
-</p>
-{% endblock %}
-
+{% block classListSlots %}
+    <template v-slot:studentMeta="slotProps">
+        <span v-if="slotProps.student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" title="{{ specialNeeds }}"></span>
+        <span v-if="slotProps.student.StudentMedicalAlert != ''" class="icon-alert alert" :title="'Medical Alert: ' + slotProps.student.StudentMedicalAlert"></span>
+        <span v-if="slotProps.student.StudentNonResidentFlag != 0" class="icon-international-student" title="International Student"></span>
+        <span v-if="slotProps.student.StudentIBFlag != 0" class="icon-international-baccalaureate" title="International Baccalaureate Student"></span>
+        <span v-if="slotProps.student.EnglishSecondFlag != 0" class="icon-eng-second-lang highlight" title="English as an Additional Language"></span>
+        <span v-if="slotProps.student.StudentTSIFlag != 0" class="icon-boarder-leave" title="Boarder"></span>
+        <span v-if="slotProps.student.IntegrationFlag != 0" class="icon-integration-student" title="SAC"></span>
+        <span v-if="slotProps.student.EMAFlag != 0" class="icon-education-mainentance" title="Ed Psych"></span>
+    </template>
+{% endblock classListSlots %}
