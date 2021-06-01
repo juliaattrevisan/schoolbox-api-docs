@@ -248,7 +248,7 @@
                 {% if config|length  %}
                 <div id="configurator">
                     {% for namespace in config %}
-                        {% if ns[namespace.id] %}
+                        {% if ns[namespace.id] is defined %}
                         <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
                         <section data-namespace="{{ ns[namespace.id].slug }}">
                             {% for source in namespace.sources %}
