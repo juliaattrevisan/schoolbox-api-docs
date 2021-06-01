@@ -3,5 +3,47 @@
     [ folder.name, '/homepage/' ~ folder.id ],
     [ googleFile.name ]
 ) }}
-<p style="margin-top: -1rem;"><a href="{{ googleFile.url }}" class="right external" target="_blank">Open in Google</a></p>
-<iframe class="fullscreen" src="{{ googleFile.url }}"></iframe>
+<p style="margin-top: -1rem;"><a href="{{ googleFile.url }}" class="right external" target="_blank">Open in Google</a>
+</p>
+<iframe id="google-file-content" class="hide"></iframe>
+<div id="google-error" class="small-12 column hide">
+    <div class="empty-state">
+        <i class="icon-google-drive"></i>
+        <p>Sorry, we could not find the document at this time.</p>
+    </div>
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/apiloader.js"></script>
+<script type="text/javascript">
+    $(function () {
+        loadGoogleApi(['client:auth2'], function () {
+            jQuery.ajax({
+                url: '{{ CDN_PREFIX }}/javascript/shared/google/picker.js',
+                dataType: 'script',
+                cache: true
+            }).then(function () {
+                $('#google-file-content').googlePicker({
+                    clientId: '{{ config.googleapps_client_id }}',
+                    modules: [],
+                    onAuth: function () {
+                        gapi.client.load('drive', 'v3', function () {
+                            let getViewLink = gapi.client.drive.files.get({
+                                'fields': 'webViewLink',
+                                'supportsAllDrives': 'true',
+                                'fileId': '{{ googleFile.googleId }}',
+                            });
+                            getViewLink.execute(function (resp) {
+                                if (resp.error || resp.webViewLink.length === 0) {
+                                    console.log(resp);
+                                    $('#google-error').removeClass('hide');
+                                    return;
+                                }
+                                $('#google-file-content').attr('src', resp.webViewLink);
+                                $('#google-file-content').removeClass('hide').addClass('fullscreen');
+                            });
+                        });
+                    },
+                });
+            });
+        });
+    });
+</script>

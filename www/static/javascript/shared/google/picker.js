@@ -83,7 +83,7 @@
          * List of scopes: https://developers.google.com/identity/protocols/oauth2/scopes
          */
         function authorize() {
-            gapi.auth2.init({
+            gapi.client.init({
                 'client_id': config.clientId,
                 'scope': config.scope
             }).then(function () {

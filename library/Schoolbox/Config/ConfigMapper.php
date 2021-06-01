@@ -148,6 +148,10 @@ class ConfigMapper extends Mapper
     public const NAME_PASTORAL_ENABLED = 'pastoral_enabled';
     public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
 
+    public const NAME_GOOGLEDRIVE_ENABLED    = 'googledrive_enabled';
+    public const NAME_GOOGLEDRIVE_EXPORT_PDF = 'googledrive_export_pdf';
+    public const NAME_GOOGLEAPPS_API_KEY     = 'googleapps_api_key';
+    public const NAME_GOOGLEAPPS_CLIENT_ID   = 'googleapps_client_id';
 
     /**
      * @throws \InvalidArgumentException

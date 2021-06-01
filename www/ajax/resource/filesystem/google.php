@@ -39,7 +39,7 @@ $proxy  = new Proxy\Server($conf);
 $grive  = new GDriveFetcher(
     $conf,
     $headers['Authorization'],
-    (bool)$conf->get('googledrive_export_pdf')
+    (bool)$conf->get(\Schoolbox\Config\ConfigMapper::NAME_GOOGLEDRIVE_EXPORT_PDF)
 );
 $mapper = Storage\Mapper::getInstance();
 $files  = [];

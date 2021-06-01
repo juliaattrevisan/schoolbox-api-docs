@@ -9,6 +9,7 @@ namespace Schoolbox\Resource\GoogleFile\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\GoogleFile\Mapper;
 use Schoolbox\Resource\GoogleFile\Model;
@@ -51,9 +52,8 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     private function isGoogleEnabled(): bool
     {
-        return $this->getConfigLoader()->get('googledrive_enabled')
-            && $this->getConfigLoader()->get('googleapps_api_key')
-            && $this->getConfigLoader()->get('googleapps_client_id');
+        return $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED)
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID);
     }
 
 
@@ -103,7 +103,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         $twigTemplate = '@googleFile/component/googleFiles.twig';
         $twigData     = [
-            'clientId'     => $this->getConfigLoader()->get('googleapps_client_id'),
+            'clientId'     => $this->getConfigLoader()->get(ConfigMapper::NAME_GOOGLEAPPS_CLIENT_ID),
             'folder'       => $this->getContext(),
             'googleFile'   => new Model(),
             'googleFiles'  => $this->googleFiles,

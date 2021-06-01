@@ -13,11 +13,13 @@ use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule\All;
 use Alaress\Authorizer\Rule\Any;
 use Alaress\Authorizer\Rule\HasHomepageAccess;
+use Alaress\Authorizer\Rule\IsConfigOn;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -35,13 +37,16 @@ class Module extends BaseModule
     /**
      * @inheritDoc
      */
-    function registerRoutes(): void
+    public function registerRoutes(): void
     {
         $this->register(
             self::METHOD_GET,
             '/{googleFileId:\d+}',
             'getGoogleFile',
-            new IsLoggedIn(),
+            new All(
+                new IsLoggedIn(),
+                new IsConfigOn(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED, $this->getConfig()),
+            ),
             function ($params) {
                 return $this->preloadGoogleFile($params);
             }
@@ -49,6 +54,7 @@ class Module extends BaseModule
 
         $canCreate = new All(
             new IsLoggedIn(),
+            new IsConfigOn(ConfigMapper::NAME_GOOGLEDRIVE_ENABLED, $this->getConfig()),
             new Any(
                 new IsSuperuser(),
                 new HasHomepageAccess(
