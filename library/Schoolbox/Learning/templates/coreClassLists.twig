@@ -31,7 +31,10 @@ Data:
         get-award-as-achievement-form-endpoint="{{ routeLookup('learningBadgeAward.redirectToAwardAsAchievementForm') }}"
         get-set-as-goal-form-endpoint="{{ routeLookup('learningBadgeAward.redirectToSetAsGoalForm') }}"
         get-create-evidence-form-endpoint="{{ routeLookup('learningMomentEvidence.redirectToCreateForm') }}"
-    ></class-list>
+    >
+        {% block classListSlots %}
+        {% endblock classListSlots %}
+    </class-list>
 </div>
 
 {#<div>#}

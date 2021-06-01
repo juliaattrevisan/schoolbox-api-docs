@@ -417,13 +417,13 @@ export default {
 
               <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id"
                   v-if="student.id && Object.keys(student.routes).length">
-<!--                {% block data_dropdown_content %}-->
-                <li v-for="element in student.routes">
-                  <a :href="element.href" :class="element.class" :title="element.title">
-                    {{ element.label }}
-                  </a>
-                </li>
-<!--                {% endblock %}-->
+                <slot name="studentMenuItems" v-bind:student="student">
+                  <li v-for="element in student.routes">
+                    <a :href="element.href" :class="element.class" :title="element.title">
+                      {{ element.label }}
+                    </a>
+                  </li>
+                </slot>
               </ul>
             </td>
             <td class="show-for-large-up">{{ student.yearlevel }}</td>
