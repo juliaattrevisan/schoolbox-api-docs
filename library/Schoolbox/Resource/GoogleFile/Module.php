@@ -37,7 +37,7 @@ class Module extends BaseModule
     /**
      * @inheritDoc
      */
-    function registerRoutes(): void
+    public function registerRoutes(): void
     {
         $this->register(
             self::METHOD_GET,
