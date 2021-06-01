@@ -22,8 +22,6 @@ $app = new class extends CliTool\App {
 
     private const EXTERNAL_DB_KEY_PATTERN = 'External_*';
 
-    private const MAX_TTL_VALUE = 3600;
-
     /** @inheritDoc */
     public function run(): void
     {
@@ -34,17 +32,18 @@ $app = new class extends CliTool\App {
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
 
-        $externalKeys = $redis->keys(self::EXTERNAL_DB_KEY_PATTERN);
+        $externalDbCacheTimeout = $this->getExternalDbCacheTTL();
 
-        if (!empty($externalKeys)) {
-            $expiry = $this->getExternalDbCacheTTL();
+        $cursor  = null;
 
-            foreach ($externalKeys as $key) {
-                $this->getLogger()->info('Set cache TTL for ' . $key . ' to ' . $expiry . ' seconds');
-                $redis->expire($key, $expiry);
+        while ($cursor !== '0') {
+            [$cursor, $elements] = $redis->scan($cursor, ['MATCH' => self::EXTERNAL_DB_KEY_PATTERN]);
+            foreach ($elements as $cacheKey) {
+                if ($redis->ttl($cacheKey) > $externalDbCacheTimeout) {
+                    $this->getLogger()->info('Set cache TTL for ' . $cacheKey . ' to ' . $externalDbCacheTimeout . ' seconds');
+                    $redis->expire($cacheKey, $externalDbCacheTimeout);
+                }
             }
-        } else {
-            $this->getLogger()->info('Unable to find keys with pattern of ' . self::EXTERNAL_DB_KEY_PATTERN . ' exiting...');
         }
     }
 
@@ -53,9 +52,7 @@ $app = new class extends CliTool\App {
      */
     public function getExternalDbCacheTTL(): int
     {
-        $cacheTimeout = (int) $this->getConfig()->get('external_cache_timeout');
-
-        return $cacheTimeout <= self::MAX_TTL_VALUE ? $cacheTimeout : self::MAX_TTL_VALUE;
+        return (int) $this->getConfig()->get('external_cache_timeout');
     }
 };
 
