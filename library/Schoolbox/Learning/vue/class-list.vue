@@ -215,7 +215,7 @@ export default {
         /**
          * The API endpoint which displays a form for creating learning moments.
          */
-        getCreateEvidenceFormEndpoint: {
+        getCreateLearningMomentFormEndpoint: {
             type: String,
             required: true,
         },
@@ -324,11 +324,9 @@ export default {
             // Set each link's href to the selected users
             let self = this,
                 dialog = $('#classList-shareLearningMoment');
-            // url      = new URL(window.location.href),
-            // pathname = '/learning/evidence/user/' + self.selectedStudentIds.join(',') + '/create';
             dialog.find('a[data-action="shareLearningMoment"]').each(function () {
                 let url = new URL(this.href);
-                url.pathname = self.getCreateEvidenceFormEndpoint;
+                url.pathname = self.getCreateLearningMomentFormEndpoint;
                 url.searchParams.append('userIds', self.selectedStudentLearningMomentsEnabledIds.join(','));
                 this.href = url.href;
             });
