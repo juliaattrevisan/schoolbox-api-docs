@@ -89,12 +89,15 @@
             }).then(function () {
                 let gAuth = gapi.auth2.getAuthInstance();
                 let gUser = gAuth.currentUser.get();
-                authResult = gUser.getAuthResponse();
                 if (gUser.isSignedIn()) {
+                    authResult = gUser.getAuthResponse();
                     handleAuthResult();
                 } else {
                     gAuth.signIn({'prompt': 'select_account'}).then(
                         function () {
+                            // reset authResult
+                            gUser = gAuth.currentUser.get();
+                            authResult = gUser.getAuthResponse();
                             handleAuthResult();
                         }
                     );
@@ -119,7 +122,7 @@
         // Create and render a Picker object for searching images.
         // Visit here to find all the view ids:
         //   https://developers.google.com/picker/docs/reference#view-id
-        function createPicker(oauthToken) {
+        function createPicker() {
             let builder = new google.picker.PickerBuilder();
 
             let features = config.features.length > 0 ? config.features :
@@ -140,7 +143,7 @@
                 builder.addView(views[i]);
             }
             let picker = builder
-                .setOAuthToken(oauthToken)
+                .setOAuthToken(authResult.access_token)
                 .setCallback(pickerCallback)
                 .hideTitleBar()
                 .build();
