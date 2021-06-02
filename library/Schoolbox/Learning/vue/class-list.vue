@@ -497,7 +497,7 @@ export default {
         <div class="small-12 island">
             <h1>{{ subjectTitle }}</h1>
 
-            <dl class="sub-nav" v-if="classCodeList.length > 1">
+            <dl class="tabs" v-if="classCodeList.length > 1">
                 <dd :class="{active: currentClassCode === null}">
                     <a href="#" @click="setClassCode(null)">All class codes</a>
                 </dd>
