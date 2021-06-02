@@ -118,6 +118,9 @@ export default {
         });
 
         self.sendEmailButtonText = self.sendEmailButtonDefaultText;
+
+        // Set the current selected class code
+        self.setClassCode(window.location.hash.substring(1));
     },
     methods: {
         getStudents: function () {
@@ -255,7 +258,11 @@ export default {
          * @param {String|null} classCode
          */
         setClassCode(classCode) {
-            this.currentClassCode = classCode;
+            if (this.classCodeList.includes(classCode)) {
+                this.currentClassCode = classCode;
+            } else {
+                this.currentClassCode = null;
+            }
         },
     },
     computed: {
