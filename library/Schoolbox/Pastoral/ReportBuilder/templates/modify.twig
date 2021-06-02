@@ -444,7 +444,10 @@
                                 {{ locale.pastoral.proper }} Groups
                                 <span class="hint has-tip tip-top" data-tooltip
                                       title="Select the {{ locale.pastoral }} groups you would like to share this report with.">?</span>
+                            </label>
+                            <ul class="option-list">
                                 {% for group in groups %}
+                                <li>
                                     <input type="hidden" name="group[{{ group.id }}]" value="0"/>
                                     <input type="checkbox"
                                            name="group[{{ group.id }}]"
@@ -453,8 +456,9 @@
                                            value="1"
                                     />
                                     <label for="group[{{ group.id }}]" class="checkbox-label">{{ group.name }}</label>
+                                </li>
                                 {% endfor %}
-                            </label>
+                            </ul>
                         </div>
                     </fieldset>
                 </section>
