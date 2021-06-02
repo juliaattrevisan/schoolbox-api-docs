@@ -7,18 +7,20 @@ Data:
     pastoralEnabled        bool      Config for whether pastoral care is enabled
     learningMomentsEnabled bool      Config for whether learning moment creation is enabled
     emailGroups            array     Data for mail group checkboxes
+    houseLabel             string    A label for the house column (default: "House"). May be customised in child templates
+    showHouseColumn        bool      Should the house column be shown (default: true)? May be customised in child templates
+    showTutorGroupColumn   bool      Should the tutor group column be shown (default: false)? May be customised in child templates
+    showCoreGroupColumn    bool      Should the core group column be shown (default: false)? May be customised in child templates
 #}
 
 {% include '@learning/component/classLists/breadcrumbs.twig' %}
 
-<div class="row class-list" id="email-class-lists">
-    {% set houseLabel = "House" %}
-    {% set showHouseColumn = true %}
-    {% set showTutorGroupColumn = false %}
-    {% set showCoreGroupColumn = false %}
-    {% block classListVars %}
-    {% endblock classListVars %}
+{% set houseLabel           = houseLabel           ?? "House" %}
+{% set showHouseColumn      = showHouseColumn      ?? true %}
+{% set showTutorGroupColumn = showTutorGroupColumn ?? false %}
+{% set showCoreGroupColumn  = showCoreGroupColumn  ?? false %}
 
+<div class="row class-list" id="email-class-lists">
     <class-list
         subject-title="{{ folder.title }}"
         :class-code-list="{{ folder.codes | keys | json_encode }}"
