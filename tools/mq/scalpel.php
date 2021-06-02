@@ -10,7 +10,9 @@
  */
 
 use Alaress\Async\AMQP\Bunny\BunnyControl;
+use Alaress\Async\Notification\Instance\Instance;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Notif\MQ\Connector;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -112,9 +114,9 @@ $app = new class extends CliTool\App{
             $compressed = $redis->executeCommand($redis->createCommand('get', array($key)));
             $uncompress = gzuncompress($compressed);
 
-            $msg = json_decode($uncompress, true);
+            $msg = unserialize($uncompress);
 
-            if ($this->checkData($args, $regexMode, $msg)) {
+            if ($this->checkData($args, $regexMode, $msg->jsonSerialize())) {
                 $redis->executeCommand($redis->createCommand('del', array($key)));
                 ++$acks;
             }
@@ -143,7 +145,7 @@ $app = new class extends CliTool\App{
             'password' => $conf->get('amqp_pass'),
             'vhost'    => $conf->get('amqp_vhost')
         ]);
-        $amqp = \Schoolbox\Notif\MQ\Connector::getInstance();
+        $amqp = Connector::getInstance();
 
         $queueList = $ctrl->listQueues(array('name'));
 
