@@ -22,50 +22,50 @@ use Schoolbox\UserMapper;
 class CollectionTest extends TestCase
 {
     /**
-     * @dataProvider provider_Collection
+     * @dataProvider providerCollection
      * @param Collection $input
      */
-    public function test_from_Collection(Collection $input)
+    public function testFromCollection(Collection $input)
     {
         $actual = $this->getUserMapper()->getModelAsCollection($input);
         $this->assertEquals($actual, $input);
     }
 
     /**
-     * @dataProvider provider_ICollection
+     * @dataProvider providerICollection
      * @param Collection $input
      */
-    public function test_from_ICollection(Collection $input)
+    public function testFromICollection(Collection $input)
     {
         $actual = $this->getUserMapper()->getModelAsCollection($input);
         $this->assertEquals($actual, $input);
     }
 
     /**
-     * @dataProvider provider_array
+     * @dataProvider providerArray
      * @param array $input
      */
-    public function test_from_Array(array $input)
+    public function testFromArray(array $input)
     {
         $collection = $this->getUserMapper()->getModelAsCollection($input);
         $this->assertEquals(get_class($collection), Collection::class);
     }
 
     /**
-     * @dataProvider provider_scalar
+     * @dataProvider providerScalar
      * @param mixed $input
      */
-    public function test_from_Scalar($input)
+    public function testFromScalar($input)
     {
         $collection = $this->getUserMapper()->getModelAsCollection($input);
         $this->assertEquals(get_class($collection), Collection::class);
     }
 
     /**
-     * @dataProvider provider_object
+     * @dataProvider providerObject
      * @param mixed $input
      */
-    public function test_from_Object($input)
+    public function testFromObject($input)
     {
         $collection = $this->getUserMapper()->getModelAsCollection($input);
         $this->assertEquals(get_class($collection), Collection::class);
@@ -73,7 +73,7 @@ class CollectionTest extends TestCase
 
 
     /**
-     * @dataProvider provider_sortNaturallyAscending
+     * @dataProvider providerSortNaturallyAscending
      * @param mixed $input
      * @param mixed $expectedNoIndex
      * @param mixed $expectedWithIndex
@@ -94,7 +94,7 @@ class CollectionTest extends TestCase
      *
      * @return array
      */
-    public function provider_sortNaturallyAscending(): array
+    public function providerSortNaturallyAscending(): array
     {
         return [
             'Firstnames 1, Ascending' => [
@@ -159,7 +159,7 @@ class CollectionTest extends TestCase
 
 
     /**
-     * @dataProvider provider_sortNaturallyDescending
+     * @dataProvider providerSortNaturallyDescending
      * @param mixed $input
      * @param mixed $expectedNoIndex
      * @param mixed $expectedWithIndex
@@ -180,7 +180,7 @@ class CollectionTest extends TestCase
      *
      * @return array
      */
-    public function provider_sortNaturallyDescending(): array
+    public function providerSortNaturallyDescending(): array
     {
         return [
             'Firstnames 1, Descending' => [
@@ -245,7 +245,7 @@ class CollectionTest extends TestCase
 
 
     /**
-     * @dataProvider provider_sortNaturallyInvalid
+     * @dataProvider providerSortNaturallyInvalid
      * @param mixed $input
      */
     public function testSortNaturallyInvalid($input)
@@ -260,7 +260,7 @@ class CollectionTest extends TestCase
      *
      * @return array
      */
-    public function provider_sortNaturallyInvalid(): array
+    public function providerSortNaturallyInvalid(): array
     {
         return [
             'Invalid 1' => [
@@ -281,7 +281,7 @@ class CollectionTest extends TestCase
 
     // ============= Data Providers =============
 
-    public function provider_Collection()
+    public function providerCollection()
     {
         return [
             [new Collection()],
@@ -293,7 +293,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function provider_ICollection()
+    public function providerICollection()
     {
         return [
             [new \Schoolbox\Calendar\EventLevelCollection(new Collection(), new Collection())],
@@ -305,7 +305,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function provider_array()
+    public function providerArray()
     {
         return [
             [[]],
@@ -315,7 +315,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function provider_scalar()
+    public function providerScalar()
     {
         return [
             [null],
@@ -326,7 +326,7 @@ class CollectionTest extends TestCase
         ];
     }
 
-    public function provider_object()
+    public function providerObject()
     {
         return [
             [new User()],
