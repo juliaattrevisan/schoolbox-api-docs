@@ -69,9 +69,9 @@ export const getAudioOnlyRecordOptions = (maxFileSize) => {
 		record: {
 			audio: true,
 			video: false,
-            maxLength: RECORDING_LENGTH, 
             audioMimeType: 'audio/webm;codecs=opus',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
+            maxLength: RECORDING_LENGTH,
 			debug: IS_DEBUG_MODE,
             maxFileSize: maxFileSize,
             timeSlice: 1000, //to enable the maxFileSize restriction
@@ -145,9 +145,9 @@ export const getRecordScreenOptions = (maxFileSize) => {
         record: {
             audio: true,
             screen: true,
-            maxLength: RECORDING_LENGTH,
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
+            maxLength: RECORDING_LENGTH,
             debug: IS_DEBUG_MODE,
             maxFileSize: maxFileSize,
             timeSlice: 1000, //to enable the maxFileSize restriction
