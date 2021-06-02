@@ -384,6 +384,7 @@ export default {
                     </li>
                 </ul>
             </section>
+
             <template v-if="showSkeletonLoader" v-for="n in 3">
                 <div class="list-item">
                     <div class="small-12 card skeleton">
@@ -394,25 +395,25 @@ export default {
                 </div>
             </template>
 
-            <table id="contact-table" v-if="!showSkeletonLoader && studentLists.length">
-                <thead>
-                <tr>
-                    <th v-if="showCheckboxes">
-                        <input type="checkbox" id="select-all" v-model="allSelected"/>
-                        <label for="select-all" class="checkbox-label"></label>
-                    </th>
-                    <th></th>
-                    <th>Name</th>
-                    <th class="show-for-large-up">Year Level</th>
-                    <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
-                    <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
-                    <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>
-                    <th class="show-for-medium-up">Last Visited</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <template v-if="studentLists.length > 0">
+            <template v-if="!showSkeletonLoader">
+                <table id="contact-table" v-if="studentLists.length">
+                    <thead>
+                    <tr>
+                        <th v-if="showCheckboxes">
+                            <input type="checkbox" id="select-all" v-model="allSelected"/>
+                            <label for="select-all" class="checkbox-label"></label>
+                        </th>
+                        <th></th>
+                        <th>Name</th>
+                        <th class="show-for-large-up">Year Level</th>
+                        <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
+                        <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
+                        <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>
+                        <th class="show-for-medium-up">Last Visited</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
                     <tr v-for="(student, index) in studentLists">
                         <td v-if="showCheckboxes">
                             <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked"/>
@@ -475,9 +476,13 @@ export default {
                             </div>
                         </td>
                     </tr>
-                </template>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+
+                <div class="empty-state" v-else>
+                    No students to show here
+                </div>
+            </template>
         </div>
 
         <div v-if="mailEnabled" id="classList-email" data-reveal aria-hidden="true" class="reveal-modal small">
