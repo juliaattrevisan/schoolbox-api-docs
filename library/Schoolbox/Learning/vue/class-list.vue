@@ -549,11 +549,11 @@ export default {
                 <table id="contact-table" v-if="studentsForCurrentClassCode.length">
                     <thead>
                     <tr>
-                        <th v-if="showCheckboxes">
+                        <th width="40" v-if="showCheckboxes">
                             <input type="checkbox" id="select-all" v-model="allSelected"/>
                             <label for="select-all" class="checkbox-label"></label>
                         </th>
-                        <th></th>
+                        <th width="84"></th>
                         <th>Name</th>
                         <th class="show-for-large-up">Year Level</th>
                         <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
