@@ -386,6 +386,7 @@ class Manager
                 AND aft.mime LIKE 'image%'
                 AND aft.mime NOT LIKE 'image%svg%'
                 AND aft.mime NOT LIKE 'image%webp%'
+                AND aft.mime NOT LIKE 'image%heic%'
             WHERE s.uploaded_on >= (NOW() - INTERVAL {$this->timeInterval} MINUTE)
             ORDER BY s.uploaded_on
             LIMIT 0, {$this->imageCountLimit}";
