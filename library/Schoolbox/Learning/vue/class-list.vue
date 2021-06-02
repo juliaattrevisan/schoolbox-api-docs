@@ -640,14 +640,16 @@ export default {
 
             <fieldset class="checklist">
                 <legend>Recipients</legend>
-                <template v-for="group in emailGroups">
-                    <input :id="group.label"
-                           name="groups[]"
-                           type="checkbox"
-                           :value="group.value"
-                           v-model="group.isChecked"/>
-                    <label :for="group.label">{{ group.label }}</label>
-                </template>
+                <ul class="option-list">
+                    <li v-for="(group, index) in emailGroups" :key="index">
+                        <input :id="group.label"
+                               name="groups[]"
+                               type="checkbox"
+                               :value="group.value"
+                               v-model="group.isChecked"/>
+                        <label :for="group.label">{{ group.label }}</label>
+                    </li>
+                </ul>
             </fieldset>
 
             <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
