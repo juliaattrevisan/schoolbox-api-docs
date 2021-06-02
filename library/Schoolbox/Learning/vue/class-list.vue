@@ -246,6 +246,9 @@ export default {
 
         // Set the current selected class code
         self.setClassCode(window.location.hash.substring(1));
+
+        // If the Back button is pressed on this page: set the class code
+        window.addEventListener('popstate', () => self.setClassCode(window.location.hash.substring(1)));
     },
     methods: {
         getStudents: function () {
