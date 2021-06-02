@@ -7,6 +7,7 @@
 
 use Alaress\Cache;
 use Alaress\Database\Connector\IConnector;
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Campus;
 use Schoolbox\CampusMapper;
 use Schoolbox\Database\Factory;
@@ -160,6 +161,20 @@ class External_Synergetic_Timetable implements External_TimetableInterface
             }
             $dateObject = new Alaress_Date_Format($date, Alaress_Date_Format::DATABASE_DATE_FORMAT);
         }
+        $params = [
+            'fileSemester'   => $this->getFileSemester($externalUserId, $dateObject),
+            'fileYear'       => $this->getFileYear($externalUserId, $dateObject),
+            'timetableGroup' => $campus->getExtTimetableCode(),
+            'day'            => $day,
+        ];
+
+        $allowedFileTypes    = $this->getAllowedFileTypes();
+        $allowedFileTypesSql = '';
+        if (!empty($allowedFileTypes)) {
+            $fileTypeBindings = Builder::getBindings($allowedFileTypes, 'fileType');
+            $allowedFileTypesSql = " TimetableDefinition.FileType IN ({$fileTypeBindings->getPlaceholder()}) AND ";
+            $params = array_merge($params, $fileTypeBindings->getParams());
+        }
 
         $query = "SELECT TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq, TimetableDefinition.TimeFrom,
                     TimetableDefinition.TimeTo, TimetableDefinition.Description, TimetableDefinition.DayNumber
@@ -167,23 +182,29 @@ class External_Synergetic_Timetable implements External_TimetableInterface
                     WHERE TimetableDefinition.FileYear = :fileYear AND
                         TimetableDefinition.FileSemester = :fileSemester AND
                         TimetableDefinition.TimetableGroup = :timetableGroup AND
-                        (TimetableDefinition.DayNumber = :day)
-                    ORDER BY TimetableDefinition.PeriodNumber, TimetableDefinition.PeriodNumberSeq
+                        {$allowedFileTypesSql}
+                        TimetableDefinition.DayNumber IN (:day, '0')
+                    ORDER BY TimetableDefinition.FileType,
+                             TimetableDefinition.DayNumber DESC,
+                             TimetableDefinition.PeriodNumber,
+                             TimetableDefinition.PeriodNumberSeq
                     ";
         unset($statement);
-        $statement = $this->getDatabase()->query(
-            $query,
-            [
-                'fileSemester'   => $this->getFileSemester($externalUserId, $dateObject),
-                'fileYear'       => $this->getFileYear($externalUserId, $dateObject),
-                'timetableGroup' => $campus->getExtTimetableCode(),
-                'day'            => $day,
-            ]
-        );
+        $statement = $this->getDatabase()->query($query, $params);
 
         $periodCount = 0;
 
+        // If there are more than one FileTypes, dayNumber can be different (either the actual day number or default 0)
+        // This map stores the dayNumber for each FileType
+        $fileTypeDayNumberMap = [];
+
         while ($period = $statement->fetch()) {
+            if (!key_exists($period['FileType'], $fileTypeDayNumberMap)) {
+                // We assume the day number for this FileType to be this periods day number
+                $fileTypeDayNumberMap[$period['FileType']] = $period['DayNumber'];
+            } elseif ($period['DayNumber'] !== $fileTypeDayNumberMap[$period['FileType']]) {
+                continue;
+            }
             $timetableDef['desc'][]     = $period['Description'];
             $timetableDef['start'][]    = date("g:ia", strtotime($period['TimeFrom']));
             $timetableDef['end'][]      = date("g:ia", strtotime($period['TimeTo']));
