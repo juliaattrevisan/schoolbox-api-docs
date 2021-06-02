@@ -264,6 +264,20 @@ export default {
                 this.currentClassCode = null;
             }
         },
+
+        /**
+         * Is this student to be displayed, going by the current selected class
+         * code?
+         *
+         * @param {Object} student
+         * @return {Boolean}
+         */
+        isStudentInCurrentClassCode(student) {
+            if (this.currentClassCode === null) {
+                return true;
+            }
+            return student.classCodes.includes(this.currentClassCode);
+        }
     },
     computed: {
         replyTo: function () {
@@ -274,21 +288,31 @@ export default {
         },
         allSelected: {
             get: function () {
-                return this.studentLists.every(function (student) {
+                return this.studentsForCurrentClassCode.every(function (student) {
                     return student.isChecked;
                 });
             },
             set: function (value) {
-                this.studentLists = this.studentLists.map(function (student) {
-                    student.isChecked = value;
+                // studentsForCurrentClassCode is a computed property without a
+                // setter, so it can't be set directly.
+                // Set studentLists instead.
+                let self          = this;
+                this.studentLists = self.studentLists.map(function (student) {
+                    if (self.isStudentInCurrentClassCode(student)) {
+                        student.isChecked = value;
+                    }
                     return student;
                 });
             }
         },
+        studentsForCurrentClassCode() {
+            // Which students are in the current class code?
+            return this.studentLists.filter(this.isStudentInCurrentClassCode);
+        },
         selectedStudentIds: function () {
             let ids = [],
                 self = this;
-            self.studentLists.forEach(function (student) {
+            self.studentsForCurrentClassCode.forEach(function (student) {
                 if (student.isChecked && student.id) {
                     ids.push(student.id);
                 }
@@ -298,7 +322,7 @@ export default {
         selectedStudentLearningMomentsEnabledIds: function () {
             let ids = [],
                 self = this;
-            self.studentLists.forEach(function (student) {
+            self.studentsForCurrentClassCode.forEach(function (student) {
                 if (student.isChecked && student.learningMomentsEnabled) {
                     ids.push(student.id);
                 }
@@ -308,7 +332,7 @@ export default {
         selectedStudentExternalIds: function () {
             let externalIds = [],
                 self = this;
-            self.studentLists.forEach(function (student) {
+            self.studentsForCurrentClassCode.forEach(function (student) {
                 if (student.isChecked && student.synergy_id) {
                     externalIds.push(student.synergy_id);
                 }
@@ -360,18 +384,18 @@ export default {
                 <ul class="flex-list flex-wrap buttons">
                     <li v-if="learningMomentsEnabled">
                         <a @click.prevent="openShareLearningMomentDialog"
-                           :class="{disabled: selectedStudentLearningMomentsEnabledIds.length === 0, 'icon-share': true}">Share
-                            Learning Moment</a>
+                           :class="{disabled: selectedStudentLearningMomentsEnabledIds.length === 0, 'icon-share': true}"
+                        >Share Learning Moment</a>
                     </li>
                     <li v-if="badgesEnabled">
                         <a :href="buildSetGoalUrl()"
-                           :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}">Set
-                            Goals</a>
+                           :class="{disabled: selectedStudentIds.length === 0, 'icon-goal': true}"
+                        >Set Goals</a>
                     </li>
                     <li v-if="badgesEnabled">
                         <a :href="buildAwardAchievementUrl()"
-                           :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}">Award
-                            Achievements</a>
+                           :class="{disabled: selectedStudentIds.length === 0, 'icon-achievement': true}"
+                        >Award Achievements</a>
                     </li>
                     <li v-if="pastoralEnabled">
                         <a @click.prevent="addPastoralRecord"
@@ -379,8 +403,8 @@ export default {
                         >Add {{ localePastoralCare }} Record</a></li>
                     <li v-if="mailEnabled && currentUserCanEmail">
                         <a @click.prevent="openMailDialog"
-                           :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}">Compose
-                            Email</a>
+                           :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}"
+                        >Compose Email</a>
                     </li>
                 </ul>
             </section>
@@ -396,7 +420,7 @@ export default {
             </template>
 
             <template v-if="!showSkeletonLoader">
-                <table id="contact-table" v-if="studentLists.length">
+                <table id="contact-table" v-if="studentsForCurrentClassCode.length">
                     <thead>
                     <tr>
                         <th v-if="showCheckboxes">
@@ -414,7 +438,7 @@ export default {
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="(student, index) in studentLists">
+                    <tr v-for="(student, index) in studentsForCurrentClassCode">
                         <td v-if="showCheckboxes">
                             <input type="checkbox" name="students[]" :id="'id-' + index" v-model="student.isChecked"/>
                             <label :for="'id-' + index" class="checkbox-label"></label>
@@ -478,10 +502,6 @@ export default {
                     </tr>
                     </tbody>
                 </table>
-
-                <div class="empty-state" v-else>
-                    No students to show here
-                </div>
             </template>
         </div>
 
@@ -514,7 +534,7 @@ export default {
             </form>
         </div>
 
-        <div class="small-12 island" v-if="!showSkeletonLoader && !studentLists.length">
+        <div class="small-12 island" v-if="!showSkeletonLoader && !studentsForCurrentClassCode.length">
             <div class="empty-state">
                 <i class="icon-class-list"></i>
                 <p>Sorry, the system is unable to find any student in this class.</p>
