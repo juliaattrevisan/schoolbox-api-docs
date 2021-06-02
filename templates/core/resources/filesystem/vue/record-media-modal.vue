@@ -207,6 +207,9 @@ export default {
          */
         onUploadSelected () {
             this.isFilenameModalActive = true;
+            this.$nextTick(() => {
+                this.$refs.filenameInput.focus(); //so can start typing straight away
+            });
         },
 
         /**
@@ -376,7 +379,7 @@ export default {
                 <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
                     <h3><em>Please add a filename prior to continuing.</em></h3>
                     <label for="filename" class="required" aria-required="true">Filename</label>
-                    <input type="text" id="filename" name="filename" v-model="newFilename">
+                    <input type="text" id="filename" name="filename" v-model="newFilename" ref="filenameInput">
                     <div class="modal-actions">
                         <button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
                         <button @click.prevent="onCloseFilenameModalSelected">Cancel</button>
