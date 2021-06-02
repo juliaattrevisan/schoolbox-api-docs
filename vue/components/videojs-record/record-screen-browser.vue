@@ -31,11 +31,6 @@ export default {
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
-        },
-        isKeepAlive: { //whether the component has to exist between DOM display/redisplay https://vuejs.org/v2/api/#keep-alive - determines whether initiates on mounted() or activated(), keep-alive is used within record-media-modal.vue
-            type: Boolean,
-            required: false, 
-            default: false
         }
     },
 
@@ -60,18 +55,12 @@ export default {
 	},
 
     mounted () {
-        if (!this.isKeepAlive && !this.hasPreRecordedData) { //only if no pre recording available
+        if (!this.hasPreRecordedData) { //only if no pre recording available
             this.initVideojsRecord();
         }
     },
 
-    activated () {
-        if (this.isKeepAlive && !this.hasPreRecordedData) { //only if no pre recording available
-            this.initVideojsRecord();
-        }
-    },
-
-    unmounted () {
+    beforeDestroy () {
         this.destroyVideojs();
     },
 
@@ -137,7 +126,6 @@ export default {
          */
         onStartRecord () {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'rgba(255, 0, 0, 0.25)');
-            this.$emit(recordMediaEvents.PROCCESS_STARTED);
         },
 
         /**
@@ -166,7 +154,6 @@ export default {
          */
         async recordedVideoReady (mediaData) {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
-            this.$emit(recordMediaEvents.PROCCESS_STOPPED); //notify any UI to re-enable
             this.recordedData = mediaData; // the blob object contains the recorded data 
 			this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
@@ -203,7 +190,7 @@ export default {
          */
         destroyVideojs () {
             if (this.player) {
-                this.player.dispose();
+                this.player.record().destroy();
             }
         },
 

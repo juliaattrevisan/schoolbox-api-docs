@@ -1,121 +1,269 @@
 <script>
 
 /*
- * The top menu, to toggle between recording types
+ * The initial menu, given maximum presence
  *
  */
 
 import { gsap } from 'gsap/all';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 
+
 export default {
 
-	props: {
-		currentRecordMediaType: { //to be able to respond to the initial change from UNSET
-	 		type: String,
-	  		required: true,
-	  		default: ''
-		},
-		isProcessActive: { //to be able to disable buttons when something heavy is going on
-	 		type: Boolean,
-	  		required: true,
-	  		default: false
-		},
-	},
+    created () {
+        this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+    },
 
-	watch: {
+    mounted () {
+        this.updateContainerHeight();
+        this.animateOn();
+    },
 
-		currentRecordMediaType (value) {
-			if (value !== recordMediaTypes.UNSET)  { //show the top menu now
-				this.animateOn();
-			}
-		}
+    methods: {
 
-	},
+        /*
+         * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
+         *
+         */
+        updateContainerHeight () {
+            const targetHeight = this.$refs.pseudoVideo.getBoundingClientRect().width * 0.5625; //so there's no height jumps on moving to selected record method
+            this.$refs.pseudoVideo.style.height = targetHeight + 'px';
+        },
 
-	created () {
-		this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
-	},
+        /** 
+         * to show selection options
+         *
+         */
+        animateOn () {
+            const allMenuItems = Array.from(this.$refs.pseudoVideo.children);
+            allMenuItems.forEach((element, index) => {
+                gsap.from(element, 0.6, {
+                    scale: 0.6,
+                    alpha: 0.0,
+                    ease: 'power2.out',
+                    delay: index * 0.1
+                } );
+                let titleContainer = element.querySelector('div');
+                gsap.from(titleContainer, 0.4, {
+                    marginTop: 50,
+                    alpha: 0,
+                    ease: 'power2.out',
+                    delay: (index * 0.1) + 0.2,
+                    onComplete: () => {
+                        if (index === 2) { //enable once everything's all animated
+                            this.initMouseEvents();
+                        }
+                    }
+                } );
+            });
+        },
 
-	mounted () {
-		this.setInitialPosition();
-	},
+        /** 
+         * to animate mouse enter / out properly
+         *
+         */
+        initMouseEvents () {
+            const allMenuItems = Array.from(this.$refs.pseudoVideo.children);
+            allMenuItems.forEach((element) => {
+                element.addEventListener('mouseenter', () => {
+                    gsap.to(element, 0.1, {
+                        backgroundColor: 'white',
+                        ease: 'power2.out',
+                        overwrite: true //to prevent quick action mouse enter / outs from breaking animations
+                    } );
+                    gsap.to(element.querySelector('span'), 0.2, {
+                        paddingBottom: 20,
+                        ease: 'power2.out',
+                        overwrite: true
+                    } );
+                    gsap.to(element.querySelector('aside'), 0.3, {
+                        opacity: 1,
+                        ease: 'power2.out',
+                        overwrite: true
+                    } );
+                });
+                element.addEventListener('mouseleave', () => {
+                    gsap.to(element, 0.1, {
+                        backgroundColor: '#FAFAFA',
+                        ease: 'power2.out',
+                        overwrite: true
+                    } );
+                    gsap.to(element.querySelector('span'), 0.2, {
+                        paddingBottom: 0,
+                        ease: 'power2.in',
+                        overwrite: true
+                    } );
+                    gsap.to(element.querySelector('aside'), 0.2, {
+                        opacity: 0,
+                        ease: 'power2.in',
+                        overwrite: true
+                    } );
+                });
+            });
+        },
 
-	methods: {
+        /**
+         * selected, so set and animate out
+         *
+         * @params {String}
+         */
+        recordMediaTypeSelected (selectedRecordMediaType) {
+            this.selectedRecordMediaType = selectedRecordMediaType;
+            this.animateOutMenu();
+        },
 
-		/*
-		 * to animate on the menu when an item within #record-media-unset is selected
-		 *
-		 */
-		setInitialPosition () {
-			const allMenuItems = Array.from(this.$refs.menu.children);
-			const toHideHeight = this.$refs.menu.offsetHeight; //to hide the menu items underneath
-			allMenuItems.forEach((element) => {
-				gsap.set(element, { top: toHideHeight } );
-			});
-		},
+        /** 
+         * fade out revealing psuedo video element in the background
+         *
+         */
+        animateOutMenu () {
+            const allMenuItems = Array.from(this.$refs.pseudoVideo.children);
+            allMenuItems.forEach((element, index) => {
+                element.style.border = 'none';
+                element.disabled = true; //prevent multiple clicks
+                let titleContainer = element.querySelector('div');
+                gsap.to(titleContainer, 0.2, {
+                    alpha: 0,
+                    marginBottom: 50,
+                    ease: 'power2.in',
+                    delay: index * 0.1
+                } );
+                gsap.to(element, 0.3, {
+                    scale: 0.9,
+                    alpha: 0,
+                    ease: 'power2.in',
+                    delay: (index * 0.1) + 0.3,
+                } );
+            });
+            gsap.to(this.$refs.pseudoVideo, 0.3, {
+                backgroundColor: '#000',
+                delay: 0.5,
+                ease: 'power2.in',
+                onComplete: () => this.$emit('on-record-media-type-selected', this.selectedRecordMediaType)
+            } );
+        },
 
-		/*
-		 * to show selection options
-		 *
-		 */
-		animateOn () {
-			const allMenuItems = Array.from(this.$refs.menu.children);
-			allMenuItems.forEach((element, index) => {
-				gsap.to(element, 0.5, {
-					top: 0,
-					ease: 'power2.inOut',
-					delay: index * 0.1
-				} );
-			});
-		},
-
-		/**
-		 * selected, so set and animate out
-		 *
-		 * @params {String}
-		 */
-		recordMediaTypeSelected (selectedRecordMediaType) {
-			this.$emit('on-record-media-type-selected', selectedRecordMediaType);
-		},
-
-	}
+    }
 
 }
+
 </script>
 
 <template>
-	<dl class="tabs menu" ref="menu">
-		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.AUDIO_ONLY ? 'active' : '']">
-			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)" href="#record-audio" title="Record audio" :disabled="isProcessActive">Audio</a>
-		</dd>
-		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.CAMERA ? 'active' : '']">
-			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.CAMERA)" href="#record-a-video" title="Record a video" :disabled="isProcessActive">Video</a>
-		</dd>
-		<dd class="menu-item" :class="[currentRecordMediaType === recordMediaTypes.SCREEN ? 'active' : '']">
-			<a @click.prevent="recordMediaTypeSelected(recordMediaTypes.SCREEN)" href="#record-your-screen" title="Record your screen" :disabled="isProcessActive">Screen</a>
-		</dd>
-	</dl>
+    <div class="pseudo-video" ref="pseudoVideo">
+        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
+            <div>
+                <div class='icon-mic'></div>
+                <span>Audio</span>
+                <aside>Say something with an audio only recording.</aside>
+            </div>
+        </button>
+        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
+            <div>
+                <div class='icon-video'></div>
+                <span>Video</span>
+                <aside>Use a computer camera to create a video recording.</aside>
+            </div>
+        </button>
+        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
+            <div>
+                <div class='icon-screen-capture'></div>
+                <span>Screen</span>
+                <aside>Choose a computer screen to create a screen recording.</aside>
+            </div>
+        </button>
+    </div>
 </template>
 
 <style lang="scss" scoped>
 
-.menu {
-	display: flex;
-	overflow: hidden;
+@import '@css/utils/variables';
+
+$font-family-icon: 'schoolbox';
+
+.pseudo-video {
+    position: absolute;
+    width: 100%;
+    height: 100%; 
+    display: flex;
+    background: white;
+    overflow: hidden;
 }
 
 .menu-item {
-	position: relative;
-    width: calc(33.333333%);
-	text-align: center;
+    width: calc(33.4%);
+    background: #FAFAFA;
+    border: 1px solid #EDEDED;
+    margin-right: 1rem;
+    margin-top: 1rem;
+    padding: 20px;
+    &:last-child {
+        margin-right: 0;
+    }
+    span {
+        display: block;
+    }
+    aside {
+        font-size: .8125rem;
+        font-style:  italic;
+        opacity: 0;
+    }
+}
+
+.icon {
+    font-family: $font-family-icon;
+    &:before {
+    color: $content-ui-foreground;
+    font-size: 3rem;
+        padding: 0;
+    }
+}
+
+.icon-mic {
+    @extend .icon;
+    &:before {
+        content: '\e641';
+    }
+}
+
+.icon-video {
+    @extend .icon;
+    &:before {
+        content: '\e674';
+    }
+}
+
+.icon-screen-capture {
+    @extend .icon;
+    &:before {
+        content: '\e920';
+    }
 }
 
 @media screen and (max-width: 950px) {
-  .tabs dd a {
-    padding: .5rem;
-    font-size: .8125rem;
-  }
+    .menu-item {
+        padding: 0px;
+    }
+    .menu-item span {
+        font-size: .875rem;
+    }
+    .icon:before {
+        font-size: 2rem;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .menu-item {
+        margin-right: 0.25rem;
+        margin-top: 0.25rem;
+        .icon:before {
+            font-size: 1.5rem;
+        }
+        aside {
+            display: none;
+        }
+    }
 }
 
 </style>

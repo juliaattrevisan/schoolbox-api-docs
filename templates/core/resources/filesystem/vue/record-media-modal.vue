@@ -6,7 +6,6 @@
  */
 
 import RecordMediaModalMenu from './record-media-modal-menu';
-import RecordMediaModalUnset from './record-media-modal-unset';
 import RecordAudioOnly from '@schoolbox/record/record-audio-only';
 import RecordCamera from '@schoolbox/record/record-camera';
 import RecordScreen from '@schoolbox/record/record-screen';
@@ -20,8 +19,7 @@ import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
 export default {
 
     components: {
-        RecordMediaModalMenu, //top menu appears after unset menu selection
-        RecordMediaModalUnset, //the initial big menu
+        RecordMediaModalMenu, //the initial big menu
         RecordAudioOnly,
         RecordCamera,
         RecordScreen,
@@ -46,12 +44,13 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
+            hasClosed: false //to allow any active vue to cleanup on beforeDestroy
         }
     },
 
     computed: {
 
-        /*
+        /**
          * To know whether to show the upload button
          *
          * @returns { Boolean }
@@ -64,7 +63,7 @@ export default {
             }
         },
 
-        /*
+        /** 
          * grab the new filename with the relevant extension (can be webm/mp4/mp3)
          *
          * @returns { String }
@@ -78,13 +77,13 @@ export default {
 
     watch: {
 
-        /*
+        /** 
          * ensure no invalid chars are added to the user added filename
          *
          */
         newFilename (newValue) {
             this.newFilename = newValue.replace(/[\\/:"*?<>|]+/g, "");
-        }
+        },
 
     },
 
@@ -92,6 +91,7 @@ export default {
         this.hasDeviceCapture = hasDeviceCapture();
         this.initRatios();
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+        this.initOnModalClosedListener();
     },
 
     mounted () {
@@ -108,6 +108,16 @@ export default {
         initRatios () {
             this.defaultRatio = 0.5625;
             this.currentRatio = this.defaultRatio;
+        },
+
+        /**
+         * to close up shop for possible re-display
+         *
+         */
+        initOnModalClosedListener () {
+            document.addEventListener('record-media-modal__onModalClosed', () => {
+                this.hasClosed = true;
+            });
         },
 
         /**
@@ -171,28 +181,12 @@ export default {
         },
 
         /**
-         * to be able to disable certain behavour when conversions/uploads are taking place
-         *
-         */
-        onProcessStarted () {
-            this.isProcessActive = true;
-        },
-
-        /**
-         * to be able to re-enable certain behavour when conversions/uploads are taking place
-         *
-         */
-        onProcessStopped () {
-            this.isProcessActive = false;
-        },
-
-        /**
          * to upload the recorded data
          *
          */
         onRecordedMediaReady (recordedData) {
             this.recordedData = recordedData;
-            this.canUpload = true; //show the upload button
+            this.canUpload = true; //to show the upload button
         },
 
         /**
@@ -207,15 +201,18 @@ export default {
             }
         },
 
-        /*
+        /**
          * present the save file name modal to name the file
          *
          */
         onUploadSelected () {
             this.isFilenameModalActive = true;
+            this.$nextTick(() => {
+                this.$refs.filenameInput.focus(); //so can start typing straight away
+            });
         },
 
-        /*
+        /**
          * close the filename modal
          *
          */
@@ -223,7 +220,7 @@ export default {
             this.isOverMediaModalClosing = true;
         },
 
-        /*
+        /**
          * close the filename modal, cancel has been selected rather than save
          *
          */
@@ -232,7 +229,7 @@ export default {
             this.isFilenameModalActive = false;
         },
 
-        /*
+        /**
          * the user has set a file name and selected save
          *
          */
@@ -259,7 +256,7 @@ export default {
             }
         },
 
-        /*
+        /** 
          * the video is ready, so upload it up to SchoolBox
          *
          */
@@ -280,7 +277,7 @@ export default {
             }
         },
 
-        /*
+        /** 
          * What to send in the upload
          *
          * @returns { FormData }
@@ -291,7 +288,7 @@ export default {
             return formData;
         },
 
-        /*
+        /**
          * To visualise the upload progress
          *
          * @params {ProgressEvent}
@@ -303,7 +300,7 @@ export default {
             }
         },
 
-        /*
+        /**
          * inform any listeners that a file was uploaded.
          * put it in the dropzone, and inform the dropzone opener
          * that a file was posted to it.
@@ -319,7 +316,7 @@ export default {
             };
             this.hasUploaded = true;
             this.canUpload = false;
-            setTimeout(() => { //put a slight delay so user sees the upload succesfull modal
+            setTimeout(() => { //put a slight delay so user sees the upload successfull modal
                 window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
                 this.isProcessActive = false;
                 this.hasUploaded = false;
@@ -344,62 +341,45 @@ export default {
 <template>
 
     <div>
-        
-        <record-media-modal-menu
-            @on-record-media-type-selected="onRecordMediaTypeSelected"
-            :current-record-media-type="currentRecordMediaType"
-            :is-process-active="isProcessActive"
-        />
 
         <div class="ab-pane">
             
-            <div class="record-media-container" ref="container" :style="{ height: targetHeight }">
+            <div v-if="!hasClosed" class="record-media-container" ref="container" :style="{ height: targetHeight }">
             
-                <record-media-modal-unset
+                <record-media-modal-menu
                     v-if="currentRecordMediaType === recordMediaTypes.UNSET"
                     @on-record-media-type-selected="onRecordMediaTypeSelected"
                 />
 
-                <keep-alive><!-- to maintain recordings etc https://vuejs.org/v2/api/#keep-alive -->
-                    <record-audio-only
-                        v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
-                        :record-media-type="recordMediaTypes.AUDIO_ONLY"
-                        :is-keep-alive="true"
-                        @on-device-ready="onDeviceReady"
-                        @on-process-started="onProcessStarted"
-                        @on-process-stopped="onProcessStopped"
-                        @on-recorded-media-ready="onRecordedMediaReady"
-                        @on-recorded-media-deleted="onRecordedMediaDeleted"
-                        @on-ratio-ready="onRatioReady"
-                    />
-                    <record-camera
-                        v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
-                        :record-media-type="recordMediaTypes.CAMERA"
-                        :is-keep-alive="true"
-                        @on-device-ready="onDeviceReady"
-                        @on-process-started="onProcessStarted"
-                        @on-process-stopped="onProcessStopped"
-                        @on-recorded-media-ready="onRecordedMediaReady"
-                        @on-recorded-media-deleted="onRecordedMediaDeleted"
-                        @on-ratio-ready="onRatioReady"
-                    />
-                    <record-screen
-                        v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
-                        :record-media-type="recordMediaTypes.SCREEN"
-                        :is-keep-alive="true"
-                        @on-device-ready="onDeviceReady"
-                        @on-process-started="onProcessStarted"
-                        @on-process-stopped="onProcessStopped"
-                        @on-recorded-media-ready="onRecordedMediaReady"
-                        @on-recorded-media-deleted="onRecordedMediaDeleted"
-                        @on-ratio-ready="onRatioReady"
-                    />
-                </keep-alive>
+                <record-audio-only
+                    v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
+                    :record-media-type="recordMediaTypes.AUDIO_ONLY"
+                    @on-device-ready="onDeviceReady"
+                    @on-recorded-media-ready="onRecordedMediaReady"
+                    @on-recorded-media-deleted="onRecordedMediaDeleted"
+                    @on-ratio-ready="onRatioReady"
+                />
+                <record-camera
+                    v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
+                    :record-media-type="recordMediaTypes.CAMERA"
+                    @on-device-ready="onDeviceReady"
+                    @on-recorded-media-ready="onRecordedMediaReady"
+                    @on-recorded-media-deleted="onRecordedMediaDeleted"
+                    @on-ratio-ready="onRatioReady"
+                />
+                <record-screen
+                    v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
+                    :record-media-type="recordMediaTypes.SCREEN"
+                    @on-device-ready="onDeviceReady"
+                    @on-recorded-media-ready="onRecordedMediaReady"
+                    @on-recorded-media-deleted="onRecordedMediaDeleted"
+                    @on-ratio-ready="onRatioReady"
+                />
 
                 <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
                     <h3><em>Please add a filename prior to continuing.</em></h3>
                     <label for="filename" class="required" aria-required="true">Filename</label>
-                    <input type="text" id="filename" name="filename" v-model="newFilename">
+                    <input type="text" id="filename" name="filename" v-model="newFilename" ref="filenameInput">
                     <div class="modal-actions">
                         <button @click.prevent="onSaveFilenameSelected" :disabled="newFilename.trim() === ''">Upload</button>
                         <button @click.prevent="onCloseFilenameModalSelected">Cancel</button>

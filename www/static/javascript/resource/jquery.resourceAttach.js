@@ -549,6 +549,9 @@
             if (event.namespace !== 'fndtn.reveal' || $('[data-reveal].open').length > 0) {
                 return;
             }
+            if (event.type === 'closed') { //close down the recorders and reset for possible re-display
+                document.dispatchEvent(new CustomEvent('record-media-modal__onModalClosed'));
+            }
         }
         var parentReveal = $(this.element).closest('[data-reveal]');
         if (parentReveal.length) {

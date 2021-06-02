@@ -18,19 +18,14 @@ export default {
     },
 
     props: {
-       preRecordedData: { //to display an already existing recording on startup
+        preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
-        },
-        isKeepAlive: { //whether the component has to exist between DOM display/redisplay https://vuejs.org/v2/api/#keep-alive - determines whether initiates on mounted() or activated(), keep-alive is used within record-media-modal.vue
-            type: Boolean,
-            required: false, 
-            default: false
         }
     },
 
     created () { //these vars are created so they can be accessed within the template
-        this.hasDeviceCapture = hasDeviceCapture();
+        this.hasDeviceCapture = hasDeviceCapture(); //to determine which capture mode to use, browser or device
     },
 
 }
