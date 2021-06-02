@@ -5,91 +5,216 @@ import axios from 'axios'
 export default {
     name: 'class-list',
     props: {
+        /**
+         * The title of the subject for which the class list is shown, including
+         * all of its class codes.
+         */
         subjectTitle: {
             type: String,
             required: true,
         },
+
+        /**
+         * A list of class codes for this subject.
+         */
         classCodeList: {
             type: Array,
             required: true,
             default: [],
+            validator: (classCodes) => classCodes.every((classCode) => typeof classCode === 'string')
         },
+
+        /**
+         * Is the learning moments module enabled?
+         *
+         * This controls whether the "share learning moment" button shows.
+         */
         learningMomentsEnabled: {
             type: Boolean,
             default: true,
         },
+
+        /**
+         * Is the badge module enabled?
+         *
+         * This controls whether the "set goals" and "award achievements"
+         * buttons show.
+         */
         badgesEnabled: {
             type: Boolean,
             default: true,
         },
+
+        /**
+         * Is the pastoral care module enabled?
+         *
+         * This controls whether the "add pastoral care record"  button shows.
+         */
         pastoralEnabled: {
             type: Boolean,
             default: true,
         },
+
+        /**
+         * Is email from Schoolbox enabled?
+         *
+         * This controls whether the "compose email"  button shows.
+         */
         mailEnabled: {
             type: Boolean,
             default: true,
         },
+
+        /**
+         * Is the current user able to email?
+         *
+         * This controls whether the "compose email"  button shows.
+         *
+         * @todo remove, and merge with mailEnabled
+         */
         currentUserCanEmail: {
             type: Boolean,
             default: true,
         },
-        localePastoralCare: {
+
+        /**
+         * Localised label for the "add pastoral care record" button.
+         */
+        pastoralCareLabel: {
             type: String,
             default: 'Pastoral Care',
         },
+
+        /**
+         * Localised label for the "house" column of the student table.
+         */
         houseLabel: {
             type: String,
             default: 'House',
         },
+
+        /**
+         * Should the "House" column be shown in the student table?
+         */
         showHouseColumn: {
             type: Boolean,
             default: true,
         },
+
+        /**
+         * Should the "Tutor Group" column be shown in the student table?
+         *
+         * @todo consider replacing with a slot as this is used by St Patrick's
+         *       custom work only
+         */
         showTutorGroupColumn: {
             type: Boolean,
             default: false,
         },
+
+        /**
+         * Should the "Core Group" column be shown in the student table?
+         *
+         * @todo consider replacing with a slot as this is used by St Patrick's
+         *       custom work only
+         */
         showCoreGroupColumn: {
             type: Boolean,
             default: false,
         },
+
+        /**
+         * The address to set as the "Reply To" address for emails sent from
+         * this component.
+         */
         replyToEmail: {
             type: String,
             default: ''
         },
-        specialNeeds: {
+
+        /**
+         * Localised label for the title of the "special needs" icon which may
+         * show for students.
+         */
+        specialNeedsLabel: {
             type: String,
             default: ''
         },
+
+        /**
+         * Should medical alerts show for students?
+         */
         showMedicalAlerts: {
             type: Boolean,
             default: false,
         },
+
+        /**
+         * The different email audiences which may be emailed to from this
+         * component.
+         */
         emailGroups: {
             type: Array,
             required: true,
+            validator: (groups) => groups.every((group) => {
+                if (typeof group === 'object') {
+                    return 'label' in group && 'isChecked' in group && 'value' in group;
+                }
+                return false;
+            })
         },
+
+        /**
+         * The query string parameter which contains the encoded return URL.
+         *
+         * Along with `encodedReturnUrl` this is used when generating a link to
+         * learning moments and badges, so that the user may be redirected
+         * somewhere after those forms are submitted.
+         */
         returnUrlName: {
             type: String,
             required: true,
         },
-        getStudentListsEndpoint: {
-            type: String,
-            required: true,
-        },
+
+        /**
+         * The encoded return URL.
+         *
+         * Along with `returnUrlName` this is used when generating a link to
+         * learning moments and badges, so that the user may be redirected
+         * somewhere after those forms are submitted.
+         */
         encodedReturnUrl: {
             type: String,
             required: true,
         },
+
+        /**
+         * The API endpoint which returns a list of students for this class.
+         */
+        getStudentListsEndpoint: {
+            type: String,
+            required: true,
+        },
+
+        /**
+         * The API endpoint which displays a form for awarding achievements.
+         */
         getAwardAsAchievementFormEndpoint: {
             type: String,
             required: true,
         },
+
+        /**
+         * The API endpoint which displays a form for awarding goals.
+         */
         getSetAsGoalFormEndpoint: {
             type: String,
             required: true,
         },
+
+        /**
+         * The API endpoint which displays a form for creating learning moments.
+         */
         getCreateEvidenceFormEndpoint: {
             type: String,
             required: true,
@@ -400,7 +525,7 @@ export default {
                     <li v-if="pastoralEnabled">
                         <a @click.prevent="addPastoralRecord"
                            :class="{disabled: selectedStudentIds.length === 0, 'icon-user': true}"
-                        >Add {{ localePastoralCare }} Record</a></li>
+                        >Add {{ pastoralCareLabel }} Record</a></li>
                     <li v-if="mailEnabled && currentUserCanEmail">
                         <a @click.prevent="openMailDialog"
                            :class="{disabled: selectedStudentExternalIds.length === 0, 'icon-email': true}"
@@ -467,7 +592,7 @@ export default {
                                     </span>
                                     <span v-if="showMedicalAlerts && Number(student.StudentSpecialNeedsFlag) === 1"
                                           class="icon-bell warning"
-                                          :title="specialNeeds">
+                                          :title="specialNeedsLabel">
                                     </span>
                                     <span v-if="showMedicalAlerts && String(student.StudentMedicalAlert) !== ''"
                                           class="icon-alert alert"
