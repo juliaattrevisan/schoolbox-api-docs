@@ -80,60 +80,73 @@ export default {
         <form class="top" :action="eventExportUrl" ref="exportForm">
             <section>
                 <fieldset class="content radiolist">
-
-                    <input type="radio" v-model="form.export" name="export" value="all" id="export-all" />
-                    <label for="export-all">All events</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="personal" id="export-personal" />
-                    <label for="export-personal">Personal events only</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="timetable" id="export-timetable" />
-                    <label for="export-timetable">Timetable classes</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="timetabledays" id="export-timetableday" />
-                    <label for="export-timetableday">Timetable days</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="duework" id="export-duework" />
-                    <label for="export-duework">{{ translations.dueWork.proper }}</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="resources" id="export-resources" />
-                    <label for="export-resources">Resource Booking</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="external" id="export-external" />
-                    <label for="export-external">External events</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="eotc_all" id="export-eotc-all" />
-                    <label for="export-eotc-all">{{ translations.eotc.proper }}</label>
-
-                    <input type="radio" v-model="form.export" name="export" value="campus" id="export-campus" />
-                    <label for="export-campus">Events for campus:
-                        <select name="campus" v-model="form.campus">
-                            <option value="">-- select --</option>
-                            <option v-for="campus in campuses" :value="campus.id" :key="campus.id">
-                                {{ campus.name }}
-                            </option>
-                        </select>
-                    </label>
-
-                    <input type="radio" v-model="form.export" name="export" value="group" id="export-group" />
-                    <label for="export-group">Events for group:
-                        <select name="group" v-model="form.group">
-                            <option value="">-- select --</option>
-                            <option v-for="group in groups" :value="group.id" :key="group.id">
-                                {{ group.name }} <template v-if="group.code">({{ group.code }})</template>
-                            </option>
-                        </select>
-                    </label>
-
-                    <input type="radio" v-model="form.export" name="export" value="event_type" id="export-type" />
-                    <label for="export-type">Events by type:
-                        <select name="event_type" v-model="form.event_type">
-                            <option value="">-- select --</option>
-                            <option v-for="eventType in eventTypes" :value="eventType.id" :key="eventType.id">
-                                {{ eventType.name }}
-                            </option>
-                        </select>
-                    </label>
+                    <ul class="option-list">     
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="all" id="export-all" />
+                            <label for="export-all">All events</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="personal" id="export-personal" />
+                            <label for="export-personal">Personal events only</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="timetable" id="export-timetable" />
+                            <label for="export-timetable">Timetable classes</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="timetabledays" id="export-timetableday" />
+                            <label for="export-timetableday">Timetable days</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="duework" id="export-duework" />
+                            <label for="export-duework">{{ translations.dueWork.proper }}</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="resources" id="export-resources" />
+                            <label for="export-resources">Resource Booking</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="external" id="export-external" />
+                            <label for="export-external">External events</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="eotc_all" id="export-eotc-all" />
+                            <label for="export-eotc-all">{{ translations.eotc.proper }}</label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="campus" id="export-campus" />
+                            <label for="export-campus">Events for campus:
+                                <select name="campus" v-model="form.campus">
+                                    <option value="">-- select --</option>
+                                    <option v-for="campus in campuses" :value="campus.id" :key="campus.id">
+                                        {{ campus.name }}
+                                    </option>
+                                </select>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="group" id="export-group" />
+                            <label for="export-group">Events for group:
+                                <select name="group" v-model="form.group">
+                                    <option value="">-- select --</option>
+                                    <option v-for="group in groups" :value="group.id" :key="group.id">
+                                        {{ group.name }} <template v-if="group.code">({{ group.code }})</template>
+                                    </option>
+                                </select>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="radio" v-model="form.export" name="export" value="event_type" id="export-type" />
+                            <label for="export-type">Events by type:
+                                <select name="event_type" v-model="form.event_type">
+                                    <option value="">-- select --</option>
+                                    <option v-for="eventType in eventTypes" :value="eventType.id" :key="eventType.id">
+                                        {{ eventType.name }}
+                                    </option>
+                                </select>
+                            </label>
+                        </li>
+                    </ul>
                 </fieldset>
             </section>
 

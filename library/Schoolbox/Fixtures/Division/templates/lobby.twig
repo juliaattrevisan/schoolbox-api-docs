@@ -130,9 +130,11 @@
         <input type="hidden" name="user_id" id="playerPositionUserId">
         <fieldset class="checklist" data-equalizer-watch="">
             <legend id="playerPositionName"></legend>
+            <ul class="option-list">
             {% for position in positions %}
-                <input data-position id="position-{{ position.id }}" name="positions[]" value="{{ position.id }}" type="checkbox"><label for="position-{{ position.id }}">{{ position.name }}</label>
+                <li><input data-position id="position-{{ position.id }}" name="positions[]" value="{{ position.id }}" type="checkbox"><label for="position-{{ position.id }}">{{ position.name }}</label></li>
             {% endfor %}
+            </ul>
         </fieldset>
         <input type="submit" value="Save Changes" />
     </form>

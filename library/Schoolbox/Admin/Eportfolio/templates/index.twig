@@ -163,10 +163,14 @@
                                 <span class="hint has-tip tip-top" data-tooltip title="Select the roles you want to copy the selected ePortfolio pages to. All users in the selected roles will receive a copy of the ePortfolio pages selected.">?</span>
                             </label>
                             <fieldset class="checklist">
+                                <ul class="option-list">
                                 {% for role in roles %}
-                                    <input data-role id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
-                                    <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
+                                    <li>
+                                        <input data-role id="checkbox-role-{{ role.id }}" name="role[]" type="checkbox" value="{{ role.id }}">
+                                        <label for="checkbox-role-{{ role.id }}">{{ role.name }}</label>
+                                    </li>
                                 {% endfor %}
+                                </ul>
                             </fieldset>
                         </div>
                         <div class="small-12 medium-6 columns">
@@ -175,10 +179,14 @@
                                 <span class="hint has-tip tip-top" data-tooltip title="Select the campuses you want to copy the selected ePortfolio pages to. All users in the selected campuses will receive a copy of the ePortfolio pages selected.">?</span>
                             </label>
                             <fieldset class="checklist">
+                                <ul class="option-list">
                                 {% for campus in campuses %}
-                                    <input data-campus id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
-                                    <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
+                                    <li>
+                                        <input data-campus id="checkbox-campus-{{ campus.id }}" name="campus[]" type="checkbox" value="{{ campus.id }}">
+                                        <label for="checkbox-campus-{{ campus.id }}">{{ campus.name }}</label>
+                                    </li>
                                 {% endfor %}
+                                </ul>
                             </fieldset>
                         </div>
                     </fieldset>

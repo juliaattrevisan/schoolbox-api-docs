@@ -11,15 +11,18 @@
 {% set idSuffix = idSuffix ?? '' %}
 
 {% if not userSelection %}
-    <input
+    <li>
+        <input
             type="hidden"
             name="filter_selection[{{ roleSelection.filter.id }}][{{ roleSelection.key }}]"
             data-key="{{ roleSelection.key }}"
             data-value-original="{% if roleSelection.selected %}1{% else %}0{% endif %}"
             value="{% if roleSelection.selected %}1{% else %}0{% endif %}">
+    </li>
 {% else %}
-    <input type="hidden" name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]" value="{% if userSelection.selected and disabled %}1{% else %}0{% endif %}">
-    <input
+    <li>
+        <input type="hidden" name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]" value="{% if userSelection.selected and disabled %}1{% else %}0{% endif %}">
+        <input
             id="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}"
             type="checkbox"
             name="filter_selection[{{ userSelection.filter.id }}][{{ userSelection.key }}]"
@@ -31,6 +34,7 @@
             {% if userSelection.selected %}checked{% endif %}
             {% if disabled %}disabled data-disabled{% endif %}
             {% block extraAttrs %}{% endblock %}
-    >
-    <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}" class="noselect">{{ label | nl2br }}</label>
+        >
+        <label for="filter_selection_{{ userSelection.filter.id }}_{{ userSelection.key }}{{ idSuffix }}" class="noselect">{{ label | nl2br }}</label>
+    </li>
 {% endif %}

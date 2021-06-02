@@ -655,15 +655,20 @@
 
                         <fieldset class="radiolist">
                             <p>Select the type of data you wish to import.</p>
-
-                            <input id="importFeedbackMarkOnly" type="radio" name="importFeedbackType" value="mark-only" />
-                            <label for="importFeedbackMarkOnly">Student ID and Mark</label>
-
-                            <input id="importFeedbackCommentOnly" type="radio" name="importFeedbackType" value="comment-only" />
-                            <label for="importFeedbackCommentOnly">Student ID and Comments</label>
-
-                            <input id="importFeedbackMarkAndComment" type="radio" name="importFeedbackType" value="mark-and-comment" />
-                            <label for="importFeedbackMarkAndComment">Student ID, Mark and Comments</label>
+                            <ul class="option-list">
+                                <li>
+                                    <input id="importFeedbackMarkOnly" type="radio" name="importFeedbackType" value="mark-only" />
+                                    <label for="importFeedbackMarkOnly">Student ID and Mark</label>
+                                </li>
+                                <li>
+                                    <input id="importFeedbackCommentOnly" type="radio" name="importFeedbackType" value="comment-only" />
+                                    <label for="importFeedbackCommentOnly">Student ID and Comments</label>
+                                </li>
+                                <li>
+                                    <input id="importFeedbackMarkAndComment" type="radio" name="importFeedbackType" value="mark-and-comment" />
+                                    <label for="importFeedbackMarkAndComment">Student ID, Mark and Comments</label>
+                                </li>
+                            </ul>
                         </fieldset>
                         <ul class="flex-list buttons">
                             <li><a href="#" class="submit" data-submit>Import</a></li>

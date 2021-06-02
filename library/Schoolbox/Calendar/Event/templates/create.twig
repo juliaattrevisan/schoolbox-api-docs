@@ -213,11 +213,14 @@
                                 Groups
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the group which will be able to view this event">?</span>
                             </legend>
-
-                            {% for folder in folders.all %}
-                                <input type="checkbox" name="folder[]" value="{{ folder.id }}" id="folder{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
-                                <label for="folder{{ folder.id }}" class="checkbox">{{ folder.name }}</label>
-                            {% endfor %}
+                            <ul class="option-list">
+                                {% for folder in folders.all %}
+                                    <li>
+                                        <input type="checkbox" name="folder[]" value="{{ folder.id }}" id="folder{{ folder.id }}" {{ folder.id in folders.selected ? 'checked="checked"' : '' }} />
+                                        <label for="folder{{ folder.id }}" class="checkbox">{{ folder.name }}</label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </fieldset>
                     </div>
                     <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">
@@ -226,13 +229,18 @@
                                 Roles
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the roles which will be able to view this event">?</span>
                             </legend>
-                            <input type="checkbox" data-select-all id="roleSelectAll"/>
-                            <label for="roleSelectAll">Select all</label>
-
-                            {% for role in roles.all %}
-                                <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'checked="checked"' : '' }} />
-                                <label for="role{{ role.id }}">{{ role.name }}</label>
-                            {% endfor %}
+                            <ul class="option-list">
+                                <li>
+                                    <input type="checkbox" data-select-all id="roleSelectAll"/>
+                                    <label for="roleSelectAll">Select all</label>
+                                </li>
+                                {% for role in roles.all %}
+                                    <li>
+                                        <input type="checkbox" name="roles[]" id="role{{ role.id }}" value="{{ role.id }}" {{ role.id in roles.selected ? 'checked="checked"' : '' }} />
+                                        <label for="role{{ role.id }}">{{ role.name }}</label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </fieldset>
                     </div>
                     <div class="small-12 large-6 column" data-hide-watch="[data-interaction='select-level']" data-hide-watch-value="3">
@@ -241,13 +249,18 @@
                                 Campus
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select the campus' which will be able to view this event">?</span>
                             </legend>
-                            <input type="checkbox" data-select-all id="campusSelectAll" />
-                            <label for="campusSelectAll">Select all</label>
-
-                            {% for campus in campuses.all %}
-                                <input type="checkbox" class="campusCheck" name="campus[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
-                                <label for="campus{{ campus.id }}">{{ campus.name }}</label>
-                            {% endfor %}
+                            <ul class="option-list">
+                                <li>
+                                    <input type="checkbox" data-select-all id="campusSelectAll" />
+                                    <label for="campusSelectAll">Select all</label>
+                                </li>
+                                {% for campus in campuses.all %}
+                                    <li>
+                                        <input type="checkbox" class="campusCheck" name="campus[]" id="campus{{ campus.id }}" value="{{ campus.id }}" {{ campus.id in campuses.selected ? 'checked="checked"' : '' }} />
+                                        <label for="campus{{ campus.id }}">{{ campus.name }}</label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </fieldset>
                     </div>
                 </fieldset>

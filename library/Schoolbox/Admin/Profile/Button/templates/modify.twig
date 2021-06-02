@@ -90,12 +90,18 @@
                             <fieldset>
                                 <label class="required">Campuses</label>
                                 <div class="checklist">
-                                    <input id="campus-availability-all" type="checkbox">
-                                    <label for="campus-availability-all">Select All</label>
-                                    {% for campus in campuses %}
-                                        <input name="campusAvailability[]" data-campus-availability id="campus-availability-{{ campus.id }}" type="checkbox" {% if campusAvailabilitySelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
-                                        <label for="campus-availability-{{ campus.id }}">{{ campus.name }}</label>
-                                    {% endfor %}
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="campus-availability-all" type="checkbox">
+                                            <label for="campus-availability-all">Select All</label>
+                                        </li>
+                                        {% for campus in campuses %}
+                                            <li>
+                                                <input name="campusAvailability[]" data-campus-availability id="campus-availability-{{ campus.id }}" type="checkbox" {% if campusAvailabilitySelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
+                                                <label for="campus-availability-{{ campus.id }}">{{ campus.name }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </fieldset>
                         </div>
@@ -103,12 +109,18 @@
                             <fieldset>
                                 <label class="required">Roles</label>
                                 <div class="checklist">
-                                    <input id="role-availability-all" type="checkbox">
-                                    <label for="role-availability-all">Select All</label>
-                                    {% for role in roles %}
-                                        <input name="roleAvailability[]" data-role-availability id="role-availability-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
-                                        <label for="role-availability-{{ role.id }}">{{ role.name }}</label>
-                                    {% endfor %}
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="role-availability-all" type="checkbox">
+                                            <label for="role-availability-all">Select All</label>
+                                        </li>
+                                        {% for role in roles %}
+                                            <li>
+                                                <input name="roleAvailability[]" data-role-availability id="role-availability-{{ role.id }}" type="checkbox" {% if roleAvailabilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
+                                                <label for="role-availability-{{ role.id }}">{{ role.name }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </fieldset>
                         </div>
@@ -124,12 +136,18 @@
                             <fieldset>
                                 <label class="required">Campuses</label>
                                 <div class="checklist">
-                                    <input id="campus-visibility-all" type="checkbox">
-                                    <label for="campus-visibility-all">Select All</label>
-                                    {% for campus in campuses %}
-                                        <input name="campusVisibility[]" data-campus-visibility id="campus-visibility-{{ campus.id }}" type="checkbox" {% if campusVisibilitySelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
-                                        <label for="campus-visibility-{{ campus.id }}">{{ campus.name }}</label>
-                                    {% endfor %}
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="campus-visibility-all" type="checkbox">
+                                            <label for="campus-visibility-all">Select All</label>
+                                        </li>
+                                        {% for campus in campuses %}
+                                            <li>
+                                                <input name="campusVisibility[]" data-campus-visibility id="campus-visibility-{{ campus.id }}" type="checkbox" {% if campusVisibilitySelected[campus.id] ?? false %}checked{% endif %} value="{{ campus.id }}">
+                                                <label for="campus-visibility-{{ campus.id }}">{{ campus.name }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </fieldset>
                         </div>
@@ -137,12 +155,18 @@
                             <fieldset>
                                 <label class="required">Roles</label>
                                 <div class="checklist">
-                                    <input id="role-visibility-all" type="checkbox">
-                                    <label for="role-visibility-all">Select All</label>
-                                    {% for role in roles %}
-                                        <input name="roleVisibility[]" data-role-visibility id="role-visibility-{{ role.id }}" type="checkbox" {% if roleVisibilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
-                                        <label for="role-visibility-{{ role.id }}">{{ role.name }}</label>
-                                    {% endfor %}
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="role-visibility-all" type="checkbox">
+                                            <label for="role-visibility-all">Select All</label>
+                                        </li>
+                                        {% for role in roles %}
+                                            <li>
+                                                <input name="roleVisibility[]" data-role-visibility id="role-visibility-{{ role.id }}" type="checkbox" {% if roleVisibilitySelected[role.id] ?? false %}checked{% endif %} value="{{ role.id }}">
+                                                <label for="role-visibility-{{ role.id }}">{{ role.name }}</label>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
                                 </div>
                             </fieldset>
                         </div>

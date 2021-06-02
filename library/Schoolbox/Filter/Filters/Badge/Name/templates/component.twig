@@ -10,15 +10,17 @@
 {% block userOptions %}
     {# Empty input is required so that filter works if not user-configurable, or
        nothing is selected #}
-    <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
+    <li>
+        <input type="hidden" name="filter_selection[{{ definition.filter.id }}]" value="" />
 
-    {% if isUserConfigurable %}
-        <input type="text"
-               placeholder="Enter a full or partial badge name"
-               name="filter_selection[{{ definition.filter.id }}][]"
-               value="{{ searchQuery }}"
-               data-value-default="" />
-    {% else %}
-        {{ parent() }}
-    {% endif %}
+        {% if isUserConfigurable %}
+            <input type="text"
+                placeholder="Enter a full or partial badge name"
+                name="filter_selection[{{ definition.filter.id }}][]"
+                value="{{ searchQuery }}"
+                data-value-default="" />
+        {% else %}
+            {{ parent() }}
+        {% endif %}
+    </li>
 {% endblock userOptions %}

@@ -258,50 +258,67 @@
                 <label class="content">Options</label>
                 <div class="row content">
                     <div class="small-12 medium-4 columns">
-
-                        <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %}{% if not config.eportfolio_enabled %} disabled {% endif %}/>
-                        <label for="eportfolio" class="checkbox-label">Enable E-Portfolio</label>
-
-
-                        <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
-                        <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
-
-                        <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
-                        <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
+                        <ul class="option-list">
+                            <li>
+                                <input id="eportfolio" type="checkbox" name="eportfolio" value="1" {% if user.eportfolioEnable %}checked{% endif %}{% if not config.eportfolio_enabled %} disabled {% endif %}/>
+                                <label for="eportfolio" class="checkbox-label">Enable E-Portfolio</label>
+                            </li>
+                            <li>
+                                <input id="hide_contacts" type="checkbox" name="hide_contacts" value="1" {% if user.hideContacts %}checked{% endif %} />
+                                <label for="hide_contacts" class="checkbox-label">Hide Contact Details</label>
+                            </li>
+                            <li>
+                                <input id="hide_timetable" type="checkbox" name="hide_timetable" value="1" {% if user.hideTimetable %}checked{% endif %} />
+                                <label for="hide_timetable" class="checkbox-label">Hide Timetable</label>
+                            </li>
+                        </ul>
                     </div>
                     <div class="small-12 medium-4 columns">
-                        <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
-                        <label for="local_email" class="checkbox-label">Email Address from Username</label>
-
-                        <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.useInternalMail %}checked{% endif %}/>
-                        <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
-
-                        <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
-                        <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+                        <ul class="option-list">
+                            <li>
+                                <input id="local_email" type="checkbox" name="local_email" value="1" {% if user.localEmail %}checked{% endif %} />
+                                <label for="local_email" class="checkbox-label">Email Address from Username</label>
+                            </li>
+                            <li>
+                                <input id="mail_handler" type="checkbox" name="mail_handler" value="1" {% if user.useInternalMail %}checked{% endif %}/>
+                                <label for="mail_handler" class="checkbox-label">Use External Mail Client</label>
+                            </li>
+                            <li>
+                                <input id="webmail" type="checkbox" name="webmail" value="1" {% if user.webMail %}checked{% endif %} />
+                                <label for="webmail" class="checkbox-label">Enable Webmail Tab</label>
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="small-12 medium-4 columns">
-                        <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
-                        <label for="display_grade_graph" class="checkbox-label">Display Comparative Graph on Grades</label>
+                        <ul class="option-list">
+                            <li>
+                                <input id="display_grade_graph" type="checkbox" name="display_grade_graph" value="1" {% if user.displayGradeGraph %}checked{% endif %} />
+                                <label for="display_grade_graph" class="checkbox-label">Display Comparative Graph on Grades</label>
+                            </li>
 
                         {% if isSchoolboxAdmin %}
                             {% if user.isSuperuser %}
                                 <input type="hidden" name="superuser" value="1" />
                             {% endif %}
-                            <input id="superuser"
-                                   type="checkbox"
-                                   name="superuser"
-                                   value="1"
-                                   disabled
-                                   {% if user.isSuperuser %}checked{% endif %}
-                            />
-                            <label for="superuser"
-                                   class="checkbox-label"
-                                   title="This user's superuser status may not be changed"
-                            >Superuser</label>
+                            <li>    
+                                <input id="superuser"
+                                    type="checkbox"
+                                    name="superuser"
+                                    value="1"
+                                    disabled
+                                    {% if user.isSuperuser %}checked{% endif %}
+                                />
+                                <label for="superuser"
+                                    class="checkbox-label"
+                                    title="This user's superuser status may not be changed"
+                                >Superuser</label>
+                            </li>
                         {% else %}
-                            <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
-                            <label for="superuser" class="checkbox-label">Superuser</label>
+                            <li>
+                                <input id="superuser" type="checkbox" name="superuser" data-role="superuser" value="1" {% if user.isSuperuser %}checked{% endif %} />
+                                <label for="superuser" class="checkbox-label">Superuser</label>
+                            </li>
                         {% endif %}
 
                         {% if method=='Update' %}
@@ -310,22 +327,27 @@
                                 {% if user.enabled %}
                                     <input type="hidden" name="account_enabled" value="1" />
                                 {% endif %}
-                                <input id="account_enabled"
-                                       type="checkbox"
-                                       name="account_enabled"
-                                       value="1"
-                                       disabled
-                                       {% if user.enabled %}checked{% endif %} />
-                                <label for="account_enabled"
-                                       class="checkbox-label"
-                                       title="This user's account must always be enabled"
-                                >Account Enabled</label>
+                                <li>
+                                    <input id="account_enabled"
+                                        type="checkbox"
+                                        name="account_enabled"
+                                        value="1"
+                                        disabled
+                                        {% if user.enabled %}checked{% endif %} />
+                                    <label for="account_enabled"
+                                        class="checkbox-label"
+                                        title="This user's account must always be enabled"
+                                    >Account Enabled</label>
+                                </li>
                             {% else %}
-                                <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
-                                       {% if user.enabled %}checked{% endif %} />
-                                <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                                <li>
+                                    <input id="account_enabled" type="checkbox" name="account_enabled" data-role="enabled" value="1"
+                                           {% if user.enabled %}checked{% endif %} />
+                                    <label for="account_enabled" class="checkbox-label">Account Enabled</label>
+                                </li>
                             {% endif %}
                         {% endif %}
+                        </ul>
                     </div>
                 </div>
             </fieldset>

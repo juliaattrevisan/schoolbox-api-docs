@@ -16,15 +16,20 @@
         <strong><span data="season-name"></span></strong>.<br>What would you like to do with them?</p>
 
     <fieldset class="radiolist" data-equalizer-watch>
-        <input type="radio" name="linkedEntities" value="move" id="linkedEntitiesMove" checked><label for="linkedEntitiesMove">Move divisions and matches to
-            <select data="seasons">
-                <option value="0" disabled selected>Select a season</option>
-                {# Dynammically populated via JS to avoid moving to current season #}
-            </select>
-        </label>
-
-        <input type="radio" name="linkedEntities" value="delete" id="linkedEntitiesDelete"><label for="linkedEntitiesDelete">Delete divisions and
-            matches</label>
+        <ul class="option-list">
+            <li>
+                <input type="radio" name="linkedEntities" value="move" id="linkedEntitiesMove" checked><label for="linkedEntitiesMove">Move divisions and matches to
+                    <select data="seasons">
+                        <option value="0" disabled selected>Select a season</option>
+                        {# Dynammically populated via JS to avoid moving to current season #}
+                    </select>
+                </label>
+            </li>
+            <li>
+                <input type="radio" name="linkedEntities" value="delete" id="linkedEntitiesDelete"><label for="linkedEntitiesDelete">Delete divisions and
+                    matches</label>
+            </li>
+        </ul>
     </fieldset>
 
     <p class="alert-box warning icon-warning hide" data="alert-delete">Are you sure you want to delete all divisions and matches linked to <strong><span
