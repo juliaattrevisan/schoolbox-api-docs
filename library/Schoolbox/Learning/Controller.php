@@ -416,6 +416,8 @@ class Controller extends Base
             $this->getRouter(),
             $this->getConfigLoader()->get('pastoral_enabled'),
             $this->getConfigLoader()->get('mail_enable'),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED),
+            $this->getConfigLoader()->get(ConfigMapper::NAME_GRADES_ENABLED),
             $this->getSession()->get('mailhandle'),
             $this->rosettaStone
         ))->getStudentLists();

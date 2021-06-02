@@ -1,5 +1,5 @@
 const path = require('path');
-const { VueLoaderPlugin } = require('vue-loader');
+const {VueLoaderPlugin} = require('vue-loader');
 const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts'); //https://www.npmjs.com/package/webpack-remove-empty-scripts
 
 module.exports = {
@@ -132,12 +132,12 @@ module.exports = {
         ],
         masonry: {
             import: [
-            // Colour handling
-            './node_modules/spectrum-colorpicker/spectrum.js',
+                // Colour handling
+                './node_modules/spectrum-colorpicker/spectrum.js',
 
-            // homepage editing
-            './www/static/javascript/shared/masonry/jquery.masonry.js',
-            './www/static/javascript/shared/masonry/jquery.masonry.spectrum.js'
+                // homepage editing
+                './www/static/javascript/shared/masonry/jquery.masonry.js',
+                './www/static/javascript/shared/masonry/jquery.masonry.spectrum.js'
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
@@ -149,14 +149,14 @@ module.exports = {
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
 
         //Calendars
-		fullCalendar: './library/Schoolbox/Calendar/vue/initSbFullCalendar.main.js',
+        fullCalendar: './library/Schoolbox/Calendar/vue/initSbFullCalendar.main.js',
         assessmentCalendar: './library/Schoolbox/Learning/Assessment/Calendar/vue/initAssessmentCalendar.js',
         upcomingDueWorkCalendar: './library/Schoolbox/Learning/Upcoming/vue/initUpcomingDueWorkCalendar.js',
         resourceBookingItemCalendar: './library/Schoolbox/ResourceBooking/Item/vue/initResourceBookingItemCalendar.js',
         resourceBookingCategoryCalendar: './library/Schoolbox/ResourceBooking/Category/vue/initResourceBookingCategoryCalendar.js',
         calendarComponent: './library/Schoolbox/Calendar/vue/initCalendarComponent.js',
         calendarEventDetails: './library/Schoolbox/Calendar/Event/templates/vue/initCalendarEventDetails.js',
-		
+
         //News related
         visitationListFull: './library/Schoolbox/Comms/News/Statistics/templates/visitation/initVisitationListFull.js',
         articleList: './library/Schoolbox/Comms/News/templates/vue/initArticleList.js',
@@ -194,8 +194,10 @@ module.exports = {
 
         //Sass
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
-        editor: './www/static/css/foundation/editor.scss'
+        editor: './www/static/css/foundation/editor.scss',
 
+        // Class List
+        classList: './library/Schoolbox/Learning/vue/init-class-list.js'
     },
     output: {
         path: path.resolve(__dirname, 'www/static/javascript/components'),
@@ -209,8 +211,8 @@ module.exports = {
                 loader: 'expose-loader', //see https://webpack.js.org/loaders/expose-loader/ - expose these to the glocal scope, allowing access to the properties in twig / other JS files
                 options: {
                     exposes: [
-                        { globalName: '$', override: true },
-                        { globalName: 'jQuery', override: true }
+                        {globalName: '$', override: true},
+                        {globalName: 'jQuery', override: true}
                     ],
                 },
             },
@@ -218,35 +220,35 @@ module.exports = {
                 test: require.resolve('dropzone'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: { globalName: 'Dropzone', override: true }
+                    exposes: {globalName: 'Dropzone', override: true}
                 },
             },
             {
                 test: require.resolve('moment'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: { globalName: 'moment', override: true }
+                    exposes: {globalName: 'moment', override: true}
                 },
             },
             {
                 test: require.resolve('axios'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: { globalName: 'axios', override: true }
+                    exposes: {globalName: 'axios', override: true}
                 },
             },
             {
                 test: require.resolve('lodash'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: { globalName: '_', override: true }
+                    exposes: {globalName: '_', override: true}
                 },
             },
             {
                 test: require.resolve('intro.js'),
                 loader: 'expose-loader',
                 options: {
-                    exposes: { globalName: 'IntroJs', moduleLocalName: 'introJs', override: true }
+                    exposes: {globalName: 'IntroJs', moduleLocalName: 'introJs', override: true}
                 },
             },
             {
@@ -309,7 +311,7 @@ module.exports = {
                                     outputPath: '../../css/core/'
                                 }
                             },
-                            { loader: 'extract-loader' },
+                            {loader: 'extract-loader'},
                             {
                                 loader: 'css-loader',
                                 options: {

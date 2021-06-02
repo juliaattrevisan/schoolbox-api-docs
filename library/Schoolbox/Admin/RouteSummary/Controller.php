@@ -31,7 +31,21 @@ class Controller extends Base
             $module = $di->get('module:' . $parsedName['controller']);
             $module->initControllerDependencies();
             $module->initControllers($di);
-            $controller = $di->get('controller:' . $parsedName['controller']);
+            try {
+                $controller = $di->get('controller:' . $parsedName['controller']);
+            } catch (\Throwable $e) {
+                // Something went wrong when parsing this controller
+                $routeSummaries[$parsedName['controller']][] = [
+                    'name'       => $route->name,
+                    'method'     => '?',
+                    'path'       => $route->path,
+                    'basename'   => $parsedName['controller'],
+                    'controller' => '?',
+                    'action'     => $parsedName['action'],
+                    'error'      => $e,
+                ];
+                continue;
+            }
 
             // method is publicly available, despite what the red worms say
             foreach ($route->method as $method) {
@@ -42,6 +56,7 @@ class Controller extends Base
                     'basename'   => $parsedName['controller'],
                     'controller' => get_class($controller),
                     'action'     => $parsedName['action'],
+                    'error'      => null,
                 ];
             }
         }
