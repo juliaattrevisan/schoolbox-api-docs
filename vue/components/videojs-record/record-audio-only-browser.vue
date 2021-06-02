@@ -16,6 +16,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getAudioOnlyRecordOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
+import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@shared/record-media/recordMediaErrors';
 import { isOfMimeType } from '@shared/util/fileUtils';
 
 
@@ -229,12 +230,11 @@ export default {
             this.hasError = true;
             const errorCode = String(this.player.deviceErrorCode);
             console.warn('errorCode = ' + errorCode);
-            if (errorCode === 'NotReadableError: Could not start video source' || errorCode === 'AbortError: Starting video failed') {
+            if (isDeviceAlreadyInUseError(errorCode)) {
                 this.hasDeviceAlreadyInUseError = true;
-            } else if (errorCode === 'NotAllowedError: Permission denied' || errorCode === 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context.') {
+            } else if (isPermissionDeniedError(errorCode)) {
                 this.hasPermissionDeniedError = true;
             }
-            console.warn(this.player.deviceErrorCode);
         },
 
         /**

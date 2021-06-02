@@ -1,4 +1,4 @@
-/*
+/** 
  * The various media types that can be recorded
  *
  */

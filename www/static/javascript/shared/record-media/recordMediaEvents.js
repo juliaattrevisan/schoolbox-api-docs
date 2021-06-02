@@ -1,4 +1,4 @@
-/*
+/** 
  * Events that can occur within #record-media.vue and its children
  *
  */
