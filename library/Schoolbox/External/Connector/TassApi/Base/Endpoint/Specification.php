@@ -68,7 +68,14 @@ class Specification implements ISpecification
         ];
 
         foreach ($modules as $module) {
-            $api[$module] = new Api($this->host, $this->dsn, $module);
+            try {
+                $api[$module] = new Api($this->host, $this->dsn, $module);
+            } catch (\DomainException $e) {
+                /* noop
+                 * occurs when a module doesn't exist but you tried to access its methods anyway
+                 * such as Student Calendar And Notices (an optional module)
+                 */
+            }
         }
 
         $paths = [
@@ -77,9 +84,10 @@ class Specification implements ISpecification
              * Full Diagnostic
              *
              * Tass is a coalition of API subsystems:
-             *   LMS Integration, Student Details, Identity Management
+             *   LMS Integration, Student Details, Identity Management, School Calendar And Notices
              *
-             * We need access to all three to complete the mission
+             * We need access to the first three to complete the mission
+             * and the fourth is optional
              */
 
             /* LMS Integration Version 3
@@ -554,11 +562,23 @@ class Specification implements ISpecification
             $errorMessage = '';
             $message = "{$path['api']}: {$path['method']}";
 
-            try {
-                $result = (bool)$api[$path['api']]->retrieveDocument($path['method'], $path['args'], $path['version']);
-            } catch (RuntimeException $e) {
-                $errorMessage = $e->getMessage();
+            /* The DSN configuration wasn't provided for the product
+             * that we're currently testing
+             */
+            if (!isset($api[$path['api']])) {
+                $errorMessage = sprintf(
+                    'Missing DSN configuration for %s',
+                    $path['api']
+                );
+
                 $result = false;
+            } else {
+                try {
+                    $result = (bool)$api[$path['api']]->retrieveDocument($path['method'], $path['args'], $path['version']);
+                } catch (RuntimeException $e) {
+                    $errorMessage = $e->getMessage();
+                    $result = false;
+                }
             }
 
             if ($result) {
