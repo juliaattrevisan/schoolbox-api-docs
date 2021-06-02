@@ -183,7 +183,7 @@ class Controller extends Web\Controller\Base
             'moreInfoId'         => $this->getExplanationOfGradesHomepageId($attributes),
         ];
 
-        $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Continuous Report");
+        $output = $this->buildHtmlOutput('@tigsParticipationReport/participation.twig', $data, "Progress Report");
 
         $this->getResponse()->content->set($output);
     }
