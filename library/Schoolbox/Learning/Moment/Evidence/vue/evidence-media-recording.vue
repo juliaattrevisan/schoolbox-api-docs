@@ -13,7 +13,6 @@ import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
 import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
-// import filesize from 'filesize.es6.js';
 
 
 export default {
@@ -51,6 +50,8 @@ export default {
             isUploading: false, //to notify of update
             uploadProgressRatio: '0%', //to track the upload amount
             hasUploadError: false, //to notify of upload error, try again?
+            uploadErrorMessage: 'Sorry, there was an unknown error while uploading.',
+            isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasUploaded: false, //notify UI of upload complete
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available or moving between the recorded media and new media
@@ -159,17 +160,12 @@ export default {
          *
          */
         async onFormSubmit (event) {
-            try {
-                this.checkRecording();
-                const responseData = await this.uploadMediaAndReturnResponse();
+            this.checkRecording();
+            const responseData = await this.uploadMediaAndReturnResponse();
+            if (!this.hasUploadError) {
                 this.addHiddenInputs(responseData);
                 this.displayUploadSuccessful();
                 document.dispatchEvent(new CustomEvent('evidence-media-recording__onUploadComplete')); //dispach to form.twig to continue form submit
-            } catch (error) {
-                console.warn('in onFormSubmit');
-                console.warn(error);
-                this.isUploading = false;
-                this.hasUploadError = true; //to show the error modal
             }
         },
 
@@ -198,8 +194,7 @@ export default {
                 this.isUploading = false; //hide the upload modal
                 return response.data;
             } catch (error) {
-                console.warn('in uploadMediaAndReturnResponse');
-                console.warn(error);
+                this.checkErrorMessage(error.response.data);
                 this.isUploading = false; //hide the upload modal
                 this.hasUploadError = true; //to show the error modal
             }
@@ -225,6 +220,17 @@ export default {
             if (progressEvent.lengthComputable) {
                 this.uploadProgressRatio = (progressEvent.loaded / progressEvent.total) * 100;
                 this.uploadProgressRatio = this.uploadProgressRatio + '%';
+            }
+        },
+
+        /**
+         * try and grab known error messages to better inform of the error that's occured
+         *
+         * @params {Object}
+         */
+        checkErrorMessage (errorResponseData) {
+            if (errorResponseData.hash?.includes('This file exceeds the file size restriction')) {
+                this.uploadErrorMessage = 'Sorry, the recording is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.';
             }
         },
 
@@ -279,6 +285,27 @@ export default {
             this.updateCurrentRatio(width, height);
         },
 
+
+
+
+
+        /**
+         * close the error modal, animating out
+         *
+         */
+        onCloseErrorModalSelected () {
+            this.isOverMediaModalClosing = true;
+        },
+
+        /**
+         * it's closed now, so disable the errors to allow trying again
+         *
+         */
+        onErrorModalClosed () {
+            this.hasUploadError = false;
+            this.isOverMediaModalClosing = false;
+        },
+
     }
 
 }
@@ -316,16 +343,17 @@ export default {
             @on-resize="onResize"
         />
 
-        <over-media-modal v-if="hasUploadError" key="isUploadingModal">
-            <div class="alert-box alert">Sorry, there was an error while uploading.</div>
-        </over-media-modal>
-        <over-media-modal v-else-if="isUploading" key="isUploadingModal">
+        <over-media-modal v-if="isUploading" key="isUploadingModal">
             <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
             <p><em>Uploading media, please wait...</em></p>
         </over-media-modal>
         <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
             <p><em>Media successfully uploaded.</em></p>
         </over-media-modal>	
+        <over-media-modal v-else-if="hasUploadError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorUploadModal">
+            <div class="alert-box alert">{{ uploadErrorMessage }}</div>
+            <button @click.prevent="onCloseErrorModalSelected">Close</button>
+        </over-media-modal>
 
     </div>	
 
