@@ -155,6 +155,9 @@ class RegistryMapper extends Mapper
         $servicePb     = $serviceMapper->getPredicateBuilder()
                                        ->equals('provider', $provider);
         $appIds        = $serviceMapper->findScalarByPredicates('id', $servicePb);
+        if (empty($appIds)) {
+            return;
+        }
 
         // Deregister for those app IDs and the given user
         $predicatePb = $this->getPredicateBuilder()
