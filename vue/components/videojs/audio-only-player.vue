@@ -42,12 +42,6 @@ export default {
         }
     },
 
-    unmounted () {
-        if (this.player) {
-            this.player.dispose();
-        }
-    },
-
     methods: {
 
         /** 

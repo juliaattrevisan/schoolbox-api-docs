@@ -44,6 +44,7 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
+            hasClosed: false //to allow any active vue to cleanup on beforeDestroy
         }
     },
 
@@ -90,6 +91,7 @@ export default {
         this.hasDeviceCapture = hasDeviceCapture();
         this.initRatios();
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+        this.initOnModalClosedListener();
     },
 
     mounted () {
@@ -106,6 +108,16 @@ export default {
         initRatios () {
             this.defaultRatio = 0.5625;
             this.currentRatio = this.defaultRatio;
+        },
+
+        /**
+         * to close up shop for possible re-display
+         *
+         */
+        initOnModalClosedListener () {
+            document.addEventListener('record-media-modal__onModalClosed', () => {
+                this.hasClosed = true;
+            });
         },
 
         /**
@@ -329,7 +341,7 @@ export default {
 
         <div class="ab-pane">
             
-            <div class="record-media-container" ref="container" :style="{ height: targetHeight }">
+            <div v-if="!hasClosed" class="record-media-container" ref="container" :style="{ height: targetHeight }">
             
                 <record-media-modal-menu
                     v-if="currentRecordMediaType === recordMediaTypes.UNSET"

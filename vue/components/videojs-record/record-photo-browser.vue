@@ -59,7 +59,7 @@ export default {
         }
     },
 
-    unmounted () {
+    beforeDestroy () {
         this.destroyVideojs();
     },
 
@@ -175,7 +175,7 @@ export default {
          */
         destroyVideojs () {
             if (this.player) {
-                this.player.dispose();
+                this.player.record().destroy();
             }
         },
 
