@@ -3,7 +3,7 @@
 {# SCC: show different student alerts #}
 
 {% block classListSlots %}
-    <template v-slot:studentMeta="slotProps">
+    <template v-slot:student-meta="slotProps">
         <span v-if="slotProps.student.StudentSpecialNeedsFlag != 0" class="icon-bell warning" title="{{ specialNeeds }}"></span>
         <span v-if="slotProps.student.StudentMedicalAlert != ''" class="icon-alert alert" :title="'Medical Alert: ' + slotProps.student.StudentMedicalAlert"></span>
         <span v-if="slotProps.student.StudentNonResidentFlag != 0" class="icon-international-student" title="International Student"></span>

@@ -586,7 +586,7 @@ export default {
                             <span class="show-for-print"><br>{{ student.email }}</span>
 
                             <p class="meta">
-                                <slot name="studentMeta" v-bind:student="student">
+                                <slot name="student-meta" v-bind:student="student">
                                     <span v-if="Number(student.EnglishSecondFlag) === 1"
                                           class="icon-eng-second-lang highlight"
                                           title="English as an Additional Language">
@@ -604,7 +604,7 @@ export default {
 
                             <ul data-dropdown-content class="f-dropdown" :id="'overflow' + student.id"
                                 v-if="student.id && Object.keys(student.routes).length">
-                                <slot name="studentMenuItems" v-bind:student="student">
+                                <slot name="student-menu-items" v-bind:student="student">
                                     <li v-for="element in student.routes">
                                         <a :href="element.href" :class="element.class" :title="element.title">
                                             {{ element.label }}
