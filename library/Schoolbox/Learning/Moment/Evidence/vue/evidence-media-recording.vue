@@ -57,7 +57,6 @@ export default {
     },
 
     created () { //these vars are created so they can be accessed within the template
-        // debugger;
         this.hasDeviceCapture = hasDeviceCapture();
         this.initRatios();
         this.recordMediaTypes = recordMediaTypes;
@@ -145,9 +144,7 @@ export default {
             document.getElementById('evidence-filename').value = this.recordedData.name; //to pass form submit validation check
             if (this.isFirstRecording) {
                 this.isFirstRecording = false;
-                document.addEventListener('evidence-media-recording__onFormSubmit', (event) => { //to prevent the form from being submitted until the media is uploaded
-                    this.onFormSubmit();
-                }); 
+                document.addEventListener('evidence-media-recording__onFormSubmit', this.onFormSubmit); //to prevent the form from being submitted until the media is uploaded
             }
         },
 
@@ -155,7 +152,7 @@ export default {
          * the form button has been pressed, so start uploading the file
          *
          */
-        async onFormSubmit (event) {
+        async onFormSubmit () {
             this.checkRecording();
             const responseData = await this.uploadMediaAndReturnResponse();
             if (!this.hasUploadError) {
