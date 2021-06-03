@@ -14,7 +14,6 @@
                     <div id="evidence-media-recording">
                         <evidence-media-recording  
                             moment-type="{{ momentType }}"
-                            :max-file-size="{{ config.max_file_size }}"
                             {% if isCreate == false %} 
                             :pre-recorded-data="{{ evidence.storage|json_encode }}"
                             {% endif %}

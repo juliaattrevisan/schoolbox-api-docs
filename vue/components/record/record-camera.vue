@@ -18,10 +18,6 @@ export default {
     },
 
     props: {
-        maxFileSize: {
-            type: Number, 
-            required: true
-        },
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
@@ -39,13 +35,11 @@ export default {
 
     <record-camera-device
         v-if="hasDeviceCapture"
-        :max-file-size="maxFileSize"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
         v-on="$listeners"
     />
     <record-camera-browser
         v-else
-        :max-file-size="maxFileSize"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
         v-on="$listeners"
     />

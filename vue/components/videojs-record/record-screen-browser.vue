@@ -29,10 +29,6 @@ export default {
     },
 
     props: {
-        maxFileSize: {
-            type: Number, 
-            required: true
-        },
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
@@ -89,7 +85,7 @@ export default {
          *
          */
         initVideojsRecord () {
-            this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(this.maxFileSize), this.onVideojsReady);
+            this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(), this.onVideojsReady);
         },
 
         /**
@@ -139,43 +135,6 @@ export default {
          *
          */
         onFinishRecord () {
-            if (this.isRecordingAboveMaxFileSize()) {
-                this.onRecordingAboveMaxFileSize();
-            } else {
-                this.checkForConverting();
-            }
-        },
-
-        /**
-         * ensure the recording size is not above the max allowed
-         *
-         * @return { Boolean }
-         */
-        isRecordingAboveMaxFileSize () {
-            if (this.player.recordedData.size > this.maxFileSize) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        /**
-         * display over limit error and reset for another possible recording
-         *
-         */
-        onRecordingAboveMaxFileSize () {
-            this.isRecordingOverMaxFileSize = true;
-            this.hasError = true;
-            document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
-            this.$emit(recordMediaEvents.PROCCESS_STOPPED); //notify any UI to re-enable
-            this.player.record().reset(); 
-        },
-
-        /**
-         * video webm's are converted so they are seekable on playback, otherwise the video is ready to use
-         *
-         */
-        checkForConverting () {
             if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //if it's a webm
                 this.player.on('finishConvert', this.onFinishConvert);
             } else {

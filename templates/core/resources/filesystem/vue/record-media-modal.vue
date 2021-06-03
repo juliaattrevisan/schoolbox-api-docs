@@ -25,13 +25,6 @@ export default {
         RecordScreen,
         OverMediaModal //to slot in upload modal
     },
-
-    props: {
-        maxFileSize: {
-            type: Number, 
-            required: true
-        }
-    },
     
     data () {
         return {

@@ -32,10 +32,6 @@ export default {
                 return ['video', 'audio', 'photo'].indexOf(value) !== -1 // The value must match one of these strings
             }
         },
-        maxFileSize: {
-            type: Number, 
-            required: true
-        },
         preRecordedData: {  //to display an already existing recording on startup, should contain hash, size, and mime
             type: Object,
             required: false
@@ -284,11 +280,7 @@ export default {
         onResize (width, height) {
             this.updateCurrentRatio(width, height);
         },
-
-
-
-
-
+        
         /**
          * close the error modal, animating out
          *
@@ -317,7 +309,6 @@ export default {
 
         <record-photo
             v-if="recordMediaType === recordMediaTypes.PHOTO"
-            :max-file-size="maxFileSize"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
@@ -326,7 +317,6 @@ export default {
         />
         <record-camera
             v-else-if="recordMediaType === recordMediaTypes.CAMERA"
-            :max-file-size="maxFileSize"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
@@ -335,7 +325,6 @@ export default {
         />
         <record-audio-only
             v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
-            :max-file-size="maxFileSize"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"

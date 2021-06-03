@@ -20,10 +20,6 @@ export default {
     },
 
     props: {
-        maxFileSize: {
-            type: Number, 
-            required: true
-        },
         preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
@@ -99,43 +95,6 @@ export default {
          */ 
         onFileAdded (mediaData) {
             this.$refs.recorder.value = ''; //prevent the input capture element showing the preview
-            if (this.isRecordingAboveMaxFileSize(mediaData)) {
-                this.onRecordingAboveMaxFileSize();
-            } else {
-                this.addRecording(mediaData);
-            }
-        },
-
-        /**
-         * ensure the recording size is not above the max allowed
-         *
-         * @return { Boolean }
-         */
-        isRecordingAboveMaxFileSize (mediaData) {
-            if (mediaData.size > this.maxFileSize) {
-                return true;
-            } else {
-                return false;
-            }
-        },
-
-        /**
-         * display over limit error and reset for another possible recording
-         *
-         */
-        onRecordingAboveMaxFileSize () {
-            this.isRecordingOverMaxFileSize = true;
-            this.hasError = true;
-            this.$nextTick(() => {
-                this.$emit(recordMediaEvents.RESIZE, this.$refs.errorModal.$el.offsetWidth, this.$refs.errorModal.$el.firstChild.offsetHeight + 40); //just ensure that the entire message is visible
-            });
-        },
-
-        /**
-         * add recording to be able to preview prior to uploading
-         *
-         */
-        addRecording (mediaData) {
             this.recordedData = mediaData; // the blob object contains the recorded data 
             this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media

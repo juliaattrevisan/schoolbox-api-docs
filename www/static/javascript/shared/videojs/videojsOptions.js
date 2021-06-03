@@ -42,7 +42,7 @@ const getDefaultVideojsRecordOptions = () => {
 * 
 * @returns { Object }
 */ 
-export const getAudioOnlyRecordOptions = (maxFileSize) => {
+export const getAudioOnlyRecordOptions = () => {
 	const options = getDefaultVideojsRecordOptions();
     options.plugins = {
 		wavesurfer: { // this plugin is only needed when recording audio-only
@@ -73,8 +73,6 @@ export const getAudioOnlyRecordOptions = (maxFileSize) => {
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: RECORDING_LENGTH,
 			debug: IS_DEBUG_MODE,
-            maxFileSize: maxFileSize,
-            timeSlice: 1000, //to enable the maxFileSize restriction
 		}
 	}
 	applyAudioWorkarounds(options);
@@ -110,7 +108,7 @@ const applyAudioWorkarounds = (options) => {
 * 
 * @returns { Object }
 */ 
-export const getRecordCameraOptions = (maxFileSize) => {
+export const getRecordCameraOptions = () => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
         record: {
@@ -123,8 +121,6 @@ export const getRecordCameraOptions = (maxFileSize) => {
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: RECORDING_LENGTH, 
             debug: IS_DEBUG_MODE,
-            maxFileSize: maxFileSize,
-            timeSlice: 1000, //to enable the maxFileSize restriction
         }
     }
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
@@ -139,7 +135,7 @@ export const getRecordCameraOptions = (maxFileSize) => {
 * 
 * @returns { Object }
 */ 
-export const getRecordScreenOptions = (maxFileSize) => {
+export const getRecordScreenOptions = () => {
     const options = getDefaultVideojsRecordOptions();
     options.plugins = {
         record: {
@@ -149,8 +145,6 @@ export const getRecordScreenOptions = (maxFileSize) => {
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
             maxLength: RECORDING_LENGTH,
             debug: IS_DEBUG_MODE,
-            maxFileSize: maxFileSize,
-            timeSlice: 1000, //to enable the maxFileSize restriction
         }
     }
     const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
