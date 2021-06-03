@@ -11,8 +11,9 @@ import RecordAudioOnly from '@schoolbox/record/record-audio-only';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
+import filesize from 'filesize';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
-import { isOfFileType, convertFilenameExtension, humanFileSize } from '@shared/util/fileUtils';
+import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
 
 
 export default {
@@ -223,7 +224,7 @@ export default {
          */
         checkErrorMessage (errorResponseData) {
             if (errorResponseData.hash?.includes('This file exceeds the file size restriction')) {
-                this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(this.recordedData.size)} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
+                this.uploadErrorMessage = `Sorry, the recording of ${filesize(this.recordedData.size)} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
             }
         },
 
