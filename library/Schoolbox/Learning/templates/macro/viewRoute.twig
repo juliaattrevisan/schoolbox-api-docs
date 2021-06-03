@@ -1,0 +1,41 @@
+{##
+ # Generate a route for viewing an assessment.
+ #
+ # If the user can view the assessment, generate a view page for them:
+ # otherwise, generate a view page for one of their children:
+ # otherwise, generate an empty string.
+ #}
+{% macro viewRoute(assessment, user) %}
+    {% apply spaceless %}
+        {# You can see an assessment,
+         # but not visit its summary page if you are a parent,
+         # with a child participating,
+         # but system is configured to hide due work details
+        #}
+        {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+            assessmentId: assessment.id,
+            assessment: assessment,
+            studentId: USER.id,
+            student: USER
+        }) %}
+
+        {# No route for own participation, what about children?
+         # Generate a link for the first child of yours which can view the
+         # assessment.
+         #}
+        {% if not viewRoute %}
+            {% for child in USER.children %}
+                {% if not viewRoute %}
+                    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
+                        assessmentId: assessment.id,
+                        assessment: assessment,
+                        studentId: child.id,
+                        student: child
+                    }) %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        {{ viewRoute }}
+    {% endapply %}
+{% endmacro %}

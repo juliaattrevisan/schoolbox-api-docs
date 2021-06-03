@@ -1,4 +1,5 @@
 {% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learning/macro/viewRoute.twig' as viewRoute %}
 
 {# What action-tot routes are available to this user? #}
 {% if readOnly %}
@@ -24,29 +25,10 @@
 >
     <div class="list-item">
         <div class="card small-12">
-
-            {# You can see an assessment, but not visit its summary page if you are a parent, with a child participating, but system is configured to hide due work details #}
-            {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                assessmentId: assessable.id,
-                assessment: assessable,
-                studentId: USER.id,
-                student: USER
-            }) %}
-            {# No route for own participation, what about children ? #}
-            {% if not viewRoute %}
-                {% for child in USER.children %}
-                    {% set viewRoute = routeLookupIfAuthorized('learningAssessment.getSummary', {
-                        assessmentId: assessable.id,
-                        assessment: assessable,
-                        studentId: child.id,
-                        student: child
-                    }) %}
-                {% endfor %}
-            {% endif %}
-
-            {% if viewRoute %}<a href="{{ viewRoute }}">{% endif %}
+            {% set route = viewRoute.viewRoute(assessable, USER) %}
+            {% if route %}<a href="{{ route }}">{% endif %}
                 <h3 data-assessment-title>{{ assessable.title }}</h3>
-            {% if viewRoute %}</a>{% endif %}
+            {% if route %}</a>{% endif %}
             <p class="meta">{{ dueDate.dueDate(assessable, USER) }}</p>
         </div>
     </div>
