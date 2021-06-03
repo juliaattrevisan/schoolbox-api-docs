@@ -198,4 +198,69 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
 
         return $contactReturn;
     }
+
+    /**
+     * @inheritDoc
+     */
+    function getParent(string $externalUserId): array
+    {
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return [];
+        }
+
+        $query =
+            "
+            SELECT      Contact.Title,
+                        Contact.Preferred,
+                        Contact.Surname,
+                        CASE
+                          WHEN Contact.DefaultEmailCode = 'O' THEN Contact.OccupEmail
+                          ELSE Contact.Email
+                        END AS Email,
+                        Contact.OccupEmail,
+                        Contact.DefaultEmailCode,
+                        Addresses.Phone AS HomePhone,
+                        Addresses.SilentPhoneFlag,
+                        Contact.SilentMobilePhoneFlag,
+                        Contact.MobilePhone,
+                        Contact.OccupPhone AS WorkPhone,
+                        Contact.DirectoryIncludeFlag,
+                        Contact.SpouseID,
+                        Spouse.Title SpouseTitle,
+                        Spouse.Preferred SpousePreferred,
+                        Spouse.Surname SpouseSurname,
+                        CASE
+                          WHEN Spouse.DefaultEmailCode = 'O' THEN Spouse.OccupEmail
+                          ELSE Spouse.Email
+                        END AS SpouseEmail,
+                        Spouse.OccupEmail SpouseOccupEmail,
+                        Spouse.DefaultEmailCode SpouseDefaultEmailCode,
+                        Spouse.MobilePhone SpouseMobilePhone,
+                        Spouse.OccupPhone AS SpouseWorkPhone,
+                        Spouse.DirectoryIncludeFlag SpouseDirectoryIncludeFlag,
+                   -- the following columns are extra for Amity
+                        Addresses.Address1,
+                        Addresses.Address2,
+                        Addresses.Address3,
+                        Addresses.Suburb,
+                        Addresses.PostCode,
+                        Addresses.State
+            FROM        dbo.Community Contact
+            LEFT JOIN   dbo.Addresses Addresses ON Contact.AddressID = Addresses.AddressID
+            LEFT JOIN   dbo.Community Spouse ON Contact.SpouseID = Spouse.ID
+            WHERE       Contact.ID = :externalId
+        ";
+
+        $parentQuery = $this->getConnector()->executeQuery($query, ['externalId' => $externalUserId]);
+
+        // Try and fetch the requested parent
+
+        if ($parent = $parentQuery->fetch()) {
+            return $this->clearInvalidValues($parent);
+        }
+
+        // Couldn't find the parent
+
+        return [];
+    }
 }

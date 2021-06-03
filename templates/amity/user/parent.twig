@@ -1,0 +1,16 @@
+{% extends '@core/user/parent.twig' %}
+{% block home_address %}
+    <dt class="small-12 medium-3">Address:</dt>
+    <dd class="small-12 medium-9">
+        {% for field in ['Address1', 'Address2', 'Address3'] %}
+            {% if externalUser[field]|length %}
+                {{ externalUser[field] }}<br>
+            {% endif %}
+        {% endfor %}
+        {% for field in ['Suburb', 'State', 'PostCode'] %}
+            {% if externalUser[field]|length %}
+                {{ externalUser[field] }}
+            {% endif %}
+        {% endfor %}
+    </dd>
+{% endblock home_address %}
