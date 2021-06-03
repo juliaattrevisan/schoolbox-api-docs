@@ -129,6 +129,10 @@ class Controller extends UserAccount\Controller
              * Even then we just need it to generate a csv
              */
             $period = $periods[$class->getPeriod()->getId()];
+            if ($period === null) {
+                continue;
+            }
+
             $period->setCycle($cycles[$class->getPeriod()->getCycle()->getId()]);
             $class->setPeriod($period);
 
