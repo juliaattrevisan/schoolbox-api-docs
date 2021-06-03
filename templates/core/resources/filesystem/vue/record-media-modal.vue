@@ -238,7 +238,7 @@ export default {
             try {
                 this.isProcessActive = true;
                 this.checkRecording();
-                const responseData = await this.uploadMedia();
+                const responseData = await this.uploadMediaAndReturnResponse();
                 this.postUploadedMessage(responseData);
             } catch (error) {
                 this.isProcessActive = false;
@@ -260,7 +260,7 @@ export default {
          * the video is ready, so upload it up to SchoolBox
          *
          */
-        async uploadMedia () {
+        async uploadMediaAndReturnResponse () {
             try {
                 this.isUploading = true;
                 this.uploadProgressRatio = '0%';

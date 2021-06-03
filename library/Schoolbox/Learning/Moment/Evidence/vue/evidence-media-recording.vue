@@ -12,7 +12,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
-import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
+import { isOfFileType, convertFilenameExtension, humanFileSize } from '@shared/util/fileUtils';
 
 
 export default {
@@ -176,7 +176,7 @@ export default {
         },
 
         /**
-         * the video is ready, so upload it up to SchoolBox and return response
+         * the media is ready, so upload it up to SchoolBox and return response
          *
          */
         async uploadMediaAndReturnResponse () {
@@ -226,7 +226,7 @@ export default {
          */
         checkErrorMessage (errorResponseData) {
             if (errorResponseData.hash?.includes('This file exceeds the file size restriction')) {
-                this.uploadErrorMessage = 'Sorry, the recording is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.';
+                this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(this.recordedData.size)} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
             }
         },
 
@@ -296,6 +296,7 @@ export default {
         onErrorModalClosed () {
             this.hasUploadError = false;
             this.isOverMediaModalClosing = false;
+            document.getElementById('evidence-submit').disabled = false; //enable to submit button again for possible re-try
         },
 
     }
