@@ -137,16 +137,16 @@ class Controller extends Component_Homepage_ControllerAbstract
             $uiIds = $this->courseImplementation->getUnits()->getPropertyValues('id');
 
             if ($this->readOnly) {
-                // I might be a learner (or parent of learner), but can't be anything more.
-                // In any case, load only my interactions - if I'm not a participant, there will be nothing.
-                // also omit anything that is not yet published (there's no easy way to apply this filter to the query)
-
+                // I might be a learner (or parent of learner):
+                // If a parent, we need to hydrate all participants so we can
+                // check parent visibility via child participation.
                 $now         = Alaress_Date_Format::now();
                 $mutator     = new AssessmentListMutator($this->getUser(), new Visibility($this->getAccess()), $now, true);
+                $user        = $this->getUser();
                 $assessments = $this->assessmentMapperProxy
                     ->findAllByUnitImplementationIdsForCourseOutline(
                         $uiIds,
-                        $this->getUser()
+                        $user->getRole()->isParent() ? null : $user,
                     )
                     ->map([$mutator, 'map'])
                     ->filter([$mutator, 'filter']);
