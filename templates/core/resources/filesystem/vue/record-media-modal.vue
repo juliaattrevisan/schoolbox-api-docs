@@ -13,7 +13,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
-import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
+import { isOfFileType, convertFilenameExtension, humanFileSize } from '@shared/util/fileUtils';
 
 
 export default {
@@ -31,7 +31,6 @@ export default {
             currentRecordMediaType: recordMediaTypes.UNSET, //the currently selected media recording
             recordMediaTypeList: [recordMediaTypes.AUDIO_ONLY, recordMediaTypes.CAMERA, recordMediaTypes.SCREEN],
             hasDeviceCapture: false, //to determine whether to use the devices native device capture rather then the browsers
-            isProcessActive: false, //to be able to disable certain behavour when recordings/conversions/uploads are taking place
             recordedData: null, //could be audio, video, image etc
             canUpload: false, //to upload the file
             isOverMediaModalClosing: false, //to animate out the over-media-modal
@@ -40,6 +39,7 @@ export default {
             isUploading: false, //to notify of update
             uploadProgressRatio: '0%', //to track the upload amount
             hasUploadError: false, //to notify of upload error, try again?
+            uploadErrorMessage: 'Sorry, there was an unknown error while uploading.',
             hasUploaded: false, //notify UI of upload complete
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
@@ -235,14 +235,10 @@ export default {
          */
         async onSaveFilenameSelected () {
             this.isFilenameModalActive = false;
-            try {
-                this.isProcessActive = true;
-                this.checkRecording();
-                const responseData = await this.uploadMediaAndReturnResponse();
+            this.checkRecording();
+            const responseData = await this.uploadMediaAndReturnResponse();
+            if (!this.hasUploadError) {
                 this.postUploadedMessage(responseData);
-            } catch (error) {
-                this.isProcessActive = false;
-                console.log(error);
             }
         },
 
@@ -271,9 +267,9 @@ export default {
                 this.isUploading = false;
                 return response.data;
             } catch (error) {
+                this.checkErrorMessage(error.response.data);
                 this.isUploading = false;
                 this.hasUploadError = true;
-                console.log(error);
             }
         },
 
@@ -301,6 +297,17 @@ export default {
         },
 
         /**
+         * try and grab known error messages to better inform of the error that's occured
+         *
+         * @params {Object}
+         */
+        checkErrorMessage (errorResponseData) {
+            if (errorResponseData.hash?.includes('This file exceeds the file size restriction')) {
+                this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(this.recordedData.size)} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
+            }
+        },
+
+        /**
          * inform any listeners that a file was uploaded.
          * put it in the dropzone, and inform the dropzone opener
          * that a file was posted to it.
@@ -318,7 +325,6 @@ export default {
             this.canUpload = false;
             setTimeout(() => { //put a slight delay so user sees the upload successfull modal
                 window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
-                this.isProcessActive = false;
                 this.hasUploaded = false;
             }, 1000);
         },
@@ -331,6 +337,23 @@ export default {
          */
         onResize (width, height) {
             this.updateCurrentRatio(width, height);
+        },
+
+        /**
+         * close the error modal, animating out
+         *
+         */
+        onCloseErrorModalSelected () {
+            this.isOverMediaModalClosing = true;
+        },
+
+        /**
+         * it's closed now, so disable the errors to allow trying again
+         *
+         */
+        onErrorModalClosed () {
+            this.hasUploadError = false;
+            this.isOverMediaModalClosing = false;
         },
 
     }
@@ -357,7 +380,7 @@ export default {
                     @on-device-ready="onDeviceReady"
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
-                    @on-ratio-ready="onRatioReady"
+                    @on-resize="onResize"
                 />
                 <record-camera
                     v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
@@ -365,7 +388,7 @@ export default {
                     @on-device-ready="onDeviceReady"
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
-                    @on-ratio-ready="onRatioReady"
+                    @on-resize="onResize"
                 />
                 <record-screen
                     v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
@@ -373,7 +396,7 @@ export default {
                     @on-device-ready="onDeviceReady"
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
-                    @on-ratio-ready="onRatioReady"
+                    @on-resize="onResize"
                 />
 
                 <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
@@ -391,6 +414,10 @@ export default {
                 </over-media-modal>
                 <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
                     <p><em>Media successfully uploaded.</em></p>
+                </over-media-modal>
+                <over-media-modal v-else-if="hasUploadError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorUploadModal">
+                    <div class="alert-box alert">{{ uploadErrorMessage }}</div>
+                    <button @click.prevent="onCloseErrorModalSelected">Close</button>
                 </over-media-modal>	
 
             </div>	
