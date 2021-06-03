@@ -166,35 +166,26 @@ class PermissionMapper extends Schoolbox\Mapper
     }
 
     /**
-     * TODO: PDO Array support for using WHERE IN
+     * Finds all permission entries for the given page, type and values.
      *
-     * http://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
-     * http://stackoverflow.com/questions/920353/php-pdo-can-i-bind-an-array-to-an-in-condition
-     *
-     * @param int $pageId
-     * @param string $type
-     * @param array $permittedValues
-     * @return Collection
+     * @param int    $pageId          An ePortfolio page ID
+     * @param string $type            A type of permission: one of the
+     *                                `Permission::TYPE_*` constants
+     * @param array  $permittedValues A list of permitted values for the
+     *                                permission
+     * @return Collection|Permission[]
      */
-    public function findValues($pageId, $type, $permittedValues)
+    public function findValues(int $pageId, string $type, array $permittedValues): Collection
     {
-        $permittedValuesSql = implode(',', $permittedValues);
-
-        $statement = $this->database->prepare("
-            SELECT {$this->getColumnString()}
-            FROM `{$this->table}`
-            WHERE `page_id` = :pageId
-			AND `type` = :type
-			AND `value` IN ({$permittedValuesSql})
-        ");
-
-        $statement->bindParam(':pageId', $pageId);
-        $statement->bindParam(':type', $type);
-        $statement->execute();
-
-        $rowset = $statement->fetchAll();
-
-        return $this->hydrateList($rowset);
+        if (empty($permittedValues)) {
+            return $this->createCollection();
+        }
+        return $this->findByPredicates(
+            $this->getPredicateBuilder()
+                 ->equals('page_id', $pageId)
+                 ->equals('type', $type)
+                 ->in('value', $permittedValues)
+        );
     }
 
 
