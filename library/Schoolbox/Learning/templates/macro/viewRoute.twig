@@ -6,7 +6,7 @@
  # otherwise, generate an empty string.
  #}
 {% macro viewRoute(assessment, user) %}
-    {% apply spaceless %}
+{% apply spaceless %}
         {# You can see an assessment,
          # but not visit its summary page if you are a parent,
          # with a child participating,
@@ -37,5 +37,5 @@
         {% endif %}
 
         {{ viewRoute }}
-    {% endapply %}
+{% endapply %}
 {% endmacro %}
