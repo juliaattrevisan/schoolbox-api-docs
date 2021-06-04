@@ -1353,7 +1353,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             $namespace = NSMapper::NS_ONLINE_ASSESS;
         }
 
-        $bob->setParam('cat', new CategoryParam($folder))
+        $bob->setParam('cat', new SimpleParam($folder->getName()))
             ->setIcon($icon)
             ->setNamespace($namespace);
         return $bob;
