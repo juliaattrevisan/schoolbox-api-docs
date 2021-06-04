@@ -66,9 +66,10 @@ cp -rf $initialdir/configfiles/bin/* /usr/local/bin
 ## Go to vagrant to initialise npm and composer
 cd /vagrant
 
-composer install
-npm install
-npm run build
+## Currently, all smoke tests run on develop only.
+## Therefore, we don't need to infer or inform which build to use: we can just
+## use the develop build.
+tar xzf $initialdir/build-artifact/develop-build.tar.gz;
 
 ## Make sure the data directory has no permissions issues.
 chmod 777 -R /vagrant/data/*
