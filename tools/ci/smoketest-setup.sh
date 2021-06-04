@@ -19,11 +19,15 @@ mkdir /var/lib/schoolbox
 apt update
 apt install git gzip -y
 
+## A case should be added with every supported PHP version
 if [ $PHP_VERSION == 'php7.4' ]
 then
   apt install php7.4-fpm php7.4-pdo php7.4-mysql nginx -y
+  CONFIG_DIR="/etc/php/7.4/fpm"
+  PHP_SERVICE="php7.4-fpm"
 else
-  apt install php7.1-fpm php7.1-pdo php7.1-mysql nginx -y
+  echo "Unsupported PHP version: ${PHP_VERSION}"
+  exit(1)
 fi
 
 apt install redis-server mysql-client npm -y
@@ -53,14 +57,7 @@ cp -rf $initialdir/schoolbox-develop/* /vagrant
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf $initialdir/configfiles/nginx/* /etc/nginx
 cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
-
-if [ $PHP_VERSION == 'php7.4' ]
-then
-  cp -rf $initialdir/configfiles/php/7.1/fpm/* /etc/php/7.4/fpm
-else
-  cp -rf $initialdir/configfiles/php/7.1/fpm/* /etc/php/7.1/fpm
-fi
-
+cp -rf $initialdir/configfiles/php/7.1/fpm/* $CONFIG_DIR
 cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -f $initialdir/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
 cp -rf $initialdir/data/* /vagrant/data
@@ -69,9 +66,10 @@ cp -rf $initialdir/configfiles/bin/* /usr/local/bin
 ## Go to vagrant to initialise npm and composer
 cd /vagrant
 
-composer install
-npm install
-npm run build
+## Currently, all smoke tests run on develop only.
+## Therefore, we don't need to infer or inform which build to use: we can just
+## use the develop build.
+tar xzf $initialdir/build-artifact/develop-build.tar.gz;
 
 ## Make sure the data directory has no permissions issues.
 chmod 777 -R /vagrant/data/*
@@ -80,7 +78,7 @@ chmod 777 -R /vagrant/data/*
 echo '127.0.0.1 vagrant.dev.schoolbox.cloud' >> /etc/hosts
 
 ## Start the services!
-service php7.1-fpm start
+service $PHP_SERVICE start
 echo 'started php'
 service nginx start
 echo 'started nginx'
