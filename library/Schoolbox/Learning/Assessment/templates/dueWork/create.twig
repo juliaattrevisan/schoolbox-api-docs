@@ -123,7 +123,7 @@
         <div class="medium-6 columns" id="similarityRow"{% if not assessment.acceptOnline %} style="display: none"{% endif %}>
             <input type="hidden" name="similarityCheckEnabled" value="{% if assessment.courseManaged %}{{ assessment.similarityCheckEnabled }}{% else %}0{% endif %}" />
 
-            <label for="similarityCheckEnabled">Similarity Check</label> <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span>
+            <label for="similarityCheckEnabled">Similarity Check <span class="hint has-tip tip-top" title="Turn this on to enable similarity checking on students' submissions." data-tooltip>?</span></label>
             <div class="switch">
                 <input id="similarityCheckEnabled"
                        name="similarityCheckEnabled"
