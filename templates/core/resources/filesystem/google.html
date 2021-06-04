@@ -73,10 +73,11 @@
                       jQuery.ajax({
                           type: 'POST',
                           url: '/ajax/resource/filesystem/google',
-                          headers: {
-                            'Authorization': token.token_type + ' ' + token.access_token
+                          data: {
+                              docs: docs,
+                              tokenType: token.token_type,
+                              accessToken: token.access_token
                           },
-                          data: {docs: docs},
                           success: function(data) {
                               window.top.postMessage(JSON.stringify({data: data}), location.origin);
                           },

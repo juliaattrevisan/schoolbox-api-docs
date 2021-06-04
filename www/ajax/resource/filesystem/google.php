@@ -10,6 +10,7 @@
 use Schoolbox\File\ExtensionMapper;
 use Schoolbox\File\Remote\GDriveFetcher;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\Resource\Storage;
@@ -24,22 +25,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     SitePage::localRedir('/resource/external/google');
 }
 
+if (!isset($_POST['tokenType']) || !isset($_POST['accessToken']) || !isset($_POST['docs'])) {
+    header('Content-Type: application/json');
+    http_response_code(400);
+    die(json_encode(['error' => 'Invalid request']));
+}
+
 /** @var SitePage $this */
 
 /** @var IConfigLoader $conf */
 $conf = $this->getDi()->get('config');
-if (function_exists('apache_request_headers')) {
-    $headers = apache_request_headers();
-} else {
-    /* Handle nginx/php-fpm case instead which doesn't have apache specific functions
-     */
-    $headers['Authorization'] = $_SERVER['HTTP_AUTHORIZATION'];
-}
 $proxy  = new Proxy\Server($conf);
 $grive  = new GDriveFetcher(
     $conf,
-    $headers['Authorization'],
-    (bool)$conf->get(\Schoolbox\Config\ConfigMapper::NAME_GOOGLEDRIVE_EXPORT_PDF)
+    $_POST['tokenType'] . ' ' . $_POST['accessToken'],
+    (bool)$conf->get(ConfigMapper::NAME_GOOGLEDRIVE_EXPORT_PDF)
 );
 $mapper = Storage\Mapper::getInstance();
 $files  = [];
