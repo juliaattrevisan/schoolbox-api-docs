@@ -9,7 +9,7 @@ then
   PHP_SERVICE="php7.4-fpm"
 else
   echo "Unsupported PHP version: ${PHP_VERSION}"
-  exit(1)
+  exit 1
 fi
 
 service $PHP_SERVICE stop
