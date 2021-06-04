@@ -499,7 +499,7 @@ export default {
 
             <dl class="tabs" v-if="classCodeList.length > 1">
                 <dd :class="{active: currentClassCode === null}">
-                    <a href="#" @click="setClassCode(null)">All class codes</a>
+                    <a href="#" @click="setClassCode(null)">All classes</a>
                 </dd>
                 <dd v-for="classCode in classCodeList" :key="classCode" :class="{active: currentClassCode === classCode}">
                     <a :href="'#' + classCode" @click="setClassCode(classCode)">{{ classCode }}</a>
