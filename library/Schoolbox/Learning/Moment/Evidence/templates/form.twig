@@ -137,6 +137,8 @@
                     && (document.getElementById('file').value === '');
         }
 
+        let isSubmittingForm = false; //ensure not submitting the form more than once
+
         /**
          * To upload the form
          *
@@ -144,25 +146,33 @@
          */
         const submitForm = (form) => {
 
-            // Build a request to post the form
-            let payload = buildPayload(form),
-                toast   = $('#toast'),
-                submit  = $('#evidence-submit');
+            if (!isSubmittingForm) {
 
-            // Toast then post
-            toast.toastActivate('Saving...')
-            submit.prop('disabled', true);
+                isSubmittingForm = true;
 
-            // Redirect to the return URL provided
-            axios.{{ isCreate ? 'post' : 'put' }}(form.action, payload)
-                .then(() => {
-                    toast.toastTimeout({text: 'Saved'});
-                    window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
-                })
-                .catch(() => {
-                    toast.toastTimeout({text: 'Save failed', css: 'alert'});
-                    submit.prop('disabled', false);
-                }); 
+                // Build a request to post the form
+                let payload = buildPayload(form),
+                    toast   = $('#toast'),
+                    submit  = $('#evidence-submit');
+
+                // Toast then post
+                toast.toastActivate('Saving...')
+                submit.prop('disabled', true);
+
+                // Redirect to the return URL provided
+                axios.{{ isCreate ? 'post' : 'put' }}(form.action, payload)
+                    .then(() => {
+                        toast.toastTimeout({text: 'Saved'});
+                        window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                        isSubmittingForm = false;
+                    })
+                    .catch(() => {
+                        toast.toastTimeout({text: 'Save failed', css: 'alert'});
+                        submit.prop('disabled', false);
+                        isSubmittingForm = false;
+                    }); 
+
+            }
         }
 
         $('#evidence-form').alaressValidate({
@@ -176,7 +186,8 @@
                 
                 if (isMediaUploadRequired()) {
                     document.getElementById('evidence-media-recording').scrollIntoView( { behavior: 'smooth' } ); //uploading can take a while, so scroll up to know that it's processing
-                    document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
+                    document.removeEventListener('evidence-media-recording__onUploadComplete', submitForm); 
+                    document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form) ); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
                 } else {
                     submitForm(form);

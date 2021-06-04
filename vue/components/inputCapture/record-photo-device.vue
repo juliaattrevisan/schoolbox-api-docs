@@ -118,8 +118,8 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onRatioReady (width, height) {
-            this.$emit(recordMediaEvents.RATIO_READY, width, height);
+        onResize (width, height) {
+            this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
     }
@@ -147,7 +147,7 @@ export default {
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
 
     </div>

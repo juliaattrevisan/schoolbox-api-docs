@@ -18,7 +18,7 @@ export default {
     },
 
     props: {
-       preRecordedData: { //to display an already existing recording on startup
+        preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
         },
@@ -32,7 +32,7 @@ export default {
 </script>
 
 <template>
-        
+
     <record-camera-device
         v-if="hasDeviceCapture"
         :pre-recorded-data="preRecordedData ? preRecordedData : undefined"

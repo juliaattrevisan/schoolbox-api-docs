@@ -28,10 +28,12 @@ export default {
 
     data () {
         return {
+            recordedData: null, //the recorded data that will be passed through to #recored-media
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
             hasRecordPlayerError: false, //error with the record player
+            isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
             captureOptions: null //to distinguish between different media types
@@ -88,15 +90,34 @@ export default {
         },
 
         /**
-         * get the correct options depending on the selected media type
+         * ensure the recording doesn't exceed the max file size otherwise allow upload
          *
-         * @returns { Blob }
          */ 
-        async onFileAdded (mediaData) {
+        onFileAdded (mediaData) {
+            this.$refs.recorder.value = ''; //prevent the input capture element showing the preview
             this.recordedData = mediaData; // the blob object contains the recorded data 
             this.hasNewRecording = true; //show the <player></player>
             this.$emit(recordMediaEvents.RECORDED_MEDIA_READY, this.recordedData); //notify anyone wishing to upload the media
-            this.$refs.recorder.value = ''; //prevent the input capture element showing the preview
+        },
+
+        /**
+         * close the error modal, animating out
+         *
+         */
+        onCloseErrorModalSelected () {
+            this.isOverMediaModalClosing = true;
+        },
+
+        /**
+         * it's closed now, so disable the errors to allow trying again
+         *
+         */
+        onErrorModalClosed () {
+            this.hasError = false;
+            this.isOverMediaModalClosing = false;
+            this.hasDeviceAlreadyInUseError = false;
+            this.hasPermissionDeniedError = false;
+            this.isRecordingOverMaxFileSize = false;
         },
 
         /**
@@ -116,8 +137,8 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onRatioReady (width, height) {
-            this.$emit(recordMediaEvents.RATIO_READY, width, height);
+        onResize (width, height) {
+            this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
     }
@@ -140,13 +161,19 @@ export default {
             v-if="hasPreRecordedData || hasNewRecording"
             key="media-container-playback"
             class="media-container media-container-playback"
-            :record-media-type="recordMediaType"
+            :record-media-type="recordMediaTypes.CAMERA"
             :has-pre-recorded-data="hasPreRecordedData"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
+
+        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal" ref="errorModal">
+            <div v-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
+            <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
+            <button @click.prevent="onCloseErrorModalSelected">Close</button>
+        </over-media-modal>
 
     </div>
 
@@ -154,54 +181,6 @@ export default {
 
 <style lang="scss" scoped>
 
-.container {
-    position: absolute;
-    width: 100%;
-    height: 100%; //will be updated by the parent container, keeping it inline with the parent
-    background: white;
-    overflow: hidden;
-}
-
-.media-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-}
-
-    .media-container-record {
-        z-index: 1;
-    }
-
-    .media-container-playback {
-        z-index: 2;
-    }
-
-.file-input-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    text-align: center;
-}    
-
-.dzone::v-deep { //piggy back on the existing dropzone styles, and update as needed
-    position: absolute;
-    z-index: 1;
-    width: 100%;
-    height: 100%;
-    font-size: 0px;
-    text-indent: -999px; //hide the text, just leaving the dzone like border/display
-}
-
-.file-input-note {
-    display: block;
-    position: relative;
-    z-index: 2;
-    padding: 20px;
-    font-size: 0.8rem;
-    pointer-events: none;
-}
-
+@import '@schoolbox/inputCapture/input-capture';
 
 </style>

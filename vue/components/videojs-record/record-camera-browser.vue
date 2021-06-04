@@ -18,6 +18,7 @@ import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import { getRecordCameraOptions } from '@shared/videojs/videojsOptions';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import recordMediaEvents from '@shared/record-media/recordMediaEvents';
+import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@shared/record-media/recordMediaErrors';
 import { isOfMimeType } from '@shared/util/fileUtils';
 
 
@@ -45,6 +46,7 @@ export default {
             hasError: false, //to manage UI elements
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
+            isRecordingOverMaxFileSize: false, //notify that the recording won't upload
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
         }
@@ -131,7 +133,7 @@ export default {
          *
          */
         onFinishRecord () {
-            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //video webm's are converted so they are seekable on playback
+            if (this.player.recordedData.type && isOfMimeType(this.player.recordedData.type, 'video/webm')) { //if it's a webm
                 this.player.on('finishConvert', this.onFinishConvert);
             } else {
                 this.recordedVideoReady(this.player.recordedData);
@@ -143,6 +145,7 @@ export default {
          *
          */
         onFinishConvert () {
+            this.player.off('finishConvert', this.onFinishConvert);
             this.recordedVideoReady(this.player.convertedData);
         },
 
@@ -150,7 +153,7 @@ export default {
          * a media has been recorded, so can now either upload it, delete and re-record or play it back
          *
          */
-        async recordedVideoReady (mediaData) {
+        recordedVideoReady (mediaData) {
             document.querySelectorAll('.vjs-time-control').forEach((el) => el.style.backgroundColor = 'transparent');
             this.recordedData = mediaData; // the blob object contains the recorded data 
 			this.hasNewRecording = true; //show the <player></player>
@@ -174,12 +177,11 @@ export default {
             this.hasError = true;
             const errorCode = String(this.player.deviceErrorCode);
             console.warn('errorCode = ' + errorCode);
-            if (errorCode === 'NotReadableError: Could not start video source' || errorCode === 'AbortError: Starting video failed') {
+            if (isDeviceAlreadyInUseError(errorCode)) {
                 this.hasDeviceAlreadyInUseError = true;
-            } else if (errorCode === 'NotAllowedError: Permission denied' || errorCode === 'NotAllowedError: The request is not allowed by the user agent or the platform in the current context.') {
+            } else if (isPermissionDeniedError(errorCode)) {
                 this.hasPermissionDeniedError = true;
             }
-            console.warn(this.player.deviceErrorCode);
         },
 
         /**
@@ -209,6 +211,7 @@ export default {
             this.isOverMediaModalClosing = false;
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
+            this.isRecordingOverMaxFileSize = false;
         },
 
         /**
@@ -232,8 +235,8 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onRatioReady (width, height) {
-            this.$emit(recordMediaEvents.RATIO_READY, width, height);
+        onResize (width, height) {
+            this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
 
@@ -259,22 +262,15 @@ export default {
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
 
         <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
-            <template v-if="hasDeviceAlreadyInUseError">
-                <div class="alert-box warning">The camera appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
-            <template v-else-if="hasPermissionDeniedError">
-                <div class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
-            <template v-else>
-                <div class="alert-box alert">Sorry, an unknown error has occured.</div>
-                <button @click.prevent="onCloseErrorModalSelected">Close</button>
-            </template>
+            <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">The camera appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
+            <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
+            <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter video or request your administrator(s) to increase the allowed file size limit.</div>
+            <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
+            <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
 
     </div>
@@ -283,112 +279,6 @@ export default {
 
 <style lang="scss" scoped>
 
-.container {
-    position: absolute;
-    width: 100%;
-    height: 100%; //will be updated by the parent container, keeping it inline with the video dimensions
-    background: black;
-    overflow: hidden;
-    h2, h3 {
-        max-width: none;
-    }
-}
-
-.media-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-}
-
-    .media-container-record {
-        z-index: 1;
-    }
-
-    .media-container-playback {
-        z-index: 2;
-    }
-
-.vjs-record-skin::v-deep {
-    .vjs-device-button.vjs-control { //not in the centre of the frame, something from SB css is probably getting in the way
-        top: 42%;
-        margin-left: -2.6em;
-    }
-    .vjs-control-bar { //fatten up the bottom control panel
-        height: 5em;
-        padding: 0px;
-    }
-    .vjs-control {
-        width: 5em;
-    }
-    .vjs-icon-record-start,
-    .vjs-icon-record-stop,
-    .vjs-icon-photo-camera { //make the start/stop record buttons big and fat and put in the middle
-        position: absolute;
-        z-index: 2;
-        left: 50%;
-        margin-left: -20px;
-        bottom: 0px; 
-        transform-origin: center;
-        transform: scale(3.1);
-        color: #f03;
-        transition: color 0.2s, transform 0.2s;
-        &:hover {
-            transform: scale(2.8);
-        }
-    }
-    .vjs-icon-photo-camera { //shrink a bit, bit big compared to the other icons
-        transform: scale(2.3);
-        color: #fff;
-        &:hover {
-            transform: scale(2.1);
-        }
-    }
-    .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
-        text-shadow: none;
-    }
-    .vjs-time-control { //make the time stand out a bit more
-        width: auto;
-        min-width: 0;
-        padding: 0px 2px;
-        font-size: 1.1rem;
-        transition: background-color 0.3s;
-    }
-    .vjs-current-time { //and pull the time of from the side
-        padding-left: 10px;
-    }
-    .vjs-duration {
-        padding-right: 10px;
-    }
-    .vjs-fullscreen-control { //currently if the user re-records in full screen, this will not be reflected, so prevent for now
-        display: none;
-    }
-    .vjs-button > .vjs-icon-placeholder::before { //make all the buttons bigger
-        color: white;
-        font-size: 4em;
-        line-height: 1.25;
-    }
-    .vjs-play-control { //it'll never be shown, as once recored moves to another player
-        display: none;
-    }
-    .vjs-control.vjs-record-indicator { //move the record note further down
-        top: 20px;
-    }
-    .vjs-control.vjs-record-indicator,
-    .vjs-control.vjs-record-indicator:before,
-    .vjs-control.vjs-record-indicator:after { //and make the record note stand out more
-        transform: scale(1.8);
-    }
-    .vjs-control.vjs-record-indicator:before { //provide a bit more padding to the recording dot
-        left: -1.8rem;
-    }
-    @media screen and (max-width: 640px) { //shrink down a bit
-        .vjs-time-control  {
-            font-size: 0.9rem;
-            line-height: 3.3rem;
-        }
-    }
-}
+@import '@schoolbox/videojs-record/videojs-record';
 
 </style>

@@ -11,6 +11,7 @@ import RecordAudioOnly from '@schoolbox/record/record-audio-only';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
 import recordMediaTypes from '@shared/record-media/recordMediaTypes';
 import axios from 'axios';
+import filesize from 'filesize';
 import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
 import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
 
@@ -35,7 +36,7 @@ export default {
         preRecordedData: {  //to display an already existing recording on startup, should contain hash, size, and mime
             type: Object,
             required: false
-        },
+        }
     },
 
     data () {
@@ -46,6 +47,8 @@ export default {
             isUploading: false, //to notify of update
             uploadProgressRatio: '0%', //to track the upload amount
             hasUploadError: false, //to notify of upload error, try again?
+            uploadErrorMessage: 'Sorry, there was an unknown error while uploading.',
+            isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasUploaded: false, //notify UI of upload complete
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available or moving between the recorded media and new media
@@ -142,9 +145,7 @@ export default {
             document.getElementById('evidence-filename').value = this.recordedData.name; //to pass form submit validation check
             if (this.isFirstRecording) {
                 this.isFirstRecording = false;
-                document.addEventListener('evidence-media-recording__onFormSubmit', (event) => { //to prevent the form from being submitted until the media is uploaded
-                    this.onFormSubmit();
-                }); 
+                document.addEventListener('evidence-media-recording__onFormSubmit', this.onFormSubmit); //to prevent the form from being submitted until the media is uploaded
             }
         },
 
@@ -152,15 +153,13 @@ export default {
          * the form button has been pressed, so start uploading the file
          *
          */
-        async onFormSubmit (event) {
-            try {
-                this.checkRecording();
-                const responseData = await this.uploadMediaAndReturnResponse();
+        async onFormSubmit () {
+            this.checkRecording();
+            const responseData = await this.uploadMediaAndReturnResponse();
+            if (!this.hasUploadError) {
                 this.addHiddenInputs(responseData);
                 this.displayUploadSuccessful();
                 document.dispatchEvent(new CustomEvent('evidence-media-recording__onUploadComplete')); //dispach to form.twig to continue form submit
-            } catch (error) {
-                console.warn(error);
             }
         },
 
@@ -175,7 +174,7 @@ export default {
         },
 
         /**
-         * the video is ready, so upload it up to SchoolBox and return response
+         * the media is ready, so upload it up to SchoolBox and return response
          *
          */
         async uploadMediaAndReturnResponse () {
@@ -189,9 +188,9 @@ export default {
                 this.isUploading = false; //hide the upload modal
                 return response.data;
             } catch (error) {
+                this.checkErrorMessage(error.response.data);
                 this.isUploading = false; //hide the upload modal
                 this.hasUploadError = true; //to show the error modal
-                console.warn(error);
             }
         },
 
@@ -215,6 +214,17 @@ export default {
             if (progressEvent.lengthComputable) {
                 this.uploadProgressRatio = (progressEvent.loaded / progressEvent.total) * 100;
                 this.uploadProgressRatio = this.uploadProgressRatio + '%';
+            }
+        },
+
+        /**
+         * try and grab known error messages to better inform of the error that's occured
+         *
+         * @params {Object}
+         */
+        checkErrorMessage (errorResponseData) {
+            if (errorResponseData.hash?.includes('This file exceeds the file size restriction')) {
+                this.uploadErrorMessage = `Sorry, the recording of ${filesize(this.recordedData.size)} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
             }
         },
 
@@ -265,8 +275,26 @@ export default {
          * @params { Number }
          * @params { Number }
          */
-        onRatioReady (width, height) {
+        onResize (width, height) {
             this.updateCurrentRatio(width, height);
+        },
+        
+        /**
+         * close the error modal, animating out
+         *
+         */
+        onCloseErrorModalSelected () {
+            this.isOverMediaModalClosing = true;
+        },
+
+        /**
+         * it's closed now, so disable the errors to allow trying again
+         *
+         */
+        onErrorModalClosed () {
+            this.hasUploadError = false;
+            this.isOverMediaModalClosing = false;
+            document.getElementById('evidence-submit').disabled = false; //enable to submit button again for possible re-try
         },
 
     }
@@ -284,7 +312,7 @@ export default {
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
         <record-camera
             v-else-if="recordMediaType === recordMediaTypes.CAMERA"
@@ -292,7 +320,7 @@ export default {
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
         <record-audio-only
             v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
@@ -300,7 +328,7 @@ export default {
             @on-device-ready="onDeviceReady"
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-ratio-ready="onRatioReady"
+            @on-resize="onResize"
         />
 
         <over-media-modal v-if="isUploading" key="isUploadingModal">
@@ -310,6 +338,10 @@ export default {
         <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
             <p><em>Media successfully uploaded.</em></p>
         </over-media-modal>	
+        <over-media-modal v-else-if="hasUploadError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorUploadModal">
+            <div class="alert-box alert">{{ uploadErrorMessage }}</div>
+            <button @click.prevent="onCloseErrorModalSelected">Close</button>
+        </over-media-modal>
 
     </div>	
 

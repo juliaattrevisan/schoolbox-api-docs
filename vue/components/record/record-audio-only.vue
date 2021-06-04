@@ -15,7 +15,7 @@ export default {
     },
 
     props: {
-       preRecordedData: { //to display an already existing recording on startup
+        preRecordedData: { //to display an already existing recording on startup
             type: Object,
             required: false,
         },

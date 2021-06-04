@@ -69,9 +69,9 @@ export const getAudioOnlyRecordOptions = () => {
 		record: {
 			audio: true,
 			video: false,
-            maxLength: RECORDING_LENGTH, 
             audioMimeType: 'audio/webm;codecs=opus',
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
+            maxLength: RECORDING_LENGTH,
 			debug: IS_DEBUG_MODE,
 		}
 	}
@@ -141,9 +141,9 @@ export const getRecordScreenOptions = () => {
         record: {
             audio: true,
             screen: true,
-            maxLength: RECORDING_LENGTH,
             videoMimeType: 'video/webm;codecs=vp8,opus', //enforce webm see https://www.webrtc-experiment.com/RecordRTC/simple-demos/isTypeSupported.html
             convertEngine: 'ts-ebml', //to be able to have seekable webm files
+            maxLength: RECORDING_LENGTH,
             debug: IS_DEBUG_MODE,
         }
     }
