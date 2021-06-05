@@ -69,11 +69,15 @@ $secret = Config::get('remote_secret');
 $time = time();
 $externalUserId = $_SESSION['sid'];
 
+$prefix = '';
+if (isset($_GET['prefix'])) {
+    $prefix = $_GET['prefix'];
+}
 
-$query['time'] = $time;
-$query['id'] = $externalUserId;
-$query['user'] = urlencode($_SESSION['username']);
-$query['key'] = sha1($secret . $time . $externalUserId);
+$query[$prefix . 'time'] = $time;
+$query[$prefix . 'id'] = $externalUserId;
+$query[$prefix . 'user'] = urlencode($_SESSION['username']);
+$query[$prefix . 'key'] = sha1($secret . $time . $externalUserId);
 
 $url->setQuery($query);
 
