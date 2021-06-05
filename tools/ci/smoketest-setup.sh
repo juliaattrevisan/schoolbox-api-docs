@@ -17,24 +17,16 @@ mkdir /var/lib/schoolbox
 
 ## Some installed things, can be moved out if we make a docker image of this
 apt update
-apt install git gzip -y
 
-## A case should be added with every supported PHP version
-if [ $PHP_VERSION == 'php7.4' ]
-then
-  apt install php7.4-fpm php7.4-pdo php7.4-mysql nginx -y
-  CONFIG_DIR="/etc/php/7.4/fpm"
-  PHP_SERVICE="php7.4-fpm"
-else
-  echo "Unsupported PHP version: ${PHP_VERSION}"
-  exit 1
-fi
+apt install php7.4-fpm php7.4-pdo php7.4-mysql nginx -y
+CONFIG_DIR="/etc/php/7.4/fpm"
+PHP_SERVICE="php7.4-fpm"
 
 apt install redis-server mysql-client npm -y
 apt install mariadb-server -y
 
 ## Start database to initialise with a username and password
-service mysql start
+systemctl start mysql
 
 ## Initialise database
 mysql -e "create database schoolbox;"
@@ -78,14 +70,12 @@ chmod 777 -R /vagrant/data/*
 echo '127.0.0.1 vagrant.dev.schoolbox.cloud' >> /etc/hosts
 
 ## Start the services!
-service $PHP_SERVICE start
+systemctl start $PHP_SERVICE
 echo 'started php'
-service nginx start
+systemctl start nginx
 echo 'started nginx'
-service redis-server start
+systemctl start redis-server
 echo 'started redis-server'
-service mysql start
-echo 'started mysql'
 
 ## Go to the tools and update the db to be the latest version.
 cd /vagrant/tools

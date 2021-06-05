@@ -1,22 +1,13 @@
 #!/bin/bash
 
 ## After the test is run we need to shut down the services
-PHP_VERSION=$1
+PHP_SERVICE="php7.4-fpm"
 
-## A case should be added with every supported PHP version
-if [ $PHP_VERSION == 'php7.4' ]
-then
-  PHP_SERVICE="php7.4-fpm"
-else
-  echo "Unsupported PHP version: ${PHP_VERSION}"
-  exit 1
-fi
-
-service $PHP_SERVICE stop
+systemctl stop $PHP_SERVICE
 echo 'stopped php'
-service nginx stop
+systemctl stop nginx
 echo 'stopped nginx'
-service redis-server stop
+systemctl stop redis-server
 echo 'stopped redis-server'
-service mysql stop
+systemctl stop mysql
 echo 'stopped mysql'
