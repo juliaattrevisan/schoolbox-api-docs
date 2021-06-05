@@ -89,7 +89,7 @@ $app = new class extends CliTool\App{
         // get a list of all available redis messages o.O;
         $redisList = $redis->executeCommand($redis->createCommand('keys', array('msg:*:m:*')));
 
-        $this->getLogger()->info("Checking redis data: ");
+        $this->getLogger()->info("Checking redis data...");
         $acks = 0;
 
         foreach ($redisList as $key) {
@@ -101,7 +101,7 @@ $app = new class extends CliTool\App{
 
             if ($this->checkData($args, $regexMode, $msgArray)) {
                 $this->getLogger()->info(sprintf(
-                    'Deleting %s %s: %s (%s)',
+                    'Found %s %s: %s (%s)',
                     $msgArray['namespace'],
                     $key,
                     $msgArray['title']['text'],
@@ -115,7 +115,10 @@ $app = new class extends CliTool\App{
             }
         }
 
-        if($this->perform()) {
+        if($acks == 0 ) {
+            $this->getLogger()->info("No matching notifications found!");
+        }
+        else if($this->perform()) {
             $this->getLogger()->info("$acks messages matched and removed");
         }
         else {
