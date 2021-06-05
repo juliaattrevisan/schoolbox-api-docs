@@ -17,18 +17,10 @@ mkdir /var/lib/schoolbox
 
 ## Some installed things, can be moved out if we make a docker image of this
 apt update
-apt install git gzip -y
 
-## A case should be added with every supported PHP version
-if [ $PHP_VERSION == 'php7.4' ]
-then
-  apt install php7.4-fpm php7.4-pdo php7.4-mysql nginx -y
-  CONFIG_DIR="/etc/php/7.4/fpm"
-  PHP_SERVICE="php7.4-fpm"
-else
-  echo "Unsupported PHP version: ${PHP_VERSION}"
-  exit 1
-fi
+apt install php7.4-fpm php7.4-pdo php7.4-mysql nginx -y
+CONFIG_DIR="/etc/php/7.4/fpm"
+PHP_SERVICE="php7.4-fpm"
 
 apt install redis-server mysql-client npm -y
 apt install mariadb-server -y
