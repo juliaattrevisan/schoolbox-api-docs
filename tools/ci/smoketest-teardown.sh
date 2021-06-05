@@ -12,11 +12,11 @@ else
   exit 1
 fi
 
-service $PHP_SERVICE stop
+systemctl stop $PHP_SERVICE
 echo 'stopped php'
-service nginx stop
+systemctl stop nginx
 echo 'stopped nginx'
-service redis-server stop
+systemctl stop redis-server
 echo 'stopped redis-server'
-service mysql stop
+systemctl stop mysql
 echo 'stopped mysql'
