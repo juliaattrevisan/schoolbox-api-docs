@@ -84,6 +84,8 @@
                             {% endif %}
 
                             {% if showDetails %}
+                                {% block home_address %}
+                                {% endblock home_address %}
                                 <dt class="small-12 medium-3">Role:</dt>
                                 <dd class="small-12 medium-9">{{ user.role.name }}</dd>
                                 {% if externalUser and externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
