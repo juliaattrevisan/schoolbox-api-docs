@@ -66,7 +66,7 @@
                     dropzoneInstance.on('removedfile', (file) => {
                         //ensure removing the file that's already in place - as this event could be called when multiple files have been dragged and dropped, 
                         //which in this case would wipe out the existing value when this event is called to remove the other files as only a single file is allowed
-                        if (file.name === filenameInput.value) { 
+                        if (filenameInput.value === file.name) { 
                             filenameInput.value = '';
                         }
                     });
