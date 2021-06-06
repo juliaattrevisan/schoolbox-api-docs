@@ -1,5 +1,6 @@
 {% extends '@core/user/parent.twig' %}
 {% block home_address %}
+    {% if isStaff or isSelf %}
     <dt class="small-12 medium-3">Address:</dt>
     <dd class="small-12 medium-9">
         {% for field in ['Address1', 'Address2', 'Address3'] %}
@@ -13,4 +14,5 @@
             {% endif %}
         {% endfor %}
     </dd>
+    {% endif %}
 {% endblock home_address %}
