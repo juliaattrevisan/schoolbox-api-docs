@@ -202,7 +202,7 @@ class External_Synergetic_Amity_User extends External_Synergetic_User
     /**
      * @inheritDoc
      */
-    function getParent(string $externalUserId): array
+    public function getParent(string $externalUserId): array
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
