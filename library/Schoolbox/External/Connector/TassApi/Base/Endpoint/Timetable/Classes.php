@@ -203,6 +203,11 @@ class Classes implements IStrategy
                      */
                     $subject = $period['SUBJECTS'][0];
 
+                    /* TODO If the FROM_DATE is not null and the TO_DATE is not null,
+                     *  check that the current time is between these two dates
+                     *  If we're outside these two dates, skip this subject
+                     */
+
                     /* Tass doesn't use the date part,
                      * Tass includes a microseconds part (sigh)
                      * So we have to ditch these bits and swipe what we need

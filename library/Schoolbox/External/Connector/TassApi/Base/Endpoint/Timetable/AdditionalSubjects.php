@@ -166,6 +166,11 @@ class AdditionalSubjects implements IStrategy
                     (string)$additionalSubject['class']
                 );
 
+                /* TODO If the from_date is not null and the to_date is not null,
+                 *  check that the current time is between these two dates
+                 *  If we're outside these two dates, skip this additionalSubject
+                 */
+
                 /* If they're already involved, don't worry about it
                  *
                  * This hash lookup lets us skips a lot of mapper nonsense if we don't need to do anything
