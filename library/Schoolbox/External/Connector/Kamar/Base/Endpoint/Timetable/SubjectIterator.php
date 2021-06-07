@@ -189,7 +189,6 @@ class SubjectIterator implements Iterator
          *   - The code itself isn't unique enough for class lists etc.
          */
         if (isset($subjectNode->core)) {
-
             /* For subjects classified as 'core'
              *
              * This creates subject names like 11C-11MATH
