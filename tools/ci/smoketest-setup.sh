@@ -26,7 +26,7 @@ apt install redis-server mysql-client npm -y
 apt install mariadb-server -y
 
 ## Start database to initialise with a username and password
-systemctl start mysql
+service mysql start
 
 ## Initialise database
 mysql -e "create database schoolbox;"
@@ -76,12 +76,14 @@ chmod 777 -R /vagrant/data/*
 echo '127.0.0.1 vagrant.dev.schoolbox.cloud' >> /etc/hosts
 
 ## Start the services!
-systemctl start $PHP_SERVICE
+service $PHP_SERVICE start
 echo 'started php'
-systemctl start nginx
+service nginx start
 echo 'started nginx'
-systemctl start redis-server
+service redis-server start
 echo 'started redis-server'
+service mysql start
+echo 'started mysql'
 
 ## Go to the tools and update the db to be the latest version.
 cd /vagrant/tools
