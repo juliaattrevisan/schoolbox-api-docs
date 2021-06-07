@@ -126,7 +126,6 @@ export default {
         onDeviceReady () {
             this.isDeviceReady = true;
             this.$emit(recordMediaEvents.DEVICE_READY, this.$refs.container.firstChild.offsetWidth, this.$refs.container.firstChild.offsetWidth * 0.5625); //ensure the entire recording is available
-            debugger;
         },
 
         /**
