@@ -59,7 +59,7 @@ class ValidActiveEnrolment
             return true;
         }
 
-        /* What happens one when date is specified but not the other?
+        /* What happens when one date is specified but not the other?
          * Not sure if that's even possible, but we shall see
          *
          * If one, but not both, were provided, assume an active enrolment
