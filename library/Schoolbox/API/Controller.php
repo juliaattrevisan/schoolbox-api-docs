@@ -85,7 +85,7 @@ class Controller extends Base
      * registers their app token.
      *
      * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
-     * @api          /api/register/{provider}
+     * @api          POST /api/register/{provider}
      * @since        145
      *
      * @param string $provider
@@ -185,7 +185,7 @@ class Controller extends Base
      * API endpoint for initializing a session based on a username/password or
      * a JWT, without registering an app.
      *
-     * @api   /api/session
+     * @api   POST /api/session
      * @since 190
      */
     public function initSession(): void
@@ -207,6 +207,18 @@ class Controller extends Base
                 }
             }
         }
+    }
+
+
+    /**
+     * API endpoint for initializing a session based on a JWT in a query string.
+     *
+     * @api   GET /api/session
+     * @since 21.0
+     */
+    public function initSessionFromQueryString(): void
+    {
+        $this->initSession();
     }
 
 

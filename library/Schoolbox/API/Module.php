@@ -27,6 +27,7 @@ class Module extends BaseModule
     {
         $this->register('POST', '/register/{provider}', 'register');
         $this->register('POST', '/session', 'initSession');
+        $this->register('GET', '/session', 'initSessionFromQueryString');
     }
 
 
