@@ -23,7 +23,8 @@ class Item
     // TODO all of these should have better selectors
     // TODO all of these belong in the main content of a page (#content)
 
-    public const LINK_MODIFY   = Common::ELEMENT_CONTENT . ' .icon-modify';
+    public const DOT_MENU   = 'a.icon-more';
+    public const LINK_MODIFY   = 'Modify';
     public const LINK_PREVIOUS = Common::ELEMENT_CONTENT . ' .icon-previous';
     public const LINK_NEXT     = Common::ELEMENT_CONTENT . ' .icon-next';
 
@@ -89,6 +90,7 @@ class Item
      */
     public function modifyArticle(): void
     {
+        $this->tester->click(self::DOT_MENU);
         $this->tester->click(self::LINK_MODIFY);
     }
 }

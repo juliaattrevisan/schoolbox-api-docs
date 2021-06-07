@@ -12,6 +12,7 @@ namespace Page\News;
 
 use AcceptanceTester;
 use Alaress_Date_Format;
+use Codeception\Util\Locator;
 use Page\Common;
 
 /**
@@ -109,7 +110,7 @@ class Form
      */
     public function seeHeadline(string $headline): self
     {
-        $this->tester->seeInField('heading', $headline);
+        $this->tester->seeInField('title', $headline);
         return $this;
     }
 
@@ -152,7 +153,7 @@ class Form
     public function seeBlurb(string $blurb): self
     {
         // Expand blurb pane, and then ensure I see its contents
-        $this->tester->click('[data-collapser="blurb"]');
+        $this->tester->click('legend.icon-down-arrow');
         $this->tester->seeInRichTextField('blurb', $blurb);
         return $this;
     }
@@ -173,7 +174,7 @@ class Form
      */
     public function seeFeatureImage(string $filename): self
     {
-        $this->tester->seeAttachzoneFile('#news-feature-zone', $filename);
+        $this->tester->seeAttachzoneFile('#featureImage-zone', $filename);
         return $this;
     }
 
@@ -250,20 +251,17 @@ class Form
 //        $this->tester->selectSelectizeOptions('userList[]', $users);
         //adding this pice of code just to continue fixing the tests as I got stuck with this function to fill the users
         $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
-        sleep(5);
         $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
-//        $this->tester->waitForText('Year Levels');
-        $this->tester->click('i.icon-teacher');
-//        $element = Locator::contains('button.button-block', 'Year Levels');
-//        $this->tester->clickWithLeftButton($element);
+        $this->tester->waitForText('Year Levels');
+        $element = Locator::contains('button.button-block', 'Year Levels');
+        $this->tester->clickWithLeftButton($element);
         $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
-//        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
-//        $this->tester->waitForText('Year 3', 5);
-        $Year_9_element = Locator::contains('div.checklist-wrapper label', 'Year 3');
+        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+        $this->tester->waitForText('Year 9', 5);
+        $Year_9_element = Locator::contains('div.checklist-wrapper', 'Year 9');
         $this->tester->clickWithLeftButton($Year_9_element);
         $this->tester->click('button.button.submit');
         sleep(5);
-
         return $this;
 
     }
