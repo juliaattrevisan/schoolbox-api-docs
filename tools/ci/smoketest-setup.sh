@@ -69,6 +69,9 @@ export INSTANCE_ID=smoketest
 ## use the develop build.
 tar xzf $initialdir/build-artifact/develop-build.tar.gz;
 
+## Extract the develop vendor build too
+tar xzf $initialdir/vendor-php-artifact-dev/develop-vendor-php-dev.tar.gz;
+
 ## Make sure the data directory has no permissions issues.
 chmod 777 -R /vagrant/data/*
 
