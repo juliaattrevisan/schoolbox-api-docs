@@ -9,19 +9,22 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\AMQP\Bunny\BunnyControl;
-use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Notification;
+use Alaress\Async\Notification\NotificationBundle;
 use Schoolbox\Application\CliTool;
-use Schoolbox\Notif\MQ\Connector;
+use Schoolbox\Realtime\Notification\Decorator;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
+    /** @var string|null $instanceId */
+    private ?string $instanceId;
+
     /** @inheritDoc */
     public function runAsRoot(): ?bool
     {
-        return true;
+        return null;
     }
 
     /** @inheritDoc */
@@ -33,7 +36,7 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function getLongOpts(): array
     {
-        return ['help', 'title:', 'href:', 'start:', 'end:'];
+        return ['help', 'title:', 'href:', 'start:', 'end:', 'instance-id:'];
     }
 
     /** @inheritDoc */
@@ -44,6 +47,12 @@ $app = new class extends CliTool\App{
             $this->printHelp();
             exit(CliTool\Kernel::EXIT_STATUS_OK);
         }
+
+        $this->instanceId = $this->getOpt('instance-id:');
+        if (empty($this->instanceId)) {
+            $this->instanceId = INSTANCE_ID;
+        }
+
 
         $regexMode = $this->getOpt('r');
         $args = [];
@@ -65,7 +74,7 @@ $app = new class extends CliTool\App{
         }
 
         if (!count($args)) {
-            $this->getLogger()->error("Insufficient search parameters specified!");
+            $this->getLogger()->error("Insufficient search parameters specified! Try -h for more information and help.");
             exit(1);
         }
 
@@ -80,6 +89,7 @@ $app = new class extends CliTool\App{
     private function checkRedis($args, $regexMode): void
     {
         $redis = \Alaress\Redis::getClientInstance();
+        $decorator = new Decorator();
 
         if (!$redis) {
             $this->getLogger()->critical("Redis instance not available");
@@ -87,7 +97,7 @@ $app = new class extends CliTool\App{
         }
 
         // get a list of all available redis messages o.O;
-        $redisList = $redis->executeCommand($redis->createCommand('keys', array('msg:*:m:*')));
+        $redisList = $redis->executeCommand($redis->createCommand('keys', array('msg:' . $this->instanceId . ':m:*')));
 
         $this->getLogger()->info("Checking redis data...");
         $acks = 0;
@@ -98,13 +108,15 @@ $app = new class extends CliTool\App{
 
             $msg = unserialize($uncompress);
             $msgArray = $msg->jsonSerialize();
+            $notification = new Notification([ $msg ]);
+            $msgArray['title']['plain'] = $decorator->renderTitleAsPlaintext($notification);
 
             if ($this->checkData($args, $regexMode, $msgArray)) {
                 $this->getLogger()->info(sprintf(
                     'Found %s %s: %s (%s)',
                     $msgArray['namespace'],
                     $key,
-                    $msgArray['title']['text'],
+                    $msgArray['title']['plain'],
                     $msgArray['href']
                 ));
 
@@ -115,13 +127,11 @@ $app = new class extends CliTool\App{
             }
         }
 
-        if($acks == 0 ) {
+        if ($acks == 0) {
             $this->getLogger()->info("No matching notifications found!");
-        }
-        else if($this->perform()) {
+        } elseif ($this->perform()) {
             $this->getLogger()->info("$acks messages matched and removed");
-        }
-        else {
+        } else {
             $this->getLogger()->info("$acks messages matched, no action taken run with -p to delete");
         }
     }
@@ -132,12 +142,12 @@ $app = new class extends CliTool\App{
      * @param array $msg
      * @return bool
      */
-    private function checkData($args, $regexMode, $msg): bool
+    private function checkData(array $args, bool $regexMode, array $msg): bool
     {
         $success = true;
 
         if (isset($args['title'])) {
-            $success = $this->checkStr($regexMode, $args['title'], $msg['title']['text']);
+            $success = $this->checkStr($regexMode, $args['title'], $msg['title']['plain']);
         }
 
         if (isset($args['href'])) {
@@ -162,7 +172,7 @@ $app = new class extends CliTool\App{
      * @param string $text
      * @return bool
      */
-    private function checkStr($regexMode, $test, $text): bool
+    private function checkStr(bool $regexMode, string $test, string $text): bool
     {
         if ($regexMode) {
             return (bool)preg_match("`$test`", $text);
@@ -177,7 +187,7 @@ $app = new class extends CliTool\App{
      * @param int  $time
      * @return bool
      */
-    private function checkTime($before, $test, $time): bool
+    private function checkTime(bool $before, int $test, int $time): bool
     {
         if ($before) {
             return $test <= $time;
@@ -200,13 +210,13 @@ Usage: scalpel.php [--title='posted by'] [--href='/news/483'] [--start='2021-02-
 Options:
     -h, --help
         Print help message and exit.
-    -t, --title
+    --title
         If set, delete notifications that contain this in the title text of the notification
-    -h, --href
+    --href
         If set, delete notifications that have this URL
-    -s  --start
+    --start
         Only notifications delivered after this date will be matched
-    -e  --end
+    --end
         Only notifications delivered before this time will be matches
     -r
         If present, title and href will be treated as preg expression strings and matches done as regexps
