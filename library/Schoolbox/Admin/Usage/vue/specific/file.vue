@@ -40,8 +40,7 @@ export default {
      */
     components: {
         RevealModal,
-        Toast,
-        // VueGoodTable
+        Toast
     },
 
     /**
