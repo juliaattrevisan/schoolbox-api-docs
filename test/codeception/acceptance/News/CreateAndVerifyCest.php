@@ -68,12 +68,12 @@ class CreateAndVerifyCest
             ->fillArticle($article)
             ->fillBlurb($blurb)
             ->fillFeatureImage($image)
-            ->fillTopic($topic)
+//            ->fillTopic($topic)
             ->fillRoles($roles)
             ->fillCampuses($campi)
             ->fillUsers($users)
-            ->fillPublishDate($publish)
-            ->fillExpiryDate($expiry)
+//            ->fillPublishDate($publish)
+//            ->fillExpiryDate($expiry)
             ->submit();
 
         // Verify that the news is in the All topic, and is the first news item
