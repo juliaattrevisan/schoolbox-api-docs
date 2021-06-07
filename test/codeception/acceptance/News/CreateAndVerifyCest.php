@@ -116,15 +116,15 @@ class CreateAndVerifyCest
             ->seeFeatureImage($image)
           //  ->seeTopic($topic)
             ->seeRoles($roles)
-            ->seeCampuses($campi)
+            ->seeCampuses($campi);
             //->seeUsers($users)
            // ->seePublishDate($publish)
            // ->seeExpiryDate($expiry);
 
-        // Verify that user Scott Berryhill cannot see it
-        $scott = $i->haveFriend('scott');
+        // Verify that user Tim Reed(student) cannot see it
+        $scott = $i->haveFriend('tim');
         $scott->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
-            $i->login('sberryhill', 'password');
+            $i->login('treed', 'password');
             $indexPage = new Index($i);
 
             // Go to all page
@@ -136,10 +136,10 @@ class CreateAndVerifyCest
             $indexPage->dontSeeHeadline($headline, $position);
         });
 
-        // Verify that user Celia Glenn can see it
-        $celia = $i->haveFriend('celia');
+        // Verify that user Alison Chan(teacher) can see it
+        $celia = $i->haveFriend('alison');
         $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
-            $i->login('cglenn', 'password');
+            $i->login('achan', 'password');
             $indexPage = new Index($i);
 
             // Go to all page
