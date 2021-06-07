@@ -33,7 +33,6 @@ export default {
         }
     },
 
-
     /**
      * Components.
      * Any other vue components you also want to use here; they must already be imported
@@ -70,15 +69,15 @@ export default {
              */
             options: {
                 headings: {
-                    firstname: 'Firstname',
-                    lastname: 'Lastname',
-                    role: 'Role',
+                    name: 'Filename',
                     size: 'Filesize',
+                    folder: 'Folder',
+                    location: 'Location',
                     id: 'Delete',
                 },
                 orderBy: {
                     ascending: true,
-                    column: 'lastname' 
+                    column: 'name' 
                 },
                 pagination: {
                     edge: false,
