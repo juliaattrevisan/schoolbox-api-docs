@@ -28,7 +28,7 @@ class ValidActiveEnrolment
 
 
     /**
-     * ValidClassEnrolment constructor.
+     * ValidActiveEnrolment constructor.
      *
      * @param Alaress_Date_Format|null $now
      */
