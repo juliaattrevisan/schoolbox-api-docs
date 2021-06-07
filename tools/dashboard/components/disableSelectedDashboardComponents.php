@@ -83,7 +83,7 @@ HELP;
 
         /** @var IConfigLoader $config */
         $config = $this->getDi()->get('config');
-        $backupFileName = $config->get('storage_dir') . '/modules.json';
+        $backupFileName = $config->get('stream_dir') . '/modules.json';
 
         $answer = 'y';
 

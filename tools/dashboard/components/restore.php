@@ -76,7 +76,7 @@ HELP;
 
         /** @var IConfigLoader $config */
         $config = $this->getDi()->get('config');
-        $backupFileName = $config->get('storage_dir') . '/modules.json';
+        $backupFileName = $config->get('stream_dir') . '/modules.json';
 
         try {
             $records = json_decode(file_get_contents($backupFileName), true, 512, JSON_THROW_ON_ERROR);
