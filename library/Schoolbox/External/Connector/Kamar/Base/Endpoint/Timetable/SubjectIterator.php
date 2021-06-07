@@ -189,6 +189,7 @@ class SubjectIterator implements Iterator
          *   - The code itself isn't unique enough for class lists etc.
          */
         if (isset($subjectNode->core)) {
+
             /* For subjects classified as 'core'
              *
              * This creates subject names like 11C-11MATH
@@ -201,7 +202,7 @@ class SubjectIterator implements Iterator
 
             $code = implode('-', array_filter([
                 $name,
-                trim((string)$subjectNode->teachers)
+                $this->translateTeacherIdentifiers((string)$subjectNode->teachers)
             ]));
         } elseif (isset($subjectNode->option)) {
             /* For subjects classified as 'optional' :
@@ -212,7 +213,7 @@ class SubjectIterator implements Iterator
             $name = implode('-', array_filter([
                 trim((string)$subjectNode->option),
                 $code,
-                trim((string)$subjectNode->teachers)
+                $this->translateTeacherIdentifiers((string)$subjectNode->teachers)
             ]));
 
             $code = $name;
@@ -226,6 +227,24 @@ class SubjectIterator implements Iterator
             'code' => $code,
             'name' => $name,
         ];
+    }
+
+
+    /**
+     * Teachers are sometimes sent as comma-separated identifiers but in kamar
+     * it's slash separated. A kamar representation "JST/MST" will come through
+     * as "JST,MST" in the xml, causing a disjunct between what you saw and what
+     * they send to us
+     *
+     * Kamar should really repair this in their API.
+     * We shouldn't be bandaiding over it like this, but until then...
+     *
+     * @param string $teachers
+     * @return string
+     */
+    private function translateTeacherIdentifiers(string $teachers): string
+    {
+        return str_replace(',', '/', trim($teachers));
     }
 
 
