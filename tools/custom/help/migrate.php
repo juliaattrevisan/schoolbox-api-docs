@@ -29,6 +29,12 @@ $app = new class extends CliTool\App {
         ];
     }
 
+    /** @inheritdoc */
+    public function getRequiredProcessUser(): ?string
+    {
+        return 'www-data';
+    }
+
 
     /**
      * Run the cli tool
