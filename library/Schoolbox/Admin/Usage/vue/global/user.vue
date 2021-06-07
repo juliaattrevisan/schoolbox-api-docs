@@ -58,13 +58,13 @@ export default {
              */
             allData: [],
 
-            /* Table columns. You can define sorting and formatting functions
-             * here, but I found the custom slots to work best for sorting on
-             * html representations e.g. linked firstname, linked lastname
+            /* Table columns
              */
             columns: [ 'firstname', 'lastname', 'role', 'size' ],
+
+            /* vue-tables-2 options, see https://matanya.gitbook.io/vue-tables-2/options-api
+             */
             options: {
-                hiddenColumns: ['id'],
                 headings: {
                     firstname: 'Firstname',
                     lastname: 'Lastname',

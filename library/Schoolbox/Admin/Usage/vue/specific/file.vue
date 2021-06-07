@@ -27,9 +27,13 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-       'endpoint'
-    ],
+    props: {
+        endpoint: {
+           type: String, 
+           required: true
+        }
+    },
+
 
     /**
      * Components.
@@ -39,7 +43,7 @@ export default {
     components: {
         RevealModal,
         Toast,
-        VueGoodTable
+        // VueGoodTable
     },
 
     /**
@@ -48,7 +52,7 @@ export default {
      * Note that v-if and v-for must never be on the same node together, as this overrides
      * the meaning of "this" in a way you don't expect.
      */
-    data() {
+    data () {
         return {
 
             /* True, when data is currently loading; used to show skeleton
@@ -59,36 +63,67 @@ export default {
              */
             allData: [],
 
-            /* Table columns. You can define sorting and formatting functions
-             * here, but I found the custom slots to work best for sorting on
-             * html representations e.g. linked firstname, linked lastname
+            /* Table columns. 
              */
-            columns: [
-                {
-                    label: 'Filename',
-                    field: 'name'
+            columns: [ 'name', 'size', 'folder', 'location' ],
+            //     {
+            //         label: 'Filename',
+            //         field: 'name'
+            //     },
+            //     {
+            //         label: 'Filesize',
+            //         field: 'size',
+            //         type: 'number',
+            //         formatFn: filesize
+            //     },
+            //     {
+            //         label: 'Folder',
+            //         field: 'folder'
+            //     },
+            //     {
+            //         label: 'Location',
+            //         field: 'location'
+            //     },
+            //     {
+            //         label: 'Delete',
+            //         field: this.linkDelete,
+            //         html: true,
+            //         sortable: false
+            //     },
+            // ],
+
+            /* vue-tables-2 options, see https://matanya.gitbook.io/vue-tables-2/options-api
+             */
+            options: {
+                headings: {
+                    firstname: 'Firstname',
+                    lastname: 'Lastname',
+                    role: 'Role',
+                    size: 'Filesize',
                 },
-                {
-                    label: 'Filesize',
-                    field: 'size',
-                    type: 'number',
-                    formatFn: filesize
+                orderBy: {
+                    ascending: true,
+                    column: 'lastname' 
                 },
-                {
-                    label: 'Folder',
-                    field: 'folder'
+                pagination: {
+                    edge: false,
                 },
-                {
-                    label: 'Location',
-                    field: 'location'
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
+                texts: {
+                    count: 'Showing {from} to {to} of {count} files|{count} files|1 file'
                 },
-                {
-                    label: 'Delete',
-                    field: this.linkDelete,
-                    html: true,
-                    sortable: false
+                skin: 'table-striped table-bordered table-hover',
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
                 },
-            ],
+                resizableColumns: false,
+                tabbable: false,
+                filterable: false
+            },
 
             /* When you click the Delete link, remember its url
              * A singleton modal spawns and uses this as its confirmation button destination
@@ -104,39 +139,8 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-        let self = this;
-
-        /* Show skeleton
-         */
-        this.loading = true;
-
-        /* Fetch payload asynchronously
-         */
-        let request = {
-            url: self.endpoint,
-            method: 'get',
-            responseType: 'json'
-        }
-
-        axios.request(request)
-            .then(function (response) {
-
-                /* Load into vue component
-                 */
-                self.allData = response.data;
-            })
-            .catch(error => {
-                if (error.response) {
-                    self.loading = false;
-                }
-            })
-            .then(function () {
-
-                /* Hide skeleton
-                 */
-                self.loading = false;
-            });
+    mounted () {
+        this.loadRows();
     },
 
     /**
@@ -152,6 +156,32 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+
+        /**
+         * Fetch payload asynchronously
+         *
+         */
+        async loadRows () {
+            this.loading = true;
+            try {
+                const response = await axios.get(this.endpoint);
+                this.allData = response.data;
+                this.loading = false;
+            } catch (error) {
+                this.loading = false; 
+            }
+        },
+
+        /**
+         * To convert the bytes into a more readable string
+         * 
+         * @param { Number } - 214430838
+         * 
+         * @returns { String } - 204.5 MB
+         */
+        getHumanReadableFilesize (value) {
+            return filesize(value);
+        },
 
         /**
          * Render a delete link
@@ -248,7 +278,7 @@ export default {
             </table>
         </template>
         <template v-else>
-            <vue-good-table
+            <!-- <vue-good-table
                 styleClass="vgt-table striped bordered"
                 :columns="columns"
                 :rows="allData"
@@ -283,7 +313,25 @@ export default {
                         {{ props.formattedRow[props.column.field] }}
                     </template>
                 </template>
-            </vue-good-table>
+            </vue-good-table> -->
+            <v-client-table 
+                :data="allData" 
+                :columns="columns" 
+                :options="options" 
+            >
+                <template v-slot:name="props"> 
+                    <a :href="props.row._links.send">{{ props.row.name }}</a>
+                </template>
+                <template v-slot:size="props"> 
+                    {{ getHumanReadableFilesize(props.row.size) }}
+                </template>
+                <template v-slot:folder="props"> 
+                    <a :href="`/homepage/${props.row.folderId}`">{{ props.row.folder }}</a>
+                </template>
+                <template v-slot:Delete="props"> 
+                    <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
+                </template>
+            </v-client-table>
         </template>
         <toast ref="toast"></toast>
         <reveal-modal ref="deleteModal">
@@ -298,5 +346,5 @@ export default {
 </template>
 
 <style lang="scss">
-@import '@schoolbox/vueGoodTable/vueGoodTable';
+@import '@schoolbox/vueTables2/vueTables2';
 </style>
