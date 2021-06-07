@@ -1,7 +1,8 @@
 <script>
+
 import axios from 'axios';
-import { VueGoodTable } from 'vue-good-table';
 import filesize from 'filesize';
+
 
 export default {
 
@@ -35,7 +36,6 @@ export default {
      * at the top of the file.
      */
     components: {
-        VueGoodTable
     },
 
     /**
@@ -59,26 +59,38 @@ export default {
              * here, but I found the custom slots to work best for sorting on
              * html representations e.g. linked firstname, linked lastname
              */
-            columns: [
-                {
-                    label: 'Firstname',
-                    field: 'firstname'
+            columns: [ 'firstname', 'lastname', 'role', 'size' ],
+            options: {
+                hiddenColumns: ['id'],
+                headings: {
+                    firstname: 'Firstname',
+                    lastname: 'Lastname',
+                    role: 'Role',
+                    size: 'Filesize',
                 },
-                {
-                    label: 'Lastname',
-                    field: 'lastname'
+                orderBy: {
+                    ascending: true,
+                    column: 'lastname' 
                 },
-                {
-                    label: 'Role',
-                    field: 'role'
+                pagination: {
+                    edge: false,
                 },
-                {
-                    label: 'Filesize',
-                    field: 'size',
-                    type: 'number',
-                    formatFn: filesize
-                }
-            ],
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
+                texts: {
+                    count: 'Showing {from} to {to} of {count} users|{count} users|1 user'
+                },
+                skin: 'table-striped table-bordered table-hover',
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
+                },
+                resizableColumns: false,
+                tabbable: false,
+                filterable: false
+            },
         }
     },
 
@@ -88,6 +100,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
+        
         let self = this;
 
         /* Show skeleton
@@ -158,43 +171,25 @@ export default {
             </table>
         </template>
         <template v-else>
-            <vue-good-table
-                styleClass="vgt-table striped bordered"
-                :columns="columns"
-                :rows="allData"
-                :search-options="{
-                    enabled: false
-                }"
-                :sort-options="{
-                    initialSortBy: {
-                        field: 'lastname',
-                        type: 'asc'
-                    }
-                }"
-                :pagination-options="{
-                    enabled: true,
-                    perPage: 50,
-                    perPageDropdown: [50, 100, 200],
-                    rowsPerPageLabel: 'Users per page',
-                    infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
-                }"
+            <v-client-table 
+                :data="allData" 
+                :columns="columns" 
+                :options="options" 
             >
-                <template slot="table-row" slot-scope="props">
-                    <template v-if="props.column.field == 'firstname'">
-                        <a :href="'/adminv2/usage/specific/' + props.row.userId">{{ props.row.firstname }}</a>
-                    </template>
-                    <template v-else-if="props.column.field == 'lastname'">
-                        <a :href="'/adminv2/usage/specific/' + props.row.userId">{{ props.row.lastname }}</a>
-                    </template>
-                    <template v-else>
-                        {{props.formattedRow[props.column.field]}}
-                    </template>
+                <template v-slot:firstname="props"> 
+                    <a :href="`/adminv2/usage/specific/${props.row.id}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
                 </template>
-            </vue-good-table>
+                <template v-slot:lastname="props"> 
+                    <a :href="`/adminv2/usage/specific/${props.row.id}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
+                </template>
+                <template v-slot:size="props"> 
+                    <a :href="`/adminv2/usage/specific/${props.row.id}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
+                </template>
+            </v-client-table>
         </template>
     </div>
 </template>
 
 <style lang="scss">
-@import '@schoolbox/vueGoodTable/vueGoodTable';
+@import '@schoolbox/vueTables2/vueTables2';
 </style>
