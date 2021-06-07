@@ -243,7 +243,13 @@ class Definition implements IStrategy
 
         foreach ($days as $day) {
             $periods = $day->xpath('Periods/Period');
-            $dayIndex = trim((string)$day->Day);
+
+            /* iSAMS uses a indexed week offset such that Sunday is Day 1
+             * but we use Monday as Day 1 so compensate for that. Except if your
+             * school actually starts on a Sunday like in the Middle East, then
+             * we will need to revisit this compensation
+             */
+            $dayIndex = (int)$day->Day - 1;
 
             /* Figure out which day has the most periods
              * Consider this value and scheme canonical
