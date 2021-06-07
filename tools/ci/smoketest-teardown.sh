@@ -3,11 +3,11 @@
 ## After the test is run we need to shut down the services
 PHP_SERVICE="php7.4-fpm"
 
-systemctl stop $PHP_SERVICE
+service $PHP_SERVICE stop
 echo 'stopped php'
-systemctl stop nginx
+service nginx stop
 echo 'stopped nginx'
-systemctl stop redis-server
+service redis-server stop
 echo 'stopped redis-server'
-systemctl stop mysql
+service mysql stop
 echo 'stopped mysql'
