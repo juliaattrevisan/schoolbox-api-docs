@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades\Cohort;
 
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -50,6 +51,12 @@ class ClassResults
 
 
     /**
+     * The academic period (a.k.a. term) to limit the cohort to.
+     */
+    private Term $term;
+
+
+    /**
      * @var array
      */
     private $tuples;
@@ -62,17 +69,20 @@ class ClassResults
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param Collection            $assessments
      * @param User                  $viewer
+     * @param Term                  $term
      */
     public function __construct(
         bool $gradeGradientEnabled,
         AssessmentMapperProxy $assessmentMapperProxy,
         Collection $assessments,
-        User $viewer
+        User $viewer,
+        Term $term
     ) {
         $this->gradeGradientEnabled = $gradeGradientEnabled;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->assessments = $assessments;
         $this->viewer = $viewer;
+        $this->term = $term;
     }
 
 

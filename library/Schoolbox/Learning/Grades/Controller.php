@@ -586,7 +586,8 @@ class Controller extends Base
                     $this->getConfigLoader()->get('grade_gradient_enable'),
                     $this->assessmentMapperProxy,
                     $assessments,
-                    $this->getUser()
+                    $this->getUser(),
+                    $term,
                 ))->collate($viewee);
             } else {
                 $graph = $this->buildGraph($filteredMarkbook, $viewee);
