@@ -58,6 +58,12 @@ cp -rf $initialdir/configfiles/bin/* /usr/local/bin
 ## Go to vagrant to initialise npm and composer
 cd /vagrant
 
+echo "Deploying schoolbox config files"
+mkdir -p /etc/schoolbox
+cp tools/ci/etc/config.ini /etc/schoolbox/config.ini
+cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
+export INSTANCE_ID=smoketest
+
 ## Currently, all smoke tests run on develop only.
 ## Therefore, we don't need to infer or inform which build to use: we can just
 ## use the develop build.
