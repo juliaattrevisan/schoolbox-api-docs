@@ -203,10 +203,22 @@ class Classes implements IStrategy
                      */
                     $subject = $period['SUBJECTS'][0];
 
-                    /* TODO If the FROM_DATE is not null and the TO_DATE is not null,
-                     *  check that the current time is between these two dates
-                     *  If we're outside these two dates, skip this subject
+                    /* If the FROM_DATE is not null and the TO_DATE is not null,
+                     * check that the current time is between these two dates
+                     * If we're outside these two dates, skip this subject
                      */
+                    $isActive = (new ValidActiveEnrolment())->isSatisfiedBy((string)$subject['FROM_DATE'], (string)$subject['TO_DATE']);
+
+                    if (!$isActive) {
+                        $this->log->info(sprintf(
+                            'Skipping class %s - we are outside the bounds of from_date %s and to_date %s',
+                            $subject['SUB_CODE'],
+                            $subject['FROM_DATE'],
+                            $subject['TO_DATE']
+                        ));
+
+                        continue;
+                    }
 
                     /* Tass doesn't use the date part,
                      * Tass includes a microseconds part (sigh)

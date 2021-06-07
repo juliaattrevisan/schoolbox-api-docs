@@ -166,10 +166,22 @@ class AdditionalSubjects implements IStrategy
                     (string)$additionalSubject['class']
                 );
 
-                /* TODO If the from_date is not null and the to_date is not null,
-                 *  check that the current time is between these two dates
-                 *  If we're outside these two dates, skip this additionalSubject
+                /* If the FROM_DATE is not null and the TO_DATE is not null,
+                 * check that the current time is between these two dates
+                 * If we're outside these two dates, skip this subject
                  */
+                $isActive = (new ValidActiveEnrolment())->isSatisfiedBy((string)$additionalSubject['from_date'], (string)$additionalSubject['to_date']);
+
+                if (!$isActive) {
+                    $this->log->info(sprintf(
+                        'Skipping class %s - we are outside the bounds of from_date %s and to_date %s',
+                        $additionalSubject['sub_code'],
+                        $additionalSubject['from_date'],
+                        $additionalSubject['to_date']
+                    ));
+
+                    continue;
+                }
 
                 /* If they're already involved, don't worry about it
                  *
