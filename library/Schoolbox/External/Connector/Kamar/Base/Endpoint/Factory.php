@@ -289,6 +289,22 @@ class Factory
         $currentWeekOffset = $weekOffsetCalculator->findWeekOffset();
         $termSettings = $weekOffsetCalculator->findCurrentTerm();
 
+        /* You need both of these to work stuff out
+         *
+         * The cycles are set up via a specific CSV import into Timetable Structure
+         * They aren't defined in the kamar xmls; we import that info because we need
+         * to name their Periods specifically and kamar has no period data
+         */
+        if (null === $currentWeekOffset) {
+            $this->log->error('Could not determine week offset; check your Timetable Structure CSV import.');
+            exit;
+        }
+
+        if (null === $termSettings) {
+            $this->log->error('Could not determine term settings; check your Timetable Structure CSV import.');
+            exit;
+        }
+
         /* Figure out which term number we're in, to navigate xml files' nodes
          * Figure out which cycle we're in, when persisting data
          */
