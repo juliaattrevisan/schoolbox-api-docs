@@ -118,6 +118,22 @@ class ValidActiveEnrolmentTest extends TestCase
                 '2021-07-14 00:00:00.0', // to
                 false,
             ],
+
+            /* Exotic usages
+             */
+            'Exotic Example 1' => [
+                '2021-07-25 00:00:00',   // simulated now
+                '',                      // from
+                '2021-07-14 00:00:00.0', // to
+                true,
+            ],
+
+            'Exotic Example 2' => [
+                '2021-07-25 00:00:00',   // simulated now
+                '2021-01-27 00:00:00.0', // from
+                '',                      // to
+                true,
+            ],
         ];
     }
 }

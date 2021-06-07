@@ -47,17 +47,26 @@ class ValidActiveEnrolment
      * check that the current time is between these two dates
      * If we're outside these two dates, skip this subject
      */
-    public function isSatisfiedBy(string $from, string $to): bool
+    public function isSatisfiedBy(string $originalFrom, string $originalTo): bool
     {
+        $from = trim($originalFrom);
+        $to = trim($originalTo);
+
         /* Dates not specified; assume active
          */
-        if ('' === trim($from) && '' === trim($to)) {
+        if ('' === $from && '' === $to) {
             return true;
         }
 
-        /* TODO what happens one when date is specified but not the other?
-         *  Not sure if that's even possible, but we shall see
+        /* What happens one when date is specified but not the other?
+         * Not sure if that's even possible, but we shall see
+         *
+         * If one, but not both, were provided, assume an active enrolment
+         * since the situation is somewhat inconclusive
          */
+        if (\count(array_filter([$from, $to])) !== 2) {
+            return true;
+        }
 
         /* Dates specified; check that we are between.
          * If we are between, then this is active
