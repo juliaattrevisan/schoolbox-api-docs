@@ -26,9 +26,12 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-       'endpoint'
-    ],
+    props: {
+        endpoint: {
+           type: String, 
+           required: true
+        }
+    },
 
     /**
      * Components.
@@ -99,40 +102,8 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-        
-        let self = this;
-
-        /* Show skeleton
-         */
-        this.loading = true;
-
-        /* Fetch payload asynchronously
-         */
-        let request = {
-            url: self.endpoint,
-            method: 'get',
-            responseType: 'json'
-        }
-
-        axios.request(request)
-            .then(function (response) {
-
-                /* Load into vue component
-                 */
-                self.allData = response.data;
-            })
-            .catch(error => {
-                if (error.response) {
-                    self.loading = false;
-                }
-            })
-            .then(function () {
-
-                /* Hide skeleton
-                 */
-                self.loading = false;
-            });
+    mounted () {
+        this.loadRows();
     },
 
     /**
@@ -148,6 +119,33 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+
+        /**
+         * Fetch payload asynchronously
+         *
+         */
+        async loadRows () {
+            this.loading = true;
+            try {
+                const response = await axios.get(this.endpoint);
+                this.allData = response.data;
+                this.loading = false;
+            } catch (error) {
+                this.loading = false; 
+            }
+        },
+
+        /**
+         * To convert the bytes into a more readable string
+         * 
+         * @param { Number } - 214430838
+         * 
+         * @returns { String } - 204.5 MB
+         */
+        getHumanReadableFilesize (value) {
+            return filesize(value);
+        }
+
     }
 }
 </script>
@@ -177,13 +175,13 @@ export default {
                 :options="options" 
             >
                 <template v-slot:firstname="props"> 
-                    <a :href="`/adminv2/usage/specific/${props.row.id}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
+                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
                 </template>
                 <template v-slot:lastname="props"> 
-                    <a :href="`/adminv2/usage/specific/${props.row.id}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
+                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
                 </template>
                 <template v-slot:size="props"> 
-                    <a :href="`/adminv2/usage/specific/${props.row.id}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
+                    {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
             </v-client-table>
         </template>
