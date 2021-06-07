@@ -15,7 +15,7 @@ initialdir=`pwd`;
 echo "smoke tests setup"
 cd /vagrant
 echo "cd into vagrant"
-./vendor/bin/codecept run smoketests
+INSTANCE_ID=smoketest ./vendor/bin/codecept run smoketests
 
 smokeTestResult=$?;
 
