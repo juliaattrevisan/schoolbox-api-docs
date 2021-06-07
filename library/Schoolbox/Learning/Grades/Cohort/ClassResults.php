@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 /**
@@ -126,8 +127,13 @@ class ClassResults
         $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($inputImplementationIds);
 
         /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
+         * (Also filter out assessments not due this term)
          */
-        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples));
+        $assessments = $this->assessmentMapperProxy
+            ->findAllByIds(array_keys($assessmentTuples))
+            ->filter(function (IAssessable $assessment) {
+                return $this->term->contains($assessment->getDueAt());
+            });
 
         /* Populate all the participants' data into this set
          * We need to build the five-point summary using EVERYONE's feedbacks for this assessment specification
@@ -158,7 +164,9 @@ class ClassResults
 
         foreach ($sortedSpecificationIds as $sortedSpecificationId) {
             foreach ($assessmentTuples as $implementationId => $specificationId) {
-                if ($specificationId === $sortedSpecificationId) {
+                // Only add this implementation to the result set if it actually
+                // is in the list of assessments that are due within this term.
+                if ($specificationId === $sortedSpecificationId && isset($assessments[$implementationId])) {
                     $sortedTuples[$implementationId] = $sortedSpecificationId;
 
                     /* Stack it up in the same order
