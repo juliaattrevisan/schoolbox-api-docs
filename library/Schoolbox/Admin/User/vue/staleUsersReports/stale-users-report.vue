@@ -79,10 +79,9 @@ export default {
                 },
                 pagination: {
                     edge: false,
-                    dropdown: true 
                 },
-                perPage: 100, 
-                perPageValues: [100, 200, 300],
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
                 selectable: {
                     mode: 'multiple' //to enable multi-select
                 },
