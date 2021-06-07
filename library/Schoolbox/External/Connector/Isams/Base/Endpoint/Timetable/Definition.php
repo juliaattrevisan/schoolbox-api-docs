@@ -104,8 +104,6 @@ class Definition implements IStrategy
          */
         $publishedTimetables = $this->batchxml->fetchXml('/iSAMS/TimetableManager/PublishedTimetables/Timetable');
 
-        $ext = null;
-
         /* Exit if you can't identify the cycle
          */
         if ($publishedTimetables) {
