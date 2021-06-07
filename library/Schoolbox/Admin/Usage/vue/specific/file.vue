@@ -1,6 +1,5 @@
 <script>
 import axios from 'axios';
-import { VueGoodTable } from 'vue-good-table';
 import filesize from 'filesize';
 import RevealModal from '@schoolbox/reveal-modal';
 import Toast from '@schoolbox/toast';
@@ -65,32 +64,7 @@ export default {
 
             /* Table columns. 
              */
-            columns: [ 'name', 'size', 'folder', 'location' ],
-            //     {
-            //         label: 'Filename',
-            //         field: 'name'
-            //     },
-            //     {
-            //         label: 'Filesize',
-            //         field: 'size',
-            //         type: 'number',
-            //         formatFn: filesize
-            //     },
-            //     {
-            //         label: 'Folder',
-            //         field: 'folder'
-            //     },
-            //     {
-            //         label: 'Location',
-            //         field: 'location'
-            //     },
-            //     {
-            //         label: 'Delete',
-            //         field: this.linkDelete,
-            //         html: true,
-            //         sortable: false
-            //     },
-            // ],
+            columns: [ 'name', 'size', 'folder', 'location', 'id' ],
 
             /* vue-tables-2 options, see https://matanya.gitbook.io/vue-tables-2/options-api
              */
@@ -100,6 +74,7 @@ export default {
                     lastname: 'Lastname',
                     role: 'Role',
                     size: 'Filesize',
+                    id: 'Delete',
                 },
                 orderBy: {
                     ascending: true,
@@ -184,60 +159,33 @@ export default {
         },
 
         /**
-         * Render a delete link
-         * (This needs a confirmDialog equivalent in vue)
-         *
-         * @param rowObj
-         * @returns {string}
-         */
-        linkDelete(rowObj) {
-            return '<a href="'+rowObj._links.delete+'">Delete</a>';
-        },
-
-
-        /**
          * Open the Delete File confirmDialog equivalent
          *
-         * @param url
+         * @param { String }
          */
-        showDeleteModal(url) {
+        showDeleteModal (url) {
             this.fileUrlToDelete = url;
             this.$refs.deleteModal.open();
         },
 
-
         /**
          * Asynchronously access an endpoint to delete a file from the appropriate place
          */
-        deleteFile() {
+        async deleteFile () {
 
             /* Set the loading flag to prevent people spamming the button
              */
             this.isProcessActive = true;
 
-            /* Asynchronously access the endpoint to delete the thing
-             */
-            axios.get(this.fileUrlToDelete).then(() => {
+            try {
+
+                /* Asynchronously access the endpoint to delete the thing
+                */
+                await axios.get(this.fileUrlToDelete);
 
                 /* Remove the element from the allData stack
-                 * Since we only have the url, I guess we search the stack until we find it
-                 * then splice it away (not sure if vue-good-table gives me an actual index)
                  */
-                let deletionIndex = -1;
-
-                for (let i = 0; i < this.allData.length; i++) {
-                    if (this.allData[i]._links.delete === this.fileUrlToDelete) {
-                        deletionIndex = i;
-                        break;
-                    }
-                }
-
-                /* This should always happen, but anyway
-                 * Splice away the deleted thing
-                 */
-                if (deletionIndex > -1) {
-                    this.allData.splice(deletionIndex, 1);
-                }
+                this.allData = this.allData.filter( (item) => item._links.delete !== this.fileUrlToDelete );
 
                 /* Shut the modal
                  */
@@ -247,13 +195,15 @@ export default {
                  */
                 this.$refs.toast.timeout('File deleted', true);
                 this.isProcessActive = false;
-            }).catch((error) => {
+
+            } catch (error) {
 
                 /* Deal with error case
                  */
                 this.$refs.toast.timeout('Unable to delete file', false);
                 this.isProcessActive = false;
-            });
+
+            }
         }
     }
 }
@@ -278,42 +228,6 @@ export default {
             </table>
         </template>
         <template v-else>
-            <!-- <vue-good-table
-                styleClass="vgt-table striped bordered"
-                :columns="columns"
-                :rows="allData"
-                :search-options="{
-                    enabled: false
-                }"
-                :sort-options="{
-                    initialSortBy: {
-                        field: 'name',
-                        type: 'asc'
-                    }
-                }"
-                :pagination-options="{
-                    enabled: true,
-                    perPage: 50,
-                    perPageDropdown: [50, 100, 200],
-                    rowsPerPageLabel: 'Files per page',
-                    infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Files`,
-                }"
-            >
-                <template slot="table-row" slot-scope="props">
-                    <template v-if="props.column.field == 'name'">
-                        <a :href="props.row._links.send">{{ props.row.name }}</a>
-                    </template>
-                    <template v-else-if="props.column.field == 'folder'">
-                        <a :href="'/homepage/' + props.row.folderId">{{ props.row.folder }}</a>
-                    </template>
-                    <template v-else-if="props.column.label == 'Delete'">
-                        <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
-                    </template>
-                    <template v-else>
-                        {{ props.formattedRow[props.column.field] }}
-                    </template>
-                </template>
-            </vue-good-table> -->
             <v-client-table 
                 :data="allData" 
                 :columns="columns" 
@@ -328,7 +242,7 @@ export default {
                 <template v-slot:folder="props"> 
                     <a :href="`/homepage/${props.row.folderId}`">{{ props.row.folder }}</a>
                 </template>
-                <template v-slot:Delete="props"> 
+                <template v-slot:id="props"> 
                     <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
                 </template>
             </v-client-table>
