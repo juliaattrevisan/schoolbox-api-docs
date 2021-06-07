@@ -36,7 +36,7 @@ class Profile implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -44,61 +44,61 @@ class Profile implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private Batchxml $batchxml;
 
 
     /**
      * @var Registry
      */
-    private $registry;
+    private Registry $registry;
 
 
     /**
      * @var UserProfile\Mapper
      */
-    private $baseProfileMapper;
+    private UserProfile\Mapper $baseProfileMapper;
 
 
     /**
      * @var UserProfile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private UserProfile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var UserProfile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private UserProfile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var UserProfile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
     /**
      * @var Traverser
      */
-    private $traverser;
+    private Traverser $traverser;
 
 
     /**
      * @var string
      */
-    private $campus;
+    private string $campus;
 
 
     /**
@@ -115,7 +115,7 @@ class Profile implements IStrategy
      *
      * @var array
      */
-    private $siblingLinks = [];
+    private array $siblingLinks = [];
 
 
     /**

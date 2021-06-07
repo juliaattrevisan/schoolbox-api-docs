@@ -46,37 +46,37 @@ class SubjectIterator implements Iterator
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
      * @var Registry
      */
-    private $registry;
+    private Registry $registry;
 
 
     /**
      * @var array|SimpleXMLElement[]
      */
-    private $subjects;
+    private array $subjects;
 
 
     /**
      * @var string
      */
-    private $studentId;
+    private string $studentId;
 
 
     /**
      * @var string
      */
-    private $day;
+    private string $day;
 
 
     /**
      * @var int
      */
-    private $position = 0;
+    private int $position = 0;
 
 
     /**

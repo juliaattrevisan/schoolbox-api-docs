@@ -26,7 +26,7 @@ class Api implements IApi
      *
      * @var string
      */
-    private $path;
+    private string $path;
 
 
     /**

@@ -26,7 +26,7 @@ class Specification extends BaseSpecification
      *
      * @var array
      */
-    protected $paths = [
+    protected array $paths = [
         '/SMSDirectoryData/timetables',
         '/SMSDirectoryData/timetables/timetable',
         '/SMSDirectoryData/timetables/timetable/week',

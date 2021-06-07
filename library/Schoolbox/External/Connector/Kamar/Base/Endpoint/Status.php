@@ -24,7 +24,7 @@ class Status implements IStatus
     /**
      * @var string
      */
-    private $path;
+    private string $path;
 
 
     /**
