@@ -203,6 +203,11 @@ class Classes implements IStrategy
                      */
                     $subject = $period['SUBJECTS'][0];
 
+                    /* TODO Shalom is the first usage of having multiple subjects in a day/period tuple
+                     *  We might have to do this instead:
+                     *  foreach($period['SUBJECTS'] as $subject) { ... }
+                     */
+
                     /* If the FROM_DATE is not null and the TO_DATE is not null,
                      * check that the current time is between these two dates
                      * If we're outside these two dates, skip this subject
