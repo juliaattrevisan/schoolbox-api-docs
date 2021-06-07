@@ -9,8 +9,11 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress_Byte_Format;
+use InvalidArgumentException;
+use League\Flysystem;
 use League\Flysystem\FileExistsException;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
 use Schoolbox\File\Exception as FileException;
@@ -144,19 +147,13 @@ class Manager
             ->setPath($this->calcPath($storage));
 
         // This should already be taken care of in the mapper, but better to be safe
-
-        if ($storage->getPath() == $tempPath) {
+        if ($storage->getPath() === $tempPath) {
             return true;
         }
 
-        // Attempt to copy the file
-
-        if (!$this->copy($tempPath, $storage)) {
-            throw new FileException("Failed to copy uploaded file, '{$storage->getBasename()}', to storage");
-        }
-
-        if (!unlink(sys_get_temp_dir() . $tempPath)) {
-            trigger_error('Unable to delete temp file', E_USER_WARNING);
+        // Attempt to move the file from temp to storage dir
+        if (!$this->move($tempPath, $storage)) {
+            throw new FileException("Failed to move uploaded file, '{$storage->getBasename()}', to storage");
         }
 
         return true;
@@ -179,6 +176,56 @@ class Manager
                 self::FS_STORAGE . '://' . $storage->getPath()
             );
         } catch (FileExistsException $e) {
+            // The file already exists in the storage backend.
+            // This is fine, because the storage file's contents determine the
+            // file path: we can assume it's the same file.
+            return true;
+        }
+    }
+
+
+    /**
+     * @param string $tmpFilePath
+     * @param Model  $storage
+     * @return bool
+     * @throws InvalidArgumentException
+     * @throws Flysystem\FilesystemNotFoundException
+     */
+    private function move(string $tmpFilePath, Model $storage): bool
+    {
+        if (strtolower((string)$storage->getMimetype()) === 'image/svg+xml') {
+            $this->sanitize(self::FS_TEMP, $tmpFilePath);
+        }
+
+        /** @var Filesystem $fsFrom */
+        $fsFrom = $this->mountManager->getFilesystem(self::FS_TEMP);
+        /** @var Filesystem $fsTo */
+        $fsTo = $this->mountManager->getFilesystem(self::FS_STORAGE);
+
+        $adapterFrom = $fsFrom->getAdapter();
+        $adapterTo   = $fsTo->getAdapter();
+
+        // Are they both local?
+        if ($adapterFrom instanceof Flysystem\Adapter\Local && $adapterTo instanceof Flysystem\Adapter\Local) {
+            // Attempt to move, rather than copy
+            $newFilename = rtrim($adapterTo->getPathPrefix()) . $storage->getPath();
+            $newDir      = dirname($newFilename);
+            if (!mkdir($newDir, 0777, true) && !is_dir($newDir)) {
+                return false;
+            }
+            return rename(
+                rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath,
+                $newFilename
+            );
+        }
+
+        try {
+            return $this->mountManager->move(
+                self::FS_TEMP . "://$tmpFilePath",
+                self::FS_STORAGE . '://' . $storage->getPath()
+            );
+        } /** @noinspection BadExceptionsProcessingInspection */
+        catch (FileExistsException $e) {
             // The file already exists in the storage backend.
             // This is fine, because the storage file's contents determine the
             // file path: we can assume it's the same file.
