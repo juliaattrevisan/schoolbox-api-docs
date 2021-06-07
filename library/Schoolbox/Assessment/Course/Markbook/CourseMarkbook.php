@@ -712,6 +712,10 @@ class CourseMarkbook
         foreach ($studentAverageMarks as $courseImplId => $courseMarks) {
             foreach ($courseMarks as $userId => $studentCourseMarks) {
                 foreach ($studentCourseMarks as $publishType => $normalised) {
+                    if (!$courseImplMarkScheme->getOffset($courseImplId)) {
+                        trigger_error("Mark does not exist for Course Impl:$courseImplId and User: $userId", E_USER_WARNING);
+                        continue;
+                    }
                     /** @var float $normalised */
                     $this->studentAverageMarks[$courseImplId][$userId][$publishType] = [
                         'norm' => $normalised,
