@@ -85,7 +85,7 @@ class Controller extends Base
      * registers their app token.
      *
      * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
-     * @api          /api/register/{provider}
+     * @api          POST /api/register/{provider}
      * @since        145
      *
      * @param string $provider
@@ -111,7 +111,8 @@ class Controller extends Base
         }
 
         // Authenticate, and if so register app
-        $sessionUser = $this->authenticate($this->request->post->getArrayCopy());
+        // (For now, don't allow a query string JWT when registering)
+        $sessionUser = $this->authenticate(false);
         if ($sessionUser) {
             // For Digistorm: token is always the user's username
             // Otherwise: token may be absent or blank, in which case we don't
@@ -184,12 +185,12 @@ class Controller extends Base
      * API endpoint for initializing a session based on a username/password or
      * a JWT, without registering an app.
      *
-     * @api   /api/session
+     * @api   POST /api/session
      * @since 190
      */
     public function initSession(): void
     {
-        $sessionuser = $this->authenticate($this->request->post->getArrayCopy());
+        $sessionuser = $this->authenticate(true);
         if ($sessionuser) {
             if ($this->isJsonRequest()) {
                 $this->response->content->set($this->buildAuthenticatedJsonOutput($sessionuser));
@@ -210,18 +211,34 @@ class Controller extends Base
 
 
     /**
+     * API endpoint for initializing a session based on a JWT in a query string.
+     *
+     * @api   GET /api/session
+     * @since 21.0
+     */
+    public function initSessionFromQueryString(): void
+    {
+        $this->initSession();
+    }
+
+
+    /**
      * Authenticates the user based on data within the request.
+     *
+     * A user may be authenticated by one of:
+     * * a username and password in POST
+     * * a JWT in POST
+     * * a JWT in the query string (if `$allowQueryStringJwt` is true)
      *
      * @noinspection PhpDocMissingThrowsInspection Spurious exception raised by setCode
      *
-     * @param array $postData A copy of the POST data passed to the form
+     * @param bool $allowQueryStringJwt
      * @return User|null The user who was authenticated, or null if they could
      *                   not be.
      */
-    private function authenticate(array $postData): ?User
+    private function authenticate(bool $allowQueryStringJwt): ?User
     {
-        $response = null;
-        $status   = null;
+        $postData = $this->request->post->getArrayCopy();
         try {
             if (isset($postData['username'], $postData['password'])) {
                 return $this->authenticateViaPostData($postData['username'], $postData['password']);
@@ -229,9 +246,17 @@ class Controller extends Base
             if (isset($postData['jwt'])) {
                 return $this->authenticateViaJwt($postData['jwt']);
             }
+            if ($allowQueryStringJwt) {
+                $queryStringJwt = $this->request->query->get('jwt');
+                if (isset($queryStringJwt)) {
+                    return $this->authenticateViaJwt($queryStringJwt);
+                }
+            }
 
             $response = [
-                'required' => 'Either the "username" and "password" or the "jwt" POST fields must be set'
+                'required' => $allowQueryStringJwt
+                    ? 'Either the "username" and "password" POST fields, the "jwt" POST field or the "jwt" query string field must be set'
+                    : 'Either the "username" and "password" or the "jwt" POST fields must be set'
             ];
             $status   = 400;
         } catch (JWT\BeforeValidException $e) {
