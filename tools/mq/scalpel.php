@@ -210,6 +210,11 @@ Usage: scalpel.php [--title='posted by'] [--href='/news/483'] [--start='2021-02-
 Options:
     -h, --help
         Print help message and exit.
+    --instance-id
+        If set, match notifications from this instance.
+        If not set, falls back to:
+        * the INSTANCE_ID environment variable
+        * the first instance defined for this system, if INSTANCE_ID is not set
     --title
         If set, delete notifications that contain this in the title text of the notification
     --href
@@ -217,7 +222,7 @@ Options:
     --start
         Only notifications delivered after this date will be matched
     --end
-        Only notifications delivered before this time will be matches
+        Only notifications delivered before this time will be matched
     -r
         If present, title and href will be treated as preg expression strings and matches done as regexps
     -p, --perform
