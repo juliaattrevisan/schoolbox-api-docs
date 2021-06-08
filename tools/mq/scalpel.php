@@ -9,83 +9,76 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Async\AMQP\Bunny\BunnyControl;
+use Alaress\Async\Notification\Notification;
+use Alaress\Async\Notification\NotificationBundle;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Realtime\Notification\Decorator;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
 
+    /** @var string|null $instanceId */
+    private ?string $instanceId;
+
     /** @inheritDoc */
     public function runAsRoot(): ?bool
     {
-        return true;
+        return null;
     }
 
     /** @inheritDoc */
     public function getShortOpts(): array
     {
-        return ['r'];
+        return ['h','r'];
     }
 
+    /** @inheritDoc */
+    public function getLongOpts(): array
+    {
+        return ['help', 'title:', 'href:', 'start:', 'end:', 'instance-id:'];
+    }
 
     /** @inheritDoc */
     public function run(): void
     {
+
+        if ($this->getOpt('h') || $this->getOpt('help')) {
+            $this->printHelp();
+            exit(CliTool\Kernel::EXIT_STATUS_OK);
+        }
+
+        $this->instanceId = $this->getOpt('instance-id:');
+        if (empty($this->instanceId)) {
+            $this->instanceId = INSTANCE_ID;
+        }
+
+
         $regexMode = $this->getOpt('r');
+        $args = [];
 
-        $type = $regexMode ? 'pattern (regex' : '(string';
-
-        $this->getLogger()->info("Surgical Removal of Messages\n");
-        $this->getLogger()->warning(" ** WARNING **");
-        $this->getLogger()->warning("This script will destroy messages that match the given parameters.");
-        $this->getLogger()->warning("There is no 'safe mode'!\n");
-        $this->getLogger()->warning("All arguments are optional, but they cannot all be blank.");
-
-        if (!$regexMode) {
-            $this->getLogger()->info("(If you need regex, use the -r flag)");
+        if ($this->getOpt('title:')) {
+            $args['title'] = $this->getOpt('title:');
         }
 
-        $this->getLogger()->info("");
-
-        $printf = "%-28s: ";
-
-        $params = array(
-            'body'  => array("Bodytext $type)",             function ($v) {
-                return $v;
-            }),
-            'href'  => array("Href $type)",                 function ($v) {
-                return $v;
-            }),
-            'start' => array("No earlier than (strtotime)", function ($v) {
-                return strtotime($v);
-            }),
-            'end'   => array("No later than (strtotime)",   function ($v) {
-                return strtotime($v);
-            })
-        );
-
-        $args = array();
-
-        foreach ($params as $key => $prompt) {
-            // remove all unprintable characters that may have been injected
-            $input = trim(preg_replace('/[[:cntrl:]]+/', '', $this->readLine(sprintf($printf, $prompt[0]))));
-            if ($input) {
-                $args[$key] = $prompt[1]($input);
-            }
+        if ($this->getOpt('href:')) {
+            $args['href'] = $this->getOpt('href:');
         }
 
-        $this->getLogger()->info("");
+        if ($this->getOpt('start:')) {
+            $args['start'] = strtotime($this->getOpt('start:'));
+        }
+
+        if ($this->getOpt('end:')) {
+            $args['end'] = strtotime($this->getOpt('end:'));
+        }
 
         if (!count($args)) {
-            $this->getLogger()->error("No search parameters specified!");
+            $this->getLogger()->error("Insufficient search parameters specified! Try -h for more information and help.");
             exit(1);
         }
 
-        $this->getLogger()->info("Starting search & destroy...");
-
         $this->checkRedis($args, $regexMode);
-        $this->checkAmqp($args, $regexMode);
     }
 
 
@@ -96,6 +89,7 @@ $app = new class extends CliTool\App{
     private function checkRedis($args, $regexMode): void
     {
         $redis = \Alaress\Redis::getClientInstance();
+        $decorator = new Decorator();
 
         if (!$redis) {
             $this->getLogger()->critical("Redis instance not available");
@@ -103,82 +97,44 @@ $app = new class extends CliTool\App{
         }
 
         // get a list of all available redis messages o.O;
-        $redisList = $redis->executeCommand($redis->createCommand('keys', array('msg:*:m:*')));
+        $redisList = $redis->executeCommand($redis->createCommand('keys', array('msg:' . $this->instanceId . ':m:*')));
 
-        $this->getLogger()->info("Checking redis data: ");
+        $this->getLogger()->info("Checking redis data...");
         $acks = 0;
 
         foreach ($redisList as $key) {
             $compressed = $redis->executeCommand($redis->createCommand('get', array($key)));
             $uncompress = gzuncompress($compressed);
 
-            $msg = json_decode($uncompress, true);
+            $msg = unserialize($uncompress);
+            $msgArray = $msg->jsonSerialize();
+            $notification = new Notification([ $msg ]);
+            $msgArray['title']['plain'] = $decorator->renderTitleAsPlaintext($notification);
 
-            if ($this->checkData($args, $regexMode, $msg)) {
-                $redis->executeCommand($redis->createCommand('del', array($key)));
+            if ($this->checkData($args, $regexMode, $msgArray)) {
+                $this->getLogger()->info(sprintf(
+                    'Found %s %s: %s (%s)',
+                    $msgArray['namespace'],
+                    $key,
+                    $msgArray['title']['plain'],
+                    $msgArray['href']
+                ));
+
+                if ($this->perform()) {
+                    $redis->executeCommand($redis->createCommand('del', [$key]));
+                }
                 ++$acks;
             }
         }
 
-        $this->getLogger()->info("$acks messages matched and removed");
-    }
-
-
-    /**
-     * @param array $args
-     * @param bool  $regexMode
-     */
-    private function checkAmqp($args, $regexMode): void
-    {
-        // stop the socket daemon
-        shell_exec('service schoolbox-socketd stop');
-
-        $conf = $this->getConfig();
-
-        // get a list of all available amqp queues
-        $ctrl = new BunnyControl([
-            'host'     => $conf->get('amqp_host'),
-            'port'     => $conf->get('amqp_admin_port'),
-            'username' => $conf->get('amqp_user'),
-            'password' => $conf->get('amqp_pass'),
-            'vhost'    => $conf->get('amqp_vhost')
-        ]);
-        $amqp = \Schoolbox\Notif\MQ\Connector::getInstance();
-
-        $queueList = $ctrl->listQueues(array('name'));
-
-        foreach ($queueList as $queue) {
-            $queueName = $queue['name'];
-
-            // only operate on unread queues
-            if (!strpos($queueName, 'unread')) {
-                continue;
-            }
-
-            $this->getLogger()->info(sprintf("%-32s| ", $queueName));
-
-            $nacks = array();
-            $acks  = array();
-
-            // iterate messages
-            while ($m = $amqp->readFromQueue($queueName)) {
-                $data = json_decode($m->body, true);
-                $msg  = json_decode($data['message'], true);
-
-                if ($this->checkData($args, $regexMode, $msg)) {
-                    $acks[] = $m;
-                } else {
-                    $nacks[] = $m;
-                }
-            }
-
-            $this->getLogger()->info(sprintf("%4d ACK | %4d NACK\n", count($acks), count($nacks)));
-
-            $amqp->acceptMessages($acks);
-            $amqp->rejectMessages($nacks);
+        if ($acks == 0) {
+            $this->getLogger()->info("No matching notifications found!");
+        } elseif ($this->perform()) {
+            $this->getLogger()->info("$acks messages matched and removed");
+        } else {
+            $this->getLogger()->info("$acks messages matched, no action taken run with -p to delete");
         }
     }
-
 
     /**
      * @param array $args
@@ -186,16 +142,16 @@ $app = new class extends CliTool\App{
      * @param array $msg
      * @return bool
      */
-    private function checkData($args, $regexMode, $msg): bool
+    private function checkData(array $args, bool $regexMode, array $msg): bool
     {
-        $success = false;
+        $success = true;
 
-        if (isset($args['body'])) {
-            $success = $success || $this->checkStr($regexMode, $args['body'], $msg['title']['text']);
+        if (isset($args['title'])) {
+            $success = $this->checkStr($regexMode, $args['title'], $msg['title']['plain']);
         }
 
         if (isset($args['href'])) {
-            $success = $success || $this->checkStr($regexMode, $args['href'], $msg['href']);
+            $success = $success && $this->checkStr($regexMode, $args['href'], $msg['href']);
         }
 
         if (isset($args['start'])) {
@@ -203,7 +159,7 @@ $app = new class extends CliTool\App{
         }
 
         if (isset($args['end'])) {
-            $success = $success && $this->checkTime(false, $args['start'], $msg['time']);
+            $success = $success && $this->checkTime(false, $args['end'], $msg['time']);
         }
 
         return $success;
@@ -216,7 +172,7 @@ $app = new class extends CliTool\App{
      * @param string $text
      * @return bool
      */
-    private function checkStr($regexMode, $test, $text): bool
+    private function checkStr(bool $regexMode, string $test, string $text): bool
     {
         if ($regexMode) {
             return (bool)preg_match("`$test`", $text);
@@ -231,12 +187,47 @@ $app = new class extends CliTool\App{
      * @param int  $time
      * @return bool
      */
-    private function checkTime($before, $test, $time): bool
+    private function checkTime(bool $before, int $test, int $time): bool
     {
         if ($before) {
             return $test <= $time;
         }
         return $test >= $time;
+    }
+
+    /**
+     * Print a help message of available options
+     */
+    private function printHelp(): void
+    {
+        echo "
+This script is used to remove notifications from the system PERMANENTLY. It will search the entire notification message
+list and delete any records it matches. To avoid unnecessary damage specify as many parameters as possible to limit
+the search space. Please ensure you do a dry run before you run the script as this is unrecoverable.
+
+Usage: scalpel.php [--title='posted by'] [--href='/news/483'] [--start='2021-02-02 10:00am'] [--end='2021-02-02 14:00'] [-p]
+
+Options:
+    -h, --help
+        Print help message and exit.
+    --instance-id
+        If set, match notifications from this instance.
+        If not set, falls back to:
+        * the INSTANCE_ID environment variable
+        * the first instance defined for this system, if INSTANCE_ID is not set
+    --title
+        If set, delete notifications that contain this in the title text of the notification
+    --href
+        If set, delete notifications that have this URL
+    --start
+        Only notifications delivered after this date will be matched
+    --end
+        Only notifications delivered before this time will be matched
+    -r
+        If present, title and href will be treated as preg expression strings and matches done as regexps
+    -p, --perform
+        Without this flag, tool will not delete messages
+";
     }
 };
 
