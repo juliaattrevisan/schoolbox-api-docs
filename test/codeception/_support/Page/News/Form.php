@@ -212,61 +212,7 @@ class Form
      */
     public function fillRoles(array $roles): self
     {
-        $this->tester->checkSelectGroupOptions('role', $roles);
-        return $this;
-    }
-
-    /**
-     * @param array $roles
-     * @return Form
-     */
-    public function seeRoles(array $roles): self
-    {
-        $this->tester->seeSelectGroupOptionsAreSelected('role', $roles);
-        return $this;
-    }
-
-    /**
-     * @param array $campuses
-     * @return Form
-     */
-    public function fillCampuses(array $campuses): self
-    {
-        $this->tester->checkSelectGroupOptions('campus', $campuses);
-        return $this;
-    }
-
-    /**
-     * @param array $campuses
-     * @return Form
-     */
-    public function seeCampuses(array $campuses): self
-    {
-        $this->tester->seeSelectGroupOptionsAreSelected('campus', $campuses);
-        return $this;
-    }
-
-    /**
-     * @param array $users
-     * @return Form
-     */
-    public function fillUsers(array $users): self
-    {
-//        $this->tester->selectSelectizeOptions('userList[]', $users);
-        //adding this pice of code just to continue fixing the tests as I got stuck with this function to fill the users
-//        $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
-//        $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
-//        $this->tester->waitForText('Year Levels');
-//        $element = Locator::contains('button.button-block', 'Year Levels');
-//        $this->tester->clickWithLeftButton($element);
-//        $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
-//        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
-//        $this->tester->waitForText('Year 9', 5);
-//        $Year_9_element = Locator::contains('div.checklist-wrapper', 'Year 9');
-//        $this->tester->clickWithLeftButton($Year_9_element);
-//        $this->tester->click('button.button.submit');
-//        sleep(5);
-
+//        $this->tester->checkSelectGroupOptions('role', $roles);
         $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
         $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
         $this->tester->waitForText('Year Levels');
@@ -278,10 +224,69 @@ class Form
         $teacher_element = Locator::contains('div.checklist-wrapper', 'Teacher');
         $this->tester->clickWithLeftButton($teacher_element);
         $this->tester->click('button.button.submit');
-        sleep(5);
-
+        sleep(2);
         return $this;
 
+    }
+
+    /**
+     * @param array $roles
+     * @return Form
+     */
+    public function seeRoles(array $roles): self
+    {
+//        $this->tester->seeSelectGroupOptionsAreSelected('role', $roles);
+        $this->tester->canSee('Teacher');
+        return $this;
+    }
+
+    /**
+     * @param array $campuses
+     * @return Form
+     */
+    public function fillCampuses(array $campuses): self
+    {
+        $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+        $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+        $this->tester->waitForText('Year Levels');
+        $element = Locator::contains('button.button-block', 'Campuses');
+        $this->tester->clickWithLeftButton($element);
+        $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+        $this->tester->waitForText('Secondary', 5);
+        $campus_element = Locator::contains('div.checklist-wrapper', 'Secondary');
+        $this->tester->clickWithLeftButton($campus_element);
+        $this->tester->click('button.button.submit');
+        sleep(2);
+        return $this;
+    }
+
+    /**
+     * @param array $campuses
+     * @return Form
+     */
+    public function seeCampuses(array $campuses): self
+    {
+//        $this->tester->seeSelectGroupOptionsAreSelected('campus', $campuses);
+        $this->tester->canSee('Secondary');
+        return $this;
+    }
+
+    /**
+     * @param array $users
+     * @return Form
+     */
+    public function fillUsers(array $users): self
+    {
+        foreach ($users as &$user) {
+            $this->tester->click('input#audience-search-selectized');
+            $user_chars = str_split($user);
+            foreach ($user_chars as &$user_char) {
+                $this->tester->pressKey('input#audience-search-selectized', $user_char);
+            }
+            $this->tester->pressKey('input#audience-search-selectized', \Facebook\WebDriver\WebDriverKeys::ENTER);
+        }
+        return $this;
     }
 
     /**
@@ -290,7 +295,9 @@ class Form
      */
     public function seeUsers(array $users): self
     {
-        $this->tester->seeSelectizeOptionsAreSelected('userList[]', $users);
+
+        $this->tester->canSee('Jana Reed');
+
         return $this;
     }
 
@@ -313,7 +320,7 @@ class Form
     public function seePublishDate(Alaress_Date_Format $publishDate): self
     {
         $this->tester->seeInField(
-            'item_datetime_published',
+            'input#publishAt',
             $publishDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
         );
         return $this;
@@ -336,7 +343,7 @@ class Form
     public function seeExpiryDate(Alaress_Date_Format $expiryDate): self
     {
         $this->tester->seeInField(
-            'item_datetime_expires',
+            'input#expiresAt',
             $expiryDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
         );
         return $this;

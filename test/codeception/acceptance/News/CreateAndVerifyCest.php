@@ -58,9 +58,9 @@ class CreateAndVerifyCest
         $image     = __DIR__ . '/upload/test.jpg';
         $topic     = 'General';
         $topicSlug = (new \Url($topic, ''))->getSlug();
-        $roles     = ['Teachers'];
+        $roles     = ['Teacher'];
         $campi     = ['Senior', 'Junior'];
-        $users     = ['David Rhodes', 'Rachel Rhodes'];
+        $users     = ['Jana Reed','Tim Reed'];
         $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
@@ -77,7 +77,8 @@ class CreateAndVerifyCest
             ->submit();
 
         // Verify that the news is in the All topic, and is the first news item
-        $i->amOnPage($indexPage->generateRoute(''));
+        sleep(5);
+        $i->amOnPage($indexPage->generateRoute('all'));
 
         $position = 1;
         $indexPage->seeHeadline($headline, $position);
@@ -115,10 +116,10 @@ class CreateAndVerifyCest
             ->seeFeatureImage($image)
             ->seeTopic($topic)
             ->seeRoles($roles)
-            ->seeCampuses($campi);
-            //->seeUsers($users)
-//            ->seePublishDate($publish)
-//            ->seeExpiryDate($expiry);
+            ->seeCampuses($campi)
+            ->seeUsers($users)
+            ->seePublishDate($publish)
+            ->seeExpiryDate($expiry);
 
         // Verify that user Tim Reed(student) cannot see it
         $tim = $i->haveFriend('tim');
