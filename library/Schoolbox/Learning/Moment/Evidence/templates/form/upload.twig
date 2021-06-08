@@ -57,8 +57,19 @@
                 let dropzoneInstance = Dropzone.instances.find(v => v.element.id === 'storage-zone');
                 if (dropzoneInstance) {
                     let filenameInput = document.getElementById('evidence-filename');
-                    dropzoneInstance.on('addedfile', file => filenameInput.value = file.name);
-                    dropzoneInstance.on('removedfile', () => filenameInput.value = '');
+                    dropzoneInstance.on('addedfile', (file) => {
+                        //only add if empty, as event could be called multiple times if dragged and dropped multiple files
+                        if (filenameInput.value === '') {
+                            filenameInput.value = file.name;
+                        }
+                    });
+                    dropzoneInstance.on('removedfile', (file) => {
+                        //ensure removing the file that's already in place - as this event could be called when multiple files have been dragged and dropped, 
+                        //which in this case would wipe out the existing value when this event is called to remove the other files as only a single file is allowed
+                        if (filenameInput.value === file.name) { 
+                            filenameInput.value = '';
+                        }
+                    });
                 }
             });
         </script>
