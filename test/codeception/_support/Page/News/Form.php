@@ -184,8 +184,10 @@ class Form
      */
     public function fillTopic(string $topic): self
     {
-//        $this->tester->selectOption('item_topic_id', $topic);
+
         $this->tester->click('input#news-topics-selectized');
+        $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('selectize-dropdown multi plugin-remove_button');
+        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
         $element = Locator::contains('div.option', $topic);
         $this->tester->click($element);
         return $this;
@@ -198,10 +200,12 @@ class Form
      */
     public function seeTopic(string $topic): self
     {
-        $this->tester->seeOptionIsSelected('item_topic_id', $topic);
-        return $this;
-    }
 
+        $this->tester->canSee($topic,'div.item');
+        return $this;
+
+
+    }
     /**
      * @param array $roles
      * @return Form
@@ -250,18 +254,32 @@ class Form
     {
 //        $this->tester->selectSelectizeOptions('userList[]', $users);
         //adding this pice of code just to continue fixing the tests as I got stuck with this function to fill the users
+//        $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+//        $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+//        $this->tester->waitForText('Year Levels');
+//        $element = Locator::contains('button.button-block', 'Year Levels');
+//        $this->tester->clickWithLeftButton($element);
+//        $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+//        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+//        $this->tester->waitForText('Year 9', 5);
+//        $Year_9_element = Locator::contains('div.checklist-wrapper', 'Year 9');
+//        $this->tester->clickWithLeftButton($Year_9_element);
+//        $this->tester->click('button.button.submit');
+//        sleep(5);
+
         $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
         $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
         $this->tester->waitForText('Year Levels');
-        $element = Locator::contains('button.button-block', 'Year Levels');
+        $element = Locator::contains('button.button-block', 'Roles');
         $this->tester->clickWithLeftButton($element);
         $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
-        $this->tester->waitForText('Year 9', 5);
-        $Year_9_element = Locator::contains('div.checklist-wrapper', 'Year 9');
-        $this->tester->clickWithLeftButton($Year_9_element);
+        $this->tester->waitForText('Teacher', 5);
+        $teacher_element = Locator::contains('div.checklist-wrapper', 'Teacher');
+        $this->tester->clickWithLeftButton($teacher_element);
         $this->tester->click('button.button.submit');
         sleep(5);
+
         return $this;
 
     }
@@ -284,7 +302,7 @@ class Form
     {
         // Type in database format, let strtotime do the work
         // This is because Codeception has no access to the DB config
-        $this->tester->fillDateField('item_datetime_published', $publishDate->getDatabase());
+        $this->tester->fillDateField('input#publishAt', $publishDate->getDatabase());
         return $this;
     }
 
@@ -307,7 +325,7 @@ class Form
      */
     public function fillExpiryDate(Alaress_Date_Format $expiryDate): self
     {
-        $this->tester->fillDateField('item_datetime_expires', $expiryDate->getDatabase());
+        $this->tester->fillDateField('input#expiresAt', $expiryDate->getDatabase());
         return $this;
     }
 

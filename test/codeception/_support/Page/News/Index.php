@@ -16,7 +16,7 @@ use Page\Common;
  */
 class Index
 {
-    public const URL = '/news/{topic}';
+    public const URL = '/news?topic={topic}';
 
     // Selectors
 

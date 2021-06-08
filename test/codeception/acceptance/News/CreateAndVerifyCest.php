@@ -21,7 +21,7 @@ class CreateAndVerifyCest
     /**
      * Test that a news item I create retains the settings I chose
      *
-     * as zsmith:
+     * as alaress:
      * * go to http://192.168.36.10/news
      * * create a new news item, with:
      * ** headline
@@ -68,12 +68,12 @@ class CreateAndVerifyCest
             ->fillArticle($article)
             ->fillBlurb($blurb)
             ->fillFeatureImage($image)
-//            ->fillTopic($topic)
+            ->fillTopic($topic)
             ->fillRoles($roles)
             ->fillCampuses($campi)
             ->fillUsers($users)
-//            ->fillPublishDate($publish)
-//            ->fillExpiryDate($expiry)
+            ->fillPublishDate($publish)
+            ->fillExpiryDate($expiry)
             ->submit();
 
         // Verify that the news is in the All topic, and is the first news item
@@ -90,14 +90,13 @@ class CreateAndVerifyCest
         // (How do I compare the image I provided to what is uploaded?)
 
         // Verify I don't see it at all in some other topic
-     //   $i->amOnPage($indexPage->generateRoute('music'));
-       // $indexPage->dontSeeHeadline($headline, $position);
+        $i->amOnPage($indexPage->generateRoute('music'));
+        $indexPage->dontSeeHeadline($headline, $position);
 
         // Verify I see it in the topic I put it in
         // (URL has invisible dependency on config; all I want is a slug)
-        //commenting until I fix the topic general
-//        $i->amOnPage($indexPage->generateRoute($topicSlug));
-//        $indexPage->seeHeadline($headline, $position);
+        $i->amOnPage($indexPage->generateRoute($topicSlug));
+        $indexPage->seeHeadline($headline, $position);
 
         // View the article I'm searched for
         $indexPage->viewArticle($position);
@@ -114,21 +113,21 @@ class CreateAndVerifyCest
             ->seeArticle($article)
             ->seeBlurb($blurb)
             ->seeFeatureImage($image)
-          //  ->seeTopic($topic)
+            ->seeTopic($topic)
             ->seeRoles($roles)
             ->seeCampuses($campi);
             //->seeUsers($users)
-           // ->seePublishDate($publish)
-           // ->seeExpiryDate($expiry);
+//            ->seePublishDate($publish)
+//            ->seeExpiryDate($expiry);
 
         // Verify that user Tim Reed(student) cannot see it
-        $scott = $i->haveFriend('tim');
-        $scott->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+        $tim = $i->haveFriend('tim');
+        $tim->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
             $i->login('treed', 'password');
             $indexPage = new Index($i);
 
             // Go to all page
-            $i->amOnPage($indexPage->generateRoute(''));
+            $i->amOnPage($indexPage->generateRoute('all'));
             $position = 1;
             $indexPage->dontSeeHeadline($headline, $position);
 
@@ -137,13 +136,13 @@ class CreateAndVerifyCest
         });
 
         // Verify that user Alison Chan(teacher) can see it
-        $celia = $i->haveFriend('alison');
-        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+        $alison = $i->haveFriend('alison');
+        $alison->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
             $i->login('achan', 'password');
             $indexPage = new Index($i);
 
             // Go to all page
-            $i->amOnPage($indexPage->generateRoute(''));
+            $i->amOnPage($indexPage->generateRoute('all'));
             $position = 1;
             $indexPage->seeHeadline($headline, $position);
 
@@ -156,12 +155,12 @@ class CreateAndVerifyCest
             ->fillPublishDate(\Alaress_Date_Format::now()->addDays(2)->setTime(0, 0, 0))
             ->submit();
 
-        // Verify that user Celia Glenn can no longer see it
-        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+        // Verify that user Alison Chan can no longer see it
+        $alison->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
             $indexPage = new Index($i);
 
             // Go to all page
-            $i->amOnPage($indexPage->generateRoute(''));
+            $i->amOnPage($indexPage->generateRoute('all'));
             $position = 1;
             $indexPage->dontSeeHeadline($headline, $position);
 
