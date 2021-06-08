@@ -460,23 +460,6 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                 )
             ";
 
-        $folderCodeKey = implode(';', $classCode);
-        $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId] = [
-            'FileType' => $class['FileType'],
-            'FileYear' => $fileYear,
-            'FileSemester' => $fileSemester,
-            'StaffID'      => $staffID,
-            'ClassCampus' => $class['ClassCampus'],
-            'ClassCode'   => $class['ClassCode'],
-            'MarkBookSeq' => '',
-            'Heading'      =>  $assessmentFieldValues["Heading"],
-            'HdgAbbrev1' => $assessmentFieldValues["HdgAbbrev1"],
-            'HdgAbbrev2' => $markbookId,
-            'ResultType' => $resultType,
-            'MarkOutOf' => '100',
-            'WeightingFactor' => $assessmentFieldValues["WeightingFactor"],
-        ];
-
         $statement = $this->getConnector()->prepareQuery($sql, [
             'fileType'             => $class['FileType'],
             'fileYear'             => $fileYear,
