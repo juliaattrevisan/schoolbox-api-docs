@@ -91,7 +91,6 @@ foreach ($_POST['docs'] as $doc) {
 
         $files[] = $meta;
     } catch (Schoolbox\File\Exception $e) {
-        unlink($dest);
         /* TODO: Find out how to handle this "successful error"
          * TODO: UI doesn't understand this payload
          */
@@ -101,6 +100,11 @@ foreach ($_POST['docs'] as $doc) {
 //            'type'  => 'unknown/binary',
 //            'err'   => $e->getMessage()
 //        );
+    } finally {
+        // Ensure temp file is always removed
+        if (file_exists($dest)) {
+            unlink($dest);
+        }
     }
 }
 
