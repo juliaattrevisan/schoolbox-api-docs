@@ -58,7 +58,26 @@ if (isset($_POST['max_file_size'])) {
     $_POST['max_file_size'] = Alaress_Byte_Format::stringToBytes($_POST['max_file_size']);
 }
 
-$mime = new Mimetype();
+/* Try to load an existing Mimetype that used $_POST['mime']
+ * One of these instance might already exist but was deleted
+ * In that case, resurrect it and give it the new settings
+ *
+ * Otherwise create a new instance and continue normally
+ */
+try {
+    $mime = $mimeMapper->findOneByColumn('mime', $_POST['mime'], [
+        'deleted' => true
+    ]);
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    $mime = $e->getDeletedObject();
+
+    /* Resurrect it
+     */
+    $mime->setDeleted(0);
+} catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+    $mime = $mimeMapper->createModel();
+}
+
 $mime->setDescription($_POST["description"]);
 $mime->setMime($_POST["mime"]);
 $mime->setIconFile($_POST["iconFile"]);
