@@ -272,13 +272,15 @@ class MapperProxy
      * specification; this essentially gets you the other implementations of an assessment
      * when you're looking for a cohort-context set
      *
-     * @param array $assessmentIds
+     * @param array     $assessmentIds
+     * @param Term|null $term          If not null, include only assessments
+     *                                 within that term's start/finish date.
      * @return array
      * @throws InvalidColumnException
      * @throws PDOException
      * @throws UnderflowException
      */
-    public function findImplementationIdWithCommonSpecificationId(array $assessmentIds): array
+    public function findImplementationIdWithCommonSpecificationId(array $assessmentIds, ?Term $term): array
     {
         /* I could have used a repeated combination of
          *
@@ -293,6 +295,9 @@ class MapperProxy
         $pb = $this->baseMapper->getPredicateBuilder()
             ->in('asi1.implementation_assessment_id', $assessmentIds)
             ->isNull('a.deleted_at');
+        if ($term) {
+            $pb = $pb->betweenDates('a.due_date', $term->getStart(), $term->getActualFinish());
+        }
 
         $where = implode(' AND ', $pb->getWhere());
 

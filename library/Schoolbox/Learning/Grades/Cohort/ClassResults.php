@@ -9,9 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Grades\Cohort;
 
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;
 
 /**
@@ -50,6 +52,12 @@ class ClassResults
 
 
     /**
+     * The academic period (a.k.a. term) to limit the cohort to.
+     */
+    private Term $term;
+
+
+    /**
      * @var array
      */
     private $tuples;
@@ -62,17 +70,20 @@ class ClassResults
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param Collection            $assessments
      * @param User                  $viewer
+     * @param Term                  $term
      */
     public function __construct(
         bool $gradeGradientEnabled,
         AssessmentMapperProxy $assessmentMapperProxy,
         Collection $assessments,
-        User $viewer
+        User $viewer,
+        Term $term
     ) {
         $this->gradeGradientEnabled = $gradeGradientEnabled;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->assessments = $assessments;
         $this->viewer = $viewer;
+        $this->term = $term;
     }
 
 
@@ -112,8 +123,12 @@ class ClassResults
         /* A user has participated in each of the elements inside $this->assessments
          * We need to find all the other assessments that shared a common specification
          * as the ones in $this->assessments
+         * (Also filter out assessments not due this term)
          */
-        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($inputImplementationIds);
+        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId(
+            $inputImplementationIds,
+            $this->term,
+        );
 
         /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
          */
@@ -148,7 +163,9 @@ class ClassResults
 
         foreach ($sortedSpecificationIds as $sortedSpecificationId) {
             foreach ($assessmentTuples as $implementationId => $specificationId) {
-                if ($specificationId === $sortedSpecificationId) {
+                // Only add this implementation to the result set if it actually
+                // is in the list of assessments that are due within this term.
+                if ($specificationId === $sortedSpecificationId && isset($assessments[$implementationId])) {
                     $sortedTuples[$implementationId] = $sortedSpecificationId;
 
                     /* Stack it up in the same order
