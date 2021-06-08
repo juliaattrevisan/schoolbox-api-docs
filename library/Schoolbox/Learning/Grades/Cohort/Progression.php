@@ -197,7 +197,10 @@ class Progression
          * We need to find all the other assessments that shared a common specification
          * as the ones in $this->assessments
          */
-        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($inputImplementationIds);
+        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId(
+            $inputImplementationIds,
+            null,
+        );
 
         /* $assessmentTuples is a set of (key, value) tuples where $key is the implementation id,
          * and $value is a corresponding specification id

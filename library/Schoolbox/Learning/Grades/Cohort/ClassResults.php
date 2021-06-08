@@ -123,17 +123,16 @@ class ClassResults
         /* A user has participated in each of the elements inside $this->assessments
          * We need to find all the other assessments that shared a common specification
          * as the ones in $this->assessments
-         */
-        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId($inputImplementationIds);
-
-        /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
          * (Also filter out assessments not due this term)
          */
-        $assessments = $this->assessmentMapperProxy
-            ->findAllByIds(array_keys($assessmentTuples))
-            ->filter(function (IAssessable $assessment) {
-                return $this->term->contains($assessment->getDueAt());
-            });
+        $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId(
+            $inputImplementationIds,
+            $this->term,
+        );
+
+        /* Use the swamp to hydrate all the participants' pieces via assessmentMapperProxy
+         */
+        $assessments = $this->assessmentMapperProxy->findAllByIds(array_keys($assessmentTuples));
 
         /* Populate all the participants' data into this set
          * We need to build the five-point summary using EVERYONE's feedbacks for this assessment specification
