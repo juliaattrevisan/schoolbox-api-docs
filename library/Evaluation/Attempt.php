@@ -82,6 +82,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND assess_attempt.deleted_at IS NULL
+                  AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getAll($query);
@@ -111,6 +112,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND assess_attempt.deleted_at IS NULL
+                  AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
         return $this->db->getAll($query);
@@ -138,6 +140,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess.assess_id = " . $this->db->smartQuote($assess_id) . "
                   AND assess_response.section_id = '$section_id'
+                  AND assess_response.deleted_at IS NULL
                   AND assess_attempt.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
@@ -172,6 +175,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
             AND   ars.assess_id  = aa.assess_id
             AND   aqs.assess_id  = aa.assess_id
             AND   aq.deleted_at  IS NULL
+            AND   ar.deleted_at IS NULL
         ";
 
         return $this->db->getOne($query);
@@ -260,6 +264,7 @@ abstract class Evaluation_Attempt extends DeprecatedModel
                   FROM assess_attempt
                   LEFT JOIN assess_response ON assess_attempt.attempt_id = assess_response.attempt_id
                   WHERE assess_attempt.attempt_id = " . $this->db->smartQuote($attempt_id) . "
+                  AND assess_response.deleted_at IS NULL
                   GROUP BY assess_attempt.attempt_id";
 
         $result = $this->db->getOne($query);

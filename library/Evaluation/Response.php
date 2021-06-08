@@ -244,7 +244,8 @@ abstract class Evaluation_Response extends DeprecatedModel
             SELECT *
             FROM assess_response
             WHERE attempt_id = " . $this->db->smartQuote($attempt_id) . "
-            AND question_id = " . $this->db->smartQuote($question_id);
+            AND question_id = " . $this->db->smartQuote($question_id) ."
+            AND assess_response.deleted_at IS NULL";
 
         return $this->db->getRow($query);
     }

@@ -48,6 +48,14 @@ $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
 // getListByAssessAndAttempt gets a rowset for some reason!
 $attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
+
+/* Questions in the attempt have all been deleted
+ * Nothing to see now...might as well not exist anymore
+ */
+if (!$attemptList) {
+    $this->pageNotFound();
+}
+
 $attempt = array_pop($attemptList);
 
 if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
