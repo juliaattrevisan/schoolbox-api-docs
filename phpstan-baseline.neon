@@ -4412,16 +4412,6 @@ parameters:
 
 		-
 			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/External/Connector/Kamar/Base/Endpoint/Cleanup.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 2
-			path: library/Schoolbox/External/Connector/Kamar/Base/Endpoint/Setup.php
-
-		-
-			message: "#^If condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Kamar/Base/Endpoint/Timetable/Classes.php
 

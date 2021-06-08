@@ -32,7 +32,7 @@ class Traverser
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private Batchxml $batchxml;
 
 
     /**

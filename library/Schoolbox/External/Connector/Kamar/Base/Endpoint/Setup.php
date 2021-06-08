@@ -30,15 +30,15 @@ class Setup implements IStrategy
 
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
-    private $log;
+    private ?LoggerInterface $log;
 
 
     /**
      * @var string
      */
-    private $cacheDir;
+    private string $cacheDir;
 
 
     /**

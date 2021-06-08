@@ -39,13 +39,13 @@ class Receiver
     /**
      * @var string
      */
-    private $dir;
+    private string $dir;
 
 
     /**
      * @var string
      */
-    private $suffix;
+    private string $suffix;
 
 
     /**
@@ -54,7 +54,7 @@ class Receiver
      *
      * @var string
      */
-    private $expectedAuthorization;
+    private string $expectedAuthorization;
 
 
     /**

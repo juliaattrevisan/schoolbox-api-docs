@@ -59,7 +59,7 @@ class Preconditions
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**

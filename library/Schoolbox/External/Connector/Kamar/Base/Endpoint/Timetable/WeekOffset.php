@@ -29,19 +29,19 @@ class WeekOffset
     /**
      * @var TimetableCycleMapper
      */
-    private $timetableCycleMapper;
+    private TimetableCycleMapper $timetableCycleMapper;
 
 
     /**
      * @var Alaress_Date_Format
      */
-    private $date;
+    private Alaress_Date_Format $date;
 
 
     /**
      * @var LoggerInterface|null
      */
-    private $log;
+    private ?LoggerInterface $log;
 
 
     /**

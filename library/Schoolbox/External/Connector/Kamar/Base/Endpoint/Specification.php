@@ -23,13 +23,13 @@ abstract class Specification implements ISpecification
     /**
      * @var Batchxml
      */
-    protected $batchxml;
+    protected Batchxml $batchxml;
 
 
     /**
      * @var array
      */
-    protected $paths = [];
+    protected array $paths = [];
 
 
     /**
