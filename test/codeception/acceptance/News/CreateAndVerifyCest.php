@@ -59,8 +59,8 @@ class CreateAndVerifyCest
         $topic     = 'General';
         $topicSlug = (new \Url($topic, ''))->getSlug();
         $roles     = ['Teacher'];
-        $campi     = ['Secondary', 'Primary'];
-        $users     = ['Jana Reed','Tim Reed'];
+        $campi     = ['Primary'];
+        $users     = ['Jana Reed','Mario Izzo'];
         $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
@@ -121,7 +121,7 @@ class CreateAndVerifyCest
             ->seePublishDate($publish)
             ->seeExpiryDate($expiry);
 
-        // Verify that user Tim Reed(student) cannot see it
+        // Verify that user Tim Reed(student from secondary) cannot see it
         $tim = $i->haveFriend('tim');
         $tim->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
             $i->login('treed', 'password');
