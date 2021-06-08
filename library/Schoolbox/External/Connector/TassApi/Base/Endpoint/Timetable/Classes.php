@@ -211,8 +211,14 @@ class Classes implements IStrategy
                     /* If the FROM_DATE is not null and the TO_DATE is not null,
                      * check that the current time is between these two dates
                      * If we're outside these two dates, skip this subject
+                     *
+                     * FROM_DATE and TO_DATE might not even exist in the API payload
+                     * for some mysterious reason, because TASS reasons I suppose
                      */
-                    $isActive = (new ValidActiveEnrolment())->isSatisfiedBy((string)$subject['FROM_DATE'], (string)$subject['TO_DATE']);
+                    $fromDate = $subject['FROM_DATE'] ?? '';
+                    $toDate = $subject['TO_DATE'] ?? '';
+
+                    $isActive = (new ValidActiveEnrolment())->isSatisfiedBy($fromDate, $toDate);
 
                     if (!$isActive) {
                         $this->log->info(sprintf(
