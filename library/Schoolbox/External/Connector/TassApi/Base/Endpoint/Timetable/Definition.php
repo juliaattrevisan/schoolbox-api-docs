@@ -175,7 +175,7 @@ class Definition implements IStrategy
             try {
                 $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $timetableCycle = $timetableCycle = $this->timetableCycleMapper->createModel();
+                $timetableCycle = $this->timetableCycleMapper->createModel();
             }
 
             $timetableCycle
