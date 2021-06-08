@@ -18,4 +18,21 @@ class Assess_Response extends Evaluation_Response
      */
     const RANDOMISE_QUESTIONS = 1;
     const ORDERED_QUESTIONS = 2;
+
+
+    /**
+     * Remove usages of a Question from all existing Attempts as well
+     *
+     * @param int $questionId
+     */
+    public function deleteQuestionFromResponses(int $questionId): void
+    {
+        $query = "
+            UPDATE {$this->_table}
+            SET deleted_at = NOW()
+            WHERE question_id = {$questionId}
+        ";
+
+        $this->db->query($query);
+    }
 }
