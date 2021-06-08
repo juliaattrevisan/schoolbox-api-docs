@@ -173,8 +173,8 @@ class AdditionalSubjects implements IStrategy
                  * FROM_DATE and TO_DATE might not even exist in the API payload
                  * for some mysterious reason, because TASS reasons I suppose
                  */
-                $fromDate = $subject['from_date'] ?? '';
-                $toDate = $subject['to_date'] ?? '';
+                $fromDate = $additionalSubject['from_date'] ?? '';
+                $toDate = $additionalSubject['to_date'] ?? '';
 
                 $isActive = (new ValidActiveEnrolment())->isSatisfiedBy($fromDate, $toDate);
 
