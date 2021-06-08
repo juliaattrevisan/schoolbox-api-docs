@@ -2,91 +2,91 @@
 @import "www/static/css/foundation/utils/variables";
 
 .fc {
-  .fc-button {
-    background-color: $content-ui-background;
-    border: 0;
-    border-radius: 0;
-    color: $content-ui-foreground;
-    margin: 0 1px 0 0 !important;
+    .fc-button {
+        background-color: $content-ui-background;
+        border: 0;
+        border-radius: 0;
+        color: $content-ui-foreground;
+        margin: 0 1px 0 0 !important;
 
-    &:focus {
-      box-shadow: none !important;
-      outline: 0;
+        &:focus {
+            box-shadow: none !important;
+            outline: 0;
+        }
     }
-  }
-  .flatpickr-input {
-    padding: 0 !important;
-    a {
-      margin: 0;
-      padding: 0.5rem 0.875rem !important;
+    .flatpickr-input {
+        padding: 0 !important;
+        a {
+            margin: 0;
+            padding: 0.5rem 0.875rem !important;
+        }
     }
-  }
-  .fc-customPrev-button,
-  .fc-customNext-button {
-    line-height: 1;
-  }
-  .fc-toolbar-title {
-    font-size: 1.125rem;
-  }
-  .fc-cell-shaded {
-    background-color: $white-smoke;
-  }
-  .fc-list-event-title {
-    width: 100%;
+    .fc-customPrev-button,
+    .fc-customNext-button {
+        line-height: 1;
+    }
+    .fc-toolbar-title {
+        font-size: 1.125rem;
+    }
+    .fc-cell-shaded {
+        background-color: $white-smoke;
+    }
+    .fc-list-event-title {
+        width: 100%;
 
-    a {
-      display: block;
-      width: 100%;
+        a {
+            display: block;
+            width: 100%;
+        }
+        .event-container {
+            padding: 0;
+        }
     }
-    .event-container {
-      padding: 0;
+    .fc-col-header-cell-cushion {
+        font-size: 0.875rem;
+        font-weight: normal;
+        text-transform: uppercase;
     }
-  }
-  .fc-col-header-cell-cushion {
-    font-size: 0.875rem;
-    font-weight: normal;
-    text-transform: uppercase;
-  }
-  .fc-daygrid-day-number {
-    font-weight: bold;
-    width: 100%;
-    text-align: center;
-  }
-  .fc-list-day-text {
-    margin: 0.25rem 0;
-    font-size: 0.875rem;
-  }
-  .fc-list-event {
-    background-color: transparent;
-  }
-  .fc-list-event:hover td {
-    background-color: $content-ui-hover;
-  }
-  .fc-daygrid-event:hover {
-    margin-top: 1px;
-  }
-  .fc-col-header-cell.fc-day-today > div,
-  .fc-daygrid-day.fc-day-today {
-    background-color: $accent-background;
-    color: $accent-foreground;
-  }
-  .fc-col-header-cell a {
-    color: $black;
-  }
+    .fc-daygrid-day-number {
+        font-weight: bold;
+        width: 100%;
+        text-align: center;
+    }
+    .fc-list-day-text {
+        margin: 0.25rem 0;
+        font-size: 0.875rem;
+    }
+    .fc-list-event {
+        background-color: transparent;
+    }
+    .fc-list-event:hover td {
+        background-color: $content-ui-hover;
+    }
+    .fc-daygrid-event:hover {
+        margin-top: 1px;
+    }
+    .fc-col-header-cell.fc-day-today > div,
+    .fc-daygrid-day.fc-day-today {
+        background-color: $accent-background;
+        color: $accent-foreground;
+    }
+    .fc-col-header-cell a {
+        color: $black;
+    }
 }
 
 .fc-custom-group.row .small-4.columns {
-  padding-left: 0;
-  @-moz-document url-prefix() {
-    padding-right: 1rem;
-  }
+    padding-left: 0;
+    @-moz-document url-prefix() {
+        padding-right: 1rem;
+    }
 }
 .fc-custom-group.row {
-  margin-left: 0 !important;
+    margin-left: 0 !important;
 }
 
 .fc-custom-group .input-group {
-  flex-wrap: nowrap !important;
+    flex-wrap: nowrap !important;
 }
 
 .fc-theme-standard th,
@@ -100,36 +100,36 @@
 .fc-theme-standard .fc-list-view,
 .fc-theme-standard .fc-list-heading td,
 .fc .fc-row .fc-content-skeleton td {
-  border: 1px solid #ededed;
+    border: 1px solid #ededed;
 }
 
 .fc-list-table {
-  td,
-  th,
-  tr {
-    border: 0;
-  }
+    td,
+    th,
+    tr {
+        border: 0;
+    }
 }
 
 .fc-theme-standard .fc-scrollgrid,
 .fc-theme-standard .fc-list,
 .fc-event {
-  border: 0;
+    border: 0;
 }
 
 .fc-daygrid-block-event .fc-event-time,
 .fc-daygrid-block-event .fc-event-title {
-  padding: 2px 4px;
+    padding: 2px 4px;
 }
 
 .fc-event {
-  margin: 0;
-  color-adjust: exact;
-  -webkit-print-color-adjust: exact;
-
-  &:hover {
     margin: 0;
-  }
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+
+    &:hover {
+        margin: 0;
+    }
 }
 
 .fc-timegrid-event,
@@ -137,11 +137,11 @@
 .fc-direction-ltr .fc-daygrid-block-event:not(.fc-event-start),
 .fc-direction-rtl .fc-daygrid-block-event:not(.fc-event-start),
 .fc-direction-rtl .fc-daygrid-block-event:not(.fc-event-end) {
-  border-radius: 0;
+    border-radius: 0;
 }
 
 .strike {
-  text-decoration: line-through !important;
+    text-decoration: line-through !important;
 }
 
 /* Allow all-day row to be visible in Week and Day views
@@ -150,125 +150,125 @@
 .fc .fc-content-skeleton table,
 .fc .fc-content-skeleton table tr:nth-of-type(even),
 .fc .fc-content-skeleton table tr:nth-of-type(even):hover {
-  background-color: transparent;
+    background-color: transparent;
 }
 
 /* Vertically center datepicker icon and current month title
  */
 .fc .fc-center {
-  padding: 1rem 0 0;
+    padding: 1rem 0 0;
 }
 
 .fc .fc-button-group > * {
-  margin: 0 1px 0 0;
-  border: 0;
+    margin: 0 1px 0 0;
+    border: 0;
 }
 
 .fc .fc-button-group > *:last-child {
-  margin: 0;
+    margin: 0;
 }
 
 .fc .fc-axis {
-  padding: 0;
+    padding: 0;
 }
 
 .fc-event {
-  min-height: 1em;
-  overflow: hidden;
+    min-height: 1em;
+    overflow: hidden;
 }
 
 .fc-event,
 .fc-event:hover {
-  color: #000;
-  border-radius: 0;
+    color: #000;
+    border-radius: 0;
 }
 .fc-event:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 .fc-event.loading {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 .fc-agenda-slots td div {
-  height: 31px;
+    height: 31px;
 }
 
 .fc-state-default.fc-corner-left,
 .fc-state-default.fc-corner-right {
-  border-top-left-radius: 0px;
-  border-bottom-left-radius: 0px;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 
 .fc-state-default {
-  text-shadow: none;
-  box-shadow: none;
-  background-image: none;
-  text-transform: capitalize;
+    text-shadow: none;
+    box-shadow: none;
+    background-image: none;
+    text-transform: capitalize;
 }
 
 .fc-state-down,
 .fc-state-active {
-  box-shadow: none;
+    box-shadow: none;
 }
 
 // Booking
 .fc .fc-event.booking {
-  /** Default booking color, if you don't have a event type called "Booking" **/
-  background-color: #eeeeee;
-  border-color: #eeeeee;
+    /** Default booking color, if you don't have a event type called "Booking" **/
+    background-color: #eeeeee;
+    border-color: #eeeeee;
 }
 .fc .fc-event.booking.approved .fc-event-inner:before {
-  /** Put a tick mark before confirmed bookings **/
-  content: "✓";
+    /** Put a tick mark before confirmed bookings **/
+    content: "✓";
 }
 .fc .fc-event.booking.rejected {
-  font-style: italic;
+    font-style: italic;
 }
 .fc .fc-event.booking.rejected .fc-event-inner:before {
-  /** Put a cross before rejected bookings **/
-  content: "✗";
+    /** Put a cross before rejected bookings **/
+    content: "✗";
 }
 .fc .fc-event.booking.cancelled {
-  /** Cancelled events - currently not shown, but put a line through them **/
-  text-decoration: line-through;
-  font-style: italic;
+    /** Cancelled events - currently not shown, but put a line through them **/
+    text-decoration: line-through;
+    font-style: italic;
 }
 
 .fc table {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 .fc-row .fc-content-skeleton td {
-  border-color: inherit;
+    border-color: inherit;
 }
 .fc-toolbar {
-  margin-bottom: 0;
+    margin-bottom: 0;
 }
 
 // Homepage and Dashboard components
 .component-container {
-  // Otherwise it has an irritating 1px border
-  .fc-list-view {
-    border-width: 0;
-  }
+    // Otherwise it has an irritating 1px border
+    .fc-list-view {
+        border-width: 0;
+    }
 
-  // Explicitly define the background color, because it's prone to a < 1px white right border. Go figure
-  .fc-view-container {
-    background-color: $body-bg;
-  }
+    // Explicitly define the background color, because it's prone to a < 1px white right border. Go figure
+    .fc-view-container {
+        background-color: $body-bg;
+    }
 
-  // Remove the empty state: use our own state messages instead
-  .fc-list-empty,
-  .fc-list-empty-wrap2 {
-    display: none;
-  }
+    // Remove the empty state: use our own state messages instead
+    .fc-list-empty,
+    .fc-list-empty-wrap2 {
+        display: none;
+    }
 
-  // The entire event is clickable
-  .fc-list-item {
-    cursor: pointer;
-  }
+    // The entire event is clickable
+    .fc-list-item {
+        cursor: pointer;
+    }
 }
 
 /* Overcome specificity
@@ -276,14 +276,23 @@
 #content > .row > .small-12 table .fc-day-header.fc-widget-header,
 #content > .row > .small-12 table .fc-head .fc-widget-header,
 #content > .row > .small-12 table .fc-body .fc-widget-content {
-  padding: 0;
+    padding: 0;
 }
 
 #content > .row > .small-12 .fc-basic-view .fc-day-number {
-  padding: 0 0.25rem 0 0;
+    padding: 0 0.25rem 0 0;
 }
 
 #calendar-loading {
-  min-height: 0;
-  max-height: 92px;
+    min-height: 0;
+    max-height: 92px;
+}
+
+//ensure stickyHeaderDates function due to existing css overwrites
+.fc-list-sticky {
+    td,
+    th,
+    .fc-event {
+        position: static;
+    }
 }
