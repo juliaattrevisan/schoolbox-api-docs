@@ -208,14 +208,12 @@ class Manager
         // Are they both local?
         if ($adapterFrom instanceof Flysystem\Adapter\Local && $adapterTo instanceof Flysystem\Adapter\Local) {
             // Attempt to move, rather than copy
-            $newFilename = rtrim($adapterTo->getPathPrefix()) . $storage->getPath();
-            $newDir      = dirname($newFilename);
-            if (!mkdir($newDir, 0777, true) && !is_dir($newDir)) {
+            if ($adapterTo->createDir(dirname($storage->getPath()), $fsTo->getConfig()) === false) {
                 return false;
             }
             return rename(
                 rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath,
-                $newFilename
+                $adapterTo->getPathPrefix() . $storage->getPath()
             );
         }
 
