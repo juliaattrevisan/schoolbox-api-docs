@@ -35,7 +35,6 @@ class Form
     public const FORM = Common::ELEMENT_CONTENT . ' #newsForm';
 
     // Not sure if every input should have its own selector constant
-//    public const FORM_SAVE = self::FORM . ' button[type="submit"]';
     public const FORM_SAVE = '#news-submit';
 
     /**
@@ -184,14 +183,12 @@ class Form
      */
     public function fillTopic(string $topic): self
     {
-
         $this->tester->click('input#news-topics-selectized');
         $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('selectize-dropdown multi plugin-remove_button');
         scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
         $element = Locator::contains('div.option', $topic);
         $this->tester->click($element);
         return $this;
-
     }
 
     /**
@@ -200,11 +197,8 @@ class Form
      */
     public function seeTopic(string $topic): self
     {
-
         $this->tester->canSee($topic,'div.item');
         return $this;
-
-
     }
     /**
      * @param array $roles
@@ -212,19 +206,24 @@ class Form
      */
     public function fillRoles(array $roles): self
     {
-//        $this->tester->checkSelectGroupOptions('role', $roles);
-        $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
-        $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
-        $this->tester->waitForText('Year Levels');
-        $element = Locator::contains('button.button-block', 'Roles');
-        $this->tester->clickWithLeftButton($element);
-        $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
-        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
-        $this->tester->waitForText('Teacher', 5);
-        $teacher_element = Locator::contains('div.checklist-wrapper', 'Teacher');
-        $this->tester->clickWithLeftButton($teacher_element);
-        $this->tester->click('button.button.submit');
-        sleep(2);
+        foreach ($roles as &$role) {
+
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Roles');
+            $element = Locator::contains('button.button-block', 'Roles');
+            $this->tester->clickWithLeftButton($element);
+            $this->tester->executeJS(
+                "var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+            scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;"
+            );
+            $this->tester->waitForText($role, 5);
+            $teacher_element = Locator::contains('div.checklist-wrapper', $role);
+            $this->tester->clickWithLeftButton($teacher_element);
+            $this->tester->click('button.button.submit');
+            sleep(2);
+
+        }
         return $this;
 
     }
@@ -235,8 +234,9 @@ class Form
      */
     public function seeRoles(array $roles): self
     {
-//        $this->tester->seeSelectGroupOptionsAreSelected('role', $roles);
-        $this->tester->canSee('Teacher');
+        foreach ($roles as &$role) {
+            $this->tester->canSee($role);
+        }
         return $this;
     }
 
@@ -246,18 +246,23 @@ class Form
      */
     public function fillCampuses(array $campuses): self
     {
-        $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
-        $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
-        $this->tester->waitForText('Year Levels');
-        $element = Locator::contains('button.button-block', 'Campuses');
-        $this->tester->clickWithLeftButton($element);
-        $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
-        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
-        $this->tester->waitForText('Secondary', 5);
-        $campus_element = Locator::contains('div.checklist-wrapper', 'Secondary');
-        $this->tester->clickWithLeftButton($campus_element);
-        $this->tester->click('button.button.submit');
-        sleep(2);
+
+        foreach ($campuses as &$campus) {
+
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Year Levels');
+            $element = Locator::contains('button.button-block', 'Campuses');
+            $this->tester->clickWithLeftButton($element);
+            $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+            scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+            $this->tester->waitForText('Secondary', 5);
+            $campus_element = Locator::contains('div.checklist-wrapper', $campus);
+            $this->tester->clickWithLeftButton($campus_element);
+            $this->tester->click('button.button.submit');
+            sleep(2);
+        }
+
         return $this;
     }
 
@@ -267,8 +272,9 @@ class Form
      */
     public function seeCampuses(array $campuses): self
     {
-//        $this->tester->seeSelectGroupOptionsAreSelected('campus', $campuses);
-        $this->tester->canSee('Secondary');
+        foreach ($campuses as &$campus) {
+            $this->tester->canSee($campus);
+        }
         return $this;
     }
 
@@ -279,6 +285,7 @@ class Form
     public function fillUsers(array $users): self
     {
         foreach ($users as &$user) {
+
             $this->tester->click('input#audience-search-selectized');
             $user_chars = str_split($user);
             foreach ($user_chars as &$user_char) {
@@ -295,9 +302,9 @@ class Form
      */
     public function seeUsers(array $users): self
     {
-
-        $this->tester->canSee('Jana Reed');
-
+        foreach ($users as &$user)  {
+            $this->tester->canSee($user);
+        }
         return $this;
     }
 

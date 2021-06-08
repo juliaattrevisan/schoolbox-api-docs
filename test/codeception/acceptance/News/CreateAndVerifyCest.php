@@ -59,7 +59,7 @@ class CreateAndVerifyCest
         $topic     = 'General';
         $topicSlug = (new \Url($topic, ''))->getSlug();
         $roles     = ['Teacher'];
-        $campi     = ['Senior', 'Junior'];
+        $campi     = ['Secondary', 'Primary'];
         $users     = ['Jana Reed','Tim Reed'];
         $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
