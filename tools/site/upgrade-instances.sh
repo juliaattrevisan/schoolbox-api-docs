@@ -149,8 +149,16 @@ function upgrade_instances(){
   log "Starting SQL updates for all instances in parallel"
   for i in $instance_list; do
   {
-    instance_log_file=/var/lib/"$package"/"$i"_upgrade.log;
+    # Ensure instance's log file's directory exists
+    mkdir -p /var/log/schoolbox/"$i"
+    instance_log_file=/var/lib/schoolbox/"$i"/upgrade.log;
     log "upgrade starting for instance $i - logging to $instance_log_file";
+
+    # If log exists in old location, move to new location. TODO remove once all instances upgrade past 20.2.12
+    old_filename=/var/lib/"$package"/"$i"_upgrade.log
+    if [[ -f  "$old_filename" ]]; then
+      mv "$old_filename" "$instance_log_file"
+    fi
 
     # TODO, consider case where:
     # 1. Non-primary upgrades from v1 to v2, and creates dirs using v1 schema
@@ -252,7 +260,7 @@ function reload_binding_cache(){
     log "---reloading binding cache (in parallel)---";
     for i in $instance_list; do
     {
-      instance_log_file_2=/var/lib/$package/"$i"_upgrade.log;
+      instance_log_file_2=/var/lib/schoolbox/"$i"/upgrade.log;
       log "binding cache refresh starting for instance $i - logging to $instance_log_file_2";
       ${package}cloud-reload-binding-cache "$i" >> "$instance_log_file_2" 2>&1;
       log "binding cache refresh finished for instance $i";
