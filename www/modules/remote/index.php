@@ -39,7 +39,7 @@ foreach (explode("\n", Config::get('safe_iframe_source_list')) as $source) {
     $source = trim($source);
     if (strlen($source) > 0) {
         $sourceEscaped = preg_quote($source, '%');
-        if (preg_match('%'.$sourceEscaped.'%', $remoteUrl)) {
+        if (preg_match('%' . $sourceEscaped . '%', $remoteUrl)) {
             $secureUrl = true;
             break;
         }
