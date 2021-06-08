@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Grades\Cohort;
 use Alaress\Database\Connector;
 use Alaress\Database\Predicate\Builder;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Term\Model as Term;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -56,6 +57,12 @@ class Progression
 
 
     /**
+     * The academic period (a.k.a. term) to limit the cohort to, if any.
+     */
+    private ?Term $term;
+
+
+    /**
      * @var array
      */
     private $tuples;
@@ -68,17 +75,20 @@ class Progression
      * @param AssessmentMapperProxy $assessmentMapperProxy
      * @param GenericCollection     $assessments
      * @param bool                  $includeComparison
+     * @param Term|null             $term
      */
     public function __construct(
         Connector\Base $database,
         AssessmentMapperProxy $assessmentMapperProxy,
         GenericCollection $assessments,
-        bool $includeComparison
+        bool $includeComparison,
+        ?Term $term = null
     ) {
         $this->database = $database;
         $this->assessmentMapperProxy = $assessmentMapperProxy;
         $this->assessments = $assessments->indexBy('id');
         $this->includeComparison = $includeComparison;
+        $this->term = $term;
     }
 
 
@@ -199,7 +209,7 @@ class Progression
          */
         $assessmentTuples = $this->assessmentMapperProxy->findImplementationIdWithCommonSpecificationId(
             $inputImplementationIds,
-            null,
+            $this->term,
         );
 
         /* $assessmentTuples is a set of (key, value) tuples where $key is the implementation id,
