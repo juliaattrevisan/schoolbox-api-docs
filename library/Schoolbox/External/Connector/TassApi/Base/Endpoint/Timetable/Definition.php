@@ -175,7 +175,7 @@ class Definition implements IStrategy
             try {
                 $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $ext);
             } catch (\Schoolbox\Mapper\Exception $e) {
-                $timetableCycle = $timetableCycle = $this->timetableCycleMapper->createModel();
+                $timetableCycle = $this->timetableCycleMapper->createModel();
             }
 
             $timetableCycle
@@ -216,7 +216,7 @@ class Definition implements IStrategy
                      * Sometimes schools have multiple instances of the same name on a given day
                      *
                      * e.g. two Tutor periods without any distinction in their name occur in the
-                     * same day in a given cycle (one is a morning session, another in the aftenoon)
+                     * same day in a given cycle (one is a morning session, another in the afternoon)
                      *
                      * Look ahead to see if it exists; if it does, augment the title - but schools
                      * should have unique period names per day instead.

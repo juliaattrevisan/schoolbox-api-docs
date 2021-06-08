@@ -203,6 +203,34 @@ class Classes implements IStrategy
                      */
                     $subject = $period['SUBJECTS'][0];
 
+                    /* TODO Shalom is the first usage of having multiple subjects in a day/period tuple
+                     *  We might have to do this instead:
+                     *  foreach($period['SUBJECTS'] as $subject) { ... }
+                     */
+
+                    /* If the FROM_DATE is not null and the TO_DATE is not null,
+                     * check that the current time is between these two dates
+                     * If we're outside these two dates, skip this subject
+                     *
+                     * FROM_DATE and TO_DATE might not even exist in the API payload
+                     * for some mysterious reason, because TASS reasons I suppose
+                     */
+                    $fromDate = $subject['FROM_DATE'] ?? '';
+                    $toDate = $subject['TO_DATE'] ?? '';
+
+                    $isActive = (new ValidActiveEnrolment())->isSatisfiedBy($fromDate, $toDate);
+
+                    if (!$isActive) {
+                        $this->log->info(sprintf(
+                            'Skipping class %s - we are outside the bounds of from_date %s and to_date %s',
+                            $subject['SUB_CODE'],
+                            $subject['FROM_DATE'],
+                            $subject['TO_DATE']
+                        ));
+
+                        continue;
+                    }
+
                     /* Tass doesn't use the date part,
                      * Tass includes a microseconds part (sigh)
                      * So we have to ditch these bits and swipe what we need
