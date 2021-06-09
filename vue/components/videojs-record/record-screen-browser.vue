@@ -43,6 +43,7 @@ export default {
             hasPreRecordedData: false, //to display an existing recording on load
             isOverMediaModalClosing: false, //to animate out the over-media-modal
             hasError: false, //to manage UI elements
+            hasNotSupportedError: false, //unable to fire up the media recorder, likely because a required media API is not available
             hasDeviceAlreadyInUseError: false, //can't access the requested device
             hasPermissionDeniedError: false, //didn't allow permission
             isRecordingOverMaxFileSize: false, //notify that the recording won't upload
@@ -85,7 +86,12 @@ export default {
          *
          */
         initVideojsRecord () {
-            this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(), this.onVideojsReady);
+            try {
+                this.player = videojs(this.$refs.recordingVideo, getRecordScreenOptions(), this.onVideojsReady);
+            } catch (error) {
+                this.hasNotSupportedError = true;
+                this.hasError = true;
+            }
         },
 
         /**
@@ -271,6 +277,7 @@ export default {
             <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">Screen sharing appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter screen recording or request your administrator(s) to increase the allowed file size limit.</div>
+            <div v-else-if="hasNotSupportedError" class="alert-box alert">Sorry, unable to record video. It's likely your browser does not support the required features. If possible please upgrade your browser.</div>
             <div v-else class="alert-box alert">Sorry, an unknown error has occured.</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>
