@@ -168,6 +168,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                   LEFT JOIN assess_section ON assess_question.section_id = assess_section.section_id
                   WHERE assess_response.attempt_id = " . $this->db->smartQuote($attempt_id) . "
                   AND assess_response.section_id = " . $this->db->smartQuote($section_id) . "
+                  AND assess_response.deleted_at IS NULL
                   AND assess_question.deleted_at IS NULL
                   ORDER BY IF(assess_section.random = '1', assess_response.response_id, assess_question.sequence)";
 
@@ -225,6 +226,7 @@ abstract class Evaluation_Section extends DeprecatedModel
                              LEFT JOIN assess_question on assess_response.question_id = assess_question.question_id
                              WHERE attempt_id = '{$this->db->quote($attemptId)}'
                              AND assess_response.section_id = '{$this->db->quote($currentSection['section_id'])}'
+                             AND assess_response.deleted_at IS NULL
                              AND assess_section.deleted_at IS NULL
                              AND assess_question.deleted_at IS NULL";
 

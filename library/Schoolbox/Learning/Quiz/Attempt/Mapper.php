@@ -258,6 +258,7 @@ class Mapper extends BaseMapper
             LEFT JOIN assess_response ar ON aa.attempt_id  = ar.attempt_id
             LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
             WHERE aa.attempt_id IN {$this->getArrayPlaceholders($attemptIds)}
+            AND ar.deleted_at IS NULL
             GROUP BY aa.assess_id, aa.attempt_id
             ORDER BY aa.start DESC
         ";
@@ -290,6 +291,7 @@ class Mapper extends BaseMapper
             WHERE a.assess_id = :assess_id
             AND a.availability = 'assess'
             AND aa.deleted_at IS NULL
+            AND ar.deleted_at IS NULL
             GROUP BY aa.assess_id, aa.attempt_id
             ORDER BY aa.start DESC
         ";

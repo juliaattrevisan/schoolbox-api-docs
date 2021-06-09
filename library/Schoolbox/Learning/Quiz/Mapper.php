@@ -350,6 +350,7 @@ class Mapper extends BaseMapper
                   ) t0
                   ON ar.attempt_id = t0.attempt_id
                   LEFT JOIN assess_question aq ON ar.question_id = aq.question_id
+                  WHERE ar.deleted_at IS NULL
                   GROUP BY t0.attempt_id
                   ORDER BY finish DESC
               ) t1

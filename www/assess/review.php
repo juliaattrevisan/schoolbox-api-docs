@@ -48,6 +48,14 @@ $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
 // getListByAssessAndAttempt gets a rowset for some reason!
 $attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
+
+/* Questions in the attempt have all been deleted
+ * Nothing to see now...might as well not exist anymore
+ */
+if (!$attemptList) {
+    $this->pageNotFound();
+}
+
 $attempt = array_pop($attemptList);
 
 if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
@@ -300,10 +308,10 @@ if (!is_numeric($nextSection['section_id']) && !is_numeric($prevSection['section
     $this->setVar('nextSection_block', '');
     $this->setVar('prevSection_block', '');
     $this->parse('endAssess_block', 'endAssess');
-} /* If there is no next section, then provide the finish link and parse out the
- * previous button if applicable
- */
-else {
+} else {
+    /* If there is no next section, then provide the finish link and parse out the
+     * previous button if applicable
+     */
     if (is_numeric($nextSection['section_id'])) {
         $this->setVar(array(
             'NEXT_SECTION_ID' => $nextSection['section_id'],

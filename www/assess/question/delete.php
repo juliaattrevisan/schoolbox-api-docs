@@ -17,6 +17,8 @@ $questionHandler = new Assess_Question();
 $answerHandler = new Assess_Answer();
 $sectionHandler = new Assess_Section();
 $groupHandler = new Group();
+$responseHandler = new Assess_Response();
+
 /* Soft delete the question
  */
 $question = $questionHandler->getByID($this->arg[0]);
@@ -56,6 +58,12 @@ $answerHandler->update(array(
     'answer_id' => $answer['answer_id'],
     'deleted_at' => 'NOW()',
 ));
+
+/* Delete this question's usage from assess_response
+ * These rows aggregate into a person's Attempt
+ */
+$responseHandler->deleteQuestionFromResponses((int)$question['question_id']);
+
 /* Reorder questions because sequence corresponds to question number
  */
 $section = $sectionHandler->getByID($question['section_id']);

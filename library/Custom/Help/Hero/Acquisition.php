@@ -261,6 +261,7 @@ class Acquisition
         $pb->notNull('aa.reviewed_at');
         $pb->isNull('aa.deleted_at');
         $pb->isNull('aq.deleted_at');
+        $pb->isNull('ar.deleted_at');
 
         $where = implode("\nAND ", $pb->getWhere());
 
