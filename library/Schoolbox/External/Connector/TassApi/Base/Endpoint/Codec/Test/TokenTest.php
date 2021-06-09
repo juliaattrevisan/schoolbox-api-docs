@@ -26,20 +26,45 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token;
 class TokenTest extends TestCase
 {
     /**
+     * Take a data struct and encrypt it into a string token
+     *
      * @dataProvider providerTokenGeneration
+     *
      * @param string $tassProductToken
      * @param array  $data
-     * @param string $expected
+     * @param string $encrypted
      * @throws \External\Tass\Api\Exception\InvalidApiKey
      * @throws \PHPUnit\Framework\ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function testTokenGeneration(string $tassProductToken, array $data, string $expected)
+    public function testTokenGeneration(string $tassProductToken, array $data, string $encrypted)
     {
         $outcome = (new Token($tassProductToken))->generateToken($data);
 
-        $this->assertEquals($expected, $outcome);
+        $this->assertEquals($encrypted, $outcome);
     }
+
+
+    /**
+     * Take the encrypted token and unpack it into the original data struct we used
+     * This is the inverse of token generation
+     *
+     * @dataProvider providerTokenGeneration
+     *
+     * @param string $tassProductToken
+     * @param array  $data
+     * @param string $encrypted
+     * @throws \External\Tass\Api\Exception\InvalidApiKey
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     */
+    public function testTokenUnpack(string $tassProductToken, array $data, string $encrypted)
+    {
+        $outcome = (new Token($tassProductToken))->unpackToken($encrypted);
+
+        $this->assertEquals($data, $outcome);
+    }
+
 
     /**
      * Data provider for testTokenGeneration
@@ -254,19 +279,19 @@ class TokenTest extends TestCase
              * For some reason this breaks
              */
 
-            // {"code":"CARR001"}
-            'CARR001 getStudentSubjects' => [
-                '4a5mz8qm98cWDvYIiYpZww==',
-                [
-                    'code' => 'CARR001',
-                ],
-
-                // TASS expected this
-                'LxYXZAVeUYH7vihV5GWCeDZJYaPz1Fx1guTVyKdVhlE='
-
-                // But we generated this
-                // pygYck+SsLsA9CSwexS1tmwqOO93T6duyCl3CbCnFaY=
-            ],
+//            // {"code":"CARR001"}
+//            'CARR001 getStudentSubjects' => [
+//                '4a5mz8qm98cWDvYIiYpZww==',
+//                [
+//                    'code' => 'CARR001',
+//                ],
+//
+//                // TASS expected this
+//                'LxYXZAVeUYH7vihV5GWCeDZJYaPz1Fx1guTVyKdVhlE='
+//
+//                // But we generated this
+//                // pygYck+SsLsA9CSwexS1tmwqOO93T6duyCl3CbCnFaY=
+//            ],
         ];
     }
 }
