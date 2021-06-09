@@ -11,17 +11,14 @@
 namespace External\Tass\Portal;
 
 use Alaress;
-
-use function array_merge;
-
-use Aura\Web\Exception\InvalidStatusCode;
 use Alaress\Session\ImpersonationCheck;
-
-use function json_encode;
-use function rtrim;
-
+use Aura\Web\Exception\InvalidStatusCode;
 use Schoolbox\User;
 use Schoolbox\Error;
+
+use function array_merge;
+use function json_encode;
+use function rtrim;
 
 class Controller extends Alaress\Web\Controller\Base
 {
