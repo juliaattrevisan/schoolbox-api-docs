@@ -249,13 +249,12 @@ class TokenTest extends TestCase
             ],
 
             /* CARR001 special area
+             *
              * We encountered 401 Unauthorized for getStudentSubjects in TASS, for some reason.
              * The algorithm works for everyone else except him
              *
              * json encoded payloads are in the docblocks
              */
-
-            // {"currentstatus":"current","commtype":"ec","code":"CARR001"}
             'CARR001 getCommunicationRulesDetails' => [
                 'ExXxxAsRVcoIMA7PDZmYOA==',
                 [
@@ -266,7 +265,6 @@ class TokenTest extends TestCase
                 '4aco62aV3eLUGHiO7IsbVDBGhU7OtVM5g+x9LQbcSuDzvJg1VnqpzX0TmND58DUHPE4bnL3DziRjlWROoUiZ5+OagEbQYmp5DjkNSlAJEuA='
             ],
 
-            // {"student_code":"CARR001"}
             'CARR001 getStudentTimetable' => [
                 '1zG9pzJ6souPcbrYGTIMvw==',
                 [
@@ -278,8 +276,6 @@ class TokenTest extends TestCase
             /* We encountered random problems with this particular string
              * For some reason this breaks
              */
-
-             // {"code":"CARR001"}
             'CARR001 getStudentSubjects' => [
                 '1zG9pzJ6souPcbrYGTIMvw==',
                 [
