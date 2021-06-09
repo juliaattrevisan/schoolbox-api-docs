@@ -198,6 +198,16 @@ class Api implements IApi
             'v'       => $version,
         ];
 
+        if (isset($params['code']) && $params['code'] == 'CARR001') {
+            print_r($params);
+            print_r($queryArgs);
+        }
+
+        if (isset($params['student_code']) && $params['student_code'] == 'CARR001') {
+            print_r($params);
+            print_r($queryArgs);
+        }
+
         /* Mine out an error message if you try to access a thing that doesn't exist
          */
         $fails = 0;
