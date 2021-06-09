@@ -82,7 +82,7 @@ class TokenTest extends TestCase
                 [
                     'studcode' => 'HINE001'
                 ],
-                '+IvzV5vVy+1F1oRWnj+Ni+SzaT6eu95aLTMeHE2GgKw='
+                '5KApwYuhaS6yzBUMnIR7PxhZ49V8BccPlifkUNQ3RrU='
             ],
 
             'CARL003 getMedicalConditions' => [
@@ -90,7 +90,7 @@ class TokenTest extends TestCase
                 [
                     'studcode' => 'CARL003'
                 ],
-                'gDGrlvWkHnf3bgAFXE5hn6+azp5dfL1BDWvgOKvsyrM='
+                '5KApwYuhaS6yzBUMnIR7P3StFftXHT6UjHhhpR9dbHA='
             ],
 
             'MUIR001 getMedicalConditions' => [
@@ -98,7 +98,7 @@ class TokenTest extends TestCase
                 [
                     'studcode' => 'MUIR001'
                 ],
-                'noGBAgFjN2AA2RqpBGzOd2wX8AuDY/mwmyOpmgPThLk='
+                '5KApwYuhaS6yzBUMnIR7P1RVNZ4IYFhYJlnG2NGfn5U='
             ],
 
             /* getCommunicationRulesDetails
@@ -111,7 +111,7 @@ class TokenTest extends TestCase
                     'commtype' => 'ec',
                     'code' => 'HINE001'
                 ],
-                'Ii3LqZCQ4lyLSjvhhuhOeIuEfWBvNLHVwFSj5xtCfThH5J3+TFSNFrpHVCH4FErLoYd7IvFw/Lyzwi2eIolZLQ=='
+                '4aco62aV3eLUGHiO7IsbVDBGhU7OtVM5g+x9LQbcSuDzvJg1VnqpzX0TmND58DUHPE4bnL3DziRjlWROoUiZ5/bb3RsmzlPyj3B5kt+CPDw='
             ],
 
             'CARL003 getCommunicationRulesDetails' => [
@@ -121,7 +121,7 @@ class TokenTest extends TestCase
                     'commtype' => 'ec',
                     'code' => 'CARL003'
                 ],
-                'Ii3LqZCQ4lyLSjvhhuhOeIuEfWBvNLHVwFSj5xtCfThH5J3+TFSNFrpHVCH4FErLuulaxJ4BWBSAmvaMtb/O/A=='
+                '4aco62aV3eLUGHiO7IsbVDBGhU7OtVM5g+x9LQbcSuDzvJg1VnqpzX0TmND58DUHPE4bnL3DziRjlWROoUiZ5xJXKU3YrLamZYJFbwlI0zw='
             ],
 
             'MUIR001 getCommunicationRulesDetails' => [
@@ -131,7 +131,7 @@ class TokenTest extends TestCase
                     'commtype' => 'ec',
                     'code' => 'MUIR001'
                 ],
-                'Ii3LqZCQ4lyLSjvhhuhOeIuEfWBvNLHVwFSj5xtCfThH5J3+TFSNFrpHVCH4FErLvRqoSX2sJDTbh3dBj+RCMA=='
+                '4aco62aV3eLUGHiO7IsbVDBGhU7OtVM5g+x9LQbcSuDzvJg1VnqpzX0TmND58DUHPE4bnL3DziRjlWROoUiZ50pMEcuS9X+oKhNd3e8Wcpg='
             ],
 
             /* getStudentTimetable
@@ -142,7 +142,7 @@ class TokenTest extends TestCase
                 [
                     'student_code' => 'AGNE003'
                 ],
-                'dZHhjYmT1NXUDZ0wDR+mZ3r1xmPdBnB3I0l5wro/mXc='
+                'wjNWPE9+PjIPxaWPVDsUhhjXImcNsqI4insJnIId/C/0FWnuEiPBvLOYtpfczmUd'
             ],
 
             'BROC003 getStudentTimetable' => [
@@ -150,7 +150,7 @@ class TokenTest extends TestCase
                 [
                     'student_code' => 'BROC003'
                 ],
-                'dZHhjYmT1NXUDZ0wDR+mZ01aXPu8uCCBs8DByfdjoMw='
+                'wjNWPE9+PjIPxaWPVDsUhjSNFkSNs4fipDYTDQ+r8vT0FWnuEiPBvLOYtpfczmUd'
             ],
 
             'MILL002 getStudentTimetable' => [
@@ -158,7 +158,7 @@ class TokenTest extends TestCase
                 [
                     'student_code' => 'MILL002'
                 ],
-                'dZHhjYmT1NXUDZ0wDR+mZ8arHCjQ6IyMVG+I/SzIirI='
+                'wjNWPE9+PjIPxaWPVDsUhpXmlzdBw6ZcHVlyg+AOdLb0FWnuEiPBvLOYtpfczmUd'
             ],
 
             /* getStudentSubjects
@@ -169,7 +169,7 @@ class TokenTest extends TestCase
                 [
                     'code' => 'ALLZ002'
                 ],
-                'XajWeBi73O7GtRGZhd6KjWwqOO93T6duyCl3CbCnFaY='
+                'cJ8acCL+ZBvrQ7HWYIMDVKbeydQREXevtp/pWg2iE94='
             ],
 
             'BELL003 getStudentSubjects' => [
@@ -177,7 +177,7 @@ class TokenTest extends TestCase
                 [
                     'code' => 'BELL003'
                 ],
-                'NRrxc0MKtjF5aYRzuluMmWwqOO93T6duyCl3CbCnFaY='
+                'HATLZFto9wOr7gnTVUZgHqvvFtrgf4bYiu8s7RUwlRM='
             ],
 
             'JENS002 getStudentSubjects' => [
@@ -185,7 +185,7 @@ class TokenTest extends TestCase
                 [
                     'code' => 'JENS002'
                 ],
-                '7YSdGTpC2LWxFIj6ZY0gsWwqOO93T6duyCl3CbCnFaY='
+                'J01gPtQPn2Xrq+lZHH+QSvAwhq5+a+6SI9ZFIodQK/g='
             ],
 
             /* getTeacherTimetable
@@ -198,7 +198,7 @@ class TokenTest extends TestCase
                     'year_num' => '2021',
                     'semester' => '1'
                 ],
-                'tRtwK58O2Bh2g6Hvbor4t46YgJx4RAsOtgeYQkhRQa5AFj82KaMMN6+fKJ2N4hkT5i0mz29bBTqRHEj5bCa67w=='
+                '+h/LoZqfIzF5WmRWy6cYYHvhIbbq/qoZImBzzgcAxYZ8Zg+AfqDABdqNW7QTAU9x4UV4CCRlMXgnAtsgokKLvnOHDP91FbawLt+jkxX3Qkw='
             ],
 
             'BIS getTeacherTimetable' => [
@@ -208,7 +208,7 @@ class TokenTest extends TestCase
                     'year_num' => '2021',
                     'semester' => '1'
                 ],
-                'tRtwK58O2Bh2g6Hvbor4tx/Y9n52ldI7NQ5LtluFhAkOkh/dFkUi4jWK69YMJXM5h6zzKE+EYqlKmiiOWDvgCA=='
+                '+h/LoZqfIzF5WmRWy6cYYG/sWCRi+ewIeIvqy19tJL6W0kB4ZygL5jzljj1mGyDtKLVlUdjLYpW7FWSRMuXKyu1CPRy8v3dlCDraJX7AFgM='
             ],
 
             'RY getTeacherTimetable' => [
@@ -218,7 +218,7 @@ class TokenTest extends TestCase
                     'year_num' => '2021',
                     'semester' => '1'
                 ],
-                'tRtwK58O2Bh2g6Hvbor4t+JfBLG47iGMEXHO1LozOmdAFj82KaMMN6+fKJ2N4hkT5i0mz29bBTqRHEj5bCa67w=='
+                '+h/LoZqfIzF5WmRWy6cYYKGeV1R/5QsEEdNHgBez5EJ8Zg+AfqDABdqNW7QTAU9x4UV4CCRlMXgnAtsgokKLvnOHDP91FbawLt+jkxX3Qkw='
             ],
 
             /* getTeacherSubjects
@@ -229,7 +229,7 @@ class TokenTest extends TestCase
                 [
                     'code' => 'AJ',
                 ],
-                'nZpuLWDyCJvKgEsmPg+EXw=='
+                'cJ8acCL+ZBvrQ7HWYIMDVKhWPRQfN63enWiTYViii7s='
             ],
 
             'CRO getTeacherSubjects' => [
@@ -237,7 +237,7 @@ class TokenTest extends TestCase
                 [
                     'code' => 'CRO',
                 ],
-                '0mb8eGYhVHZkHd4hqbTFFA=='
+                'UJUcw2pLGyuGOaYYD/Jq/c5GdegftACk3a4WAMfmGLI='
             ],
 
             'ZTO getTeacherSubjects' => [
@@ -245,7 +245,7 @@ class TokenTest extends TestCase
                 [
                     'code' => 'ZTO',
                 ],
-                'xsnJYa4MRUJhwKWgjOoqvA=='
+                '+oSVC42qXOSPW7sXflKJVirkMQfQ3qsUwlhcDVPtFcQ='
             ],
 
             /* CARR001 special area
@@ -263,7 +263,7 @@ class TokenTest extends TestCase
                     'commtype' => 'ec',
                     'code' => 'CARR001'
                 ],
-                'Ii3LqZCQ4lyLSjvhhuhOeIuEfWBvNLHVwFSj5xtCfThH5J3+TFSNFrpHVCH4FErLCnEsGsLMePKGycuH1aZq1Q=='
+                '4aco62aV3eLUGHiO7IsbVDBGhU7OtVM5g+x9LQbcSuDzvJg1VnqpzX0TmND58DUHPE4bnL3DziRjlWROoUiZ5+OagEbQYmp5DjkNSlAJEuA='
             ],
 
             // {"student_code":"CARR001"}
@@ -272,26 +272,21 @@ class TokenTest extends TestCase
                 [
                     'student_code' => 'CARR001'
                 ],
-                'dZHhjYmT1NXUDZ0wDR+mZ+s0X+1STyt57R9P3csnjeY='
+                'wjNWPE9+PjIPxaWPVDsUhgylmqlt1ymN/T07jChqrSv0FWnuEiPBvLOYtpfczmUd'
             ],
 
             /* We encountered random problems with this particular string
              * For some reason this breaks
              */
 
-//            // {"code":"CARR001"}
-//            'CARR001 getStudentSubjects' => [
-//                '4a5mz8qm98cWDvYIiYpZww==',
-//                [
-//                    'code' => 'CARR001',
-//                ],
-//
-//                // TASS expected this
-//                'LxYXZAVeUYH7vihV5GWCeDZJYaPz1Fx1guTVyKdVhlE='
-//
-//                // But we generated this
-//                // pygYck+SsLsA9CSwexS1tmwqOO93T6duyCl3CbCnFaY=
-//            ],
+             // {"code":"CARR001"}
+            'CARR001 getStudentSubjects' => [
+                '1zG9pzJ6souPcbrYGTIMvw==',
+                [
+                    'code' => 'CARR001',
+                ],
+                'UJUcw2pLGyuGOaYYD/Jq/Xl+XuZASrd+HNIQAQ4LpHI='
+            ],
         ];
     }
 }

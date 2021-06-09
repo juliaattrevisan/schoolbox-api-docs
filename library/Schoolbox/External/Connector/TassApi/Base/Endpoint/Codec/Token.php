@@ -77,7 +77,7 @@ class Token
      */
     public function generateToken(array $data): string
     {
-        $parameters = json_encode($data);
+        $parameters = json_encode($data, JSON_PRETTY_PRINT);
         $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
 
         return base64_encode($encrypted);
