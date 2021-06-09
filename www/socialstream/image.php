@@ -92,6 +92,7 @@ try {
     $processor  = new Image\Processor($storage, $transforms->getCacheKey($size), $transforms->retrieve($size));
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {
+    $kernel->outputResourceBeingProcessedHeader();
     \SitePage::redirectToBrokenImageWithTransform('storage', $size, $e->getHttpStatusCode());
 } catch (\Throwable $e) {
     \SitePage::redirectToBrokenImageWithTransform('storage', $size);

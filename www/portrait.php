@@ -84,6 +84,7 @@ try {
     $image->load()->stream();
 } catch (ConcurrentTransformationException $e) {
     // This transformation is already being processed.
+    $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'], $e->getHttpStatusCode());
 } catch (\RuntimeException $e) {
     /* When you cannot access the requested image (access denied)

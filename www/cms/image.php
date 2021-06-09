@@ -75,6 +75,7 @@ try {
     $imageProcessor = new Processor($resource, $cacheKey, $transform);
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException $e) {
+    $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], $e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
     SitePage::redirectToBrokenImageOfSize($_GET['width'], $_GET['height'], 404);

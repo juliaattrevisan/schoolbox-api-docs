@@ -33,6 +33,7 @@ try {
     $imageProcessor = new Image\Processor(LocalFS::getStorageModel(WEB_root, $path), $cache_key, $transform);
     $imageProcessor->load()->stream();
 } catch (ConcurrentTransformationException $e) {
+    $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImage($e->getHttpStatusCode());
 } catch (Exception $e) {
 //  echo $e;

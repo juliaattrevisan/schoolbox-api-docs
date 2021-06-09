@@ -61,6 +61,23 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 
 
     /**
+     * Output a header appropriate for indicating that this resource is still
+     * being processed.
+     *
+     * It's not appropriate to instruct the browser to cache responses for
+     * requests for resources that are still processing (at least not for
+     * nearly as long as standard redirects).
+     *
+     * For now, this sets the cache max age to zero so the redirect which would
+     * be generated is not cached at all.
+     */
+    public function outputResourceBeingProcessedHeader(): void
+    {
+        $this->outputCacheControlMaxAgeHeader(0);
+    }
+
+
+    /**
      * Shutdown handler for either exceptions or fatal errors
      *
      * @param \Exception|array $e

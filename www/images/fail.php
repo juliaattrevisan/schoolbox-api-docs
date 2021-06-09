@@ -108,6 +108,7 @@ try {
     );
     $imageProcessor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {
+    $kernel->outputResourceBeingProcessedHeader();
     SitePage::localRedir($path, false, $e->getHttpStatusCode());
 } catch (Exception $e) {
     /** @var PrefixGenerator $prefixGenerator */
