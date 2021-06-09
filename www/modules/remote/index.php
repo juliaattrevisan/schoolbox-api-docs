@@ -33,6 +33,22 @@ if (!$url->isValid()) {
     $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
 }
 
+//Check the security of the remoteUrl, by validating it against the safe iframe list
+$secureUrl = false;
+foreach (explode("\n", Config::get('safe_iframe_source_list')) as $source) {
+    $source = trim($source);
+    if (strlen($source) > 0) {
+        $sourceEscaped = preg_quote($source, '%');
+        if (preg_match('%' . $sourceEscaped . '%', $remoteUrl)) {
+            $secureUrl = true;
+            break;
+        }
+    }
+}
+if (!$secureUrl) {
+    $this->error(ErrorMapper::ERROR_INFORMATION_MISSING);
+}
+
 $fragment = $url->getFragment();
 
 preg_match("#zx_h=([0-9]+)#", $fragment, $matches);
