@@ -103,7 +103,6 @@ cd /vagrant/tools/synchronise
 php sisImporter.php -vvv --perform
 ```
 
-
 ## 2.1 Campus List
 
 Visit the `Lists > Campus` screen in schoolbox admin. For `External Timetable Code`, select the appropriate timetable from the dropdown. This is the name of the TASS timetable that corresponds to a particular campus. The logs tell you which timetable code(s) were imported but since it's school-configurable, consult with them to decide which timetable should display for each campus.
@@ -146,6 +145,9 @@ The default UPS rulesets are also somewhat incompatible with TASS and you'll nee
 
 There are some idiosyncracies in the TASS universe that we had to manage surgically. This relates to treatment of Families, their contact details; and also Teaching Staff and how they relate to Non-Teaching Staff.
 
+Note that in order for a contact to appear they must be enabled in the Parent Lounge of TASS.
+(The parent record needs Parent Lounge access)
+
 ## 3.1 Families and Split Families
 
 Since TASS operates on the concept of *families*, and schoolbox operates on the concept of *people*, we've had to do some micromanagement to identify individuals inside a family such that we can import them into schoolbox from TASS.
@@ -172,7 +174,6 @@ Let's take our `FAM001` and pretend it's a split family. One of the parents has 
 The primary parent has the externalId `PFAM001` and when we add the `sfa_num` suffix, it becomes `PFAM0011`.
 
 The same applies to the spouse.
-
 
 ### 3.1.3 Email Addresses
 
