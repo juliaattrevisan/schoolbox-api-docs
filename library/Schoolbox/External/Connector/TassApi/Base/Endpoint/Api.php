@@ -178,6 +178,7 @@ class Api implements IApi
      *
      * @param string $method
      * @param array  $params
+     * @param int    $version
      * @return array|null
      * @throws DomainException
      * @throws RuntimeException
@@ -197,16 +198,6 @@ class Api implements IApi
             'token'   => $this->tokenCodec->generateToken($params),
             'v'       => $version,
         ];
-
-        if (isset($params['code']) && $params['code'] == 'CARR001') {
-            print_r($params);
-            print_r($queryArgs);
-        }
-
-        if (isset($params['student_code']) && $params['student_code'] == 'CARR001') {
-            print_r($params);
-            print_r($queryArgs);
-        }
 
         /* Mine out an error message if you try to access a thing that doesn't exist
          */

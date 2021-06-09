@@ -78,15 +78,6 @@ class Token
     public function generateToken(array $data): string
     {
         $parameters = json_encode($data);
-
-        if (isset($data['code']) && $data['code'] == 'CARR001') {
-            print_r($parameters);
-        }
-
-        if (isset($data['student_code']) && $data['student_code'] == 'CARR001') {
-            print_r($parameters);
-        }
-
         $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
 
         return base64_encode($encrypted);
