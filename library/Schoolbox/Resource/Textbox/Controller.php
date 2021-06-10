@@ -155,7 +155,7 @@ class Controller extends Base
     {
         $allBreadcrumbs = [
             [$folder->getNameWithCodes(), "/homepage/{$folder->getId()}"],
-            ['Textbox', null]
+            ['Text Boxes', null]
         ];
 
         /* Textbox usage data struct

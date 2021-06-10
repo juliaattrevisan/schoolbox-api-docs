@@ -31,7 +31,7 @@ class Renderer extends Base
      *
      * @var string
      */
-    protected $tabName = 'Textboxes';
+    protected $tabName = 'Text Boxes';
 
     /**
      * Render html fragment
