@@ -9,6 +9,7 @@
 namespace Schoolbox\Sync\Provisioner;
 
 use Alaress\Rules\Lang\SkipException;
+use Alaress_Date_Format;
 use InvalidArgumentException;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -388,10 +389,19 @@ class Provisioner
                         $message = $update ? "$originalName $action" : "$originalName would have been {$action}d";
                         $context = array_merge($commonContext, ['diff' => $diff]);
                     } else {
+                        // The user hasn't been changed: still, they've been
+                        // seen by UPS so their updated at time should update.
+                        // This is so they are not considered stale by the stale
+                        // users report.
                         $level = Logger::INFO;
                         $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': record is unchanged';
                         $context = $commonContext;
                         $this->logger->log($level, $message, $context);
+                        if ($update) {
+                            $this->logger->debug("Marking $originalName as having been updated", $commonContext);
+                            $internalUser->setUpdatedAt(Alaress_Date_Format::now());
+                            $this->userMapper->save($internalUser);
+                        }
                         ++$skipped;
                         continue;
                     }
