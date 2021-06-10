@@ -146,9 +146,20 @@ class AdditionalSubjects implements IStrategy
         $involvements = $this->lookup->getInvolvements();
 
         foreach ($users as $externalId => $userData) {
-            $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
-                'code' => $externalId
-            ]);
+            try {
+                $data = $this->api[Codec\DSN::MODULE_LMS_INTEGRATION]->retrieveDocument($endpoint, [
+                    'code' => $externalId
+                ]);
+            } catch (\RuntimeException $e) {
+                $this->log->warning(sprintf(
+                    "Skipping timetable data for student %s.",
+                    $externalId
+                ));
+
+                $this->log->warning($e->getMessage());
+
+                continue;
+            }
 
             /* No additional subjects
              */

@@ -178,6 +178,7 @@ class Api implements IApi
      *
      * @param string $method
      * @param array  $params
+     * @param int    $version
      * @return array|null
      * @throws DomainException
      * @throws RuntimeException

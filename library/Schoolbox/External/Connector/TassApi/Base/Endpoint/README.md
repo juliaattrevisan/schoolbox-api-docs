@@ -10,6 +10,23 @@ SUDS TASS is a little more complex than the other SUDS connectors. TASS is a coa
 4. School Calendar And Notices
    https://github.com/TheAlphaSchoolSystemPTYLTD/school-calendar-and-notices/blob/master/getStudentNotices.md
 
+# Command Summary
+This is a quick reference for the synchronisation commands. They're explained further down, but they are listed here for expedience.
+
+```
+vagrant ssh
+cd /vagrant/tools/synchronise
+
+// Import all the profile and timetable data
+php sisImporter.php -vvv --perform
+
+// Import calendar events, if DSN provided
+php calendarImporter.php -vvv --perform 
+
+// Create user accounts in schoolbox
+php userProvision.php -vvv --perform-update
+```
+
 # 1. Connector Setup
 As usual we need two pieces of data for SUDS to work: *School Data Endpoint Host* and *School Data Endpoint Key*.
 
@@ -83,9 +100,8 @@ Then run the sisImporter in the usual spot. It'll chomp through all the data.
 ```
 vagrant ssh
 cd /vagrant/tools/synchronise
-php sisImporter.php --perform -vvv
+php sisImporter.php -vvv --perform
 ```
-
 
 ## 2.1 Campus List
 
@@ -98,7 +114,7 @@ When it's done with that, you'll need to run the UPS rulesets as per tradition. 
 ```
 vagrant ssh
 cd /vagrant/tools/synchronise
-php`userProvision.php -vvv --perform-update`
+php userProvision.php -vvv --perform-update
 ```
 
 ## 2.3 Calendar Import
@@ -108,7 +124,7 @@ Note that the Calendar import is performed separately.
 ```
 vagrant ssh
 cd /vagrant/tools/synchronise
-php calendarImporter.php --perform -vvv
+php calendarImporter.php -vvv --perform 
 ```
 
 It'll import events and try to match them up with the items you've configured in schoolbox at `Lists > Event Types`. If they match *exactly*, a TASS calendar event will display the corresponding colour. If it doesn't match exactly, the TASS calendar event will be given the first Event Type configured in schoolbox.
@@ -128,6 +144,9 @@ The default UPS rulesets are also somewhat incompatible with TASS and you'll nee
 # 3. Data
 
 There are some idiosyncracies in the TASS universe that we had to manage surgically. This relates to treatment of Families, their contact details; and also Teaching Staff and how they relate to Non-Teaching Staff.
+
+Note that in order for a contact to appear they must be enabled in the Parent Lounge of TASS.
+(The parent record needs Parent Lounge access)
 
 ## 3.1 Families and Split Families
 
@@ -155,7 +174,6 @@ Let's take our `FAM001` and pretend it's a split family. One of the parents has 
 The primary parent has the externalId `PFAM001` and when we add the `sfa_num` suffix, it becomes `PFAM0011`.
 
 The same applies to the spouse.
-
 
 ### 3.1.3 Email Addresses
 

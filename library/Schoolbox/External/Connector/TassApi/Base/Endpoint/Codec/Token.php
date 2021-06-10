@@ -77,7 +77,7 @@ class Token
      */
     public function generateToken(array $data): string
     {
-        $parameters = json_encode($data);
+        $parameters = json_encode($data, JSON_PRETTY_PRINT);
         $encrypted  = openssl_encrypt($parameters, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
 
         return base64_encode($encrypted);
@@ -94,6 +94,20 @@ class Token
     {
         $encrypted  = base64_decode($token);
         $parameters = openssl_decrypt($encrypted, self::CIPHER_METHOD, $this->decodedToken, OPENSSL_RAW_DATA);
+
+        /* Couldn't decrypt the $encrypted data for some reason
+         * Might as well log it
+         */
+        if (false === $parameters) {
+            trigger_error(
+                sprintf(
+                    'SUDS TASS Token: could not decrypt token %s properly. This is the reason: %s',
+                    $token,
+                    openssl_error_string()
+                ),
+                E_USER_ERROR
+            );
+        }
 
         return json_decode($parameters, true);
     }
