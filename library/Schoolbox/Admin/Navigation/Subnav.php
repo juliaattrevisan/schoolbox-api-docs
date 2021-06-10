@@ -206,7 +206,7 @@ class Subnav
                     ],
                     '/adminv2/engagement/index/mobile'        => [
                         'name'        => 'Mobile Apps',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get('push_notifications_enabled'),
                         'children'    => [],
                         'description' => 'Statistics related to the use of mobile apps by users to access the system.',
                     ],
@@ -303,12 +303,6 @@ class Subnav
                 'visible'    => true,
                 'searchable' => false,
                 'children'   => [
-//                    '/adminv2/import/directImport'  => [
-//                        'name'        => 'Home',
-//                        'visible'     => true,
-//                        'children'    => [],
-//                        'description' => '.',
-//                    ],
                     '/adminv2/import/folder'        => [
                         'name'        => 'Pages',
                         'visible'     => true,
@@ -397,7 +391,7 @@ class Subnav
                 'children'   => [
                     '/adminv2/lists/achievement-category'             => [
                         'name'        => 'Badge Categories',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_BADGES_ENABLED),
                         'children'    => [],
                         'description' => 'Configure the list of categories that badges can be defined within.',
                     ],
@@ -415,7 +409,7 @@ class Subnav
                     ],
                     '/adminv2/lists/webdav'                           => [
                         'name'        => 'Drives',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get('webdav_enable'),
                         'children'    => [],
                         'description' => 'Configure network drives that users will be able to browse inside the platform using the WebDAV protocol.',
                     ],
@@ -433,7 +427,7 @@ class Subnav
                     ],
                     '/adminv2/lists/evidence-tag'                     => [
                         'name'        => 'Learning Moments',
-                        'visible'     => true,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
                         'children'    => [],
                         'description' => 'Configure tags that can be used on learning moments when students capture evidence.',
                     ],

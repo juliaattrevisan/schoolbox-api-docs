@@ -94,8 +94,8 @@ $border-bottom-width: 2px;
     width: 100%;
 
     // 'Lists'
-    > li:nth-child(8) .flyout {
-      height: 313px;
+    .flyout {
+      max-height: 450px;
       overflow: auto;
     }
     // flyout menus near bottom of the nav - 'drop up'
