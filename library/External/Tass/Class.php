@@ -27,7 +27,7 @@ class External_Tass_Class implements External_ClassInterface
      */
     private $externalUser;
 
-    function __construct()
+    public function __construct()
     {
         $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('tass');
@@ -155,14 +155,33 @@ class External_Tass_Class implements External_ClassInterface
         $parts = explode(self::CLASS_CODE_DELIMITER, $classCode);
 
         if (\count($parts) === 3) {
-            return $parts;
+            // Three parts: this is what was expected
+            [$year, $code, $class] = $parts;
+        } elseif (\count($parts) === 4 && $parts[0] === '' && preg_match('/[0-9]+/', $parts[1])) {
+            // Four parts: that can happen, because the year can be negative
+            [$year, $code, $class] = [self::CLASS_CODE_DELIMITER . $parts[1], $parts[2], $parts[3]];
+        } else {
+            // Some other number of parts: shouldn't get here?
+            // Should this be an error? I think so but pretend it's something
+            trigger_error(
+                sprintf(
+                    'TASS class code "%s" should be in the format "{year}-{code}-{class}"',
+                    $classCode,
+                ),
+                E_USER_WARNING,
+            );
+            [$year, $code, $class] = $parts;
+            $year  ??= '';
+            $code  ??= '';
+            $class ??= '';
         }
 
-        if (\count($parts) === 4 && $parts[0] === '' && preg_match('/[0-9]+/', $parts[1])) {
-            return [self::CLASS_CODE_DELIMITER . $parts[1], $parts[2], $parts[3]];
-        }
-
-        // shouldn't get here, but just in case.
-        return $parts;
+        // Ensure year is an int, or an empty string if not set
+        $year = filter_var($year, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+        return [
+            isset($year) ? (string)$year : '',
+            $code,
+            $class,
+        ];
     }
 }
