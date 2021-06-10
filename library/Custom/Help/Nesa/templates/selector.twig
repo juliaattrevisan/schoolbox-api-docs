@@ -6,7 +6,7 @@
         <form action="{{ routeLookup('helpNesa.postNesa') }}" method="post">
             <h2 class="subheader">Options</h2>
             <section class="content">
-
+            <ul class="option-list">
             {# Default NSW #}
             {% for state in states %}
                 {% if state == 'NSW' %}
@@ -14,10 +14,12 @@
                 {% else %}
                     {% set checked = '' %}
                 {% endif %}
-
-                <input id="state-{{ state }}" name="state[]" type="checkbox" value="{{ state }}" {{ checked }}/>
-                <label for="state-{{ state }}" class="checkbox-label">{{ state }}</label>
+                <li>
+                    <input id="state-{{ state }}" name="state[]" type="checkbox" value="{{ state }}" {{ checked }}/>
+                    <label for="state-{{ state }}" class="checkbox-label">{{ state }}</label>
+                </li>
             {% endfor %}
+            </ul>
             </section>
 
             <section class="content">

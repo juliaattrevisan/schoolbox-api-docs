@@ -6,8 +6,11 @@
     });
 </script>
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
-
+<ul class="option-list">
 <!-- BEGIN answerOption -->
-<input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}' name="answer[]" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} />
-<label for="questionForm-{QUESTION_ID}-{ANSWER_VALUE}" class="checkbox-label">{ANSWER_VALUE_FACADE}) {ANSWER_DESCRIPTION}</label>
+    <li>
+        <input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}' name="answer[]" type="checkbox" value="{ANSWER_VALUE}" {ANSWER_CHECKED} />
+        <label for="questionForm-{QUESTION_ID}-{ANSWER_VALUE}" class="checkbox-label">{ANSWER_VALUE_FACADE}) {ANSWER_DESCRIPTION}</label>
+    </li>
 <!-- END answerOption -->
+</ul>
