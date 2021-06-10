@@ -20,18 +20,30 @@ class ClassCodeTest extends TestCase
      * @param string $expectedYear
      * @param string $expectedCode
      * @param string $expectedClass
+     * @param bool   $expectWarning
      * @throws \ReflectionException
      */
-    public function testClassCode(string $classCode, string $expectedYear, string $expectedCode, string $expectedClass)
-    {
+    public function testClassCode(
+        string $classCode,
+        string $expectedYear,
+        string $expectedCode,
+        string $expectedClass,
+        bool $expectWarning
+    ): void {
         $parseClassCode = (new ReflectionClass(External_Tass_Class::class))->getMethod('parseClassCode');
         $parseClassCode->setAccessible(true);
 
-        [$actualYear, $actualCode, $actualClass] = $parseClassCode->invoke(null, $classCode);
+        [$actualYear, $actualCode, $actualClass] = @$parseClassCode->invoke(null, $classCode);
 
         $this->assertEquals($actualYear, $expectedYear);
         $this->assertEquals($actualCode, $expectedCode);
         $this->assertEquals($actualClass, $expectedClass);
+
+        // Test the warning
+        if ($expectWarning) {
+            $this->expectWarning();
+            $parseClassCode->invoke(null, $classCode);
+        }
     }
 
 
@@ -40,7 +52,7 @@ class ClassCodeTest extends TestCase
      *
      * @return array
      */
-    public function providerForTestClassCode()
+    public function providerForTestClassCode(): array
     {
         return [
             '+ve year + code + class'                  => [
@@ -48,48 +60,147 @@ class ClassCodeTest extends TestCase
                 'expectedYear'  => '12',
                 'expectedCode'  => '6125',
                 'expectedClass' => 'TC',
+                'expectWarning' => false,
             ],
             '-ve year + code + class'                  => [
                 'classCode'     => '-2-6125-TC',
                 'expectedYear'  => '-2',
                 'expectedCode'  => '6125',
                 'expectedClass' => 'TC',
+                'expectWarning' => false,
             ],
             'no year + code + class'                   => [
                 'classCode'     => '-6125-TC',
                 'expectedYear'  => '',
                 'expectedCode'  => '6125',
                 'expectedClass' => 'TC',
+                'expectWarning' => false,
             ],
             'non-numeric year + code + class'          => [
                 'classCode'     => 'P-6125-TC',
                 'expectedYear'  => '',
                 'expectedCode'  => '6125',
                 'expectedClass' => 'TC',
+                'expectWarning' => false,
             ],
             '+ve year + code + class w/ space'         => [
                 'classCode'     => '12-ABCDEF-Term 2',
                 'expectedYear'  => '12',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => 'Term 2',
+                'expectWarning' => false,
             ],
             '-ve year + code + class w/ space'         => [
                 'classCode'     => '-2-ABCDEF-Term 2',
                 'expectedYear'  => '-2',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => 'Term 2',
+                'expectWarning' => false,
             ],
             'no year + code + class w/ space'          => [
                 'classCode'     => '-ABCDEF-Term 2',
                 'expectedYear'  => '',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => 'Term 2',
+                'expectWarning' => false,
             ],
             'non-numeric year + code + class w/ space' => [
                 'classCode'     => 'P-ABCDEF-Term 2',
                 'expectedYear'  => '',
                 'expectedCode'  => 'ABCDEF',
                 'expectedClass' => 'Term 2',
+                'expectWarning' => false,
+            ],
+            // Error cases
+            'empty' => [
+                'classCode'     => '',
+                'expectedYear'  => '',
+                'expectedCode'  => '',
+                'expectedClass' => '',
+                'expectWarning' => true,
+            ],
+            'only one part' => [
+                'classCode'     => '12',
+                'expectedYear'  => '12',
+                'expectedCode'  => '',
+                'expectedClass' => '',
+                'expectWarning' => true,
+            ],
+            // This cannot be tested, as a negative year is indistinguishable
+            // from a year+code if the class code is malformed
+//            'only one negative part' => [
+//                'classCode'     => '-12',
+//                'expectedYear'  => '-12',
+//                'expectedCode'  => '',
+//                'expectedClass' => '',
+//                'expectWarning' => true,
+//            ],
+            'only one non-numeric part' => [
+                'classCode'     => 'D',
+                'expectedYear'  => '',
+                'expectedCode'  => '',
+                'expectedClass' => '',
+                'expectWarning' => true,
+            ],
+            'only two parts, no year' => [
+                'classCode'     => '-ABCDEF',
+                'expectedYear'  => '',
+                'expectedCode'  => 'ABCDEF',
+                'expectedClass' => '',
+                'expectWarning' => true,
+            ],
+            'only two parts, year' => [
+                'classCode'     => '12-ABCDEF',
+                'expectedYear'  => '12',
+                'expectedCode'  => 'ABCDEF',
+                'expectedClass' => '',
+                'expectWarning' => true,
+            ],
+            // This cannot be tested, as a negative year is indistinguishable
+            // from a year+code if the class code is malformed
+//            'only two parts, negative year' => [
+//                'classCode'     => '-12-ABCDEF',
+//                'expectedYear'  => '12',
+//                'expectedCode'  => 'ABCDEF',
+//                'expectedClass' => '',
+//                'expectWarning' => true,
+//            ],
+            'only two parts, non-numeric year' => [
+                'classCode'     => 'B-ABCDEF',
+                'expectedYear'  => '',
+                'expectedCode'  => 'ABCDEF',
+                'expectedClass' => '',
+                'expectWarning' => true,
+            ],
+            'excess parts, no year' => [
+                'classCode'     => '-ABCDEF-Term 2-excess',
+                'expectedYear'  => '',
+                'expectedCode'  => 'ABCDEF',
+                'expectedClass' => 'Term 2',
+                'expectWarning' => true,
+            ],
+            'excess parts, year' => [
+                'classCode'     => '6-ABCDEF-Term 2-excess',
+                'expectedYear'  => '6',
+                'expectedCode'  => 'ABCDEF',
+                'expectedClass' => 'Term 2',
+                'expectWarning' => true,
+            ],
+            // This cannot be tested, as a negative year is indistinguishable
+            // from a year+code if the class code is malformed
+//            'excess parts, negative year' => [
+//                'classCode'     => '-6-ABCDEF-Term 2-excess',
+//                'expectedYear'  => '-6',
+//                'expectedCode'  => 'ABCDEF',
+//                'expectedClass' => 'Term 2',
+//                'expectWarning' => true,
+//            ],
+            'excess parts, non-numeric year' => [
+                'classCode'     => 'B-ABCDEF-Term 2-excess',
+                'expectedYear'  => '',
+                'expectedCode'  => 'ABCDEF',
+                'expectedClass' => 'Term 2',
+                'expectWarning' => true,
             ],
         ];
     }
