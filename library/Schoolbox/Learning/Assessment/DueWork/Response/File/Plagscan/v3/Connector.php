@@ -162,9 +162,25 @@ class Connector
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody(), true);
+        try {
+            $content = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
 
-        if ($response->getStatusCode() == 201) {
+            /* We expected $content to be an array after decoding, but that's not always the case
+             * json_decode might successfully return null for some reason due to bad data from plag
+             * I guess we'll have to log it to see why it dies
+             */
+            throw new \RuntimeException(sprintf(
+                "Runtime error: json_decode failed (%s) for response body %s",
+                $e->getMessage(),
+                $response->getBody()
+            ));
+        }
+
+        /* Otherwise it decoded into something we can presumably inspect
+         * Continue as usual
+         */
+        if ($response->getStatusCode() === 201) {
             if (!(array_key_exists('data', $content) && array_key_exists('docID', $content['data']))) {
                 throw new \InvalidArgumentException(
                     'response[data][docID] does not exist: PlagScan has changed their API again'
@@ -181,7 +197,7 @@ class Connector
          * All non-201 status codes at this juncture are classified as repeatable failures and will mark documents
          * accordingly, instead of leaving them in a state where it can be tried again
          */
-        if ((int)$response->getStatusCode() >= 400) {
+        if ($response->getStatusCode() >= 400) {
             throw new \DomainException("Domain error {$content['error']['code']}: {$content['error']['message']}");
         }
 
