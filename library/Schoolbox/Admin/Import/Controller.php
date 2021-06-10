@@ -44,23 +44,6 @@ class Controller extends ConfigController
 
 
     /**
-     * Landing Page for Direct Import
-     *
-     * @throws ServiceNotFound
-     * @throws RouteNotFound
-     * @throws ReflectionException
-     */
-    public function getDirectIndex(): void
-    {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct/index.twig', [
-            'pageCurrent' => $this->router->generate('adminImportIndex.getDirectIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getDirectIndex')),
-            'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
-        ])->setTitle('Direct Import'));
-    }
-
-
-    /**
      * Landing Page for School Data Import
      *
      * @throws ServiceNotFound

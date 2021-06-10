@@ -48,7 +48,6 @@ class Module extends BaseModule
             new Rule\IsSuperuser()
         );
 
-        $this->register('GET', '/directImport', 'getDirectIndex', $perms);
         $this->register('GET', '/schoolDataImport', 'getSchoolDataIndex', $perms);
         $this->register('POST', '/schoolDataImport', 'postSchoolDataOptions', $perms);
         $this->register('GET', '/schoolDataImport/status/indicator', 'getStatusIndicator', $perms);
