@@ -100,6 +100,11 @@ foreach ($_POST['docs'] as $doc) {
 //            'type'  => 'unknown/binary',
 //            'err'   => $e->getMessage()
 //        );
+    } finally {
+        // Ensure temp file is always removed
+        if (file_exists($dest)) {
+            unlink($dest);
+        }
     }
 }
 
