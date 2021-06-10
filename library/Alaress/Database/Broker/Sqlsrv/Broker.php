@@ -159,4 +159,23 @@ class Broker extends Base
     {
         return $this->connector->executeQuery("SELECT SCOPE_IDENTITY()")->fetchColumn();
     }
+
+    /**
+     * Override the base implementation to escape `}` characters in the
+     * password.
+     *
+     * @see https://docs.microsoft.com/en-us/sql/connect/php/how-to-connect-using-sql-server-authentication?view=sql-server-ver15
+     *
+     * @param array $connectOptions
+     * @return PDO
+     */
+    protected function buildPdoConnection(array $connectOptions): PDO
+    {
+        return new PDO(
+            $this->getDsn(),
+            $this->connector->getUsername(),
+            str_replace('}', '}}', $this->connector->getPassword()),
+            $connectOptions,
+        );
+    }
 }

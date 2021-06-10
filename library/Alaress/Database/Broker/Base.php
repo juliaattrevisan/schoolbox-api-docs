@@ -113,12 +113,7 @@ abstract class Base implements IBroker
         try {
             // Create a new PDO instance using the DSN string and supplied username/password parameters
 
-            $this->pdo = new PDO(
-                $this->getDsn(),
-                $this->connector->getUsername(),
-                $this->connector->getPassword(),
-                $connectOptions
-            );
+            $this->pdo = $this->buildPdoConnection($connectOptions);
         } catch (PDOException $e) {
             // Need to restore timeout both here and in normal control flow
 
@@ -241,6 +236,25 @@ abstract class Base implements IBroker
     public function getPdo(): PDO
     {
         return $this->pdo;
+    }
+
+    /**
+     * Helper method for building PDO connections.
+     *
+     * Some implementations need to override this method, as they may need to
+     * escape the username or password differently.
+     *
+     * @param array $connectOptions
+     * @return PDO
+     */
+    protected function buildPdoConnection(array $connectOptions): PDO
+    {
+        return new PDO(
+            $this->getDsn(),
+            $this->connector->getUsername(),
+            $this->connector->getPassword(),
+            $connectOptions,
+        );
     }
 
     // ----------------------------------------------------------------------------------------------------------------
