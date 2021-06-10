@@ -4,6 +4,7 @@ namespace AusGeneralCapabilitiesBadge;
 
 use Schoolbox\Admin\Package\BadgeCategoryLocator;
 use Schoolbox\Admin\Package\IPackageInstall;
+use Schoolbox\YearLevel;
 use Schoolbox\Learning\Badge;
 use Schoolbox\Curriculum\Node;
 use Alaress\Csv\Reader as CsvReader;
@@ -38,6 +39,27 @@ class Installer implements IPackageInstall
             $badge->setIcon('/images/badges' . $row['Image']);
             $badge->setCategory($badgeCategoryLocator->locate($row['Category'], $user));
             $badge->setAllowAsGoal((bool)$row['Goal']);
+
+            if ($row['Year']) {
+                $yearMapper = YearLevel\Mapper::getInstance();
+                $yearList = $yearMapper->createCollection();
+
+                foreach (explode(',', $row['Year']) as $year) {
+                    try {
+                        $yearObject = $yearMapper->findOneByColumn(YearLevel\Mapper::COL_NAME, $year);
+                        $yearList->add($yearObject);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        //retry but this time with the word 'Year ' in front.
+                        try {
+                            $yearObject = $yearMapper->findOneByColumn(YearLevel\Mapper::COL_NAME, 'Year ' . $year);
+                            $yearList->add($yearObject);
+                        } catch (\Schoolbox\Mapper\Exception $e) {
+                            //noop
+                        }
+                    }
+                }
+                $badge->setYearLevels($yearList);
+            }
 
             $curriculumCodes = explode(',', $row['Curriculum']);
             $nodeCollection  = new GenericCollection(Node\Model::class);
