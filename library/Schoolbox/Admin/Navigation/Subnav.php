@@ -542,7 +542,7 @@ class Subnav
                     ],
                     '/adminv2/setting/Pastoral%20Care' => [
                         'name'        => 'Pastoral Care',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_PASTORAL_CARE] ?? []) > 0,
+                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
                         'children'    => [],
                         'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
