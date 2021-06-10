@@ -17,7 +17,6 @@ use Aura\Di\Exception\ServiceNotFound;
 use Aura\Router\Exception\RouteNotFound;
 use PDOException;
 use ReflectionException;
-use Schoolbox\Admin\Import\Navigation\Direct;
 use Schoolbox\Admin\Import\Navigation\SchoolData;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Config\ConfigMapper;
@@ -41,23 +40,6 @@ class Controller extends ConfigController
      * but you got your settings arbitrarily reset
      */
     private const DEFAULT_UNKNOWN_DATA_SOURCE = 'Unknown data source selected.';
-
-
-    /**
-     * Landing Page for Direct Import
-     *
-     * @throws ServiceNotFound
-     * @throws RouteNotFound
-     * @throws ReflectionException
-     */
-    public function getDirectIndex(): void
-    {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@adminImportIndex/direct/index.twig', [
-            'pageCurrent' => $this->router->generate('adminImportIndex.getDirectIndex'),
-            'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminImportIndex.getDirectIndex')),
-            'allNavigation'  => (new Direct($this->getConfigLoader()))->buildNavigation($this->getRouter())->getAllNodes()
-        ])->setTitle('Direct Import'));
-    }
 
 
     /**
