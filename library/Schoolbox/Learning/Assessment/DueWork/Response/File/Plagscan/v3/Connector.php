@@ -165,7 +165,6 @@ class Connector
         try {
             $content = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-
             /* We expected $content to be an array after decoding, but that's not always the case
              * json_decode might successfully return null for some reason due to bad data from plag
              * I guess we'll have to log it to see why it dies
