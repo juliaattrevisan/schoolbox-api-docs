@@ -102,22 +102,6 @@ if (isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId'])) {
     $mime->setId($_POST['fileTypeId']);
 }
 
-
-// verify data integritae (no duplicate mimes)
-try {
-    /** @var Mimetype $existing */
-    $existing = $mimeMapper->findOneByColumnList([
-        'mime'    => $mime->getMime(),
-        'deleted' => 0
-    ]);
-
-    if ($existing->getId() != $mime->getId()) {
-        error(105, 'The mime type you have chosen for this file type is already in use.');
-    }
-} catch (Schoolbox\Mapper\Exception $e) {
-    // doesn't exist: noop
-}
-
 // save that thing, and get the ID in case it's new
 $ids = $mimeMapper->save($mime);
 $id  = count($ids) ? $ids[0] : 0;
