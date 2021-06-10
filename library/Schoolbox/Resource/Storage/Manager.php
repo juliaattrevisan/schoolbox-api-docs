@@ -226,8 +226,10 @@ class Manager
             // The file already exists in the storage backend.
             // This is fine, because the storage file's contents determine the
             // file path: we can assume it's the same file.
-            if (file_exists($tmpFilePath)) {
-                unlink($tmpFilePath);
+            try {
+                $fsFrom->delete($tmpFilePath);
+            } catch (FileNotFoundException $e2) {
+                // The temp file didn't exist after all: that's fine too
             }
             return true;
         }
