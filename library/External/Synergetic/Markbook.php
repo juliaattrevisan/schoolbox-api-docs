@@ -994,7 +994,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         ], $folderCodeBindings->getParams());
 
         $result = $this->getConnector()->executeQuery($sql, $params)->fetchAll();
-        $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId] = $result;
+        if (count($result)) {
+            $this->synMarkbook[$fileYear][$fileSemester][$folderCodeKey][$markbookId] = $result;
+        }
         return $result;
     }
 
