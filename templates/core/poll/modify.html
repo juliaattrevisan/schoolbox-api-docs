@@ -51,8 +51,10 @@ $(function() {
 
                 <fieldset class="content">
                     <div class="small-12 large-6 columns">
-                        <label for="cal_date" class="required">Close Date</label>
-                        <span class="hint has-tip tip-top" data-tooltip title="No votes can be cast after this date">?</span>
+                        <label for="cal_date">
+                            <span class="required-with-tip">Close Date</span>
+                            <span class="hint has-tip tip-top" data-tooltip title="No votes can be cast after this date">?</span>
+                        </label>
                         <input name="close" id="cal_date" type="text" size="15" maxlength="30" value="{CLOSE}" data-datepicker required />
                     </div>
                     <div class="small-12 large-6 columns">
