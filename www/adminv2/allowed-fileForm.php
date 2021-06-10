@@ -68,6 +68,18 @@ try {
     $mime = $mimeMapper->findOneByColumn('mime', $_POST['mime'], [
         'deleted' => true
     ]);
+
+    /* Check if $mime->getFileTypeId is the same as that which was POSTed
+     *
+     * If fileTypeId was provided, then we perhaps tried to modify an existing
+     * instance to inadvertently have the same mime as another instance
+     * In that case, error out as usual
+     */
+    if (isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId'])) {
+        if ((int)$_POST['fileTypeId'] !== $mime->getFileTypeID()) {
+            error(105, 'The mime type you have chosen for this file type is already in use.');
+        }
+    }
 } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
     $mime = $e->getDeletedObject();
 
@@ -77,6 +89,7 @@ try {
 } catch (\Schoolbox\Mapper\Exception\NotFound $e) {
     $mime = $mimeMapper->createModel();
 }
+
 
 $mime->setDescription($_POST["description"]);
 $mime->setMime($_POST["mime"]);
