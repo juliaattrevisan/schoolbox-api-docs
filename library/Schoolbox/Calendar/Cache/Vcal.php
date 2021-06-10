@@ -28,8 +28,8 @@ class Vcal
     private const CACHE_KEY_BASE = 'vcal.%s';
 
 
-    // Cache expiry: 8 hours?
-    private const CACHE_EXPIRY = (60 * 60 * 8);
+    // Cache expiry: 2 hours?
+    private const CACHE_EXPIRY = 7200;
 
 
     /**
