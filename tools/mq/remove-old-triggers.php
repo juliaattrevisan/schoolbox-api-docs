@@ -74,7 +74,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $numKeysProcessed++;
             $progress = round(($numKeysProcessed / $numKeys) * 100, 2);
             if ($progress % 10 === 0) {
-                $this->getLogger()->info("{$progress} % processed");
+                $this->getLogger()->debug("{$progress} % processed");
             }
 
             $expiryTime = self::ttlToDate($this->redis->ttl($key));
