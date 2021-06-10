@@ -802,11 +802,11 @@ class Event implements ISoftDeletable
 
 
     /**
-     * @param string $variant
+     * @param string|null $variant
      * @return $this
      * @throws OutOfBoundsException if `$class` isn't a `self::VARIANT_*` value
      */
-    public function setVariant(string $variant): self
+    public function setVariant(?string $variant): self
     {
         // Why doesn't PHP have enumerated types yet?
         if (!in_array($variant, [self::VARIANT_EVENT, self::VARIANT_TASK], true)) {

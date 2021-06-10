@@ -81,14 +81,45 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->getLogger()->debug("[ $key : (TTL: {$expiryTime}) ]");
 
             $keyType = $this->redis->type($key);
+
+            // clean up set
+            if ($keyType->getPayload() === 'set') {
+                $members = $this->redis->smembers($key);
+                $memberCount = count($members);
+                $memberExpired = 0;
+                foreach ($members as $member) {
+                    $ttl = $this->redis->ttl($member);
+                    // expired
+                    if ($ttl === -2) {
+                        $this->getLogger()->info("[REMOVING] expired {$member} from set: {$key} ");
+                        $memberExpired++;
+                        if ($this->perform()) {
+                            $this->redis->srem($key, $member);
+                        }
+                    }
+                }
+                // if all of the members of this set is expired, delete this set
+                if ($memberCount === $memberExpired) {
+                    $this->deleteFromRedis("Empty set: {$key}", null, $key);
+                }
+                continue;
+            }
+
+            $uncompressed = null;
             try {
                 $rawRedisData = $this->redis->get($key);
                 if (!$rawRedisData) {
                     $this->deleteFromRedis("Empty value for key: {$key}", null, $key);
                     continue;
                 }
-                $instance = unserialize(gzuncompress($rawRedisData));
+                $uncompressed = gzuncompress($rawRedisData);
+                $instance = unserialize($uncompressed);
             } catch (Exception $e) {
+                if ($uncompressed) {
+                    // likely be corrupted data
+                    $this->deleteFromRedis("Cannot unserialize: {$key}", null, $key);
+                    continue;
+                }
                 $this->getLogger()->debug("[SKIPPING] type-{$keyType} : {$key}");
                 continue;
             }
@@ -179,7 +210,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     /**
      * Deletes from redis
      * @param string $target
-     * @param Alaress_Date_Format $triggerDate
+     * @param Alaress_Date_Format|null $triggerDate
      * @param string $key
      */
     private function deleteFromRedis(string $target, ?Alaress_Date_Format $triggerDate, string $key): void
