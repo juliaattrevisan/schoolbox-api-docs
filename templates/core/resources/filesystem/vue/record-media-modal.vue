@@ -45,7 +45,7 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
-            hasClosed: false //to allow any active vue to cleanup on beforeDestroy
+            hasClosed: false, //to allow any active vue to cleanup on beforeDestroy
         }
     },
 
@@ -90,25 +90,30 @@ export default {
 
     created () {
         this.hasDeviceCapture = hasDeviceCapture();
-        this.initRatios();
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
-        this.initOnModalClosedListener();
+        
     },
 
     mounted () {
-        this.initKeyboardEvents();
+        this.initKeyboardListener();
+        this.initOnModalClosedListener();
+        this.initRatios();
         this.initContainerHeight();
     },
 
     methods: {
-        
+
         /**
-         * Set to ensure the container isn't too big
+         * to be able to press enter to save filename
          *
          */
-        initRatios () {
-            this.defaultRatio = 0.5625;
-            this.currentRatio = this.defaultRatio;
+        initKeyboardListener () {
+            document.addEventListener('keyup', (event) => {
+                const keyName = event.key;
+                if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
+                    this.onSaveFilenameSelected();
+                }
+            });
         },
 
         /**
@@ -122,20 +127,17 @@ export default {
         },
 
         /**
-         * to be able to press enter to save filename
+         * Set to ensure the container isn't too big
          *
          */
-        initKeyboardEvents () {
-            document.addEventListener('keyup', (event) => {
-                const keyName = event.key;
-                if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
-                    this.onSaveFilenameSelected();
-                }
-            });
+        initRatios () {
+            this.defaultRatio = 0.5625;
+            this.currentRatio = this.defaultRatio;
         },
 
         /**
-         * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
+         * To set up appropriate initial height on container, typically keeping the same size as a 16:9 video element 
+         * unless otherwise set by say, a mobile phone recorded video requested a larger size to fit a portrait recorded video
          *
          */
         initContainerHeight () {
