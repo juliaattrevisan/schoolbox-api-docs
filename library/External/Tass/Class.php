@@ -27,7 +27,7 @@ class External_Tass_Class implements External_ClassInterface
      */
     private $externalUser;
 
-    function __construct()
+    public function __construct()
     {
         $this->database = Factory::getInstanceExternal();
         $this->externalUser = new External_User('tass');
