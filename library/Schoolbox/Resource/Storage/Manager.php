@@ -222,11 +222,13 @@ class Manager
                 self::FS_TEMP . "://$tmpFilePath",
                 self::FS_STORAGE . '://' . $storage->getPath()
             );
-        } /** @noinspection BadExceptionsProcessingInspection */
-        catch (FileExistsException $e) {
+        } catch (FileExistsException $e) {
             // The file already exists in the storage backend.
             // This is fine, because the storage file's contents determine the
             // file path: we can assume it's the same file.
+            if (file_exists($tmpFilePath)) {
+                unlink($tmpFilePath);
+            }
             return true;
         }
     }
