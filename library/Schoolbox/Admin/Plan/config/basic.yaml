@@ -87,7 +87,7 @@ config:
   messaging_enabled: { hide: false }
   push_notifications_enabled: { value: false, edit: false }
   ups_groups_enabled: { value: false, hide: true }
-  eportfolio_enabled: { value: false, edit: false}
+  eportfolio_enabled: { hide: false, value: false, edit: false}
   staff_directory_enabled: {value: false, edit: false}
   report_staff_access : { hide : true }
   parent_directory_enabled: {value: false, edit: false}
