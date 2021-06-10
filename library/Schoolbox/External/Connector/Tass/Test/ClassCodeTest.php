@@ -35,9 +35,9 @@ class ClassCodeTest extends TestCase
 
         [$actualYear, $actualCode, $actualClass] = @$parseClassCode->invoke(null, $classCode);
 
-        $this->assertEquals($actualYear, $expectedYear);
-        $this->assertEquals($actualCode, $expectedCode);
-        $this->assertEquals($actualClass, $expectedClass);
+        $this->assertSame($actualYear, $expectedYear);
+        $this->assertSame($actualCode, $expectedCode);
+        $this->assertSame($actualClass, $expectedClass);
 
         // Test the warning
         if ($expectWarning) {
