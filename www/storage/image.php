@@ -52,6 +52,7 @@ try {
         exit;
     }
 } catch (ConcurrentTransformationException $e) {
+    $kernel->outputResourceBeingProcessedHeader();
     SitePage::redirectToBrokenImageWithTransform('storage', $_GET['size'], $e->getHttpStatusCode());
 } catch (Exception $e) {
     // fall through

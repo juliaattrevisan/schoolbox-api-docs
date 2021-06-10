@@ -47,6 +47,7 @@ $processor    = new Image\Processor($storageModel, $cacheKey, $transform);
 try {
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {
+    $kernel->outputResourceBeingProcessedHeader();
     redirectToBroken($e->getHttpStatusCode());
 } catch (SchoolboxNotFoundException $e) {
     redirectToBroken(404);

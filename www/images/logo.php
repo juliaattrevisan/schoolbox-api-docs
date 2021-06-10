@@ -98,6 +98,7 @@ try {
     $imageProcessor->load()->stream();
     exit;
 } catch (ConcurrentTransformationException $e) {
+    $kernel->outputResourceBeingProcessedHeader();
     $responseCode = $e->getHttpStatusCode();
     $placeHolderFile = __DIR__ . $logoSizes[$logo][$size][2];
     if (is_readable($placeHolderFile)) {
