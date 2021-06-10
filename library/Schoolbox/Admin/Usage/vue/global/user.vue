@@ -90,6 +90,16 @@ export default {
                     up: 'glyphicon-chevron-up',
                     down: 'glyphicon-chevron-down'
                 },
+                customSorting: {
+                    size: (ascending) => { //ensure filesize is sorted numerically
+                        return (a, b) => {
+                            if (ascending) {
+                                return parseInt(a.size) >= parseInt(b.size) ? 1 : -1;
+                            }
+                            return parseInt(a.size) <= parseInt(b.size) ? 1 : -1;
+                        }
+                    }
+                },
                 resizableColumns: false,
                 tabbable: false,
                 filterable: false
