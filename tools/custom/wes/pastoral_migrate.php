@@ -146,7 +146,7 @@ $app = new class extends CliTool\App {
                             $log .= $pastoralAccess['pastoral_id'] . " (" . $pastoralAccess['heading'] . ")" . "\n";
                             $log .= "Was in pastoral group $oldGroupName \n";
                             $log .= "Now in group ";
-                            $log .= array_search($groupId, $this->groupNameIdMap) . " ($groupId)\n";
+                            $log .= array_search($groupId, $this->groupNameIdMap) . " ($groupId) with acccessLevel {$pastoralAccess['access']} \n";
 
                             $this->getLogger()->info($log);
                         } else {
@@ -232,11 +232,12 @@ $app = new class extends CliTool\App {
                         JOIN luCampus c on c.id = sc.campus
                         LEFT JOIN house h on h.id = s.house
                         WHERE pa.group_id = :oldGroupId
-                        AND pa.access IN (:accessLevelPrivate)
+                        AND pa.access IN (:accessLevelPrivate, :accessLevelPublic)
                         AND pa.deleted_at IS NULL';
 
         $params = [
             'accessLevelPrivate' => PastoralAccessMapper::ACCESS_PRIVATE,
+            'accessLevelPublic'  => PastoralAccessMapper::ACCESS_PUBLIC,
             'oldGroupId'         => $oldGroupId,
         ];
 
