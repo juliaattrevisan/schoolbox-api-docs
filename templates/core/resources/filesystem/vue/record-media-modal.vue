@@ -378,7 +378,6 @@ export default {
                 <record-audio-only
                     v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
                     :record-media-type="recordMediaTypes.AUDIO_ONLY"
-                    @on-device-ready="onDeviceReady"
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
@@ -400,7 +399,7 @@ export default {
                     @on-resize="onResize"
                 />
 
-                <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
+                <over-media-modal v-if="isFilenameModalActive" @on-resize="onResize" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
                     <h3><em>Please add a filename prior to continuing.</em></h3>
                     <label for="filename" class="required" aria-required="true">Filename</label>
                     <input type="text" id="filename" name="filename" v-model="newFilename" ref="filenameInput">
@@ -410,7 +409,7 @@ export default {
                     </div>	
                 </over-media-modal>
                 <over-media-modal v-else-if="isUploading" key="isUploadingModal">
-                    <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
+                    <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ width: uploadProgressRatio }"></span></div>
                     <p><em>Uploading video, please wait...</em></p>
                 </over-media-modal>
                 <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
@@ -429,7 +428,7 @@ export default {
             <section>
                 <a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
                 <transition name="fade">
-                    <a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button" title="Upload" href="#upload" key="upload">Upload</a>
+                    <a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button" title="Upload" href="#upload">Upload</a>
                 </transition>
             </section>
         </div><!-- .component-action -->

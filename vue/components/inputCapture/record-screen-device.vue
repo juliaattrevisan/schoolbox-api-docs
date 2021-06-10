@@ -18,19 +18,13 @@ export default {
 </script>
 
 <template>
-
     <div class="container">
-
         <div class="media-container media-container-record">
             <div class="alert-box warn" ref="noScreenNote">Sorry, screen recording is not currently possible on this device. To record your screen, please use a desktop computer or laptop.</div>
         </div>
-
     </div>
-
 </template>
 
 <style lang="scss" scoped>
-
 @import '@schoolbox/inputCapture/input-capture';
-
 </style>

@@ -1,8 +1,7 @@
 <script>
 
 /**
- * To record, playback and upload a camera/screen recording into SB 
- * It currently always sits within a parent, currently #evidence-media-recording and #record-medida-modal
+ * A previously or just recorded media made through either #record-media-modal or #evidence-media-recording
  *
  */
 

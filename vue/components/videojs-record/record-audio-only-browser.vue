@@ -86,7 +86,7 @@ export default {
          */
         initVideojsRecord () {
             try {
-                this.player = videojs(this.$refs.recordingVideo, getAudioOnlyRecordOptions(), this.onVideojsReady);
+                this.player = videojs(this.$refs.recordingAudio, getAudioOnlyRecordOptions(), this.onVideojsReady);
             } catch (error) {
                 this.hasNotSupportedError = true;
                 this.hasError = true;
@@ -118,20 +118,10 @@ export default {
          *
          */
         initVideojsRecordRecordListeners () {
-            this.player.on('deviceReady', this.onDeviceReady);
             this.player.on('startRecord', this.onStartRecord);
             this.player.on('finishRecord', this.onFinishRecord);
             this.player.on('error', this.onError);
             this.player.on('deviceError', this.onDeviceError);
-        },
-
-        /**
-         * onDeviceReady, dispatch to anyone listening, maybe the parent
-         *
-         */
-        onDeviceReady () {
-            this.isDeviceReady = true;
-            this.$emit(recordMediaEvents.DEVICE_READY, this.$refs.container.firstChild.offsetWidth, this.$refs.container.firstChild.offsetWidth * 0.5625); //ensure the entire recording is available
         },
 
         /**
@@ -204,6 +194,7 @@ export default {
          */
         destroyVideojs () {
             if (this.player) {
+                this.player.record().stopDevice();
                 this.player.record().destroy();
             }
         },
@@ -264,23 +255,21 @@ export default {
     
     <div class="container" ref="container">
         
-        <div class="media-container media-container-record" key="recordMediaContainer">
-            <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
+        <div class="media-container media-container-record">
+            <video ref="recordingAudio" playsinline class="video-js vjs-record-skin"></video>
         </div>
 
         <recorded-media 
             v-if="hasPreRecordedData || hasNewRecording"
-            key="media-container-playback"
             class="media-container media-container-playback"
             :record-media-type="recordMediaTypes.AUDIO_ONLY"
             :has-pre-recorded-data="hasPreRecordedData"
             :pre-recorded-data="preRecordedData ? preRecordedData : undefined"
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
-            @on-resize="onResize"
         />
 
-        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
+        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed">
             <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">The camera appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the device was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter audio or request your administrator(s) to increase the allowed file size limit.</div>
