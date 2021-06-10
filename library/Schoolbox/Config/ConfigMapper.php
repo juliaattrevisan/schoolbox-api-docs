@@ -147,7 +147,9 @@ class ConfigMapper extends Mapper
     public const NAME_RUBRIC_MARKBOOK_ENABLED = 'rubric_markbook_enable';
     public const NAME_PASTORAL_ENABLED = 'pastoral_enabled';
     public const NAME_NOTIFICATIONS_ENABLED = 'messaging_enabled';
+    public const NAME_MOBILE_PUSH_NOTIF_ENABLED = 'push_notifications_enabled';
 
+    public const NAME_WEBDAV_ENABLED         = 'webdav_enable';
     public const NAME_GOOGLEDRIVE_ENABLED    = 'googledrive_enabled';
     public const NAME_GOOGLEDRIVE_EXPORT_PDF = 'googledrive_export_pdf';
     public const NAME_GOOGLEAPPS_API_KEY     = 'googleapps_api_key';
