@@ -75,14 +75,12 @@ try {
      * instance to inadvertently have the same mime as another instance
      */
     if (isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId'])) {
-
         /* You can't update an existing record into one where the mimetype already exists
          */
         if ((int)$_POST['fileTypeId'] !== $mime->getFileTypeID()) {
             error(105, 'The mime type you have chosen for this file type is already in use.');
         }
     } else {
-
         /* You can't create a new record if the mime type is already in use
          */
         error(105, 'The mime type you have chosen for this file type is already in use.');
