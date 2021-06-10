@@ -58,7 +58,44 @@ if (isset($_POST['max_file_size'])) {
     $_POST['max_file_size'] = Alaress_Byte_Format::stringToBytes($_POST['max_file_size']);
 }
 
-$mime = new Mimetype();
+/* Try to load an existing Mimetype that used $_POST['mime']
+ * One of these instance might already exist but was deleted
+ * In that case, resurrect it and give it the new settings
+ *
+ * Otherwise create a new instance and continue normally
+ */
+try {
+    $mime = $mimeMapper->findOneByColumn('mime', $_POST['mime'], [
+        'deleted' => true
+    ]);
+
+    /* Check if $mime->getFileTypeId is the same as that which was POSTed
+     *
+     * If fileTypeId was provided, then we perhaps tried to modify an existing
+     * instance to inadvertently have the same mime as another instance
+     */
+    if (isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId'])) {
+        /* You can't update an existing record into one where the mimetype already exists
+         */
+        if ((int)$_POST['fileTypeId'] !== $mime->getFileTypeID()) {
+            error(105, 'The mime type you have chosen for this file type is already in use.');
+        }
+    } else {
+        /* You can't create a new record if the mime type is already in use
+         */
+        error(105, 'The mime type you have chosen for this file type is already in use.');
+    }
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    $mime = $e->getDeletedObject();
+
+    /* Resurrect it
+     */
+    $mime->setDeleted(0);
+} catch (\Schoolbox\Mapper\Exception\NotFound $e) {
+    $mime = $mimeMapper->createModel();
+}
+
+
 $mime->setDescription($_POST["description"]);
 $mime->setMime($_POST["mime"]);
 $mime->setIconFile($_POST["iconFile"]);
@@ -68,22 +105,6 @@ $mime->setMaxFileSize($_POST["max_file_size"]);
 
 if (isset($_POST['fileTypeId']) && is_numeric($_POST['fileTypeId'])) {
     $mime->setId($_POST['fileTypeId']);
-}
-
-
-// verify data integritae (no duplicate mimes)
-try {
-    /** @var Mimetype $existing */
-    $existing = $mimeMapper->findOneByColumnList([
-        'mime'    => $mime->getMime(),
-        'deleted' => 0
-    ]);
-
-    if ($existing->getId() != $mime->getId()) {
-        error(105, 'The mime type you have chosen for this file type is already in use.');
-    }
-} catch (Schoolbox\Mapper\Exception $e) {
-    // doesn't exist: noop
 }
 
 // save that thing, and get the ID in case it's new
