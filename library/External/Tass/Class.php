@@ -170,7 +170,10 @@ class External_Tass_Class implements External_ClassInterface
                 ),
                 E_USER_WARNING,
             );
-            [$year, $code, $class] = array_fill($parts, '', 3);
+            [$year, $code, $class] = $parts;
+            $year  ??= '';
+            $code  ??= '';
+            $class ??= '';
         }
 
         // Ensure year is an int, or an empty string if not set
