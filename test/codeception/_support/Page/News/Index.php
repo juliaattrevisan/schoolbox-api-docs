@@ -16,7 +16,7 @@ use Page\Common;
  */
 class Index
 {
-    public const URL = '/news/{topic}';
+    public const URL = '/news?topic={topic}';
 
     // Selectors
 
@@ -32,7 +32,7 @@ class Index
 
     public const ELEMENT_NEWS_LIST                  = '.information-list';
     public const ELEMENT_NEWS_LIST_ITEM             = '.actions-small-1';
-    public const ELEMENT_NEWS_LIST_ITEM_HEADLINE    = '.card h3';
+    public const ELEMENT_NEWS_LIST_ITEM_HEADLINE    = 'div.small-12.card h3 a';
     public const ELEMENT_NEWS_LIST_ITEM_ARTICLE     = '.card article';
     public const ELEMENT_NEWS_LIST_ITEM_META_AUTHOR = '.card > .meta:nth-of-type(1)';
     public const ELEMENT_NEWS_LIST_ITEM_META_DATE   = '.card > .meta:nth-of-type(2)';

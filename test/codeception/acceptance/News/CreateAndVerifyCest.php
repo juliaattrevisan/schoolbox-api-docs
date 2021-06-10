@@ -21,7 +21,7 @@ class CreateAndVerifyCest
     /**
      * Test that a news item I create retains the settings I chose
      *
-     * as zsmith:
+     * as alaress:
      * * go to http://192.168.36.10/news
      * * create a new news item, with:
      * ** headline
@@ -47,7 +47,7 @@ class CreateAndVerifyCest
      */
     public function createNews(AcceptanceTester $i, Form $formPage, Index $indexPage, Item $itemPage)
     {
-        $i->login('zsmith', 'password');
+        $i->login('alaress', 'alaress');
         $i->amOnPage($formPage->generateCreateRoute());
 
         // Fill in form values
@@ -58,9 +58,9 @@ class CreateAndVerifyCest
         $image     = __DIR__ . '/upload/test.jpg';
         $topic     = 'General';
         $topicSlug = (new \Url($topic, ''))->getSlug();
-        $roles     = ['Teachers'];
-        $campi     = ['Senior', 'Junior'];
-        $users     = ['David Rhodes', 'Rachel Rhodes'];
+        $roles     = ['Teacher'];
+        $campi     = ['Primary'];
+        $users     = ['Jana Reed','Mario Izzo'];
         $publish   = \Alaress_Date_Format::now()->addHours(-1)->setTime(0, 0, 0);
         $expiry    = \Alaress_Date_Format::now()->addDays(7)->setTime(0, 0, 0);
         $formPage
@@ -77,7 +77,8 @@ class CreateAndVerifyCest
             ->submit();
 
         // Verify that the news is in the All topic, and is the first news item
-        $i->amOnPage($indexPage->generateRoute(''));
+        sleep(5);
+        $i->amOnPage($indexPage->generateRoute('all'));
 
         $position = 1;
         $indexPage->seeHeadline($headline, $position);
@@ -120,14 +121,14 @@ class CreateAndVerifyCest
             ->seePublishDate($publish)
             ->seeExpiryDate($expiry);
 
-        // Verify that user Scott Berryhill cannot see it
-        $scott = $i->haveFriend('scott');
-        $scott->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
-            $i->login('sberryhill', 'password');
+        // Verify that user Tim Reed(student from secondary) cannot see it
+        $tim = $i->haveFriend('tim');
+        $tim->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $i->login('treed', 'password');
             $indexPage = new Index($i);
 
             // Go to all page
-            $i->amOnPage($indexPage->generateRoute(''));
+            $i->amOnPage($indexPage->generateRoute('all'));
             $position = 1;
             $indexPage->dontSeeHeadline($headline, $position);
 
@@ -135,14 +136,14 @@ class CreateAndVerifyCest
             $indexPage->dontSeeHeadline($headline, $position);
         });
 
-        // Verify that user Celia Glenn can see it
-        $celia = $i->haveFriend('celia');
-        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
-            $i->login('cglenn', 'password');
+        // Verify that user Alison Chan(teacher) can see it
+        $alison = $i->haveFriend('alison');
+        $alison->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+            $i->login('achan', 'password');
             $indexPage = new Index($i);
 
             // Go to all page
-            $i->amOnPage($indexPage->generateRoute(''));
+            $i->amOnPage($indexPage->generateRoute('all'));
             $position = 1;
             $indexPage->seeHeadline($headline, $position);
 
@@ -155,12 +156,12 @@ class CreateAndVerifyCest
             ->fillPublishDate(\Alaress_Date_Format::now()->addDays(2)->setTime(0, 0, 0))
             ->submit();
 
-        // Verify that user Celia Glenn can no longer see it
-        $celia->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
+        // Verify that user Alison Chan can no longer see it
+        $alison->does(function (AcceptanceTester $i) use ($headline, $topicSlug) {
             $indexPage = new Index($i);
 
             // Go to all page
-            $i->amOnPage($indexPage->generateRoute(''));
+            $i->amOnPage($indexPage->generateRoute('all'));
             $position = 1;
             $indexPage->dontSeeHeadline($headline, $position);
 

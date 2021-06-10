@@ -21,6 +21,7 @@ use Codeception\Module;
 class AcceptanceTester extends \Codeception\Actor
 {
     use _generated\AcceptanceTesterActions;
+    use \Codeception\Lib\Actor\Shared\Friend;
 
     /**
      * Define custom actions here

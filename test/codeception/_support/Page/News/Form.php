@@ -12,6 +12,7 @@ namespace Page\News;
 
 use AcceptanceTester;
 use Alaress_Date_Format;
+use Codeception\Util\Locator;
 use Page\Common;
 
 /**
@@ -21,7 +22,7 @@ use Page\Common;
  */
 class Form
 {
-    public const URL = '/news/modify/{id}';
+    public const URL = '/news/create';
 
     // Selectors
 
@@ -34,7 +35,7 @@ class Form
     public const FORM = Common::ELEMENT_CONTENT . ' #newsForm';
 
     // Not sure if every input should have its own selector constant
-    public const FORM_SAVE = self::FORM . ' input[type="submit"]';
+    public const FORM_SAVE = '#news-submit';
 
     /**
      * @var AcceptanceTester
@@ -98,7 +99,7 @@ class Form
      */
     public function fillHeadline(string $headline): self
     {
-        $this->tester->fillField('heading', $headline);
+        $this->tester->fillField('title', $headline);
         return $this;
     }
 
@@ -108,7 +109,7 @@ class Form
      */
     public function seeHeadline(string $headline): self
     {
-        $this->tester->seeInField('heading', $headline);
+        $this->tester->seeInField('title', $headline);
         return $this;
     }
 
@@ -139,7 +140,7 @@ class Form
     public function fillBlurb(string $blurb): self
     {
         // Expand blurb pane, and then enter it in
-        $this->tester->click('[data-collapser="blurb"]');
+        $this->tester->click('legend.icon-down-arrow');
         $this->tester->fillRichTextField('blurb', $blurb);
         return $this;
     }
@@ -151,7 +152,7 @@ class Form
     public function seeBlurb(string $blurb): self
     {
         // Expand blurb pane, and then ensure I see its contents
-        $this->tester->click('[data-collapser="blurb"]');
+        $this->tester->click('legend.icon-down-arrow');
         $this->tester->seeInRichTextField('blurb', $blurb);
         return $this;
     }
@@ -162,7 +163,7 @@ class Form
      */
     public function fillFeatureImage(string $filename): self
     {
-        $this->tester->attachAttachzoneFile('#news-feature-zone', $filename);
+        $this->tester->attachAttachzoneFile('#featureImage-zone', $filename);
         return $this;
     }
 
@@ -172,7 +173,7 @@ class Form
      */
     public function seeFeatureImage(string $filename): self
     {
-        $this->tester->seeAttachzoneFile('#news-feature-zone', $filename);
+        $this->tester->seeAttachzoneFile('#featureImage-zone', $filename);
         return $this;
     }
 
@@ -182,7 +183,11 @@ class Form
      */
     public function fillTopic(string $topic): self
     {
-        $this->tester->selectOption('item_topic_id', $topic);
+        $this->tester->click('input#news-topics-selectized');
+        $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('selectize-dropdown multi plugin-remove_button');
+        scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+        $element = Locator::contains('div.option', $topic);
+        $this->tester->click($element);
         return $this;
     }
 
@@ -192,18 +197,35 @@ class Form
      */
     public function seeTopic(string $topic): self
     {
-        $this->tester->seeOptionIsSelected('item_topic_id', $topic);
+        $this->tester->canSee($topic,'div.item');
         return $this;
     }
-
     /**
      * @param array $roles
      * @return Form
      */
     public function fillRoles(array $roles): self
     {
-        $this->tester->checkSelectGroupOptions('role', $roles);
+        foreach ($roles as &$role) {
+
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Roles');
+            $element = Locator::contains('button.button-block', 'Roles');
+            $this->tester->clickWithLeftButton($element);
+            $this->tester->executeJS(
+                "var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+            scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;"
+            );
+            $this->tester->waitForText($role, 5);
+            $teacher_element = Locator::contains('div.checklist-wrapper', $role);
+            $this->tester->clickWithLeftButton($teacher_element);
+            $this->tester->click('button.button.submit');
+            sleep(2);
+
+        }
         return $this;
+
     }
 
     /**
@@ -212,7 +234,9 @@ class Form
      */
     public function seeRoles(array $roles): self
     {
-        $this->tester->seeSelectGroupOptionsAreSelected('role', $roles);
+        foreach ($roles as &$role) {
+            $this->tester->canSee($role);
+        }
         return $this;
     }
 
@@ -222,7 +246,23 @@ class Form
      */
     public function fillCampuses(array $campuses): self
     {
-        $this->tester->checkSelectGroupOptions('campus', $campuses);
+
+        foreach ($campuses as &$campus) {
+
+            $this->tester->scrollTo(['css' => 'button.button.icon-drag-drop']);
+            $this->tester->click(['css' => 'button.button.icon-drag-drop'], ['css' => 'div#audience-selectize-group']);
+            $this->tester->waitForText('Year Levels');
+            $element = Locator::contains('button.button-block', 'Campuses');
+            $this->tester->clickWithLeftButton($element);
+            $this->tester->executeJS("var scrollableDiv = document.getElementsByClassName('checklist checklist-container');
+            scrollableDiv.scrollTop=scrollableDiv.scrollHeight - scrollableDiv.offsetHeight;");
+            $this->tester->waitForText('Secondary', 5);
+            $campus_element = Locator::contains('div.checklist-wrapper', $campus);
+            $this->tester->clickWithLeftButton($campus_element);
+            $this->tester->click('button.button.submit');
+            sleep(2);
+        }
+
         return $this;
     }
 
@@ -232,7 +272,9 @@ class Form
      */
     public function seeCampuses(array $campuses): self
     {
-        $this->tester->seeSelectGroupOptionsAreSelected('campus', $campuses);
+        foreach ($campuses as &$campus) {
+            $this->tester->canSee($campus);
+        }
         return $this;
     }
 
@@ -242,7 +284,15 @@ class Form
      */
     public function fillUsers(array $users): self
     {
-        $this->tester->selectSelectizeOptions('userList[]', $users);
+        foreach ($users as &$user) {
+
+            $this->tester->click('input#audience-search-selectized');
+            $user_chars = str_split($user);
+            foreach ($user_chars as &$user_char) {
+                $this->tester->pressKey('input#audience-search-selectized', $user_char);
+            }
+            $this->tester->pressKey('input#audience-search-selectized', \Facebook\WebDriver\WebDriverKeys::ENTER);
+        }
         return $this;
     }
 
@@ -252,7 +302,9 @@ class Form
      */
     public function seeUsers(array $users): self
     {
-        $this->tester->seeSelectizeOptionsAreSelected('userList[]', $users);
+        foreach ($users as &$user)  {
+            $this->tester->canSee($user);
+        }
         return $this;
     }
 
@@ -264,7 +316,7 @@ class Form
     {
         // Type in database format, let strtotime do the work
         // This is because Codeception has no access to the DB config
-        $this->tester->fillDateField('item_datetime_published', $publishDate->getDatabase());
+        $this->tester->fillDateField('input#publishAt', $publishDate->getDatabase());
         return $this;
     }
 
@@ -275,7 +327,7 @@ class Form
     public function seePublishDate(Alaress_Date_Format $publishDate): self
     {
         $this->tester->seeInField(
-            'item_datetime_published',
+            'input#publishAt',
             $publishDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
         );
         return $this;
@@ -287,7 +339,7 @@ class Form
      */
     public function fillExpiryDate(Alaress_Date_Format $expiryDate): self
     {
-        $this->tester->fillDateField('item_datetime_expires', $expiryDate->getDatabase());
+        $this->tester->fillDateField('input#expiresAt', $expiryDate->getDatabase());
         return $this;
     }
 
@@ -298,7 +350,7 @@ class Form
     public function seeExpiryDate(Alaress_Date_Format $expiryDate): self
     {
         $this->tester->seeInField(
-            'item_datetime_expires',
+            'input#expiresAt',
             $expiryDate->getUsingFormat(Common::FORMAT_INPUT_DATETIME)
         );
         return $this;
