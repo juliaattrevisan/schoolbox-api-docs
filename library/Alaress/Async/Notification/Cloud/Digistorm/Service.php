@@ -41,7 +41,7 @@ class Service extends AbstractService
     /**
      * How many attempts may be made to send the message before we give up?
      */
-    private const MAX_ATTEMPTS = 100;
+    private const MAX_ATTEMPTS = 10;
 
     /**
      * The amount of time (in milliseconds) to wait for at first when
@@ -146,11 +146,11 @@ class Service extends AbstractService
                 }
             }
 
-            $wait = $jitter->calculateJitter($attemptNum);
+            $wait = (int)$jitter->calculateJitter($attemptNum);
             $this->getLog()->notice(
-                sprintf('Notification service is likely rate-limited: waiting %d us before trying again', $wait)
+                sprintf('Notification service is likely rate-limited: waiting %d ms before trying again', $wait)
             );
-            usleep((int)$wait);
+            usleep($wait * 1000);
             $attemptNum++;
         }
 
