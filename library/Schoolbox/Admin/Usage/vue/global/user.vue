@@ -1,7 +1,9 @@
 <script>
+
 import axios from 'axios';
-import { VueGoodTable } from 'vue-good-table';
 import filesize from 'filesize';
+import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
+
 
 export default {
 
@@ -18,16 +20,21 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [
+        mixinFooterUI //to place and keep the tables UI in the footer
+    ],
 
     /**
      * Props.
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-       'endpoint'
-    ],
+    props: {
+        endpoint: {
+           type: String, 
+           required: true
+        }
+    },
 
     /**
      * Components.
@@ -35,7 +42,6 @@ export default {
      * at the top of the file.
      */
     components: {
-        VueGoodTable
     },
 
     /**
@@ -55,30 +61,51 @@ export default {
              */
             allData: [],
 
-            /* Table columns. You can define sorting and formatting functions
-             * here, but I found the custom slots to work best for sorting on
-             * html representations e.g. linked firstname, linked lastname
+            /* Table columns
              */
-            columns: [
-                {
-                    label: 'Firstname',
-                    field: 'firstname'
+            columns: [ 'firstname', 'lastname', 'role', 'size' ],
+
+            /* vue-tables-2 options, see https://matanya.gitbook.io/vue-tables-2/options-api
+             */
+            options: {
+                headings: {
+                    firstname: 'Firstname',
+                    lastname: 'Lastname',
+                    role: 'Role',
+                    size: 'Filesize',
                 },
-                {
-                    label: 'Lastname',
-                    field: 'lastname'
+                orderBy: {
+                    ascending: true,
+                    column: 'lastname' 
                 },
-                {
-                    label: 'Role',
-                    field: 'role'
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
+                debounce: 100, //faster debouce as data is stored on the client side,
+                resizableColumns: false,
+                tabbable: false,
+                texts: {
+                    filterPlaceholder: 'Search for users...',
+                    noResults: 'No matching users...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
                 },
-                {
-                    label: 'Filesize',
-                    field: 'size',
-                    type: 'number',
-                    formatFn: filesize
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
+                },
+                customSorting: {
+                    size: (ascending) => { //ensure filesize is sorted numerically
+                        return (a, b) => {
+                            if (ascending) {
+                                return parseInt(a.size) >= parseInt(b.size) ? 1 : -1;
+                            }
+                            return parseInt(a.size) <= parseInt(b.size) ? 1 : -1;
+                        }
+                    }
                 }
-            ],
+            },
         }
     },
 
@@ -87,39 +114,8 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-        let self = this;
-
-        /* Show skeleton
-         */
-        this.loading = true;
-
-        /* Fetch payload asynchronously
-         */
-        let request = {
-            url: self.endpoint,
-            method: 'get',
-            responseType: 'json'
-        }
-
-        axios.request(request)
-            .then(function (response) {
-
-                /* Load into vue component
-                 */
-                self.allData = response.data;
-            })
-            .catch(error => {
-                if (error.response) {
-                    self.loading = false;
-                }
-            })
-            .then(function () {
-
-                /* Hide skeleton
-                 */
-                self.loading = false;
-            });
+    mounted () {
+        this.loadRows();
     },
 
     /**
@@ -135,6 +131,41 @@ export default {
      * other ordinary javascript that you might have written before.
      */
     methods: {
+
+        /**
+         * Fetch payload asynchronously
+         *
+         */
+        async loadRows () {
+            this.loading = true;
+            try {
+                const response = await axios.get(this.endpoint);
+                this.allData = response.data;
+                this.loading = false;
+            } catch (error) {
+                this.loading = false; 
+            }
+        },
+
+        /**
+         * To update the table to show the UI in the footer
+         * 
+         */
+        onLoaded () {
+            this.$nextTick(() => this.$_footerUI_update());
+        },
+
+        /**
+         * To convert the bytes into a more readable string
+         * 
+         * @param { Number } - 214430838
+         * 
+         * @returns { String } - 204.5 MB
+         */
+        getHumanReadableFilesize (value) {
+            return filesize(value);
+        }
+
     }
 }
 </script>
@@ -158,43 +189,32 @@ export default {
             </table>
         </template>
         <template v-else>
-            <vue-good-table
-                styleClass="vgt-table striped bordered"
-                :columns="columns"
-                :rows="allData"
-                :search-options="{
-                    enabled: false
-                }"
-                :sort-options="{
-                    initialSortBy: {
-                        field: 'lastname',
-                        type: 'asc'
-                    }
-                }"
-                :pagination-options="{
-                    enabled: true,
-                    perPage: 50,
-                    perPageDropdown: [50, 100, 200],
-                    rowsPerPageLabel: 'Users per page',
-                    infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
-                }"
+            <v-client-table 
+                :data="allData" 
+                :columns="columns" 
+                :options="options" 
+                @loaded="onLoaded"
             >
-                <template slot="table-row" slot-scope="props">
-                    <template v-if="props.column.field == 'firstname'">
-                        <a :href="'/adminv2/usage/specific/' + props.row.userId">{{ props.row.firstname }}</a>
-                    </template>
-                    <template v-else-if="props.column.field == 'lastname'">
-                        <a :href="'/adminv2/usage/specific/' + props.row.userId">{{ props.row.lastname }}</a>
-                    </template>
-                    <template v-else>
-                        {{props.formattedRow[props.column.field]}}
-                    </template>
+                <template v-slot:firstname="props"> 
+                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
                 </template>
-            </vue-good-table>
+                <template v-slot:lastname="props"> 
+                    <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.lastname }}</a>
+                </template>
+                <template v-slot:size="props"> 
+                    {{ getHumanReadableFilesize(props.row.size) }}
+                </template>
+                <div slot="afterTable">
+                    <div class="VueTables__table-footer" ref="tableFooter"></div>
+                </div>
+            </v-client-table>
+            
         </template>
     </div>
 </template>
 
 <style lang="scss">
-@import '@schoolbox/vueGoodTable/vueGoodTable';
+
+@import '@schoolbox/vueTables2/vueTables2';
+
 </style>

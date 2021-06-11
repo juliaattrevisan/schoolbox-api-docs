@@ -1,18 +1,14 @@
 <script>
     
-import { VueGoodTable } from 'vue-good-table';
-import { fetchAsJson } from '@shared/fetch/fetch';
+import axios from 'axios';
 import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
 
 export default {
 
-    name: 'visitation-list-full',
-
-    components: {
-        VueGoodTable
-    },   
+    mixins: [
+        mixinFooterUI //to place and keep the tables UI in the footer
+    ],
 
     props: {
         payload: {
@@ -31,33 +27,47 @@ export default {
     data () {
         return {
             isLoading: true, //used to show skeleton
-            columns: [ //The table headings to display and thus row data to show
-                {
-                    label: 'id',
-                    field: 'id',
-                    hidden: true
+            columns: ['fullname', 'role', 'occursAt'],
+            options: {
+                headings: {
+                    fullname: 'Name',
+                    role: 'Role',
+                    occursAt: 'Last Visited',
                 },
-                {
-                    label: 'Name',
-                    field: 'fullname',
-                    sortFn: this.sortName
+                orderBy: {
+                    ascending: false,
+                    column: 'occursAt' //initial sorting display
                 },
-                {
-                    label: 'Role',
-                    field: 'role'
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
+                debounce: 100, //faster debouce as data is stored on the client side,
+                resizableColumns: false,
+                tabbable: false,
+                texts: {
+                    filterPlaceholder: 'Search for visitors...',
+                    noResults: 'No matching visitors...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
                 },
-                {
-                    label: 'Last Visited',
-                    field: 'occursAt.absolute',
-                    formatFn: this.formatLastVisited
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
                 },
-            ],
+                customSorting: {
+                    fullname: (ascending) => { //sort fullname by last name
+                        return (a, b) => {
+                            if (ascending) {
+                                return a.lastname >= b.lastname ? 1 : -1;
+                            }
+                            return a.lastname <= b.lastname ? 1 : -1;
+                        }
+                    }
+                }
+            },
             rows: [] //Will hold the row data once it's loaded
         }
-    },
-
-    created () {
-        dayjs.extend(relativeTime); //add the relativeTime plugin to be able to use fromNow() in formatLastVisited
     },
 
     mounted () {
@@ -65,41 +75,36 @@ export default {
     },
 
     methods: {
-        
+
         /**
          * Fetch payload asynchronously
          *
          */
-        loadRows () {
-            fetchAsJson(ENDPOINTS.payloadFullPath(this.payload.article.id))
-                .then((response) => {
-                    this.rows = response; //Load into vue component
-                    this.isLoading = false; //Hide skeleton
-                
-                }).catch((error) => {
-                    this.isLoading = false; //display error note in the DOM
-                }); 
+        async loadRows () {
+            try {
+                const response = await axios.get(ENDPOINTS.payloadFullPath(this.payload.article.id));
+                this.rows = response.data;
+                this.isLoading = false;
+            } catch (error) {
+                this.isLoading = false; 
+            }
         },
 
         /**
-         * use the last name for formatting the full name
-         * https://xaksis.github.io/vue-good-table/guide/configuration/column-options.html#sortfn
-         *
+         * To update the table to show the UI in the footer
+         * 
          */
-        sortName (x, y, col, rowX, rowY) {
-            return (rowX.lastname < rowY.lastname ? -1 : (rowX.lastname > rowY.lastname ? 1 : 0));
+        onLoaded () {
+            this.$nextTick(() => this.$_footerUI_update());
         },
 
         /**
          * format the ISO date for better readability
-         * https://xaksis.github.io/vue-good-table/guide/configuration/column-options.html#formatfn
          *          
          * @returns {String} - eg: Mar 19, 2021 08:52am (4 minutes ago)
          */
         formatLastVisited (value) {
-            const nice = dayjs(value).format('MMM D, YYYY hh:mma');
-            const relative = dayjs(value).fromNow();
-            return nice + ' (' + relative + ')';
+            return value.nice + ' (' + value.relative + ')';
         }
         
     }
@@ -125,40 +130,22 @@ export default {
                 </template>
                 <template v-else>
                     <section>
-                        <vue-good-table
-                            styleClass="vgt-table striped bordered"
-                            :columns="columns"
-                            :rows="rows"
-                            :search-options="{
-                                enabled: true,
-                                placeholder: 'Search for visitors...',
-                            }"
-                            :sort-options="{
-                                initialSortBy: { 
-                                    field: 'occursAt.absolute',
-                                    type: 'desc'
-                                }
-                            }"
-                            :pagination-options="{
-                                enabled: true,
-                                perPage: 50,
-                                perPageDropdown: [50, 100, 200],
-                                rowsPerPageLabel: 'Users per page',
-                                infoFn: (params) => `${params.firstRecordOnPage} - ${params.lastRecordOnPage} of ${params.totalRecords} Users`,
-                            }"
+                        <v-client-table 
+                            :data="rows" 
+                            :columns="columns" 
+                            :options="options" 
+                            @loaded="onLoaded"
                         >
-                            <div slot="emptystate">
-                                <p>No visitors found</p>
-                            </div>
-                            <template slot="table-row" slot-scope="props">
-                                <span v-if="props.column.field === 'fullname'">
-                                    <a :href="'/search/user/' + props.row.id" :title="props.row.fullname">{{props.row.fullname}}</a> 
-                                </span>
-                                <span v-else>
-                                    {{ props.formattedRow[props.column.field] }}
-                                </span>
+                            <template v-slot:fullname="props"> 
+                                <a :href="`/search/user/${props.row.id}`" :title="props.row.fullname">{{props.row.fullname}}</a>
                             </template>
-                        </vue-good-table>
+                            <template v-slot:occursAt="props"> 
+                                <span v-if="props.row.occursAt">{{ formatLastVisited(props.row.occursAt) }}</span>
+                            </template>
+                            <div slot="afterTable">
+                                <div class="VueTables__table-footer" ref="tableFooter"></div>
+                            </div>
+                        </v-client-table>
                     </section>
                 </template>
             </div>
@@ -168,7 +155,7 @@ export default {
 
 <style lang="scss">
 
-@import '@schoolbox/vueGoodTable/vueGoodTable';
+@import '@schoolbox/vueTables2/vueTables2';
 
 </style>
 

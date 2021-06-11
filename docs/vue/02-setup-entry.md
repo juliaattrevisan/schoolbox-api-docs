@@ -64,7 +64,7 @@ Add `library/Schoolbox/Greenhouse/templates/user-list.vue` and paste this massiv
 ```js
 <script>
 
-import VueGoodTable from 'vue-good-table;
+import Toast from '@schoolbox/toast';
 
 export default {
 
@@ -81,7 +81,7 @@ export default {
      * at the top of the file.
      */
     components: {
-        VueGoodTable
+        Toast
     },
 
     /**
