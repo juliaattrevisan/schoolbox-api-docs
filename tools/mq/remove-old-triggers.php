@@ -74,21 +74,57 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $numKeysProcessed++;
             $progress = round(($numKeysProcessed / $numKeys) * 100, 2);
             if ($progress % 10 === 0) {
-                $this->getLogger()->info("{$progress} % processed");
+                $this->getLogger()->debug("{$progress} % processed");
             }
 
             $expiryTime = self::ttlToDate($this->redis->ttl($key));
             $this->getLogger()->debug("[ $key : (TTL: {$expiryTime}) ]");
 
             $keyType = $this->redis->type($key);
+
+            // clean up set
+            if ($keyType->getPayload() === 'set') {
+                $members = $this->redis->smembers($key);
+                $memberCount = count($members);
+                foreach ($members as $member) {
+                    $ttl = $this->redis->ttl($member);
+                    // expired
+                    if ($ttl === -2) {
+                        $this->getLogger()->info("[REMOVING] expired {$member} from set: {$key} ");
+                        $memberCount--;
+                        if ($this->perform()) {
+                            $this->redis->srem($key, $member);
+                        }
+                    }
+                }
+                // if all of the members of this set is expired, delete this set
+                if ($memberCount === 0) {
+                    $this->deleteFromRedis("Empty set: {$key}", null, $key);
+                }
+                continue;
+            }
+
+            // if the key is not string (unexpectedly), skip
+            if ($keyType->getPayload() !== 'string') {
+                $this->getLogger()->debug("Skipping {$key} type: {$keyType->getPayload()} ");
+                continue;
+            }
+
+            $uncompressed = null;
             try {
                 $rawRedisData = $this->redis->get($key);
                 if (!$rawRedisData) {
                     $this->deleteFromRedis("Empty value for key: {$key}", null, $key);
                     continue;
                 }
-                $instance = unserialize(gzuncompress($rawRedisData));
+                $uncompressed = gzuncompress($rawRedisData);
+                $instance = unserialize($uncompressed);
             } catch (Exception $e) {
+                if ($uncompressed) {
+                    // likely be corrupted data
+                    $this->deleteFromRedis("Cannot unserialize: {$key}", null, $key);
+                    continue;
+                }
                 $this->getLogger()->debug("[SKIPPING] type-{$keyType} : {$key}");
                 continue;
             }
@@ -179,7 +215,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
     /**
      * Deletes from redis
      * @param string $target
-     * @param Alaress_Date_Format $triggerDate
+     * @param Alaress_Date_Format|null $triggerDate
      * @param string $key
      */
     private function deleteFromRedis(string $target, ?Alaress_Date_Format $triggerDate, string $key): void

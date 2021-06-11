@@ -66,9 +66,11 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->getLogger()->info("[ $key : (TTL: {$expiryTime}) ]");
 
             $keyType = $this->redis->type($key);
+            $uncompressed = null;
             try {
                 $rawRedisData = $this->redis->get($key);
-                $instance = unserialize(gzuncompress($rawRedisData));
+                $uncompressed = gzuncompress($rawRedisData);
+                $instance = unserialize($uncompressed);
             } catch (Exception $e) {
                 if ($keyType->getPayload() === 'set') {
                     $setCount = \count($this->redis->smembers($key));
@@ -95,6 +97,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                         }
                         $this->extractInstance($memberInstance);
                     }
+                } elseif ($uncompressed) {
+                    $this->getLogger()->info("Failed to unserialize {$key} : {$e->getMessage()}");
                 } else {
                     $this->getLogger()->info("Type of {$key} is {$keyType}");
                 }

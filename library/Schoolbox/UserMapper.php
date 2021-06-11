@@ -15,6 +15,7 @@ use House;
 use HouseMapper;
 use HouseResidentialMapper;
 use PDOStatement;
+use Predis\ClientInterface;
 use Schoolbox;
 use Schoolbox\Calendar\Util\ViewNameMapping;
 use Schoolbox\External\Connector\ICommunityPortal;
@@ -176,6 +177,7 @@ class UserMapper extends Mapper
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deletePastoralAudiences']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteNotificationQueue']);
 
         $this->registerCallback(
             self::CALLBACK_POSTSOFTDELETE,
@@ -804,6 +806,22 @@ class UserMapper extends Mapper
                 }
             }
         }
+    }
+
+
+    /**
+     * Post-softDelete callback to delete redis queues for this user
+     * @param User $user
+     * @throws ServiceNotFound
+     */
+    public function deleteNotificationQueue(User $user)
+    {
+        /** @var ClientInterface $redis */
+        $redis   = self::getDi()->get('redis');
+        $factory = new Schoolbox\Realtime\MessageList\ListFactory(INSTANCE_ID, $redis);
+        $factory->listed($user->getId())->drain();
+        $factory->unread($user->getId())->drain();
+        $factory->digest($user->getId())->drain();
     }
 
 
