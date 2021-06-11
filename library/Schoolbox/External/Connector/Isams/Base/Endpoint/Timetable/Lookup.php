@@ -37,15 +37,15 @@ class Lookup
 
 
     /**
-     * @var array
+     * @var array|null
      */
-    private array $users;
+    private ?array $users = null;
 
 
     /**
-     * @var array
+     * @var array|null
      */
-    private array $periods;
+    private ?array $periods = null;
 
 
     /**

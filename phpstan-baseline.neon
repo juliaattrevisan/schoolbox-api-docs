@@ -4386,11 +4386,6 @@ parameters:
 			path: library/Schoolbox/External/Connector/Edumate/Base/User.php
 
 		-
-			message: "#^Negated boolean expression is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Api.php
-
-		-
 			message: "#^Property Schoolbox\\\\External\\\\Connector\\\\Isams\\\\Base\\\\Endpoint\\\\Timetable\\\\ScheduleIterator\\:\\:\\$schedules \\(array\\<SimpleXMLElement\\>\\) does not accept SimpleXMLElement\\.$#"
 			count: 1
 			path: library/Schoolbox/External/Connector/Isams/Base/Endpoint/Timetable/ScheduleIterator.php
