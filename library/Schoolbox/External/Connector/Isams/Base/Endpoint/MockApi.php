@@ -26,7 +26,7 @@ class MockApi implements IApi
      *
      * @var string
      */
-    private $file;
+    private string $file;
 
 
     /**

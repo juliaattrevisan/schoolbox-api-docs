@@ -33,7 +33,7 @@ class Batchxml
     /**
      * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
@@ -42,7 +42,7 @@ class Batchxml
      *
      * @var SimpleXMLElement
      */
-    private $nodes;
+    private SimpleXMLElement $nodes;
 
 
     /**
