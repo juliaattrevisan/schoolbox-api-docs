@@ -12,6 +12,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { ResizeObserver } from 'vue-resize';
 import 'vue-resize/dist/vue-resize.css';
+import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -22,6 +23,10 @@ export default {
         RevealModal,
         ResizeObserver
     },
+
+    mixins: [
+        mixinFooterUI //to place and keep the tables UI in the footer
+    ],
 
     props: {
         dateFormat: {
@@ -65,6 +70,26 @@ export default {
                         return dayjs(row.updated_at).format(this.dateFormat); //to format date properly
                     }
                 },
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
+                selectable: {
+                    mode: 'multiple' //to enable multi-select
+                },
+                debounce: 100, //faster debouce as data is stored on the client side,
+                resizableColumns: false,
+                tabbable: false,
+                texts: {
+                    filterPlaceholder: 'Search for users...',
+                    noResults: 'No matching users...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
+                },
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
+                },
                 customSorting: {
                     year: (ascending) => { //sort year level naturally
                         return (a, b) => {
@@ -75,30 +100,7 @@ export default {
                             }
                         }
                     }
-                },
-                pagination: {
-                    edge: false,
-                },
-                perPage: 50, 
-                perPageValues: [50, 100, 200],
-                selectable: {
-                    mode: 'multiple' //to enable multi-select
-                },
-                texts: {
-                    filterPlaceholder: 'Search for users...',
-                    noResults: 'No matching users',
-                    count: 'Showing {from} to {to} of {count} users|{count} users|1 user'
-                },
-                skin: 'table-striped table-bordered table-hover',
-                sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
-                },
-                debounce: 100, //faster debouce as data is stored on the client side,
-                resizableColumns: false,
-                tabbable: false
+                }
             },
             singleRowName: 'user',
             pluralRowName: 'users',
@@ -207,6 +209,14 @@ export default {
             } catch (error) {
                 this.hasLoadError = true; //display error note in the DOM
             }
+        },
+
+        /**
+         * To update the table to show the UI in the footer
+         * 
+         */
+        onLoaded () {
+            this.$nextTick(() => this.$_footerUI_update());
         },
 
         /**
@@ -321,8 +331,13 @@ export default {
             :data="rows" 
             :columns="columns" 
             :options="options" 
+            @loaded="onLoaded"
             @select="onRowSelected"
-        />
+        >
+            <div slot="afterTable">
+                <div class="VueTables__table-footer" ref="tableFooter"></div>
+            </div>
+        </v-client-table>
 
         <toast ref="toast"></toast>
 

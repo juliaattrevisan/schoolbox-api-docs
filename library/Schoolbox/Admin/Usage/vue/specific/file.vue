@@ -3,6 +3,7 @@ import axios from 'axios';
 import filesize from 'filesize';
 import RevealModal from '@schoolbox/reveal-modal';
 import Toast from '@schoolbox/toast';
+import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
 
 export default {
 
@@ -19,7 +20,9 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [
+        mixinFooterUI //to place and keep the tables UI in the footer
+    ],
 
     /**
      * Props.
@@ -78,15 +81,17 @@ export default {
                     ascending: true,
                     column: 'name' 
                 },
-                // pagination: {
-                //     show: false
-                // },
                 perPage: 50, 
                 perPageValues: [50, 100, 200],
+                debounce: 100, //faster debouce as data is stored on the client side,
+                resizableColumns: false,
+                tabbable: false,
                 texts: {
-                    count: 'Showing {from} to {to} of {count} files|{count} files|1 file'
+                    filterPlaceholder: 'Search for files...',
+                    noResults: 'No matching files...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
                 },
-                skin: 'table-striped table-bordered table-hover',
                 sortIcon: {
                     is: 'glyphicon-sort',
                     base: 'glyphicon',
@@ -102,10 +107,7 @@ export default {
                             return parseInt(a.size) <= parseInt(b.size) ? 1 : -1;
                         }
                     }
-                },
-                resizableColumns: false,
-                tabbable: false,
-                filterable: false
+                }
             },
 
             /* When you click the Delete link, remember its url
@@ -127,13 +129,6 @@ export default {
     },
 
     /**
-     * Computed properties.
-     * Access the results of a function as if they were a property of an object.
-     */
-    computed: {
-    },
-
-    /**
      * Methods.
      * Arbitrary javascript functions which operate on the args provided, just like any
      * other ordinary javascript that you might have written before.
@@ -150,26 +145,18 @@ export default {
                 const response = await axios.get(this.endpoint);
                 this.allData = response.data;
                 this.loading = false;
-                this.$nextTick(() => this.updateTableControls());
             } catch (error) {
                 this.loading = false; 
             }
         },
 
         /**
-         * To adjust the UI display
+         * To update the table to show the UI in the footer
          * 
          */
-        updateTableControls () {
-            
-            const perPageControls = document.querySelector('.VueTables__limit');
-            const paginationControls = document.querySelector('.VuePagination');
-
-            this.$refs.tableFooter.appendChild(perPageControls);
-            this.$refs.tableFooter.appendChild(paginationControls);
-
+        onLoaded () {
+            this.$nextTick(() => this.$_footerUI_update());
         },
-
 
         /**
          * To convert the bytes into a more readable string
@@ -256,6 +243,7 @@ export default {
                 :data="allData" 
                 :columns="columns" 
                 :options="options" 
+                @loaded="onLoaded"
             >
                 <template v-slot:name="props"> 
                     <a :href="props.row._links.send">{{ props.row.name }}</a>
@@ -270,9 +258,7 @@ export default {
                     <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
                 </template>
                 <div slot="afterTable">
-                    <div class="table-footer" ref="tableFooter">
-
-                    </div>
+                    <div class="VueTables__table-footer" ref="tableFooter"></div>
                 </div>
             </v-client-table>
         </template>
@@ -291,36 +277,5 @@ export default {
 <style lang="scss">
 
 @import '@schoolbox/vueTables2/vueTables2';
-
-.VueTables table {
-    margin-bottom: 0px;
-}
-
-.VueTables .table-footer {
-    width: 100%;
-    height: auto;
-    display: flex;
-    justify-content: flex-end;
-    padding: 1rem;
-    background: white;
-}
-
-.VueTables__limit {
-    width: 160px;
-    margin-right: 20px;
-    label, select {
-        display: inline-block;
-    }
-    label {
-        width: 80px;
-    } 
-    select {
-        width: 80px;
-    }
-}
-
-.VuePagination__pagination-item {
-    display: none;
-}
 
 </style>

@@ -2,8 +2,13 @@
     
 import axios from 'axios';
 import { ENDPOINTS } from '@schoolboxCommsNews/Statistics/templates/visitation/endpoints.js';
+import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
 
 export default {
+
+    mixins: [
+        mixinFooterUI //to place and keep the tables UI in the footer
+    ],
 
     props: {
         payload: {
@@ -33,6 +38,23 @@ export default {
                     ascending: false,
                     column: 'occursAt' //initial sorting display
                 },
+                perPage: 50, 
+                perPageValues: [50, 100, 200],
+                debounce: 100, //faster debouce as data is stored on the client side,
+                resizableColumns: false,
+                tabbable: false,
+                texts: {
+                    filterPlaceholder: 'Search for visitors...',
+                    noResults: 'No matching visitors...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
+                },
+                sortIcon: {
+                    is: 'glyphicon-sort',
+                    base: 'glyphicon',
+                    up: 'glyphicon-chevron-up',
+                    down: 'glyphicon-chevron-down'
+                },
                 customSorting: {
                     fullname: (ascending) => { //sort fullname by last name
                         return (a, b) => {
@@ -42,27 +64,7 @@ export default {
                             return a.lastname <= b.lastname ? 1 : -1;
                         }
                     }
-                },
-                pagination: {
-                    edge: false,
-                },
-                perPage: 50, 
-                perPageValues: [50, 100, 200],
-                texts: {
-                    filterPlaceholder: 'Search for visitors...',
-                    noResults: 'No visitors found',
-                    count: 'Showing {from} to {to} of {count} visitors|{count} visitors|1 visitor'
-                },
-                skin: 'table-striped table-bordered table-hover',
-                sortIcon: {
-                    is: 'glyphicon-sort',
-                    base: 'glyphicon',
-                    up: 'glyphicon-chevron-up',
-                    down: 'glyphicon-chevron-down'
-                },
-                debounce: 100, //faster debouce as data is stored on the client side,
-                resizableColumns: false,
-                tabbable: false
+                }
             },
             rows: [] //Will hold the row data once it's loaded
         }
@@ -86,6 +88,14 @@ export default {
             } catch (error) {
                 this.isLoading = false; 
             }
+        },
+
+        /**
+         * To update the table to show the UI in the footer
+         * 
+         */
+        onLoaded () {
+            this.$nextTick(() => this.$_footerUI_update());
         },
 
         /**
@@ -124,6 +134,7 @@ export default {
                             :data="rows" 
                             :columns="columns" 
                             :options="options" 
+                            @loaded="onLoaded"
                         >
                             <template v-slot:fullname="props"> 
                                 <a :href="`/search/user/${props.row.id}`" :title="props.row.fullname">{{props.row.fullname}}</a>
@@ -131,6 +142,9 @@ export default {
                             <template v-slot:occursAt="props"> 
                                 <span v-if="props.row.occursAt">{{ formatLastVisited(props.row.occursAt) }}</span>
                             </template>
+                            <div slot="afterTable">
+                                <div class="VueTables__table-footer" ref="tableFooter"></div>
+                            </div>
                         </v-client-table>
                     </section>
                 </template>
@@ -142,10 +156,6 @@ export default {
 <style lang="scss">
 
 @import '@schoolbox/vueTables2/vueTables2';
-
-.VueTables__search-field {
-    padding: 10px;
-}
 
 </style>
 

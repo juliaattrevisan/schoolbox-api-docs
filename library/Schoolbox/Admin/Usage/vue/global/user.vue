@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import filesize from 'filesize';
+import { mixinFooterUI } from '@schoolbox/vueTables2/mixinFooterUI';
 
 
 export default {
@@ -19,7 +20,9 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [],
+    mixins: [
+        mixinFooterUI //to place and keep the tables UI in the footer
+    ],
 
     /**
      * Props.
@@ -75,15 +78,17 @@ export default {
                     ascending: true,
                     column: 'lastname' 
                 },
-                pagination: {
-                    edge: false,
-                },
                 perPage: 50, 
                 perPageValues: [50, 100, 200],
+                debounce: 100, //faster debouce as data is stored on the client side,
+                resizableColumns: false,
+                tabbable: false,
                 texts: {
-                    count: 'Showing {from} to {to} of {count} users|{count} users|1 user'
+                    filterPlaceholder: 'Search for users...',
+                    noResults: 'No matching users...',
+                    count: '{from}-{to} of {count}',
+                    limit: 'Rows per page:'
                 },
-                skin: 'table-striped table-bordered table-hover',
                 sortIcon: {
                     is: 'glyphicon-sort',
                     base: 'glyphicon',
@@ -99,11 +104,7 @@ export default {
                             return parseInt(a.size) <= parseInt(b.size) ? 1 : -1;
                         }
                     }
-                },
-                resizableColumns: false,
-                tabbable: false,
-                filterable: false,
-                stickyHeader: true            
+                }
             },
         }
     },
@@ -147,6 +148,14 @@ export default {
         },
 
         /**
+         * To update the table to show the UI in the footer
+         * 
+         */
+        onLoaded () {
+            this.$nextTick(() => this.$_footerUI_update());
+        },
+
+        /**
          * To convert the bytes into a more readable string
          * 
          * @param { Number } - 214430838
@@ -184,6 +193,7 @@ export default {
                 :data="allData" 
                 :columns="columns" 
                 :options="options" 
+                @loaded="onLoaded"
             >
                 <template v-slot:firstname="props"> 
                     <a :href="`/adminv2/usage/specific/${props.row.userId}`" :title="props.row.fullname">{{ props.row.firstname }}</a>
@@ -194,6 +204,9 @@ export default {
                 <template v-slot:size="props"> 
                     {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
+                <div slot="afterTable">
+                    <div class="VueTables__table-footer" ref="tableFooter"></div>
+                </div>
             </v-client-table>
             
         </template>

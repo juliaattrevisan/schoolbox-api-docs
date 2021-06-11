@@ -1,5 +1,20 @@
 $cdn-prefix: "/static";
 
+.VueTables__search {
+    padding: 1rem;
+    background: white;
+}
+
+.VueTables table {
+    //for .VueTables__table-footer to sit straight on the bottom
+    margin-bottom: 0px;
+}
+
+.VueTables__wrapper {
+    padding: 0rem 1rem;
+    background: white;
+}
+
 .VueTables input[type="checkbox"] {
     position: static;
     width: 1rem;
@@ -35,4 +50,45 @@ $cdn-prefix: "/static";
 }
 .VueTables .glyphicon-chevron-down:before {
     content: url("#{$cdn-prefix}/images/svg/sort-down.svg");
+}
+
+.VueTables__table-footer {
+    //container for the table controls, rows per page, current count, and next/prev pagination
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 2rem 1rem;
+    background: white;
+}
+
+.VueTables__limit {
+    //rows per page control
+    width: 190px;
+    margin-right: 30px;
+    label,
+    select {
+        display: inline-block;
+    }
+    label {
+        width: 110px;
+    }
+    select {
+        width: 80px;
+        margin: 0px;
+    }
+}
+
+.VuePagination__count {
+    //curent count
+    margin: 0px 30px 0px 0px;
+    padding: 0px;
+}
+
+.VueTables .VuePagination__pagination-item {
+    //next/prev buttons, all others disabled
+    margin: 0px 0px 0px 4px;
+    width: 40px;
 }
