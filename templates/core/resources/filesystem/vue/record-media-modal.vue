@@ -207,9 +207,7 @@ export default {
             if (this.hasDeviceCapture) { //restore the height to a decent amount, especially if was a phone portrait capture
                 this.currentRatio = this.defaultRatio;
                 this.updateContainerHeight();
-            } else {
-                this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
-            }
+            } 
         },
 
         /**
@@ -238,7 +236,6 @@ export default {
         onFilenameModalClosed () {
             this.isOverMediaModalClosing = false;
             this.isFilenameModalActive = false;
-            this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
         },
 
         /**
@@ -368,6 +365,24 @@ export default {
             this.isOverMediaModalClosing = false;
         },
 
+        /**
+         * Ensure the recorded over media modal is fully visible
+         *
+         * @params { Number }
+         * @params { Number }
+         */
+        onOverMediaModalOpened (width, height) {
+            this.updateCurrentRatio(width, height);
+        },
+
+        /**
+         * revert back to original setting
+         *
+         */
+        onOverMediaModalClosed () {
+            this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
+        },
+
     }
 
 }
@@ -392,6 +407,8 @@ export default {
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
+                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-closed="onOverMediaModalClosed"
                 />
                 <record-camera
                     v-else-if="currentRecordMediaType === recordMediaTypes.CAMERA"
@@ -400,6 +417,8 @@ export default {
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
+                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-closed="onOverMediaModalClosed"
                 />
                 <record-screen
                     v-else-if="currentRecordMediaType === recordMediaTypes.SCREEN"
@@ -408,9 +427,18 @@ export default {
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
+                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-closed="onOverMediaModalClosed"
                 />
 
-                <over-media-modal v-if="isFilenameModalActive" @on-resize="onResize" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
+                <over-media-modal 
+                    v-if="isFilenameModalActive"  
+                    :is-closing="isOverMediaModalClosing" 
+                    :closed-call-back="onFilenameModalClosed" 
+                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-closed="onOverMediaModalClosed"
+                    key="filenameModal"
+                >
                     <h3><em>Please add a filename prior to continuing.</em></h3>
                     <label for="filename" class="required" aria-required="true">Filename</label>
                     <input type="text" id="filename" name="filename" v-model="newFilename" ref="filenameInput">
@@ -423,10 +451,16 @@ export default {
                     <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ width: uploadProgressRatio }"></span></div>
                     <p><em>Uploading video, please wait...</em></p>
                 </over-media-modal>
-                <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
+                <over-media-modal v-else-if="hasUploaded" @on-over-media-modal-closed="onOverMediaModalClosed" key="hasUploadedModal">
                     <p><em>Media successfully uploaded.</em></p>
                 </over-media-modal>
-                <over-media-modal v-else-if="hasUploadError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorUploadModal">
+                <over-media-modal 
+                    v-else-if="hasUploadError" 
+                    :is-closing="isOverMediaModalClosing" 
+                    :closed-call-back="onErrorModalClosed" 
+                    @on-over-media-modal-opened="onOverMediaModalOpened" 
+                    @on-over-media-modal-closed="onOverMediaModalClosed"
+                    key="errorUploadModal">
                     <div class="alert-box alert">{{ uploadErrorMessage }}</div>
                     <button @click.prevent="onCloseErrorModalSelected">Close</button>
                 </over-media-modal>	
@@ -456,6 +490,7 @@ export default {
     height: 300px; //updated on mounted()
     background: black;
     overflow: hidden;
+    transition: 0.2s height ease-out; //don't jar the height as much, provide a slight ease
     h2, h3 {
         max-width: none;
     }

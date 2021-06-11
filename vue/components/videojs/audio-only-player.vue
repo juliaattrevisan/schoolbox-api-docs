@@ -131,7 +131,7 @@ export default {
                 src: this.options.audioPlayerSrc, 
                 type: this.options.audioPlayerType
             });
-            this.$emit('on-ready');
+            this.$emit('on-dimensions-ready', this.$refs.audioContainer.offsetWidth, this.$refs.audioContainer.offsetHeight);
         },
 
         /** 
@@ -278,7 +278,8 @@ export default {
             transform: scale(0.8);
         }
         .vjs-control-bar {
-            height: 2.5em
+            height: 2.5em;
+            overflow: hidden;
         }
         .vjs-control {
             width: 2.5em;

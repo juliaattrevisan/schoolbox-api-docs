@@ -56,9 +56,26 @@ export default {
             hasRecordPlayerError: false, //error with the record player
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
+            isDeleteRequested: false, //to notify of deletion when over-media-modal is closed
             mediaWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
             mediaHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes 
         }
+    },
+
+    computed: {
+
+        currentRecordingType () {
+            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) {
+                return 'audio recording';
+            } else if (this.recordMediaType === recordMediaTypes.PHOTO) {
+                return 'photo';
+            }  else if (this.recordMediaType === recordMediaTypes.CAMERA) {
+                return 'video recording';
+            }  else if (this.recordMediaType === recordMediaTypes.SCREEN) {
+                return 'screen recording';
+            }
+        }
+
     },
 
 	created () {
@@ -143,8 +160,8 @@ export default {
          *
          */
         onConfirmDeleteRecordingSelected () {
-            this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
-            this.isDeleteRecordingModalActive = false;
+            this.isDeleteRequested = true;
+            this.isOverMediaModalClosing = true;
         },
 
         /**
@@ -156,13 +173,16 @@ export default {
         },
 
         /**
-         * closed the delete recording modal, cancel has been selected rather than confirm
+         * closed the delete recording modal, and notify of delete request if required
          *
          */
         onDeleteRecordingModalClosed () {
             this.isOverMediaModalClosing = false;
             this.isDeleteRecordingModalActive = false;
-            this.$emit(recordMediaEvents.RESIZE, this.mediaWidth, this.mediaHeight);
+            if (this.isDeleteRequested) {
+                this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
+                this.isDeleteRequested = false;
+            }
         },
 
         /**
@@ -226,13 +246,23 @@ export default {
         },
 
         /**
-         * Ensure the recorded video ratio is respected
+         * Ensure the recorded over media modal is fully visible
          *
          * @params { Number }
          * @params { Number }
          */
-        onResize (width, height) {
-            this.$emit(recordMediaEvents.RESIZE, width, height);
+        onOverMediaModalOpened (width, height) {
+            this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_OPENED, width, height);
+        },
+
+        /**
+         * revert back to original setting
+         *
+         * @params { Number }
+         * @params { Number }
+         */
+        onOverMediaModalClosed () {
+            this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
         },
 
     }
@@ -266,8 +296,15 @@ export default {
             <a ref="deleteButton" v-if="!hasError" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
         </transition>
 
-        <over-media-modal v-if="isDeleteRecordingModalActive" @on-resize="onResize" :is-closing="isOverMediaModalClosing" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
-            <p>Are you sure you wish to delete the current recording?</p>
+        <over-media-modal 
+            v-if="isDeleteRecordingModalActive" 
+            :is-closing="isOverMediaModalClosing" 
+            :closed-call-back="onDeleteRecordingModalClosed" 
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed" 
+            key="deleteRecordingModal"
+        >
+            <p>Are you sure you wish to delete the current {{currentRecordingType}}?</p>
             <div class="modal-actions">
                 <button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
                 <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>

@@ -53,15 +53,17 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available or moving between the recorded media and new media
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
-            isFirstRecording: true //prevent multipled recordings coming through
+            isFirstRecording: true, //prevent multipled recordings coming through
+            deviceWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
+            deviceHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
         }
     },
 
     created () { //these vars are created so they can be accessed within the template
         this.hasDeviceCapture = hasDeviceCapture();
-        this.initRatios();
         this.recordMediaTypes = recordMediaTypes;
         this.recordMediaType = this.getMomentTypeToBrowserMediaCaptureType();
+        this.initRatios();
     },
 
     mounted () {
@@ -69,19 +71,6 @@ export default {
     },
 
     methods: {
-        
-        /**
-         * Set to ensure the container isn't too big
-         *
-         */
-        initRatios () {
-            if (this.hasDeviceCapture) {
-                this.defaultRatio = 0.35;
-            } else {
-                this.defaultRatio = 0.5625;
-            }
-            this.currentRatio = this.defaultRatio;
-        },
 
         /**
          * to know how to display the browser-media-capture
@@ -99,12 +88,27 @@ export default {
         },
 
         /**
+         * Set to ensure the container isn't too big on mobile devices
+         *
+         */
+        initRatios () {
+            if (this.hasDeviceCapture && this.recordMediaType !== recordMediaTypes.AUDIO_ONLY) { //audio only is purely browser API, not device capture
+                this.defaultRatio = 0.35;
+            } else {
+                this.defaultRatio = 0.5625;
+            }
+            this.currentRatio = this.defaultRatio;
+        },
+
+        /**
          * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
          *
          */
         initContainerHeight () {
             window.addEventListener('resize', this.updateContainerHeight);
             this.updateContainerHeight();
+            this.deviceWidth = this.$refs.container.getBoundingClientRect().width;
+            this.deviceHeight = parseInt(this.targetHeight);
         },
 
         /**
@@ -297,6 +301,24 @@ export default {
             document.getElementById('evidence-submit').disabled = false; //enable to submit button again for possible re-try
         },
 
+        /**
+         * Ensure the recorded over media modal is fully visible
+         *
+         * @params { Number }
+         * @params { Number }
+         */
+        onOverMediaModalOpened (width, height) {
+            this.updateCurrentRatio(width, height);
+        },
+
+        /**
+         * revert back to original setting
+         *
+         */
+        onOverMediaModalClosed () {
+            this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
+        },
+
     }
 
 }
@@ -313,6 +335,8 @@ export default {
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
             @on-resize="onResize"
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed"
         />
         <record-camera
             v-else-if="recordMediaType === recordMediaTypes.CAMERA"
@@ -321,6 +345,8 @@ export default {
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
             @on-resize="onResize"
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed"
         />
         <record-audio-only
             v-else-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
@@ -329,16 +355,25 @@ export default {
             @on-recorded-media-ready="onRecordedMediaReady"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
             @on-resize="onResize"
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed"
         />
 
         <over-media-modal v-if="isUploading" key="isUploadingModal">
             <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
             <p><em>Uploading media, please wait...</em></p>
         </over-media-modal>
-        <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
+        <over-media-modal v-else-if="hasUploaded" @on-over-media-modal-closed="onOverMediaModalClosed" key="hasUploadedModal">
             <p><em>Media successfully uploaded.</em></p>
         </over-media-modal>	
-        <over-media-modal v-else-if="hasUploadError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorUploadModal">
+        <over-media-modal 
+            v-else-if="hasUploadError" 
+            :is-closing="isOverMediaModalClosing" 
+            :closed-call-back="onErrorModalClosed" 
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed"
+            key="errorUploadModal"
+        >
             <div class="alert-box alert">{{ uploadErrorMessage }}</div>
             <button @click.prevent="onCloseErrorModalSelected">Close</button>
         </over-media-modal>

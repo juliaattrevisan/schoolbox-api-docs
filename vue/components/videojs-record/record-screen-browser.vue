@@ -248,6 +248,23 @@ export default {
             this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
+        /**
+         * Ensure the recorded over media modal is fully visible
+         *
+         * @params { Number }
+         * @params { Number }
+         */
+        onOverMediaModalOpened (width, height) {
+            this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_OPENED, width, height);
+        },
+
+        /**
+         * revert back to original setting
+         *
+         */
+        onOverMediaModalClosed () {
+            this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
+        },
 
     }
 
@@ -271,9 +288,17 @@ export default {
             :recorded-data="recordedData"
             @on-recorded-media-deleted="onRecordedMediaDeleted"
             @on-resize="onResize"
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed"
         />
 
-        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed">
+        <over-media-modal 
+            v-if="hasError" 
+            :is-closing="isOverMediaModalClosing" 
+            :closed-call-back="onErrorModalClosed"
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed"
+        >
             <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">Screen sharing appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter screen recording or request your administrator(s) to increase the allowed file size limit.</div>

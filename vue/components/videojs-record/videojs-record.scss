@@ -117,6 +117,17 @@
     }
     @media screen and (max-width: 640px) {
         //shrink down everything to fit better
+        .vjs-control.vjs-record-indicator {
+            top: 10px;
+        }
+        .vjs-control.vjs-record-indicator,
+        .vjs-control.vjs-record-indicator:before,
+        .vjs-control.vjs-record-indicator:after {
+            transform: scale(1.4);
+        }
+        .vjs-control.vjs-record-indicator:before {
+            left: -1.4rem;
+        }
         .vjs-control-bar {
             height: 3em;
         }
