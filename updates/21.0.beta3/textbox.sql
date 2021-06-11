@@ -13,6 +13,22 @@ UPDATE component_definition
 SET description = 'Module for displaying custom content on dashboards by being linked to a pre-existing text box.'
 WHERE class IN ('Component_Dashboard_TextboxController');
 
+-- This appears in eportfolio for Eden Reed, "General - Bog (5)"
+-- There's a random Text Box component that you can spawn
+-- This is its config
 UPDATE component_definition
 SET description = 'A text box component'
 WHERE class IN ('Component_Eportfolio_TextboxController');
+
+-- Update component config names
+-- This appears in Dashboard layout where you can chooze what textbox to display
+UPDATE component_config_definition
+SET label = 'Text Box Search'
+WHERE label = 'Textbox Search';
+
+-- This appears in eportfolio for Eden Reed, "General - Bog (5)"
+-- There's a random Text Box component that you can spawn
+-- This is its config
+UPDATE component_config_definition
+SET label = 'Text Box Title'
+WHERE label = 'Textbox Title';
