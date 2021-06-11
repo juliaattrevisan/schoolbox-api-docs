@@ -24,14 +24,18 @@
     </div>
     <h3>Available Result Sets</h3>
     <div class="small-12 columns no-pad">
+        <ul class="option-list">
         {% for resultSetId, resultSet in resultSets %}
-            <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
-            <label for="rs-{{ resultSetId }}" class="radio-label">
-                {%- for result in resultSet -%}
-                    {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
-                {%- endfor -%}
-            </label>
+            <li>
+                <input id="rs-{{ resultSetId }}" type="radio" name="resultset" value="{{ resultSetId }}"{% if loop.first %} checked="checked"{% endif %}/>
+                <label for="rs-{{ resultSetId }}" class="radio-label">
+                    {%- for result in resultSet -%}
+                        {{ result.label }}{% if resultSet|length > 1 and not loop.last %}, {% endif %}
+                    {%- endfor -%}
+                </label>
+            </li>
         {% endfor %}
+        </ul>
         <ul class="flex-list buttons">
             <li><a href="#" data-action="applyResultSet" class="submit button">Apply</a></li>
             <li><a href="#" data-action="close" class="button">Cancel</a></li>

@@ -294,24 +294,28 @@
                         <label>
                             Image Size
                         </label>
-
-                        <input type="radio"
-                               id="background_image_contained_0"
-                               name="background_image_contained"
-                               value="0"
-                               {% if not item.backgroundImageContained %}checked{% endif %} />
-                        <label for="background_image_contained_0" class="radio-label">
-                            Stretch to cover entire tile
-                        </label>
-
-                        <input type="radio"
-                               id="background_image_contained_1"
-                               name="background_image_contained"
-                               value="1"
-                               {% if item.backgroundImageContained %}checked{% endif %} />
-                        <label for="background_image_contained_1" class="radio-label">
-                            Resize to fit within tile
-                        </label>
+                        <ul class="option-list">
+                            <li>
+                                <input type="radio"
+                                    id="background_image_contained_0"
+                                    name="background_image_contained"
+                                    value="0"
+                                    {% if not item.backgroundImageContained %}checked{% endif %} />
+                                <label for="background_image_contained_0" class="radio-label">
+                                    Stretch to cover entire tile
+                                </label>
+                            </li>
+                            <li>
+                                <input type="radio"
+                                    id="background_image_contained_1"
+                                    name="background_image_contained"
+                                    value="1"
+                                    {% if item.backgroundImageContained %}checked{% endif %} />
+                                <label for="background_image_contained_1" class="radio-label">
+                                    Resize to fit within tile
+                                </label>
+                            </li>
+                        </ul>
                     </div>
                 </fieldset>
                 <fieldset class="content {% if not item.backgroundImageContained %}hide{% endif %}" data-hide-watch="[name='background_image_contained']" data-hide-watch-value="1">
