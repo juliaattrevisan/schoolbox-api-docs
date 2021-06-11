@@ -29,6 +29,23 @@ use ZendService\Apple\Apns;
  */
 class ServiceManager implements IServiceManager
 {
+    /**
+     * Never use the test service: always use a production service.
+     */
+    public const TEST_SERVICE_NEVER = 1;
+
+    /**
+     * Use the test service based on the instance
+     * * developer instances always use the test service
+     * * staging instances use the test service unless they are sandboxes
+     * * production instances always use the production service
+     */
+    public const TEST_SERVICE_BASED_ON_INSTANCE_TYPE = 2;
+
+    /**
+     * Always use the test service: never use a production service.
+     */
+    public const TEST_SERVICE_ALWAYS = 3;
 
     /** @var RegistryMapper */
     protected $registryMapper;
