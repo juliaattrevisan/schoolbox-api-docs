@@ -542,6 +542,7 @@ class Controller extends BaseController
             }
 
             $log->warning('-- END --');
+            $content['data']['registry'] = [];
         } else {
             $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll(['order' => ['user_id' => 'asc']]);
         }
