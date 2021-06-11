@@ -9,8 +9,7 @@
 
 namespace Schoolbox\Realtime\Admin;
 
-use Alaress\Async\Notification\Instance\Instance;
-use Alaress\Async\Notification\Parameter\Param;
+use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -23,11 +22,11 @@ use Schoolbox\Realtime\Message\RerouteOverrideMapper;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
+use Schoolbox\Realtime\Notification\Parameter\SimpleParam;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\RoleMapper;
-use Alaress\Redis;
 use Schoolbox\MobileApp;
 use Schoolbox\UserMapper;
 
@@ -518,11 +517,6 @@ class Controller extends BaseController
                 : MobileApp\ServiceManager::SERVICE_TYPE_TEST,
         );
 
-        // just grab... anything
-        $redis = Redis::getClientInstance();
-        $keys  = $redis->keys('msg*:m:*');
-        $data  = $redis->get($keys[1]);
-
         $content = [
             'template' => '@adminMessages/puush.twig',
             'data'     => [
@@ -539,10 +533,13 @@ class Controller extends BaseController
 
                 $content['data']['user'] = $user;
 
-                $cloudManager->push(
-                    $user->getId(),
-                    unserialize(gzuncompress($data), ['allowed_classes' => [Instance::class, Param::class,],])
-                );
+                // Build a fake message
+                $builder  = new Builder(false);
+                $instance = $builder
+                    ->setTitle('Test message from :instance')
+                    ->setParam('instance', new SimpleParam($this->getConfigLoader()->get('title')))
+                    ->build();
+                $cloudManager->push($user->getId(), $instance);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", ['exception' => $e]);
             }
