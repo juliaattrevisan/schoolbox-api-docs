@@ -41,13 +41,13 @@ class Service extends AbstractService
     /**
      * How many attempts may be made to send the message before we give up?
      */
-    private const MAX_ATTEMPTS = 10;
+    private const MAX_ATTEMPTS = 15;
 
     /**
      * The amount of time (in milliseconds) to wait for at first when
      * re-attempting to send a message.
      */
-    private const ATTEMPT_BASE_TIMEOUT = 1000;
+    private const ATTEMPT_BASE_TIMEOUT = 2500;
 
     /**
      * API key for the service
