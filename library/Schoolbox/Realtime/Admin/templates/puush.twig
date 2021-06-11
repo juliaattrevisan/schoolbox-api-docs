@@ -33,7 +33,6 @@
                     {% endif %}
                     <li><a href="{{ routeLookup('adminMessages.testPush') }}">Back to list</a></li>
                 </ul>
-                <ul class="flex-list"
             {% elseif registry | length %}
                 <h2 class="subheader">Applications Registered</h2>
                 <table>
@@ -50,7 +49,8 @@
                     <tbody>
                     {% for registration in registry %}
                         <tr>
-                            <td><a href="{{ routeLookup('adminMessages.testPush', { userId: registration.user.id }) }}">{{ registration.user.formatName }}</a></td>
+                            <td><a href="{{ routeLookup('adminMessages.testPush', { userId: registration.user.id }) }}"
+                                   title="Test sending a message to this user">{{ registration.user.formatName }}</a></td>
                             <td><span class="tkn" title="{{ registration.token }}">{{ registration.token }}</span></td>
                             <td><span class="tkn" title="{{ registration.deviceId }}">{{ registration.deviceId }}</span></td>
                             <td><a href="{{ routeLookup('adminMessages.getApps') }}" class="tkn" title="{{ registration.service.appIdentifier }}">{{ registration.service.appIdentifier }}</a> ({{ registration.service.providerName }})</td>
