@@ -217,7 +217,6 @@ export default {
             this.hasDeviceAlreadyInUseError = false;
             this.hasPermissionDeniedError = false;
             this.isRecordingOverMaxFileSize = false;
-            
         },
 
         /**
