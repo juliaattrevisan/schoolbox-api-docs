@@ -170,7 +170,7 @@ class Connector
              * I guess we'll have to log it to see why it dies
              */
             throw new \RuntimeException(sprintf(
-                "Runtime error: json_decode failed (%s) for response body %s",
+                "Runtime error (transmit): json_decode failed (%s) for response body %s",
                 $e->getMessage(),
                 $response->getBody()
             ));
@@ -255,7 +255,20 @@ class Connector
 
         /* What was the outcome?
          */
-        $content = json_decode($response->getBody(), true);
+        try {
+            $content = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            /* We expected $content to be an array after decoding, but that's not always the case
+             * json_decode might successfully return null for some reason due to bad data from plag
+             * I guess we'll have to log it to see why it dies
+             */
+            throw new \RuntimeException(sprintf(
+                "Runtime error (analyse) for plagscanId %s: json_decode failed (%s) for response body %s",
+                $plagscanId,
+                $e->getMessage(),
+                $response->getBody()
+            ));
+        }
 
         /* As far as I know, the only success state is statusCode 204
          */
@@ -320,7 +333,22 @@ class Connector
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_INTERACTIVE);
 
-        $content = json_decode($response->getBody(), true);
+        /* What was the outcome?
+         */
+        try {
+            $content = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            /* We expected $content to be an array after decoding, but that's not always the case
+             * json_decode might successfully return null for some reason due to bad data from plag
+             * I guess we'll have to log it to see why it dies
+             */
+            throw new \RuntimeException(sprintf(
+                "Runtime error (fetchInteractiveReportUrl) for plagscanId %s: json_decode failed (%s) for response body %s",
+                $plagscanId,
+                $e->getMessage(),
+                $response->getBody()
+            ));
+        }
 
         /* Save the report url
          */
@@ -383,21 +411,27 @@ class Connector
     {
         $response = $this->retrieve($plagscanId, self::PLAGSCAN_MODE_SCORE);
 
-        $content = json_decode($response->getBody(), true);
+        /* What was the outcome?
+         */
+        try {
+            $content = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            /* We expected $content to be an array after decoding, but that's not always the case
+             * json_decode might successfully return null for some reason due to bad data from plag
+             * I guess we'll have to log it to see why it dies
+             */
+            throw new \RuntimeException(sprintf(
+                "Runtime error (fetchScore) for plagscanId %s: json_decode failed (%s) for response body %s",
+                $plagscanId,
+                $e->getMessage(),
+                $response->getBody()
+            ));
+        }
 
+        /* json_decode succeeded, but has a different format than previously known
+         * check what the api is now returning, adapt accordingly
+         */
         if ($response->getStatusCode() === 200) {
-            /* json_decode failed for some reason, but it shouldn't have
-             * report back whatever was found
-             */
-            if (null === $content) {
-                $errorMessage = json_last_error_msg();
-
-                throw new \InvalidArgumentException("{$errorMessage} for {$plagscanId}: {$response->getBody()}");
-            }
-
-            /* json_decode succeeded, but has a different format than previously known
-             * check what the api is now returning, adapt accordingly
-             */
             if (!(array_key_exists('data', $content) && array_key_exists('plagLevel', $content['data']))) {
                 throw new \InvalidArgumentException(
                     "response[data][plagLevel] does not exist: PlagScan has changed their API again"
