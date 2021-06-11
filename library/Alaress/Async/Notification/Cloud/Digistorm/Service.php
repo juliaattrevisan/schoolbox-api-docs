@@ -105,6 +105,7 @@ class Service extends AbstractService
         $attemptNum = 1;
         $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
         while (!$jitter->tooManyAttempts($attemptNum)) {
+            $this->getLog()->debug(sprintf('Attempting to send notification: attempt %d', $attemptNum));
             try {
                 $response = $client->post(
                     self::BASE_URL,
@@ -134,6 +135,7 @@ class Service extends AbstractService
                 $responseCode = $e->getCode();
                 if ($responseCode === 401) {
                     // your API key is bad: don't try to do anything else
+                    $this->getLog()->error('Received response code 401: this means the API key is incorrect');
                     throw $e;
                 }
 
@@ -144,7 +146,11 @@ class Service extends AbstractService
                 }
             }
 
-            usleep($jitter->calculateJitter($attemptNum));
+            $wait = $jitter->calculateJitter($attemptNum);
+            $this->getLog()->notice(
+                sprintf('Notification service is likely rate-limited: waiting %d us before trying again', $wait)
+            );
+            usleep((int)$wait);
             $attemptNum++;
         }
 
