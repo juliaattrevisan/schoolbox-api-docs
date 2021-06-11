@@ -24,11 +24,16 @@ WHERE class IN ('Component_Eportfolio_TextboxController');
 -- This appears in Dashboard layout where you can chooze what textbox to display
 UPDATE component_config_definition
 SET label = 'Text Box Search'
-WHERE label = 'Textbox Search';
+WHERE label = 'Textbox Search' AND `key` = 'textboxSearch';
 
 -- This appears in eportfolio for Eden Reed, "General - Bog (5)"
 -- There's a random Text Box component that you can spawn
 -- This is its config
 UPDATE component_config_definition
 SET label = 'Text Box Title'
-WHERE label = 'Textbox Title';
+WHERE label = 'Textbox Title' AND `key` = 'componentname';
+
+-- Default textbox name for the eportfolio Text Box component
+UPDATE component_config_definition
+SET default_value = 'My Text Box'
+WHERE default_value = 'My Textbox' AND `key` = 'componentname'
