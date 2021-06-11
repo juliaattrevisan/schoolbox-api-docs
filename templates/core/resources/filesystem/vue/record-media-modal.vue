@@ -45,7 +45,7 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
-            hasClosed: false //to allow any active vue to cleanup on beforeDestroy
+            hasClosed: false, //to allow any active vue to cleanup on beforeDestroy
         }
     },
 
@@ -90,25 +90,30 @@ export default {
 
     created () {
         this.hasDeviceCapture = hasDeviceCapture();
-        this.initRatios();
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
-        this.initOnModalClosedListener();
+        
     },
 
     mounted () {
-        this.initKeyboardEvents();
+        this.initKeyboardListener();
+        this.initOnModalClosedListener();
+        this.initRatios();
         this.initContainerHeight();
     },
 
     methods: {
-        
+
         /**
-         * Set to ensure the container isn't too big
+         * to be able to press enter to save filename
          *
          */
-        initRatios () {
-            this.defaultRatio = 0.5625;
-            this.currentRatio = this.defaultRatio;
+        initKeyboardListener () {
+            document.addEventListener('keyup', (event) => {
+                const keyName = event.key;
+                if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
+                    this.onSaveFilenameSelected();
+                }
+            });
         },
 
         /**
@@ -122,20 +127,17 @@ export default {
         },
 
         /**
-         * to be able to press enter to save filename
+         * Set to ensure the container isn't too big
          *
          */
-        initKeyboardEvents () {
-            document.addEventListener('keyup', (event) => {
-                const keyName = event.key;
-                if (keyName === 'Enter' && this.isFilenameModalActive && this.newFilename.trim() !== '') { //the save modal is open, and the filename is not blank
-                    this.onSaveFilenameSelected();
-                }
-            });
+        initRatios () {
+            this.defaultRatio = 0.5625;
+            this.currentRatio = this.defaultRatio;
         },
 
         /**
-         * To set up appropriate initial height on container, keeping the same size as a 16:9 video element
+         * To set up appropriate initial height on container, typically keeping the same size as a 16:9 video element 
+         * unless otherwise set by say, a mobile phone recorded video requested a larger size to fit a portrait recorded video
          *
          */
         initContainerHeight () {
@@ -378,7 +380,6 @@ export default {
                 <record-audio-only
                     v-if="currentRecordMediaType === recordMediaTypes.AUDIO_ONLY"
                     :record-media-type="recordMediaTypes.AUDIO_ONLY"
-                    @on-device-ready="onDeviceReady"
                     @on-recorded-media-ready="onRecordedMediaReady"
                     @on-recorded-media-deleted="onRecordedMediaDeleted"
                     @on-resize="onResize"
@@ -400,7 +401,7 @@ export default {
                     @on-resize="onResize"
                 />
 
-                <over-media-modal v-if="isFilenameModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
+                <over-media-modal v-if="isFilenameModalActive" @on-resize="onResize" :is-closing="isOverMediaModalClosing" :closed-call-back="onFilenameModalClosed" key="filenameModal">
                     <h3><em>Please add a filename prior to continuing.</em></h3>
                     <label for="filename" class="required" aria-required="true">Filename</label>
                     <input type="text" id="filename" name="filename" v-model="newFilename" ref="filenameInput">
@@ -410,7 +411,7 @@ export default {
                     </div>	
                 </over-media-modal>
                 <over-media-modal v-else-if="isUploading" key="isUploadingModal">
-                    <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ 'width': uploadProgressRatio }"></span></div>
+                    <div class="progress large-12" style="margin-bottom: 1rem;"><span class="meter" :style="{ width: uploadProgressRatio }"></span></div>
                     <p><em>Uploading video, please wait...</em></p>
                 </over-media-modal>
                 <over-media-modal v-else-if="hasUploaded" key="hasUploadedModal">
@@ -429,7 +430,7 @@ export default {
             <section>
                 <a role="button" class="button" disabled></a><!-- just to keep the size between all record-x.vue consistent -->
                 <transition name="fade">
-                    <a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button" title="Upload" href="#upload" key="upload">Upload</a>
+                    <a v-if="showUploadButton" @click.prevent="onUploadSelected" role="button" class="button" title="Upload" href="#upload">Upload</a>
                 </transition>
             </section>
         </div><!-- .component-action -->

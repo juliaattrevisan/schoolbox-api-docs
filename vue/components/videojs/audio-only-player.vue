@@ -42,6 +42,12 @@ export default {
         }
     },
 
+    beforeDestroy () {
+        if (this.player) {
+            this.player.dispose(); //cleanup, can be re-activated later on the same page
+        }
+    },
+
     methods: {
 
         /** 

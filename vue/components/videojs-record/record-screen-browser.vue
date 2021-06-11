@@ -198,6 +198,7 @@ export default {
          */
         destroyVideojs () {
             if (this.player) {
+                this.player.record().stopDevice();
                 this.player.record().destroy();
             }
         },
@@ -257,13 +258,12 @@ export default {
     
     <div class="container">
         
-        <div class="media-container media-container-record" key="recordMediaContainer">
+        <div class="media-container media-container-record">
             <video ref="recordingVideo" playsinline class="video-js vjs-record-skin"></video>
         </div>
 
         <recorded-media 
             v-if="hasPreRecordedData || hasNewRecording"
-            key="media-container-playback"
             class="media-container media-container-playback"
             :record-media-type="recordMediaTypes.SCREEN"
             :has-pre-recorded-data="hasPreRecordedData"
@@ -273,7 +273,7 @@ export default {
             @on-resize="onResize"
         />
 
-        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed" key="errorModal">
+        <over-media-modal v-if="hasError" :is-closing="isOverMediaModalClosing" :closed-call-back="onErrorModalClosed">
             <div v-if="hasDeviceAlreadyInUseError" class="alert-box warning">Screen sharing appears to be already in use or permission has been denied. Please close any Applications or Browser windows that may be using the camera and try again.</div>
             <div v-else-if="hasPermissionDeniedError" class="alert-box alert">Permission to access the screen was denied. Please retry and grant access if you wish to proceed.</div>
             <div v-else-if="isRecordingOverMaxFileSize" class="alert-box alert">Sorry, the recording has stopped as it is over the allowed file size limit. Please record a shorter screen recording or request your administrator(s) to increase the allowed file size limit.</div>
