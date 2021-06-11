@@ -55,114 +55,115 @@ $alert-tint-amount: 90%;
 $alert-default-background: css-darken($body-bg, 10%);
 
 .alert-box {
-  background-color: $alert-default-background;
-  // DONE use contrast color
-  color: $body-bg-contrast;
-  color-adjust: exact;
-  -webkit-print-color-adjust: exact;
+    background-color: $alert-default-background;
+    // DONE use contrast color
+    color: $body-bg-contrast;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
 
-  .close {
-    &:hover {
-      text-decoration: none;
+    .close {
+        &:hover {
+            text-decoration: none;
+        }
+        color: inherit;
+        margin: 0;
+        line-height: 0.8;
     }
-    color: inherit;
-    margin: 0;
-    line-height: 0.8;
-  }
 
-  &.highlight {
-    background-color: $accent-background;
-    color: $accent-foreground;
-  }
-  &.success {
-    background-color: $success-color;
-    color: $white;
-  }
-  &.warning {
-    background-color: $warning-color;
-    color: $white;
-  }
-  &.alert {
-    background-color: $alert-color;
-    color: $white;
-  }
+    &.highlight {
+        background-color: $accent-background;
+        color: $accent-foreground;
+    }
+    &.success {
+        background-color: $success-color;
+        color: $white;
+    }
+    &.warning {
+        background-color: $warning-color;
+        color: $white;
+    }
+    &.alert {
+        background-color: $alert-color;
+        color: $white;
+    }
 }
 
 .alert-box:empty {
-  display: none;
+    display: none;
 }
 
 .alert-box-icon {
-  @extend .alert-box;
-  display: inline-block;
-  padding: 0.25rem 0.5rem;
+    @extend .alert-box;
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
 
-  [class^="icon-"],
-  [class*=" icon-"] {
-    &:before {
-      color: $white;
-      padding-right: 0;
-    }
-  }
-  &.highlight {
     [class^="icon-"],
     [class*=" icon-"] {
-      &:before {
-        color: $accent-foreground;
-      }
+        &:before {
+            color: $white;
+            padding-right: 0;
+        }
     }
-  }
+    &.highlight {
+        [class^="icon-"],
+        [class*=" icon-"] {
+            &:before {
+                color: $accent-foreground;
+            }
+        }
+    }
 }
 
 // Toast pop-up alert...
 // A less obnoxious pop-up alert
 .toast {
-  background-color: $tuatara;
-  bottom: 1rem;
-  color: $white;
-  display: block;
-  font-size: $base-font-size - 2;
-  opacity: 0;
-  padding: 0.875rem 1.25rem;
-  position: fixed;
-  right: 1rem;
-  text-align: center;
-  z-index: 2000;
-  @include transition(all, 0.3s, cubic-bezier(0.65, 0.05, 0.36, 1), 0s);
-  &.pop {
-    @include transform(translateY(0));
-    opacity: 1;
-  }
+    background-color: $tuatara;
+    bottom: 1rem;
+    color: $white;
+    display: block;
+    font-size: $base-font-size - 2;
+    opacity: 0;
+    padding: 0.875rem 1.25rem;
+    position: fixed;
+    right: -999px; //ensure doesn't interfere while inactive
+    text-align: center;
+    z-index: 2000;
+    transition: opacity 0.3s;
+    &.pop {
+        right: 1rem;
+        @include transform(translateY(0));
+        opacity: 1;
+    }
 
-  &::before {
-    background-color: $white;
-    border-radius: 0.75rem;
-    content: "";
-    display: inline-block;
-    height: 0.75rem;
-    margin-right: 0.5rem;
-    width: 0.75rem;
-    animation: pulse 1.5s infinite;
-  }
+    &::before {
+        background-color: $white;
+        border-radius: 0.75rem;
+        content: "";
+        display: inline-block;
+        height: 0.75rem;
+        margin-right: 0.5rem;
+        width: 0.75rem;
+        animation: pulse 1.5s infinite;
+    }
 
-  &.success::before {
-    background-color: $success-color;
-    animation: none;
-  }
-  &.warning::before {
-    background-color: $warning-color;
-    animation: none;
-  }
-  &.alert::before {
-    background-color: $alert-color;
-    animation: none;
-  }
+    &.success::before {
+        background-color: $success-color;
+        animation: none;
+    }
+    &.warning::before {
+        background-color: $warning-color;
+        animation: none;
+    }
+    &.alert::before {
+        background-color: $alert-color;
+        animation: none;
+    }
 }
 
 // Accommodate for when the notifications are open
 .move-left,
 .right-open {
-  .toast {
-    right: 17.25rem;
-  }
+    .toast {
+        right: 17.25rem;
+    }
 }

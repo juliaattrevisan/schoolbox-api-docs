@@ -1,96 +1,90 @@
-
 .attachment-browser-container {
-  display: flex;
+    display: flex;
 
-  .attachment-browser-filesystems {
-    flex: 0 0 auto;
+    .attachment-browser-filesystems {
+        flex: 0 0 auto;
 
-    ul {
-      box-shadow: inset -1px 0px 0px $silver;
-      height: 100%;
-    }
+        ul {
+            box-shadow: inset -1px 0px 0px $silver;
+            height: 100%;
+        }
 
-    li {
-      a {
+        li {
+            a {
+                @media #{$medium-down} {
+                    padding: 0.5rem !important;
+                    max-width: rem-calc(124);
+                    text-align: center;
+                    // Accommodate the Microsoft Teams Meetings tab
+                    word-wrap: break-word;
+
+                    &::before {
+                        display: block;
+                        padding-right: 0;
+                    }
+                }
+            }
+
+            &.active > a {
+                background: $white;
+            }
+        }
+
         @media #{$medium-down} {
-          padding: .5rem !important;
-          max-width: rem-calc(124);
-          text-align: center;
-          // Accommodate the Microsoft Teams Meetings tab
-          word-wrap: break-word;
-
-          &::before {
-            display: block;
-            padding-right: 0;
-          }
+            min-width: max-content;
+            flex: 0;
         }
-      }
-
-      &.active > a {
-        background: $white;
-      }
     }
 
-    @media #{$medium-down} {
-      min-width: max-content;
-      flex: 0;
-    }
-  }
-
-  .attachment-browser-panel-container {
-    flex-grow: 1;
-    padding: 0;
-    position: relative;
-    max-height: 75vh;
-    min-height: 292px;
-    @media #{$small-only} {
-      min-height: 100vh;
-      max-height: 100vh;
-    }
-
-    .content {
-      padding: 1rem 1rem 0 1rem;
-      height: 100%;
-      overflow-y: auto;
-
-      // For Firefox - it ignores parents padding
-      .ab-pane {
-        display: block;
-        padding-bottom: 3.5rem;
-      }
-    }
-    // Recording vertical centre
-    #ab-usermedia {
-      height: 100%;
-
-      .dz-default {
-        display: flex;
-        align-items: center;
-        height: 100%;
-
-        label {
-          width: 100%;
+    .attachment-browser-panel-container {
+        flex-grow: 1;
+        padding: 0;
+        position: relative;
+        max-height: 75vh;
+        min-height: 292px;
+        @media #{$small-only} {
+            min-height: 100vh;
+            max-height: 100vh;
         }
-      }
+
+        .content {
+            padding: 1rem 1rem 0 1rem;
+            height: 100%;
+            overflow-y: auto;
+
+            // For Firefox - it ignores parents padding
+            .ab-pane {
+                display: block;
+                padding-bottom: 3.5rem;
+            }
+        }
+        // Recording vertical centre
+        #ab-usermedia {
+            height: 100%;
+
+            .dz-default {
+                display: flex;
+                align-items: center;
+                height: 100%;
+
+                label {
+                    width: 100%;
+                }
+            }
+        }
     }
-  }
-  .component-action {
-    margin: auto -1rem -1rem;
-    position: absolute;
-    bottom: 1rem;
-    right: 1rem;
-    width: 100%;
-
-    section {
-      margin-top: 0;
+    .component-action {
+        margin: auto -1rem -1rem;
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+        width: 100%;
+        section {
+            margin-top: 0;
+        }
     }
-  }
 
-  .compact-mime {
-    width: 2rem;
-  }
-
+    .compact-mime {
+        width: 2rem;
+    }
 }
-
-
-

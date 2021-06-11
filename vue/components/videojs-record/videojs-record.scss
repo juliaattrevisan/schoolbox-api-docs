@@ -116,10 +116,28 @@
         left: -1.8rem;
     }
     @media screen and (max-width: 640px) {
-        //shrink down a bit
+        //shrink down everything to fit better
+        .vjs-control-bar {
+            height: 3em;
+        }
         .vjs-time-control {
             font-size: 0.9rem;
-            line-height: 3.3rem;
+            line-height: 1.9rem;
+        }
+        .vjs-device-button {
+            transform: scale(0.4);
+        }
+        .vjs-icon-record-start,
+        .vjs-icon-record-stop,
+        .vjs-icon-photo-camera {
+            left: auto;
+            right: 0px;
+            bottom: -5px;
+            margin-left: 0px;
+            transform: scale(2);
+            &:hover {
+                transform: scale(2);
+            }
         }
     }
 }

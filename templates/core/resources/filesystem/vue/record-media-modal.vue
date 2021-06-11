@@ -45,7 +45,9 @@ export default {
             defaultRatio: 0, //a ratio to return to when a video is selected
             currentRatio: 0, //default to 16:9 ratio, but could change when the device is actually available
             targetHeight: '0px', //to set the height based on the aspect ratio of the video
-            hasClosed: false, //to allow any active vue to cleanup on beforeDestroy
+            hasClosed: false, //to allow any active vue to cleanup on beforeDestroy,
+            deviceWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
+            deviceHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
         }
     },
 
@@ -143,6 +145,8 @@ export default {
         initContainerHeight () {
             window.addEventListener('resize', this.updateContainerHeight);
             this.updateContainerHeight();
+            this.deviceWidth = this.$refs.container.getBoundingClientRect().width;
+            this.deviceHeight = parseInt(this.targetHeight);
         },
 
         /**
@@ -160,6 +164,8 @@ export default {
          * @params { Number }
          */
         onDeviceReady (width, height) {
+            this.deviceWidth = width;
+            this.deviceHeight = height;
             this.updateCurrentRatio(width, height);
         },
 
@@ -201,6 +207,8 @@ export default {
             if (this.hasDeviceCapture) { //restore the height to a decent amount, especially if was a phone portrait capture
                 this.currentRatio = this.defaultRatio;
                 this.updateContainerHeight();
+            } else {
+                this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
             }
         },
 
@@ -230,6 +238,7 @@ export default {
         onFilenameModalClosed () {
             this.isOverMediaModalClosing = false;
             this.isFilenameModalActive = false;
+            this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
         },
 
         /**
@@ -463,8 +472,7 @@ export default {
 }
 
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-      opacity: 0;
+    opacity: 0;
 }
-
 
 </style>

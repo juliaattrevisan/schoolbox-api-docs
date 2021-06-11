@@ -8,6 +8,7 @@
  */
 
 import { gsap } from 'gsap/all';
+import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
 export default {
     
@@ -42,6 +43,7 @@ export default {
          */ 
         animateOn () {
             gsap.from(this.$refs.modal, 0.3, { alpha: 0, marginTop: 40, delay: 0 } );
+            this.$emit(recordMediaEvents.RESIZE, this.$refs.modal.parentElement.offsetWidth, this.$refs.modal.offsetHeight + 40); //just ensure that the entire message is visible
         },
 
         /*
