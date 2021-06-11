@@ -247,12 +247,18 @@
                                     Campus Involvement
                                     <span data-tooltip class="hint has-tip tip-top" title="One or more campuses that the users will be involved in.">?</span>
                                 </label>
-                                <input id="apply_campus-unchanged" name='apply_campus[]' type="checkbox" value="-1" checked="checked" />
-                                <label class="checkbox-label" for="apply_campus-unchanged">Unchanged</label>
-                                <!-- BEGIN apply_campus -->
-                                <input id="apply_campus-{APPLY_CAMPUS_ID}" name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />
-                                <label class="checkbox-label" for="apply_campus-{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</label>
-                                <!-- END apply_campus -->
+                                <ul class="option-list">
+                                    <li>
+                                        <input id="apply_campus-unchanged" name='apply_campus[]' type="checkbox" value="-1" checked="checked" />
+                                        <label class="checkbox-label" for="apply_campus-unchanged">Unchanged</label>
+                                    </li>
+                                    <!-- BEGIN apply_campus -->
+                                    <li>
+                                        <input id="apply_campus-{APPLY_CAMPUS_ID}" name='apply_campus[]' type="checkbox" value="{APPLY_CAMPUS_ID}" />
+                                        <label class="checkbox-label" for="apply_campus-{APPLY_CAMPUS_ID}">{APPLY_CAMPUS_NAME}</label>
+                                    </li>
+                                    <!-- END apply_campus -->
+                                </ul>
                             </div>
 
                             <div class="small-12 medium-6 columns">

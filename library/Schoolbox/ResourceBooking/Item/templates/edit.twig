@@ -215,21 +215,25 @@
                         <label for="select-all" class="checkbox-label">Select All</label>
 
                         <div data-allowed-roles>
+                        <ul class="option-list">
                         {% for role in roleList %}
-                            {# Default for new items: staff roles are selected, others are not #}
-                            <input type="hidden" name="role[{{ role.id }}]" value="0" />
-                            <input type="checkbox" name="role[{{ role.id }}]" id="role[{{ role.id }}]" value="1"
-                                   data-select-all-group="role"
-                                {% if item.id %}
-                                    {% for resourceRole in item.roleList | filter(resourceRole => resourceRole.role.id == role.id )  %}
-                                        {% if resourceRole.allowed %}checked{% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                    {% if role.type == 'staff' %}checked{% endif %}
-                                {% endif %}
-                                />
-                            <label for="role[{{ role.id }}]" class="checkbox-label">{{ role.name }}</label>
+                            <li>
+                                {# Default for new items: staff roles are selected, others are not #}
+                                <input type="hidden" name="role[{{ role.id }}]" value="0" />
+                                <input type="checkbox" name="role[{{ role.id }}]" id="role[{{ role.id }}]" value="1"
+                                    data-select-all-group="role"
+                                    {% if item.id %}
+                                        {% for resourceRole in item.roleList | filter(resourceRole => resourceRole.role.id == role.id )  %}
+                                            {% if resourceRole.allowed %}checked{% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        {% if role.type == 'staff' %}checked{% endif %}
+                                    {% endif %}
+                                    />
+                                <label for="role[{{ role.id }}]" class="checkbox-label">{{ role.name }}</label>
+                            </li>
                         {% endfor %}
+                        </ul>
                         </div>
 
                         <label>

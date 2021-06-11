@@ -67,20 +67,28 @@
                                             Campus
                                             <span class="hint has-tip tip-right" data-tooltip title="Select the campuses that will be able to view these events">?</span>
                                         </label>
+                                        <ul class="option-list">
                                         <!-- BEGIN campus_check_list -->
-                                        <input id="campus-{CAMPUSID}" type="checkbox" name="campusList[]" value="{CAMPUSID}" />
-                                        <label for="campus-{CAMPUSID}" class="checkbox-label">{CAMPUSNAME}</label>
+                                            <li>
+                                                <input id="campus-{CAMPUSID}" type="checkbox" name="campusList[]" value="{CAMPUSID}" />
+                                                <label for="campus-{CAMPUSID}" class="checkbox-label">{CAMPUSNAME}</label>
+                                            </li>
                                         <!-- END campus_check_list -->
+                                        </ul>
                                     </div>
                                     <div class="small-12 medium-6 columns">
                                         <label>
                                             Roles
                                             <span class="hint has-tip tip-right" data-tooltip title="Select the roles that will be able to view these events">?</span>
                                         </label>
+                                        <ul class="option-list">
                                         <!-- BEGIN user_group_check_list -->
-                                        <input id="role-{USERGROUPID}" type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
-                                        <label for="role-{USERGROUPID}" class="checkbox-label">{USERGROUPNAME}</label>
+                                            <li>
+                                                <input id="role-{USERGROUPID}" type="checkbox" name="userGroup[]" value="{USERGROUPID}" />
+                                                <label for="role-{USERGROUPID}" class="checkbox-label">{USERGROUPNAME}</label>
+                                            </li>
                                         <!-- END user_group_check_list -->
+                                        </ul>
                                     </div>
                                     <div class="small-12 columns">
                                     <label>
@@ -185,10 +193,16 @@
 
                     <!-- BEGIN cleanup_has_events -->
                     <section class="content">
-                        <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
-                        <label for="check-personal" class="checkbox-label">Select Personal Events</label>
-                        <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
-                        <label for="check-group" class="checkbox-label">Select Group Events</label>
+                        <ul class="option-list">
+                            <li>
+                                <input id="check-personal" type="checkbox" data-modifier-control="true" value="personal" />
+                                <label for="check-personal" class="checkbox-label">Select Personal Events</label>
+                            </li>
+                            <li>
+                                <input id="check-group" type="checkbox" data-modifier-control="true" value="group" />
+                                <label for="check-group" class="checkbox-label">Select Group Events</label>
+                            </li>
+                        </ul>
                     </section>
 
                     <form action="/adminv2/calendar/modifyForm" method="post">

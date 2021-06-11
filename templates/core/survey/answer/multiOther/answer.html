@@ -7,14 +7,18 @@
 </script>
 
 <span data-mandatory="{CONFIGURATION_MANDATORY}"></span>
+<ul class="option-list">
 <!-- BEGIN answerOption -->
-<input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}'
-       name="answer[]"
-       type="checkbox"
-       value="{ANSWER_VALUE}"
-       {ANSWER_CHECKED}
-       {ANSWER_DATA_ROLE}
-/>
-<label for="questionForm-{QUESTION_ID}-{ANSWER_VALUE}" class="checkbox-label">{ANSWER_VALUE_FACADE}) {ANSWER_DESCRIPTION}</label>
+    <li>
+        <input id='questionForm-{QUESTION_ID}-{ANSWER_VALUE}'
+            name="answer[]"
+            type="checkbox"
+            value="{ANSWER_VALUE}"
+            {ANSWER_CHECKED}
+            {ANSWER_DATA_ROLE}
+        />
+        <label for="questionForm-{QUESTION_ID}-{ANSWER_VALUE}" class="checkbox-label">{ANSWER_VALUE_FACADE}) {ANSWER_DESCRIPTION}</label>
+    </li>
 <!-- END answerOption -->
+</ul>
 <input data-role="other-answer" name="answer[other]" type="text" value="{ANSWER_OTHER}" />

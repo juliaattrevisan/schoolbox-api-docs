@@ -72,15 +72,20 @@
                     <div class="small-6 columns">
                         <fieldset>
                             <legend>Categories</legend>
-                            <input id='select-all' type="checkbox" data-selectall="category[]" {% if search.category|length == categoryList|length %}checked{% endif %} />
-                            <label for="select-all" class="checkbox-label">All</label>
-
-                            {% for category in categoryList %}
-                            <input id='category-checkbox-{{ category.getId() }}' type="checkbox" name="category[]" value="{{ category.getId() }}" {% if category.getId() in search.category %}checked{% endif %} />
-                            <label for='category-checkbox-{{ category.getId() }}' class="checkbox-label">
-                                {{ category.getName() }}
-                            </label>
-                            {% endfor %}
+                            <ul class="option-list">
+                                <li>
+                                    <input id='select-all' type="checkbox" data-selectall="category[]" {% if search.category|length == categoryList|length %}checked{% endif %} />
+                                    <label for="select-all" class="checkbox-label">All</label>
+                                </li>
+                                {% for category in categoryList %}
+                                <li>
+                                    <input id='category-checkbox-{{ category.getId() }}' type="checkbox" name="category[]" value="{{ category.getId() }}" {% if category.getId() in search.category %}checked{% endif %} />
+                                    <label for='category-checkbox-{{ category.getId() }}' class="checkbox-label">
+                                        {{ category.getName() }}
+                                    </label>
+                                </li>
+                                {% endfor %}
+                            </ul>
                         </fieldset>
                     </div>
 

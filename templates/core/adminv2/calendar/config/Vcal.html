@@ -27,16 +27,24 @@
     </div>
     <div class="column medium-6">
         <div class="content">
-        <label>Campus</label>
-        <!-- BEGIN campus_list -->
-        <input id="campus-{CAMPUS_ID}-{CONNECTOR_ID}" type="checkbox" class="campusCheck" name="record[{CONNECTOR_ID}][campus][]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />
-        <label for="campus-{CAMPUS_ID}-{CONNECTOR_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
-        <!-- END campus_list -->
-        <label>Role</label>
-        <!-- BEGIN group_list -->
-        <input id="role-{GROUP_ID}-{CONNECTOR_ID}" type="checkbox" name="record[{CONNECTOR_ID}][groupCheck][]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />
-        <label for="role-{GROUP_ID}-{CONNECTOR_ID}" class="checkbox-label">{GROUP_NAME}</label>
-        <!-- END group_list -->
+            <label>Campus</label>
+            <ul class="option-list">
+            <!-- BEGIN campus_list -->
+                <li>
+                    <input id="campus-{CAMPUS_ID}-{CONNECTOR_ID}" type="checkbox" class="campusCheck" name="record[{CONNECTOR_ID}][campus][]" value="{CAMPUS_ID}" {CAMPUS_ID_SELECTED} />
+                    <label for="campus-{CAMPUS_ID}-{CONNECTOR_ID}" class="checkbox-label">{CAMPUS_NAME}</label>
+                </li>
+            <!-- END campus_list -->
+            </ul>
+            <label>Role</label>
+            <ul class="option-list">
+            <!-- BEGIN group_list -->
+                <li>
+                    <input id="role-{GROUP_ID}-{CONNECTOR_ID}" type="checkbox" name="record[{CONNECTOR_ID}][groupCheck][]" value="{GROUP_ID}" {GROUP_ID_SELECTED} />
+                    <label for="role-{GROUP_ID}-{CONNECTOR_ID}" class="checkbox-label">{GROUP_NAME}</label>
+                </li>
+            <!-- END group_list -->
+            </ul>
         </div>
     </div>
     <div class="column small-12">
