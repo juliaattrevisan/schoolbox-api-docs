@@ -13,9 +13,10 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\Test;
 
 use PHPUnit\Framework\TestCase;
+use Schoolbox\External\Connector\TassApi\Base\Endpoint\Timetable\ValidActiveEnrolment;
 
 /**
  * Class ValidActiveEnrolmentTest
