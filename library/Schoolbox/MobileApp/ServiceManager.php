@@ -177,7 +177,7 @@ class ServiceManager implements IServiceManager
 
             if ($this->shouldUseTestService()) {
                 // ignore the provider from the DB and just use the mock
-                return new Cloud\Test\TestService(Schoolbox\Notif\Notifactory::create(Schoolbox\Notif\Notif::TOPIC_ADMIN), $this->registryMapper, $identifier);
+                return new Cloud\Test\TestService($this->registryMapper, $identifier);
             }
 
             switch ($provider) {
