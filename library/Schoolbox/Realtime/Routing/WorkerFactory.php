@@ -90,7 +90,8 @@ class WorkerFactory
             $this->log,
             $this->registryMapper,
             $this->instance,
-            $this->conf->get('title')
+            $this->conf->get('title'),
+            MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 
         // factory for configuring instant emails

@@ -32,7 +32,7 @@ class ServiceManager implements IServiceManager
     /**
      * Never use the test service: always use a production service.
      */
-    public const TEST_SERVICE_NEVER = 1;
+    public const SERVICE_TYPE_TEST = 1;
 
     /**
      * Use the test service based on the instance
@@ -40,12 +40,12 @@ class ServiceManager implements IServiceManager
      * * staging instances use the test service unless they are sandboxes
      * * production instances always use the production service
      */
-    public const TEST_SERVICE_BASED_ON_INSTANCE_TYPE = 2;
+    public const SERVICE_TYPE_BASED_ON_INSTANCE_TYPE = 2;
 
     /**
      * Always use the test service: never use a production service.
      */
-    public const TEST_SERVICE_ALWAYS = 3;
+    public const SERVICE_TYPE_PRODUCTION = 3;
 
     /** @var RegistryMapper */
     protected $registryMapper;
@@ -65,23 +65,34 @@ class ServiceManager implements IServiceManager
     private string $appTitle;
 
     /**
+     * One of the `self::SERVICE_TYPE_*` constants: controls whether to use a
+     * test or production service.
+     *
+     * By default, this depends on the instance type.
+     */
+    private int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE;
+
+    /**
      * Constructor
      *
      * @param LoggerInterface    $log
      * @param RegistryMapper     $registryMapper
      * @param Schoolbox\Instance $serverInstance
      * @param string             $appTitle
+     * @param int                $serviceType
      */
     public function __construct(
         LoggerInterface $log,
         RegistryMapper $registryMapper,
         Schoolbox\Instance $serverInstance,
-        string $appTitle
+        string $appTitle,
+        int $serviceType = self::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE
     ) {
         $this->registryMapper = $registryMapper;
         $this->log            = $log;
         $this->serverInstance = $serverInstance;
         $this->appTitle       = $appTitle;
+        $this->serviceType    = $serviceType;
     }
 
 
@@ -302,6 +313,14 @@ class ServiceManager implements IServiceManager
      */
     private function shouldUseTestService()
     {
+        // Is this always using the production or test service?
+        if ($this->serviceType === self::SERVICE_TYPE_PRODUCTION) {
+            return false;
+        }
+        if ($this->serviceType === self::SERVICE_TYPE_TEST) {
+            return true;
+        }
+
         // use test service in vagrant always
         if ($this->serverInstance->isVagrant()) {
             return true;

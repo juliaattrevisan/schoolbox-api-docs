@@ -511,7 +511,8 @@ class Controller extends BaseController
             $log,
             MobileApp\RegistryMapper::getInstance(),
             $this->getDi()->get('instance'),
-            $this->getConfigLoader()->get('title')
+            $this->getConfigLoader()->get('title'),
+            MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
         );
 
         // just grab... anything
