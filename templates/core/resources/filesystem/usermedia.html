@@ -1,13 +1,13 @@
 <div id="record-media-modal">
     <record-media-modal />
 </div>
-<script type="text/javascript" src="{CDN_PREFIX}/javascript/components/recordMediaModal.bundle.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{CDN_PREFIX}/javascript/components/recordMediaModal.bundle.js?v={SITE_VERSION}"></script>
 <script>
     /**
-    * I don't entirely understand how this usermedia.html file is loaded/re-loaded, however we need to ensure that 
+    * I don't entirely understand how this usermedia.html file is loaded/re-loaded, however we need to ensure that
     * the <record-media-modal> has the opportunity to cleanup prior to it's possible re-selection to properly handle display/context.
     * For example in Firefox, selecting say a Screen Recording, then selecting the Recording menu button again, then moving to a Video recording instead causes
-    * unexpected context issues which causes the video to fail as the Screen recording is already active. 
+    * unexpected context issues which causes the video to fail as the Screen recording is already active.
     * So it's best to ensure everything is reset when before re-display
     */
     document.querySelectorAll('[data-attach-option]').forEach((menuItem) =>
