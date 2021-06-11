@@ -22,23 +22,6 @@ use Schoolbox\MobileApp\RegistryMapper;
  */
 class TestService extends AbstractService
 {
-
-    /** @var LoggerInterface */
-    private $log;
-
-
-    /**
-     * @param LoggerInterface $log
-     * @param RegistryMapper  $registryMapper
-     * @param string          $appIdentifier
-     */
-    public function __construct(LoggerInterface $log, RegistryMapper $registryMapper, $appIdentifier)
-    {
-        parent::__construct($registryMapper, $appIdentifier);
-        $this->log = $log;
-    }
-
-
     /**
      * @param array  $tokens
      * @param int    $id
@@ -48,11 +31,15 @@ class TestService extends AbstractService
      */
     protected function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
-        $this->log->debug($title, [
-            'app_tokens'   => $tokens,
-            'message_id'   => $id,
-            'unread_count' => $unreadCount
-        ]);
+        $this->getLog()->debug('This is a test message: it is not sent anywhere');
+        $this->getLog()->debug(
+            $title,
+            [
+                'app_tokens'   => $tokens,
+                'message_id'   => $id,
+                'unread_count' => $unreadCount
+            ]
+        );
 
         return true;
     }

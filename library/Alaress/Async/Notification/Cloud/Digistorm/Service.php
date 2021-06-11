@@ -41,13 +41,13 @@ class Service extends AbstractService
     /**
      * How many attempts may be made to send the message before we give up?
      */
-    private const MAX_ATTEMPTS = 100;
+    private const MAX_ATTEMPTS = 15;
 
     /**
      * The amount of time (in milliseconds) to wait for at first when
      * re-attempting to send a message.
      */
-    private const ATTEMPT_BASE_TIMEOUT = 1000;
+    private const ATTEMPT_BASE_TIMEOUT = 2500;
 
     /**
      * API key for the service
@@ -102,9 +102,10 @@ class Service extends AbstractService
 
         // need a HTTP client (should this be injected?)
         $client     = new Client();
-        $attemptNum = 1;
+        $attemptNum = 0;
         $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
         while (!$jitter->tooManyAttempts($attemptNum)) {
+            $this->getLog()->debug(sprintf('Attempting to send notification: attempt %d', $attemptNum + 1));
             try {
                 $response = $client->post(
                     self::BASE_URL,
@@ -134,6 +135,7 @@ class Service extends AbstractService
                 $responseCode = $e->getCode();
                 if ($responseCode === 401) {
                     // your API key is bad: don't try to do anything else
+                    $this->getLog()->error('Received response code 401: this means the API key is incorrect');
                     throw $e;
                 }
 
@@ -144,7 +146,13 @@ class Service extends AbstractService
                 }
             }
 
-            usleep($jitter->calculateJitter($attemptNum));
+            if (!$jitter->tooManyAttempts($attemptNum + 1)) {
+                $wait = (int)$jitter->calculateJitter($attemptNum);
+                $this->getLog()->notice(
+                    sprintf('Notification service is likely rate-limited: waiting %d ms before trying again', $wait)
+                );
+                usleep($wait * 1000);
+            }
             $attemptNum++;
         }
 
