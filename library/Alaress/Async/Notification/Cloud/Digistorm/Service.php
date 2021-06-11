@@ -102,10 +102,10 @@ class Service extends AbstractService
 
         // need a HTTP client (should this be injected?)
         $client     = new Client();
-        $attemptNum = 1;
+        $attemptNum = 0;
         $jitter     = new Jitter(new FloatGenerator(), self::MAX_ATTEMPTS, self::ATTEMPT_BASE_TIMEOUT);
         while (!$jitter->tooManyAttempts($attemptNum)) {
-            $this->getLog()->debug(sprintf('Attempting to send notification: attempt %d', $attemptNum));
+            $this->getLog()->debug(sprintf('Attempting to send notification: attempt %d', $attemptNum + 1));
             try {
                 $response = $client->post(
                     self::BASE_URL,
