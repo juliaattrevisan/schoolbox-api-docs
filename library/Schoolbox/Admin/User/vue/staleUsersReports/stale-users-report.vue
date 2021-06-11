@@ -47,7 +47,6 @@ export default {
             selectedRows: [], //keep track of which rows could be deleted
             columns: ['username', 'external_id', 'firstname', 'lastname', 'role', 'year', 'updated_at'],
             options: {
-                hiddenColumns: ['id'],
                 headings: {
                     username: 'Username',
                     external_id: 'External ID',

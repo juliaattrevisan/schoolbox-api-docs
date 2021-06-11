@@ -102,7 +102,8 @@ export default {
                 },
                 resizableColumns: false,
                 tabbable: false,
-                filterable: false
+                filterable: false,
+                stickyHeader: true            
             },
         }
     },
@@ -194,10 +195,13 @@ export default {
                     {{ getHumanReadableFilesize(props.row.size) }}
                 </template>
             </v-client-table>
+            
         </template>
     </div>
 </template>
 
 <style lang="scss">
+
 @import '@schoolbox/vueTables2/vueTables2';
+
 </style>

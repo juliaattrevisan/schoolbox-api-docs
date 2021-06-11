@@ -78,9 +78,9 @@ export default {
                     ascending: true,
                     column: 'name' 
                 },
-                pagination: {
-                    edge: false,
-                },
+                // pagination: {
+                //     show: false
+                // },
                 perPage: 50, 
                 perPageValues: [50, 100, 200],
                 texts: {
@@ -150,10 +150,26 @@ export default {
                 const response = await axios.get(this.endpoint);
                 this.allData = response.data;
                 this.loading = false;
+                this.$nextTick(() => this.updateTableControls());
             } catch (error) {
                 this.loading = false; 
             }
         },
+
+        /**
+         * To adjust the UI display
+         * 
+         */
+        updateTableControls () {
+            
+            const perPageControls = document.querySelector('.VueTables__limit');
+            const paginationControls = document.querySelector('.VuePagination');
+
+            this.$refs.tableFooter.appendChild(perPageControls);
+            this.$refs.tableFooter.appendChild(paginationControls);
+
+        },
+
 
         /**
          * To convert the bytes into a more readable string
@@ -253,6 +269,11 @@ export default {
                 <template v-slot:id="props"> 
                     <a :href="props.row._links.delete" @click.prevent="showDeleteModal(props.row._links.delete)">Delete</a>
                 </template>
+                <div slot="afterTable">
+                    <div class="table-footer" ref="tableFooter">
+
+                    </div>
+                </div>
             </v-client-table>
         </template>
         <toast ref="toast"></toast>
@@ -268,5 +289,38 @@ export default {
 </template>
 
 <style lang="scss">
+
 @import '@schoolbox/vueTables2/vueTables2';
+
+.VueTables table {
+    margin-bottom: 0px;
+}
+
+.VueTables .table-footer {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem;
+    background: white;
+}
+
+.VueTables__limit {
+    width: 160px;
+    margin-right: 20px;
+    label, select {
+        display: inline-block;
+    }
+    label {
+        width: 80px;
+    } 
+    select {
+        width: 80px;
+    }
+}
+
+.VuePagination__pagination-item {
+    display: none;
+}
+
 </style>

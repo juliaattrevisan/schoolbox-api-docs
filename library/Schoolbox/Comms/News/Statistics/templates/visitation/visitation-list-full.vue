@@ -24,7 +24,6 @@ export default {
             isLoading: true, //used to show skeleton
             columns: ['fullname', 'role', 'occursAt'],
             options: {
-                hiddenColumns: ['id', 'lastname'],
                 headings: {
                     fullname: 'Name',
                     role: 'Role',
