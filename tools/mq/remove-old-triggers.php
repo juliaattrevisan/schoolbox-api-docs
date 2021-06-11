@@ -86,22 +86,27 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             if ($keyType->getPayload() === 'set') {
                 $members = $this->redis->smembers($key);
                 $memberCount = count($members);
-                $memberExpired = 0;
                 foreach ($members as $member) {
                     $ttl = $this->redis->ttl($member);
                     // expired
                     if ($ttl === -2) {
                         $this->getLogger()->info("[REMOVING] expired {$member} from set: {$key} ");
-                        $memberExpired++;
+                        $memberCount--;
                         if ($this->perform()) {
                             $this->redis->srem($key, $member);
                         }
                     }
                 }
                 // if all of the members of this set is expired, delete this set
-                if ($memberCount === $memberExpired) {
+                if ($memberCount === 0) {
                     $this->deleteFromRedis("Empty set: {$key}", null, $key);
                 }
+                continue;
+            }
+
+            // if the key is not string (unexpectedly), skip
+            if ($keyType->getPayload() !== 'string') {
+                $this->getLogger()->debug("Skipping {$key} type: {$keyType->getPayload()} ");
                 continue;
             }
 
