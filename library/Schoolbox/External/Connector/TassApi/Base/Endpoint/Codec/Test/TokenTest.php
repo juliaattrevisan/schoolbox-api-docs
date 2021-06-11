@@ -13,7 +13,7 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Example\Test;
+namespace Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Test;
 
 use PHPUnit\Framework\TestCase;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\Token;
