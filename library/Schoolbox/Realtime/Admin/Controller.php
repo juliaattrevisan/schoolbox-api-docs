@@ -503,6 +503,7 @@ class Controller extends BaseController
      */
     public function testPush($userId = null)
     {
+        $liveMessage = $this->request->query->getBool('live', false);
         $write = fopen('php://memory', 'rb+');
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
@@ -512,7 +513,9 @@ class Controller extends BaseController
             MobileApp\RegistryMapper::getInstance(),
             $this->getDi()->get('instance'),
             $this->getConfigLoader()->get('title'),
-            MobileApp\ServiceManager::SERVICE_TYPE_BASED_ON_INSTANCE_TYPE,
+            $liveMessage
+                ? MobileApp\ServiceManager::SERVICE_TYPE_PRODUCTION
+                : MobileApp\ServiceManager::SERVICE_TYPE_TEST,
         );
 
         // just grab... anything
@@ -523,8 +526,10 @@ class Controller extends BaseController
         $content = [
             'template' => '@adminMessages/puush.twig',
             'data'     => [
-                'pageCurrent' => $this->router->generate('adminMessages.testPush'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminMessages.testPush')),
+                'liveMessage'    => $liveMessage,
+                'pageCurrent'    => $this->router->generate('adminMessages.testPush'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))
+                    ->generateBreadcrumbs($this->router->generate('adminMessages.testPush')),
             ],
         ];
 

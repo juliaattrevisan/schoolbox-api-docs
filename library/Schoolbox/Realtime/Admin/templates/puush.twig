@@ -19,16 +19,22 @@
     <div class="admin-content">
         <div class="small-12 island">
             {% if logs | length %}
-            <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
-            <section class="content">
-                <ul class="no-margin">
-                    {% for line in logs %}
-                        <li><pre>{{ line }}</pre></li>
-                    {% endfor %}
+                <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
+                <section class="content">
+                    <ul class="no-margin">
+                        {% for line in logs %}
+                            <li><pre>{{ line }}</pre></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                <ul class="flex-list buttons">
+                    {% if not liveMessage %}
+                        <li><a href="{{ routeLookup('adminMessages.testPush', { userId: user.id }) }}?live=1" class="submit">Test sending LIVE message</a></li>
+                    {% endif %}
+                    <li><a href="{{ routeLookup('adminMessages.testPush') }}">Back to list</a></li>
                 </ul>
-            </section>
-            {% endif %}
-            {% if registry | length %}
+                <ul class="flex-list"
+            {% elseif registry | length %}
                 <h2 class="subheader">Applications Registered</h2>
                 <table>
                     <thead>
