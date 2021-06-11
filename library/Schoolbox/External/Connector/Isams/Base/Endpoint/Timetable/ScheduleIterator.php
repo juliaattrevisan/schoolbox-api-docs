@@ -187,7 +187,13 @@ class ScheduleIterator implements Iterator
         /* Otherwise we knew when this happened and what was in it
          */
         return [
-            'day' => trim((string)$day[0]->Day),
+
+            /* iSAMS uses a indexed week offset such that Sunday is Day 1
+             * but we use Monday as Day 1 so compensate for that. Except if your
+             * school actually starts on a Sunday like in the Middle East, then
+             * we will need to revisit this compensation
+             */
+            'day' => (int)$day[0]->Day - 1,
             'name' => trim((string)$period[0]->Name),
             'abbrev' => trim((string)$period[0]->ShortName),
             'start' => trim((string)$period[0]->StartTime),
