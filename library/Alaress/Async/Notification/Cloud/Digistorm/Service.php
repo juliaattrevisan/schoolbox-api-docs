@@ -146,11 +146,13 @@ class Service extends AbstractService
                 }
             }
 
-            $wait = (int)$jitter->calculateJitter($attemptNum);
-            $this->getLog()->notice(
-                sprintf('Notification service is likely rate-limited: waiting %d ms before trying again', $wait)
-            );
-            usleep($wait * 1000);
+            if (!$jitter->tooManyAttempts($attemptNum + 1)) {
+                $wait = (int)$jitter->calculateJitter($attemptNum);
+                $this->getLog()->notice(
+                    sprintf('Notification service is likely rate-limited: waiting %d ms before trying again', $wait)
+                );
+                usleep($wait * 1000);
+            }
             $attemptNum++;
         }
 
