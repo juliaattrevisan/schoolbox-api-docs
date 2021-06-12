@@ -231,6 +231,13 @@ export default {
     .vjs-slider-bar {
         background: white;
     }
+    @media screen and (max-width: 640px) {
+        //shrink down everything to fit better
+        .vjs-big-play-button {
+            top: 40%;
+            transform: scale(0.8);
+        }
+    }
 }
 
 </style>

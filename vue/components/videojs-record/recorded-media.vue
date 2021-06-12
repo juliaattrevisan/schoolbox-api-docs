@@ -56,7 +56,26 @@ export default {
             hasRecordPlayerError: false, //error with the record player
             hasNewRecording: false, //need a different videojs player for playback to enable the progress controls
             isDeleteRecordingModalActive: false, //to confirm/deny whether to delete the video
+            isDeleteRequested: false, //to notify of deletion when over-media-modal is closed
+            mediaWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
+            mediaHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes 
         }
+    },
+
+    computed: {
+
+        currentRecordingType () {
+            if (this.recordMediaType === recordMediaTypes.AUDIO_ONLY) {
+                return 'audio recording';
+            } else if (this.recordMediaType === recordMediaTypes.PHOTO) {
+                return 'photo';
+            }  else if (this.recordMediaType === recordMediaTypes.CAMERA) {
+                return 'video recording';
+            }  else if (this.recordMediaType === recordMediaTypes.SCREEN) {
+                return 'screen recording';
+            }
+        }
+
     },
 
 	created () {
@@ -141,8 +160,8 @@ export default {
          *
          */
         onConfirmDeleteRecordingSelected () {
-            this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
-            this.isDeleteRecordingModalActive = false;
+            this.isDeleteRequested = true;
+            this.isOverMediaModalClosing = true;
         },
 
         /**
@@ -154,12 +173,16 @@ export default {
         },
 
         /**
-         * closed the delete recording modal, cancel has been selected rather than confirm
+         * closed the delete recording modal, and notify of delete request if required
          *
          */
         onDeleteRecordingModalClosed () {
             this.isOverMediaModalClosing = false;
             this.isDeleteRecordingModalActive = false;
+            if (this.isDeleteRequested) {
+                this.$emit(recordMediaEvents.RECORDED_MEDIA_DELETED);
+                this.isDeleteRequested = false;
+            }
         },
 
         /**
@@ -208,6 +231,8 @@ export default {
          * @params { Number }
          */
         onMediaDimensionsReady (width, height) {
+            this.mediaWidth = width;
+            this.mediaHeight = height;
             this.$emit(recordMediaEvents.RESIZE, width, height);
         },
 
@@ -218,7 +243,27 @@ export default {
         onRecordPlayerError () {
             this.hasRecordPlayerError = true;
             this.hasError = true;
-        }
+        },
+
+        /**
+         * Ensure the recorded over media modal is fully visible
+         *
+         * @params { Number }
+         * @params { Number }
+         */
+        onOverMediaModalOpened (width, height) {
+            this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_OPENED, width, height);
+        },
+
+        /**
+         * revert back to original setting
+         *
+         * @params { Number }
+         * @params { Number }
+         */
+        onOverMediaModalClosed () {
+            this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED);
+        },
 
     }
 
@@ -232,6 +277,7 @@ export default {
         <audio-only-player
             v-if="recordMediaType === recordMediaTypes.AUDIO_ONLY"
             :options="getAudioPlayerOptions()"
+            @on-dimensions-ready="onMediaDimensionsReady"
         />
         <photo-player
             v-else-if="recordMediaType === recordMediaTypes.PHOTO"
@@ -250,8 +296,15 @@ export default {
             <a ref="deleteButton" v-if="!hasError" @click.prevent="onDeleteRecordingSelected" class="button icon-delete delete-button" title="Delete recording"></a>
         </transition>
 
-        <over-media-modal v-if="isDeleteRecordingModalActive" :is-closing="isOverMediaModalClosing" :closed-call-back="onDeleteRecordingModalClosed" key="deleteRecordingModal">
-            <p>Are you sure you wish to delete the current recording?</p>
+        <over-media-modal 
+            v-if="isDeleteRecordingModalActive" 
+            :is-closing="isOverMediaModalClosing" 
+            :closed-call-back="onDeleteRecordingModalClosed" 
+            @on-over-media-modal-opened="onOverMediaModalOpened" 
+            @on-over-media-modal-closed="onOverMediaModalClosed" 
+            key="deleteRecordingModal"
+        >
+            <p>Are you sure you wish to delete the current {{currentRecordingType}}?</p>
             <div class="modal-actions">
                 <button @click.prevent="onConfirmDeleteRecordingSelected">Confirm</button>
                 <button @click.prevent="onCancelDeleteRecordingSelected">Cancel</button>
@@ -286,6 +339,10 @@ export default {
     &:hover {
         opacity: 0.8;
     }
+    @media screen and (max-width: 640px) {
+        right: 5px; 
+        top: 5px;
+    }
 }
 
 .modal-actions {
@@ -307,87 +364,6 @@ export default {
 }
 .slide-enter-to {
     right: 10px; 
-}
-
-.vjs-record-skin::v-deep {
-    .vjs-device-button.vjs-control { //not in the centre of the frame, something from SB css is probably getting in the way
-        top: 42%;
-        margin-left: -2.6em;
-    }
-    .vjs-control-bar { //fatten up the bottom control panel
-        height: 5em;
-        padding: 0px;
-    }
-    .vjs-control {
-        width: 5em;
-    }
-    .vjs-icon-record-start,
-    .vjs-icon-record-stop,
-    .vjs-icon-photo-camera { //make the start/stop record buttons big and fat and put in the middle
-        position: absolute;
-        z-index: 2;
-        left: 50%;
-        margin-left: -20px;
-        bottom: 0px; 
-        transform-origin: center;
-        transform: scale(3.1);
-        color: #f03;
-        transition: color 0.2s, transform 0.2s;
-        &:hover {
-            transform: scale(2.8);
-        }
-    }
-    .vjs-icon-photo-camera { //shrink a bit, bit big compared to the other icons
-        transform: scale(2.3);
-        color: #fff;
-        &:hover {
-            transform: scale(2.1);
-        }
-    }
-    .vjs-control:focus::before, .vjs-control:hover::before, .vjs-control:focus {
-        text-shadow: none;
-    }
-    .vjs-time-control { //make the time stand out a bit more
-        width: auto;
-        min-width: 0;
-        padding: 0px 2px;
-        font-size: 1.1rem;
-        transition: background-color 0.3s;
-    }
-    .vjs-current-time { //and pull the time of from the side
-        padding-left: 10px;
-    }
-    .vjs-duration {
-        padding-right: 10px;
-    }
-    .vjs-fullscreen-control { //currently if the user re-records in full screen, this will not be reflected, so prevent for now
-        display: none;
-    }
-    .vjs-button > .vjs-icon-placeholder::before { //make all the buttons bigger
-        color: white;
-        font-size: 4em;
-        line-height: 1.25;
-    }
-    .vjs-play-control { //it'll never be shown, as once recored moves to another player
-        display: none;
-    }
-    .vjs-control.vjs-record-indicator { //move the record note further down
-        top: 20px;
-    }
-    .vjs-control.vjs-record-indicator,
-    .vjs-control.vjs-record-indicator:before,
-    .vjs-control.vjs-record-indicator:after { //and make the record note stand out more
-        transform: scale(1.8);
-    }
-    .vjs-control.vjs-record-indicator:before { //provide a bit more padding to the recording dot
-        left: -1.8rem;
-    }
-    @media screen and (max-width: 640px) { //shrink down a bit
-        .vjs-time-control  {
-            font-size: 0.9rem;
-            line-height: 3.3rem;
-        }
-    }
 }
 
 </style>

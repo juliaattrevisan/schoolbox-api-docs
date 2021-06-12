@@ -8,6 +8,7 @@
  */
 
 import { gsap } from 'gsap/all';
+import recordMediaEvents from '@shared/record-media/recordMediaEvents';
 
 export default {
     
@@ -20,6 +21,12 @@ export default {
      		type: Function,
       		required: false,
     	},
+    },
+
+    data () {
+        return {
+            hasEmitOpened: false //no need to dispatch closed if opened hasn't been called
+        }
     },
 
 	watch:  { 
@@ -42,6 +49,10 @@ export default {
          */ 
         animateOn () {
             gsap.from(this.$refs.modal, 0.3, { alpha: 0, marginTop: 40, delay: 0 } );
+            if (this.$refs.modal.offsetHeight > this.$refs.modal.parentElement.offsetHeight) { //only if the modal message exceeds the height of the parent container
+                this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_OPENED, this.$refs.modal.parentElement.offsetWidth, this.$refs.modal.offsetHeight + 40); //just ensure that the entire message is visible
+                this.hasEmitOpened = true;
+            }
         },
 
         /*
@@ -50,6 +61,10 @@ export default {
          */ 
         animateOff () {
             gsap.to(this.$refs.modal, 0.2, { alpha: 0, marginTop: 40, ease: 'power2.in', onComplete: this.closedCallBack } );
+            if (this.hasEmitOpened) {
+                this.$emit(recordMediaEvents.OVER_MEDIA_MODAL_CLOSED); //just ensure that the entire message is visible
+                this.hasEmitOpened = false;
+            }
         }
 
     }
