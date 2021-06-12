@@ -211,6 +211,8 @@ class Manager
             if ($adapterTo->createDir(dirname($storage->getPath()), $fsTo->getConfig()) === false) {
                 return false;
             }
+
+            chmod(rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath, 0664);
             return rename(
                 rtrim($adapterFrom->getPathPrefix(), '/') . $tmpFilePath,
                 $adapterTo->getPathPrefix() . $storage->getPath()
