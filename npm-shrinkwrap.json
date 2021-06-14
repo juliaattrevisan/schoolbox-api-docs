@@ -41,7 +41,7 @@
         "jquery": "2.1.4",
         "jquery-ui": "1.12.1",
         "jquery-validation": "1.15.1",
-        "locutus": "^2.0.14",
+        "locutus": "^2.0.15",
         "lodash": "4.17.21",
         "magnific-popup": "1.0.0",
         "mediaelement": "4.2.16",
@@ -3372,11 +3372,6 @@
       "integrity": "sha512-ooYciCUtfw6/d2w56UVeqHPcoCFAiJdz5XOkYpv/Txl1HMUozpXjz/2RIQgqwKdXNDPSF1W7mJCFse3G+HDyAA==",
       "dev": true
     },
-    "node_modules/es6-promise": {
-      "version": "4.2.8",
-      "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.2.8.tgz",
-      "integrity": "sha1-TrIVlMlyvEBVPSduUQU5FD21Pgo="
-    },
     "node_modules/escalade": {
       "version": "3.1.1",
       "resolved": "https://registry.npmjs.org/escalade/-/escalade-3.1.1.tgz",
@@ -4238,14 +4233,11 @@
       }
     },
     "node_modules/locutus": {
-      "version": "2.0.14",
-      "resolved": "https://registry.npmjs.org/locutus/-/locutus-2.0.14.tgz",
-      "integrity": "sha1-U9JZrHIAsGIe1OVgS2xJmTQVpFU=",
-      "dependencies": {
-        "es6-promise": "^4.2.5"
-      },
+      "version": "2.0.15",
+      "resolved": "https://registry.npmjs.org/locutus/-/locutus-2.0.15.tgz",
+      "integrity": "sha512-2xWC4RkoAoCVXEb/stzEgG1TNgd+mrkLBj6TuEDNyUoKeQ2XzDTyJUC23sMiqbL6zJmJSP3w59OZo+zc4IBOmA==",
       "engines": {
-        "node": ">= 0.12.0"
+        "node": ">= 10"
       }
     },
     "node_modules/lodash": {
@@ -9434,11 +9426,6 @@
       "integrity": "sha512-ooYciCUtfw6/d2w56UVeqHPcoCFAiJdz5XOkYpv/Txl1HMUozpXjz/2RIQgqwKdXNDPSF1W7mJCFse3G+HDyAA==",
       "dev": true
     },
-    "es6-promise": {
-      "version": "4.2.8",
-      "resolved": "https://registry.npmjs.org/es6-promise/-/es6-promise-4.2.8.tgz",
-      "integrity": "sha1-TrIVlMlyvEBVPSduUQU5FD21Pgo="
-    },
     "escalade": {
       "version": "3.1.1",
       "resolved": "https://registry.npmjs.org/escalade/-/escalade-3.1.1.tgz",
@@ -10106,12 +10093,9 @@
       }
     },
     "locutus": {
-      "version": "2.0.14",
-      "resolved": "https://registry.npmjs.org/locutus/-/locutus-2.0.14.tgz",
-      "integrity": "sha1-U9JZrHIAsGIe1OVgS2xJmTQVpFU=",
-      "requires": {
-        "es6-promise": "^4.2.5"
-      }
+      "version": "2.0.15",
+      "resolved": "https://registry.npmjs.org/locutus/-/locutus-2.0.15.tgz",
+      "integrity": "sha512-2xWC4RkoAoCVXEb/stzEgG1TNgd+mrkLBj6TuEDNyUoKeQ2XzDTyJUC23sMiqbL6zJmJSP3w59OZo+zc4IBOmA=="
     },
     "lodash": {
       "version": "4.17.21",
