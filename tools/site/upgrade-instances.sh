@@ -150,8 +150,8 @@ function upgrade_instances(){
   for i in $instance_list; do
   {
     # Ensure instance's log file's directory exists
-    mkdir -p /var/lib/schoolbox/"$i"
-    instance_log_file=/var/lib/schoolbox/"$i"/upgrade.log;
+    mkdir -p /var/log/schoolbox/"$i"
+    instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
     log "upgrade starting for instance $i - logging to $instance_log_file";
 
     # If log exists in old location, move to new location. TODO remove once all instances upgrade past 20.2.12
