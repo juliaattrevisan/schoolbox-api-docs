@@ -150,7 +150,7 @@ function upgrade_instances(){
   for i in $instance_list; do
   {
     # Ensure instance's log file's directory exists
-    mkdir -p /var/log/schoolbox/"$i"
+    mkdir -p /var/lib/schoolbox/"$i"
     instance_log_file=/var/lib/schoolbox/"$i"/upgrade.log;
     log "upgrade starting for instance $i - logging to $instance_log_file";
 
