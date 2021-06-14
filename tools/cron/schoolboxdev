@@ -61,7 +61,7 @@ MAILTO="support@schoolbox.com.au"
 15 3 * * * www-data php /usr/share/schoolboxdev/tools/stats.php | curl -s -X POST -d @- 'http://localhost:8128/telegraf' 2>&1
 
 # Rebuild notification routes for users by polling group and class memberships
-30 2 * * * www-data php /usr/share/schoolboxdev/tools/notif/route/refresh-binding-cache.php -vvv >>/var/log/schoolboxdev/binder.log 2>&1
+30 2 * * * www-data php /usr/share/schoolboxdev/tools/notif/route/refresh-binding-cache.php -vv >>/var/log/schoolboxdev/binder.log 2>&1
 
 # Cleanup redis notification data (once a week on a Sunday)
 20 1 * * 0 www-data php /usr/share/schoolboxdev/tools/mq/remove-old-triggers.php -p >> /var/log/schoolboxdev/remove-old-triggers.log 2>&1

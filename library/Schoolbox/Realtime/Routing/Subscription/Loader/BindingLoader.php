@@ -98,7 +98,7 @@ class BindingLoader implements ILoader
 
         $b = microtime(true);
 
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 "%d subscriptions loaded for %d users in %0.3f seconds",
                 $totalRoutes,
@@ -107,10 +107,25 @@ class BindingLoader implements ILoader
             )
         );
 
+        $c = microtime(true);
+        $redirectCount = 0;
+        $this->log->info('Loading notification redirection routes..');
+
         foreach ($this->getRedirects() as $from => $to) {
-            $this->log->info("Adding redirect `$from` -> `$to`");
+            $this->log->debug("Adding redirect `$from` -> `$to`");
             $router->add($from, $to, true);
+            $redirectCount++;
         }
+
+        $d = microtime(true);
+
+        $this->log->info(
+            sprintf(
+                "%d redirections loaded in %0.3f seconds",
+                $redirectCount,
+                ($d - $c)
+            )
+        );
 
         return $this;
     }
