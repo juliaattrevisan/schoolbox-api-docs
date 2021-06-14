@@ -260,7 +260,7 @@ function reload_binding_cache(){
     log "---reloading binding cache (in parallel)---";
     for i in $instance_list; do
     {
-      instance_log_file_2=/var/lib/schoolbox/"$i"/upgrade.log;
+      instance_log_file_2=/var/log/schoolbox/"$i"/upgrade.log;
       log "binding cache refresh starting for instance $i - logging to $instance_log_file_2";
       ${package}cloud-reload-binding-cache "$i" >> "$instance_log_file_2" 2>&1;
       log "binding cache refresh finished for instance $i";
