@@ -52,6 +52,13 @@ $app = new class extends CliTool\App {
         return [self::OPT_LONG_HELP, self::OPT_LONG_FORCE, self::OPT_LONG_QUIET,];
     }
 
+    /**
+     * Does not touch any files, so user is not important
+     */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 
     /**
      *

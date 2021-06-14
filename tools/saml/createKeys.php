@@ -41,6 +41,13 @@ $app = new class extends CliTool\App
         ];
     }
 
+    /**
+     * Does not touch any files, so user is not important
+     */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 
     /** @inheritDoc */
     public function run(): void
