@@ -18,88 +18,88 @@ $f-dropdown-icon-align: 0.25rem;
 
 // Dropdown
 .f-dropdown {
-  @include box-shadow(-2px, 2px, 4px, rgba(0, 0, 0, 0.15));
-  overflow-y: auto;
-  overflow-x: hidden;
+    @include box-shadow(-2px, 2px, 4px, rgba(0, 0, 0, 0.15));
+    overflow-y: auto;
+    overflow-x: hidden;
 
-  &.drop-top {
-    max-height: none;
-    overflow: visible;
-    z-index: 1002;
-  }
-  li {
-    display: block;
-    width: 100%;
-    a:hover {
-      background-color: $content-ui-hover;
-      text-decoration: none;
+    &.drop-top {
+        max-height: none;
+        overflow: visible;
+        z-index: 1002;
     }
-  }
-  a.menu_disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-  .separator,
-  .meta {
-    // DONE making this color transparent works okay
-    color: css-scale-color($content-ui-foreground, $alpha: -65%);
-  }
-  .separator {
-    padding: $f-dropdown-list-padding;
-    font-weight: $font-weight-normal;
-    text-transform: uppercase;
-    background-color: transparent;
-    cursor: default;
-    font-size: rem-calc($base-font-size - 3);
-    &:hover {
-      background-color: $content-ui-background;
+    li {
+        display: block;
+        width: 100%;
+        a:hover {
+            background-color: $content-ui-hover;
+            text-decoration: none;
+        }
     }
-  }
-  [class*="icon-"]:before {
-    padding-right: 0.8125rem;
-  }
+    a.menu_disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+    .separator,
+    .meta {
+        // DONE making this color transparent works okay
+        color: css-scale-color($content-ui-foreground, $alpha: -65%);
+    }
+    .separator {
+        padding: $f-dropdown-list-padding;
+        font-weight: $font-weight-normal;
+        text-transform: uppercase;
+        background-color: transparent;
+        cursor: default;
+        font-size: rem-calc($base-font-size - 3);
+        &:hover {
+            background-color: $content-ui-background;
+        }
+    }
+    [class*="icon-"]:before {
+        padding-right: 0.8125rem;
+    }
 }
 
 #tab-control {
-  @media #{$small-only} {
-    width: 99% !important;
-  }
-  @media screen and (min-width: 767px) {
-    max-width: rem-calc(688);
-    width: auto;
-  }
-  .container {
-    display: flex;
-    @media screen and (max-width: 766px) {
-      flex-wrap: wrap;
+    @media #{$small-only} {
+        width: 99% !important;
     }
-  }
-  .category {
-    flex: 1 auto;
-    min-width: rem-calc(240);
-    @media screen and (max-width: 766px) {
-      flex: 1 100%;
+    @media screen and (min-width: 767px) {
+        max-width: rem-calc(688);
+        width: auto;
     }
-    &:last-child ul {
-      margin: 0;
+    .container {
+        display: flex;
+        @media screen and (max-width: 766px) {
+            flex-wrap: wrap;
+        }
+    }
+    .category {
+        flex: 1 auto;
+        min-width: rem-calc(240);
+        @media screen and (max-width: 766px) {
+            flex: 1 100%;
+        }
+        &:last-child ul {
+            margin: 0;
+        }
+        ul {
+            margin: 0 2px 0 0;
+
+            &.role-view {
+                margin: 0;
+            }
+        }
+        &:last-child ul {
+            margin: 0;
+        }
     }
     ul {
-      margin: 0 2px 0 0;
-
-      &.role-view {
-        margin: 0;
-      }
+        margin: 0 2px 0 0;
     }
-    &:last-child ul {
-      margin: 0;
+    .separator {
+        // DONE use CSS darken
+        background-color: css-darken($f-dropdown-bg, 5%);
+        color: $anchor-font-color;
     }
-  }
-  ul {
-    margin: 0 2px 0 0;
-  }
-  .separator {
-    // DONE use CSS darken
-    background-color: css-darken($f-dropdown-bg, 5%);
-    color: $anchor-font-color;
-  }
 }
