@@ -34,6 +34,11 @@ class RemoveDuplicates extends CliTool\App
             ORDER BY touched_at ASC LIMIT :limit
         ");
 
+        $this->getLogger()->notice(
+            $this->perform()
+                ? 'Running in live mode: changes will be committed'
+                : 'Running in dry-run mode: changes will not be committed'
+        );
         try {
             $result = $db
                 ->executeQuery(
@@ -49,7 +54,7 @@ class RemoveDuplicates extends CliTool\App
                 "
                 )
                 ->fetchAll();
-            $this->getLogger()->info(sprintf('%d duplicated mobile_app_registry record(s) found', count($result)));
+            $this->getLogger()->notice(sprintf('%d duplicated mobile_app_registry record(s) found', count($result)));
             foreach ($result as $row) {
                 $this->getLogger()->info(
                     sprintf(
@@ -75,8 +80,10 @@ class RemoveDuplicates extends CliTool\App
             exit(1);
         }
         if ($this->perform()) {
+            $this->getLogger()->notice('Committing changes');
             $db->commit();
         } else {
+            $this->getLogger()->notice('Rolling back changes');
             $db->rollBack();
         }
     }
