@@ -630,14 +630,10 @@ ul.filters {
     }
     li {
         display: inline-block;
+        margin-bottom: 3px;
     }
     label {
         padding: 0 12px 0 8px;
-    }
-    @media #{$small-only} {
-        li {
-            margin-bottom: 3px;
-        }
     }
 }
 
