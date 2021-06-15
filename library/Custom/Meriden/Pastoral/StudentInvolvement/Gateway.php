@@ -307,9 +307,9 @@ class Gateway
                         THEN ' '
                         ELSE CONCAT (' - ', el.lev_desc)
                     END) AS act_desc,
-                ea.act_type,
-                el.lev_desc,
-                COALESCE(eu.ud_desc, ' ') AS ud_desc
+                NULL AS act_type,
+                NULL AS lev_desc,
+                eu.ud_desc
             FROM ecactivity ea
             INNER JOIN studecact se
                 ON se.act_code = ea.act_code
