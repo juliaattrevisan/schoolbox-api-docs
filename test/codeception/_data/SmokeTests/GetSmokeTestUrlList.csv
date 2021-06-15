@@ -63,7 +63,6 @@ Admin,Config filters,https://vagrant.dev.schoolbox.cloud/adminv2/filters
 Admin,Configure filters on pending assessment,https://vagrant.dev.schoolbox.cloud/adminv2/filters/pending
 Admin,Configre feature tours,https://vagrant.dev.schoolbox.cloud/adminv2/feature-tours
 Admin,Import school data,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport
-Admin,Import direct import,https://vagrant.dev.schoolbox.cloud/adminv2/import/directImport
 Admin,Import import pastoral,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral
 Admin,Import timetable Structure,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableStructure
 Admin,Import timetable ,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetable

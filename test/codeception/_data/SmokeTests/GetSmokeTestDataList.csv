@@ -258,10 +258,6 @@ Admin,"Import school data",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2
 Admin,"Import school data",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
 Admin,"Import school data",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
 Admin,"Import school data",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/schoolDataImport,401
-Admin,"Import direct import",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/directImport,200
-Admin,"Import direct import",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/directImport,401
-Admin,"Import direct import",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/directImport,401
-Admin,"Import direct import",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/directImport,401
 Admin,"Import import pastoral",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral,200
 Admin,"Import import pastoral",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral,401
 Admin,"Import import pastoral",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/pastoral,401
