@@ -79,6 +79,7 @@
         methods: {
 
             onChange:  _.debounce(function (e) {
+                e.target.composing = false; //enable checking while predictive text is active, so on some devices you don't need to first select or finish a word for the checking to fire
                 var self = this;
 
                 if (self.keyword.length >= self.minKeywordLength) {
