@@ -11,14 +11,14 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 /**
- * Class MockApi
+ * Class MockFileApi
  *
  * A version of Api that can be used in unit tests
  * Loads an isams xml file from somewhere instead of their actual endpoint
  *
  * @package Schoolbox\External\Connector\Isams\Base\Endpoint
  */
-class MockApi implements IApi
+class MockFileApi implements IApi
 {
 
     /**
@@ -30,7 +30,7 @@ class MockApi implements IApi
 
 
     /**
-     * MockApi constructor.
+     * MockFileApi constructor.
      *
      * @param string $file
      */

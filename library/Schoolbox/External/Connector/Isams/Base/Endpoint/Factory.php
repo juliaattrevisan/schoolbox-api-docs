@@ -204,7 +204,7 @@ class Factory
     {
         if ($this->file) {
             $this->log->info("Loading from locally-cached xml file: {$this->file}");
-            $api = new MockApi($this->file);
+            $api = new MockFileApi($this->file);
         } else {
             $this->log->info('Accessing api endpoint');
             $api = new Api($this->host, $this->key);
