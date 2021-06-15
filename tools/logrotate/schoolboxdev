@@ -13,14 +13,7 @@
 	compress
 }
 
-/var/log/schoolboxdev/plagscan*.log {
-	monthly
-	missingok
-	rotate 2
-	compress
-}
-
-/var/log/schoolboxdev/quiz*.log {
+/var/log/schoolboxdev/quiz*.log /var/log/schoolboxdev/plagscan*.log /var/log/schoolboxdev/docman*.log /var/log/schoolboxdev/etherpad-sync*.log /var/log/schoolboxdev/remove-old-triggers.log  {
 	monthly
 	missingok
 	rotate 2
@@ -34,6 +27,13 @@
 	compress
 }
 
+/var/log/schoolboxdev/*/upgrade.log {
+	monthly
+	missingok
+	rotate 6
+	compress
+}
+
 /var/lib/schoolboxdev/cache/logs/*.log {
 	monthly
 	missingok
@@ -41,10 +41,10 @@
 	compress
 }
 
-/var/log/schoolboxdev/cache-cleanup*.log /var/log/schoolboxdev/skin-builder*.log {
+/var/log/schoolboxdev/cache-cleanup*.log  /var/log/schoolboxdev/set-config-data-dirs-perms*.log {
 	weekly
 	missingok
-	rotate 12
+	rotate 5
 	compress
 }
 
