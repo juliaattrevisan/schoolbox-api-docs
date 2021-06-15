@@ -15,6 +15,22 @@
 
 {% block details_formTeacher %}
     {% if showClasses %}
+        {# Horizontal Tutor #}
+        {% if tutorTeacher %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>
+            <dd class="small-8 medium-9 columns">
+                {% if tutorTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
+                {% else %}
+                    {{ tutorTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+
+        {% if externalUser.StudentTutorDescription ?? false %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>
+            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
+        {% endif %}
 
         {# Vertical Tutor #}
         {% if formTeacher %}
@@ -36,24 +52,6 @@
                 <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
             {% endif %}
         {% endif %}
-
-        {# Horizontal Tutor #}
-        {% if tutorTeacher %}
-            <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>
-            <dd class="small-8 medium-9 columns">
-                {% if tutorTeacher.id %}
-                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
-                {% else %}
-                    {{ tutorTeacher.formatName }}
-                {% endif %}
-            </dd>
-        {% endif %}
-
-        {% if externalUser.StudentTutorDescription ?? false %}
-            <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>
-            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
-        {% endif %}
-
     {% endif %}
 {% endblock %}
 
