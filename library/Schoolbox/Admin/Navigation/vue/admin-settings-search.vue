@@ -401,6 +401,7 @@ export default {
         <input
             v-if="!hasLoadError"
             v-model="searchQuery"
+            @input="$event.target.composing = false"
             :readonly="!isLoaded"
             :placeholder="searchInputPlaceholder"
             type="text"
