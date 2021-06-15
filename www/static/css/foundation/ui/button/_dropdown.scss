@@ -58,13 +58,6 @@ $f-dropdown-icon-align: 0.25rem;
     [class*="icon-"]:before {
         padding-right: 0.8125rem;
     }
-    @media #{$small-only} {
-        //ensure the menu lines up with the button on mobile
-        max-width: 70%;
-        left: auto !important;
-        right: 0px;
-        width: 70% !important;
-    }
 }
 
 #tab-control {
