@@ -1,10 +1,41 @@
 {% extends '@core/user/student.twig' %}
 
+{# Turn off these tutor blocks
+ # All the tutor stuff is dealt with in details_formTeacher
+ # because Form and Tutor both represent Tutor data now
+ #}
+{% block details_tutorTeacher %}
+{% endblock %}
+
+{% block details_studentForm %}
+{% endblock %}
+
+{% block details_tutorGroup %}
+{% endblock %}
+
 {% block details_formTeacher %}
     {% if showClasses %}
+        {# Horizontal Tutor #}
+        {% if tutorTeacher %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>
+            <dd class="small-8 medium-9 columns">
+                {% if tutorTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
+                {% else %}
+                    {{ tutorTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+
+        {% if externalUser.StudentTutorDescription ?? false %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>
+            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
+        {% endif %}
+
+        {# Vertical Tutor #}
         {% if formTeacher %}
             {% if externalUser.StudentYearLevel >= 6 and externalUser.StudentYearLevel <= 12 %}
-                <dt class="small-12 medium-3">Tutor Group Teacher:</dt>
+                <dt class="small-12 medium-3">Vertical Tutor:</dt>
             {% else %}
                 <dt class="small-12 medium-3">Class Teacher:</dt>
             {% endif %}
@@ -15,25 +46,21 @@
                     {{ formTeacher.formatName }}
                 {% endif %}
             </dd>
-        {% endif %}
-    {% endif %}
-{% endblock details_formTeacher %}
 
-{% block details_studentForm %}
-    {% if showClasses %}
-        {% if externalUser.StudentForm %}
-            <dt class="small-12 medium-3">Tutor Group:</dt>
-            <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
+            {% if externalUser.StudentForm %}
+                <dt class="small-12 medium-3">Vertical Tutor Group:</dt>
+                <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
+            {% endif %}
         {% endif %}
     {% endif %}
-{% endblock details_studentForm %}
+{% endblock %}
 
 {% block details_studiesCode %}
     {% if externalUser.StudentStudiesCode %}
     <dt class="small-12 medium-3">TASC Code:</dt>
     <dd class="small-12 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
     {% endif %}
-{% endblock details_studiesCode %}
+{% endblock %}
 
 {% block buttons_dueWork %}
     {% if not (config.restrict_parent_duework_access and session.user.isParent()) %}
@@ -41,7 +68,7 @@
             <a href="/learning/due/{{ user.getId() }}" class="icon-due-work">Tasks/Assessments Due</a>
         </li>
     {% endif %}
-{% endblock buttons_dueWork %}
+{% endblock %}
 
 {% block buttons_grades %}
     {% if not (config.restrict_parent_grades and session.user.isParent()) %}
@@ -49,4 +76,4 @@
             <a href="/learning/grades/{{ user.getId() }}" class="icon-tick">Assessments</a>
         </li>
     {% endif %}
-{% endblock buttons_grades %}
+{% endblock %}
