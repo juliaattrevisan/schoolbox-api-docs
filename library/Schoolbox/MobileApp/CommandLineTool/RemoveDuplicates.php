@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\MobileApp\CommandLineTool;
 
+use PDO;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Throwable;
@@ -88,21 +89,25 @@ class RemoveDuplicates extends CliTool\App
             foreach ($result as $row) {
                 $this->getLogger()->info(
                     sprintf(
-                        '%d duplicates for user_id: %d, app_id: %d, app_token: "%s" found: deleting all but one',
+                        '%d duplicates for user_id: %d, app_id: %d, app_token: "%s" found: deleting all but most recent',
+                        $row['duplicate_count'],
                         $row['user_id'],
                         $row['app_id'],
                         $row['app_token'],
-                        $row['duplicate_count'],
                     )
                 );
-                $deleteDuplicateQuery->execute(
+                $deleteDuplicateQuery->bindInputs(
                     [
                         'userId'   => $row['user_id'],
                         'appId'    => $row['app_id'],
                         'appToken' => $row['app_token'],
-                        'limit'    => (int)$row['duplicate_count'] - 1,
+                        'limit'    => [
+                            'value' => (int)$row['duplicate_count'] - 1,
+                            'type'  => PDO::PARAM_INT
+                        ],
                     ]
                 );
+                $deleteDuplicateQuery->execute();
             }
         } catch (Throwable $e) {
             $this->getLogger()->error(sprintf('Caught error "%s" during deletion: rolling back', $e->getMessage()));
