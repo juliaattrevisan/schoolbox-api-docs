@@ -177,7 +177,7 @@ class CsvImporter implements IImporter
                     if (!($descriptorName === '' && $descriptorValue === '')) {
                         $descriptors[$level] = [
                             'name'  => $descriptorName,
-                            'value' => filter_var($descriptorValue, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE),
+                            'value' => filter_var($descriptorValue, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE),
                         ];
                     } else {
                         $descriptors[$level] = null;
