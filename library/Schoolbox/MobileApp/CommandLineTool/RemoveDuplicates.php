@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\MobileApp\CommandLineTool;
 
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
 use Throwable;
 
@@ -18,11 +19,40 @@ use Throwable;
  */
 class RemoveDuplicates extends CliTool\App
 {
+    private const OPT_SHORT_HELP       = 'h';
+    private const OPT_LONG_HELP        = 'help';
+
+    /**
+     * @inheritdoc
+     */
+    public function getShortOpts(): array
+    {
+        return [
+            self::OPT_SHORT_HELP,
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLongOpts(): array
+    {
+        return [
+            self::OPT_LONG_HELP,
+        ];
+    }
+
     /**
      * @inheritdoc
      */
     public function run(): void
     {
+        // Did user request help?
+        if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
+            $this->printHelp();
+            exit(CliKernelAbstract::EXIT_STATUS_OK);
+        }
+
         $db = $this->getDatabaseInternal();
         $db->beginTransaction();
 
@@ -77,7 +107,7 @@ class RemoveDuplicates extends CliTool\App
         } catch (Throwable $e) {
             $this->getLogger()->error(sprintf('Caught error "%s" during deletion: rolling back', $e->getMessage()));
             $db->rollBack();
-            exit(1);
+            exit(CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
         }
         if ($this->perform()) {
             $this->getLogger()->notice('Committing changes');
@@ -86,5 +116,34 @@ class RemoveDuplicates extends CliTool\App
             $this->getLogger()->notice('Rolling back changes');
             $db->rollBack();
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function printHelp(): void
+    {
+        $file           = $this->getToolFilename();
+        $green          = self::COLOUR_GREEN;
+        $white          = self::COLOUR_WHITE;
+        $yellow         = self::COLOUR_YELLOW;
+        $help           = "{$white}NAME:
+    Duplicate mobile app registration detection and removal tool
+
+SYNOPSIS:
+    $green{$file} {$yellow}[OPTION]...$white
+
+DESCRIPTION
+    Detects and optionally removes duplicate mobile app registrations.
+
+OPTIONS
+    $yellow-h, --help$white
+        Print this help and exit
+
+    $yellow-p, --perform$white
+        If set, actually deletes duplicates - otherwise, performs a dry run.
+
+";
+        fwrite(STDOUT, $help);
     }
 }
