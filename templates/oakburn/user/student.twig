@@ -1,10 +1,25 @@
 {% extends '@core/user/student.twig' %}
 
+{# Turn off these tutor blocks
+ # All the tutor stuff is dealt with in details_formTeacher
+ # because Form and Tutor both represent Tutor data now
+ #}
+{% block details_tutorTeacher %}
+{% endblock %}
+
+{% block details_studentForm %}
+{% endblock details_studentForm %}
+
+{% block details_tutorGroup %}
+{% endblock details_tutorGroup %}
+
 {% block details_formTeacher %}
     {% if showClasses %}
+
+        {# Vertical Tutor #}
         {% if formTeacher %}
             {% if externalUser.StudentYearLevel >= 6 and externalUser.StudentYearLevel <= 12 %}
-                <dt class="small-12 medium-3">Tutor Group Teacher:</dt>
+                <dt class="small-12 medium-3">Vertical Tutor:</dt>
             {% else %}
                 <dt class="small-12 medium-3">Class Teacher:</dt>
             {% endif %}
@@ -15,18 +30,32 @@
                     {{ formTeacher.formatName }}
                 {% endif %}
             </dd>
+
+            {% if externalUser.StudentForm %}
+                <dt class="small-12 medium-3">Vertical Tutor Group:</dt>
+                <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
+            {% endif %}
         {% endif %}
+
+        {# Horizontal Tutor #}
+        {% if tutorTeacher %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor:</dt>
+            <dd class="small-8 medium-9 columns">
+                {% if tutorTeacher.id %}
+                    <a href="{{ session.mailhandle }}{{ tutorTeacher.email }}">{{ tutorTeacher.formatName }}</a>
+                {% else %}
+                    {{ tutorTeacher.formatName }}
+                {% endif %}
+            </dd>
+        {% endif %}
+
+        {% if externalUser.StudentTutorDescription ?? false %}
+            <dt class="small-4 medium-3 columns">Horizontal Tutor Group:</dt>
+            <dd class="small-8 medium-9 columns">{{ externalUser.StudentTutorDescription }}</dd>
+        {% endif %}
+
     {% endif %}
 {% endblock details_formTeacher %}
-
-{% block details_studentForm %}
-    {% if showClasses %}
-        {% if externalUser.StudentForm %}
-            <dt class="small-12 medium-3">Tutor Group:</dt>
-            <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
-        {% endif %}
-    {% endif %}
-{% endblock details_studentForm %}
 
 {% block details_studiesCode %}
     {% if externalUser.StudentStudiesCode %}
