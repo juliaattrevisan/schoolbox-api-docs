@@ -35,11 +35,21 @@ $app = new class extends CliTool\App {
                 HAVING duplicate_count > 1
             ")
             ->fetchAll();
+        $this->getLogger()->info(sprintf('%d duplicated mobile_app_registry record(s) found', count($result)));
         foreach ($result as $row) {
+            $this->getLogger()->info(
+                sprintf(
+                    '%d duplicates for user_id: %d, app_id: %d, app_token: "%s" found: deleting all but one',
+                    $row['user_id'],
+                    $row['app_id'],
+                    $row['app_token'],
+                    $row['duplicate_count'],
+                )
+            );
             $deleteDuplicateQuery->execute([
                 'userId'   => $row['user_id'],
-                'appToken' => $row['app_token'],
                 'appId'    => $row['app_id'],
+                'appToken' => $row['app_token'],
                 'limit'    => (int)$row['duplicate_count'] - 1,
             ]);
         }
