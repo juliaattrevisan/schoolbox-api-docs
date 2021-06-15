@@ -329,7 +329,7 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer
 
         $currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
-        $isCorrect = $this->compareStrings($existing['response'], $currentAnswer['answer']);
+        $isCorrect = $this->compareStrings((string)$existing['response'], $currentAnswer['answer']);
 
         if ($isCorrect) {
             $title = 'Respondent provided a correct answer';
