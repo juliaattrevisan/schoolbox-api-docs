@@ -397,7 +397,7 @@ class Provisioner
                         $message = ($update ? "Skipping $action of $originalName" : "$originalName would not have been {$action}d") . ': record is unchanged';
                         $context = $commonContext;
                         $this->logger->log($level, $message, $context);
-                        if ($update) {
+                        if ($update && ($action === 'update')) {
                             $this->logger->debug("Marking $originalName as having been updated", $commonContext);
                             $internalUser->setUpdatedAt(Alaress_Date_Format::now());
                             $this->userMapper->save($internalUser);
