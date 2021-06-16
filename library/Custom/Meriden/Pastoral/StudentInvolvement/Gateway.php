@@ -298,15 +298,17 @@ class Gateway
                 se.stud_code,
                 CONCAT(
                     CASE
-                        WHEN ea.ecaud21_desc IS NULL THEN RTRIM(ea.act_desc)
-                        ELSE RTRIM(ea.ecaud21_desc)
+                        WHEN ISNULL(CHARINDEX(ea.ecaud21_desc,ea.act_desc), 0) = 0
+                        THEN RTRIM(ea.act_desc)
+                        ELSE SUBSTRING(ea.act_desc, 1, CHARINDEX(ea.ecaud21_desc,ea.act_desc) - 3)
                     END,
                     CASE
-                        WHEN el.lev_desc IS NULL THEN ''
+                        WHEN el.lev_desc IS NULL
+                        THEN ' '
                         ELSE CONCAT (' - ', el.lev_desc)
                     END) AS act_desc,
-                ea.act_type,
-                el.lev_desc,
+                NULL AS act_type,
+                NULL AS lev_desc,
                 eu.ud_desc
             FROM ecactivity ea
             INNER JOIN studecact se

@@ -43,6 +43,17 @@ class Factory
     private const LATERAL_LEARNING_SUBJECT_NAME_REGEX = '/Lateral\\s+Learning/i';
 
     /**
+     * The year levels for the Middle School variant of the report.
+     */
+    private const REPORT_YEARS_MIDDLE_SCHOOL = [7, 8, 9];
+
+    /**
+     * The year levels for the Senior School variant of the report.
+     */
+    private const REPORT_YEARS_SENIOR_SCHOOL = [10, 11, 12];
+
+
+    /**
      * @var Gateway
      */
     private $gateway;
@@ -381,9 +392,8 @@ class Factory
     /**
      * Which year level was `$student` in during calendar year `$year`?
      *
-     * Reports are only valid for
-     * * students who started year 7 in 2015+
-     * * for years in which the student was in years 7-12
+     * * All reports are only valid for students who started year 7 in 2015+
+     * * Senior year (10-12) reports are only valid for years 2021 and future
      *
      * In addition, subject pages are only valid for students in years 7-9.
      *
@@ -406,13 +416,39 @@ class Factory
 
         // Determine the year level of the report
         $reportYearLevel = ((int)$student->getYear()->getName()) - ($thisYear - $year);
-        if ($reportYearLevel < 7 || $reportYearLevel > 12) {
+        if (self::isReportYearSeniorSchool($reportYearLevel)) {
+            if (isset($subjectCode)) {
+                throw new RangeException("Report subject pages are only for years 7-9");
+            }
+            if ($year < 2021) {
+                throw new RangeException("Senior reports are not available prior to 2021");
+            }
+        } elseif (!self::isReportYearMiddleSchool($reportYearLevel)) {
             throw new RangeException("Reports are only for years 7-12");
         }
-        if (isset($subjectCode) && $reportYearLevel > 9) {
-            throw new RangeException("Report subject pages are only for years 7-9");
-        }
         return $reportYearLevel;
+    }
+
+    /**
+     * Is this report year valid for a middle school report?
+     *
+     * @param int $reportYearLevel
+     * @return bool
+     */
+    private static function isReportYearMiddleSchool(int $reportYearLevel)
+    {
+        return in_array($reportYearLevel, self::REPORT_YEARS_MIDDLE_SCHOOL);
+    }
+
+    /**
+     * Is this report year valid for a senior school report?
+     *
+     * @param int $reportYearLevel
+     * @return bool
+     */
+    private static function isReportYearSeniorSchool(int $reportYearLevel)
+    {
+        return in_array($reportYearLevel, self::REPORT_YEARS_SENIOR_SCHOOL);
     }
 
     /**
@@ -896,10 +932,14 @@ class Factory
     private static function buildTutorGroupReport(int $level, User $student)
     {
         $yearLevel = self::determineYearLevel($level, $student, null);
-        if ($yearLevel <= 9) {
+        if (self::isReportYearMiddleSchool($yearLevel)) {
             $tutorGroup = new TutorGroup\MiddleSchool();
-        } else {
+        } elseif (self::isReportYearSeniorSchool($yearLevel)) {
             $tutorGroup = new TutorGroup\SeniorSchool();
+        } else {
+            // this should've thrown an exception in determineYearLevel,
+            // but catch here anyway
+            throw new RangeException("Reports are only for years 7-12");
         }
         return $tutorGroup;
     }
