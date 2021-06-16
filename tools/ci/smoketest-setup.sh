@@ -15,16 +15,16 @@ CONFIG_DIR="/etc/php/7.4/fpm"
 PHP_SERVICE="php7.4-fpm"
 
 ## Start database to initialise with a username and password
-service mysql start
+service mariadb start
 
 ## Initialise database
-mysql -e "create database schoolbox;"
-mysql -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
-mysql -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
+mariadb -e "create database schoolbox;"
+mariadb -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
+mariadb -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
-mysql schoolbox < $initialdir/configfiles/vagrant_config.sql
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
+mariadb schoolbox < $initialdir/configfiles/vagrant_config.sql
 
 ## Make directories that will be used by our schoolbox instance
 mkdir vagrant
@@ -75,8 +75,8 @@ service nginx start
 echo 'started nginx'
 service redis-server start
 echo 'started redis-server'
-service mysql start
-echo 'started mysql'
+service mariadb start
+echo 'started mariadb'
 
 ## Go to the tools and update the db to be the latest version.
 cd /vagrant/tools
