@@ -35,7 +35,7 @@ $(document).ready(function() {
         });
     });
 
-    forms.find('textarea').blur(function(e) {
+    forms.find('textarea, input').blur(function(e) {
         e.preventDefault();
         if ($(this).val() !== '') {
             $.post(
@@ -48,19 +48,6 @@ $(document).ready(function() {
             );
             return false;
         }
-    });
-
-    forms.find('input').blur(function(e) {
-        e.preventDefault();
-//        showAlert($(this));
-        $.post(
-            $(this).closest('form').attr('action'),
-            $(this).closest('form').serialize()
-//            ,function(responseText) {
-//                var dataFunction = new Function('return ' + responseText);
-//                var result = dataFunction();
-//            }
-        );
     });
 
     var assessAttempted = '{ASSESS_PREVIOUSLY_REVIEWED}';
