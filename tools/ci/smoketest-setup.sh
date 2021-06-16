@@ -31,6 +31,7 @@ mkdir vagrant
 mkdir mnt/data
 mkdir mnt/data/php_tmp
 mkdir vagrant/data
+ln -sf /vagrant/data /var/lib/schoolbox
 chmod 777 mnt/data/php_tmp
 
 ## Move our specific config items into the correct folders
