@@ -31,15 +31,18 @@ if (!$assessHandler->isValidUrlAccess($section['assess_id'])) {
 }
 
 if ($assessHandler->isDeleted($section['assess_id'])) {
-    error(112);
+    error(Error\Mapper::ERROR_QUIZ_NOT_FOUND);
+    exit;
 }
 
 if (!$assessHandler->isOwner($this->arg[0]) && ($groupHandler->getPermission($assess['category_id']) < UserAccess::ACCESS_WRITE)) {
-    error(127);
+    error(Error\Mapper::ERROR_PERM_TEST_REVIEW);
+    exit;
 }
 
 if (!$question) {
-    error(119);
+    error(Error\Mapper::ERROR_QUESTION_NOT_FOUND);
+    exit;
 }
 
 /* Check the folder exists meaningfully
@@ -48,6 +51,7 @@ try {
     $folder = Folder\Mapper::getInstance()->findById($assess['category_id']);
 } catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_SELECT_QUIZ_GROUP);
+    exit;
 }
 
 $response = $responseHandler->getByID($this->arg[1]);
@@ -56,6 +60,7 @@ try {
     $user = UserMapper::getInstance()->findById($attempt['user_id']);
 } catch (Mapper\Exception $e) {
     error(Error\Mapper::ERROR_USER_NOT_FOUND);
+    exit;
 }
 
 /* Excluded participants 404
@@ -67,8 +72,14 @@ if (!$actionValidator->canReviewAttempts($_SESSION['user'], $user, $this->getDi(
 
 $factory = new Assess_Factory();
 $answerHandler = $factory->createAnswerModel($question['type_id']);
+$mark = filter_var($_POST['reviewedMarks'] ?? '', FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+if (!isset($mark)) {
+    // Generic "not enough submitted" message
+    error(Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
 $result = $answerHandler->saveReviewedResponse($_POST, $this->arg[1]);
 echo json_encode($result);
 /* Prevent rendering of template
  */
-exit();
+exit;
