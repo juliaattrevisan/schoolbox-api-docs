@@ -78,7 +78,6 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
                         vStudentsAll.StudentIBFlag,
-                        uStudentCommunityService.ServiceHours,
                         $learningPlanQuery
             FROM        dbo.vStudentsAll vStudentsAll
             LEFT JOIN   CommunityAlerts ON
@@ -99,7 +98,6 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
             LEFT JOIN   luHouse House ON
                             StudentCampus = House.Campus AND
                             StudentHouse = House.Code
-            LEFT JOIN uStudentCommunityService ON uStudentCommunityService.ID = :externalId2 AND uStudentCommunityService.ServiceYear = :currentYear
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = vStudentsAll.FileSemester AND
                             Semester.FileYear = vStudentsAll.FileYear AND
@@ -111,8 +109,6 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
 
         $iteratorStudents = $this->getConnector()->getQueryIterator($query, [
             'externalId' => $externalUserId,
-            'externalId2' => $externalUserId,
-            'currentYear' => date('Y')
         ]);
 
         foreach ($iteratorStudents as $row) {
@@ -136,15 +132,30 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
 
                 $student['AlertMessage'][] = $row['AlertMessage'];
             }
-
-            /* Chesed Community Service hours in the current year
-             */
-            $student['ChesedHours'] = (string)$row['ServiceHours'];
         }
 
         if (!empty($student) && is_array($student['AlertMessage'])) {
             $student['AlertMessage'] = array_unique(array_filter($student['AlertMessage']));
         }
+
+        /* Get the Chesed Community Service data separately
+         * Sometimes it's one row, sometimes not, plus it's easier to debug
+         * a volatile spec by having this separate anyway
+         */
+        $communityService = $this->getConnector()->executeQuery("
+            SELECT ID, SUM(ServiceHours) AS ServiceHours
+            FROM uStudentCommunityService
+            WHERE ID = :externalId
+            AND ServiceYear = :currentYear
+            GROUP BY ID
+        ", [
+            'externalId' => $externalUserId,
+            'currentYear' => date('Y')
+        ])->fetch();
+
+        /* Chesed Community Service hours in the current year
+         */
+        $student['ChesedHours'] = (string)$communityService['ServiceHours'];
 
         // Remove Synergetic's annoying 'Not Selected' default value for lookups
 
