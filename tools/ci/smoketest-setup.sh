@@ -38,7 +38,7 @@ cp -rf $initialdir/schoolbox-develop/* /vagrant
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf $initialdir/configfiles/nginx/* /etc/nginx
 cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
-cp -rf $initialdir/configfiles/php/7.1/fpm/* $CONFIG_DIR
+cp -rf $initialdir/configfiles/php/7.4/fpm/* $CONFIG_DIR
 cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -f $initialdir/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
 cp -rf $initialdir/data/* /vagrant/data
