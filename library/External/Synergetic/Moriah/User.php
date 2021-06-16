@@ -7,13 +7,11 @@
 
 declare(strict_types=1);
 
-use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\IBuilder as PredicateBuilder;
-use Schoolbox\External\Normalise\TupleStack;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-
+/**
+ * Class External_Synergetic_Moriah_User
+ *
+ * Includes Chesed Community Service data for the current year
+ */
 class External_Synergetic_Moriah_User extends External_Synergetic_User
 {
 
@@ -24,15 +22,6 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
     {
         if (!$this->isExternalIdValid($externalUserId)) {
             return [];
-        }
-
-        try {
-            $query = "SELECT TOP 1 * FROM uStudentCommunityService";
-            $res   = $this->getConnector()->executeQuery($query)->fetch() ?: [];
-            new \Alaress_Probe($res);
-        } catch (\Exception $e) {
-            new \Alaress_Probe($e->getMessage());
-            die();
         }
 
         if ($this->config->get('external_learning_plans')) {
@@ -89,6 +78,7 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
                         vStudentsAll.StudentIBFlag,
+                        uStudentCommunityService.ServiceHours,
                         $learningPlanQuery
             FROM        dbo.vStudentsAll vStudentsAll
             LEFT JOIN   CommunityAlerts ON
@@ -109,6 +99,7 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
             LEFT JOIN   luHouse House ON
                             StudentCampus = House.Campus AND
                             StudentHouse = House.Code
+            LEFT JOIN uStudentCommunityService ON uStudentCommunityService.ID = :externalId2 AND uStudentCommunityService.ServiceYear = :currentYear
             JOIN        FileSemesters Semester ON
                             Semester.FileSemester = vStudentsAll.FileSemester AND
                             Semester.FileYear = vStudentsAll.FileYear AND
@@ -118,7 +109,11 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
 
         $student = [];
 
-        $iteratorStudents = $this->getConnector()->getQueryIterator($query, ['externalId' => $externalUserId]);
+        $iteratorStudents = $this->getConnector()->getQueryIterator($query, [
+            'externalId' => $externalUserId,
+            'externalId2' => $externalUserId,
+            'currentYear' => date('Y')
+        ]);
 
         foreach ($iteratorStudents as $row) {
             // There might be multiple records, if this is the first one populate the bulk of the details
@@ -141,6 +136,10 @@ class External_Synergetic_Moriah_User extends External_Synergetic_User
 
                 $student['AlertMessage'][] = $row['AlertMessage'];
             }
+
+            /* Chesed Community Service hours in the current year
+             */
+            $student['ChesedHours'] = (string)$row['ServiceHours'];
         }
 
         if (!empty($student) && is_array($student['AlertMessage'])) {

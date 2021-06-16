@@ -74,10 +74,10 @@
 {% block extraDetails %}
 
     {# Community Service hours are only available to student and their parents #}
-    {% if externalUser.studentChesedHours and (isSelf or isParentOfStudent) %}
+    {% if externalUser.ChesedHours and (isSelf or isParentOfStudent) %}
         <dt class="small-4 medium-3 columns">
             Chesed Hours:
         </dt>
-        <dd class="small-8 medium-9 columns">{{ externalUser.studentChesedHours }}</dd>
+        <dd class="small-8 medium-9 columns">{{ externalUser.ChesedHours }}</dd>
     {% endif %}
 {% endblock %}
