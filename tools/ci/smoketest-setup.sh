@@ -15,22 +15,23 @@ CONFIG_DIR="/etc/php/7.4/fpm"
 PHP_SERVICE="php7.4-fpm"
 
 ## Start database to initialise with a username and password
-service mysql start
+service mariadb start
 
 ## Initialise database
-mysql -e "create database schoolbox;"
-mysql -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
-mysql -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
+mariadb -e "create database schoolbox;"
+mariadb -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
+mariadb -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
-mysql schoolbox < $initialdir/configfiles/vagrant_config.sql
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
+mariadb schoolbox < $initialdir/configfiles/vagrant_config.sql
 
 ## Make directories that will be used by our schoolbox instance
 mkdir vagrant
 mkdir mnt/data
 mkdir mnt/data/php_tmp
 mkdir vagrant/data
+ln -sf /vagrant/data /var/lib/schoolbox
 chmod 777 mnt/data/php_tmp
 
 ## Move our specific config items into the correct folders
@@ -38,7 +39,7 @@ cp -rf $initialdir/schoolbox-develop/* /vagrant
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf $initialdir/configfiles/nginx/* /etc/nginx
 cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
-cp -rf $initialdir/configfiles/php/7.1/fpm/* $CONFIG_DIR
+cp -rf $initialdir/configfiles/php/7.4/fpm/* $CONFIG_DIR
 cp -f $initialdir/configfiles/redis/redis.conf /etc/redis/redis.conf
 cp -f $initialdir/configfiles/www-conf/conf.php /vagrant/www/conf/conf.php
 cp -rf $initialdir/data/* /vagrant/data
@@ -74,8 +75,8 @@ service nginx start
 echo 'started nginx'
 service redis-server start
 echo 'started redis-server'
-service mysql start
-echo 'started mysql'
+service mariadb start
+echo 'started mariadb'
 
 ## Go to the tools and update the db to be the latest version.
 cd /vagrant/tools

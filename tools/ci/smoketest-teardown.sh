@@ -9,5 +9,5 @@ service nginx stop
 echo 'stopped nginx'
 service redis-server stop
 echo 'stopped redis-server'
-service mysql stop
-echo 'stopped mysql'
+service mariadb stop
+echo 'stopped mariadb'
