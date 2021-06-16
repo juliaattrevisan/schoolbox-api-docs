@@ -180,8 +180,8 @@ class CsvImporterTest extends TestCase
                 [
                     '',
                     '',
-                    '6',
-                    '7',
+                    '6.5',
+                    '7.5',
                     '',
                 ],
             ],
@@ -215,24 +215,24 @@ class CsvImporterTest extends TestCase
                         [
                             'name'        => 'Ind 1',
                             'descriptors' => [
-                                ['name' => 'Desc 1', 'value' => 6,],
-                                ['name' => 'Desc 2', 'value' => 7,],
-                                ['name' => 'Desc 3', 'value' => 8,],
+                                ['name' => 'Desc 1', 'value' => (float)6,],
+                                ['name' => 'Desc 2', 'value' => (float)7,],
+                                ['name' => 'Desc 3', 'value' => (float)8,],
                             ],
                         ],
                         [
                             'name'        => 'Ind 2',
                             'descriptors' => [
-                                ['name' => 'Desc 1', 'value' => 6,],
+                                ['name' => 'Desc 1', 'value' => (float)6,],
                                 null,
-                                ['name' => 'Desc 3', 'value' => 8,],
+                                ['name' => 'Desc 3', 'value' => (float)8,],
                             ],
                         ],
                         [
                             'name'        => 'Ind 3',
                             'descriptors' => [
-                                ['name' => '',       'value' => 6,],
-                                ['name' => 'Desc 2', 'value' => 7,],
+                                ['name' => '',       'value' => (float)6.5,],
+                                ['name' => 'Desc 2', 'value' => (float)7.5,],
                                 null,
                             ],
                         ],
