@@ -27,25 +27,25 @@ class Lookup
     /**
      * @var TimetablePeriodMapper
      */
-    private $timetablePeriodMapper;
+    private TimetablePeriodMapper $timetablePeriodMapper;
 
 
     /**
      * @var UserMapper
      */
-    private $userMapper;
+    private UserMapper $userMapper;
 
 
     /**
-     * @var array
+     * @var array|null
      */
-    private $users;
+    private ?array $users = null;
 
 
     /**
-     * @var array
+     * @var array|null
      */
-    private $periods;
+    private ?array $periods = null;
 
 
     /**

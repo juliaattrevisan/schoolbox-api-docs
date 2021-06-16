@@ -30,19 +30,25 @@ class ScheduleIterator implements Iterator
     /**
      * @var int
      */
-    private $position = 0;
+    private int $position = 0;
 
 
     /**
      * @var array|SimpleXMLElement[]
      */
-    private $schedules;
+    private array $schedules;
 
 
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private Batchxml $batchxml;
+
+
+    /**
+     * @var DayCalibrator
+     */
+    private DayCalibrator $dayCalibrator;
 
 
     /**
@@ -55,6 +61,7 @@ class ScheduleIterator implements Iterator
     {
         $this->batchxml = $batchxml;
         $this->schedules = $timetable->xpath('Schedules')[0]->Schedule;
+        $this->dayCalibrator = new DayCalibrator($batchxml);
     }
 
 
@@ -187,13 +194,7 @@ class ScheduleIterator implements Iterator
         /* Otherwise we knew when this happened and what was in it
          */
         return [
-
-            /* iSAMS uses a indexed week offset such that Sunday is Day 1
-             * but we use Monday as Day 1 so compensate for that. Except if your
-             * school actually starts on a Sunday like in the Middle East, then
-             * we will need to revisit this compensation
-             */
-            'day' => (int)$day[0]->Day - 1,
+            'day' => $this->dayCalibrator->determineSchoolboxDay((int)$day[0]->Day),
             'name' => trim((string)$period[0]->Name),
             'abbrev' => trim((string)$period[0]->ShortName),
             'start' => trim((string)$period[0]->StartTime),

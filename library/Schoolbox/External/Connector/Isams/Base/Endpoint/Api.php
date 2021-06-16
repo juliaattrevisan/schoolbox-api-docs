@@ -28,7 +28,7 @@ class Api implements IApi
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
@@ -36,13 +36,13 @@ class Api implements IApi
      *
      * @var string
      */
-    private $apiKey;
+    private string $apiKey;
 
 
     /**
-     * @var Uri
+     * @var Uri|null
      */
-    private $url;
+    private ?Uri $url = null;
 
 
     /**
@@ -130,5 +130,23 @@ class Api implements IApi
         }
 
         return $curl;
+    }
+
+
+    /**
+     * Save the xml to $filename in the root folder of the instance
+     *
+     * @param string $filename
+     * @throws Exception\InvalidArgumentException
+     * @throws Exception\InvalidUriPartException
+     * @throws RuntimeException
+     */
+    public function saveToFile(string $filename): void
+    {
+        $data = $this->retrieveDocument();
+
+        $filepointer = fopen("../{$filename}", 'w+');
+        fputs($filepointer, $data);
+        fclose($filepointer);
     }
 }

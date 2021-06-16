@@ -12,7 +12,7 @@ declare(strict_types=1);
 use Schoolbox\Application\CliTool;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Api;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\MockApi;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\MockFileApi;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Specification;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Zend\Uri\Exception\InvalidUriPartException;
@@ -81,7 +81,7 @@ HELP;
 
         if ($file) {
             $this->getLogger()->info("Loading from locally-cached xml file: {$file}");
-            $api = new MockApi($file);
+            $api = new MockFileApi($file);
         } else {
             $this->getLogger()->info('Accessing api endpoint');
             $api = new Api($this->getConfig()->get('schooldata_import_endpoint_host'), $this->getConfig()->get('schooldata_import_endpoint_key'));

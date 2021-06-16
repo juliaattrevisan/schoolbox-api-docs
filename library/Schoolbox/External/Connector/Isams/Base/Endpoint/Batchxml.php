@@ -33,16 +33,16 @@ class Batchxml
     /**
      * @var IApi
      */
-    private $api;
+    private IApi $api;
 
 
     /**
      * Cache the xml nodes that we downloaded so we don't end up re-fetching it
      * if we traverse the xml more than once
      *
-     * @var SimpleXMLElement
+     * @var SimpleXMLElement|null
      */
-    private $nodes;
+    private ?SimpleXMLElement $nodes = null;
 
 
     /**

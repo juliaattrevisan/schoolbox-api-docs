@@ -27,7 +27,7 @@ class Specification implements ISpecification
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private Batchxml $batchxml;
 
 
     /**

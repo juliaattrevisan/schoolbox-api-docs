@@ -28,7 +28,7 @@ class Identifier implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -36,13 +36,13 @@ class Identifier implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private Batchxml $batchxml;
 
 
     /**

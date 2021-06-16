@@ -41,7 +41,7 @@ class Definition implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -49,25 +49,31 @@ class Definition implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Batchxml
      */
-    private $batchxml;
+    private Batchxml $batchxml;
 
 
     /**
      * @var TimetableCycleMapper
      */
-    private $timetableCycleMapper;
+    private TimetableCycleMapper $timetableCycleMapper;
 
 
     /**
      * @var TimetablePeriodMapper
      */
-    private $timetablePeriodMapper;
+    private TimetablePeriodMapper $timetablePeriodMapper;
+
+
+    /**
+     * @var DayCalibrator
+     */
+    private DayCalibrator $dayCalibrator;
 
 
     /**
@@ -91,6 +97,7 @@ class Definition implements IStrategy
         $this->batchxml = $batchxml;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
+        $this->dayCalibrator = new DayCalibrator($batchxml);
     }
 
 
@@ -241,13 +248,7 @@ class Definition implements IStrategy
 
         foreach ($days as $day) {
             $periods = $day->xpath('Periods/Period');
-
-            /* iSAMS uses a indexed week offset such that Sunday is Day 1
-             * but we use Monday as Day 1 so compensate for that. Except if your
-             * school actually starts on a Sunday like in the Middle East, then
-             * we will need to revisit this compensation
-             */
-            $dayIndex = (int)$day->Day - 1;
+            $dayIndex = $this->dayCalibrator->determineSchoolboxDay((int)$day->Day);
 
             /* Figure out which day has the most periods
              * Consider this value and scheme canonical
