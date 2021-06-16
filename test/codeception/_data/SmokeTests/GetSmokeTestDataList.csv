@@ -685,3 +685,39 @@ Search,"Search and resieve no results.",Superuser,https://vagrant.dev.schoolbox.
 Search,"Search and resieve no results.",Teacher,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
 Search,"Search and resieve no results.",Student,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
 Search,"Search and resieve no results.",Parent,https://vagrant.dev.schoolbox.cloud/search?keyword=ahtrehrash,200
+Learning Moments,"Create a new learning moment with photo",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
+Learning Moments,"Create a new learning moment with photo",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
+Learning Moments,"Create a new learning moment with photo",Student,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,200
+Learning Moments,"Create a new learning moment with photo",Parent,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=photo,401
+Learning Moments,"Create a new learning moment with video",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=video,200
+Learning Moments,"Create a new learning moment with video",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=video,200
+Learning Moments,"Create a new learning moment with video",Student,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=video,200
+Learning Moments,"Create a new learning moment with video",Parent,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=video,401
+Learning Moments,"Create a new learning moment with audio",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=audio,200
+Learning Moments,"Create a new learning moment with audio",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=audio,200
+Learning Moments,"Create a new learning moment with audio",Student,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=audio,200
+Learning Moments,"Create a new learning moment with audio",Parent,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=audio,401
+Learning Moments,"Create a new learning moment with upload",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=upload,200
+Learning Moments,"Create a new learning moment with upload",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=upload,200
+Learning Moments,"Create a new learning moment with upload",Student,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=upload,200
+Learning Moments,"Create a new learning moment with upload",Parent,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=upload,401
+Learning Moments,"Create a new learning moment with text",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=text,200
+Learning Moments,"Create a new learning moment with text",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=text,200
+Learning Moments,"Create a new learning moment with text",Student,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=text,200
+Learning Moments,"Create a new learning moment with text",Parent,https://vagrant.dev.schoolbox.cloud/learning/evidence/user/25/create?momentType=text,401
+Badge,"View Badges",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge,200
+Badge,"View Badges",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge,200
+Badge,"View Badges",Student,https://vagrant.dev.schoolbox.cloud/learning/badge,401
+Badge,"View Badges",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge,401
+Badge,"Create Badges",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge/create,200
+Badge,"Create Badges",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge/create,200
+Badge,"Create Badges",Student,https://vagrant.dev.schoolbox.cloud/learning/badge/create,401
+Badge,"Create Badges",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge/create,401
+Badge,"Award a goal",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/goal,200
+Badge,"Award a goal",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/goal,200
+Badge,"Award a goal",Student,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/goal,401
+Badge,"Award a goal",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/goal,401
+Badge,"Set a goal",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/achievement,200
+Badge,"Set a goal",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/achievement,200
+Badge,"Set a goal",Student,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/achievement,401
+Badge,"Set a goal",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/achievement,401
