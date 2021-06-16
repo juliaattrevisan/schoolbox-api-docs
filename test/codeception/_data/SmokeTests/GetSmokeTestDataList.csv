@@ -721,3 +721,15 @@ Badge,"Set a goal",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge/
 Badge,"Set a goal",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/achievement,200
 Badge,"Set a goal",Student,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/achievement,401
 Badge,"Set a goal",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge/award/user/25/achievement,401
+Evidence Feed,"View student profile activity feed",Superuser,https://vagrant.dev.schoolbox.cloud/learning/evidenceFeed/user/25,200
+Evidence Feed,"View student profile activity feed",Teacher,https://vagrant.dev.schoolbox.cloud/learning/evidenceFeed/user/25,200
+Evidence Feed,"View student profile activity feed",Student,https://vagrant.dev.schoolbox.cloud/learning/evidenceFeed/user/25,200
+Evidence Feed,"View student profile activity feed",Parent,https://vagrant.dev.schoolbox.cloud/learning/evidenceFeed/user/25,200
+Evidence Feed,"View awarded goals",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/goal,200
+Evidence Feed,"View awarded goals",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/goal,200
+Evidence Feed,"View awarded goals",Student,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/goal,200
+Evidence Feed,"View awarded goals",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/goal,200
+Evidence Feed,"View awarded achievements",Superuser,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/achievement,200
+Evidence Feed,"View awarded achievements",Teacher,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/achievement,200
+Evidence Feed,"View awarded achievements",Student,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/achievement,200
+Evidence Feed,"View awarded achievements",Parent,https://vagrant.dev.schoolbox.cloud/learning/badge/award/25/awarded/achievement,200
