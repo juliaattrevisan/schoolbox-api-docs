@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Tour;
 
+use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
@@ -50,7 +52,6 @@ class Module extends BaseModule
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -67,5 +68,17 @@ class Module extends BaseModule
 
             return $injectedValues;
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function initRoutePermissions(Authorizer $authorizer)
+    {
+        $this->addRoutePermission(
+            $authorizer,
+            '.*',
+            new IsLoggedIn(),
+        );
     }
 }
