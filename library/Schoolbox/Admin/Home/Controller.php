@@ -94,7 +94,7 @@ class Controller extends Base
             }
 
             $memory_total = $m['MemTotal'];
-            $memory_used = $memory_total - $m['MemFree'] - $m['Cached'];
+            $memory_used = $memory_total - $m['MemAvailable'];
             $memory_percentage = round($memory_used / $m['MemTotal'] * 100);
             $memory_gradient = 10 - floor($memory_percentage / 10);
         } else {
