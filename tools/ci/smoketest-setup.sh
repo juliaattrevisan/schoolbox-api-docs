@@ -11,19 +11,8 @@ tar xzf qa-container-config/qa-container-config.tar.gz
 
 ## As I am using the vagrant image we need to set things up in root directory.
 cd /
-groupadd nginx
-useradd -g nginx nginx
-mkdir /var/lib/schoolbox
-
-## Some installed things, can be moved out if we make a docker image of this
-apt update
-
-apt install php7.4-fpm php7.4-pdo php7.4-mysql nginx -y
 CONFIG_DIR="/etc/php/7.4/fpm"
 PHP_SERVICE="php7.4-fpm"
-
-apt install redis-server mysql-client npm -y
-apt install mariadb-server -y
 
 ## Start database to initialise with a username and password
 service mysql start
