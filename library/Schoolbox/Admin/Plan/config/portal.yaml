@@ -115,6 +115,7 @@ topMenu:
     - /learning/pending
     - /learning/due
     - /learning/grades
+    - /learning/badge
     - /course/list
     - /eportfolio
     - /fixtures

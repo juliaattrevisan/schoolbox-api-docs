@@ -8,7 +8,7 @@ config:
   curriculum_tagging_enabled: {edit: true}
   eotc_enabled: {value: false, edit: false}
   learning_moments_enabled : {edit: true}
-  badges_enabled : {value: false, edit: false}
+  badges_enabled : {edit: true}
   fixtures_enabled: {value: false, edit: false}
   pastoral_enabled : {value: false, edit: false}
   resource_booking_enabled: {value: false, edit: false}
@@ -120,6 +120,7 @@ topMenu:
     - /learning/grades
     - /course/list
     - /eportfolio
+    - /learning/badge
 components:
   hide:
    - Schoolbox\Fixtures\Component\Homepage\Controller
