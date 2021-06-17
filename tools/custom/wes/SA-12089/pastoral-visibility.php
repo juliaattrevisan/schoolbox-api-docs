@@ -58,7 +58,7 @@ $app = new class extends CliTool\App {
     {
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
-Updates pastoral records where access has been incorrectly set. Non-deleted pastoral records
+Updates pastoral records where access has been incorrectly set. Non-deleted pastoral_access records
 set to Teachers/Deny will be upgraded to Teachers/General. 
 
 Existing pastoral_access records are backed up into _pastoral_access after the first Perform.
