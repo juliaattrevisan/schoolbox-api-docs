@@ -8,7 +8,7 @@ config:
   curriculum_tagging_enabled: {value: false, edit: false}
   eotc_enabled: {value: false, edit: false}
   learning_moments_enabled : {edit: true}
-  badges_enabled : {edit: true}
+  badges_enabled : {value: false, edit: false}
   fixtures_enabled: {edit: true}
   pastoral_enabled : {value: false, edit: false}
   resource_booking_enabled: {edit: true}
@@ -115,12 +115,12 @@ topMenu:
     - /learning/pending
     - /learning/due
     - /learning/grades
+    - /learning/badge
     - /course/list
     - /pastoral
   show:
     - /eportfolio
     - /fixtures
-    - /learning/badge
 components:
   hide:
    - Schoolbox\Learning\Component\Dashboard\UpcomingWorkController
