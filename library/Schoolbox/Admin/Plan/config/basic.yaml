@@ -115,6 +115,7 @@ topMenu:
     - /fixtures
     - /pastoral
     - /eportfolio
+    - /learning/badge
   show:
     - /learning/pending
     - /learning/due
