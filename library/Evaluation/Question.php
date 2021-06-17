@@ -225,31 +225,30 @@ abstract class Evaluation_Question extends DeprecatedModel
      *
      * @param array $allIds
      */
-    public function reorderQuestions($allIds)
+    public function reorderQuestions(array $allIds): void
     {
         if (is_array($allIds) && count($allIds)) {
-            $queryComponents = array();
             $sequence = 1;
 
             foreach ($allIds as $currentId) {
-                $id = str_replace('question_', '', $currentId);
+                /* Skip any $currentIds that aren't truly numeric,
+                 * in case someone randomly subverted the data payload from frontend
+                 *
+                 * Arguably someone can subvert the payload to contain "1e3" which is considered
+                 * numeric but that shouldn't correspond to 1000; it's can't be a system-generated value
+                 */
+                if ((int)preg_replace('/[^0-9]*/', '', $currentId) !== (int)$currentId) {
+                    continue;
+                }
 
-                $queryComponents[] = "($id, $sequence)";
+                $this->db->query("
+                    UPDATE {$this->_table}
+                    SET sequence = {$sequence}
+                    WHERE question_id = {$currentId}
+                ");
 
                 $sequence++;
             }
-
-            $values = implode(',', $queryComponents);
-
-            /* :>
-             */
-            $query = "
-                INSERT INTO {$this->_table} (question_id, sequence)
-                VALUES $values
-                ON DUPLICATE KEY UPDATE sequence = VALUES(sequence)
-            ";
-
-            $this->db->query($query);
         }
     }
 
