@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ${NAME}
+ * Reorder quiz questions if you have access permissions
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -13,11 +13,11 @@ use Schoolbox\Permission\Access\UserAccess;
 $groupHandler  = new Group();
 $assessHandler = new Assess_Main();
 
-$assess = $assessHandler->getByID($this->arg[0]);
-
 if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
     $this->pageNotFound();
 }
+
+$assess = $assessHandler->getByID($this->arg[0]);
 
 if ($assessHandler->isDeleted($this->arg[0])) {
     error(112);
