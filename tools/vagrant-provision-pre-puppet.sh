@@ -85,7 +85,7 @@ fi
 
 # Remove old single-instance daemons
 for service in socketd digestd routed scheduled; do
-  if systemctl | grep -q "schoolbox-$service.service"; then
+  if systemctl --plain --no-legend | grep -q "schoolbox-$service.service"; then
     systemctl stop "schoolbox-$service.service";
   fi
   find /etc/systemd/system/multi-user.target.wants/ -iname "schoolbox-$service.service" -delete

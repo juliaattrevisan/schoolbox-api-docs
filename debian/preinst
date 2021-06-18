@@ -47,7 +47,7 @@ case "$1" in
 
         # Stop all schoolbox daemons (supports both old+new single/multi instance style)
         for daemon in socketd digestd routed scheduled belld; do
-            for service in $(systemctl | grep -E "schoolbox*.*$daemon.*service" | awk '{print $1}'); do
+            for service in $(systemctl --plain --no-legend | grep -E "schoolbox*.*$daemon.*service" | awk '{print $1}'); do
                 echo "stopping $service" | tee -a /var/log/schoolbox/upgrade.log
                 systemctl stop "$service"
             done
