@@ -150,9 +150,7 @@ class Api implements IApi
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
-                $response = $this->client->get($this->host, [
-                    'query' => $queryArgs
-                ]);
+                $response = $this->client->post($this->host, ['query' => $queryArgs]);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 
