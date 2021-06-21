@@ -1,31 +1,37 @@
 <!-- BEGIN custom_head -->
 <script type='text/javascript'>
-	$(function() {
-        var absenceCounter = $('[data-attendance-count]');
-        var absenceChecks  = $('[data-attendance-absence]');
+    $(function() {
+        let absenceCounter = $('[data-attendance-count]');
+        let absenceChecks  = $('[data-attendance-absence]');
         absenceChecks.on('change', function() {
             absenceCounter.text(absenceChecks.not(':checked').length);
         });
 
+        // Disable the submit button on submitting the attendance form.
+        // No need to re-enable it, as the form submit redirects elsewhere.
+        $('#attendance-form').on('submit', function () {
+            $('#attendance-form-submit').prop('disabled', true);
+        });
+
         /* Get the list of values that exist per type
          */
-        var reasonStack = {DROPDOWN_HASH};
+        let reasonStack = {DROPDOWN_HASH};
 
         /* For each student's Type dropdown, figure out
          *  - the type currently selected
          *  - the corresponding Reason dropdown that needs to be replaced
          */
         $('[data-absence-type]').on('change', function(event) {
-            var id = $(this).attr('data-absence-type');
+            let id = $(this).attr('data-absence-type');
 
-            var destination = '#' + 'absenceReason' + id;
+            let destination = '#' + 'absenceReason' + id;
 
             /* When the Type dropdown changes, find its value
              * then build the Reason dropdown
              */
-            var availableOptions = reasonStack[$(this).val()];
+            let availableOptions = reasonStack[$(this).val()];
 
-            var select = $('<select id="absenceReason'+id+'" name="PossibleReasonCode[]" data-absence-reason="'+id+'" />');
+            let select = $('<select id="absenceReason'+id+'" name="PossibleReasonCode[]" data-absence-reason="'+id+'" />');
 
             /* All other uncorrelated options (also happens to include Not Selected)
              */
@@ -77,8 +83,7 @@
 
 <div class="row">
     <div class="small-12 island">
-
-        <form method='post' action='/modules/attendance/modifyForm'>
+        <form method='post' action='/modules/attendance/modifyForm' id="attendance-form">
             <section>
                 <input name='fileType' type='hidden' value='{FILETYPE}' />
                 <input name='classCode' type='hidden' value='{CLASS_CODE}' />
@@ -168,7 +173,7 @@
                     <span data-attendance-count>{ATTENDANCE_COUNT}</span> students attending out of {ATTENDANCE_TOTAL}
                 </div>
             </section>
-            <input type="submit" value="Submit Attendances" />
+            <input type="submit" value="Submit Attendances" id="attendance-form-submit" />
         </form>
     </div>
 </div>
