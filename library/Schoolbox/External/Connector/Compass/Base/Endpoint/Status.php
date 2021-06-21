@@ -31,6 +31,7 @@ class Status implements IStatus
      *
      * @param string $host
      * @param string $key
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function __construct(string $host, string $key)
     {
@@ -45,6 +46,11 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
+        $result = $this->api->retrieveDocument('/person/v1/GetStudents', [
+            'lBound' => '2021-01-01T00:00:00Z',
+            'uBound' => '2021-12-31T00:00:00Z'
+        ]);
+
         return false;
     }
 
