@@ -131,6 +131,8 @@ class Api implements IApi
      */
     public function retrieveDocument(string $method, array $params): ?array
     {
+        $response = null;
+
         /* Record endpoint usage
          */
         $this->apiUsage->record($method);
@@ -148,7 +150,9 @@ class Api implements IApi
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
-                $response = $this->client->get($this->host, $queryArgs);
+                $response = $this->client->get($this->host, [
+                    'query' => $queryArgs
+                ]);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 
@@ -165,29 +169,26 @@ class Api implements IApi
                     return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
                 } catch (\JsonException $e) {
                     /* Couldn't decode json, or server refused something, or something else died
+                     * noop; just increase the $fails counter
                      */
-                    $fails++;
-
-                    continue;
                 }
             }
 
-            /* We tried multiple times and failed multiple times
-             * This might as well have died
-             *
-             * Exit by throwing exception like we normally would have done
-             * otherwise we'll get stuck in an infinite loop and pound the api
-             */
-            if ($fails >= self::NUM_RETRY) {
-                throw new RuntimeException(sprintf(
-                    'Bad endpoint %s: %s %s after %s retries. Payload: %s',
-                    $method,
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase(),
-                    self::NUM_RETRY,
-                    json_encode($queryArgs, JSON_THROW_ON_ERROR)
-                ));
-            }
+            $fails++;
+        }
+
+        /* We tried multiple times and failed multiple times
+         * This might as well have died
+         */
+        if ($response) {
+            throw new RuntimeException(sprintf(
+                'Bad endpoint %s: %s %s after %s retries. Payload: %s',
+                $method,
+                $response->getStatusCode(),
+                $response->getReasonPhrase(),
+                self::NUM_RETRY,
+                json_encode($queryArgs, JSON_THROW_ON_ERROR)
+            ));
         }
 
         /* Couldn't decode json, or server refused something, or something else died
