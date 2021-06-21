@@ -49,9 +49,12 @@ class Status implements IStatus
      */
     public function isReachable(): bool
     {
+        /* ISO8601 format:
+         * https://stackoverflow.com/questions/903203/how-to-display-a-date-as-iso-8601-format-with-php
+         */
         $result = $this->api->retrieveDocument('person/v1/GetStudents', [
-            'lBound' => \Alaress_Date_Format::now()->getDatabaseDate() . 'T00:00:00Z',
-            'uBound' => \Alaress_Date_Format::now()->addDays(1)->getDatabaseDate() . 'T00:00:00Z'
+            'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
+            'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
         ]);
 
         return (bool)$result;
