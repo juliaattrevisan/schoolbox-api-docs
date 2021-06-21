@@ -19,7 +19,7 @@ use Schoolbox\External\Profile as UserProfile;
  *
  * Remove any stale profiles
  *
- * @package Schoolbox\External\Connector\Example\Base\Endpoint
+ * @package Schoolbox\External\Connector\Example\Base\Endpoint\Profile
  */
 class Cleanup implements IStrategy
 {

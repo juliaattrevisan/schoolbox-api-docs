@@ -21,7 +21,7 @@ use Schoolbox\External\TimetablePeriodMapper;
  *
  * Clears data from a db in preparation for an import
  *
- * @package Schoolbox\External\Connector\Example\Base\Endpoint
+ * @package Schoolbox\External\Connector\Example\Base\Endpoint\Timetable
  */
 class Prepare implements IStrategy
 {

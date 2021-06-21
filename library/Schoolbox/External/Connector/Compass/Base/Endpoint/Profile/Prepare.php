@@ -18,7 +18,7 @@ use Schoolbox\External\Profile as UserProfile;
  *
  * Clears data from a db in preparation for an import
  *
- * @package Schoolbox\External\Connector\Compass\Base\Endpoint
+ * @package Schoolbox\External\Connector\Compass\Base\Endpoint\Profile
  */
 class Prepare implements IStrategy
 {
