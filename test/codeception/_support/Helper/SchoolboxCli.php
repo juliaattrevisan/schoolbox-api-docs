@@ -284,4 +284,15 @@ class SchoolboxCli extends \Codeception\Module
     {
         return \Schoolbox\Learning\Badge\Mapper::getInstance()->findOneByColumn('name', $name);
     }
+
+    /**
+     * Returns the first learning moment based on its title.
+     *
+     * @param string $body
+     * @return \Schoolbox\Learning\Moment\Evidence\Model;
+     */
+    public function grabLearningMomentByBody(string $body):\Schoolbox\Learning\Moment\Evidence\Model
+    {
+        return \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance()->findOneByColumn('body', $body);
+    }
 }

@@ -23,7 +23,8 @@ class LearningMomentsCest
     }
 
 
-    /** Create draft news using curl request
+    /** Create a learning moment by writing something and submitting it
+     * check if response code is 200
      *
      * @param IntegrationTester    $i
      */
@@ -33,10 +34,10 @@ class LearningMomentsCest
         $student_jreed = $i->grabUser('jreed');
         $type= 'text';
         $timestamp = time();
-        $body     = 'Smoke Test Learning Moment type text ' . $timestamp;
+        $body     = 'Learning Moment Text: Automation API Smoke Test' . $timestamp;
 
         #WHEN
-        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(),$type);
+        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(),$type, $body);
         $i->amGoingTo('Send request to create a learning moment');
         $i->sendRequest($learningMomentPayload);
 
@@ -44,4 +45,36 @@ class LearningMomentsCest
         $i->seeResponseCodeIs(200);
 
     }
+
+    /** Update a text learning moment submitting it
+     * check if response code is 200
+     *
+     * @param IntegrationTester    $i
+     */
+    public function modifyLearningMomentText(IntegrationTester $i): void
+    {
+        #GIVEN
+        $student_jreed = $i->grabUser('jreed');
+        $type= 'text';
+        $timestamp = time();
+        $body     = 'Learning Moment Text: Automation API Smoke Test' . $timestamp;
+        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(),$type, $body);
+        $i->amGoingTo('Send request to create a learning moment');
+        $i->sendRequest($learningMomentPayload);
+        $i->seeResponseCodeIs(200);
+
+        $evidence = $i->grabLearningMomentByBody($body);
+
+        #WHEN
+        $body     = 'Learning Moment Text: Automation API Smoke Test - getting this text updated' . $timestamp;
+        $type= 'text';
+        $learningMomentPayloadModify = new Payload\LearningMoment\Modify($evidence->getId(), $type,  $body);
+        $i->amGoingTo('Send request to update a learning moment');
+        $i->sendRequest($learningMomentPayloadModify);
+        $i->seeResponseCodeIs(200);
+
+    }
+
+
+
 }
