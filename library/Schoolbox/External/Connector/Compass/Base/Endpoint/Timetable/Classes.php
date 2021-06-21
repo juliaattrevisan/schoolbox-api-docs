@@ -108,124 +108,124 @@ class Classes implements IStrategy
     public function import(): void
     {
 
-        /* Cache a flat key-value array of (user.id, user.synergy_id)
-         * The alternative would be to iterate findById() in a loop which probably costs more at scale
-         *
-         * Cache a flat key-value array of (day, period)
-         */
-        $this->lookup->init();
-
-        $users = $this->lookup->getUsers();
-        $periods = $this->lookup->getPeriods();
-
-        /* TODO Get a list of all the timetables to process
-         */
-        $timetables = [];
-
-        /* If there aren't any timetables, log it and exit
-         */
-        if (!\count($timetables)) {
-            $this->log->warning('No timetables detected.');
-            return;
-        }
-
-        foreach ($timetables as $timetable) {
-            /* TODO External Timetable Code (Cycle Identifier)
-             */
-            $ext = '';
-
-            /* Find all the classes and their details as best we can
-             *
-             * Some parts will rely on data to have already been imported into local schema,
-             * such as period ids, user ids, etc. so we try to get those and assemble them into
-             * a convenient struct which we can then just ram home
-             */
-            /* TODO Create an Iterator which collates subject data
-             */
-            $classes = [
-                /*
-                    [
-                        'period' => [
-                            'day' => '',
-                            'name' => '',
-                            'sequence' => '',
-                            'start' => '',
-                            'end' => ''
-                        ],
-                        'class' => [
-                            'code' => '',
-                            'name' => ''
-                        ],
-                        'room' => [
-                            'name' => ''
-                        ],
-                        'teachers' => [
-                            [
-                                'externalId' => '',
-                                'firstname' => '',
-                                'surname' => '',
-                            ]
-                        ],
-                        'student' => [
-                            [
-                                'externalId' => '',
-                                'firstname' => '',
-                                'surname' => '',
-                            ]
-                        ]
-                    ]
-                */
-            ];
-
-            foreach ($classes as $class) {
-                /* Look up the period instance by (name, day)
-                 *
-                 * If the period doesn't correspond to something in our timetable definition,
-                 * we can't process it anyway, so skip it
-                 */
-                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
-
-                $this->log->info(sprintf(
-                    'Looking for ext_timetable_code %s, day %s, period %s',
-                    $ext,
-                    $class['period']['day'],
-                    $class['period']['name']
-                ));
-
-                if (null === $timetablePeriod) {
-                    $this->log->warning(sprintf(
-                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
-                        $class['period']['name'],
-                        $class['period']['day'],
-                        $ext
-                    ));
-
-                    continue;
-                }
-
-                /* Assemble the pieces
-                 */
-                $timetableClass = $this->createTimetableClass($class);
-                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
-
-                /* Process students
-                 */
-                foreach ($class['students'] as $student) {
-                    /* Throw warning, but assign them anyway
-                     */
-                    if (!isset($users[$student['externalId']])) {
-                        $this->log->warning(sprintf(
-                            'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
-                            $student['externalId'],
-                            $timetableClass->getName(),
-                            $timetableClass->getCode()
-                        ));
-                    }
-
-                    $this->createTimetableClassInvolvement($student, $timetableClass);
-                }
-            }
-        }
+//        /* Cache a flat key-value array of (user.id, user.synergy_id)
+//         * The alternative would be to iterate findById() in a loop which probably costs more at scale
+//         *
+//         * Cache a flat key-value array of (day, period)
+//         */
+//        $this->lookup->init();
+//
+//        $users = $this->lookup->getUsers();
+//        $periods = $this->lookup->getPeriods();
+//
+//        /* TODO Get a list of all the timetables to process
+//         */
+//        $timetables = [];
+//
+//        /* If there aren't any timetables, log it and exit
+//         */
+//        if (!\count($timetables)) {
+//            $this->log->warning('No timetables detected.');
+//            return;
+//        }
+//
+//        foreach ($timetables as $timetable) {
+//            /* TODO External Timetable Code (Cycle Identifier)
+//             */
+//            $ext = '';
+//
+//            /* Find all the classes and their details as best we can
+//             *
+//             * Some parts will rely on data to have already been imported into local schema,
+//             * such as period ids, user ids, etc. so we try to get those and assemble them into
+//             * a convenient struct which we can then just ram home
+//             */
+//            /* TODO Create an Iterator which collates subject data
+//             */
+//            $classes = [
+//                /*
+//                    [
+//                        'period' => [
+//                            'day' => '',
+//                            'name' => '',
+//                            'sequence' => '',
+//                            'start' => '',
+//                            'end' => ''
+//                        ],
+//                        'class' => [
+//                            'code' => '',
+//                            'name' => ''
+//                        ],
+//                        'room' => [
+//                            'name' => ''
+//                        ],
+//                        'teachers' => [
+//                            [
+//                                'externalId' => '',
+//                                'firstname' => '',
+//                                'surname' => '',
+//                            ]
+//                        ],
+//                        'student' => [
+//                            [
+//                                'externalId' => '',
+//                                'firstname' => '',
+//                                'surname' => '',
+//                            ]
+//                        ]
+//                    ]
+//                */
+//            ];
+//
+//            foreach ($classes as $class) {
+//                /* Look up the period instance by (name, day)
+//                 *
+//                 * If the period doesn't correspond to something in our timetable definition,
+//                 * we can't process it anyway, so skip it
+//                 */
+//                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
+//
+//                $this->log->info(sprintf(
+//                    'Looking for ext_timetable_code %s, day %s, period %s',
+//                    $ext,
+//                    $class['period']['day'],
+//                    $class['period']['name']
+//                ));
+//
+//                if (null === $timetablePeriod) {
+//                    $this->log->warning(sprintf(
+//                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
+//                        $class['period']['name'],
+//                        $class['period']['day'],
+//                        $ext
+//                    ));
+//
+//                    continue;
+//                }
+//
+//                /* Assemble the pieces
+//                 */
+//                $timetableClass = $this->createTimetableClass($class);
+//                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+//
+//                /* Process students
+//                 */
+//                foreach ($class['students'] as $student) {
+//                    /* Throw warning, but assign them anyway
+//                     */
+//                    if (!isset($users[$student['externalId']])) {
+//                        $this->log->warning(sprintf(
+//                            'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
+//                            $student['externalId'],
+//                            $timetableClass->getName(),
+//                            $timetableClass->getCode()
+//                        ));
+//                    }
+//
+//                    $this->createTimetableClassInvolvement($student, $timetableClass);
+//                }
+//            }
+//        }
     }
 
 

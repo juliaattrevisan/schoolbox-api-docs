@@ -96,25 +96,25 @@ class Specification
 
         $messages = [];
 
-        foreach ($paths as $path) {
-            $paddedPath = str_pad($path, $paddedLength);
-
-            if ($this->batchxml->fetchXml($path)) {
-                $message = "{$paddedPath} " . self::STATUS_OK;
-
-                if ($this->log) {
-                    $this->log->info($message);
-                }
-            } else {
-                $message = "{$paddedPath} " . self::STATUS_MISSING;
-
-                if ($this->log) {
-                    $this->log->warning($message);
-                }
-            }
-
-            $messages[] = $message;
-        }
+//        foreach ($paths as $path) {
+//            $paddedPath = str_pad($path, $paddedLength);
+//
+//            if ($this->batchxml->fetchXml($path)) {
+//                $message = "{$paddedPath} " . self::STATUS_OK;
+//
+//                if ($this->log) {
+//                    $this->log->info($message);
+//                }
+//            } else {
+//                $message = "{$paddedPath} " . self::STATUS_MISSING;
+//
+//                if ($this->log) {
+//                    $this->log->warning($message);
+//                }
+//            }
+//
+//            $messages[] = $message;
+//        }
 
         return $messages;
     }
