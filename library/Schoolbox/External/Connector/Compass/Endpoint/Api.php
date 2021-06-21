@@ -119,6 +119,6 @@ class Api implements IApi
      */
     private function initCurl(): \Alaress_Curl_Url
     {
-        return new Alaress_Curl_Url($this->getUrl());
+        return new Alaress_Curl_Url($this->getUrl()->toString());
     }
 }
