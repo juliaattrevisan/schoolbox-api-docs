@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * @copyright   Copyright 2020, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
+
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
+use Schoolbox\External\Importer\Endpoint\Status\IStatus;
+
+/**
+ * Class Status
+ *
+ * @package Schoolbox\External\Connector\Compass\Base\Endpoint
+ */
+class Status implements IStatus
+{
+
+    /**
+     * @var Api
+     */
+    private Api $api;
+
+
+    /**
+     * Status constructor.
+     *
+     * @param string $host
+     * @param string $key
+     */
+    public function __construct(string $host, string $key)
+    {
+        $this->api = new Api($host, $key);
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return bool
+     */
+    public function isReachable(): bool
+    {
+        return false;
+    }
+
+
+    /**
+     * @inheritDoc
+     *
+     * @return array
+     */
+    public function getReport(): array
+    {
+        try {
+            return [];
+        } catch (\RuntimeException $e) {
+            return [[
+                 'message' => 'Cannot access api endpoint',
+                 'reason' => $e->getMessage(),
+                 'status' => ISpecification::STATUS_ERROR
+            ]];
+        }
+    }
+}
