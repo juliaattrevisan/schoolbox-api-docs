@@ -94,9 +94,13 @@ class Api implements IApi
 
         return new Client([
             'headers' => $headers,
-            'base_uri' => $host,
             'timeout' => $timeout,
             'http_errors' => false,
+
+            /* See https://docs.guzzlephp.org/en/stable/quickstart.html for usage
+             * There's a little thing about relative urls here
+             */
+            'base_uri' => $host,
         ]);
     }
 
