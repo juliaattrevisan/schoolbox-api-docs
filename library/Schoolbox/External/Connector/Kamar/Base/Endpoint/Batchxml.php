@@ -37,9 +37,9 @@ class Batchxml
      * Cache the xml nodes that we downloaded so we don't end up re-fetching it
      * if we traverse the xml more than once
      *
-     * @var SimpleXMLElement|null
+     * @var SimpleXMLElement
      */
-    private ?SimpleXMLElement $nodes = null;
+    private SimpleXMLElement $nodes;
 
 
     /**
