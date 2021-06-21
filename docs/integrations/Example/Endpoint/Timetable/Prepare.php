@@ -96,7 +96,6 @@ class Prepare implements IStrategy
     public function import(): void
     {
         if ($this->perform) {
-
             /* Truncate other data entirely
              */
             $this->classEntryMapper->truncate();

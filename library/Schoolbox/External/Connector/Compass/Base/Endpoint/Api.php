@@ -136,7 +136,6 @@ class Api implements IApi
                 $response = $this->client->post($method, [
                     RequestOptions::JSON => $params
                 ]);
-
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 

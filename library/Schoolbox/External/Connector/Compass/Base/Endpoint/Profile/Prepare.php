@@ -83,7 +83,7 @@ class Prepare implements IStrategy
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
         UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
+        UserProfile\Relationship\Mapper $relationshipMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
