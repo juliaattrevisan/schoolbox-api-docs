@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
-use Psr\Log\LoggerInterface;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -24,37 +24,19 @@ class Specification
 {
 
     /**
-     * Status text for existing nodes
+     * @var Api
      */
-    private const STATUS_OK = 'OK';
-
-
-    /**
-     * Status text for missing nodes
-     */
-    private const STATUS_MISSING = 'MISSING';
-
-
-    /**
-     * Number of spaces for output formatting
-     */
-    private const PADDING = 20;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private ?LoggerInterface $log;
+    private Api $api;
 
 
     /**
      * Specification constructor.
      *
-     * @param LoggerInterface|null $log
+     * @param Api $api
      */
-    public function __construct(?LoggerInterface $log)
+    public function __construct(Api $api)
     {
-        $this->log = $log;
+        $this->api = $api;
     }
 
 
@@ -74,6 +56,13 @@ class Specification
             /**
              * Student Profile nodes
              */
+            [
+                'endpoint' =>'person/v1/GetStudents',
+                'params' => [
+                    'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
+                    'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
+                ]
+            ]
 
 
             /**
@@ -92,30 +81,34 @@ class Specification
 
         ];
 
-        $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
+        $endpoints = [];
 
-        $messages = [];
+        foreach ($paths as $path) {
+            $errorMessage = '';
+            $message = $path['endpoint'];
 
-//        foreach ($paths as $path) {
-//            $paddedPath = str_pad($path, $paddedLength);
-//
-//            if ($this->batchxml->fetchXml($path)) {
-//                $message = "{$paddedPath} " . self::STATUS_OK;
-//
-//                if ($this->log) {
-//                    $this->log->info($message);
-//                }
-//            } else {
-//                $message = "{$paddedPath} " . self::STATUS_MISSING;
-//
-//                if ($this->log) {
-//                    $this->log->warning($message);
-//                }
-//            }
-//
-//            $messages[] = $message;
-//        }
+            try {
+                $result = (bool)$this->api->retrieveDocument($path['endpoint'], $path['params']);
+            } catch (\RuntimeException $e) {
+                $errorMessage = $e->getMessage();
+                $result = false;
+            }
 
-        return $messages;
+            if ($result) {
+                $endpoints[] = [
+                    'message' => $message,
+                    'reason' => '',
+                    'status' => ISpecification::STATUS_OK
+                ];
+            } else {
+                $endpoints[] = [
+                    'message' => $message,
+                    'reason' => $errorMessage,
+                    'status' => ISpecification::STATUS_MISSING
+                ];
+            }
+        }
+
+        return $endpoints;
     }
 }
