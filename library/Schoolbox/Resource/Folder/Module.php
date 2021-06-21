@@ -116,7 +116,7 @@ class Module extends BaseModule
                         /** @var Model $folder */
                         $folder = $params['folder'];
                         if ($this->getMapper()->countByColumn('parent', $folder->getId()) > 0) {
-                            throw new InvalidPath("The category is not empty");
+                            throw new InvalidPath("The folder is not empty");
                         }
                     }
                 )
