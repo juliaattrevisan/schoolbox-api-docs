@@ -10,10 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint;
 
-use Alaress_Curl_Url;
+use DomainException;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use RuntimeException;
-use Zend\Uri\Exception;
-use Zend\Uri\Uri;
 
 /**
  * Class Api
@@ -24,25 +24,38 @@ class Api implements IApi
 {
 
     /**
-     * The host server
-     *
-     * @var string
+     * Request timeout
      */
-    private string $host;
+    private const DEFAULT_TIMEOUT = 300;
 
 
     /**
-     * The API key for this call, provided by the school
+     * Number of seconds to take a nap before retrying a failed endpoint
      *
-     * @var string
+     * Sometimes endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
      */
-    private string $apiKey;
+    private const NAP_TIMEOUT = 3;
 
 
     /**
-     * @var Uri
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
      */
-    private Uri $url;
+    private const NUM_RETRY = 3;
+
+
+    /**
+     * @var ApiUsage
+     */
+    private ApiUsage $apiUsage;
+
+
+    /**
+     * @var Client
+     */
+    private Client $client;
 
 
     /**
@@ -50,75 +63,124 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $apiKey
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function __construct(string $host, string $apiKey)
     {
-        $this->host   = $host;
-        $this->apiKey = $apiKey;
+        $this->client = $this->initClient($host, $apiKey, self::DEFAULT_TIMEOUT);
+
+        /* Record some stats about api usage
+         * Turn this into an Observer pattern if you want to record more details
+         */
+        $this->apiUsage = new ApiUsage();
+    }
+
+
+    /**
+     * Set up guzzle client
+     *
+     * @param string $host
+     * @param string $key
+     * @param int    $timeout
+     * @return Client
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     */
+    private function initClient(string $host, string $key, int $timeout): Client
+    {
+        /* SIS-API-Key: this header tuple depends on your sis
+         * Find out what this should actually be called
+         */
+        $headers = [
+            'SIS-API-Key' => $key,
+            'Content-Type' => 'application/json'
+        ];
+
+        return new Client([
+            'headers' => $headers,
+            'timeout' => $timeout,
+            'http_errors' => false,
+
+            /* See https://docs.guzzlephp.org/en/stable/quickstart.html for usage
+             * There's a little thing about relative urls here
+             */
+            'base_uri' => $host,
+        ]);
     }
 
 
     /**
      * Retrieves endpoint data representing the result from the API call.
      *
-     * @return string|null
+     * @param string $method
+     * @param array  $params
+     * @return array|null
+     * @throws DomainException
      * @throws RuntimeException if the retrieval of the endpoint failed
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
+     * @throws \JsonException
      */
-    public function retrieveDocument(): ?string
+    public function retrieveDocument(string $method, array $params): ?array
     {
-        $curl = $this->initCurl();
-        $curl->exec();
+        $response = null;
 
-        if (empty($curl->getErrors())) {
-            // Too big to parse
-            return $curl->getResult();
-        }
-
-        throw new RuntimeException(
-            sprintf(
-                'Endpoint retrieval failed: response code %d, message: %s',
-                $curl->getResponseCode(),
-                implode(', ', $curl->getErrors())
-            ),
-            $curl->getResponseCode()
-        );
-    }
-
-
-    /**
-     * Cache a url definition then return its value
-     *
-     * @return Uri
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
-     */
-    public function getUrl(): Uri
-    {
-        /* TODO Set Path
+        /* Record endpoint usage
          */
-        if (!$this->url) {
-            $this->url = (new Uri())
-                ->setScheme('https')
-                ->setHost($this->host)
-                ->setPath('')
-                ->setQuery(['apikey' => $this->apiKey]);
+        $this->apiUsage->record($method);
+
+        /* Mine out an error message if you try to access a thing that doesn't exist
+         */
+        $fails = 0;
+
+        /* Try multiple times in case sis dies for a random reason
+         */
+        while ($fails < self::NUM_RETRY) {
+            /* Any exception thrown by guzzle might as well be a reason to nap and retry
+             */
+            try {
+                $response = $this->client->post($method, [
+                    RequestOptions::JSON => $params
+                ]);
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                $fails++;
+
+                sleep(self::NAP_TIMEOUT);
+
+                continue;
+            }
+
+            /* Successful response from server, but it might not send a valid data payload back
+             * so try to decode it. If it can't decode properly, return null
+             */
+            if ($response->getStatusCode() === 200) {
+                try {
+                    return json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    /* Couldn't decode json, or server refused something, or something else died
+                     * noop; just increase the $fails counter
+                     */
+                }
+            }
+
+            $fails++;
         }
 
-        return $this->url;
-    }
+        /* We tried multiple times and failed multiple times
+         * This might as well have died
+         */
+        if ($response) {
+            throw new RuntimeException(sprintf(
+                'Bad endpoint %s: %s %s after %s retries. Payload: %s',
+                $method,
+                $response->getStatusCode(),
+                $response->getReasonPhrase(),
+                self::NUM_RETRY,
+                json_encode($params, JSON_THROW_ON_ERROR)
+            ));
+        }
 
-
-    /**
-     * Set up curl instance
-     *
-     * @return Alaress_Curl_Url
-     * @throws Exception\InvalidArgumentException
-     * @throws Exception\InvalidUriPartException
-     */
-    private function initCurl(): \Alaress_Curl_Url
-    {
-        return new Alaress_Curl_Url($this->getUrl()->toString());
+        /* Couldn't decode json, or server refused something, or something else died
+         * Guzzle repeatedly failed too many times and kept throwing exceptions when $response
+         * was being requested, so I guess you ended up here
+         */
+        throw new DomainException('Could not access server, or bad json payload returned.');
     }
 }
