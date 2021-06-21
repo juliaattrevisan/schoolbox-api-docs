@@ -7,6 +7,12 @@
             absenceCounter.text(absenceChecks.not(':checked').length);
         });
 
+        // Disable the submit button on submitting the attendance form.
+        // No need to re-enable it, as the form submit redirects elsewhere.
+        $('#attendance-form').on('submit', function () {
+            $('#attendance-form-submit').prop('disabled', true);
+        });
+
         /* Get the list of values that exist per type
          */
         let reasonStack = {DROPDOWN_HASH};
