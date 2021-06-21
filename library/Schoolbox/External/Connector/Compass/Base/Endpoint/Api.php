@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
 use DomainException;
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use RuntimeException;
 
 /**
@@ -46,22 +47,6 @@ class Api implements IApi
 
 
     /**
-     * The host server
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * The API key for this call, provided by the school
-     *
-     * @var string
-     */
-    private string $apiKey;
-
-
-    /**
      * @var ApiUsage
      */
     private ApiUsage $apiUsage;
@@ -82,9 +67,6 @@ class Api implements IApi
      */
     public function __construct(string $host, string $apiKey)
     {
-        $this->host   = $host;
-        $this->apiKey = $apiKey;
-
         $this->client = $this->initClient($host, $apiKey, self::DEFAULT_TIMEOUT);
 
         /* Record some stats about api usage
@@ -105,10 +87,10 @@ class Api implements IApi
      */
     private function initClient(string $host, string $key, int $timeout): Client
     {
-        $headers = array_combine(
-            ['CompassApiKey', 'Content-Type'],
-            [$key, 'application/json']
-        );
+        $headers = [
+            'CompassApiKey' => $key,
+            'Content-Type' => 'application/json'
+        ];
 
         return new Client([
             'headers' => $headers,
@@ -141,16 +123,16 @@ class Api implements IApi
          */
         $fails = 0;
 
-        // TODO Augment with additional endpoint args here, if required
-        $queryArgs = $params;
-
         /* Try multiple times in case sis dies for a random reason
          */
         while ($fails < self::NUM_RETRY) {
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
-                $response = $this->client->post($this->host, ['query' => $queryArgs]);
+                $response = $this->client->post($method, [
+                    RequestOptions::JSON => $params
+                ]);
+
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 
@@ -185,7 +167,7 @@ class Api implements IApi
                 $response->getStatusCode(),
                 $response->getReasonPhrase(),
                 self::NUM_RETRY,
-                json_encode($queryArgs, JSON_THROW_ON_ERROR)
+                json_encode($params, JSON_THROW_ON_ERROR)
             ));
         }
 
