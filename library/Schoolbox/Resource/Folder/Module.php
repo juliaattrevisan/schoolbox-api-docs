@@ -100,13 +100,27 @@ class Module extends BaseModule
         // Must have WRITE+ access and folder must not be root folder
         $writeAccessAndNotRoot = new Rule\All(
             $folderWriteAccess,
-            new Rule\Callback(static function (array $params = []) {
-                /** @var Model $folder */
-                $folder = $params['folder'];
-                if ($folder->getId() === Model::ROOT_ID) {
-                    throw new InvalidPath("Folder is root");
+            new Rule\Callback(
+                static function (array $params = []) {
+                    /** @var Model $folder */
+                    $folder = $params['folder'];
+                    if ($folder->getId() === Model::ROOT_ID) {
+                        throw new InvalidPath("Folder is root");
+                    }
                 }
-            })
+            ),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\Callback(
+                    function (array $params = []) {
+                        /** @var Model $folder */
+                        $folder = $params['folder'];
+                        if ($this->getMapper()->countByColumn('parent', $folder->getId()) > 0) {
+                            throw new InvalidPath("The folder is not empty");
+                        }
+                    }
+                )
+            )
         );
 
         $this->register('GET', '/mygroups', 'getGroups', $loggedInAccess);
@@ -149,7 +163,8 @@ class Module extends BaseModule
         $mapperFactory = $this->getMapperFactory();
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew(Controller::class, [
+            $injector->lazyNew(
+                Controller::class, [
                 'folderMapper'           => $mapperFactory->getLazy(Mapper::class),
                 'homepageConfigMapper'   => $mapperFactory->getLazy(HomepageConfigMapper::class),
                 'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class),
@@ -162,7 +177,8 @@ class Module extends BaseModule
                 'groupMapper'            => $mapperFactory->getLazy(GroupMapper::class),
                 'fileMapper'             => $mapperFactory->getLazy(File\Mapper::class),
                 'yearLevelMapper'        => $mapperFactory->getLazy(YearLevel\Mapper::class),
-            ])
+            ]
+            )
         );
     }
 }
