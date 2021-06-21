@@ -43,15 +43,18 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
+     * @throws \DomainException
+     * @throws \JsonException
+     * @throws \RuntimeException
      */
     public function isReachable(): bool
     {
-        $result = $this->api->retrieveDocument('/person/v1/GetStudents', [
-            'lBound' => '2021-01-01T00:00:00Z',
-            'uBound' => '2021-12-31T00:00:00Z'
+        $result = $this->api->retrieveDocument('person/v1/GetStudents', [
+            'lBound' => \Alaress_Date_Format::now()->getDatabaseDate() . 'T00:00:00Z',
+            'uBound' => \Alaress_Date_Format::now()->addDays(1)->getDatabaseDate() . 'T00:00:00Z'
         ]);
 
-        return false;
+        return (bool)$result;
     }
 
 
