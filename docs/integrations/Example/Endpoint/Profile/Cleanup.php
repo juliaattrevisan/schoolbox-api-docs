@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Example\Base\Endpoint;
+namespace Schoolbox\External\Connector\Example\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
 use RuntimeException;
