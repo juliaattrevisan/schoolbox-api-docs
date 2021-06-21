@@ -44,7 +44,7 @@ class Specification
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private ?LoggerInterface $log;
 
 
     /**

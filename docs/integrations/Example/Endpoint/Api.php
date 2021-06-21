@@ -28,7 +28,7 @@ class Api implements IApi
      *
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
@@ -36,13 +36,13 @@ class Api implements IApi
      *
      * @var string
      */
-    private $apiKey;
+    private string $apiKey;
 
 
     /**
      * @var Uri
      */
-    private $url;
+    private Uri $url;
 
 
     /**
