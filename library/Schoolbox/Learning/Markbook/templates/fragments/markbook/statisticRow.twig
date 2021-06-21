@@ -4,7 +4,7 @@
     {% for assessment in markbook.assessments  %}
     <td data-assessment="{{ assessment.id }}">
         {% if markbook.assessmentStatistics[assessment.id][key] is defined %}
-            {% if input ?? false and assessment is not task %}
+            {% if input ?? false and assessment is not task and not assessment.courseManaged %}
                 <input type="number" name="weight" data-weight value="{{ assessment.weight }}" min=0 data-assessment="{{ assessment.id }}">
             {% elseif round is defined %}
                 {{ markbook.assessmentStatistics[assessment.id][key] | round(round) }}
