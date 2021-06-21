@@ -72,7 +72,6 @@ class Status implements IStatus
 
         try {
             return $specification->check();
-
         } catch (\RuntimeException $e) {
             return [[
                  'message' => 'Cannot access api endpoint',

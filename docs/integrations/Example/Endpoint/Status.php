@@ -56,8 +56,10 @@ class Status implements IStatus
      */
     public function getReport(): array
     {
+        $specification = new Specification($this->api);
+
         try {
-            return [];
+            return $specification->check();
         } catch (\RuntimeException $e) {
             return [[
                  'message' => 'Cannot access api endpoint',

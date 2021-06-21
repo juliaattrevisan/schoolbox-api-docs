@@ -57,7 +57,7 @@ class Specification
              * Student Profile nodes
              */
             [
-                'endpoint' =>'person/v1/GetStudents',
+                'endpoint' => 'person/v1/GetStudents',
                 'params' => [
                     'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
                     'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
