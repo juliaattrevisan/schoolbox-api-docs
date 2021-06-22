@@ -163,7 +163,6 @@ class Profile implements IStrategy
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
             $campusName = $this->findCampusName($student['organisationMilestones']);
-            $comments = '';
             $dob = $this->findDate($student['dateOfBirth']);
             $email = $this->findEmail($student['studentDetails']);
 
@@ -217,13 +216,14 @@ class Profile implements IStrategy
 
             /* Alerts
              */
-            $medical = $this->findMedicalAlert($student['medicalConditions']);
+            $comments = '';
             $legal = '';
+            $medical = $this->findMedicalAlert($student['medicalConditions']);
             $messages = '';
 
-//            /* Emergency Contacts
-//             */
-//            $emergencyContacts = $this->findEmergencyContacts();
+            /* Emergency Contacts
+             */
+            $emergencyContacts = $this->findEmergencyContacts($student['emergencyContacts']);
 
             /* Dates
              */
@@ -329,42 +329,42 @@ class Profile implements IStrategy
                     ->setDateOfBirth(new Alaress_Date_Format($dob, 'Ymd'));
             }
 
-//            /**
-//             * Emergency Contacts
-//             * ...because we didn't normalise it, I'm hardcoding these
-//             */
-//            if (\count($emergencyContacts)) {
-//                if (isset($emergencyContacts[0])) {
-//                    $studentProfile
-//                        ->setEmergencyContactName1($emergencyContacts[0]['name'])
-//                        ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
-//                }
-//
-//                if (isset($emergencyContacts[1])) {
-//                    $studentProfile
-//                        ->setEmergencyContactName2($emergencyContacts[1]['name'])
-//                        ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
-//                }
-//
-//                if (isset($emergencyContacts[2])) {
-//                    $studentProfile
-//                        ->setEmergencyContactName3($emergencyContacts[2]['name'])
-//                        ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
-//                }
-//            }
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding student profile for %s',
-//                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->studentProfileMapper->save($studentProfile);
-//            }
+            /**
+             * Emergency Contacts
+             * ...because we didn't normalise it, I'm hardcoding these
+             */
+            if (\count($emergencyContacts)) {
+                if (isset($emergencyContacts[0])) {
+                    $studentProfile
+                        ->setEmergencyContactName1($emergencyContacts[0]['name'])
+                        ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
+                }
+
+                if (isset($emergencyContacts[1])) {
+                    $studentProfile
+                        ->setEmergencyContactName2($emergencyContacts[1]['name'])
+                        ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
+                }
+
+                if (isset($emergencyContacts[2])) {
+                    $studentProfile
+                        ->setEmergencyContactName3($emergencyContacts[2]['name'])
+                        ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
+                }
+            }
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding student profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->studentProfileMapper->save($studentProfile);
+            }
 //
 //            /* Add their parents' profile data
 //             */
@@ -507,46 +507,48 @@ class Profile implements IStrategy
     }
 
 
-//    /**
-//     * Find all the meaningful emergency contacts for a student
-//     *
-//     * @return array
-//     */
-//    public function findEmergencyContacts(): array
-//    {
-//        $emergencyContacts = [];
-//        $contacts = [];
-//        $n = 0;
-//
-//        foreach ($emergencyContacts as $emergencyContact) {
-//            if ($n < self::MAX_EMERGENCY_CONTACTS) {
-//                /* TODO Fill in these emergency contact vars
-//                 */
-//                $fullname = '';
-//                $relation = '';
-//                $phone = '';
-//
-//                /* Suffix the $relation if provided
-//                 */
-//                if ('' !== $relation) {
-//                    $fullname .= " ({$relation})";
-//                }
-//
-//                /* Aggregate them if we have a name
-//                 */
-//                if ('' !== $fullname) {
-//                    $contacts[] = [
-//                        'name' => $fullname,
-//                        'phone' => $phone
-//                    ];
-//                }
-//            }
-//
-//            $n++;
-//        }
-//
-//        return $contacts;
-//    }
+    /**
+     * Find all the meaningful emergency contacts for a student
+     *
+     * @param array $emergencyContacts
+     * @return array
+     */
+    public function findEmergencyContacts(array $emergencyContacts): array
+    {
+        $contacts = [];
+        $n = 0;
+
+        foreach ($emergencyContacts as $emergencyContact) {
+            if ($n < self::MAX_EMERGENCY_CONTACTS) {
+                $fullname = trim((string)$emergencyContact['name']);
+                $relation = trim((string)$emergencyContact['relation']);
+                $phone = trim((string)$emergencyContact['contactNotes']);
+
+                /* Suffix the $relation if provided
+                 */
+                if ('' !== $relation) {
+                    $fullname .= " ({$relation})";
+                }
+
+                /* Aggregate them if we have a name
+                 */
+                if ('' !== $fullname) {
+                    $contacts[$emergencyContact['contactOrder']] = [
+                        'name' => $fullname,
+                        'phone' => $phone
+                    ];
+                }
+            }
+
+            $n++;
+        }
+
+        /* There's a contactOrder field which seems to be a priority sequence integer
+         * Reindex this array so it's zero-indexed again
+         */
+        return array_values($contacts);
+    }
+
 
     /**
      * A student's Form is "typically groupA" in the payload
