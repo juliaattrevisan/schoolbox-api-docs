@@ -414,8 +414,10 @@ class Profile implements IStrategy
             $studentSchool = explode('.', $studentDetail['organisationName'])[0];
 
             if (strpos($this->api->getHost(), $studentSchool) > -1) {
-                if (in_array($studentDetail['boarderType'], $boarders, true)) {
-                    return true;
+                if ('Active' === $studentDetail['status']) {
+                    if (in_array($studentDetail['boarderType'], $boarders, true)) {
+                        return true;
+                    }
                 }
             }
         }
