@@ -149,14 +149,13 @@ class Profile implements IStrategy
             $academicHouse = '';
             $boardingStatus = false;
             $campusName = '';
-            $comments = '';
+
             $dob = '';
             $email = '';
             $firstname = '';
             $form = '';
             $gender = '';
             $lastname = '';
-            $legal = '';
             $messages = '';
             $mobile = '';
             $studiesCode = '';
@@ -172,13 +171,19 @@ class Profile implements IStrategy
             $leavingDate = '';
 
             /* Flags
-             */
-            /* TODO Fill in these flag vars
+             * TODO Fill in these flag vars
              */
             $esl = false;
             $ib = false;
             $ilp = false;
             $specialNeeds = false;
+
+            /* Alerts
+             * TODO Define the mechanism to find these alert contents
+             */
+            $comments = $this->findComments();
+            $legal = $this->findLegal();
+            $medical = $this->findMedicalAlert();
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -228,21 +233,6 @@ class Profile implements IStrategy
              *  Maintain the methods' return signature for easiest resolution
              *  though you are free to customise it as you see fit
              */
-            /* Fish out alert comments
-             */
-            $alertComments = $this->findComments();
-
-            /* Fish out legal alerts
-             */
-            $alertLegal = $this->findLegal();
-
-            /* Fish out medical alerts
-             */
-            $alertMedical = $this->findMedicalAlert();
-
-            /* Fish out campus name
-             */
-            $campusName = $this->findCampusName();
 
             /* Emergency Contacts
              */
@@ -277,9 +267,9 @@ class Profile implements IStrategy
              */
             $studentProfile
                 ->setUsername($username)
-                ->setAlertComment($alertComments)
-                ->setAlertLegal($alertLegal)
-                ->setAlertMedical($alertMedical)
+                ->setAlertComment($comments)
+                ->setAlertLegal($legal)
+                ->setAlertMedical($medical)
                 ->setAlertMessage($messages)
                 ->setCampusName($campusName)
                 ->setEmail($email)
@@ -358,20 +348,6 @@ class Profile implements IStrategy
              */
             $this->importParentsOfStudent($externalId, $studentBaseProfile);
         }
-    }
-
-
-    /**
-     * Find campus name
-     *
-     * Assign campuses if they exist in the mapping
-     * Otherwise quietly disregard bad data
-     *
-     * @return string|null
-     */
-    private function findCampusName(): ?string
-    {
-        return null;
     }
 
 
