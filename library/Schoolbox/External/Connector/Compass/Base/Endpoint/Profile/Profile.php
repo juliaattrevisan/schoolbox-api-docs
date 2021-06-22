@@ -158,7 +158,8 @@ class Profile implements IStrategy
         foreach ($students['d'] as $student) {
             $externalId = $this->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
-//            $boardingStatus = false;
+            $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
+
 //            $campusName = '';
 //            $comments = '';
 //            $dob = '';
@@ -389,6 +390,39 @@ class Profile implements IStrategy
         }
 
         return null;
+    }
+
+
+    /**
+     * Multiple Boarding Status might exist for a given student if they're involved in
+     * multiple schools. Just like the externalId, find the record that is relevant to the
+     * current school (host)
+     *
+     * Possible values: None, Full Time, Weekday, Part Time, Casual
+     *
+     * @param array $studentDetails
+     * @return bool
+     */
+    private function findBoardingStatus(array $studentDetails): bool
+    {
+        /* I guess Full Time boarders result in true
+         * but I don't know what a Part Time boarder is?
+         *
+         * I guess they're gonna return true, too
+         */
+        $boarders = ['Full Time', 'Part Time', 'Weekday'];
+
+        foreach ($studentDetails as $studentDetail) {
+            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
+
+            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                if (in_array($studentDetail['boarderType'], $boarders, true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 //    /**
