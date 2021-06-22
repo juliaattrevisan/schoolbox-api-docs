@@ -175,11 +175,12 @@ class Profile implements IStrategy
             ]);
 
             $form = $this->findForm($student['organisationMilestones']);
+            $gender = trim((string)$student['gender']);
 
-            print_r("$externalId $firstname $form\n");
+            print_r("$externalId $firstname $form $gender\n");
 
 
-//            $gender = '';
+
 //            $lastname = '';
 //            $legal = '';
 //            $messages = '';
