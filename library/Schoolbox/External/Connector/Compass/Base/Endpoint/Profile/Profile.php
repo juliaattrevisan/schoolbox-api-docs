@@ -15,6 +15,7 @@ use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -164,8 +165,15 @@ class Profile implements IStrategy
             $dob = $this->findDate($student['dateOfBirth']);
             $email = $this->findEmail($student['studentDetails']);
 
-            print_r("$externalId $email\n");
-//            $firstname = '';
+            /* Prioritise preferred names over official names
+             */
+            $firstname = (new FirstMeaningfulValue())->find([
+                $student['preferredFirstName'],
+                $student['firstName']
+            ]);
+
+            print_r("$externalId $firstname\n");
+
 //            $form = '';
 //            $gender = '';
 //            $lastname = '';
