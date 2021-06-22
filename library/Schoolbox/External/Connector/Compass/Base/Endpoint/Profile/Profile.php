@@ -150,12 +150,28 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+        $lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
+
+        $this->log->info(sprintf(
+            'Downloading parents active between %s and %s...',
+            $lBound,
+            $uBound
+        ));
+
+        $families = (new Families($this->api))->generate($lBound, $uBound);
+
+        $this->log->info(sprintf(
+            'Downloading students active between %s and %s...',
+            $lBound,
+            $uBound
+        ));
 
         /* Shank all the students active today
          */
         $students = $this->api->retrieveDocument('person/v1/GetStudents', [
-            'lBound' => \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c'),
-            'uBound' => \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c')
+            'lBound' => $lBound,
+            'uBound' => $uBound
         ]);
 
         foreach ($students['d'] as $student) {
@@ -365,10 +381,10 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->studentProfileMapper->save($studentProfile);
             }
-//
-//            /* Add their parents' profile data
-//             */
-//            $this->importParentsOfStudent($externalId, $studentBaseProfile);
+
+            /* Add their parents' profile data
+             */
+            $this->importParentsOfStudent($externalId, $studentBaseProfile, $families);
         }
     }
 
@@ -667,19 +683,19 @@ class Profile implements IStrategy
     }
 
 
-//    /**
-//     * Import parent profile data for a given student
-//     *
-//     * @param string            $studentExternalId
-//     * @param UserProfile\Model $studentBaseProfile
-//     * @throws Exception
-//     * @throws Mapper\DefinitionException
-//     * @throws PDOException
-//     * @throws RuntimeException
-//     * @throws UnexpectedValueException
-//     */
-//    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
-//    {
+    /**
+     * Import parent profile data for a given student
+     *
+     * @param string            $studentExternalId
+     * @param UserProfile\Model $studentBaseProfile
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws RuntimeException
+     * @throws UnexpectedValueException
+     */
+    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile, array $families): void
+    {
 //        $parents = [];
 //
 //        /* For every associated parent, find out if they have a parent profile
@@ -857,5 +873,5 @@ class Profile implements IStrategy
 //                $this->staffProfileMapper->save($staffProfile);
 //            }
 //        }
-//    }
+    }
 }
