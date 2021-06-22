@@ -25,4 +25,16 @@ interface IApi
      * @return array|null
      */
     public function retrieveDocument(string $method, array $params): ?array;
+
+
+    /**
+     * @return ApiUsage
+     */
+    public function getUsage(): ApiUsage;
+
+
+    /**
+     * @return string
+     */
+    public function getHost(): string;
 }
