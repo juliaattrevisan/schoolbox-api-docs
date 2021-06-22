@@ -146,6 +146,10 @@ class Profile implements IStrategy
     /**
      * Import students' profile data
      *
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
      * @throws \InvalidArgumentException
      */
     private function importStudents(): void
@@ -153,12 +157,17 @@ class Profile implements IStrategy
         $lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
         $uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
 
+        /* Shank all the parents active today
+         */
         $this->log->info(sprintf(
             'Downloading parents active between %s and %s...',
             $lBound,
             $uBound
         ));
 
+        /* Save them into a hash lookup because compass guids are used to
+         * identify parents and this is will be a fast way to get them
+         */
         $families = (new Families($this->api))->generate($lBound, $uBound);
 
         $this->log->info(sprintf(
