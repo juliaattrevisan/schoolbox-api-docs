@@ -162,8 +162,9 @@ class Profile implements IStrategy
             $campusName = $this->findCampusName($student['organisationMilestones']);
             $comments = '';
             $dob = $this->findDate($student['dateOfBirth']);
+            $email = $this->findEmail($student['studentDetails']);
 
-//            $email = '';
+            print_r("$externalId $email\n");
 //            $firstname = '';
 //            $form = '';
 //            $gender = '';
@@ -479,8 +480,30 @@ class Profile implements IStrategy
 
         return null;
     }
-//
-//
+
+
+    /**
+     * Find a student's organisationUserEmail
+     *
+     * @param array $studentDetails
+     * @return string
+     */
+    private function findEmail(array $studentDetails): string
+    {
+        foreach ($studentDetails as $studentDetail) {
+            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
+
+            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                if ('Active' === $studentDetail['status']) {
+                    return $studentDetail['organisationUserEmail'];
+                }
+            }
+        }
+
+        return '';
+    }
+
+
 //    /**
 //     * Find all the meaningful emergency contacts for a student
 //     *
