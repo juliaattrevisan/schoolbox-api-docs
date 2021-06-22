@@ -200,10 +200,9 @@ class Profile implements IStrategy
             $tutor = $this->findTutor();
             $tutorGroup = $this->findTutorGroup($student['organisationMilestones']);
             $username = trim((string)$student['username']);
+            $yearLevel = $this->findYearLevel($student['organisationMilestones']);
 
-            print_r("$externalId $title $firstname $lastname $studiesCode $username\n");
-
-//            $yearLevel = '';
+            print_r("$externalId $title $firstname $lastname $studiesCode $yearLevel\n");
 //
 //            /* TODO Fill in these dates
 //             */
@@ -715,6 +714,26 @@ class Profile implements IStrategy
             if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
                 if ('' !== trim((string)$organisationMilestone['groupB'])) {
                     return $organisationMilestone['groupB'];
+                }
+            }
+        }
+
+        return '';
+    }
+
+
+    /**
+     * Find the first organisationMilestone that specified a meaningful yearLevel value
+     *
+     * @param array $organisationMilestones
+     * @return string
+     */
+    private function findYearLevel(array $organisationMilestones): string
+    {
+        foreach ($organisationMilestones as $organisationMilestone) {
+            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                if ('' !== trim((string)$organisationMilestone['yearLevel'])) {
+                    return $organisationMilestone['yearLevel'];
                 }
             }
         }
