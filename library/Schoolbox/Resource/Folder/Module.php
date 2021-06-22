@@ -100,15 +100,18 @@ class Module extends BaseModule
         // Must have WRITE+ access and folder must not be root folder
         $writeAccessAndNotRoot = new Rule\All(
             $folderWriteAccess,
-            new Rule\Callback(
-                static function (array $params = []) {
-                    /** @var Model $folder */
-                    $folder = $params['folder'];
-                    if ($folder->getId() === Model::ROOT_ID) {
-                        throw new InvalidPath("Folder is root");
-                    }
+            new Rule\Callback(static function (array $params = []) {
+                /** @var Model $folder */
+                $folder = $params['folder'];
+                if ($folder->getId() === Model::ROOT_ID) {
+                    throw new InvalidPath("Folder is root");
                 }
-            ),
+            })
+        );
+
+        // If user is not superuser, only folders without sub-folders can be deleted.
+        $canDelete = new RUle\All(
+            $writeAccessAndNotRoot,
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\Callback(
@@ -129,7 +132,7 @@ class Module extends BaseModule
         $this->register('GET', '/folder/{id:\d+}/modify', 'getFolderModify', $writeAccessAndNotRoot, $preloadFolder);
         $this->register('POST', '/folder/{id:\d+}/update', 'postUpdateFolder', $writeAccessAndNotRoot, $preloadFolder);
         $this->register('PUT', '/folder/{id:\d+}/move/{parentId:\d+}', 'putMoveFolder', $permWriteBoth, $preloadBoth);
-        $this->register('DELETE', '/folder/{id:\d+}', 'deleteFolder', $writeAccessAndNotRoot, $preloadFolder);
+        $this->register('DELETE', '/folder/{id:\d+}', 'deleteFolder', $canDelete, $preloadFolder);
         $this->register('POST', '/folder/{id:\d+}/reset', 'postFolderReset', $writeAccessAndNotRoot, $preloadFolder);
     }
 
