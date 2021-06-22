@@ -228,38 +228,49 @@ class Profile implements IStrategy
                 continue;
             }
 
-//            /* Find out if this externalId already has a student profile
-//             * If one already exists, load it, update it, then save it
-//             * Otherwise make a new one for the given id
-//             */
-//            try {
-//                $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
-//                $studentBaseProfile = $studentProfile->getBaseProfile();
-//            } catch (Exception $e) {
-//                $studentProfile = $this->studentProfileMapper->createModel();
-//                $studentBaseProfile = $this->baseProfileMapper->createModel();
-//
-//                $studentProfile->setBaseProfile($studentBaseProfile);
-//            }
-//
-//            $studentBaseProfile
-//                ->setExternalId($externalId)
-//                ->setTitle($title)
-//                ->setFirstname($firstname)
-//                ->setLastname($lastname);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding base profile for %s',
-//                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->baseProfileMapper->save($studentBaseProfile);
-//            }
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a student profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
+             */
+            try {
+                $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
+                $studentBaseProfile = $studentProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $studentProfile = $this->studentProfileMapper->createModel();
+
+                try {
+                    $studentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $studentBaseProfile = $this->baseProfileMapper->createModel();
+                }
+
+                $studentProfile->setBaseProfile($studentBaseProfile);
+            }
+
+            $studentBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($studentBaseProfile);
+            }
 //
 //            /* TODO Customise these find* methods to suit your implementation
 //             *  Maintain the methods' return signature for easiest resolution

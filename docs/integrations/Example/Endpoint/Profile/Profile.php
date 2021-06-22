@@ -180,16 +180,27 @@ class Profile implements IStrategy
             $ilp = false;
             $specialNeeds = false;
 
-            /* Find out if this externalId already has a student profile
-             * If one already exists, load it, update it, then save it
-             * Otherwise make a new one for the given id
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a student profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
              */
             try {
                 $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
                 $studentBaseProfile = $studentProfile->getBaseProfile();
             } catch (Exception $e) {
                 $studentProfile = $this->studentProfileMapper->createModel();
-                $studentBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $studentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $studentBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $studentProfile->setBaseProfile($studentBaseProfile);
             }
