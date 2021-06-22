@@ -122,7 +122,6 @@ export default {
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
             views: {
                 day: {
-                    titleFormat: this.$_fullCalendarHelper_dayTitleFormat,
                     dayHeaders: false
                 },
                 week: {
