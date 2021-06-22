@@ -716,10 +716,7 @@ class Controller extends Base
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->response->content->set($this->buildJsonOutput([
-                'articles' => $partialData['articles'],
-            ]));
-
+            $this->response->content->set($this->buildJsonOutput($partialData['articles']));
             return;
         }
 
