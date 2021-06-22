@@ -215,9 +215,9 @@ class Profile implements IStrategy
             /* Flags
              */
             $esl = (bool)$student['receivesEsl'];
-//            $ib = false;
-//            $ilp = false;
-//            $specialNeeds = false;
+            $ib = false;
+            $ilp = false;
+            $specialNeeds = false;
 //
 //            /* Find out if this externalId already has a student profile
 //             * If one already exists, load it, update it, then save it
