@@ -100,17 +100,19 @@ class Module extends BaseModule
         // Must have WRITE+ access and folder must not be root folder
         $writeAccessAndNotRoot = new Rule\All(
             $folderWriteAccess,
-            new Rule\Callback(static function (array $params = []) {
-                /** @var Model $folder */
-                $folder = $params['folder'];
-                if ($folder->getId() === Model::ROOT_ID) {
-                    throw new InvalidPath("Folder is root");
+            new Rule\Callback(
+                static function (array $params = []) {
+                    /** @var Model $folder */
+                    $folder = $params['folder'];
+                    if ($folder->getId() === Model::ROOT_ID) {
+                        throw new InvalidPath("Folder is root");
+                    }
                 }
-            })
+            )
         );
 
         // If user is not superuser, only folders without sub-folders can be deleted.
-        $canDelete = new RUle\All(
+        $canDelete = new Rule\All(
             $writeAccessAndNotRoot,
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -167,20 +169,21 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(
-                Controller::class, [
-                'folderMapper'           => $mapperFactory->getLazy(Mapper::class),
-                'homepageConfigMapper'   => $mapperFactory->getLazy(HomepageConfigMapper::class),
-                'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class),
-                'roleAccessMapper'       => $mapperFactory->getLazy(RoleAccessMapper::class),
-                'userAccessMapper'       => $mapperFactory->getLazy(UserAccessMapper::class),
-                'roleMapper'             => $mapperFactory->getLazy(RoleMapper::class),
-                'errorMapper'            => $mapperFactory->getLazy(Error\Mapper::class),
-                'access'                 => $mapperFactory->getLazy(Access::class),
-                'curriculumNodeMapper'   => $mapperFactory->getLazy(Curriculum\Node\Mapper::class),
-                'groupMapper'            => $mapperFactory->getLazy(GroupMapper::class),
-                'fileMapper'             => $mapperFactory->getLazy(File\Mapper::class),
-                'yearLevelMapper'        => $mapperFactory->getLazy(YearLevel\Mapper::class),
-            ]
+                Controller::class,
+                [
+                    'folderMapper'           => $mapperFactory->getLazy(Mapper::class),
+                    'homepageConfigMapper'   => $mapperFactory->getLazy(HomepageConfigMapper::class),
+                    'homepageTemplateMapper' => $mapperFactory->getLazy(HomepageTemplateMapper::class),
+                    'roleAccessMapper'       => $mapperFactory->getLazy(RoleAccessMapper::class),
+                    'userAccessMapper'       => $mapperFactory->getLazy(UserAccessMapper::class),
+                    'roleMapper'             => $mapperFactory->getLazy(RoleMapper::class),
+                    'errorMapper'            => $mapperFactory->getLazy(Error\Mapper::class),
+                    'access'                 => $mapperFactory->getLazy(Access::class),
+                    'curriculumNodeMapper'   => $mapperFactory->getLazy(Curriculum\Node\Mapper::class),
+                    'groupMapper'            => $mapperFactory->getLazy(GroupMapper::class),
+                    'fileMapper'             => $mapperFactory->getLazy(File\Mapper::class),
+                    'yearLevelMapper'        => $mapperFactory->getLazy(YearLevel\Mapper::class),
+                ]
             )
         );
     }
