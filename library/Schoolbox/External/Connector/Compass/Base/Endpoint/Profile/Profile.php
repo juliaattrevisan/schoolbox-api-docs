@@ -442,7 +442,7 @@ class Profile implements IStrategy
         foreach ($organisationMilestones as $organisationMilestone) {
             $studentSchool = explode('.', $organisationMilestone['organisationName'])[0];
 
-            if ((int)$organisationMilestone['isActive']) {
+            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
                 if (strpos($this->api->getHost(), $studentSchool) > -1) {
                     return $organisationMilestone['homeCampus'];
                 }
@@ -549,8 +549,10 @@ class Profile implements IStrategy
     private function findHouse(array $organisationMilestones): string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
-            if ('' !== trim((string)$organisationMilestone['groupC'])) {
-                return $organisationMilestone['groupC'];
+            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                if ('' !== trim((string)$organisationMilestone['groupC'])) {
+                    return $organisationMilestone['groupC'];
+                }
             }
         }
 
