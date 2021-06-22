@@ -145,6 +145,8 @@ class Profile implements IStrategy
 
     /**
      * Import students' profile data
+     *
+     * @throws \InvalidArgumentException
      */
     private function importStudents(): void
     {
@@ -172,9 +174,11 @@ class Profile implements IStrategy
                 $student['firstName']
             ]);
 
-            print_r("$externalId $firstname\n");
+            $form = $this->findForm($student['organisationMilestones']);
 
-//            $form = '';
+            print_r("$externalId $firstname $form\n");
+
+
 //            $gender = '';
 //            $lastname = '';
 //            $legal = '';
@@ -552,8 +556,30 @@ class Profile implements IStrategy
 //
 //        return $contacts;
 //    }
-//
-//
+
+    /**
+     * A student's Form is "typically groupA" in the payload
+     * This manifests as "House" in the ui, so despite its arbitrary name it seems predictable
+     *
+     * Find the first organisationMilestone that specified a meaningful groupA value
+     *
+     * @param array $organisationMilestones
+     * @return string
+     */
+    private function findForm(array $organisationMilestones): string
+    {
+        foreach ($organisationMilestones as $organisationMilestone) {
+            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                if ('' !== trim((string)$organisationMilestone['groupA'])) {
+                    return $organisationMilestone['groupA'];
+                }
+            }
+        }
+
+        return '';
+    }
+
+
 //    /**
 //     * Find a form teacher from their form code
 //     *
