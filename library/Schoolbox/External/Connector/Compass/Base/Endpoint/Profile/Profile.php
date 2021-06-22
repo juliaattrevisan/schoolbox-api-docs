@@ -271,19 +271,7 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
-//
-//            /* TODO Customise these find* methods to suit your implementation
-//             *  Maintain the methods' return signature for easiest resolution
-//             *  though you are free to customise it as you see fit
-//             */
-//            /* Fish out alert comments
-//             */
-//            $alertComments = $this->findComments();
-//
-//            /* Fish out legal alerts
-//             */
-//            $alertLegal = $this->findLegal();
-//
+
 //            /* Fish out medical alerts
 //             */
 //            $alertMedical = $this->findMedicalAlert();
@@ -291,76 +279,56 @@ class Profile implements IStrategy
 //            /* Emergency Contacts
 //             */
 //            $emergencyContacts = $this->findEmergencyContacts();
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $formTeacher = $this->findFormTeacher();
-//
-//            /* Fish out a staff member via their user code
-//             */
-//            $housemaster = $this->findHousemaster();
-//
-//            /* Fish out special needs
-//             */
-//            $specialNeeds = $this->findSpecialNeeds();
-//
-//            /* Fish out a staff member via their user code
-//             */
-//            $tutor = $this->findTutor();
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $yearLevelCoordinator = $this->findYearLevelCoordinator();
-//
-//            /* Dates
-//             */
-//            $enrolment = $this->findDate($enrolmentDate);
-//            $leaving = $this->findDate($leavingDate);
-//
-//            /* Smoosh it all together
-//             */
-//            $studentProfile
-//                ->setUsername($username)
-//                ->setAlertComment($alertComments)
-//                ->setAlertLegal($alertLegal)
-//                ->setAlertMedical($alertMedical)
-//                ->setAlertMessage($messages)
-//                ->setCampusName($campusName)
-//                ->setEmail($email)
-//                ->setEnrolmentDate($enrolment)
-//                ->setFormName($form)
-//                ->setFormTeacherId($formTeacher['id'])
-//                ->setFormTeacherName($formTeacher['name'])
-//                ->setGender($gender)
-//                ->setHeadOfHouseId($housemaster['id'])
-//                ->setHeadOfHouseName($housemaster['name'])
-//                ->setHouseName($academicHouse)
-//                ->setLeavingDate($leaving)
-//                ->setMobile($mobile)
-//                ->setStudiesCode($studiesCode)
-//                ->setTutorGroup($tutorGroup)
-//                ->setTutorTeacherId($tutor['id'])
-//                ->setTutorTeacherName($tutor['name'])
-//                ->setYearLevel($yearLevel)
-//                ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
-//                ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
-//
-//                /**
-//                 * Flags
-//                 */
-//                ->setBoardingStatus($boardingStatus)
-//                ->setEsl($esl)
-//                ->setIb($ib)
-//                ->setIndividualLearningPlans($ilp)
-//                ->setSpecialNeeds($specialNeeds);
-//
-//            /* Date of birth requires special treatment as ADF doesn't deal with nulls well
-//             */
-//            if ($dob) {
-//                $studentProfile
-//                    ->setDateOfBirth(new Alaress_Date_Format($dob, 'Ymd'));
-//            }
-//
+
+            /* Dates
+             */
+            $enrolment = $this->findDate($enrolmentDate);
+            $leaving = $this->findDate($leavingDate);
+
+            /* Smoosh it all together
+             */
+            $studentProfile
+                ->setUsername($username)
+                ->setAlertComment(null)
+                ->setAlertLegal(null)
+                ->setAlertMedical($alertMedical)
+                ->setAlertMessage($messages)
+                ->setCampusName($campusName)
+                ->setEmail($email)
+                ->setEnrolmentDate($enrolment)
+                ->setFormName($form)
+                ->setFormTeacherId(null)
+                ->setFormTeacherName(null)
+                ->setGender($gender)
+                ->setHeadOfHouseId(null)
+                ->setHeadOfHouseName(null)
+                ->setHouseName($academicHouse)
+                ->setLeavingDate($leaving)
+                ->setMobile($mobile)
+                ->setStudiesCode($studiesCode)
+                ->setTutorGroup($tutorGroup)
+                ->setTutorTeacherId($tutor['id'])
+                ->setTutorTeacherName($tutor['name'])
+                ->setYearLevel($yearLevel)
+                ->setYearLevelCoordinatorId(null)
+                ->setYearLevelCoordinatorName(null)
+
+                /**
+                 * Flags
+                 */
+                ->setBoardingStatus($boardingStatus)
+                ->setEsl($esl)
+                ->setIb($ib)
+                ->setIndividualLearningPlans($ilp)
+                ->setSpecialNeeds($specialNeeds);
+
+            /* Date of birth requires special treatment as ADF doesn't deal with nulls well
+             */
+            if ($dob) {
+                $studentProfile
+                    ->setDateOfBirth(new Alaress_Date_Format($dob, 'Ymd'));
+            }
+
 //            /**
 //             * Emergency Contacts
 //             * ...because we didn't normalise it, I'm hardcoding these
@@ -500,17 +468,6 @@ class Profile implements IStrategy
     }
 
 
-//    /**
-//     * Find comments info for a given student
-//     *
-//     * @return string
-//     */
-//    private function findComments(): string
-//    {
-//        return '';
-//    }
-//
-//
     /**
      * Convert a date from possibly null/empty value
      *
@@ -613,21 +570,6 @@ class Profile implements IStrategy
     }
 
 
-//    /**
-//     * Find a form teacher from their form code
-//     *
-//     * @return array
-//     */
-//    private function findFormTeacher(): array
-//    {
-//        /* TODO Fill in these form teacher vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-
     /**
      * A student's house is "typically groupC" in the payload
      * This manifests as "House" in the ui, so despite its arbitrary name it seems predictable
@@ -651,36 +593,6 @@ class Profile implements IStrategy
     }
 
 
-//
-//    /**
-//     * Find a housemaster from their house name
-//     *
-//     * @return array
-//     */
-//    private function findHousemaster(): array
-//    {
-//        /* TODO Fill in these housemaster vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Find legal alerts
-//     *
-//     * @return string|null
-//     */
-//    private function findLegal(): ?string
-//    {
-//        /* TODO Fill in these legal alert vars
-//         */
-//        return null;
-//    }
-//
-//
 //    /**
 //     * Find medical data for student
 //     *
@@ -691,19 +603,6 @@ class Profile implements IStrategy
 //        /* TODO Fill in these medical alert vars
 //         */
 //        return null;
-//    }
-//
-//
-//    /**
-//     * Find out if this student has special needs
-//     *
-//     * @return bool
-//     */
-//    private function findSpecialNeeds(): bool
-//    {
-//        /* TODO Fill in these special needs vars
-//         */
-//        return false;
 //    }
 
 
@@ -762,22 +661,7 @@ class Profile implements IStrategy
         return '';
     }
 
-//    /**
-//     * Find a year level coordinator from their year level
-//     *
-//     * @return array
-//     */
-//    private function findYearLevelCoordinator(): array
-//    {
-//        /* TODO Fill in these ylc vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
+
 //    /**
 //     * Import parent profile data for a given student
 //     *
