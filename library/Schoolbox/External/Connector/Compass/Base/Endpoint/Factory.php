@@ -253,6 +253,10 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
+            ))
+            ->add(new ApiCertification(
+                $this->log,
+                $api
             ));
     }
 }
