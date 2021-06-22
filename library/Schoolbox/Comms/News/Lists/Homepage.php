@@ -123,7 +123,7 @@ class Homepage extends Base
         $readMores = (new ReadMore($this->readMoreText, $this->commentsIsEnabled))->generate($articles);
 
         return [
-            'articles' => $this->populateMetadata($articles),
+            'articles' => $this->populateMetadata($articles)->reindex(),
             'attachmentCounts' => $attachmentCounts,
             'readMores' => $readMores,
             'saveForLater' => $this->saveForLaterEnabled,
