@@ -177,11 +177,18 @@ class Profile implements IStrategy
             $form = $this->findForm($student['organisationMilestones']);
             $gender = trim((string)$student['gender']);
 
-            print_r("$externalId $firstname $form $gender\n");
+            /* Prioritise preferred names over official names
+             */
+            $lastname = (new FirstMeaningfulValue())->find([
+                $student['preferredLastName'],
+                $student['lastName']
+            ]);
+
+            print_r("$externalId $firstname $lastname\n");
 
 
 
-//            $lastname = '';
+
 //            $legal = '';
 //            $messages = '';
 //            $mobile = '';
