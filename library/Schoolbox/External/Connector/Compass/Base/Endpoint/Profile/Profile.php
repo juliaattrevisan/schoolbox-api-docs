@@ -184,8 +184,6 @@ class Profile implements IStrategy
                 $student['lastName']
             ]);
 
-            $legal = '';
-            $messages = '';
             $mobile = '';
 
             /* Not sure where a studies code equivalent is, but have taken
@@ -216,6 +214,12 @@ class Profile implements IStrategy
             $ib = false;
             $ilp = false;
             $specialNeeds = false;
+
+            /* Alerts
+             */
+            $medical = $this->findMedicalAlert($student['medicalConditions']);
+            $legal = '';
+            $messages = '';
 
             /* If the externalId was empty, skip them
              */
@@ -272,10 +276,6 @@ class Profile implements IStrategy
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
 
-//            /* Fish out medical alerts
-//             */
-//            $alertMedical = $this->findMedicalAlert();
-//
 //            /* Emergency Contacts
 //             */
 //            $emergencyContacts = $this->findEmergencyContacts();
@@ -291,7 +291,7 @@ class Profile implements IStrategy
                 ->setUsername($username)
                 ->setAlertComment(null)
                 ->setAlertLegal(null)
-                ->setAlertMedical($alertMedical)
+                ->setAlertMedical($medical)
                 ->setAlertMessage($messages)
                 ->setCampusName($campusName)
                 ->setEmail($email)
@@ -593,17 +593,20 @@ class Profile implements IStrategy
     }
 
 
-//    /**
-//     * Find medical data for student
-//     *
-//     * @return string|null
-//     */
-//    private function findMedicalAlert(): ?string
-//    {
-//        /* TODO Fill in these medical alert vars
-//         */
-//        return null;
-//    }
+    /**
+     * Find medical data for student
+     *
+     * @param array $medicalConditions
+     * @return string|null
+     */
+    private function findMedicalAlert(array $medicalConditions): ?string
+    {
+        if (\count($medicalConditions)) {
+            return 'This student has medical conditions.';
+        }
+
+        return null;
+    }
 
 
     /**
