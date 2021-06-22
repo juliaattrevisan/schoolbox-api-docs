@@ -156,7 +156,6 @@ class Profile implements IStrategy
             $form = '';
             $gender = '';
             $lastname = '';
-            $messages = '';
             $mobile = '';
             $studiesCode = '';
             $title = '';
@@ -184,6 +183,7 @@ class Profile implements IStrategy
             $comments = $this->findComments();
             $legal = $this->findLegal();
             $medical = $this->findMedicalAlert();
+            $messages = '';
 
             /* TODO Customise these find* methods to suit your implementation
              *  Maintain the methods' return signature for easiest resolution
