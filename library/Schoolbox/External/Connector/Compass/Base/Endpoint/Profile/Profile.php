@@ -326,7 +326,7 @@ class Profile implements IStrategy
              */
             if ($dob) {
                 $studentProfile
-                    ->setDateOfBirth(new Alaress_Date_Format($dob, 'Ymd'));
+                    ->setDateOfBirth($dob);
             }
 
             /**
