@@ -251,7 +251,8 @@ class Profile implements IStrategy
             if (null === $externalId) {
                 $this->log->info(sprintf(
                     'Skipping %s %s (no external identifier)',
-                    $firstname, $lastname
+                    $firstname,
+                    $lastname
                 ));
 
                 continue;
