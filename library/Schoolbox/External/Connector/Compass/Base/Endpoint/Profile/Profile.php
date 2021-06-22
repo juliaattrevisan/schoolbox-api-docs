@@ -159,8 +159,10 @@ class Profile implements IStrategy
             $externalId = $this->findExternalId($student['importIdentifiers']);
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
+            $campusName = $this->findCampusName($student['organisationMilestones']);
 
-//            $campusName = '';
+            print_r("$externalId $campusName\n");
+
 //            $comments = '';
 //            $dob = '';
 //            $email = '';
@@ -240,10 +242,6 @@ class Profile implements IStrategy
 //            /* Fish out medical alerts
 //             */
 //            $alertMedical = $this->findMedicalAlert();
-//
-//            /* Fish out campus name
-//             */
-//            $campusName = $this->findCampusName();
 //
 //            /* Emergency Contacts
 //             */
@@ -425,20 +423,36 @@ class Profile implements IStrategy
         return false;
     }
 
-//    /**
-//     * Find campus name
-//     *
-//     * Assign campuses if they exist in the mapping
-//     * Otherwise quietly disregard bad data
-//     *
-//     * @return string|null
-//     */
-//    private function findCampusName(): ?string
-//    {
-//        return null;
-//    }
-//
-//
+
+    /**
+     * Find campus name
+     *
+     * Assign campuses if they exist in the mapping
+     * Otherwise quietly disregard bad data
+     *
+     * @param array $organisationMilestones
+     * @return string
+     */
+    private function findCampusName(array $organisationMilestones): string
+    {
+        /* TODO homeCampus is just a guid - I don't know where the lookup is located
+         *  so for now, just provide the first active guid corresponding to the current host
+         *  (UPS can assign arbitrarily based on this guid)
+         */
+        foreach ($organisationMilestones as $organisationMilestone) {
+            $studentSchool = explode('.', $organisationMilestone['organisationName'])[0];
+
+            if ((int)$organisationMilestone['isActive']) {
+                if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                    return $organisationMilestone['homeCampus'];
+                }
+            }
+        }
+
+        return '';
+    }
+
+
 //    /**
 //     * Find comments info for a given student
 //     *
