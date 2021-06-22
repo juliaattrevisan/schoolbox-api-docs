@@ -190,6 +190,8 @@ class Profile implements IStrategy
 
             /* Not sure where a studies code equivalent is, but have taken
              * a guess that it's one of govtCode* fields
+             *
+             * In the test instance this manifests in Personal > VSN
              */
             $studiesCode = (new FirstMeaningfulValue())->find([
                 $student['govtCode1'],
