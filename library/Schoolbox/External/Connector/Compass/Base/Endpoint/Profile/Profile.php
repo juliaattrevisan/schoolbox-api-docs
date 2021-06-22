@@ -160,11 +160,9 @@ class Profile implements IStrategy
             $academicHouse = $this->findHouse($student['organisationMilestones']);
             $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
             $campusName = $this->findCampusName($student['organisationMilestones']);
+            $comments = '';
+            $dob = $this->findDate($student['dateOfBirth']);
 
-            print_r("$externalId $campusName\n");
-
-//            $comments = '';
-//            $dob = '';
 //            $email = '';
 //            $firstname = '';
 //            $form = '';
@@ -466,20 +464,21 @@ class Profile implements IStrategy
 //    }
 //
 //
-//    /**
-//     * Convert a date from possibly null/empty value
-//     *
-//     * @param string $date
-//     * @return Alaress_Date_Format|null
-//     */
-//    public function findDate(string $date): ?Alaress_Date_Format
-//    {
-//        if ($date) {
-//            return Alaress_Date_Format::newFromTimestamp(strtotime($date));
-//        }
-//
-//        return null;
-//    }
+    /**
+     * Convert a date from possibly null/empty value
+     *
+     * @param string $date
+     * @return Alaress_Date_Format|null
+     * @throws \InvalidArgumentException
+     */
+    public function findDate(string $date): ?Alaress_Date_Format
+    {
+        if ($date) {
+            return new \Alaress_Date_Format($date, 'd/m/Y');
+        }
+
+        return null;
+    }
 //
 //
 //    /**
