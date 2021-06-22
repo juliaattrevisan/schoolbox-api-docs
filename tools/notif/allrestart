@@ -4,13 +4,17 @@ export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/ga
 file_path=$(readlink -f "$0");
 dir_path=${file_path%/*}
 site_root=$(readlink -f "$dir_path"/../../);
-conf_file="$site_root"/www/conf/conf.php
+package=${site_root##*/};
+if [[ $package == 'vagrant' ]]; then
+  package='schoolbox'
+fi
+ini_file="/etc/$package/instances.ini"
 
 # Stop all schoolbox notif daemons
 "$dir_path"/allstop
 
 # All environments are now Multi-instance arch.
-instance_list=$(schoolbox-conf --conf="$conf_file" --option=instancelist | jq -r '.[]' | sort);
+instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list | sort);
 for daemon in socketd digestd routed scheduled; do
     for instance_id in $instance_list; do
         echo "starting schoolbox-cloud-$daemon@$instance_id"
