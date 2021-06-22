@@ -25,8 +25,8 @@ mariadb -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
 mariadb -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
-mariadb schoolbox < $initialdir/configfiles/vagrant_config.sql
+# mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
+mysql schoolbox < $initialdir/configfiles/vagrant_config.sql
 
 ## Make directories that will be used by our schoolbox instance
 mkdir vagrant
