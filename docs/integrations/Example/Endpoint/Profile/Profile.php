@@ -556,12 +556,27 @@ class Profile implements IStrategy
             $title = '';
             $username = '';
 
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a parent profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
+             */
             try {
                 $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
                 $parentBaseProfile = $parentProfile->getBaseProfile();
             } catch (Exception $e) {
                 $parentProfile = $this->parentProfileMapper->createModel();
-                $parentBaseProfile = $this->baseProfileMapper->createModel();
+
+                try {
+                    $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+                }
 
                 $parentProfile->setBaseProfile($parentBaseProfile);
             }
