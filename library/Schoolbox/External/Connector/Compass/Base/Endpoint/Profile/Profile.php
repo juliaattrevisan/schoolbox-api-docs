@@ -210,15 +210,24 @@ class Profile implements IStrategy
             $enrolmentDate = '';
             $leavingDate = '';
 
-            print_r("$externalId $title $firstname $lastname\n");
-
             /* Flags
              */
             $esl = (bool)$student['receivesEsl'];
             $ib = false;
             $ilp = false;
             $specialNeeds = false;
-//
+
+            /* If the externalId was empty, skip them
+             */
+            if ('' === $externalId) {
+                $this->log->info(sprintf(
+                    'Skipping %s %s (no external identifier)',
+                    $firstname, $lastname
+                ));
+
+                continue;
+            }
+
 //            /* Find out if this externalId already has a student profile
 //             * If one already exists, load it, update it, then save it
 //             * Otherwise make a new one for the given id
@@ -393,9 +402,9 @@ class Profile implements IStrategy
      * The IApi conveniently knows this, though
      *
      * @param array  $importIdentifiers
-     * @return string|null
+     * @return string
      */
-    private function findExternalId(array $importIdentifiers): ?string
+    private function findExternalId(array $importIdentifiers): string
     {
         /* Example usage:
          *
@@ -412,7 +421,7 @@ class Profile implements IStrategy
             }
         }
 
-        return null;
+        return '';
     }
 
 
