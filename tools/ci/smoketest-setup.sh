@@ -2,6 +2,8 @@
 
 ## Initial directory is where all the resources that are linked are included so save it for later use.
 initialdir=`pwd`;
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*}
 
 PHP_VERSION=$1
 
@@ -35,7 +37,7 @@ ln -sf /vagrant/data /var/lib/schoolbox
 chmod 777 mnt/data/php_tmp
 
 ## Move our specific config items into the correct folders
-cp -rf $initialdir/schoolbox-develop/* /vagrant
+cp -rf $fullpath/../../* /vagrant
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf $initialdir/configfiles/nginx/* /etc/nginx
 cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
