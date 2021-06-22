@@ -114,17 +114,6 @@ export const mixinFullCalendarHelper = {
         },
 
         /**
-         * Helper for rendering the title of the day view.
-         * Without this the calendar renders the date twice for some reason.
-         *
-         * @param dateObject
-         * @return {string}
-         */
-        $_fullCalendarHelper_dayTitleFormat (dateObject) {
-            return this.$_fullCalendarHelper_toMoment(dateObject.date).format(this.config.dateDisplayFormats.momentJsDateLong);
-        },
-
-        /**
          * Helper function to get the difference between two dates.
          * @param start
          * @param end

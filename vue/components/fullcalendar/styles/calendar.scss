@@ -296,3 +296,8 @@
         position: static;
     }
 }
+
+//this popover should sit underneath the event modal
+.fc .fc-popover {
+    z-index: 1000;
+}
