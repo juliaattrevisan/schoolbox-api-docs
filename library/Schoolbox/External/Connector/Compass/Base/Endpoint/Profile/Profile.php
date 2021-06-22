@@ -196,9 +196,9 @@ class Profile implements IStrategy
                 $student['govtCode2']
             ]);
 
-            print_r("$externalId $firstname $lastname $studiesCode\n");
+            $title = trim((string)$student['title']);
+            print_r("$externalId $title $firstname $lastname $studiesCode\n");
 
-//            $title = '';
 //            $tutor = '';
 //            $tutorGroup = '';
 //            $username = '';
