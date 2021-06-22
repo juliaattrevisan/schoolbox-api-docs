@@ -185,6 +185,40 @@ class Profile implements IStrategy
             $legal = $this->findLegal();
             $medical = $this->findMedicalAlert();
 
+            /* TODO Customise these find* methods to suit your implementation
+             *  Maintain the methods' return signature for easiest resolution
+             *  though you are free to customise it as you see fit
+             */
+
+            /* Emergency Contacts
+             */
+            $emergencyContacts = $this->findEmergencyContacts();
+
+            /* Find out a staff member via their user code
+             */
+            $formTeacher = $this->findFormTeacher();
+
+            /* Fish out a staff member via their user code
+             */
+            $housemaster = $this->findHousemaster();
+
+            /* Fish out special needs
+             */
+            $specialNeeds = $this->findSpecialNeeds();
+
+            /* Fish out a staff member via their user code
+             */
+            $tutor = $this->findTutor();
+
+            /* Find out a staff member via their user code
+             */
+            $yearLevelCoordinator = $this->findYearLevelCoordinator();
+
+            /* Dates
+             */
+            $enrolment = $this->findDate($enrolmentDate);
+            $leaving = $this->findDate($leavingDate);
+
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
              *
@@ -228,40 +262,6 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
-
-            /* TODO Customise these find* methods to suit your implementation
-             *  Maintain the methods' return signature for easiest resolution
-             *  though you are free to customise it as you see fit
-             */
-
-            /* Emergency Contacts
-             */
-            $emergencyContacts = $this->findEmergencyContacts();
-
-            /* Find out a staff member via their user code
-             */
-            $formTeacher = $this->findFormTeacher();
-
-            /* Fish out a staff member via their user code
-             */
-            $housemaster = $this->findHousemaster();
-
-            /* Fish out special needs
-             */
-            $specialNeeds = $this->findSpecialNeeds();
-
-            /* Fish out a staff member via their user code
-             */
-            $tutor = $this->findTutor();
-
-            /* Find out a staff member via their user code
-             */
-            $yearLevelCoordinator = $this->findYearLevelCoordinator();
-
-            /* Dates
-             */
-            $enrolment = $this->findDate($enrolmentDate);
-            $leaving = $this->findDate($leavingDate);
 
             /* Smoosh it all together
              */

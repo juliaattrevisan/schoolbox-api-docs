@@ -221,6 +221,15 @@ class Profile implements IStrategy
             $legal = '';
             $messages = '';
 
+//            /* Emergency Contacts
+//             */
+//            $emergencyContacts = $this->findEmergencyContacts();
+
+            /* Dates
+             */
+            $enrolment = $this->findDate($enrolmentDate);
+            $leaving = $this->findDate($leavingDate);
+
             /* If the externalId was empty, skip them
              */
             if ('' === $externalId) {
@@ -275,15 +284,6 @@ class Profile implements IStrategy
             if ($this->perform) {
                 $this->baseProfileMapper->save($studentBaseProfile);
             }
-
-//            /* Emergency Contacts
-//             */
-//            $emergencyContacts = $this->findEmergencyContacts();
-
-            /* Dates
-             */
-            $enrolment = $this->findDate($enrolmentDate);
-            $leaving = $this->findDate($leavingDate);
 
             /* Smoosh it all together
              */
