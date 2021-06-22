@@ -212,11 +212,9 @@ class Profile implements IStrategy
 
             print_r("$externalId $title $firstname $lastname\n");
 
-//            /* Flags
-//             */
-//            /* TODO Fill in these flag vars
-//             */
-//            $esl = false;
+            /* Flags
+             */
+            $esl = (bool)$student['receivesEsl'];
 //            $ib = false;
 //            $ilp = false;
 //            $specialNeeds = false;
