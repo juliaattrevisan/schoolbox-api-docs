@@ -232,7 +232,7 @@ class Profile implements IStrategy
 
             /* If the externalId was empty, skip them
              */
-            if ('' === $externalId) {
+            if (null === $externalId) {
                 $this->log->info(sprintf(
                     'Skipping %s %s (no external identifier)',
                     $firstname, $lastname
@@ -381,9 +381,9 @@ class Profile implements IStrategy
      * The IApi conveniently knows this, though
      *
      * @param array  $importIdentifiers
-     * @return string
+     * @return string|null
      */
-    private function findExternalId(array $importIdentifiers): string
+    private function findExternalId(array $importIdentifiers): ?string
     {
         /* Example usage:
          *
@@ -400,7 +400,7 @@ class Profile implements IStrategy
             }
         }
 
-        return '';
+        return null;
     }
 
 
@@ -446,9 +446,9 @@ class Profile implements IStrategy
      * Otherwise quietly disregard bad data
      *
      * @param array $organisationMilestones
-     * @return string
+     * @return string|null
      */
-    private function findCampusName(array $organisationMilestones): string
+    private function findCampusName(array $organisationMilestones): ?string
     {
         /* TODO homeCampus is just a guid - I don't know where the lookup is located
          *  so for now, just provide the first active guid corresponding to the current host
@@ -464,7 +464,7 @@ class Profile implements IStrategy
             }
         }
 
-        return '';
+        return null;
     }
 
 
@@ -489,9 +489,9 @@ class Profile implements IStrategy
      * Find a student's organisationUserEmail
      *
      * @param array $studentDetails
-     * @return string
+     * @return string|null
      */
-    private function findEmail(array $studentDetails): string
+    private function findEmail(array $studentDetails): ?string
     {
         foreach ($studentDetails as $studentDetail) {
             $studentSchool = explode('.', $studentDetail['organisationName'])[0];
@@ -503,7 +503,7 @@ class Profile implements IStrategy
             }
         }
 
-        return '';
+        return null;
     }
 
 
@@ -556,9 +556,9 @@ class Profile implements IStrategy
      * Find the first organisationMilestone that specified a meaningful groupA value
      *
      * @param array $organisationMilestones
-     * @return string
+     * @return string|null
      */
-    private function findForm(array $organisationMilestones): string
+    private function findForm(array $organisationMilestones): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
             if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
@@ -568,7 +568,7 @@ class Profile implements IStrategy
             }
         }
 
-        return '';
+        return null;
     }
 
 
@@ -579,9 +579,9 @@ class Profile implements IStrategy
      * Find the first organisationMilestone that specified a meaningful groupC value
      *
      * @param array $organisationMilestones
-     * @return string
+     * @return string|null
      */
-    private function findHouse(array $organisationMilestones): string
+    private function findHouse(array $organisationMilestones): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
             if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
@@ -591,7 +591,7 @@ class Profile implements IStrategy
             }
         }
 
-        return '';
+        return null;
     }
 
 
@@ -631,9 +631,9 @@ class Profile implements IStrategy
      * Find the first organisationMilestone that specified a meaningful groupB value
      *
      * @param array $organisationMilestones
-     * @return string
+     * @return string|null
      */
-    private function findTutorGroup(array $organisationMilestones)
+    private function findTutorGroup(array $organisationMilestones): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
             if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
@@ -643,7 +643,7 @@ class Profile implements IStrategy
             }
         }
 
-        return '';
+        return null;
     }
 
 
