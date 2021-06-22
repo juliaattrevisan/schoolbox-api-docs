@@ -14,6 +14,7 @@ use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -48,6 +49,12 @@ class Profile implements IStrategy
      * @var bool
      */
     private bool $perform;
+
+
+    /**
+     * @var IApi
+     */
+    private IApi $api;
 
 
     /**
@@ -94,6 +101,7 @@ class Profile implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        IApi $api,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -102,6 +110,7 @@ class Profile implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->api = $api;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -116,13 +125,13 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-//
-//        /* Import students' profile data
-//         * Import their specific parents' profile data
-//         */
-//        $this->log->info('Processing students and their parents.');
-//
-//        $this->importStudents();
+
+        /* Import students' profile data
+         * Import their specific parents' profile data
+         */
+        $this->log->info('Processing students and their parents.');
+
+        $this->importStudents();
 //
 //        /* Import staff profile data
 //         */
@@ -130,19 +139,20 @@ class Profile implements IStrategy
 //
 //        $this->importStaff();
     }
-//
-//
-//    /**
-//     * Import students' profile data
-//     */
-//    private function importStudents(): void
-//    {
-//
-//        /* TODO Get a set of students that we need to process
-//         */
-//        $students = [];
-//
-//        foreach ($students as $student) {
+
+
+    /**
+     * Import students' profile data
+     */
+    private function importStudents(): void
+    {
+        $students = $this->api->retrieveDocument('person/v1/GetStudents', [
+            'lBound' => \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c'),
+            'uBound' => \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c')
+        ]);
+
+        foreach ($students['d'] as $student) {
+
 //            /* TODO Fill in these basic student vars
 //             */
 //            $externalId = '';
@@ -346,10 +356,10 @@ class Profile implements IStrategy
 //            /* Add their parents' profile data
 //             */
 //            $this->importParentsOfStudent($externalId, $studentBaseProfile);
-//        }
-//    }
-//
-//
+        }
+    }
+
+
 //    /**
 //     * Find campus name
 //     *
