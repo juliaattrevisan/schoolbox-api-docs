@@ -197,10 +197,12 @@ class Profile implements IStrategy
             ]);
 
             $title = trim((string)$student['title']);
-            print_r("$externalId $title $firstname $lastname $studiesCode\n");
+            $tutor = $this->findTutor();
+            $tutorGroup = $this->findTutorGroup($student['organisationMilestones']);
 
-//            $tutor = '';
-//            $tutorGroup = '';
+            print_r("$externalId $title $firstname $lastname $studiesCode $tutorGroup\n");
+
+
 //            $username = '';
 //            $yearLevel = '';
 //
@@ -572,7 +574,6 @@ class Profile implements IStrategy
 
     /**
      * A student's Form is "typically groupA" in the payload
-     * This manifests as "House" in the ui, so despite its arbitrary name it seems predictable
      *
      * Find the first organisationMilestone that specified a meaningful groupA value
      *
@@ -685,24 +686,43 @@ class Profile implements IStrategy
 //         */
 //        return false;
 //    }
-//
-//
-//    /**
-//     * Find a tutor from their id
-//     *
-//     * @return array
-//     */
-//    private function findTutor(): array
-//    {
-//        /* TODO Fill in these tutor vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
+
+
+    /**
+     * Find a tutor from their id
+     *
+     * @return array
+     */
+    private function findTutor(): array
+    {
+        return [
+            'id' => null,
+            'name' => null
+        ];
+    }
+
+
+    /**
+     * A student's Tutor Group is "typically groupB" in the payload
+     *
+     * Find the first organisationMilestone that specified a meaningful groupB value
+     *
+     * @param array $organisationMilestones
+     * @return string
+     */
+    private function findTutorGroup(array $organisationMilestones)
+    {
+        foreach ($organisationMilestones as $organisationMilestone) {
+            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                if ('' !== trim((string)$organisationMilestone['groupB'])) {
+                    return $organisationMilestone['groupB'];
+                }
+            }
+        }
+
+        return '';
+    }
+
 //    /**
 //     * Find a year level coordinator from their year level
 //     *
