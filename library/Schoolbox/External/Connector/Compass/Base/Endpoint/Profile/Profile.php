@@ -188,9 +188,16 @@ class Profile implements IStrategy
             $messages = '';
             $mobile = '';
 
-            print_r("$externalId $firstname $lastname\n");
+            /* Not sure where a studies code equivalent is, but have taken
+             * a guess that it's one of govtCode* fields
+             */
+            $studiesCode = (new FirstMeaningfulValue())->find([
+                $student['govtCode1'],
+                $student['govtCode2']
+            ]);
 
-//            $studiesCode = '';
+            print_r("$externalId $firstname $lastname $studiesCode\n");
+
 //            $title = '';
 //            $tutor = '';
 //            $tutorGroup = '';
