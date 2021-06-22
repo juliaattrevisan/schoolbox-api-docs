@@ -15,6 +15,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
@@ -192,8 +193,23 @@ class Module extends BaseModule
         return new Rule\Any(
             new Rule\IsSuperuser(),
             $this->buildRuleHasWriteAccess(),
-            new ParentCanViewFeedback(),
-            new StudentCanViewFeedback()
+            new Rule\All(
+                new Rule\Any(
+                    new ParentCanViewFeedback(),
+                    new StudentCanViewFeedback(),
+                ),
+                new Rule\Callback(
+                    static function (array $params = []) {
+                        if (isset($params['feedback']) && $params['feedback'] instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
+                            $feedback = $params['feedback'];
+                            if ($feedback->getReviewRoute() === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+                                return;
+                            }
+                        }
+                        throw new Unauthorized();
+                    }
+                )
+            )
         );
     }
 
