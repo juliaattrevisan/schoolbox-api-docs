@@ -204,13 +204,14 @@ class Profile implements IStrategy
             $username = trim((string)$student['username']);
             $yearLevel = $this->findYearLevel($student['organisationMilestones']);
 
-            print_r("$externalId $title $firstname $lastname $studiesCode $yearLevel\n");
-//
-//            /* TODO Fill in these dates
-//             */
-//            $enrolmentDate = '';
-//            $leavingDate = '';
-//
+            /* No dates provided
+             * The api only gives you active users anyway
+             */
+            $enrolmentDate = '';
+            $leavingDate = '';
+
+            print_r("$externalId $title $firstname $lastname\n");
+
 //            /* Flags
 //             */
 //            /* TODO Fill in these flag vars
