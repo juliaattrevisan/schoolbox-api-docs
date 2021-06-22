@@ -199,11 +199,10 @@ class Profile implements IStrategy
             $title = trim((string)$student['title']);
             $tutor = $this->findTutor();
             $tutorGroup = $this->findTutorGroup($student['organisationMilestones']);
+            $username = trim((string)$student['username']);
 
-            print_r("$externalId $title $firstname $lastname $studiesCode $tutorGroup\n");
+            print_r("$externalId $title $firstname $lastname $studiesCode $username\n");
 
-
-//            $username = '';
 //            $yearLevel = '';
 //
 //            /* TODO Fill in these dates
