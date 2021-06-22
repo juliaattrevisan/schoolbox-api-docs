@@ -1,4 +1,7 @@
 #!/bin/bash
+# Restarts all notif daemons.
+# If an INSTANCE_ID env var is present, just restart for that instance, else restart for all instances
+
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games;
 
 file_path=$(readlink -f "$0");
@@ -14,11 +17,15 @@ ini_file="/etc/$package/instances.ini"
 "$dir_path"/allstop
 
 # All environments are now Multi-instance arch.
-instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list | sort);
+if [[ -n $INSTANCE_ID ]]; then
+  instance_list=$INSTANCE_ID
+else
+  instance_list=$(schoolbox-read-instances --ini "$ini_file" --option instance-list | sort);
+fi
 for daemon in socketd digestd routed scheduled; do
     for instance_id in $instance_list; do
         echo "starting schoolbox-cloud-$daemon@$instance_id"
-        service "schoolbox-cloud-$daemon@$instance_id" start;
+        systemctl start "schoolbox-cloud-$daemon@$instance_id"
     done
 done
 
@@ -26,6 +33,6 @@ done
 for instance_id in $instance_list; do
     if [ "$(systemctl is-enabled schoolbox-cloud-belld@"$instance_id" 2>/dev/null)" = "enabled" ]; then
         echo "starting schoolbox-cloud-belld@$instance_id"
-        service schoolbox-cloud-belld@"$instance_id" start;
+        systemctl start  schoolbox-cloud-belld@"$instance_id"
     fi
 done

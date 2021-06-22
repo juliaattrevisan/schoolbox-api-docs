@@ -1,9 +1,20 @@
 #!/bin/bash
+# Stops all notif daemons.
+# If an INSTANCE_ID env var is present, just stop for that instance, else stop for all instances
 
 # Stop all schoolbox notif daemons (supports both old+new single/multi instance style)
 for daemon in socketd digestd routed scheduled belld; do
-    for service in $(systemctl --plain --no-legend | grep -E "schoolbox.*$daemon.*service" | awk '{print $1}'); do
+    # Old single-instance style
+    for service in $(systemctl --plain --no-legend | grep -E "schoolbox(dev)?-$daemon.service" | awk '{print $1}'); do
         echo "stopping $service"
         systemctl stop "$service"
+    done
+
+    # New Multi-instance style
+    for service in $(systemctl --plain --no-legend | grep -E "schoolbox.*$daemon.*service" | awk '{print $1}'); do
+        if [[ -z $INSTANCE_ID ]] || echo "$service" | grep -q "$INSTANCE_ID"; then
+            echo "stopping $service"
+            systemctl stop "$service"
+        fi
     done
 done
