@@ -576,15 +576,7 @@ class Profile implements IStrategy
      */
     private function findForm(array $organisationMilestones): ?string
     {
-        foreach ($organisationMilestones as $organisationMilestone) {
-            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if ('' !== trim((string)$organisationMilestone['groupA'])) {
-                    return $organisationMilestone['groupA'];
-                }
-            }
-        }
-
-        return null;
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'groupA');
     }
 
 
@@ -599,15 +591,7 @@ class Profile implements IStrategy
      */
     private function findHouse(array $organisationMilestones): ?string
     {
-        foreach ($organisationMilestones as $organisationMilestone) {
-            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if ('' !== trim((string)$organisationMilestone['groupC'])) {
-                    return $organisationMilestone['groupC'];
-                }
-            }
-        }
-
-        return null;
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'groupC');
     }
 
 
@@ -651,15 +635,7 @@ class Profile implements IStrategy
      */
     private function findTutorGroup(array $organisationMilestones): ?string
     {
-        foreach ($organisationMilestones as $organisationMilestone) {
-            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if ('' !== trim((string)$organisationMilestone['groupB'])) {
-                    return $organisationMilestone['groupB'];
-                }
-            }
-        }
-
-        return null;
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'groupB');
     }
 
 
@@ -667,19 +643,32 @@ class Profile implements IStrategy
      * Find the first organisationMilestone that specified a meaningful yearLevel value
      *
      * @param array $organisationMilestones
-     * @return string
+     * @return string|null
      */
-    private function findYearLevel(array $organisationMilestones): string
+    private function findYearLevel(array $organisationMilestones): ?string
+    {
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'yearLevel');
+    }
+
+
+    /**
+     * Find a particular field inside the set of $organisationMilestones tuples
+     *
+     * @param array  $organisationMilestones
+     * @param string $field
+     * @return string|null
+     */
+    private function findOrganisationMilestoneField(array $organisationMilestones, string $field): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
             if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if ('' !== trim((string)$organisationMilestone['yearLevel'])) {
-                    return $organisationMilestone['yearLevel'];
+                if ('' !== trim((string)$organisationMilestone[$field])) {
+                    return $organisationMilestone[$field];
                 }
             }
         }
 
-        return '';
+        return null;
     }
 
 
