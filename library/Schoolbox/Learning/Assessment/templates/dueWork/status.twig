@@ -40,7 +40,7 @@
                href="{{ routeLookup('learningAssessment.downloadSubmissions', {
                    assessmentId: assessment.id,
                    assessment: assessment
-               }) }}">Download All Submissions</a>
+               }) }}">Download All</a>
         </li>
     {% endif %}
     {% if assessment.useRubric %}
@@ -287,7 +287,7 @@
             $('#download-submissions').click(function (event) {
                 event.preventDefault();
                 $(this).confirmDialog({
-                    header: 'Download all submissions?',
+                    header: 'Download all feedback and submissions?',
                     text: 'Please be aware that your download will take some time to begin as we compile the students feedback and submissions into a ZIP file.',
                 });
             })

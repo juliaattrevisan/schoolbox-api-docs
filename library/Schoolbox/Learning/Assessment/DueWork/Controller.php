@@ -52,6 +52,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradableWithResponse;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
@@ -176,7 +177,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Determine if there are any submission files available for download on the assessment
+     * Determine if there are any submission files or feedback available for download on the assessment
      * @param IAssessable $assessment
      * @return bool
      */
@@ -186,8 +187,14 @@ class Controller extends Assessment\Controller
 
         /** @var Participant $participant */
         foreach ($assessment->getAllParticipants() as $participant) {
-            // Iterate all their responses
+            // Iterate all feedbacks
+            foreach ($participant->getAllFeedbacks() as $feedback) {
+                if ($feedback instanceof Feedback && $feedback->isPublished()) {
+                    return true;
+                }
+            }
 
+            // Iterate all their responses
             /** @var Submission $response */
             foreach ($participant->getAllResponses() as $response) {
                 // If the response is a submission...
