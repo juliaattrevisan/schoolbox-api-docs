@@ -45,12 +45,14 @@ class Specification
      *
      * @return array
      *
-     * @throws \RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
+     * @throws \DomainException
+     * @throws \JsonException
      */
     public function check(): array
     {
+        $lBound = \Alaress_Date_Format::now()->getUsingFormat('c');
+        $uBound = \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c');
+
         $paths = [
 
             /**
@@ -59,16 +61,22 @@ class Specification
             [
                 'endpoint' => 'person/v1/GetStudents',
                 'params' => [
-                    'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
-                    'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
+                    'lBound' => $lBound,
+                    'uBound' => $uBound
                 ]
-            ]
+            ],
 
 
             /**
              * Parent Profile nodes
              */
-
+            [
+                'endpoint' => 'person/v1/GetParents',
+                'params' => [
+                    'lBound' => $lBound,
+                    'uBound' => $uBound
+                ]
+            ]
 
             /**
              * Staff Profile nodes
