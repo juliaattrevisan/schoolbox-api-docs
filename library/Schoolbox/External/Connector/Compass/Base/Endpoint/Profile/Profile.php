@@ -184,14 +184,12 @@ class Profile implements IStrategy
                 $student['lastName']
             ]);
 
+            $legal = '';
+            $messages = '';
+            $mobile = '';
+
             print_r("$externalId $firstname $lastname\n");
 
-
-
-
-//            $legal = '';
-//            $messages = '';
-//            $mobile = '';
 //            $studiesCode = '';
 //            $title = '';
 //            $tutor = '';
