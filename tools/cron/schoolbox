@@ -63,6 +63,9 @@ MAILTO="support@schoolbox.com.au"
 # Rebuild notification routes for users by polling group and class memberships
 30 2 * * * www-data php /usr/share/schoolbox/tools/notif/route/refresh-binding-cache.php -vv >>/var/log/schoolbox/binder.log 2>&1
 
+# Reload notification daemons nightly at 1am
+0 1 * * * root /usr/share/schoolbox/tools/notif/allrestart  -vvv >>/var/log/schoolbox/notif-restart.log 2>&1
+
 # Cleanup redis notification data (once a week on a Sunday)
 20 1 * * 0 www-data php /usr/share/schoolbox/tools/mq/remove-old-triggers.php -p >> /var/log/schoolbox/remove-old-triggers.log 2>&1
 
