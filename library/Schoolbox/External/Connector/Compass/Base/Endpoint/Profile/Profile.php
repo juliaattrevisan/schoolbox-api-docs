@@ -92,6 +92,7 @@ class Profile implements IStrategy
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
+     * @param IApi                            $api
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -146,16 +147,16 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
+
+        /* Shank all the students active today
+         */
         $students = $this->api->retrieveDocument('person/v1/GetStudents', [
             'lBound' => \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c'),
             'uBound' => \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c')
         ]);
 
         foreach ($students['d'] as $student) {
-
-//            /* TODO Fill in these basic student vars
-//             */
-//            $externalId = '';
+            $externalId = $this->findExternalId($student['importIdentifiers']);
 //            $academicHouse = '';
 //            $boardingStatus = false;
 //            $campusName = '';
@@ -359,6 +360,36 @@ class Profile implements IStrategy
         }
     }
 
+
+    /**
+     * A student has multiple externalIds based on whichever school they're in
+     * These import identifiers are not the same if they're involved in multiple schools
+     * We have to find the external id relevant to the current school (host)
+     *
+     * The IApi conveniently knows this, though
+     *
+     * @param array  $importIdentifiers
+     * @return string|null
+     */
+    private function findExternalId(array $importIdentifiers): ?string
+    {
+        /* Example usage:
+         *
+         * $this->api->getHost()        https://wyndhamchristiancollege-integration-vic.compass.education/api/
+         * $importIdentifier['school']  wyndhamchristiancollege-integration.vic.edu.au
+         *
+         * Commonality:                 wyndhamchristiancollege-integration
+         */
+        foreach ($importIdentifiers as $importIdentifier) {
+            $studentSchool = explode('.', $importIdentifier['school'])[0];
+
+            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                return $importIdentifier['importIdentifier'];
+            }
+        }
+
+        return null;
+    }
 
 //    /**
 //     * Find campus name

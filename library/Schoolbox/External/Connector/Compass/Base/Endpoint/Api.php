@@ -47,6 +47,14 @@ class Api implements IApi
 
 
     /**
+     * External Ids are derived from this value
+     *
+     * @var string
+     */
+    private string $host;
+
+
+    /**
      * @var ApiUsage
      */
     private ApiUsage $apiUsage;
@@ -67,6 +75,8 @@ class Api implements IApi
      */
     public function __construct(string $host, string $apiKey)
     {
+        $this->host = $host;
+
         $this->client = $this->initClient($host, $apiKey, self::DEFAULT_TIMEOUT);
 
         /* Record some stats about api usage
@@ -188,5 +198,14 @@ class Api implements IApi
     public function getUsage(): ApiUsage
     {
         return $this->apiUsage;
+    }
+
+
+    /**
+     * @return string
+     */
+    public function getHost(): string
+    {
+        return $this->host;
     }
 }
