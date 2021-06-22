@@ -157,7 +157,7 @@ class Profile implements IStrategy
 
         foreach ($students['d'] as $student) {
             $externalId = $this->findExternalId($student['importIdentifiers']);
-//            $academicHouse = '';
+            $academicHouse = $this->findHouse($student['organisationMilestones']);
 //            $boardingStatus = false;
 //            $campusName = '';
 //            $comments = '';
@@ -488,7 +488,28 @@ class Profile implements IStrategy
 //            'name' => null
 //        ];
 //    }
-//
+
+    /**
+     * A student's house is "typically groupC" in the payload
+     * This manifests as "House" in the ui, so despite its arbitrary name it seems predictable
+     *
+     * Find the first organisationMilestone that specified a meaningful groupC value
+     *
+     * @param array $organisationMilestones
+     * @return string
+     */
+    private function findHouse(array $organisationMilestones): string
+    {
+        foreach ($organisationMilestones as $organisationMilestone) {
+            if ('' !== trim((string)$organisationMilestone['groupC'])) {
+                return $organisationMilestone['groupC'];
+            }
+        }
+
+        return '';
+    }
+
+
 //
 //    /**
 //     * Find a housemaster from their house name
