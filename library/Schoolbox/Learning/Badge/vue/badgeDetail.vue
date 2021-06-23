@@ -30,7 +30,9 @@ export default {
             return [];
         },
         achievementExpiryLabel() {
-            return translateExpiryToLabel(this.badge?.achievementExpiry);
+            let expiry = this.badge?.achievementExpiry;
+            return expiry ? translateExpiryToLabel(expiry) : null;
+
         }
     },
     methods: {},
