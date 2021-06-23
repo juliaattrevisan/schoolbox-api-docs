@@ -419,9 +419,7 @@ class Profile implements IStrategy
          * Commonality:                 wyndhamchristiancollege-integration
          */
         foreach ($importIdentifiers as $importIdentifier) {
-            $studentSchool = explode('.', $importIdentifier['school'])[0];
-
-            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+            if ($this->matchesHost($importIdentifier['school'])) {
                 return $importIdentifier['importIdentifier'];
             }
         }
@@ -470,17 +468,7 @@ class Profile implements IStrategy
          *  so for now, just provide the first active guid corresponding to the current host
          *  (UPS can assign arbitrarily based on this guid)
          */
-        foreach ($organisationMilestones as $organisationMilestone) {
-            $studentSchool = explode('.', $organisationMilestone['organisationName'])[0];
-
-            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if (strpos($this->api->getHost(), $studentSchool) > -1) {
-                    return $organisationMilestone['homeCampus'];
-                }
-            }
-        }
-
-        return null;
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'homeCampus');
     }
 
 
@@ -525,16 +513,64 @@ class Profile implements IStrategy
     private function findDetailsField(array $details, string $field): ?string
     {
         foreach ($details as $detail) {
-            $school = explode('.', $detail['organisationName'])[0];
-
-            if (strpos($this->api->getHost(), $school) > -1) {
-                if ('Active' === $detail['status']) {
-                    return (string)$detail[$field];
-                }
+            if ($this->isActiveDetailsField($detail)) {
+                return (string)$detail[$field];
             }
         }
 
         return null;
+    }
+
+
+    /**
+     * Find the value of $field in the set of details $details
+     * This iterates to find the first Active record that corresponds
+     * to the current instance and organisationName
+     *
+     * Returns an array because sometimes that's what's in the details set
+     *
+     * @param array  $details
+     * @param string $field
+     * @return array|null
+     */
+    private function findDetailsFieldArray(array $details, string $field): ?array
+    {
+        foreach ($details as $detail) {
+            if ($this->isActiveDetailsField($detail)) {
+                return $detail[$field];
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Decide if $organisation matches the endpoint host in suds
+     * This is how we identify records shared across multiple schools
+     *
+     * @param string $organisationName
+     * @return bool
+     */
+    private function matchesHost(string $organisationName): bool
+    {
+        $school = explode('.', $organisationName)[0];
+
+        return strpos($this->api->getHost(), $school) > -1;
+    }
+
+
+    /**
+     * Decide if one of the records in studentDetails, parentDetails
+     * or staffDetails is Active based on its status field and also
+     * if it corresponds to the current host
+     *
+     * @param array $detail
+     * @return bool
+     */
+    private function isActiveDetailsField(array $detail): bool
+    {
+        return $this->matchesHost($detail['organisationName']) && 'Active' === $detail['status'];
     }
 
 
@@ -676,9 +712,11 @@ class Profile implements IStrategy
     private function findOrganisationMilestoneField(array $organisationMilestones, string $field): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
-            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if ('' !== trim((string)$organisationMilestone[$field])) {
-                    return $organisationMilestone[$field];
+            if ($this->matchesHost($organisationMilestone['organisationName'])) {
+                if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                    if ('' !== trim((string)$organisationMilestone[$field])) {
+                        return $organisationMilestone[$field];
+                    }
                 }
             }
         }
@@ -991,30 +1029,5 @@ class Profile implements IStrategy
                 $this->staffProfileMapper->save($staffProfile);
             }
         }
-    }
-
-
-    /**
-     * Find the value of $field in the set of details $details
-     * This iterates to find the first Active record that corresponds
-     * to the current instance and organisationName
-     *
-     * @param array  $details
-     * @param string $field
-     * @return array|null
-     */
-    private function findDetailsFieldArray(array $details, string $field): ?array
-    {
-        foreach ($details as $detail) {
-            $school = explode('.', $detail['organisationName'])[0];
-
-            if (strpos($this->api->getHost(), $school) > -1) {
-                if ('Active' === $detail['status']) {
-                    return $detail[$field];
-                }
-            }
-        }
-
-        return null;
     }
 }
