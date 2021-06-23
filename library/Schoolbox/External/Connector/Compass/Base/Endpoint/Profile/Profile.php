@@ -124,16 +124,21 @@ class Profile implements IStrategy
 
     /**
      * Import user profile data into sis_user_profile*
+     *
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function import(): void
     {
-
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-//        $this->log->info('Processing students and their parents.');
-//
-//        $this->importStudents();
+        $this->log->info('Processing students and their parents.');
+
+        $this->importStudents();
 
         /* Import staff profile data
          */
