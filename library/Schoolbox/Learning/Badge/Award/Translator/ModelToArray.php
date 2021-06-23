@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award\Translator;
 
+use Alaress_Date_Format;
 use Error;
 use Schoolbox\Learning\Badge\Award\Model;
 
@@ -111,6 +112,9 @@ class ModelToArray
             'awardedBy' => $awardedBy,
             'awardedAt' => $model->getAwardedAt() && !$model->getAwardedAt()->isNull()
                 ? $model->getAwardedAt()->getUsingFormat(DATE_ATOM)
+                : null,
+            'expiresAt' => $model->getExpiresAt() && !$model->getExpiresAt()->isNull()
+                ? $model->getExpiresAt()->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 : null,
             '_links'    => call_user_func($this->linkTranslator, $model),
         ];
