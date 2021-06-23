@@ -39,7 +39,7 @@ class Controller extends Base
             'data'     => [
                 'pageCurrent' => $this->router->generate('adminTerminology.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminTerminology.getIndex')),
-                'terms' => $this->l10nMapper->findAll()
+                'terms' => $this->l10nMapper->findAll()->sortNaturally('title'),
             ],
             'title' => 'Admin - Terminology'
         ]);
