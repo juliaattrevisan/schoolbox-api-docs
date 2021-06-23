@@ -322,7 +322,7 @@ class Profile implements IStrategy
                 ->setAlertComment(null)
                 ->setAlertLegal(null)
                 ->setAlertMedical($medical)
-                ->setAlertMessage($messages)
+                ->setAlertMessage(null)
                 ->setCampusName($campusName)
                 ->setEmail($email)
                 ->setEnrolmentDate($enrolment)
