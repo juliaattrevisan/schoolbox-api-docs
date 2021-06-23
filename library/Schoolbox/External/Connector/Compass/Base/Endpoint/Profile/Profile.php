@@ -95,6 +95,22 @@ class Profile implements IStrategy
 
 
     /**
+     * Used for api calls
+     *
+     * @var string
+     */
+    private string $lBound;
+
+
+    /**
+     * Used for api calls
+     *
+     * @var string
+     */
+    private string $uBound;
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -125,6 +141,13 @@ class Profile implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+
+        /* Data is obtained daily; remember lower and upper bound values
+         * for api calls. It needs to be in a specific format so might
+         * as well remember that
+         */
+        $this->lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $this->uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
     }
 
 
@@ -165,33 +188,30 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        $lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
-        $uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
-
         /* Shank all the parents active today
          */
         $this->log->info(sprintf(
             'Downloading parents active between %s and %s...',
-            $lBound,
-            $uBound
+            $this->lBound,
+            $this->uBound
         ));
 
         /* Save them into a hash lookup because compass guids are used to
          * identify parents and this is will be a fast way to get them
          */
-        $families = (new Families($this->api))->generate($lBound, $uBound);
+        $families = (new Families($this->api))->generate($this->lBound, $this->uBound);
 
         $this->log->info(sprintf(
             'Downloading students active between %s and %s...',
-            $lBound,
-            $uBound
+            $this->lBound,
+            $this->uBound
         ));
 
         /* Shank all the students active today
          */
         $students = $this->api->retrieveDocument('person/v1/GetStudents', [
-            'lBound' => $lBound,
-            'uBound' => $uBound
+            'lBound' => $this->lBound,
+            'uBound' => $this->uBound
         ]);
 
         foreach ($students['d'] as $student) {
@@ -905,22 +925,19 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
-        $lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
-        $uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
-
         /* Shank all the staff active today
          */
         $this->log->info(sprintf(
             'Downloading staff active between %s and %s...',
-            $lBound,
-            $uBound
+            $this->lBound,
+            $this->uBound
         ));
 
         /* Shank all the students active today
          */
         $staffs = $this->api->retrieveDocument('person/v1/GetStaff', [
-            'lBound' => $lBound,
-            'uBound' => $uBound
+            'lBound' => $this->lBound,
+            'uBound' => $this->uBound
         ]);
 
         foreach ($staffs['d'] as $staff) {
