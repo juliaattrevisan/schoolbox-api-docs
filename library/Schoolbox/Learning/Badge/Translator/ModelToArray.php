@@ -73,7 +73,7 @@ class ModelToArray
         $this->userTranslator    = $userTranslator;
         $this->storageTranslator = $storageTranslator;
         $this->purifier          = $purifier;
-        $this->linkTranslator  = $linkTranslator;
+        $this->linkTranslator    = $linkTranslator;
     }
 
 
@@ -118,46 +118,49 @@ class ModelToArray
 
 
         return [
-            'id'              => $model->getId(),
-            'createdAt'       => $model->getCreatedAt() && !$model->getCreatedAt()->isNull()
+            'id'                => $model->getId(),
+            'createdAt'         => $model->getCreatedAt() && !$model->getCreatedAt()->isNull()
                 ? $model->getCreatedAt()->getUsingFormat(DATE_ATOM)
                 : null,
-            'createdBy'       => $createdBy,
-            'updatedAt'       => $model->getUpdatedAt() && !$model->getUpdatedAt()->isNull()
+            'createdBy'         => $createdBy,
+            'updatedAt'         => $model->getUpdatedAt() && !$model->getUpdatedAt()->isNull()
                 ? $model->getUpdatedAt()->getUsingFormat(DATE_ATOM)
                 : null,
-            'updatedBy'       => $updatedBy,
-            'name'            => $model->getName(),
-            'body'            => $this->purifier->purify($model->getBody()),
-            'image'           => $image
+            'updatedBy'         => $updatedBy,
+            'name'              => $model->getName(),
+            'body'              => $this->purifier->purify($model->getBody()),
+            'image'             => $image
                 ? call_user_func($this->storageTranslator, $model->getImage())
                 : null,
-            'icon'            => $model->getIcon(),
-            'allowAsGoal'     => $model->getAllowAsGoal(),
-            'category'        => $category
+            'icon'              => $model->getIcon(),
+            'allowAsGoal'       => $model->getAllowAsGoal(),
+            'category'          => $category
                 ? [
                     'id'   => $category->getId(),
                     'name' => $category->getName(),
                 ]
                 : null,
-            'curriculumNodes' => $curriculumNodes
+            'achievementExpiry' => $model->getAchievementExpiry(),
+            'curriculumNodes'   => $curriculumNodes
                 ? $curriculumNodes
-                    ->map(static function (Node\Model $node) {
-                        return [
-                            'id'   => $node->getId(),
-                            'name' => $node->getName(),
-                            'code' => $node->getCode(),
-                        ];
-                    })
+                    ->map(
+                        static function (Node\Model $node) {
+                            return [
+                                'id'   => $node->getId(),
+                                'name' => $node->getName(),
+                                'code' => $node->getCode(),
+                            ];
+                        }
+                    )
                     ->reindex()
                 : null,
 
             // Tags don't exist yet, they will be added soon though
-            'tags'            => null,
+            'tags'              => null,
 
             /* Assign a variety of useful urls about this badge
              */
-            '_links' => call_user_func($this->linkTranslator, $model)
+            '_links'            => call_user_func($this->linkTranslator, $model),
         ];
     }
 }
