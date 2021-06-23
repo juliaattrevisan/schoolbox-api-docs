@@ -1001,15 +1001,17 @@ class Profile implements IStrategy
              * so it's actually a generic Phone Number field
              */
             $phone = (new FirstMeaningfulValue())->find([
+                $this->findDetailsField($staff['staffDetails'], 'phoneExtension'),
                 $staff['homePhoneNumber'],
                 $staff['mobileNumber']
             ]);
 
             $positionTitle = $this->findDetailsField($staff['staffDetails'], 'roleInSchool');
 
-            /* This seems to be Office Location, but I can't save data in the test instance
+            /* What's Office Location, then?
+             * I can't save anything to it in the compass ui anyway
              */
-            $room = $this->findDetailsField($staff['staffDetails'], 'officeLocation');
+            $room = $this->findDetailsField($staff['staffDetails'], 'room');
 
             $title = trim((string)$staff['title']);
             $username = trim((string)$staff['username']);
