@@ -38,6 +38,13 @@ class Profile implements IStrategy
 
 
     /**
+     * Staff Category strings; they can be renamed to whatever you prefer
+     */
+    private const TEACHING_STAFF = 'Teaching Staff';
+    private const NON_TEACHING_STAFF = 'Non-Teaching Staff';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -941,7 +948,7 @@ class Profile implements IStrategy
             /* I guess I just assume this department for now
              * Use it to indicate teaching/non teaching staff, I suppose
              */
-            $category = (int)$this->findDetailsField($staff['staffDetails'], 'isTeachingStaff') ? 'Teaching Staff' : 'Non-Teaching Staff';
+            $category = (int)$this->findDetailsField($staff['staffDetails'], 'isTeachingStaff') ? self::TEACHING_STAFF : self::NON_TEACHING_STAFF;
 
             /* This seems to be a set of organisationTitles elements
              */
