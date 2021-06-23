@@ -10,6 +10,7 @@ import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
+import moment from 'moment';
 
 const EVENT_CHANGE = 'change';
 
@@ -99,6 +100,14 @@ export default {
             showSkeletonLoader: true,
             selectedFilters: null,
         }
+    },
+    computed: {
+        /**
+         * Global date display formats.
+         *
+         * TODO attempt to inject this
+         */
+        dateDisplayFormats: () => window.dateDisplayFormats,
     },
     methods: {
         /**
@@ -317,6 +326,16 @@ export default {
             Object.keys(this.selectedFilters).forEach(k => emptyQueryString[k] = '');
             return "?" + new URLSearchParams(emptyQueryString).toString();
         },
+
+        /**
+         * Renders an expiry date, in the long date display format.
+         *
+         * @param {Date|null} date
+         * @returns {string}
+         */
+        renderExpiryDate(date) {
+            return moment(date).format(this.dateDisplayFormats.momentJsDateLong);
+        }
     },
 }
 </script>
@@ -436,7 +455,7 @@ export default {
                 </template>
                 <template v-slot:expiryMessage="slotProps">
                     <p class="meta" v-if="currentBadge.achievementExpiry">
-                        This award will expire in {{ slotProps.expiryLabel }}, on {{ slotProps.expiryDate }}.
+                        This achievement will expire in {{ slotProps.expiryLabel }}, on {{ renderExpiryDate(slotProps.expiryDate) }}.
                     </p>
                 </template>
             </badge-award>
