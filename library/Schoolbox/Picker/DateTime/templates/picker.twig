@@ -63,7 +63,7 @@
 
                             <div class="column small-6">
                                 <label>
-                                    Term/Semester:
+                                    {{ locale.term.proper }}:
                                     <select name="term" data-adtp-tt-term>
                                         {% for term in terms %}
                                             <option value="{{ term.id }}" data-duration="{{ term.duration }}" data-start-date="{{ term.start }}" data-end-date="{{ term.displayFinish }}" {% if term.id == timetableVars.term %} selected {% endif %}>{{ term.title }} </option>
@@ -73,7 +73,7 @@
                             </div>
                         </div>
 
-                        <div data-alert data-adtp-tt-error class="alert-box alert hide">Not enough data to build a timetable for the selected campus and term.</div>
+                        <div data-alert data-adtp-tt-error class="alert-box alert hide">Not enough data to build a timetable for the selected campus and {{ locale.term }}.</div>
 
                         <div data-adtp-tt-picker>
                             <div class="adtp-tt-container">
