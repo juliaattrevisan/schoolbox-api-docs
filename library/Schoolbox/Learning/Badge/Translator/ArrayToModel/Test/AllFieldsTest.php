@@ -113,6 +113,14 @@ class AllFieldsTest extends TestCase
                 ->setImage($storage),
             new AllFields($collectorFactoryMock),
         ];
+
+        yield 'achievement expiry' => [
+            [
+                'achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_DAY,
+            ],
+            (new Model())
+                ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY),
+        ];
     }
 
 
@@ -137,6 +145,7 @@ class AllFieldsTest extends TestCase
             ->setBody('test')
             ->setImage((new Storage())->setHash('1234567890123456789012345678901234567890'))
             ->setCategory((new Category())->setId($oldId))
+            ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY)
             ->setCreatedBy((new User())->setId($oldId))
             ->setUpdatedBy((new User())->setId($oldId));
 
@@ -235,7 +244,7 @@ class AllFieldsTest extends TestCase
             (clone $baseModel)->setBody('new body'),
         ];
 
-        yield 'update bodye - left+right trim' => [
+        yield 'update body - left+right trim' => [
             ['body' => ' new body ',],
             (clone $baseModel),
             (clone $baseModel)->setBody('new body'),
@@ -253,6 +262,18 @@ class AllFieldsTest extends TestCase
             ['category' => ['id' => null],],
             (clone $baseModel),
             (clone $baseModel)->setCategory((new Category())->setId(null)),
+        ];
+
+        yield 'update achievement expiry' => [
+            ['achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_MONTH,],
+            (clone $baseModel),
+            (clone $baseModel)->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_MONTH),
+        ];
+
+        yield 'null achievement expiry' => [
+            ['achievementExpiry' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setAchievementExpiry(null),
         ];
 
         // Created by is not nullable
@@ -375,6 +396,21 @@ class AllFieldsTest extends TestCase
         ];
     }
 
+    /**
+     * Data provider for `testInvokeInvalidAchievementExpiry`.
+     *
+     * @return iterable
+     */
+    public function getTestInvokeInvalidAchievementExpiryData(): iterable
+    {
+        return [
+            '0 days' => [0],
+            '2 days' => [2],
+            '-1 day' => [-1],
+            '366 days' => [366],
+        ];
+    }
+
 
     /**
      * Test that creation of a new model from an array works as expected.
@@ -445,6 +481,29 @@ class AllFieldsTest extends TestCase
 
         /** @noinspection PhpUnhandledExceptionInspection */
         self::assertEquals($expected, $converter($input, $existing));
+    }
+
+
+    /**
+     * Test that setting an invalid achievement expiry value raises an error.
+     *
+     * This only tests int values: `null` is a valid value, and other non-int
+     * values are covered by type definitions.
+     *
+     * @dataProvider getTestInvokeInvalidAchievementExpiryData
+     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::__invoke
+     *
+     * @param int $invalidValue
+     * @noinspection PhpDocMissingThrowsInspection We know this will be thrown, and catch it
+     */
+    public function testInvokeInvalidAchievementExpiry(int $invalidValue): void
+    {
+        $converter = $this->createConverterIfNull();
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $converter(['achievementExpiry' => $invalidValue,], new Model());
     }
 
 

@@ -15,6 +15,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 /**
  * Class Model
@@ -35,6 +36,22 @@ class Model implements ISoftDeletable
      */
     public const AVATAR_ICON = 'icon';
     public const AVATAR_IMAGE = 'image';
+
+
+    public const ACHIEVEMENT_EXPIRY_DAY = 1;
+    public const ACHIEVEMENT_EXPIRY_WEEK = 7;
+    public const ACHIEVEMENT_EXPIRY_FORTNIGHT = 14;
+    public const ACHIEVEMENT_EXPIRY_MONTH = 31;
+    public const ACHIEVEMENT_EXPIRY_HALF_YEAR = 183;
+    public const ACHIEVEMENT_EXPIRY_YEAR = 365;
+    public const VALID_ACHIEVEMENT_EXPIRY_VALUES = [
+        self::ACHIEVEMENT_EXPIRY_DAY,
+        self::ACHIEVEMENT_EXPIRY_WEEK,
+        self::ACHIEVEMENT_EXPIRY_FORTNIGHT,
+        self::ACHIEVEMENT_EXPIRY_MONTH,
+        self::ACHIEVEMENT_EXPIRY_HALF_YEAR,
+        self::ACHIEVEMENT_EXPIRY_YEAR,
+    ];
 
 
     /**
@@ -241,9 +258,20 @@ class Model implements ISoftDeletable
     /**
      * @param int|null $achievementExpiry
      * @return $this
+     * @throws UnexpectedValueException if `$achievementExpiry` isn't in
+     *                                  `self::VALID_ACHIEVEMENT_EXPIRY_VALUES`
      */
     public function setAchievementExpiry(?int $achievementExpiry): self
     {
+        if (isset($achievementExpiry) && !in_array($achievementExpiry, self::VALID_ACHIEVEMENT_EXPIRY_VALUES, true)) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Achievement expiry must be one of: [%s], received %d instead',
+                    implode(',', self::VALID_ACHIEVEMENT_EXPIRY_VALUES),
+                    $achievementExpiry,
+                )
+            );
+        }
         $this->achievementExpiry = $achievementExpiry;
         return $this;
     }
