@@ -13,7 +13,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
