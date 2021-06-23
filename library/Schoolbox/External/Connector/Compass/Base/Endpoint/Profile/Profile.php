@@ -131,15 +131,15 @@ class Profile implements IStrategy
         /* Import students' profile data
          * Import their specific parents' profile data
          */
-        $this->log->info('Processing students and their parents.');
+//        $this->log->info('Processing students and their parents.');
+//
+//        $this->importStudents();
 
-        $this->importStudents();
-//
-//        /* Import staff profile data
-//         */
-//        $this->log->info('Processing staff.');
-//
-//        $this->importStaff();
+        /* Import staff profile data
+         */
+        $this->log->info('Processing staff.');
+
+        $this->importStaff();
     }
 
 
@@ -844,89 +844,136 @@ class Profile implements IStrategy
             }
         }
     }
-//
-//
-//    /**
-//     * Import staff profile data
-//     */
-//    private function importStaff(): void
-//    {
-//        $staffs = [];
-//
-//        foreach ($staffs as $staff) {
-//            /* TODO Fill in basic staff vars
-//             */
-//            $externalId = '';
-//
-//            $firstname = '';
-//            $lastname = '';
-//            $building = '';
-//            $campusName = '';
-//            $category = '';
-//            $department = '';
-//            $email = '';
-//            $phone = '';
-//            $positionTitle = '';
-//            $room = '';
-//            $title = '';
-//            $username = '';
-//
-//            /* Find out if this externalId already has a staff profile
-//             * If one already exists, load it, update it, then save it
-//             * Otherwise make a new one for the given id
-//             */
-//            try {
-//                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
-//                $staffBaseProfile = $staffProfile->getBaseProfile();
-//            } catch (Exception $e) {
-//                $staffProfile = $this->staffProfileMapper->createModel();
-//                $staffBaseProfile = $this->baseProfileMapper->createModel();
-//
-//                $staffProfile->setBaseProfile($staffBaseProfile);
-//            }
-//
-//            $staffBaseProfile
-//                ->setExternalId($externalId)
-//                ->setTitle($title)
-//                ->setFirstname($firstname)
-//                ->setLastname($lastname);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding base profile for %s',
-//                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->baseProfileMapper->save($staffBaseProfile);
-//            }
-//
-//            $staffProfile
-//                ->setBuilding($building)
-//                ->setCampusName($campusName)
-//                ->setCategory($category)
-//                ->setDepartment($department)
-//                ->setEmail($email)
-//                ->setPhone($phone)
-//                ->setPositionTitle($positionTitle)
-//                ->setRoom($room)
-//                ->setUsername($username);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding staff profile for %s',
-//                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->staffProfileMapper->save($staffProfile);
-//            }
-//        }
-//    }
+
+
+    /**
+     * Import staff profile data
+     */
+    private function importStaff(): void
+    {
+        $lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
+
+        /* Shank all the staff active today
+         */
+        $this->log->info(sprintf(
+            'Downloading staff active between %s and %s...',
+            $lBound,
+            $uBound
+        ));
+
+        /* Shank all the students active today
+         */
+        $staffs = $this->api->retrieveDocument('person/v1/GetStaff', [
+            'lBound' => $lBound,
+            'uBound' => $uBound
+        ]);
+
+        foreach ($staffs['d'] as $staff) {
+            $externalId = $this->findExternalId($staff['importIdentifiers']);
+
+            /* Prioritise preferred names over official names
+             */
+            $firstname = (new FirstMeaningfulValue())->find([
+                $staff['preferredFirstName'],
+                $staff['firstName']
+            ]);
+
+            /* Prioritise preferred names over official names
+             */
+            $lastname = (new FirstMeaningfulValue())->find([
+                $staff['preferredLastName'],
+                $staff['lastName']
+            ]);
+
+            $building = '';
+            $campusName = '';
+            $category = '';
+            $department = '';
+
+            /* TODO Email addresses also exist inside staffDetails and are
+             *  instance-specific...what's the difference between those
+             *  emails and this one? Which one should take precedent?
+             */
+            $email = trim((string)$staff['emailAddress']);
+
+            /* TODO See if you can find a Business Phone equivalent
+             */
+            $phone = (new FirstMeaningfulValue())->find([
+                $staff['mobileNumber'],
+
+                /* TODO I don't think this is right, but they might be
+                 *  putting work phones into this field? Need to check
+                 */
+                $staff['homePhoneNumber']
+            ]);
+
+            $positionTitle = '';
+            $room = '';
+            $title = trim((string)$staff['title']);
+            $username = trim((string)$staff['username']);
+
+            /* Find out if this externalId already has a staff profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            try {
+                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                $staffBaseProfile = $staffProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $staffProfile = $this->staffProfileMapper->createModel();
+
+                try {
+                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                }
+
+                $staffProfile->setBaseProfile($staffBaseProfile);
+            }
+
+            $staffBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($staffBaseProfile);
+            }
+
+            $staffProfile
+                ->setBuilding($building)
+                ->setCampusName($campusName)
+                ->setCategory($category)
+                ->setDepartment($department)
+                ->setEmail($email)
+                ->setPhone($phone)
+                ->setPositionTitle($positionTitle)
+                ->setRoom($room)
+                ->setUsername($username);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding staff profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->staffProfileMapper->save($staffProfile);
+            }
+        }
+    }
 }
