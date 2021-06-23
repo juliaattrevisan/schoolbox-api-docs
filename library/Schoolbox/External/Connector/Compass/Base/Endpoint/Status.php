@@ -21,9 +21,9 @@ class Status implements IStatus
 {
 
     /**
-     * @var Api
+     * @var IApi
      */
-    private Api $api;
+    private IApi $api;
 
 
     /**
