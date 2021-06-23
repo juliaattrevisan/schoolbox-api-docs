@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
+use Alaress_Date_Format;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge;
@@ -207,14 +208,19 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Otherwise get the $awardStatus records
          */
-        $from = \Alaress_Date_Format::now()->addYears(-1);
-        $to = \Alaress_Date_Format::now();
+        $from = Alaress_Date_Format::now()->addYears(-1);
+        $to = Alaress_Date_Format::now();
 
         $pb = $this->getPredicateBuilder()
             ->equals('recipient_id', $user->getId())
             ->equals('status', $awardStatus)
             ->isNull('award_id')
-            ->betweenDates('awarded_at', $from, $to);
+            ->betweenDates('awarded_at', $from, $to)
+            ->any(
+                $this->getPredicateBuilder()
+                    ->isNull('expires_at')
+                    ->greaterThanOrEqualTo('expires_at', Alaress_Date_Format::now())
+            );
 
         return $this->findByPredicates($pb, [
             'order' => [
