@@ -132,23 +132,23 @@ export default {
                 <p class="meta">Category: {{ award.badge.category.name }}</p>
                 <p class="meta">
                     <template v-if="award.isGoal">
-                        Goal set <relative-time :datetime="award.awardedAt"></relative-time> by
+                        Goal set <relative-time :datetime="award.awardedAt" :key="award.id"></relative-time> by
                         <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
                     </template>
                     <template v-else>
-                        Awarded <relative-time :datetime="award.awardedAt"></relative-time> by
+                        Awarded <relative-time :datetime="award.awardedAt" :key="award.id"></relative-time> by
                         <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
                     </template>
                 </p>
                 <p class="meta" v-if="award.isGoal && award.award">
-                    Goal has been achieved <relative-time :datetime="award.award.awardedAt"></relative-time>
+                    Goal has been achieved <relative-time :datetime="award.award.awardedAt" :key="award.id"></relative-time>
                 </p>
                 <p class="meta" v-if="award.expiresAt">
                     <template v-if="award.isGoal">
-                        Goal expires <relative-time :datetime="award.expiresAt" date-only></relative-time>
+                        Goal expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
                     </template>
                     <template v-else>
-                        Achievement expires <relative-time :datetime="award.expiresAt" date-only></relative-time>
+                        Achievement expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
                     </template>
                 </p>
 
