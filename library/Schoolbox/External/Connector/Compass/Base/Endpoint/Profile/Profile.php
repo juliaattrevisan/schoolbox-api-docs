@@ -897,14 +897,11 @@ class Profile implements IStrategy
              */
             $email = trim((string)$staff['emailAddress']);
 
-            /* TODO See if you can find a Business Phone equivalent
+            /* The "Phone" field in compass ui ends up mapping to homePhoneNumber
+             * so it's actually a generic Phone Number field
              */
             $phone = (new FirstMeaningfulValue())->find([
                 $staff['mobileNumber'],
-
-                /* TODO I don't think this is right, but they might be
-                 *  putting work phones into this field? Need to check
-                 */
                 $staff['homePhoneNumber']
             ]);
 
