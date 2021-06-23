@@ -420,7 +420,12 @@ class Controller extends Base
                 ->setBadge($badge)
                 ->setStatus($status)
                 ->setAwardedBy($this->getUser())
-                ->setAwardedAt(Alaress_Date_Format::now());
+                ->setAwardedAt(Alaress_Date_Format::now())
+                ->setExpiresAt(
+                    $badge->getAchievementExpiry()
+                        ? Alaress_Date_Format::now()->addDays($badge->getAchievementExpiry())
+                        : null
+                );
 
             $history = $histories[$user->getId()];
 
@@ -458,7 +463,12 @@ class Controller extends Base
             ->setBadge($badge)
             ->setStatus(AwardModel::AWARD_STATUS_GOAL)
             ->setAwardedBy($this->getUser())
-            ->setAwardedAt(Alaress_Date_Format::now());
+            ->setAwardedAt(Alaress_Date_Format::now())
+            ->setExpiresAt(
+                $badge->getAchievementExpiry()
+                    ? Alaress_Date_Format::now()->addDays($badge->getAchievementExpiry())
+                    : null
+            );
 
         (new Transactor($history, $this->mapper))->award($award);
 
