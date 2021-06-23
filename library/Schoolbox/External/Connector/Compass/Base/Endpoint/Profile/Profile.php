@@ -45,6 +45,12 @@ class Profile implements IStrategy
 
 
     /**
+     * A string corresponding to a record that is considered Active
+     */
+    private const ACTIVE = 'Active';
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -601,7 +607,7 @@ class Profile implements IStrategy
      */
     private function isActiveDetailsField(array $detail): bool
     {
-        return $this->matchesHost($detail['organisationName']) && 'Active' === $detail['status'];
+        return $this->matchesHost($detail['organisationName']) && self::ACTIVE === $detail['status'];
     }
 
 
