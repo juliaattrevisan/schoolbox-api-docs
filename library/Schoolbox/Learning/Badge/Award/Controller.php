@@ -274,7 +274,7 @@ class Controller extends Base
      */
     public function getAwardedBadges(User $user, string $awardStatus): void
     {
-        $awards = $this->mapper->findRecentForUser($user, $awardStatus);
+        $awards = $this->mapper->findRecentForUser($user, $awardStatus, Alaress_Date_Format::now());
 
         $stack = [];
 
