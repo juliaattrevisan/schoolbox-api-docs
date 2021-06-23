@@ -43,19 +43,20 @@ class Status implements IStatus
      * @inheritDoc
      *
      * @return bool
-     * @throws \DomainException
-     * @throws \JsonException
-     * @throws \RuntimeException
      */
     public function isReachable(): bool
     {
         /* ISO8601 format:
          * https://stackoverflow.com/questions/903203/how-to-display-a-date-as-iso-8601-format-with-php
          */
-        $result = $this->api->retrieveDocument('person/v1/GetStudents', [
-            'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
-            'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
-        ]);
+        try {
+            $result = $this->api->retrieveDocument('person/v1/GetStudents', [
+                'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
+                'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
+            ]);
+        } catch (\RuntimeException|\DomainException|\JsonException $e) {
+            return false;
+        }
 
         return (bool)$result;
     }
