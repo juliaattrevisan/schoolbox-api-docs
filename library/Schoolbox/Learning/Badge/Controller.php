@@ -35,6 +35,38 @@ class Controller extends Base
     private const BADGES_PER_PAGE = 40;
 
 
+    private const ACHIEVEMENT_EXPIRY_OPTIONS = [
+        [
+            'label' => 'Forever',
+            'value' => null,
+        ],
+        [
+            'label' => '1 day',
+            'value' => Model::ACHIEVEMENT_EXPIRY_DAY,
+        ],
+        [
+            'label' => '1 week',
+            'value' => Model::ACHIEVEMENT_EXPIRY_WEEK,
+        ],
+        [
+            'label' => '2 weeks',
+            'value' => Model::ACHIEVEMENT_EXPIRY_FORTNIGHT,
+        ],
+        [
+            'label' => '1 month',
+            'value' => Model::ACHIEVEMENT_EXPIRY_MONTH,
+        ],
+        [
+            'label' => '6 months',
+            'value' => Model::ACHIEVEMENT_EXPIRY_HALF_YEAR,
+        ],
+        [
+            'label' => '1 year',
+            'value' => Model::ACHIEVEMENT_EXPIRY_YEAR,
+        ],
+    ];
+
+
     /**
      * The badge mapper.
      */
@@ -250,6 +282,7 @@ class Controller extends Base
                     'badge' => [],
                     'attachzone' => $attachzone->getTwigContext(),
                     'categories' => $this->categoryMapper->findAll(),
+                    'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTIONS,
                     'yearLevels' => $yearLevels,
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
@@ -356,6 +389,7 @@ class Controller extends Base
             'badge' => $badge,
             'attachzone' => $attachzone->getTwigContext(),
             'categories' => $this->categoryMapper->findAll(),
+            'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTIONS,
             'yearLevels' => $yearLevels,
             'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'iconRegistry' => [
