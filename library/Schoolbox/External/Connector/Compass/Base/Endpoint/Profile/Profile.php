@@ -51,6 +51,21 @@ class Profile implements IStrategy
 
 
     /**
+     * These strings represent Boarders
+     *
+     * I'm not sure what the difference is between a Part Time boarder
+     * and a Weekday boarder, exactly...
+     *
+     * It seems like Part Time boarder might be someone who does everything
+     * except sleep at school 5 days a week.
+     *
+     * A Weekday boarder might be like a full time boarder but only
+     * for 5 days a week; they go home on weekends.
+     */
+    private const BOARDERS = ['Full Time', 'Part Time', 'Weekday'];
+
+
+    /**
      * @var LoggerInterface
      */
     private LoggerInterface $log;
@@ -482,11 +497,9 @@ class Profile implements IStrategy
          *
          * I guess they're gonna return true, too
          */
-        $boarders = ['Full Time', 'Part Time', 'Weekday'];
-
         $boarderType = $this->findDetailsField($studentDetails, 'boarderType');
 
-        return in_array($boarderType, $boarders, true);
+        return in_array($boarderType, self::BOARDERS, true);
     }
 
 
