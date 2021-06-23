@@ -5,6 +5,8 @@ import RevealModal from "@schoolbox/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badgeList';
 import toastMixin from '@schoolbox/toast-mixin';
+import {calculateExpiryDate, translateExpiryToLabel} from "../../vue/expiry-helper";
+import moment from "moment";
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -64,6 +66,17 @@ export default {
         users: {
             type: Array,
             required: true,
+        },
+
+        /**
+         * The field to use to determine when a badge award should expire.
+         *
+         * If this value is set: the award modal will show this value for each
+         * badge that is selected, as the amount of time until it will expire.
+         */
+        expiryField: {
+            type: String,
+            default: null,
         },
 
         /**
@@ -209,6 +222,13 @@ export default {
     computed: {
         window: () => window,
 
+        /**
+         * Global date display formats.
+         *
+         * TODO attempt to inject this
+         */
+        dateDisplayFormats: () => window.dateDisplayFormats,
+
         // Messages are computed depending on how many badges are selected
         toastActivateMessage() {
             return this.selectedBadges.length === 1
@@ -292,6 +312,27 @@ export default {
                     this.$refs.awardModalSubmit.disabled = false;
                 });
         },
+
+        /**
+         * Translate this badge award's expiry into a text label.
+         *
+         * @param {Number|null} expiry
+         * @returns {String|null}
+         */
+        expiryLabel (expiry) {
+            return translateExpiryToLabel(expiry);
+        },
+
+        /**
+         * Renders an expiry date, in the long date display format.
+         *
+         * @param {Number|null} expiry
+         * @param {Date|null} fromDate
+         * @returns {String}
+         */
+        renderExpiryDate(expiry, fromDate) {
+            return moment(calculateExpiryDate(expiry, fromDate)).format(this.dateDisplayFormats.momentJsDateLong);
+        }
     },
 }
 </script>
@@ -326,6 +367,9 @@ export default {
                             <badge-image :badge="badge"></badge-image>
                             <h3>{{ badge.name }}</h3>
                         </div>
+                        <p class="meta" v-if="expiryField && badge[expiryField]">
+                            Expires in {{ expiryLabel(badge[expiryField]) }}, on {{ renderExpiryDate(badge[expiryField]) }}
+                        </p>
                     </div>
                 </li>
             </ul>
