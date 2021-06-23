@@ -163,10 +163,20 @@ export default {
         /**
          * Translate this badge award's expiry into a text label.
          *
-         * @returns {String}
+         * @returns {String|null}
          */
         expiryLabel () {
             return translateExpiryToLabel(this.expiry);
+        },
+
+        /**
+         * Translate this badge award's expiry into a Date object.
+         *
+         * @param {Date|null} fromDate
+         * @returns {Date|null}
+         */
+        expiryDate (fromDate) {
+            return calculateExpiryDate(this.expiry, fromDate);
         },
     },
     methods: {
@@ -261,9 +271,10 @@ export default {
 
         <!--
         @slot The expiry message for this badge award
-        @binding {String} expiryLabel A relative expiry date
+        @binding {String|null} expiryLabel A relative expiry date
+        @binding {Date|null} expiryDate An actual expiry date object
         -->
-        <slot name="expiryMessage" :expiryLabel="expiryLabel"></slot>
+        <slot name="expiryMessage" :expiryLabel="expiryLabel" :expiryDate="expiryDate"></slot>
 
         <v-select class="schoolbox-vue-selectize"
                   :options="options"

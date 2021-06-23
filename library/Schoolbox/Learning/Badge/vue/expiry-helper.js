@@ -49,6 +49,19 @@ export function translateExpiryToLabel(expiry) {
     return null;
 }
 
-export function calculateExpiryDate(expiry) {
-    let date = new Date();
+/**
+ * Calculates an actual expiry date from a number of days, with an optional date
+ * to calculate from.
+ *
+ * @param {Number|null} expiry
+ * @param {Date|null} fromDate
+ * @returns {Date|null}
+ */
+export function calculateExpiryDate(expiry, fromDate) {
+    if (expiry === null) {
+        return null;
+    }
+    let date = fromDate instanceof Date ? new Date(fromDate.getTime()) : new Date();
+    date.setDate(date.getDate() + expiry);
+    return date;
 }

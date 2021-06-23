@@ -436,7 +436,7 @@ export default {
                 </template>
                 <template v-slot:expiryMessage="slotProps">
                     <p class="meta" v-if="currentBadge.achievementExpiry">
-                        This award will expire in {{ slotProps.expiryLabel }}.
+                        This award will expire in {{ slotProps.expiryLabel }}, on {{ slotProps.expiryDate }}.
                     </p>
                 </template>
             </badge-award>
