@@ -76,7 +76,7 @@ HELP;
             /* Have a look to see how many records would get changed
              */
             $result = $db->executeQuery('
-                SELECT pastoral.id, pastoral.heading
+                SELECT pastoral.id, pastoral.heading, pastoral.student_id
                 FROM pastoral_access
                 INNER JOIN pastoral ON pastoral.id = pastoral_access.pastoral_id
                 WHERE pastoral_access.access = 0
@@ -86,9 +86,10 @@ HELP;
 
             foreach ($result as $row) {
                 $this->getLogger()->info(sprintf(
-                    'Pastoral record "%s" (%s) will be updated.',
+                    'Pastoral record "%s" %s (user %s) will be updated.',
                     $row['heading'],
-                    $row['id']
+                    $row['id'],
+                    $row['student_id']
                 ));
             }
 
