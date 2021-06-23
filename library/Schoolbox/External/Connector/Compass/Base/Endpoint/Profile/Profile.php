@@ -449,19 +449,9 @@ class Profile implements IStrategy
          */
         $boarders = ['Full Time', 'Part Time', 'Weekday'];
 
-        foreach ($studentDetails as $studentDetail) {
-            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
+        $boarderType = $this->findDetailsField($studentDetails, 'boarderType');
 
-            if (strpos($this->api->getHost(), $studentSchool) > -1) {
-                if ('Active' === $studentDetail['status']) {
-                    if (in_array($studentDetail['boarderType'], $boarders, true)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return in_array($boarderType, $boarders, true);
     }
 
 
@@ -519,12 +509,27 @@ class Profile implements IStrategy
      */
     private function findEmail(array $studentDetails): ?string
     {
-        foreach ($studentDetails as $studentDetail) {
-            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
+        return $this->findDetailsField($studentDetails, 'organisationUserEmail');
+    }
 
-            if (strpos($this->api->getHost(), $studentSchool) > -1) {
-                if ('Active' === $studentDetail['status']) {
-                    return $studentDetail['organisationUserEmail'];
+
+    /**
+     * Find the value of $field in the set of details $details
+     * This iterates to find the first Active record that corresponds
+     * to the current instance and organisationName
+     *
+     * @param array  $details
+     * @param string $field
+     * @return string|null
+     */
+    private function findDetailsField(array $details, string $field): ?string
+    {
+        foreach ($details as $detail) {
+            $school = explode('.', $detail['organisationName'])[0];
+
+            if (strpos($this->api->getHost(), $school) > -1) {
+                if ('Active' === $detail['status']) {
+                    return (string)$detail[$field];
                 }
             }
         }
@@ -886,27 +891,41 @@ class Profile implements IStrategy
                 $staff['lastName']
             ]);
 
+            /* Haven't encountered data this specific
+             */
             $building = '';
             $campusName = '';
-            $category = '';
-            $department = '';
+
+            /* I guess I just assume this department for now
+             * Use it to indicate teaching/non teaching staff, I suppose
+             */
+            $category = (int)$this->findDetailsField($staff['staffDetails'], 'isTeachingStaff') ? 'Teaching Staff' : 'Non-Teaching Staff';
+
+            /* This seems to be a set of organisationTitles elements
+             */
+            $department = implode(', ', $this->findDetailsFieldArray($staff['staffDetails'], 'organisationTitles'));
 
             /* TODO Email addresses also exist inside staffDetails and are
              *  instance-specific...what's the difference between those
-             *  emails and this one? Which one should take precedent?
+             *  emails and this emailAddress one?
+             *  Which one should take precedence?
              */
-            $email = trim((string)$staff['emailAddress']);
+            $email = $this->findDetailsField($staff['staffDetails'], 'organisationUserEmail');
 
             /* The "Phone" field in compass ui ends up mapping to homePhoneNumber
              * so it's actually a generic Phone Number field
              */
             $phone = (new FirstMeaningfulValue())->find([
-                $staff['mobileNumber'],
-                $staff['homePhoneNumber']
+                $staff['homePhoneNumber'],
+                $staff['mobileNumber']
             ]);
 
-            $positionTitle = '';
-            $room = '';
+            $positionTitle = $this->findDetailsField($staff['staffDetails'], 'roleInSchool');
+
+            /* This seems to be Office Location, but I can't save data in the test instance
+             */
+            $room = $this->findDetailsField($staff['staffDetails'], 'officeLocation');
+
             $title = trim((string)$staff['title']);
             $username = trim((string)$staff['username']);
 
@@ -972,5 +991,30 @@ class Profile implements IStrategy
                 $this->staffProfileMapper->save($staffProfile);
             }
         }
+    }
+
+
+    /**
+     * Find the value of $field in the set of details $details
+     * This iterates to find the first Active record that corresponds
+     * to the current instance and organisationName
+     *
+     * @param array  $details
+     * @param string $field
+     * @return array|null
+     */
+    private function findDetailsFieldArray(array $details, string $field): ?array
+    {
+        foreach ($details as $detail) {
+            $school = explode('.', $detail['organisationName'])[0];
+
+            if (strpos($this->api->getHost(), $school) > -1) {
+                if ('Active' === $detail['status']) {
+                    return $detail[$field];
+                }
+            }
+        }
+
+        return null;
     }
 }
