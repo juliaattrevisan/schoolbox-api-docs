@@ -1,14 +1,15 @@
 #!/usr/bin/php
 <?php
+
 /**
  * @author      Steve Chan <steve.chan@schoolbox.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        http://www.schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
 
