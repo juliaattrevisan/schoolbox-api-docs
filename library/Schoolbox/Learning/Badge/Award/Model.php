@@ -213,10 +213,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param Alaress_Date_Format|null $expiresAt
+     * @return $this
      */
-    public function setExpiresAt(?Alaress_Date_Format $expiresAt): void
+    public function setExpiresAt(?Alaress_Date_Format $expiresAt): self
     {
         $this->expiresAt = $expiresAt;
+        return $this;
     }
 
 

@@ -240,10 +240,12 @@ class Model implements ISoftDeletable
 
     /**
      * @param int|null $achievementExpiry
+     * @return $this
      */
-    public function setAchievementExpiry(?int $achievementExpiry): void
+    public function setAchievementExpiry(?int $achievementExpiry): self
     {
         $this->achievementExpiry = $achievementExpiry;
+        return $this;
     }
 
 
