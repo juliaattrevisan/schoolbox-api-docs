@@ -35,7 +35,7 @@ class Factory
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -43,85 +43,85 @@ class Factory
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var string
      */
-    private $host;
+    private string $host;
 
 
     /**
      * @var string
      */
-    private $key;
+    private string $key;
 
 
     /**
      * @var UserProfile\Mapper
      */
-    private $baseProfileMapper;
+    private UserProfile\Mapper $baseProfileMapper;
 
 
     /**
      * @var UserProfile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private UserProfile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var UserProfile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private UserProfile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var UserProfile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
     /**
      * @var CampusMapper
      */
-    private $campusMapper;
+    private CampusMapper $campusMapper;
 
 
     /**
      * @var TimetableCycleMapper
      */
-    private $timetableCycleMapper;
+    private TimetableCycleMapper $timetableCycleMapper;
 
 
     /**
      * @var TimetablePeriodMapper
      */
-    private $timetablePeriodMapper;
+    private TimetablePeriodMapper $timetablePeriodMapper;
 
 
     /**
      * @var ClassEntryMapper
      */
-    private $classEntryMapper;
+    private ClassEntryMapper $classEntryMapper;
 
 
     /**
      * @var ClassInvolvementMapper
      */
-    private $classInvolvementMapper;
+    private ClassInvolvementMapper $classInvolvementMapper;
 
 
     /**
      * @var ClassPeriodMapper
      */
-    private $classPeriodMapper;
+    private ClassPeriodMapper $classPeriodMapper;
 
 
     /**
@@ -201,18 +201,14 @@ class Factory
 
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Prepare(
+            ->add(new Profile\Prepare(
                 $this->log,
                 $this->perform,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
-                $this->relationshipMapper,
-                $this->timetablePeriodMapper,
-                $this->classEntryMapper,
-                $this->classInvolvementMapper,
-                $this->classPeriodMapper
+                $this->relationshipMapper
             ))
             ->add(new Profile\Profile(
                 $this->log,
@@ -222,6 +218,23 @@ class Factory
                 $this->parentProfileMapper,
                 $this->staffProfileMapper,
                 $this->relationshipMapper
+            ))
+            ->add(new Profile\Cleanup(
+                $this->log,
+                $this->perform,
+                $this->baseProfileMapper,
+                $this->studentProfileMapper,
+                $this->parentProfileMapper,
+                $this->staffProfileMapper,
+                $this->relationshipMapper
+            ))
+            ->add(new Timetable\Prepare(
+                $this->log,
+                $this->perform,
+                $this->timetablePeriodMapper,
+                $this->classEntryMapper,
+                $this->classInvolvementMapper,
+                $this->classPeriodMapper
             ))
             ->add(new Timetable\Definition(
                 $this->log,
@@ -236,15 +249,6 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
-            ))
-            ->add(new Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
             ));
     }
 }

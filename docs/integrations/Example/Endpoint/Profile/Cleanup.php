@@ -7,10 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\External\Connector\Example\Base\Endpoint;
+namespace Schoolbox\External\Connector\Example\Base\Endpoint\Profile;
 
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\Admin\Import\Profile\OrphanRemover;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
@@ -20,52 +19,52 @@ use Schoolbox\External\Profile as UserProfile;
  *
  * Remove any stale profiles
  *
- * @package Schoolbox\External\Connector\Example\Base\Endpoint
+ * @package Schoolbox\External\Connector\Example\Base\Endpoint\Profile
  */
 class Cleanup implements IStrategy
 {
 
 
     /**
-     * @var LoggerInterface
+     * @var LoggerInterface|null
      */
-    private $log;
+    private ?LoggerInterface $log;
 
 
     /**
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var UserProfile\Mapper
      */
-    private $baseProfileMapper;
+    private UserProfile\Mapper $baseProfileMapper;
 
 
     /**
      * @var UserProfile\Student\Mapper
      */
-    private $studentProfileMapper;
+    private UserProfile\Student\Mapper $studentProfileMapper;
 
 
     /**
      * @var UserProfile\Parent\Mapper
      */
-    private $parentProfileMapper;
+    private UserProfile\Parent\Mapper $parentProfileMapper;
 
 
     /**
      * @var UserProfile\Staff\Mapper
      */
-    private $staffProfileMapper;
+    private UserProfile\Staff\Mapper $staffProfileMapper;
 
 
     /**
      * @var UserProfile\Relationship\Mapper
      */
-    private $relationshipMapper;
+    private UserProfile\Relationship\Mapper $relationshipMapper;
 
 
     /**

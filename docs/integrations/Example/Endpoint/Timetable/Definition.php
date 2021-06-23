@@ -40,7 +40,7 @@ class Definition implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -48,19 +48,19 @@ class Definition implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var TimetableCycleMapper
      */
-    private $timetableCycleMapper;
+    private TimetableCycleMapper $timetableCycleMapper;
 
 
     /**
      * @var TimetablePeriodMapper
      */
-    private $timetablePeriodMapper;
+    private TimetablePeriodMapper $timetablePeriodMapper;
 
 
     /**

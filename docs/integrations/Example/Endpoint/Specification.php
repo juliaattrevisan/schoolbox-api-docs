@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Example\Base\Endpoint;
 
-use Psr\Log\LoggerInterface;
+use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Zend\Uri\Exception\InvalidArgumentException;
 use Zend\Uri\Exception\InvalidUriPartException;
 
@@ -24,37 +24,19 @@ class Specification
 {
 
     /**
-     * Status text for existing nodes
+     * @var Api
      */
-    private const STATUS_OK = 'OK';
-
-
-    /**
-     * Status text for missing nodes
-     */
-    private const STATUS_MISSING = 'MISSING';
-
-
-    /**
-     * Number of spaces for output formatting
-     */
-    private const PADDING = 20;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private $log;
+    private Api $api;
 
 
     /**
      * Specification constructor.
      *
-     * @param LoggerInterface|null $log
+     * @param Api $api
      */
-    public function __construct(?LoggerInterface $log)
+    public function __construct(Api $api)
     {
-        $this->log = $log;
+        $this->api = $api;
     }
 
 
@@ -63,13 +45,19 @@ class Specification
      *
      * @return array
      *
-     * @throws \RuntimeException
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
      */
     public function check(): array
     {
         $paths = [
+
+            /* Example struct
+             */
+//            [
+//                'endpoint' => '',
+//                'params' => [],
+//            ],
 
             /**
              * Student Profile nodes
@@ -92,30 +80,45 @@ class Specification
 
         ];
 
-        $paddedLength = max(array_map('\strlen', $paths)) + self::PADDING;
-
-        $messages = [];
+        $endpoints = [];
 
         foreach ($paths as $path) {
-            $paddedPath = str_pad($path, $paddedLength);
+            /* A short description of what went wrong (usually an Exception message)
+             * when you tried to access $path['endpoint']
+             */
+            $errorMessage = '';
 
-            if ($this->batchxml->fetchXml($path)) {
-                $message = "{$paddedPath} " . self::STATUS_OK;
+            /* The endpoint you tried to access; indexed in the Specification report
+             */
+            $message = $path['endpoint'];
 
-                if ($this->log) {
-                    $this->log->info($message);
-                }
-            } else {
-                $message = "{$paddedPath} " . self::STATUS_MISSING;
-
-                if ($this->log) {
-                    $this->log->warning($message);
-                }
+            /* Try to access the endpoint and capture the outcome
+             */
+            try {
+                $result = (bool)$this->api->retrieveDocument();
+            } catch (\RuntimeException $e) {
+                $errorMessage = $e->getMessage();
+                $result = false;
             }
 
-            $messages[] = $message;
+            /* If it succeeded, show OK
+             * Otherwise classify as MISSING and display an accompanying error message
+             */
+            if ($result) {
+                $endpoints[] = [
+                    'message' => $message,
+                    'reason' => '',
+                    'status' => ISpecification::STATUS_OK
+                ];
+            } else {
+                $endpoints[] = [
+                    'message' => $message,
+                    'reason' => $errorMessage,
+                    'status' => ISpecification::STATUS_MISSING
+                ];
+            }
         }
 
-        return $messages;
+        return $endpoints;
     }
 }

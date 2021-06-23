@@ -21,12 +21,8 @@ use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
-use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\UserMapper;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Classes
@@ -41,7 +37,7 @@ class Classes implements IStrategy
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -49,31 +45,31 @@ class Classes implements IStrategy
      *
      * @var bool
      */
-    private $perform;
+    private bool $perform;
 
 
     /**
      * @var Lookup
      */
-    private $lookup;
+    private Lookup $lookup;
 
 
     /**
      * @var ClassEntryMapper
      */
-    private $classEntryMapper;
+    private ClassEntryMapper $classEntryMapper;
 
 
     /**
      * @var ClassInvolvementMapper
      */
-    private $classInvolvementMapper;
+    private ClassInvolvementMapper $classInvolvementMapper;
 
 
     /**
      * @var ClassPeriodMapper
      */
-    private $classPeriodMapper;
+    private ClassPeriodMapper $classPeriodMapper;
 
 
     /**

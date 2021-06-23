@@ -20,7 +20,9 @@ interface IApi
     /**
      * Retrieves data from an endpoint
      *
-     * @return string|null
+     * @param string $method
+     * @param array  $params
+     * @return array|null
      */
-    public function retrieveDocument(): ?string;
+    public function retrieveDocument(string $method, array $params): ?array;
 }
