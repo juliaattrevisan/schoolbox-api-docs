@@ -23,9 +23,24 @@ export default {
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hypen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: [
-        'datetime'
-    ],
+    props: {
+        /**
+         * The date-time to display in this relative time input.
+         */
+        datetime: {
+            required: true,
+        },
+
+        /**
+         * Is `datetime` to be considered a date only?
+         *
+         * If so, the absolute time is displayed as a date only.
+         */
+        dateOnly: {
+            type: Boolean,
+            default: false,
+        }
+    },
 
     /**
      * Components.
@@ -77,15 +92,19 @@ export default {
         /**
          * Renders the given datetime as a string.
          *
-         * @param {Moment} datetime
+         * @param {*} datetime Any date-like thing MomentJS accepts in its
+         *                     constructor.
          */
         renderFormattedDatetimes(datetime) {
             let now = moment().startOf('d'),
                 date = moment(datetime),
-                dayDiff = date.diff(now, 'd');
+                dayDiff = date.diff(now, 'd'),
+                dateFormat = this.dateOnly
+                    ? this.dateDisplayFormats.momentJs
+                    : this.dateDisplayFormats.momentJsDatetime;
 
             let struct = {
-                'absolute': date.format(dateDisplayFormats.momentJsDatetime),
+                'absolute': date.format(dateFormat),
                 'relative': ''
             };
 

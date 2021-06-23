@@ -143,6 +143,14 @@ export default {
                 <p class="meta" v-if="award.isGoal && award.award">
                     Goal has been achieved <relative-time :datetime="award.award.awardedAt"></relative-time>
                 </p>
+                <p class="meta" v-if="award.expiresAt">
+                    <template v-if="award.isGoal">
+                        Goal expires <relative-time :datetime="award.expiresAt" date-only></relative-time>
+                    </template>
+                    <template v-else>
+                        Achievement expires <relative-time :datetime="award.expiresAt" date-only></relative-time>
+                    </template>
+                </p>
 
                 <article v-html="award.badge.body"></article>
 
