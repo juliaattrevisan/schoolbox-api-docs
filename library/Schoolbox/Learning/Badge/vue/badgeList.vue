@@ -420,6 +420,7 @@ export default {
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
                          :endpoint="currentBadge._links.awardAsAchievement"
+                         :expiry="currentBadge.achievementExpiry"
                          @cancel="closeAwardAsAchievementModal"
                          @done="closeAwardAsAchievementModal"
                          placeholder="Search for users to award achievement to"
@@ -432,6 +433,11 @@ export default {
                 </template>
                 <template v-slot:confirmButton>
                     Award Achievement
+                </template>
+                <template v-slot:expiryMessage="slotProps">
+                    <p class="meta" v-if="currentBadge.achievementExpiry">
+                        This award will expire in {{ slotProps.expiryLabel }}.
+                    </p>
                 </template>
             </badge-award>
         </reveal-modal>
