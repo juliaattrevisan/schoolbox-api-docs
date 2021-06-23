@@ -1,7 +1,7 @@
 <script>
 import BadgeImage from './badge-image';
 
-import {translateAchievementExpiryToLabel} from './badgeAchievementExpiries';
+import {translateExpiryToLabel} from './badge-achievement-expiries';
 
 export default {
     components: {
@@ -30,7 +30,7 @@ export default {
             return [];
         },
         achievementExpiryLabel() {
-            return translateAchievementExpiryToLabel(this.badge?.achievementExpiry);
+            return translateExpiryToLabel(this.badge?.achievementExpiry);
         }
     },
     methods: {},
