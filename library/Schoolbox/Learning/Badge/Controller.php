@@ -35,6 +35,11 @@ class Controller extends Base
     private const BADGES_PER_PAGE = 40;
 
 
+    /**
+     * Expiry options for achievements, along with their labels.
+     *
+     * TODO figure out if there's a better place to put the labels
+     */
     private const ACHIEVEMENT_EXPIRY_OPTIONS = [
         [
             'label' => 'Forever',
