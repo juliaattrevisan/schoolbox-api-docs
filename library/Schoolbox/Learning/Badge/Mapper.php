@@ -49,6 +49,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('image_path', self::TYPE_STRING, null, 'icon', null);
         $this->uses('allow_as_goal', self::TYPE_BOOLEAN);
         $this->joins('category_id', Category\Mapper::class, 'id', null, null, 'category', 'category');
+        $this->uses('achievement_expiry', self::TYPE_INTEGER);
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

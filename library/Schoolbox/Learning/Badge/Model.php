@@ -80,6 +80,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * In how many days will an achievement created from this badge expire?
+     */
+    private ?int $achievementExpiry;
+
+
+    /**
      * @var GenericCollection|null
      */
     private ?GenericCollection $yearLevels = null;
@@ -220,6 +226,24 @@ class Model implements ISoftDeletable
     {
         $this->category = $category;
         return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getAchievementExpiry(): ?int
+    {
+        return $this->achievementExpiry;
+    }
+
+
+    /**
+     * @param int|null $achievementExpiry
+     */
+    public function setAchievementExpiry(?int $achievementExpiry): void
+    {
+        $this->achievementExpiry = $achievementExpiry;
     }
 
 
