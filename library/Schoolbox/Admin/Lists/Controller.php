@@ -360,7 +360,67 @@ class Controller extends Base
                         ],
                         'width'     => 2,
                         'mandatory' => true,
-                    ]
+                    ],
+                    'viewStudentProfile' => [
+                        'caption'   => 'View Student Profile',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'viewStudentGrades' => [
+                        'caption'   => 'View Student Grades',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'viewStudentCalendar' => [
+                        'caption'   => 'View Student Calendar',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'viewParentProfile' => [
+                        'caption'   => 'View Parent Profile',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'accessEportfolio' => [
+                        'caption'   => 'Access Eportfolio',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'accessPastoral' => [
+                        'caption'   => 'Access Pastoral',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'createBadges' => [
+                        'caption'   => 'Create Badges',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'createEvidence' => [
+                        'caption'   => 'Create Evidence',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'viewParentDirectory' => [
+                        'caption'   => 'View Parent Directory',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
+                    'viewStaffDirectory' => [
+                        'caption'   => 'View Staff Directory',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                    ],
                 ]
             ],
             'house' => [
