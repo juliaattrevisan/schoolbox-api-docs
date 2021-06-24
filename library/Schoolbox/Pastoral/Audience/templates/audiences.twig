@@ -11,60 +11,16 @@
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbsArray(breadcrumbs) }}
+{{ bread.crumbs(
+    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
+    [ 'Manage Type Defaults' ]
+) }}
 
-<div class="admin-container row">
-
-    {# Default text is "Manage Type Defaults"
-     # But you can set that to empty string to remove it
-     #}
-    {% include '@submenu/flyout.twig' with {
-        nodes: flyout.nodes,
-        pageCurrent: flyout.pageCurrent,
-        subpageCurrent: flyout.subpageCurrent,
-        parentSelected: 'Manage Type Defaults'
-    } %}
-
-    <div class="admin-content">
-        <div class="small-12 island">
-            {% if types is not empty %}
-                <section>
-                    <ul class="action-list">
-                        {% for type in types %}
-                            <li class="actions-small-2">
-                                <div class="list-item">
-                                    <div class="card small-12 actions-1">
-                                        {% set route = routeLookupIfAuthorized('pastoralAudience.getAudiencesTypeModify', {type: type, typeId: type.id}) %}
-                                        {% if route %}<a href="{{ route }}">{{ type.name }}</a>{% else %}{{ type.name }}{% endif %}
-                                    </div>
-                                </div>
-                            </li>
-                            {% for subtype in type.subTypes %}
-                                {% if subtype.pastoralType.Id == type.id %}
-                                    <li class="actions-small-2">
-                                        <div class="list-item">
-                                            <div class="card small-12">
-                                                {% set route = routeLookupIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', {subtype: subtype, subtypeId: subtype.id}) %}
-                                                {% set label = type.name ~ ' : ' ~ subtype.name %}
-                                                {% if route %}<a href={{ route }}>{{ label }}</a>{% else %}{{ label }}{% endif %}
-                                            </div>
-                                        </div>
-                                    </li>
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% else %}
-                <div class="empty-state">
-                    <i class="icon-group"></i>
-                    <p>No {{ locale.pastoral.proper }} Types have been created.</p>
-                    {% set route = routeLookupIfAuthorized('adminLists.getIndex', {table: 'pastoral-type'}) %}
-                    {% if route %}
-                        <p>Configure <a href="{{ route }}">{{ locale.pastoral.proper }} Types</a></p>
-                    {% endif %}
-                </div>
-            {% endif %}
-        </div>
-    </div>
+<div class="empty-state">
+    <i class="icon-group"></i>
+    <p>No {{ locale.pastoral.proper }} Types have been created.</p>
+    {% set route = routeLookupIfAuthorized('adminLists.getIndex', {table: 'pastoral-type'}) %}
+    {% if route %}
+        <p>Configure <a href="{{ route }}">{{ locale.pastoral.proper }} Types</a></p>
+    {% endif %}
 </div>

@@ -68,24 +68,48 @@ class Controller extends Base
      */
     public function getAudiences(): void
     {
-        $flyout = new Flyout(
-            $this->getConfigLoader(),
-            [
-                ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
-                ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
-            ],
-            $this->router,
-            $this->pastoralTypeMapper
-        );
-        
+        $types = $this->pastoralTypeMapper->findAll();
+
+        foreach ($types as $type) {
+            /* Find the first Type that didn't have any Subtypes
+             * You can't edit Types if they have Subtypes
+             */
+            if ($type->getSubTypes()->count()) {
+                foreach ($type->getSubTypes() as $subtype) {
+                    /* Find the first available subtype
+                     * and redirect to its modify screen
+                     */
+                    $this->getResponse()->redirect->to(
+                        $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
+                            'subtypeId' => $subtype->getId()
+                        ])
+                    );
+
+                    return;
+                }
+            }
+
+            /* If there aren't any subtypes, find the first available type
+             * and redirect to its modify screen
+             */
+            $this->getResponse()->redirect->to(
+                $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
+                    'typeId' => $type->getId(),
+                    'type' => $type
+                ])
+            );
+
+            return;
+        }
+
+        /* Otherwise if there are neither subtypes nor types, then you've
+         * not configured the Pastoral Module sufficiently
+         * Empty State
+         */
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences.twig',
-            'data'     => [
-                'types'    => $this->pastoralTypeMapper->findAll(),
-                'flyout' => $flyout->generateVars(''),
-                'breadcrumbs' => $flyout->generateBreadcrumbs('')
-            ],
-            'title'    => 'Pastoral Group Management',
+            'data' => [],
+            'title' => 'Pastoral Group Management',
         ]);
     }
 
