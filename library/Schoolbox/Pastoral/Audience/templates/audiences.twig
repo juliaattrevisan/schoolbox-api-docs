@@ -22,5 +22,7 @@
     {% set route = routeLookupIfAuthorized('adminLists.getIndex', {table: 'pastoral-type'}) %}
     {% if route %}
         <p>Configure <a href="{{ route }}">{{ locale.pastoral.proper }} Types</a></p>
+    {% else %}
+        <p>Please consult your system administrator for further assistance.</p>
     {% endif %}
 </div>
