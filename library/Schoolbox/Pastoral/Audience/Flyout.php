@@ -38,10 +38,10 @@ class Flyout extends \Schoolbox\Submenu\Flyout
     /**
      * Flyout constructor.
      *
-     * @param IConfigLoader  $configLoader
-     * @param array          $rootNode
-     * @param Router         $router
-     * @param Type\Mapper $typeMapper
+     * @param IConfigLoader $configLoader
+     * @param array         $rootNode
+     * @param Router        $router
+     * @param Type\Mapper   $subtypeMapper
      */
     public function __construct(
         IConfigLoader $configLoader,

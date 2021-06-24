@@ -36,7 +36,20 @@
                         bulkCreate: false,
                     } only
                 %}
-                <input type="submit" value="Save Visibility">
+
+                <h2 class="subheader">General Template</h2>
+
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+                <script>
+                    $(function() {
+                        $('#general-template').alaressEditor();
+                    });
+                </script>
+
+                <textarea id="general-template">General Template goes here I guess</textarea>
+
+                <input type="submit" value="Save">
             </form>
         </div>
     </div>
