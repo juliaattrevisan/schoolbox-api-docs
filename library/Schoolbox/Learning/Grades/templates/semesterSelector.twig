@@ -47,8 +47,8 @@ Usage: include 'sub/semesterSelector.twig
     {% endif %}
 </nav>
 <div class="semester">
-    <select id="context-selector-semester" title="Select a {% if year is not empty %}Year/{% endif %}Term">
-        <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select a {% if year is not empty %}year/{% endif %}term">Select a {% if year is not empty %}year/{% endif %}term</option>
+    <select id="context-selector-semester" title="Select {{ locale.term.indefiniteArticle ~ ' ' ~ locale.term }}{% if year is not empty %}/Year{% endif %}">
+        <option disabled {% if currentTerm is empty %}selected{% endif %} label="Select {{ locale.term.indefiniteArticle ~ ' ' ~ locale.term }}{% if year is not empty %}/year{% endif %}">Select {{ locale.term.indefiniteArticle ~ ' ' ~ locale.term }}{% if year is not empty %}/year{% endif %}</option>
         {% set foundYear = {} %}
         {% set selected = false %}
         {% for term in terms %}

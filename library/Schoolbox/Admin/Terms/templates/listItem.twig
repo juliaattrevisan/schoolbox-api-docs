@@ -4,7 +4,7 @@
             <h3>
                 {% if term.getArchived() %}
                     <del class="icon icon-archive"
-                         title="This term is archived, and will be de-emphasised in selectors.">{{ term.getTitle() }} ({{ term.getCode() }})</del>
+                         title="This academic period is archived, and will be de-emphasised in selectors.">{{ term.getTitle() }} ({{ term.getCode() }})</del>
                 {% else %}
                     {{ term.getTitle() }} ({{ term.getCode() }})
                 {% endif %}
