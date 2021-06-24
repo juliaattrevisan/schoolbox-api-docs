@@ -200,6 +200,16 @@
             </form>
         </div>
     </div>
+
+    <div id="roles-list">
+        <roles-list 
+            table-name="{{ table }}"
+            :table="{{ tables[table] | json_encode }}"
+            :initial-records="{{ records | json_encode }}"
+        />
+    </div>
+    <script type="text/javascript" src="{{CDN_PREFIX}}/javascript/components/rolesList.bundle.js?v={{ config.site_version }}"></script>
+
 </div>
 
 {# Draw cloneable row for use when adding new rows#}
