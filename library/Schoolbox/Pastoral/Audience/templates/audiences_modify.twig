@@ -23,20 +23,7 @@
 
     <div class="admin-content">
         <div class="small-12 island" id="formPastoral">
-            <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data"
-                  action="{{ action }}">
-                {% include "@pastoral/modify_section_visibility.twig" with
-                    {
-                        record: record,
-                        allowIndividual: allowIndividual,
-                        groups: groups,
-                        allowParents: allowParents,
-                        roles: roles,
-                        roleUsers: roleUsers,
-                        bulkCreate: false,
-                    } only
-                %}
-
+            <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="{{ action }}">
                 <h2 class="subheader">General Template</h2>
 
                 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
@@ -48,6 +35,18 @@
                 </script>
 
                 <textarea id="general-template">General Template goes here I guess</textarea>
+
+                {% include "@pastoral/modify_section_visibility.twig" with
+                    {
+                        record: record,
+                        allowIndividual: allowIndividual,
+                        groups: groups,
+                        allowParents: allowParents,
+                        roles: roles,
+                        roleUsers: roleUsers,
+                        bulkCreate: false,
+                    } only
+                %}
 
                 <input type="submit" value="Save">
             </form>
