@@ -5,15 +5,13 @@
  # which was mostly synonymous with Visibility
  #
  # @param GenericCollection|Pastoral\Type\Model[] $types
- # @param array $subnav  A hierarchical set of nodes for the flyout menu
+ # @param array $breadcrumbs  A hierarchical set of nodes for the flyout menu
+ # @param array $flyout       A set of tuples that configures the flyout menu
  #}
 {% import '@pastoral/macros/profile.twig' as profile %}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-    [ locale.pastoralCare.proper, routeLookup('pastoral.getIndex') ],
-    [ 'Manage Type Defaults' ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="admin-container row">
 

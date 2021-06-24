@@ -71,8 +71,8 @@ class Controller extends Base
     public function getAudiences(): void
     {
         $flyout = new Flyout($this->getConfigLoader(), [
-            'Pastoral Care',
-            $this->router->generate('pastoralAudience.getAudiences'),
+            ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
+            ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
         ]);
         
         $this->getResponse()->content->set([

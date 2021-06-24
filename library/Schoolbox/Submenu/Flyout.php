@@ -31,7 +31,15 @@ class Flyout
     protected IConfigLoader $configLoader;
 
     /**
-     * A (name, url) tuple for the first node in a breadcrumb trail
+     * A set of (name, url) tuples for the first node(s) in a breadcrumb trail
+     * All other nodes get appended to this stack
+     *
+     * e.g. this will setup the first two nodes in the breadcrumb trail
+     *
+     * $rootNode = [
+     *     ['Node 1', $url1],
+     *     ['Node 2', $url2]
+     * ];
      *
      * @var array
      */
@@ -66,9 +74,7 @@ class Flyout
      */
     public function generateBreadcrumbs(string $url): array
     {
-        $allCrumbs = [
-            $this->rootNode
-        ];
+        $allCrumbs = $this->rootNode;
 
         foreach ($this->generate() as $parentUrl => $parentData) {
             if ($parentUrl === $url) {
