@@ -162,6 +162,9 @@ export default {
          *                           changes (accepts a Boolean)
          */
         onSearch: debounce(function(query, loading) {
+            if (query.length < 3) {
+                return;
+            }
             loading(true);
             let params = this.userSearchAdditionalParams;
             params[this.userSearchQueryParam] = query;
@@ -239,7 +242,7 @@ export default {
         <v-select class="schoolbox-vue-selectize"
                   :options="options"
                   :clear-search-on-blur="function() { return true; }"
-                  :clear-search-on-select="false"
+                  :clear-search-on-select="true"
                   :close-on-select="false"
                   multiple
                   @search="onSearch"
