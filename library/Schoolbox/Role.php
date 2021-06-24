@@ -28,28 +28,82 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     /** @var string */
     private $name;
 
-    /** @var string */
-    private $type; //Type of user group, guest, student, parent, staff
+    /**
+     * @var string Type of user group, guest, student, parent, staff
+     */
+    private $type;
 
-    /** @var bool */
-    private $canChangePassword; //Users can change passwords (bool)
+    /**
+     * @var bool Users can change passwords
+     */
+    private $canChangePassword;
+
+    /**
+     * @var bool Users can view student profile (for staff)
+     */
+    private bool $viewStudentProfile;
+
+    /**
+     * @var bool Users can view student grade (for staff)
+     */
+    private bool $viewStudentGrades;
+
+    /**
+     * @var bool Users can view student calendar (for staff)
+     */
+    private bool $viewStudentCalendar;
+
+    /**
+     * @var bool Users can view parent profile (for staff)
+     */
+    private bool $viewParentProfile;
+
+    /**
+     * @var bool Users can access eportfolio (for staff)
+     */
+    private bool $accessEportfolio;
+
+    /**
+     * @var bool Users can access pastoral (for staff)
+     */
+    private bool $accessPastoral;
+
+    /**
+     * @var bool Users can create badges (for staff)
+     */
+    private bool $createBadges;
+
+    /**
+     * @var bool Users can create evidence (for staff)
+     */
+    private bool $createEvidence;
+
+    /**
+     * @var bool Users can view parent directory (for staff)
+     */
+    private bool $viewParentDirectory;
+
+    /**
+     * @var bool Users can view staff directory (for staff)
+     */
+    private bool $viewStaffDirectory;
 
     /**
      * What's the digest schedule for this group?
      * self::DIGEST_NEVER or a cron schedule
      *
-     * @var string
+     * @var string|null
      */
-    protected $digestSchedule;
+    protected ?string $digestSchedule;
 
     /**
      * Role Types
      * Every role has a type
      */
-    public const GUEST = 'guest';
+    public const GUEST   = 'guest';
     public const STUDENT = 'student';
-    public const PARENT = 'parent';
-    public const STAFF = 'staff';
+    public const PARENT  = 'parent';
+    public const STAFF   = 'staff';
 
     public const DIGEST_NEVER = '0';
 
@@ -150,6 +204,189 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
         return $this->canChangePassword;
     }
 
+    /**
+     * @param bool $viewStudentProfile
+     * @return static
+     */
+    public function setViewStudentProfile(bool $viewStudentProfile): self
+    {
+        $this->viewStudentProfile = $viewStudentProfile;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getViewStudentProfile(): bool
+    {
+        return $this->viewStudentProfile;
+    }
+
+    /**
+     * @param bool $viewStudentGrades
+     * @return static
+     */
+    public function setViewStudentGrades(bool $viewStudentGrades): self
+    {
+        $this->viewStudentGrades = $viewStudentGrades;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getViewStudentGrades(): bool
+    {
+        return $this->viewStudentGrades;
+    }
+
+    /**
+     * @param bool $viewStudentCalendar
+     * @return static
+     */
+    public function setViewStudentCalendar(bool $viewStudentCalendar): self
+    {
+        $this->viewStudentCalendar = $viewStudentCalendar;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getViewStudentCalendar(): bool
+    {
+        return $this->viewStudentCalendar;
+    }
+
+    /**
+     * @param bool $viewParentProfile
+     * @return static
+     */
+    public function setViewParentProfile(bool $viewParentProfile): self
+    {
+        $this->viewParentProfile = $viewParentProfile;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getViewParentProfile(): bool
+    {
+        return $this->viewParentProfile;
+    }
+
+
+    /**
+     * @param bool $accessEportfolio
+     * @return static
+     */
+    public function setAccessEportfolio(bool $accessEportfolio): self
+    {
+        $this->accessEportfolio = $accessEportfolio;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAccessEportfolio(): bool
+    {
+        return $this->accessEportfolio;
+    }
+
+    /**
+     * @param bool $accessPastoral
+     * @return static
+     */
+    public function setAccessPastoral(bool $accessPastoral): self
+    {
+        $this->accessPastoral = $accessPastoral;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAccessPastoral(): bool
+    {
+        return $this->accessPastoral;
+    }
+
+
+    /**
+     * @param bool $createBadges
+     * @return static
+     */
+    public function setCreateBadges(bool $createBadges): self
+    {
+        $this->createBadges = $createBadges;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCreateBadges(): bool
+    {
+        return $this->createBadges;
+    }
+
+    /**
+     * @param bool $createEvidence
+     * @return static
+     */
+    public function setCreateEvidence($createEvidence)
+    {
+        $this->createEvidence = $createEvidence;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function getCreateEvidence(): bool
+    {
+        return $this->createEvidence;
+    }
+
+
+    /**
+     * @param bool $viewParentDirectory
+     * @return static
+     */
+    public function setViewParentDirectory(bool $viewParentDirectory): self
+    {
+        $this->viewParentDirectory = $viewParentDirectory;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getViewParentDirectory(): bool
+    {
+        return $this->viewParentDirectory;
+    }
+
+    /**
+     * @param bool $viewStaffDirectory
+     * @return static
+     */
+    public function setViewStaffDirectory(bool $viewStaffDirectory): self
+    {
+        $this->viewStaffDirectory = $viewStaffDirectory;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getViewStaffDirectory(): bool
+    {
+        return $this->viewStaffDirectory;
+    }
 
     /**
      * @param int|null $id
@@ -206,7 +443,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     }
 
     /**
-     * @param  string|null $digestSchedule
+     * @param string|null $digestSchedule
      * @return self
      */
     public function setDigestSchedule(?string $digestSchedule): Role
@@ -224,7 +461,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     }
 
 
-     /**
+    /**
      * @return array
      */
     public function jsonSerialize(): array
