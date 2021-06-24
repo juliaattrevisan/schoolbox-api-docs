@@ -69,7 +69,7 @@ $(function() {
     $.validator.addMethod(
         'remote.currentTerm',
         getValidatorRemoteMethod('{{ validationErrors.currentTerm }}', '{{ validationData.end }}'),
-        'This item may not be booked outside of the current term.'
+        'This item may not be booked outside of the current {{ locale.term }}.'
     );
 
     // Repeat-Until must be after StartDate

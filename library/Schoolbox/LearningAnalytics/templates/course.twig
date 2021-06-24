@@ -195,7 +195,7 @@
     <div class="small-12">
         <div class="empty-state">
             <i class="icon-due-work"></i>
-            <p>There are no activities due in this term, maybe try selecting a different term.</p>
+            <p>There are no activities due in this {{ locale.term }}, maybe try selecting a different {{ locale.term }}.</p>
         </div>
     </div>
 </div>
@@ -298,7 +298,7 @@
         {% elseif 0 == (gradableAssessments | length) %}
         <div class="empty-state">
             <i class="icon-due-work"></i>
-            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
+            <p>There are no gradable activities due in this {{ locale.term }}, maybe try selecting a different {{ locale.term }}.</p>
             <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
         </div>
         {% else %}
@@ -345,7 +345,7 @@
         {% elseif 0 == (gradableAssessments | length) %}
         <div class="empty-state">
             <i class="icon-due-work"></i>
-            <p>There are no gradable activities due in this term, maybe try selecting a different term.</p>
+            <p>There are no gradable activities due in this {{ locale.term }}, maybe try selecting a different {{ locale.term }}.</p>
             <p>If you expected to see activities here, ensure they are not a Task, have a MarkType of 'None' or a weight of 0.</p>
         </div>
         {% endif %}
