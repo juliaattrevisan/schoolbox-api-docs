@@ -1,4 +1,4 @@
-ALTER TABLE groups
+ALTER TABLE `groups`
     ADD COLUMN view_student_profile TINYINT(1) DEFAULT 0 AFTER can_change_password,
     ADD COLUMN view_student_grades TINYINT(1) DEFAULT 0 AFTER view_student_profile,
     ADD COLUMN view_student_calendar TINYINT(1) DEFAULT 0 AFTER view_student_grades,
@@ -9,7 +9,7 @@ ALTER TABLE groups
     ADD COLUMN create_evidence TINYINT(1) DEFAULT 0 AFTER create_badges,
     ADD COLUMN view_parent_directory TINYINT(1) DEFAULT 0 AFTER create_evidence,
     ADD COLUMN view_staff_directory TINYINT(1) DEFAULT 0 AFTER view_parent_directory;
-UPDATE TABLE groups
+UPDATE `groups`
 SET view_student_profile  = 1,
     view_student_grades   = 1,
     view_student_calendar = 1,
