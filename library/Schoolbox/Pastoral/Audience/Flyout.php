@@ -11,7 +11,7 @@ namespace Schoolbox\Pastoral\Audience;
 
 use Aura\Router\Router;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Pastoral\SubType;
+use Schoolbox\Pastoral\Type;
 
 /**
  * Class Flyout
@@ -30,9 +30,9 @@ class Flyout extends \Schoolbox\Submenu\Flyout
 
 
     /**
-     * @var SubType\Mapper
+     * @var Type\Mapper
      */
-    private SubType\Mapper $subtypeMapper;
+    private Type\Mapper $typeMapper;
 
 
     /**
@@ -41,13 +41,13 @@ class Flyout extends \Schoolbox\Submenu\Flyout
      * @param IConfigLoader  $configLoader
      * @param array          $rootNode
      * @param Router         $router
-     * @param SubType\Mapper $subtypeMapper
+     * @param Type\Mapper $typeMapper
      */
     public function __construct(
         IConfigLoader $configLoader,
         array $rootNode,
         Router $router,
-        SubType\Mapper $subtypeMapper
+        Type\Mapper $subtypeMapper
     ) {
         parent::__construct($configLoader, $rootNode);
 
@@ -57,7 +57,7 @@ class Flyout extends \Schoolbox\Submenu\Flyout
 
         /* This is the source of our nodes
          */
-        $this->subtypeMapper = $subtypeMapper;
+        $this->typeMapper = $subtypeMapper;
     }
 
 
@@ -72,34 +72,36 @@ class Flyout extends \Schoolbox\Submenu\Flyout
     {
         $stack = [];
 
-        foreach ($this->subtypeMapper->findAll() as $subtype) {
+        foreach ($this->typeMapper->findAll() as $type) {
             $typeUrl = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
-                'typeId' => $subtype->getPastoralType()->getId()
-            ]);
-
-            $subtypeUrl = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
-                'subtypeId' => $subtype->getId()
+                'typeId' => $type->getId()
             ]);
 
             /* If the Type hasn't been seen yet, initialise it
              */
             if (!isset($stack[$typeUrl])) {
                 $stack[$typeUrl] = [
-                    'name' => $subtype->getPastoralType()->getName(),
+                    'name' => $type->getName(),
                     'visible' => true,
-                    'description' => $subtype->getPastoralType()->getName(),
+                    'description' => $type->getName(),
                     'children' => []
                 ];
             }
 
-            /* Add the current SubType to the children of its parent Type
-             */
-            $stack[$typeUrl]['children'][$subtypeUrl] = [
-                'name' => $subtype->getName(),
-                'visible' => true,
-                'description' => $subtype->getName(),
-                'children' => []
-            ];
+            foreach ($type->getSubTypes() as $subtype) {
+                $subtypeUrl = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
+                    'subtypeId' => $subtype->getId()
+                ]);
+
+                /* Add the current SubType to the children of its parent Type
+                 */
+                $stack[$typeUrl]['children'][$subtypeUrl] = [
+                    'name' => $subtype->getName(),
+                    'visible' => true,
+                    'description' => $subtype->getName(),
+                    'children' => []
+                ];
+            }
         }
 
         return $stack;

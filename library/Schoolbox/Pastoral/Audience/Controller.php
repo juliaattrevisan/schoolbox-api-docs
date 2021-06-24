@@ -37,11 +37,6 @@ class Controller extends Base
     private $pastoralTypeMapper;
 
     /**
-     * @var Pastoral\SubType\Mapper
-     */
-    private Pastoral\SubType\Mapper $pastoralSubTypeMapper;
-
-    /**
      * Constructor
      *
      * @param UserMapper              $userMapper
@@ -49,22 +44,19 @@ class Controller extends Base
      * @param Mapper                  $pastoralAudienceMapper
      * @param RoleMapper              $roleMapper
      * @param Pastoral\Type\Mapper    $pastoralTypeMapper
-     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
      */
     public function __construct(
         UserMapper $userMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper,
         Mapper $pastoralAudienceMapper,
         RoleMapper $roleMapper,
-        Pastoral\Type\Mapper $pastoralTypeMapper,
-        Pastoral\SubType\Mapper $pastoralSubTypeMapper
+        Pastoral\Type\Mapper $pastoralTypeMapper
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
         $this->pastoralAudienceMapper = $pastoralAudienceMapper;
         $this->roleMapper             = $roleMapper;
         $this->pastoralTypeMapper     = $pastoralTypeMapper;
-        $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
     }
 
 
@@ -83,7 +75,7 @@ class Controller extends Base
                 ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
             ],
             $this->router,
-            $this->pastoralSubTypeMapper
+            $this->pastoralTypeMapper
         );
         
         $this->getResponse()->content->set([
@@ -154,9 +146,37 @@ class Controller extends Base
         $record['id']     = "fakeId";
         $record['access'] = $this->getAudienceForType($type, $subType);
 
+        /* Set up flyout menu
+         */
+        if (null !== $subType) {
+            $url = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
+                'typeId' => $type->getId(),
+                'subtypeId' => $subType->getId()
+            ]);
+        } else {
+            $url = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
+                'typeId' => $type->getId(),
+            ]);
+        }
+
+        $flyout = new Flyout(
+            $this->getConfigLoader(),
+            [
+                ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
+                ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
+            ],
+            $this->router,
+            $this->pastoralTypeMapper
+        );
+
+        $flyoutVars = $flyout->generateVars($url);
+        $flyoutBreadcrumbs = $flyout->generateBreadcrumbs($url);
+
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences_modify.twig',
             'data'     => [
+                'flyout'          => $flyoutVars,
+                'breadcrumbs'     => $flyoutBreadcrumbs,
                 'record'          => $record,
                 'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'    => false,  //prevent user search from including student parents

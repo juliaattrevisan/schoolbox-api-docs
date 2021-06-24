@@ -6,34 +6,38 @@
     {% set title = type.name ~ ': ' ~ subtype.name %}
 {% endif %}
 
-
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-    [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-    [ 'Visibility Defaults',      routeLookup('pastoralAudience.getAudiences') ],
-    [ title ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
-<div class='row'>
-    <div class='small-12 columns'>
-        <h1>{{ title }} Visibility Defaults</h1>
+<div class="admin-container row">
+
+    {# Default text is "Manage Type Defaults"
+     # But you can set that to empty string to remove it
+    #}
+    {% include '@submenu/flyout.twig' with {
+        nodes: flyout.nodes,
+        pageCurrent: flyout.pageCurrent,
+        subpageCurrent: flyout.subpageCurrent,
+        parentSelected: 'Manage Type Defaults'
+    } %}
+
+    <div class="admin-content">
+        <div class="small-12 island" id="formPastoral">
+            <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data"
+                  action="{{ action }}">
+                {% include "@pastoral/modify_section_visibility.twig" with
+                    {
+                        record: record,
+                        allowIndividual: allowIndividual,
+                        groups: groups,
+                        allowParents: allowParents,
+                        roles: roles,
+                        roleUsers: roleUsers,
+                        bulkCreate: false,
+                    } only
+                %}
+                <input type="submit" value="Save Visibility">
+            </form>
+        </div>
     </div>
-</div>
-
-<div class="small-12 island" id="formPastoral">
-    <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data"
-          action="{{ action }}">
-        {% include "@pastoral/modify_section_visibility.twig" with
-            {
-                record: record,
-                allowIndividual: allowIndividual,
-                groups: groups,
-                allowParents: allowParents,
-                roles: roles,
-                roleUsers: roleUsers,
-                bulkCreate: false,
-            } only
-        %}
-        <input type="submit" value="Save Visibility">
-    </form>
 </div>
