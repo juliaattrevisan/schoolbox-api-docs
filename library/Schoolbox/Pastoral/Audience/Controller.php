@@ -78,7 +78,7 @@ class Controller extends Base
             'template' => '@pastoralAudience/audiences.twig',
             'data'     => [
                 'types'    => $this->pastoralTypeMapper->findAll(),
-                'subnav' => (new Subnav($this->getConfigLoader()))->generateHtml('/management/audience')
+                'subnav' => (new Subnav($this->getConfigLoader()))->generateHtml('')
             ],
             'title'    => 'Pastoral Group Management',
         ]);
