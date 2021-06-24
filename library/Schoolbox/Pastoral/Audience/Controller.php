@@ -64,8 +64,13 @@ class Controller extends Base
     /**
      * Display default audiences for pastoral types and sub-types
      *
-     * @api   GET /pastoral/management/audience
      * @since 18.2
+     * @api   GET /pastoral/management/audience
+     *
+     * @throws \LogicException
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function getAudiences(): void
     {
@@ -73,6 +78,7 @@ class Controller extends Base
             'template' => '@pastoralAudience/audiences.twig',
             'data'     => [
                 'types'    => $this->pastoralTypeMapper->findAll(),
+                'subnav' => (new Subnav($this->getConfigLoader()))->generateHtml('/management/audience')
             ],
             'title'    => 'Pastoral Group Management',
         ]);
