@@ -1,6 +1,7 @@
 <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/spectrum/spectrum.css" />
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/masonry.js?v={{ config.site_version }}"></script>
 
+{% if table != 'roles' %}
 <script type="text/javascript">
 
     $(function() {
@@ -79,7 +80,7 @@
 
             var deleteId = $(this).data('delete');
             var listItem = $('[data-record-id="' + deleteId + '"]');
-
+            
             $(this).confirmDialog({
                 text: '{{ tables[table].deleteWarning ?? '' }}',
                 confirmEvent: function () {
@@ -104,6 +105,7 @@
                     });
                 }
             });
+            
         });
 
         {# Wire up colour pickers #}
@@ -125,6 +127,7 @@
     });
 
 </script>
+{% endif %}
 
 {# some vars we'll need throughout the page #}
 {% set deletable = tables[table].delete ?? false %}
@@ -140,6 +143,22 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+
+        {# Use Vue just for the roles list for now, aim to incorporate all lists in the future #}
+        {% if table == 'roles' %}
+        
+        <div id="roles-list">
+            <roles-list 
+                table-name="{{ table }}"
+                :table="{{ tables[table] | json_encode }}"
+                :initial-records="{{ records | json_encode }}"
+                delete-route={{ routeLookup('adminLists.postDelete') }}
+            />
+        </div>
+        <script type="text/javascript" src="{{CDN_PREFIX}}/javascript/components/rolesList.bundle.js?v={{ config.site_version }}"></script>
+
+        {% else %}
+
         <div class="small-12 island">
             {% if records | length > 0 %}
                 {% set emptyStateClass = 'hide' %}
@@ -199,16 +218,10 @@
                 <input type="submit" value="Save"/>
             </form>
         </div>
-    </div>
 
-    <div id="roles-list">
-        <roles-list 
-            table-name="{{ table }}"
-            :table="{{ tables[table] | json_encode }}"
-            :initial-records="{{ records | json_encode }}"
-        />
+        {% endif %}
+
     </div>
-    <script type="text/javascript" src="{{CDN_PREFIX}}/javascript/components/rolesList.bundle.js?v={{ config.site_version }}"></script>
 
 </div>
 
