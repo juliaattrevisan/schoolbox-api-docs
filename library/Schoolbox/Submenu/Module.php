@@ -15,7 +15,6 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use InvalidArgumentException;
 
-
 /**
  * Class Module
  *
