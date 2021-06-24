@@ -149,6 +149,24 @@ class Flyout
      */
     public function generate(): array
     {
+        /* TODO Inject these later
+         */
+        $subtypeMapper = \Schoolbox\Pastoral\SubType\Mapper::getInstance();
+        
+        $nodes = $subtypeMapper->findAll();
+
+        $stack = [];
+
+        foreach ($nodes as $node) {
+
+            /* If the Type hasn't been seen yet, initialise it
+             */
+
+            /* Add the current SubType to the children of its parent Type
+             */
+        }
+
+        new \Alaress_Probe($nodes);
         return [
             'url_academic' => [
                 'name' => 'Academic',
