@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\Submenu;
 
-use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;
 use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
 
 /**
  * Class Flyout
@@ -63,29 +61,68 @@ class Flyout
 
 
     /**
+     * A (name, url) tuple for the first node in a breadcrumb trail
+     *
+     * @var array
+     */
+    protected array $rootNode;
+
+
+    /**
      * Subnav constructor.
      *
      * @param IConfigLoader $configLoader
-     * @throws \LogicException
+     * @param array         $rootNode
      */
-    public function __construct(IConfigLoader $configLoader)
+    public function __construct(IConfigLoader $configLoader, array $rootNode)
     {
         $this->configLoader = $configLoader;
 
-        $options = [
-            'debug'            => $this->configLoader->get('debug_templates'),
-            'strict_variables' => $this->configLoader->get('strict_templates'),
+        /* The first node in the breadcrumbs
+         */
+        $this->rootNode = $rootNode;
+    }
+
+
+    /**
+     * Generate breadcrumbs from the adminSubnav stack, for the consistency of names
+     * in both the breadcrumbs themselves and also the submenu
+     *
+     * There are multiple implementations of breadcrumbs but there should be only one
+     * Those should be removed in favour of this implementation
+     *
+     * @param string $url
+     * @return array
+     */
+    public function generateBreadcrumbs(string $url): array
+    {
+        $allCrumbs = [
+            $this->rootNode
         ];
 
-        // do not cache when in debug mode
-        if (!$this->configLoader->get('debug_mode')) {
-            $options['cache'] = $this->configLoader->get('twig_cache_dir');
+        foreach ($this->generate() as $parentUrl => $parentData) {
+            if ($parentUrl === $url) {
+                $allCrumbs[] = [$parentData['name'], $parentUrl];
+            }
+
+            if (\count($parentData['children'])) {
+                foreach ($parentData['children'] as $childUrl => $childData) {
+                    if ($childUrl === $url) {
+                        /* parentUrl is sometimes the same as a childUrl
+                         * and manifest twice in the breadcrumb trail; we only
+                         * need the parent node if it was different to its child node
+                         */
+                        if ($parentUrl !== $url) {
+                            $allCrumbs[] = [$parentData['name'], $parentUrl];
+                        }
+
+                        $allCrumbs[] = [$childData['name'],  $childUrl];
+                    }
+                }
+            }
         }
 
-        $this->twig = new Environment(new FilesystemLoader($this->paths), $options);
-
-        // The CDN_PREFIX needs to be made available in this Twig instance
-        $this->twig->addGlobal('CDN_PREFIX', (new PrefixGenerator($this->configLoader))->generate());
+        return $allCrumbs;
     }
 
 
@@ -95,9 +132,6 @@ class Flyout
      *
      * @param string $url
      * @return array
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
      */
     public function generateVars(string $url): array
     {

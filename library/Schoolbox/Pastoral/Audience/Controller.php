@@ -67,19 +67,20 @@ class Controller extends Base
      *
      * @since 18.2
      * @api   GET /pastoral/management/audience
-     *
-     * @throws \LogicException
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
      */
     public function getAudiences(): void
     {
+        $flyout = new Flyout($this->getConfigLoader(), [
+            'Pastoral Care',
+            $this->router->generate('pastoralAudience.getAudiences'),
+        ]);
+        
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences.twig',
             'data'     => [
                 'types'    => $this->pastoralTypeMapper->findAll(),
-                'flyout' => (new Flyout($this->getConfigLoader()))->generateVars('')
+                'flyout' => $flyout->generateVars(''),
+                'breadcrumbs' => $flyout->generateBreadcrumbs('')
             ],
             'title'    => 'Pastoral Group Management',
         ]);
