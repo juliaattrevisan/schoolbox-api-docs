@@ -24,7 +24,7 @@
 
     {% if item.currentTermRestriction %}
         <li>
-            This item cannot be booked beyond <strong>{{ currentTerm.displayFinish.longDateOnly }}</strong>, the end of the current school term.
+            This item cannot be booked beyond <strong>{{ currentTerm.displayFinish.longDateOnly }}</strong>, the end of the current school {{ locale.term }}.
         </li>
     {% endif %}
 
