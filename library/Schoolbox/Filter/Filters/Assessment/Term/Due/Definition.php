@@ -27,7 +27,7 @@ class Definition extends AssessmentTermFilter\Definition
 {
 
     // The name to expose in the UI
-    protected const NAME = 'Term Due';
+    protected const NAME = 'Academic Period';
 
 
     /**
