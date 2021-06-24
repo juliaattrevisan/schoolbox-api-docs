@@ -33,6 +33,13 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      */
     private $name;
 
+
+    /**
+     * @var string|null
+     */
+    private ?string $template = null;
+
+
     /**
      * Optional. Null if not linked to SIS
      *
@@ -111,5 +118,24 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
             'id'   => $this->getId(),
             'name' => $this->getName(),
         ];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTemplate(): ?string
+    {
+        return $this->template;
+    }
+
+
+    /**
+     * @param string|null $template
+     * @return Model
+     */
+    public function setTemplate(?string $template): self
+    {
+        $this->template = $template;
+        return $this;
     }
 }
