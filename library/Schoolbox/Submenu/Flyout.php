@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Pastoral\Audience;
+namespace Schoolbox\Submenu;
 
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\IConfigLoader;
@@ -15,14 +15,14 @@ use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 /**
- * Class Subnav
+ * Class Flyout
  *
  * An emulation of Admin Side Navigation that automatically generates the
  * hierarchy based on the Pastoral Types and SubTypes that currently exist
  *
- * @package Schoolbox\Pastoral\Audience
+ * @package Schoolbox\Submenu
  */
-class Subnav
+class Flyout
 {
 
     /**
@@ -31,7 +31,7 @@ class Subnav
      *
      * @var IConfigLoader
      */
-    private IConfigLoader $configLoader;
+    protected IConfigLoader $configLoader;
 
 
     /**
@@ -40,7 +40,26 @@ class Subnav
      *
      * @var Environment
      */
-    private Environment $twig;
+    protected Environment $twig;
+
+
+    /**
+     * Places to look for twig templates
+     *
+     * @var array|string[]
+     */
+    protected array $paths = [
+        SITE_root . '/library/Schoolbox/Submenu',
+        SITE_root . '/templates/core/sub'
+    ];
+
+
+    /**
+     * The twig template for this menu style
+     *
+     * @var string
+     */
+    protected string $template = 'flyout.twig';
 
 
     /**
@@ -53,9 +72,6 @@ class Subnav
     {
         $this->configLoader = $configLoader;
 
-        $paths[] = SITE_root . '/library/Schoolbox/Pastoral/Audience/templates';
-        $paths[] = SITE_root . '/templates/core/sub';
-
         $options = [
             'debug'            => $this->configLoader->get('debug_templates'),
             'strict_variables' => $this->configLoader->get('strict_templates'),
@@ -66,7 +82,7 @@ class Subnav
             $options['cache'] = $this->configLoader->get('twig_cache_dir');
         }
 
-        $this->twig = new Environment(new FilesystemLoader($paths), $options);
+        $this->twig = new Environment(new FilesystemLoader($this->paths), $options);
 
         // The CDN_PREFIX needs to be made available in this Twig instance
         $this->twig->addGlobal('CDN_PREFIX', (new PrefixGenerator($this->configLoader))->generate());
@@ -74,16 +90,16 @@ class Subnav
 
 
     /**
-     * Render the self-contained subnav as a purely html fragment
-     * so you can slam it straight into a phplib sigh
+     * Decide the vars that you can pump into the specified template
+     * so it can render the flyout with selected states
      *
      * @param string $url
-     * @return string
+     * @return array
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generateHtml(string $url): string
+    public function generateVars(string $url): array
     {
 
         /* Look ahead for $url
@@ -107,11 +123,11 @@ class Subnav
             }
         }
 
-        return $this->twig->render('subnav.twig', [
+        return [
             'adminSubnav' => $this->generate(),
             'pageCurrent' => $pageCurrent,
             'subpageCurrent' => $subpageCurrent
-        ]);
+        ];
     }
 
 

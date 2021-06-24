@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\Submenu\Flyout;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -78,7 +79,7 @@ class Controller extends Base
             'template' => '@pastoralAudience/audiences.twig',
             'data'     => [
                 'types'    => $this->pastoralTypeMapper->findAll(),
-                'subnav' => (new Subnav($this->getConfigLoader()))->generateHtml('')
+                'flyout' => (new Flyout($this->getConfigLoader()))->generateVars('')
             ],
             'title'    => 'Pastoral Group Management',
         ]);

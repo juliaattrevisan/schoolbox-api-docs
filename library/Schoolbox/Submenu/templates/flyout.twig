@@ -1,0 +1,101 @@
+{##
+ # subnav
+ #
+ # Render the Admin subnav independently of everything else via Subnav.php
+ # This is purely the menu only, it doesn't include the heading for the page
+ # you're currently viewing; you get that by combining this with index.twig
+ # via renderAdminNavigation() twig extension
+ #
+ # @param array $adminSubnav      A set of tuples for each node in the menu
+ # @param string $pageCurrent     A string corresponding to url in a tuple
+ # @param string $subpageCurrent  A string corresponding to url in a tuple
+ #}
+<script src="{{ CDN_PREFIX }}/javascript/admin/menu.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#admin-nav').adminMenu();
+    });
+</script>
+
+{# Lookahead to figure out which urls are selected
+ # Shared among the vertical menu and also the top level breadcrumby title
+ # Its crumbs are derived from the cosmetic names given in the adminSubnav stack
+ # 'Home' is the default node which circumstantially matches one in the stack
+#}
+{% set parentSelected = 'Manage Type Defaults' %}
+{% set parentSelectedUrl = '' %}
+{% set childSelected = false %}
+{% set childSelectedUrl = false %}
+
+{% for parentUrl, parentData in adminSubnav %}
+    {% if parentUrl == pageCurrent %}
+        {% set parentSelected = parentData.name %}
+        {% set parentSelectedUrl = parentUrl %}
+    {% endif %}
+
+    {# Find out if there's a subpage breadcrumby title
+     # This is also derived from the adminSubnav stack
+    #}
+    {% if parentData.children|length %}
+        {% for childUrl, childData in parentData.children %}
+            {% if childUrl == subpageCurrent %}
+                {% set parentSelected = parentData.name %}
+                {% set parentSelectedUrl = parentUrl %}
+
+                {% set childSelected = childData.name %}
+                {% set childSelectedUrl = childUrl %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endfor %}
+
+<div class="small-12 columns">
+    <h1>{{ parentSelected }}{% if childSelected %} › {{ childSelected }}{% endif %}</h1>
+</div>
+
+<nav id="admin-nav">
+    <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
+    <ul class="admin side-nav" role="navigation" data-admin>
+
+        {% for parentUrl, parentData in adminSubnav | filter(parentData => parentData.visible) %}
+
+            {# Decide if the current node is selected
+             #
+             # Each phplib controller specifies a string for pageCurrent so you have to match
+             # them up here, circumstantially, to provide indication of which node is active
+            #}
+            {% set parentSelectedCss = '' %}
+
+            {% if parentUrl == parentSelectedUrl %}
+                {% set parentSelectedCss = 'active' %}
+            {% endif %}
+
+            <li class="{{ parentSelectedCss }} {% if parentData.children|length %}parent-item{% endif %}" role="menuitem" {% if parentData.children|length %}data-parent-item{% endif %}>
+
+                {# Only link parent nodes if they have no children
+                 # Otherwise rely entirely on the children
+                #}
+                {% set children = parentData.children | filter(childData => childData.visible) %}
+                {% if children | length %}
+                    <a>{{ parentData.name }}</a>
+                {% else %}
+                    <a href="{{ parentUrl }}">{{ parentData.name }}</a>
+                {% endif %}
+
+                {% if children | length %}
+                    <ul class="flyout" role="navigation" data-admin-subnav-flyout>
+                        {% for childUrl, childData in children %}
+                            {% set childSelectedCss = '' %}
+
+                            {% if childUrl == childSelectedUrl %}
+                                {% set childSelectedCss = 'active' %}
+                            {% endif %}
+
+                            <li class='{{ childSelectedCss }}' role="menuitem"><a href="{{ childUrl }}">{{ childData.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+</nav>

@@ -17,11 +17,11 @@
 
 <div class="admin-container row">
 
-    {# TODO Find an alternative to |raw, I guess
-     #  admin had a special function specifically to render the subnav
-     #  but do I really need that...?
-     #}
-    {{ subnav|raw}}
+    {% include '@submenu/flyout.twig' with {
+        adminSubnav: flyout.adminSubnav,
+        pageCurrent: flyout.pageCurrent,
+        subpageCurrent: flyout.subpageCurrent
+    } %}
 
     <div class="admin-content">
         <div class="small-12 island">
