@@ -78,6 +78,7 @@ class Module extends AlaressModule\Module
             'pastoralAudienceMapper' => $this->getMapperFactory()->getLazy(Pastoral\Audience\Mapper::class),
             'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'pastoralTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
+            'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

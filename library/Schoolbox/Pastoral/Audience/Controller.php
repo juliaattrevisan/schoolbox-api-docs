@@ -36,6 +36,10 @@ class Controller extends Base
     /** @var Pastoral\Type\Mapper */
     private $pastoralTypeMapper;
 
+    /**
+     * @var Pastoral\SubType\Mapper
+     */
+    private Pastoral\SubType\Mapper $pastoralSubTypeMapper;
 
     /**
      * Constructor
@@ -45,19 +49,22 @@ class Controller extends Base
      * @param Mapper                  $pastoralAudienceMapper
      * @param RoleMapper              $roleMapper
      * @param Pastoral\Type\Mapper    $pastoralTypeMapper
+     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
      */
     public function __construct(
         UserMapper $userMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper,
         Mapper $pastoralAudienceMapper,
         RoleMapper $roleMapper,
-        Pastoral\Type\Mapper $pastoralTypeMapper
+        Pastoral\Type\Mapper $pastoralTypeMapper,
+        Pastoral\SubType\Mapper $pastoralSubTypeMapper
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
         $this->pastoralAudienceMapper = $pastoralAudienceMapper;
         $this->roleMapper             = $roleMapper;
         $this->pastoralTypeMapper     = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
     }
 
 
@@ -69,10 +76,15 @@ class Controller extends Base
      */
     public function getAudiences(): void
     {
-        $flyout = new Flyout($this->getConfigLoader(), [
-            ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
-            ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
-        ], $this->router);
+        $flyout = new Flyout(
+            $this->getConfigLoader(),
+            [
+                ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
+                ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
+            ],
+            $this->router,
+            $this->pastoralSubTypeMapper
+        );
         
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences.twig',

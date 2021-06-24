@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\Audience;
 
 use Aura\Router\Router;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Pastoral\SubType;
 
 /**
  * Class Flyout
@@ -29,19 +30,34 @@ class Flyout extends \Schoolbox\Submenu\Flyout
 
 
     /**
+     * @var SubType\Mapper
+     */
+    private SubType\Mapper $subtypeMapper;
+
+
+    /**
      * Flyout constructor.
      *
-     * @param IConfigLoader       $configLoader
-     * @param array               $rootNode
-     * @param Router $router
+     * @param IConfigLoader  $configLoader
+     * @param array          $rootNode
+     * @param Router         $router
+     * @param SubType\Mapper $subtypeMapper
      */
-    public function __construct(IConfigLoader $configLoader, array $rootNode, Router $router)
-    {
+    public function __construct(
+        IConfigLoader $configLoader,
+        array $rootNode,
+        Router $router,
+        SubType\Mapper $subtypeMapper
+    ) {
         parent::__construct($configLoader, $rootNode);
 
         /* Need aura to generate some routes for us
          */
         $this->router = $router;
+
+        /* This is the source of our nodes
+         */
+        $this->subtypeMapper = $subtypeMapper;
     }
 
 
@@ -54,15 +70,9 @@ class Flyout extends \Schoolbox\Submenu\Flyout
      */
     public function generate(): array
     {
-        /* TODO Inject these later
-         */
-        $subtypeMapper = \Schoolbox\Pastoral\SubType\Mapper::getInstance();
-
-        $subtypes = $subtypeMapper->findAll();
-
         $stack = [];
 
-        foreach ($subtypes as $subtype) {
+        foreach ($this->subtypeMapper->findAll() as $subtype) {
             $typeUrl = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
                 'typeId' => $subtype->getPastoralType()->getId()
             ]);
