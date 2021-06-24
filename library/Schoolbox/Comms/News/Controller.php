@@ -695,7 +695,10 @@ class Controller extends Base
     /**
      * Get a list of articles that are audienced to me for homepage component
      *
-     * @api GET /news/lists/homepage
+     * @api GET /news/lists/homepage/{folderId}
+     *
+     * @param int $folderId The folder to which the articles are audienced
+     *
      * @throws MapperException
      * @throws UnexpectedValueException
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -704,18 +707,16 @@ class Controller extends Base
      * @throws InvalidArgumentException
      * @throws UnderflowException
      */
-    public function getListForHomepage(): void
+    public function getListForHomepage(int $folderId): void
     {
         $params = new Querystring($this->getRequest()->query);
+        $params->setFolderId($folderId);
 
         $partialData = $this->generatePartialForHomepage($params);
 
         if (!$this->isXhrRequest()) {
             // if it's NOT XHR, go for API version
-            $this->response->content->set($this->buildJsonOutput([
-                'articles' => $partialData['articles'],
-            ]));
-
+            $this->response->content->set($this->buildJsonOutput($partialData['articles']));
             return;
         }
 
