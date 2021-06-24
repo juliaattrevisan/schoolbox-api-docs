@@ -15,7 +15,6 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\Submenu\Flyout;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
