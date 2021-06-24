@@ -6,9 +6,13 @@
  # you're currently viewing; you get that by combining this with index.twig
  # via renderAdminNavigation() twig extension
  #
- # @param array $adminSubnav      A set of tuples for each node in the menu
- # @param string $pageCurrent     A string corresponding to url in a tuple
- # @param string $subpageCurrent  A string corresponding to url in a tuple
+ # @param array $nodes              A set of tuples for each node in the menu
+ # @param string $pageCurrent       A string corresponding to url in a tuple
+ # @param string $subpageCurrent    A string corresponding to url in a tuple
+ # @param string parentSelected     Name of the node that's currently selected (optional)
+ # @param string parentSelectedUrl  Url of the node that's currently selected (optional)
+ # @param string childSelected      Name of the subnode that's current selected (optional)
+ # @param string childSelectedUrl   Url of the subnode that's currently selected (optional)
  #}
 <script src="{{ CDN_PREFIX }}/javascript/admin/menu.js"></script>
 <script type="text/javascript">
@@ -19,22 +23,22 @@
 
 {# Lookahead to figure out which urls are selected
  # Shared among the vertical menu and also the top level breadcrumby title
- # Its crumbs are derived from the cosmetic names given in the adminSubnav stack
+ # Its crumbs are derived from the cosmetic names given in the nodes stack
  # 'Home' is the default node which circumstantially matches one in the stack
-#}
-{% set parentSelected = 'Manage Type Defaults' %}
-{% set parentSelectedUrl = '' %}
-{% set childSelected = false %}
-{% set childSelectedUrl = false %}
+ #}
+{% set parentSelected = parentSelected ?? 'Home' %}
+{% set parentSelectedUrl = parentSelectedUrl ?? '' %}
+{% set childSelected = childSelected ?? false %}
+{% set childSelectedUrl = childSelectedUrl ?? false %}
 
-{% for parentUrl, parentData in adminSubnav %}
+{% for parentUrl, parentData in nodes %}
     {% if parentUrl == pageCurrent %}
         {% set parentSelected = parentData.name %}
         {% set parentSelectedUrl = parentUrl %}
     {% endif %}
 
     {# Find out if there's a subpage breadcrumby title
-     # This is also derived from the adminSubnav stack
+     # This is also derived from the nodes stack
     #}
     {% if parentData.children|length %}
         {% for childUrl, childData in parentData.children %}
@@ -57,7 +61,7 @@
     <a href="#" class="dropdown-btn" data-admin-subnav-dropdown>Go to...</a>
     <ul class="admin side-nav" role="navigation" data-admin>
 
-        {% for parentUrl, parentData in adminSubnav | filter(parentData => parentData.visible) %}
+        {% for parentUrl, parentData in nodes | filter(parentData => parentData.visible) %}
 
             {# Decide if the current node is selected
              #

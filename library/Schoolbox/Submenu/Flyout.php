@@ -124,7 +124,7 @@ class Flyout
         }
 
         return [
-            'adminSubnav' => $this->generate(),
+            'nodes' => $this->generate(),
             'pageCurrent' => $pageCurrent,
             'subpageCurrent' => $subpageCurrent
         ];
