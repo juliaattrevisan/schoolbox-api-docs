@@ -279,6 +279,12 @@ class Controller extends Base
              */
             $subType->setTemplate($post['template']);
             $this->pastoralSubTypeMapper->save($subType);
+
+            /* Reload this page
+             */
+            $redirect = $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
+                'subtypeId' => $subType->getId()
+            ]);
         } else {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $type->getId()]);
 
@@ -286,9 +292,14 @@ class Controller extends Base
              */
             $type->setTemplate($post['template']);
             $this->pastoralTypeMapper->save($type);
+
+            /* Reload this page
+             */
+            $redirect = $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
+                'typeId' => $type->getId(),
+                'type' => $type
+            ]);
         }
-
-
 
         // Build the posted rules
         $posted = $this->pastoralAudienceMapper->createCollection();
@@ -372,7 +383,14 @@ class Controller extends Base
         $this->pastoralAudienceMapper->save($rulesToAdd);
         $this->pastoralAudienceMapper->save($rulesToUpdate);
 
-        $this->response->redirect->to($this->getRouteIfAuthorized('pastoralAudience.getAudiences'));
+        /* TODO Reload the current page.
+         *  Because getAudiences() now redirects you to the first meaningful record,
+         *  after you save you'll be redirected to a whole different record than the
+         *  one you just saw, which is a disorienting experience
+         *
+         * TODO Possibly replace this with an async toast
+         */
+        $this->response->redirect->to($redirect);
     }
 
 
