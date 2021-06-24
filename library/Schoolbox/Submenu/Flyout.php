@@ -149,47 +149,53 @@ class Flyout
      */
     public function generate(): array
     {
-        /* TODO Inject these later
-         */
-        $subtypeMapper = \Schoolbox\Pastoral\SubType\Mapper::getInstance();
-        
-        $nodes = $subtypeMapper->findAll();
-
-        $stack = [];
-
-        foreach ($nodes as $node) {
-
-            /* If the Type hasn't been seen yet, initialise it
-             */
-
-            /* Add the current SubType to the children of its parent Type
-             */
-        }
-
-        new \Alaress_Probe($nodes);
+//        /* TODO Inject these later
+//         */
+//        $subtypeMapper = \Schoolbox\Pastoral\SubType\Mapper::getInstance();
+//
+//        $nodes = $subtypeMapper->findAll();
+//
+//        $stack = [];
+//
+//        foreach ($nodes as $node) {
+//
+//            /* If the Type hasn't been seen yet, initialise it
+//             */
+//
+//            /* Add the current SubType to the children of its parent Type
+//             */
+//        }
+//
+//        new \Alaress_Probe($nodes);
         return [
-            'url_academic' => [
-                'name' => 'Academic',
+            'url_1' => [
+                'name' => 'Node 1',
                 'visible' => true,
-                'description' => 'Academic',
+                'description' => 'Description for node 1',
                 'children' => [
-                    'url_awardachievement' => [
-                        'name' => 'Award/Achievement',
+                    'url_1_1' => [
+                        'name' => 'Node 1.1',
                         'visible' => true,
-                        'description' => 'Award/Achievement',
+                        'description' => 'Description for Node 1.1',
+                        'children' => []
+                    ],
+                    'url_1_2' => [
+                        'name' => 'Node 1.2',
+                        'visible' => true,
+                        'description' => 'Description for Node 1.2',
                         'children' => []
                     ],
                 ]
             ],
-            'url_discipline' => [
-                'name' => 'Discipline',
+            'url_2' => [
+                'name' => 'Node 2',
                 'visible' => true,
-                'description' => 'Discipline',
+                'description' => 'Description for node 2',
                 'children' => [
-                    'url_behaviouralissues' => [
-                        'name' => 'Behavioural Issues',
+                    'url_1_1' => [
+                        'name' => 'Node 2.1',
                         'visible' => true,
-                        'description' => 'Behavioural Issues',
+                        'description' => 'Description for Node 2.1',
                         'children' => []
                     ],
                 ]
