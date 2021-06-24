@@ -30,7 +30,7 @@ class Definition extends AssessmentTermFilter\Definition
 {
 
     // The name to expose in the UI
-    protected const NAME = 'Term Closed';
+    protected const NAME = 'Academic Period Closed';
 
 
     /**
