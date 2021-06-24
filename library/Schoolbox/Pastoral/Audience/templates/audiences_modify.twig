@@ -34,7 +34,7 @@
                     });
                 </script>
 
-                <textarea id="general-template">General Template goes here I guess</textarea>
+                <textarea id="general-template" name="template">{% if subtype %}{{ subtype.template }}{% elseif type %}{{ type.template }}{% endif %}</textarea>
 
                 {% include "@pastoral/modify_section_visibility.twig" with
                     {
