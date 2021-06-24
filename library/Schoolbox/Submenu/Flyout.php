@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Submenu;
 
 use Schoolbox\IConfigLoader;
-use Twig\Environment;
 
 /**
  * Class Flyout
@@ -31,35 +30,6 @@ class Flyout
      */
     protected IConfigLoader $configLoader;
 
-
-    /**
-     * A twig rendering environment. I know it's spawned in the constructor, but half
-     * the screens use phplib and the other half use twig
-     *
-     * @var Environment
-     */
-    protected Environment $twig;
-
-
-    /**
-     * Places to look for twig templates
-     *
-     * @var array|string[]
-     */
-    protected array $paths = [
-        SITE_root . '/library/Schoolbox/Submenu',
-        SITE_root . '/templates/core/sub'
-    ];
-
-
-    /**
-     * The twig template for this menu style
-     *
-     * @var string
-     */
-    protected string $template = 'flyout.twig';
-
-
     /**
      * A (name, url) tuple for the first node in a breadcrumb trail
      *
@@ -69,7 +39,7 @@ class Flyout
 
 
     /**
-     * Subnav constructor.
+     * Flyout constructor.
      *
      * @param IConfigLoader $configLoader
      * @param array         $rootNode
