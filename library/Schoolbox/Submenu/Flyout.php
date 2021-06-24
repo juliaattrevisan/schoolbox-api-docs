@@ -118,7 +118,9 @@ class Flyout
         $pageCurrent = '';
         $subpageCurrent = '';
 
-        foreach ($this->generate() as $parentUrl => $parentData) {
+        $nodes = $this->generate();
+
+        foreach ($nodes as $parentUrl => $parentData) {
             if ($parentUrl === $url) {
                 $pageCurrent = $parentUrl;
             }
@@ -134,7 +136,7 @@ class Flyout
         }
 
         return [
-            'nodes' => $this->generate(),
+            'nodes' => $nodes,
             'pageCurrent' => $pageCurrent,
             'subpageCurrent' => $subpageCurrent
         ];

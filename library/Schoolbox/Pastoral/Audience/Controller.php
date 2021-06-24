@@ -72,7 +72,7 @@ class Controller extends Base
         $flyout = new Flyout($this->getConfigLoader(), [
             ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
             ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
-        ]);
+        ], $this->router);
         
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences.twig',
