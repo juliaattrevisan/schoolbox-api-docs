@@ -15,6 +15,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use OutOfBoundsException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SubmissionMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
@@ -23,6 +24,7 @@ use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -192,8 +194,24 @@ class Module extends BaseModule
         return new Rule\Any(
             new Rule\IsSuperuser(),
             $this->buildRuleHasWriteAccess(),
-            new ParentCanViewFeedback(),
-            new StudentCanViewFeedback()
+            //Student who submitted the feedback and and their parents can view feedback, so long as the feedback is not a self-assessment
+            new Rule\All(
+                new Rule\Any(
+                    new ParentCanViewFeedback(),
+                    new StudentCanViewFeedback(),
+                ),
+                new Rule\Callback(
+                    static function (array $params = []) {
+                        if (isset($params['feedback']) && $params['feedback'] instanceof Feedback) {
+                            $feedback = $params['feedback'];
+                            if ($feedback->getReviewRoute() === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
+                                return;
+                            }
+                        }
+                        throw new Unauthorized();
+                    }
+                )
+            )
         );
     }
 
@@ -235,10 +253,9 @@ class Module extends BaseModule
             if (!isset($student, $response)) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
-        }
-        /* Otherwise spawn a floating feedback instead
-         */
-        elseif ($params['studentId']) {
+        } elseif ($params['studentId']) {
+            /* Otherwise spawn a floating feedback instead
+             */
             try {
                 $response = null;
                 $student  = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
