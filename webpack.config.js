@@ -116,7 +116,7 @@ module.exports = {
             // Random Scripts
             // Various javascripts that are so tiny they didn't get
             // their own files/plugins
-            './www/static/js/miscellaneous.js',
+            './www/static/js/miscellaneous/miscellaneous.js',
 
             // Feature tours
             './node_modules/intro.js/intro.js',
