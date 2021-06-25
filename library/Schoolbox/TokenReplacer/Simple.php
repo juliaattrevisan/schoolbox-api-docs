@@ -60,5 +60,6 @@ class Simple
      */
     public function manifest(string $body): array
     {
+        return [];
     }
 }
