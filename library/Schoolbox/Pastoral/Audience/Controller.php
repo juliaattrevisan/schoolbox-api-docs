@@ -208,14 +208,16 @@ class Controller extends Base
             ]);
         }
 
-        $flyout = new Flyout(
+        /* Set up flyout with special prefix breadcrumbs because we're in some deep
+         * part of the system where the flyout doesn't represent the full app hierarchy
+         */
+        $flyout = (new Flyout(
             $this->getConfigLoader(),
-            new FlyoutNodes($this->router, $this->pastoralTypeMapper),
-            [
-                [$this->rosettaStone->translate('pastoralCare', false, true), $this->router->generate('pastoral.getIndex')],
-                ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
-            ]
-        );
+            new FlyoutNodes($this->router, $this->pastoralTypeMapper)
+        ))->prefixBreadcrumbs([
+            [$this->rosettaStone->translate('pastoralCare', false, true), $this->router->generate('pastoral.getIndex')],
+            ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
+        ]);
 
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences_modify.twig',
