@@ -12,6 +12,7 @@ namespace Schoolbox\Pastoral\Audience;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Pastoral;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -45,6 +46,12 @@ class Controller extends Base
 
 
     /**
+     * @var RosettaStone
+     */
+    private RosettaStone $rosettaStone;
+
+
+    /**
      * Constructor
      *
      * @param UserMapper              $userMapper
@@ -60,7 +67,8 @@ class Controller extends Base
         Mapper $pastoralAudienceMapper,
         RoleMapper $roleMapper,
         Pastoral\Type\Mapper $pastoralTypeMapper,
-        Pastoral\SubType\Mapper $pastoralSubTypeMapper
+        Pastoral\SubType\Mapper $pastoralSubTypeMapper,
+        RosettaStone $rosettaStone
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
@@ -68,6 +76,7 @@ class Controller extends Base
         $this->roleMapper             = $roleMapper;
         $this->pastoralTypeMapper     = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
+        $this->rosettaStone           = $rosettaStone;
     }
 
 
@@ -199,13 +208,11 @@ class Controller extends Base
             ]);
         }
 
-        /* TODO Localise terminology
-         */
         $flyout = new Flyout(
             $this->getConfigLoader(),
             new FlyoutNodes($this->router, $this->pastoralTypeMapper),
             [
-                ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
+                [$this->rosettaStone->translate('pastoralCare', false, true), $this->router->generate('pastoral.getIndex')],
                 ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
             ]
         );

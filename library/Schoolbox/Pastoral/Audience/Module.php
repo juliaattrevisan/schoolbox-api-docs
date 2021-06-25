@@ -79,6 +79,7 @@ class Module extends AlaressModule\Module
             'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'pastoralTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
             'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
+            'rosettaStone'           => $injector->lazyGet('l10n'),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));
