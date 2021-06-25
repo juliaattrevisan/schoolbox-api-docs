@@ -38,7 +38,7 @@ echo "Creating artifact directory";
 mkdir -vp $initialdir/built-artifacts;
 
 echo "Creating artifact";
-tar czf $initialdir/built-artifacts/"$branch"-assets.tar.gz www/static/js/components www/static/css/core/*.css;
+tar czf $initialdir/built-artifacts/"$branch"-assets.tar.gz www/static/js/bundle www/static/css/core/*.css;
 
 echo "Artifact List: `readlink -f $initialdir/built-artifacts/`";
 ls -lhR $initialdir/built-artifacts/;
