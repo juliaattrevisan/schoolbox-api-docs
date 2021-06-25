@@ -14,6 +14,8 @@ use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
@@ -51,6 +53,12 @@ class Profile implements IStrategy
 
 
     /**
+     * @var IApi
+     */
+    private IApi $api;
+
+
+    /**
      * @var UserProfile\Mapper
      */
     private UserProfile\Mapper $baseProfileMapper;
@@ -85,6 +93,7 @@ class Profile implements IStrategy
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
+     * @param IApi                            $api
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
@@ -94,6 +103,7 @@ class Profile implements IStrategy
     public function __construct(
         LoggerInterface $log,
         bool $perform,
+        IApi $api,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
         UserProfile\Parent\Mapper $parentProfileMapper,
@@ -102,6 +112,7 @@ class Profile implements IStrategy
     ) {
         $this->log = $log;
         $this->perform = $perform;
+        $this->api = $api;
 
         $this->baseProfileMapper = $baseProfileMapper;
         $this->studentProfileMapper = $studentProfileMapper;
@@ -116,13 +127,13 @@ class Profile implements IStrategy
      */
     public function import(): void
     {
-//
-//        /* Import students' profile data
-//         * Import their specific parents' profile data
-//         */
-//        $this->log->info('Processing students and their parents.');
-//
-//        $this->importStudents();
+
+        /* Import students' profile data
+         * Import their specific parents' profile data
+         */
+        $this->log->info('Processing students and their parents.');
+
+        $this->importStudents();
 //
 //        /* Import staff profile data
 //         */
@@ -130,518 +141,709 @@ class Profile implements IStrategy
 //
 //        $this->importStaff();
     }
-//
-//
-//    /**
-//     * Import students' profile data
-//     */
-//    private function importStudents(): void
-//    {
-//
-//        /* TODO Get a set of students that we need to process
-//         */
-//        $students = [];
-//
-//        foreach ($students as $student) {
-//            /* TODO Fill in these basic student vars
-//             */
-//            $externalId = '';
-//            $academicHouse = '';
-//            $boardingStatus = false;
-//            $campusName = '';
-//            $comments = '';
-//            $dob = '';
-//            $email = '';
-//            $firstname = '';
-//            $form = '';
-//            $gender = '';
-//            $lastname = '';
-//            $legal = '';
-//            $messages = '';
-//            $mobile = '';
-//            $studiesCode = '';
-//            $title = '';
-//            $tutor = '';
-//            $tutorGroup = '';
-//            $username = '';
-//            $yearLevel = '';
-//
-//            /* TODO Fill in these dates
-//             */
-//            $enrolmentDate = '';
-//            $leavingDate = '';
-//
-//            /* Flags
-//             */
-//            /* TODO Fill in these flag vars
-//             */
-//            $esl = false;
-//            $ib = false;
-//            $ilp = false;
-//            $specialNeeds = false;
-//
-//            /* Find out if this externalId already has a student profile
-//             * If one already exists, load it, update it, then save it
-//             * Otherwise make a new one for the given id
-//             */
-//            try {
-//                $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
-//                $studentBaseProfile = $studentProfile->getBaseProfile();
-//            } catch (Exception $e) {
-//                $studentProfile = $this->studentProfileMapper->createModel();
-//                $studentBaseProfile = $this->baseProfileMapper->createModel();
-//
-//                $studentProfile->setBaseProfile($studentBaseProfile);
-//            }
-//
-//            $studentBaseProfile
-//                ->setExternalId($externalId)
-//                ->setTitle($title)
-//                ->setFirstname($firstname)
-//                ->setLastname($lastname);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding base profile for %s',
-//                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->baseProfileMapper->save($studentBaseProfile);
-//            }
-//
-//            /* TODO Customise these find* methods to suit your implementation
-//             *  Maintain the methods' return signature for easiest resolution
-//             *  though you are free to customise it as you see fit
-//             */
-//            /* Fish out alert comments
-//             */
-//            $alertComments = $this->findComments();
-//
-//            /* Fish out legal alerts
-//             */
-//            $alertLegal = $this->findLegal();
-//
-//            /* Fish out medical alerts
-//             */
-//            $alertMedical = $this->findMedicalAlert();
-//
-//            /* Fish out campus name
-//             */
-//            $campusName = $this->findCampusName();
-//
-//            /* Emergency Contacts
-//             */
-//            $emergencyContacts = $this->findEmergencyContacts();
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $formTeacher = $this->findFormTeacher();
-//
-//            /* Fish out a staff member via their user code
-//             */
-//            $housemaster = $this->findHousemaster();
-//
-//            /* Fish out special needs
-//             */
-//            $specialNeeds = $this->findSpecialNeeds();
-//
-//            /* Fish out a staff member via their user code
-//             */
-//            $tutor = $this->findTutor();
-//
-//            /* Find out a staff member via their user code
-//             */
-//            $yearLevelCoordinator = $this->findYearLevelCoordinator();
-//
-//            /* Dates
-//             */
-//            $enrolment = $this->findDate($enrolmentDate);
-//            $leaving = $this->findDate($leavingDate);
-//
-//            /* Smoosh it all together
-//             */
-//            $studentProfile
-//                ->setUsername($username)
-//                ->setAlertComment($alertComments)
-//                ->setAlertLegal($alertLegal)
-//                ->setAlertMedical($alertMedical)
-//                ->setAlertMessage($messages)
-//                ->setCampusName($campusName)
-//                ->setEmail($email)
-//                ->setEnrolmentDate($enrolment)
-//                ->setFormName($form)
-//                ->setFormTeacherId($formTeacher['id'])
-//                ->setFormTeacherName($formTeacher['name'])
-//                ->setGender($gender)
-//                ->setHeadOfHouseId($housemaster['id'])
-//                ->setHeadOfHouseName($housemaster['name'])
-//                ->setHouseName($academicHouse)
-//                ->setLeavingDate($leaving)
-//                ->setMobile($mobile)
-//                ->setStudiesCode($studiesCode)
-//                ->setTutorGroup($tutorGroup)
-//                ->setTutorTeacherId($tutor['id'])
-//                ->setTutorTeacherName($tutor['name'])
-//                ->setYearLevel($yearLevel)
-//                ->setYearLevelCoordinatorId($yearLevelCoordinator['id'])
-//                ->setYearLevelCoordinatorName($yearLevelCoordinator['name'])
-//
-//                /**
-//                 * Flags
-//                 */
-//                ->setBoardingStatus($boardingStatus)
-//                ->setEsl($esl)
-//                ->setIb($ib)
-//                ->setIndividualLearningPlans($ilp)
-//                ->setSpecialNeeds($specialNeeds);
-//
-//            /* Date of birth requires special treatment as ADF doesn't deal with nulls well
-//             */
-//            if ($dob) {
-//                $studentProfile
-//                    ->setDateOfBirth(new Alaress_Date_Format($dob, 'Ymd'));
-//            }
-//
-//            /**
-//             * Emergency Contacts
-//             * ...because we didn't normalise it, I'm hardcoding these
-//             */
-//            if (\count($emergencyContacts)) {
-//                if (isset($emergencyContacts[0])) {
-//                    $studentProfile
-//                        ->setEmergencyContactName1($emergencyContacts[0]['name'])
-//                        ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
-//                }
-//
-//                if (isset($emergencyContacts[1])) {
-//                    $studentProfile
-//                        ->setEmergencyContactName2($emergencyContacts[1]['name'])
-//                        ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
-//                }
-//
-//                if (isset($emergencyContacts[2])) {
-//                    $studentProfile
-//                        ->setEmergencyContactName3($emergencyContacts[2]['name'])
-//                        ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
-//                }
-//            }
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding student profile for %s',
-//                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->studentProfileMapper->save($studentProfile);
-//            }
-//
-//            /* Add their parents' profile data
-//             */
-//            $this->importParentsOfStudent($externalId, $studentBaseProfile);
-//        }
-//    }
-//
-//
-//    /**
-//     * Find campus name
-//     *
-//     * Assign campuses if they exist in the mapping
-//     * Otherwise quietly disregard bad data
-//     *
-//     * @return string|null
-//     */
-//    private function findCampusName(): ?string
-//    {
-//        return null;
-//    }
-//
-//
-//    /**
-//     * Find comments info for a given student
-//     *
-//     * @return string
-//     */
-//    private function findComments(): string
-//    {
-//        return '';
-//    }
-//
-//
-//    /**
-//     * Convert a date from possibly null/empty value
-//     *
-//     * @param string $date
-//     * @return Alaress_Date_Format|null
-//     */
-//    public function findDate(string $date): ?Alaress_Date_Format
-//    {
-//        if ($date) {
-//            return Alaress_Date_Format::newFromTimestamp(strtotime($date));
-//        }
-//
-//        return null;
-//    }
-//
-//
-//    /**
-//     * Find all the meaningful emergency contacts for a student
-//     *
-//     * @return array
-//     */
-//    public function findEmergencyContacts(): array
-//    {
-//        $emergencyContacts = [];
-//        $contacts = [];
-//        $n = 0;
-//
-//        foreach ($emergencyContacts as $emergencyContact) {
-//            if ($n < self::MAX_EMERGENCY_CONTACTS) {
-//                /* TODO Fill in these emergency contact vars
-//                 */
-//                $fullname = '';
-//                $relation = '';
-//                $phone = '';
-//
-//                /* Suffix the $relation if provided
-//                 */
-//                if ('' !== $relation) {
-//                    $fullname .= " ({$relation})";
-//                }
-//
-//                /* Aggregate them if we have a name
-//                 */
-//                if ('' !== $fullname) {
-//                    $contacts[] = [
-//                        'name' => $fullname,
-//                        'phone' => $phone
-//                    ];
-//                }
-//            }
-//
-//            $n++;
-//        }
-//
-//        return $contacts;
-//    }
-//
-//
-//    /**
-//     * Find a form teacher from their form code
-//     *
-//     * @return array
-//     */
-//    private function findFormTeacher(): array
-//    {
-//        /* TODO Fill in these form teacher vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Find a housemaster from their house name
-//     *
-//     * @return array
-//     */
-//    private function findHousemaster(): array
-//    {
-//        /* TODO Fill in these housemaster vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Find legal alerts
-//     *
-//     * @return string|null
-//     */
-//    private function findLegal(): ?string
-//    {
-//        /* TODO Fill in these legal alert vars
-//         */
-//        return null;
-//    }
-//
-//
-//    /**
-//     * Find medical data for student
-//     *
-//     * @return string|null
-//     */
-//    private function findMedicalAlert(): ?string
-//    {
-//        /* TODO Fill in these medical alert vars
-//         */
-//        return null;
-//    }
-//
-//
-//    /**
-//     * Find out if this student has special needs
-//     *
-//     * @return bool
-//     */
-//    private function findSpecialNeeds(): bool
-//    {
-//        /* TODO Fill in these special needs vars
-//         */
-//        return false;
-//    }
-//
-//
-//    /**
-//     * Find a tutor from their id
-//     *
-//     * @return array
-//     */
-//    private function findTutor(): array
-//    {
-//        /* TODO Fill in these tutor vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Find a year level coordinator from their year level
-//     *
-//     * @return array
-//     */
-//    private function findYearLevelCoordinator(): array
-//    {
-//        /* TODO Fill in these ylc vars
-//         */
-//        return [
-//            'id' => null,
-//            'name' => null
-//        ];
-//    }
-//
-//
-//    /**
-//     * Import parent profile data for a given student
-//     *
-//     * @param string            $studentExternalId
-//     * @param UserProfile\Model $studentBaseProfile
-//     * @throws Exception
-//     * @throws Mapper\DefinitionException
-//     * @throws PDOException
-//     * @throws RuntimeException
-//     * @throws UnexpectedValueException
-//     */
-//    private function importParentsOfStudent(string $studentExternalId, UserProfile\Model $studentBaseProfile): void
-//    {
-//        $parents = [];
-//
-//        /* For every associated parent, find out if they have a parent profile
-//         * If one already exists, load it, update it, then save it
-//         * Otherwise make a new one for the given id
-//         */
-//        foreach ($parents as $parent) {
-//            /* TODO Fill in these basic parent vars
-//             */
-//            $externalId = '';
-//            $email = '';
-//            $firstname = '';
-//            $lastname = '';
-//            $phoneHome = '';
-//            $phoneMobile = '';
-//            $phoneWork = '';
-//            $relationship = '';
-//            $title = '';
-//            $username = '';
-//
-//            try {
-//                $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
-//                $parentBaseProfile = $parentProfile->getBaseProfile();
-//            } catch (Exception $e) {
-//                $parentProfile = $this->parentProfileMapper->createModel();
-//                $parentBaseProfile = $this->baseProfileMapper->createModel();
-//
-//                $parentProfile->setBaseProfile($parentBaseProfile);
-//            }
-//
-//            $parentBaseProfile
-//                ->setExternalId($externalId)
-//                ->setTitle($title)
-//                ->setFirstname($firstname)
-//                ->setLastname($lastname);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding base profile for %s',
-//                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->baseProfileMapper->save($parentBaseProfile);
-//            }
-//
-//            $parentProfile
-//                ->setPhoneHome($phoneHome)
-//                ->setPhoneWork($phoneWork)
-//                ->setMobile($phoneMobile)
-//                ->setEmail($email)
-//                ->setUsername($username);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding parent profile for %s',
-//                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->parentProfileMapper->save($parentProfile);
-//            }
-//
-//            /* Manufacture relations
-//             */
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding relation between %s, the %s of %s',
-//                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
-//                trim($relationship),
-//                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $relationship = $this->relationshipMapper->createModel()
-//                    ->setUserProfile($parentBaseProfile)
-//                    ->setChildProfile($studentBaseProfile)
-//                    ->setType($relationship);
-//
-//                $this->relationshipMapper->save($relationship);
-//            }
-//        }
-//    }
+
+
+    /**
+     * Import students' profile data
+     *
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
+     */
+    private function importStudents(): void
+    {
+        $lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
+
+        /* Shank all the parents active today
+         */
+        $this->log->info(sprintf(
+            'Downloading parents active between %s and %s...',
+            $lBound,
+            $uBound
+        ));
+
+        /* Save them into a hash lookup because compass guids are used to
+         * identify parents and this is will be a fast way to get them
+         */
+        $families = (new Families($this->api))->generate($lBound, $uBound);
+
+        $this->log->info(sprintf(
+            'Downloading students active between %s and %s...',
+            $lBound,
+            $uBound
+        ));
+
+        /* Shank all the students active today
+         */
+        $students = $this->api->retrieveDocument('person/v1/GetStudents', [
+            'lBound' => $lBound,
+            'uBound' => $uBound
+        ]);
+
+        foreach ($students['d'] as $student) {
+            $externalId = $this->findExternalId($student['importIdentifiers']);
+            $academicHouse = $this->findHouse($student['organisationMilestones']);
+            $boardingStatus = $this->findBoardingStatus($student['studentDetails']);
+            $campusName = $this->findCampusName($student['organisationMilestones']);
+            $dob = $this->findDate($student['dateOfBirth']);
+            $email = $this->findEmail($student['studentDetails']);
+
+            /* Prioritise preferred names over official names
+             */
+            $firstname = (new FirstMeaningfulValue())->find([
+                $student['preferredFirstName'],
+                $student['firstName']
+            ]);
+
+            $form = $this->findForm($student['organisationMilestones']);
+            $gender = trim((string)$student['gender']);
+
+            /* Prioritise preferred names over official names
+             */
+            $lastname = (new FirstMeaningfulValue())->find([
+                $student['preferredLastName'],
+                $student['lastName']
+            ]);
+
+            $mobile = '';
+
+            /* Not sure where a studies code equivalent is, but have taken
+             * a guess that it's one of govtCode* fields
+             *
+             * In the test instance this manifests in Personal > VSN
+             */
+            $studiesCode = (new FirstMeaningfulValue())->find([
+                $student['govtCode1'],
+                $student['govtCode2']
+            ]);
+
+            $title = trim((string)$student['title']);
+            $tutor = $this->findTutor();
+            $tutorGroup = $this->findTutorGroup($student['organisationMilestones']);
+            $username = trim((string)$student['username']);
+            $yearLevel = $this->findYearLevel($student['organisationMilestones']);
+
+            /* No dates provided
+             * The api only gives you active users anyway
+             */
+            $enrolmentDate = '';
+            $leavingDate = '';
+
+            /* Flags
+             */
+            $esl = (bool)$student['receivesEsl'];
+            $ib = false;
+            $ilp = false;
+            $specialNeeds = false;
+
+            /* Alerts
+             */
+            $comments = '';
+            $legal = '';
+            $medical = $this->findMedicalAlert($student['medicalConditions']);
+            $messages = '';
+
+            /* Emergency Contacts
+             */
+            $emergencyContacts = $this->findEmergencyContacts($student['emergencyContacts']);
+
+            /* Dates
+             */
+            $enrolment = $this->findDate($enrolmentDate);
+            $leaving = $this->findDate($leavingDate);
+
+            /* If the externalId was empty, skip them
+             */
+            if (null === $externalId) {
+                $this->log->info(sprintf(
+                    'Skipping %s %s (no external identifier)',
+                    $firstname,
+                    $lastname
+                ));
+
+                continue;
+            }
+
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a student profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
+             */
+            try {
+                $studentProfile = $this->studentProfileMapper->findByExternalId($externalId);
+                $studentBaseProfile = $studentProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $studentProfile = $this->studentProfileMapper->createModel();
+
+                try {
+                    $studentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $studentBaseProfile = $this->baseProfileMapper->createModel();
+                }
+
+                $studentProfile->setBaseProfile($studentBaseProfile);
+            }
+
+            $studentBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($studentBaseProfile);
+            }
+
+            /* Smoosh it all together
+             */
+            $studentProfile
+                ->setUsername($username)
+                ->setAlertComment(null)
+                ->setAlertLegal(null)
+                ->setAlertMedical($medical)
+                ->setAlertMessage($messages)
+                ->setCampusName($campusName)
+                ->setEmail($email)
+                ->setEnrolmentDate($enrolment)
+                ->setFormName($form)
+                ->setFormTeacherId(null)
+                ->setFormTeacherName(null)
+                ->setGender($gender)
+                ->setHeadOfHouseId(null)
+                ->setHeadOfHouseName(null)
+                ->setHouseName($academicHouse)
+                ->setLeavingDate($leaving)
+                ->setMobile($mobile)
+                ->setStudiesCode($studiesCode)
+                ->setTutorGroup($tutorGroup)
+                ->setTutorTeacherId($tutor['id'])
+                ->setTutorTeacherName($tutor['name'])
+                ->setYearLevel($yearLevel)
+                ->setYearLevelCoordinatorId(null)
+                ->setYearLevelCoordinatorName(null)
+
+                /**
+                 * Flags
+                 */
+                ->setBoardingStatus($boardingStatus)
+                ->setEsl($esl)
+                ->setIb($ib)
+                ->setIndividualLearningPlans($ilp)
+                ->setSpecialNeeds($specialNeeds);
+
+            /* Date of birth requires special treatment as ADF doesn't deal with nulls well
+             */
+            if ($dob) {
+                $studentProfile
+                    ->setDateOfBirth($dob);
+            }
+
+            /**
+             * Emergency Contacts
+             * ...because we didn't normalise it, I'm hardcoding these
+             */
+            if (\count($emergencyContacts)) {
+                if (isset($emergencyContacts[0])) {
+                    $studentProfile
+                        ->setEmergencyContactName1($emergencyContacts[0]['name'])
+                        ->setEmergencyContactPhone1($emergencyContacts[0]['phone']);
+                }
+
+                if (isset($emergencyContacts[1])) {
+                    $studentProfile
+                        ->setEmergencyContactName2($emergencyContacts[1]['name'])
+                        ->setEmergencyContactPhone2($emergencyContacts[1]['phone']);
+                }
+
+                if (isset($emergencyContacts[2])) {
+                    $studentProfile
+                        ->setEmergencyContactName3($emergencyContacts[2]['name'])
+                        ->setEmergencyContactPhone3($emergencyContacts[2]['phone']);
+                }
+            }
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding student profile for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->studentProfileMapper->save($studentProfile);
+            }
+
+            /* Add their parents' profile data
+             */
+            $this->importParentsOfStudent($student['relationships'], $studentBaseProfile, $families);
+        }
+    }
+
+
+    /**
+     * A student has multiple externalIds based on whichever school they're in
+     * These import identifiers are not the same if they're involved in multiple schools
+     * We have to find the external id relevant to the current school (host)
+     *
+     * The IApi conveniently knows this, though
+     *
+     * @param array  $importIdentifiers
+     * @return string|null
+     */
+    private function findExternalId(array $importIdentifiers): ?string
+    {
+        /* Example usage:
+         *
+         * $this->api->getHost()        https://wyndhamchristiancollege-integration-vic.compass.education/api/
+         * $importIdentifier['school']  wyndhamchristiancollege-integration.vic.edu.au
+         *
+         * Commonality:                 wyndhamchristiancollege-integration
+         */
+        foreach ($importIdentifiers as $importIdentifier) {
+            $studentSchool = explode('.', $importIdentifier['school'])[0];
+
+            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                return $importIdentifier['importIdentifier'];
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Multiple Boarding Status might exist for a given student if they're involved in
+     * multiple schools. Just like the externalId, find the record that is relevant to the
+     * current school (host)
+     *
+     * Possible values: None, Full Time, Weekday, Part Time, Casual
+     *
+     * @param array $studentDetails
+     * @return bool
+     */
+    private function findBoardingStatus(array $studentDetails): bool
+    {
+        /* I guess Full Time boarders result in true
+         * but I don't know what a Part Time boarder is?
+         *
+         * I guess they're gonna return true, too
+         */
+        $boarders = ['Full Time', 'Part Time', 'Weekday'];
+
+        foreach ($studentDetails as $studentDetail) {
+            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
+
+            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                if ('Active' === $studentDetail['status']) {
+                    if (in_array($studentDetail['boarderType'], $boarders, true)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * Find campus name
+     *
+     * Assign campuses if they exist in the mapping
+     * Otherwise quietly disregard bad data
+     *
+     * @param array $organisationMilestones
+     * @return string|null
+     */
+    private function findCampusName(array $organisationMilestones): ?string
+    {
+        /* TODO homeCampus is just a guid - I don't know where the lookup is located
+         *  so for now, just provide the first active guid corresponding to the current host
+         *  (UPS can assign arbitrarily based on this guid)
+         */
+        foreach ($organisationMilestones as $organisationMilestone) {
+            $studentSchool = explode('.', $organisationMilestone['organisationName'])[0];
+
+            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                    return $organisationMilestone['homeCampus'];
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Convert a date from possibly null/empty value
+     *
+     * @param string $date
+     * @return Alaress_Date_Format|null
+     * @throws \InvalidArgumentException
+     */
+    public function findDate(string $date): ?Alaress_Date_Format
+    {
+        if ($date) {
+            return new \Alaress_Date_Format($date, 'd/m/Y');
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Find a student's organisationUserEmail
+     *
+     * @param array $studentDetails
+     * @return string|null
+     */
+    private function findEmail(array $studentDetails): ?string
+    {
+        foreach ($studentDetails as $studentDetail) {
+            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
+
+            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+                if ('Active' === $studentDetail['status']) {
+                    return $studentDetail['organisationUserEmail'];
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Find all the meaningful emergency contacts for a student
+     *
+     * @param array $emergencyContacts
+     * @return array
+     */
+    public function findEmergencyContacts(array $emergencyContacts): array
+    {
+        $contacts = [];
+        $n = 0;
+
+        foreach ($emergencyContacts as $emergencyContact) {
+            if ($n < self::MAX_EMERGENCY_CONTACTS) {
+                $fullname = trim((string)$emergencyContact['name']);
+                $relation = trim((string)$emergencyContact['relation']);
+                $phone = trim((string)$emergencyContact['contactNotes']);
+
+                /* Suffix the $relation if provided
+                 */
+                if ('' !== $relation) {
+                    $fullname .= " ({$relation})";
+                }
+
+                /* Aggregate them if we have a name
+                 */
+                if ('' !== $fullname) {
+                    $contacts[$emergencyContact['contactOrder']] = [
+                        'name' => $fullname,
+                        'phone' => $phone
+                    ];
+                }
+            }
+
+            $n++;
+        }
+
+        /* There's a contactOrder field which seems to be a priority sequence integer
+         * Reindex this array so it's zero-indexed again
+         */
+        return array_values($contacts);
+    }
+
+
+    /**
+     * A student's Form is "typically groupA" in the payload
+     *
+     * Find the first organisationMilestone that specified a meaningful groupA value
+     *
+     * @param array $organisationMilestones
+     * @return string|null
+     */
+    private function findForm(array $organisationMilestones): ?string
+    {
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'groupA');
+    }
+
+
+    /**
+     * A student's house is "typically groupC" in the payload
+     * This manifests as "House" in the ui, so despite its arbitrary name it seems predictable
+     *
+     * Find the first organisationMilestone that specified a meaningful groupC value
+     *
+     * @param array $organisationMilestones
+     * @return string|null
+     */
+    private function findHouse(array $organisationMilestones): ?string
+    {
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'groupC');
+    }
+
+
+    /**
+     * Find medical data for student
+     *
+     * @param array $medicalConditions
+     * @return string|null
+     */
+    private function findMedicalAlert(array $medicalConditions): ?string
+    {
+        if (\count($medicalConditions)) {
+            return 'This student has medical conditions.';
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Find a tutor from their id
+     *
+     * @return array
+     */
+    private function findTutor(): array
+    {
+        return [
+            'id' => null,
+            'name' => null
+        ];
+    }
+
+
+    /**
+     * A student's Tutor Group is "typically groupB" in the payload
+     *
+     * Find the first organisationMilestone that specified a meaningful groupB value
+     *
+     * @param array $organisationMilestones
+     * @return string|null
+     */
+    private function findTutorGroup(array $organisationMilestones): ?string
+    {
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'groupB');
+    }
+
+
+    /**
+     * Find the first organisationMilestone that specified a meaningful yearLevel value
+     *
+     * @param array $organisationMilestones
+     * @return string|null
+     */
+    private function findYearLevel(array $organisationMilestones): ?string
+    {
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'yearLevel');
+    }
+
+
+    /**
+     * Find a particular field inside the set of $organisationMilestones tuples
+     *
+     * @param array  $organisationMilestones
+     * @param string $field
+     * @return string|null
+     */
+    private function findOrganisationMilestoneField(array $organisationMilestones, string $field): ?string
+    {
+        foreach ($organisationMilestones as $organisationMilestone) {
+            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                if ('' !== trim((string)$organisationMilestone[$field])) {
+                    return $organisationMilestone[$field];
+                }
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Import parent profile data for a given student
+     *
+     * @param array             $relationships
+     * @param UserProfile\Model $studentBaseProfile
+     * @param array             $families
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    private function importParentsOfStudent(array $relationships, UserProfile\Model $studentBaseProfile, array $families): void
+    {
+
+        /* For every associated parent, find out if they have a parent profile
+         * If one already exists, load it, update it, then save it
+         * Otherwise make a new one for the given id
+         */
+        foreach ($relationships as $relationship) {
+            /* Can't find parent? Skip it
+             */
+            if (!isset($families[$relationship['compassPersonToId']])) {
+                $this->log->info(sprintf(
+                    'Skipping: could not find parent %s for %s %s',
+                    $relationship['compassPersonToId'],
+                    $studentBaseProfile->getFirstname(),
+                    $studentBaseProfile->getLastname()
+                ));
+            }
+
+            /* Otherwise grab them out and process them as usual
+             */
+            $parent = $families[$relationship['compassPersonToId']];
+
+            /* Start piling in the deets
+             */
+            $externalId = $this->findExternalId($parent['importIdentifiers']);
+
+            /* If the externalId was empty, skip them
+             */
+            if (null === $externalId) {
+                $this->log->info(sprintf(
+                    'Skipping parent %s (no external identifier)',
+                    $relationship['compassPersonToId']
+                ));
+
+                continue;
+            }
+
+            /* TODO Waht about emailAllowed field?
+             */
+            $email = trim((string)$parent['emailAddress']);
+
+            /* Prioritise preferred names over official names
+             */
+            $firstname = (new FirstMeaningfulValue())->find([
+                $parent['preferredFirstName'],
+                $parent['firstName']
+            ]);
+
+            /* Prioritise preferred names over official names
+             */
+            $lastname = (new FirstMeaningfulValue())->find([
+                $parent['preferredLastName'],
+                $parent['lastName']
+            ]);
+
+            $phoneHome = trim((string)$parent['homePhoneNumber']);
+            $phoneMobile = trim((string)$parent['mobileNumber']);
+            $phoneWork = '';
+            $relationship = trim((string)$relationship['type']);
+            $title = trim((string)$parent['title']);
+            $username = trim((string)$parent['username']);
+
+            /* Parents might inadvertently have the same externalId as someone else's
+             * base profile (e.g. parent has same external id as student)
+             *
+             * This is not usually supposed to happen.
+             * some sis implementations let you have broken data in this way
+             *
+             * Try and load a parent profile based on external id. If it exists, just reuse
+             * those pieces. If it doesn't exist, first check if there's an existing base
+             * profile before making a whole new one (this is how you end up with fk issues)
+             */
+            try {
+                $parentProfile = $this->parentProfileMapper->findByExternalId($externalId);
+                $parentBaseProfile = $parentProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $parentProfile = $this->parentProfileMapper->createModel();
+
+                try {
+                    $parentBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $parentBaseProfile = $this->baseProfileMapper->createModel();
+                }
+
+                $parentProfile->setBaseProfile($parentBaseProfile);
+            }
+
+            $parentBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($parentBaseProfile);
+            }
+
+            $parentProfile
+                ->setPhoneHome($phoneHome)
+                ->setPhoneWork($phoneWork)
+                ->setMobile($phoneMobile)
+                ->setEmail($email)
+                ->setUsername($username);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding parent profile for %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->parentProfileMapper->save($parentProfile);
+            }
+
+            /* Manufacture relations
+             */
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding relation between %s, the %s of %s',
+                trim("{$parentBaseProfile->getFirstname()} {$parentBaseProfile->getLastname()}"),
+                trim($relationship),
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $relationship = $this->relationshipMapper->createModel()
+                    ->setUserProfile($parentBaseProfile)
+                    ->setChildProfile($studentBaseProfile)
+                    ->setType($relationship);
+
+                $this->relationshipMapper->save($relationship);
+            }
+        }
+    }
 //
 //
 //    /**

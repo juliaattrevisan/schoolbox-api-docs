@@ -189,6 +189,7 @@ class Factory
     /**
      * @return GenericCollection
      * @throws UnexpectedValueException
+     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     public function produce(): GenericCollection
     {
@@ -196,6 +197,8 @@ class Factory
          * Every student timetable processing uses info stored there
          */
         $lookup = new Timetable\Lookup($this->timetablePeriodMapper);
+
+        $api = new Api($this->host, $this->key);
 
         return (new GenericCollection(IStrategy::class))
 
@@ -213,6 +216,7 @@ class Factory
             ->add(new Profile\Profile(
                 $this->log,
                 $this->perform,
+                $api,
                 $this->baseProfileMapper,
                 $this->studentProfileMapper,
                 $this->parentProfileMapper,
@@ -249,6 +253,10 @@ class Factory
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
+            ))
+            ->add(new ApiCertification(
+                $this->log,
+                $api
             ));
     }
 }

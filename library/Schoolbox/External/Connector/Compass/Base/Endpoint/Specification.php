@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Specification
@@ -24,17 +22,17 @@ class Specification
 {
 
     /**
-     * @var Api
+     * @var IApi
      */
-    private Api $api;
+    private IApi $api;
 
 
     /**
      * Specification constructor.
      *
-     * @param Api $api
+     * @param IApi $api
      */
-    public function __construct(Api $api)
+    public function __construct(IApi $api)
     {
         $this->api = $api;
     }
@@ -44,13 +42,12 @@ class Specification
      * Get a list of nodes that did, or didn't, get configured properly
      *
      * @return array
-     *
-     * @throws \RuntimeException
-     * @throws InvalidArgumentException
-     * @throws InvalidUriPartException
      */
     public function check(): array
     {
+        $lBound = \Alaress_Date_Format::now()->getUsingFormat('c');
+        $uBound = \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c');
+
         $paths = [
 
             /**
@@ -59,16 +56,22 @@ class Specification
             [
                 'endpoint' => 'person/v1/GetStudents',
                 'params' => [
-                    'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
-                    'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
+                    'lBound' => $lBound,
+                    'uBound' => $uBound
                 ]
-            ]
+            ],
 
 
             /**
              * Parent Profile nodes
              */
-
+            [
+                'endpoint' => 'person/v1/GetParents',
+                'params' => [
+                    'lBound' => $lBound,
+                    'uBound' => $uBound
+                ]
+            ]
 
             /**
              * Staff Profile nodes
@@ -89,7 +92,7 @@ class Specification
 
             try {
                 $result = (bool)$this->api->retrieveDocument($path['endpoint'], $path['params']);
-            } catch (\RuntimeException $e) {
+            } catch (\RuntimeException | \DomainException | \JsonException $e) {
                 $errorMessage = $e->getMessage();
                 $result = false;
             }
