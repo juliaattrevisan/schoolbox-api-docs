@@ -49,8 +49,8 @@ module.exports = {
             './www/static/js/foundation/foundation.tab.js',
             './www/static/js/foundation/foundation.tooltip.js',
             './www/static/js/foundation/foundation.dropdown.js',
-            './www/static/js/jquery.tab-activator.js',
-            './www/static/js/jquery.collapsable.js',
+            './www/static/js/foundation/jquery.tab-activator.js',
+            './www/static/js/foundation/jquery.collapsable.js',
 
             // Side Navigation
             // This includes the Flyout menu, on user profile drop down
