@@ -88,6 +88,17 @@ export default {
             type: Boolean,
             default: false,
         },
+
+        /**
+         * The Moment date format which is used to render the date when an
+         * awarding of a badge will expire.
+         *
+         * If not provided, the date will not be rendered.
+         */
+        expiryDateFormat: {
+            type: String,
+            default: null,
+        },
     },
     data() {
         return {
@@ -100,14 +111,6 @@ export default {
             showSkeletonLoader: true,
             selectedFilters: null,
         }
-    },
-    computed: {
-        /**
-         * Global date display formats.
-         *
-         * TODO attempt to inject this
-         */
-        dateDisplayFormats: () => window.dateDisplayFormats,
     },
     methods: {
         /**
@@ -334,7 +337,7 @@ export default {
          * @returns {string}
          */
         renderExpiryDate(date) {
-            return moment(date).format(this.dateDisplayFormats.momentJsDateLong);
+            return moment(date).format(this.expiryDateFormat);
         }
     },
 }
@@ -455,7 +458,13 @@ export default {
                 </template>
                 <template v-slot:expiryMessage="slotProps">
                     <p class="meta" v-if="currentBadge.achievementExpiry">
-                        This achievement will expire in {{ slotProps.expiryLabel }}, on {{ renderExpiryDate(slotProps.expiryDate) }}.
+                        <template v-if="expiryDateFormat">
+                            This achievement will expire in {{ slotProps.expiryLabel }},
+                            on {{ renderExpiryDate(slotProps.expiryDate) }}.
+                        </template>
+                        <template v-else>
+                            This achievement will expire in {{ slotProps.expiryLabel }}.
+                        </template>
                     </p>
                 </template>
             </badge-award>

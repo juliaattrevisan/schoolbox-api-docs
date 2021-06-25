@@ -69,6 +69,17 @@ export default {
         },
 
         /**
+         * The Moment date format which is used to render the date when an
+         * awarding of a badge will expire.
+         *
+         * If not provided, the date will not be rendered.
+         */
+        expiryDateFormat: {
+            type: String,
+            default: null,
+        },
+
+        /**
          * The field to use to determine when a badge award should expire.
          *
          * If this value is set: the award modal will show this value for each
@@ -222,13 +233,6 @@ export default {
     computed: {
         window: () => window,
 
-        /**
-         * Global date display formats.
-         *
-         * TODO attempt to inject this
-         */
-        dateDisplayFormats: () => window.dateDisplayFormats,
-
         // Messages are computed depending on how many badges are selected
         toastActivateMessage() {
             return this.selectedBadges.length === 1
@@ -331,7 +335,7 @@ export default {
          * @returns {String}
          */
         renderExpiryDate(expiry, fromDate) {
-            return moment(calculateExpiryDate(expiry, fromDate)).format(this.dateDisplayFormats.momentJsDateLong);
+            return moment(calculateExpiryDate(expiry, fromDate)).format(this.expiryDateFormat);
         }
     },
 }
@@ -344,6 +348,7 @@ export default {
                     :get-badge-create-form-route="getBadgeCreateFormRoute"
                     :allow-selection="true"
                     :show-badge-menus="false"
+                    :expiry-date-format="expiryDateFormat"
                     @[badgeListChangeEvent]="updateSelectedBadges"
         ></badge-list>
 

@@ -39,7 +39,8 @@
         <div id="{{ reportContentId }}">
             <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadgeJsonList') }}"
                         get-badge-create-form-route="{{ routeLookupIfAuthorized('learningBadge.getCreateForm')
-                        ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null }}">
+                        ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null }}"
+                        expiry-date-format="{{ config.date_long | momentJsFormat }}">
             </badge-list>
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/badgeList.js"></script>
