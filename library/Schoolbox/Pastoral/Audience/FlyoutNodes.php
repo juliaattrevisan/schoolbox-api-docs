@@ -66,7 +66,11 @@ class FlyoutNodes implements IFlyoutNodes
     {
         $stack = [];
 
-        foreach ($this->typeMapper->findAll() as $type) {
+        /* These aren't sorted by sequence
+         */
+        $types = $this->typeMapper->findAll()->sortBy('sequence', 'asc');
+
+        foreach ($types as $type) {
             $typeUrl = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
                 'typeId' => $type->getId()
             ]);
@@ -82,7 +86,11 @@ class FlyoutNodes implements IFlyoutNodes
                 ];
             }
 
-            foreach ($type->getSubTypes() as $subtype) {
+            /* These aren't sorted by sequence
+             */
+            $subtypes = $type->getSubTypes()->sortBy('sequence', 'asc');
+
+            foreach ($subtypes as $subtype) {
                 $subtypeUrl = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
                     'subtypeId' => $subtype->getId()
                 ]);
