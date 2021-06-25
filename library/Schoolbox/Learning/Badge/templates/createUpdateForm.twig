@@ -185,17 +185,26 @@
                     </div>
                     <div class="small-12 columns">
                         <label for="badge-achievement-expiry">
-                            Achievement lifetime
+                            Achievement expiry
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
-                                  title="How long will an achievement awarded from this badge last before it expires?">?</span>
+                                  title="When will an achievement awarded from this badge expire?">?</span>
                         </label>
 
+                        {% set achievementExpiryLabels = {
+                            never:     'Never',
+                            day:       '1 day after awarding',
+                            week:      '1 week after awarding',
+                            fortnight: '2 weeks after awarding',
+                            month:     '1 month after awarding',
+                            halfYear:  '6 months after awarding',
+                            year:      '1 year after awarding',
+                        } %}
                         <select name="achievementExpiry" id="badge-achievement-expiry">
-                            {% for achievementExpiry in achievementExpiries %}
-                                <option value="{{ achievementExpiry.value }}"
-                                        label="{{ achievementExpiry.label }}"
-                                        {% if (badge.achievementExpiry ?? null) is same as achievementExpiry.value %}selected{% endif %}>
-                                    {{ achievementExpiry.label }}
+                            {% for key, value in achievementExpiries %}
+                                <option value="{{ value }}"
+                                        label="{{ achievementExpiryLabels[key] }}"
+                                        {% if (badge.achievementExpiry ?? null) is same as value %}selected{% endif %}>
+                                    {{ achievementExpiryLabels[key] }}
                                 </option>
                             {% endfor %}
                         </select>

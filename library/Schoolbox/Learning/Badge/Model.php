@@ -38,6 +38,9 @@ class Model implements ISoftDeletable
     public const AVATAR_IMAGE = 'image';
 
 
+    /**
+     * Constants for when an achievement awarded from a badge will expire.
+     */
     public const ACHIEVEMENT_EXPIRY_NEVER = null;
     public const ACHIEVEMENT_EXPIRY_DAY = 1;
     public const ACHIEVEMENT_EXPIRY_WEEK = 7;

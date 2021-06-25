@@ -36,39 +36,19 @@ class Controller extends Base
 
 
     /**
-     * Expiry options for achievements, along with their labels.
+     * Expiry options for achievements, with an identifiable key for each.
      *
-     * TODO figure out if there's a better place to put the labels
+     * The value labels are in the template: this keeps the presentation logic
+     * out of the controller.
      */
-    private const ACHIEVEMENT_EXPIRY_OPTIONS = [
-        [
-            'label' => 'Forever',
-            'value' => Model::ACHIEVEMENT_EXPIRY_NEVER,
-        ],
-        [
-            'label' => '1 day',
-            'value' => Model::ACHIEVEMENT_EXPIRY_DAY,
-        ],
-        [
-            'label' => '1 week',
-            'value' => Model::ACHIEVEMENT_EXPIRY_WEEK,
-        ],
-        [
-            'label' => '2 weeks',
-            'value' => Model::ACHIEVEMENT_EXPIRY_FORTNIGHT,
-        ],
-        [
-            'label' => '1 month',
-            'value' => Model::ACHIEVEMENT_EXPIRY_MONTH,
-        ],
-        [
-            'label' => '6 months',
-            'value' => Model::ACHIEVEMENT_EXPIRY_HALF_YEAR,
-        ],
-        [
-            'label' => '1 year',
-            'value' => Model::ACHIEVEMENT_EXPIRY_YEAR,
-        ],
+    private const ACHIEVEMENT_EXPIRY_OPTION_VALUES = [
+        'never'     => Model::ACHIEVEMENT_EXPIRY_NEVER,
+        'day'       => Model::ACHIEVEMENT_EXPIRY_DAY,
+        'week'      => Model::ACHIEVEMENT_EXPIRY_WEEK,
+        'fortnight' => Model::ACHIEVEMENT_EXPIRY_FORTNIGHT,
+        'month'     => Model::ACHIEVEMENT_EXPIRY_MONTH,
+        'halfYear'  => Model::ACHIEVEMENT_EXPIRY_HALF_YEAR,
+        'year'      => Model::ACHIEVEMENT_EXPIRY_YEAR,
     ];
 
 
@@ -287,7 +267,7 @@ class Controller extends Base
                     'badge' => [],
                     'attachzone' => $attachzone->getTwigContext(),
                     'categories' => $this->categoryMapper->findAll(),
-                    'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTIONS,
+                    'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTION_VALUES,
                     'yearLevels' => $yearLevels,
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
@@ -394,7 +374,7 @@ class Controller extends Base
             'badge' => $badge,
             'attachzone' => $attachzone->getTwigContext(),
             'categories' => $this->categoryMapper->findAll(),
-            'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTIONS,
+            'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTION_VALUES,
             'yearLevels' => $yearLevels,
             'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'iconRegistry' => [
