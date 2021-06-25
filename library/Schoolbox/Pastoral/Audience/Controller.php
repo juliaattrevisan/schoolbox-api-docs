@@ -15,6 +15,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\Submenu\Flyout;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -155,9 +156,11 @@ class Controller extends Base
      *
      * @api   GET /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
      * @since 18.2
+     *
      * @param Pastoral\Type\Model         $type
      * @param Pastoral\SubType\Model|null $subType
      * @throws InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function getAudiencesModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $subType): void
     {
@@ -180,7 +183,10 @@ class Controller extends Base
         $record['id']     = "fakeId";
         $record['access'] = $this->getAudienceForType($type, $subType);
 
-        /* Set up flyout menu
+        /* Set up flyout menu; identify our current url to see what should
+         * be selected in the flyout menu. Since the modify route addresses both
+         * Pastoral Types and Pastoral Subtypes we have to figure out which one we
+         * are actually in...
          */
         if (null !== $subType) {
             $url = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
@@ -193,24 +199,22 @@ class Controller extends Base
             ]);
         }
 
+        /* TODO Localise terminology
+         */
         $flyout = new Flyout(
             $this->getConfigLoader(),
+            new FlyoutNodes($this->router, $this->pastoralTypeMapper),
             [
                 ['Pastoral Care', $this->router->generate('pastoral.getIndex')],
                 ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
-            ],
-            $this->router,
-            $this->pastoralTypeMapper
+            ]
         );
-
-        $flyoutVars = $flyout->generateVars($url);
-        $flyoutBreadcrumbs = $flyout->generateBreadcrumbs($url);
 
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences_modify.twig',
             'data'     => [
-                'flyout'          => $flyoutVars,
-                'breadcrumbs'     => $flyoutBreadcrumbs,
+                'flyout'          => $flyout->generateVars($url),
+                'breadcrumbs'     => $flyout->generateBreadcrumbs($url),
                 'record'          => $record,
                 'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'    => false,  //prevent user search from including student parents

@@ -15,7 +15,7 @@ use Schoolbox\IConfigLoader;
  * Class Flyout
  *
  * An emulation of Admin Side Navigation that automatically generates the
- * hierarchy based on the Pastoral Types and SubTypes that currently exist
+ * hierarchy based on the nodes provided
  *
  * @package Schoolbox\Submenu
  */
@@ -29,6 +29,15 @@ class Flyout
      * @var IConfigLoader
      */
     protected IConfigLoader $configLoader;
+
+
+    /**
+     * All the nodes in the flyout menu
+     *
+     * @var IFlyoutNodes
+     */
+    private IFlyoutNodes $nodes;
+
 
     /**
      * A set of (name, url) tuples for the first node(s) in a breadcrumb trail
@@ -50,11 +59,19 @@ class Flyout
      * Flyout constructor.
      *
      * @param IConfigLoader $configLoader
+     * @param IFlyoutNodes  $nodes
      * @param array         $rootNode
      */
-    public function __construct(IConfigLoader $configLoader, array $rootNode)
-    {
+    public function __construct(
+        IConfigLoader $configLoader,
+        IFlyoutNodes $nodes,
+        array $rootNode
+    ) {
         $this->configLoader = $configLoader;
+
+        /* All the nodes for the flyout menu
+         */
+        $this->nodes = $nodes;
 
         /* The first node in the breadcrumbs
          */
@@ -144,46 +161,13 @@ class Flyout
 
 
     /**
-     * Generate a list of tuples that represent the Pastoral Type and Subtype hierarchy
+     * Generate a list of tuples that represent the nodes hierarchy
      * in more or less the same way as the admin subnavigation
      *
      * @return array
      */
     public function generate(): array
     {
-        return [
-            'url_1' => [
-                'name' => 'Node 1',
-                'visible' => true,
-                'description' => 'Description for node 1',
-                'children' => [
-                    'url_1_1' => [
-                        'name' => 'Node 1.1',
-                        'visible' => true,
-                        'description' => 'Description for Node 1.1',
-                        'children' => []
-                    ],
-                    'url_1_2' => [
-                        'name' => 'Node 1.2',
-                        'visible' => true,
-                        'description' => 'Description for Node 1.2',
-                        'children' => []
-                    ],
-                ]
-            ],
-            'url_2' => [
-                'name' => 'Node 2',
-                'visible' => true,
-                'description' => 'Description for node 2',
-                'children' => [
-                    'url_1_1' => [
-                        'name' => 'Node 2.1',
-                        'visible' => true,
-                        'description' => 'Description for Node 2.1',
-                        'children' => []
-                    ],
-                ]
-            ],
-        ];
+        return $this->nodes->generate();
     }
 }

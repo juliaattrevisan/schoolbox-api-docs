@@ -1,26 +1,25 @@
 <?php
-
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
-
 declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
 use Aura\Router\Router;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Type;
+use Schoolbox\Submenu\IFlyoutNodes;
+
 
 /**
- * Class Flyout
+ * Class FlyoutNodes
  *
- * Render the Pastoral Types/SubTypes flyout menu
+ * Generate nodes for the Pastoral Audiencing flyout menu
  *
  * @package Schoolbox\Pastoral\Audience
  */
-class Flyout extends \Schoolbox\Submenu\Flyout
+class FlyoutNodes implements IFlyoutNodes
 {
 
     /**
@@ -36,34 +35,28 @@ class Flyout extends \Schoolbox\Submenu\Flyout
 
 
     /**
-     * Flyout constructor.
+     * FlyoutNodes constructor.
      *
-     * @param IConfigLoader $configLoader
-     * @param array         $rootNode
      * @param Router        $router
-     * @param Type\Mapper   $subtypeMapper
+     * @param Type\Mapper   $typeMapper
      */
-    public function __construct(
-        IConfigLoader $configLoader,
-        array $rootNode,
-        Router $router,
-        Type\Mapper $subtypeMapper
-    ) {
-        parent::__construct($configLoader, $rootNode);
-
+    public function __construct(Router $router, Type\Mapper $typeMapper)
+    {
         /* Need aura to generate some routes for us
          */
         $this->router = $router;
 
         /* This is the source of our nodes
          */
-        $this->typeMapper = $subtypeMapper;
+        $this->typeMapper = $typeMapper;
     }
 
 
     /**
      * Generate a list of tuples that represent the Pastoral Type and Subtype hierarchy
      * in more or less the same way as the admin subnavigation
+     *
+     * See @inheritDoc for more details about the structure inside
      *
      * @return array
      * @throws \Aura\Router\Exception\RouteNotFound
