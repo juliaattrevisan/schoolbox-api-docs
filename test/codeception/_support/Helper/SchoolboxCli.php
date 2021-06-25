@@ -276,10 +276,9 @@ class SchoolboxCli extends \Codeception\Module
     }
 
     /**
-     * Returns first Assessment based on the title
+     * Returns Badge based on the title
      *
      * @param string $name
-     * @return \Schoolbox\Learning\Assessment\IAssessable
      */
     public function grabFirstBadgeByTitle(string $name): \Schoolbox\Learning\Badge\Model
     {

@@ -11,8 +11,6 @@ class Create extends \Payload\Request
     use PostTrait;
     use FormTrait;
 
-
-
     public function __construct(string $badgeavatarselector,int $category, string $body,string $name, bool $allowasgoal)
     {
 
