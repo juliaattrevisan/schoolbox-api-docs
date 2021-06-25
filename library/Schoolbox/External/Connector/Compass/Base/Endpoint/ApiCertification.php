@@ -23,9 +23,9 @@ class ApiCertification implements IStrategy
 {
 
     /**
-     * @var LoggerInterface|null
+     * @var LoggerInterface
      */
-    private ?LoggerInterface $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -37,10 +37,10 @@ class ApiCertification implements IStrategy
     /**
      * ApiCertification constructor.
      *
-     * @param LoggerInterface|null $log
-     * @param IApi                 $api
+     * @param LoggerInterface $log
+     * @param IApi            $api
      */
-    public function __construct(?LoggerInterface $log, IApi $api)
+    public function __construct(LoggerInterface $log, IApi $api)
     {
         $this->log = $log;
         $this->api = $api;
