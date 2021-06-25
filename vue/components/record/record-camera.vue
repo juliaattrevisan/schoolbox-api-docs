@@ -7,7 +7,7 @@
 
 import RecordCameraDevice from '@schoolbox/inputCapture/record-camera-device';
 import RecordCameraBrowser from '@schoolbox/videojs-record/record-camera-browser';
-import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
+import { hasDeviceCapture } from '@js/util/featureDetectionUtils';
 
 
 export default {

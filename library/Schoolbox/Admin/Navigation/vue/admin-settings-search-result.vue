@@ -6,7 +6,7 @@
  *
  */
 
-import { getIndex } from '@shared/util/domTools';
+import { getIndex } from '@js/util/domTools';
 
 export default {
 

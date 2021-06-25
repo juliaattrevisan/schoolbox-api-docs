@@ -8,7 +8,7 @@
  */
 
 import { gsap } from 'gsap/all';
-import recordMediaEvents from '@shared/record-media/recordMediaEvents';
+import recordMediaEvents from '@js/record-media/recordMediaEvents';
 
 export default {
     

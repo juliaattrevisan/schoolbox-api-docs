@@ -6,7 +6,7 @@
  */
 
 import { gsap } from 'gsap/all';
-import recordMediaTypes from '@shared/record-media/recordMediaTypes';
+import recordMediaTypes from '@js/record-media/recordMediaTypes';
 
 
 export default {

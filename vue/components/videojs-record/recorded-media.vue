@@ -10,9 +10,9 @@ import AudioOnlyPlayer from '@schoolbox/videojs/audio-only-player';
 import PhotoPlayer from '@schoolbox/videojs/photo-player';
 import VideoPlayer from '@schoolbox/videojs/video-player';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
-import { getVideoPlayerOptionsWithBlob, getVideoPlayerOptionsWithSrc, getAudioPlayerOptionsWithBlob, getAudioPlayerOptionsWithSrc } from '@shared/videojs/videojsOptions';
-import recordMediaTypes from '@shared/record-media/recordMediaTypes';
-import recordMediaEvents from '@shared/record-media/recordMediaEvents';
+import { getVideoPlayerOptionsWithBlob, getVideoPlayerOptionsWithSrc, getAudioPlayerOptionsWithBlob, getAudioPlayerOptionsWithSrc } from '@js/videojs/videojsOptions';
+import recordMediaTypes from '@js/record-media/recordMediaTypes';
+import recordMediaEvents from '@js/record-media/recordMediaEvents';
 
 
 export default {
