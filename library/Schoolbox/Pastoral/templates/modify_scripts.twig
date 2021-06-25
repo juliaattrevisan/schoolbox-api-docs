@@ -205,5 +205,78 @@
         loadAudience();
 });
 </script>
+<script>
+    $(function() {
+
+        /* Sequential dependency on loadAudience()
+         */
+        const subtypesIndex = {{ subtypesIndex|json_encode|raw }};
+        const typesIndex = {{ typesIndex|json_encode|raw }};
+
+        /* Some conenient selectors
+         */
+        const typeDropdown = $('#typeId');
+        const subtypeDropdown = $('#subtypeId');
+        const generalTemplate = CKEDITOR.instances['body_public'];
+
+        /* Whenever Subtype changes, see if the now-selected subtypeId is null
+         *
+         * If subtypeId != null, load its template html iff the General Template's
+         * current value is the same as the Subtype template or if the General
+         * Template's current value is empty string
+         */
+        subtypeDropdown.on('change', function(event) {
+            init(null, $(this).val());
+        });
+
+        /* If subtypeId == null, look at the parent typeId. load its template
+         * html iff the General Template's current value is the same as the
+         * Type template or if the General Template's current value is empty string
+         */
+        typeDropdown.on('change', function(event) {
+            init($(this).val(), subtypeDropdown.val());
+        });
+
+        /* Also Initialise upon load
+         */
+        init(typeDropdown.val(), subtypeDropdown.val());
+
+        /**
+         * If this Type has a Subtype template, change to that
+         * Otherwise see if there's a Type template
+         */
+        function init(typeVal, subtypeVal) {
+            if (subtypeVal) {
+                replaceSubtypeTemplate(subtypeVal);
+            } else {
+                replaceTypeTemplate(typeVal);
+            }
+        }
+
+
+        /**
+         * Put a Subtype template html into General
+         *
+         * @param subtypeId
+         */
+        function replaceSubtypeTemplate(subtypeId) {
+            let current = CKEDITOR.instances['body_public'].getData();
+
+            generalTemplate.setData(subtypesIndex[subtypeId]);
+        }
+
+
+        /**
+         * Put a Type template html into General
+         *
+         * @param typeId
+         */
+        function replaceTypeTemplate(typeId) {
+            let current = CKEDITOR.instances['body_public'].getData();
+
+            generalTemplate.setData(typesIndex[typeId]);
+        }
+    });
+</script>
 {% endautoescape %}
 

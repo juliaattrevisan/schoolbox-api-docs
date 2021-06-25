@@ -565,7 +565,7 @@ class Controller extends Base
          * perform an id lookup
          */
         $types = $this->pastoralTypeMapper->findAll();
-        $subtypes = $this->pastoralTypeMapper->findAll();
+        $subtypes = $this->pastoralSubTypeMapper->findAll();
 
         $typesIndex = [];
 
@@ -590,9 +590,9 @@ class Controller extends Base
                     'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                     'allowParents'      => $allowParents,
                     'types'             => $types,
-                    'typesIndex'        => json_encode($typesIndex, JSON_THROW_ON_ERROR),
+                    'typesIndex'        => $typesIndex,
                     'subTypes'          => $subtypes,
-                    'subtypesIndex'     => json_encode($subtypesIndex, JSON_THROW_ON_ERROR),
+                    'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
                     'roleUsers'         => $roleUsers,
