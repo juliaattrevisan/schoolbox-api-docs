@@ -10,8 +10,8 @@ www/static/css/core/chrome-foundation.css
 www/static/css/core/editor.css
 *.log
 vendor/
-# Bower install directory
-www/static/js/components/
+# Webpack bundle export directory
+www/static/js/bundle/
 node_modules/
 test/behavior/screenshots/*.png
 test/behavior/screenshots/*.html

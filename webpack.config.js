@@ -200,9 +200,9 @@ module.exports = {
         classList: './library/Schoolbox/Learning/vue/init-class-list.js'
     },
     output: {
-        path: path.resolve(__dirname, 'www/static/js/components'),
-        publicPath: '/static/js/components/',
-        filename: '[name].bundle.js'
+        path: path.resolve(__dirname, 'www/static/js/bundle'),
+        publicPath: '/static/js/bundle/',
+        filename: '[name].js'
     },
     module: { //https://webpack.js.org/configuration/module/
         rules: [
@@ -341,9 +341,8 @@ module.exports = {
             '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
-            '@shared': path.resolve(__dirname, 'www/static/js/shared'),
-            '@css': path.resolve(__dirname, 'www/static/css/foundation'),
-            '@styles': path.resolve(__dirname, 'www/static/css/foundation')
+            '@js': path.resolve(__dirname, 'www/static/js'),
+            '@css': path.resolve(__dirname, 'www/static/css')
         },
         extensions: ['*', '.js', '.vue', '.json']
     },

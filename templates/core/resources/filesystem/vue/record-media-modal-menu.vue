@@ -178,7 +178,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import '@css/utils/variables';
+@import '@css/foundation/utils/variables';
 
 $font-family-icon: 'schoolbox';
 
