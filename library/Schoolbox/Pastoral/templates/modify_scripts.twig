@@ -247,9 +247,9 @@
          */
         function init(typeVal, subtypeVal) {
             if (subtypeVal) {
-                replaceSubtypeTemplate(subtypeVal);
+                replaceTemplate(subtypesIndex[subtypeVal]);
             } else {
-                replaceTypeTemplate(typeVal);
+                replaceTemplate(typesIndex[typeVal]);
             }
         }
 
@@ -257,24 +257,12 @@
         /**
          * Put a Subtype template html into General
          *
-         * @param subtypeId
+         * @param template
          */
-        function replaceSubtypeTemplate(subtypeId) {
+        function replaceTemplate(template) {
             let current = CKEDITOR.instances['body_public'].getData();
 
-            generalTemplate.setData(subtypesIndex[subtypeId]);
-        }
-
-
-        /**
-         * Put a Type template html into General
-         *
-         * @param typeId
-         */
-        function replaceTypeTemplate(typeId) {
-            let current = CKEDITOR.instances['body_public'].getData();
-
-            generalTemplate.setData(typesIndex[typeId]);
+            generalTemplate.setData(template);
         }
     });
 </script>
