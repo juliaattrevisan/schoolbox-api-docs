@@ -68,7 +68,7 @@ module.exports = {
             './node_modules/moment/moment.js',
 
             // Files And Resource Browser
-            './www/static/socialstream/browser/browser.js',
+            './www/static/js/socialstream/browser/browser.js',
             './node_modules/dropzone/dist/dropzone.js',
 
             // Magnific Popup Lightbox
