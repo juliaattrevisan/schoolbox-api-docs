@@ -55,6 +55,7 @@ use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\TokenReplacer\Simple;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -1011,11 +1012,20 @@ class Controller extends Base
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
             $record->setSeverity($severity);
-
             $record->setModifiedBy($this->getUser());
             $record->setHeading($heading);
             $record->setPoints($post->get('points'));
-            $record->setBodyPublic(trim($post->get('body_public')));
+
+            /* Perform token replacements, basically a square bracket phplib
+             * that performs a one-way substitution
+             */
+            $record->setBodyPublic((new Simple())->replace(trim($post->get('body_public')), [
+                '[firstname]' => $student->getFirstname(),
+                '[surname]' => $student->getLastname(),
+                '[year]' => $student->getYear() ? $student->getYear()->getLongName() : '',
+                '[house]' => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : ''
+            ]));
+
             $record->setBodyPrivate(trim($post->get('body_private')));
             $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
 
