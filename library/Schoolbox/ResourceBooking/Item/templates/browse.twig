@@ -1,6 +1,6 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('resourceItem.browse') }}">Resources</a></li>
-    <li class="active"><a href="#">{{  category.getName() }}</a></li>
+    <li class="active"><a href="#">{{ category.getName() }}</a></li>
 </ul>
 
 <div class="actions-small-2 row">
@@ -49,7 +49,7 @@
 <div class="row">
     <div class="small-12 columns">
         <dl class="tabs">
-            <dd><a href="{{ routeLookup('resourceItem.browse') }}" class="{% if not categoryId %}current{% endif %}">All</a></dd>
+            <dd class="{% if not categoryId %}active{% endif %}"><a href="{{ routeLookup('resourceItem.browse') }}">All</a></dd>
             {% for item in categoryList %}
             {% include '@resourceItem/sub/searchLink.twig' with {currentId: categoryId} %}
             {% endfor %}
