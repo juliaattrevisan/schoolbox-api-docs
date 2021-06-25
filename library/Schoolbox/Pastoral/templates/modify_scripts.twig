@@ -219,6 +219,10 @@
         const subtypeDropdown = $('#subtypeId');
         const generalTemplate = CKEDITOR.instances['body_public'];
 
+        /* The template html that was most recently chosen
+         */
+        let lastTemplate = '';
+
         /* Whenever Subtype changes, see if the now-selected subtypeId is null
          *
          * If subtypeId != null, load its template html iff the General Template's
@@ -244,12 +248,14 @@
         /**
          * If this Type has a Subtype template, change to that
          * Otherwise see if there's a Type template
+         *
+         * For some reason these html chunks might have a preceding space
          */
         function init(typeVal, subtypeVal) {
             if (subtypeVal) {
-                replaceTemplate(subtypesIndex[subtypeVal]);
+                replaceTemplate($.trim(subtypesIndex[subtypeVal]));
             } else {
-                replaceTemplate(typesIndex[typeVal]);
+                replaceTemplate($.trim(typesIndex[typeVal]));
             }
         }
 
@@ -260,9 +266,18 @@
          * @param template
          */
         function replaceTemplate(template) {
-            let current = CKEDITOR.instances['body_public'].getData();
+            let current = $.trim(CKEDITOR.instances['body_public'].getData());
 
-            generalTemplate.setData(template);
+            /* If the current data is the same as the template contents,
+             * then you're safe to swap it to another template
+             *
+             * If the current data is empty, you can fill it with another template
+             */
+            if (current === lastTemplate || current === '') {
+                generalTemplate.setData(template);
+
+                lastTemplate = template;
+            }
         }
     });
 </script>
