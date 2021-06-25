@@ -50,22 +50,23 @@ class Flyout
      *     ['Node 2', $url2]
      * ];
      *
-     * @var array
+     * @var array|null
      */
-    protected array $rootNode;
+    protected ?array $rootNode;
 
 
     /**
      * Flyout constructor.
      *
      * @param IConfigLoader $configLoader
-     * @param IFlyoutNodes  $nodes
-     * @param array         $rootNode
+     * @param IFlyoutNodes $nodes
+     * @param array|null   $rootNode
+     *
      */
     public function __construct(
         IConfigLoader $configLoader,
         IFlyoutNodes $nodes,
-        array $rootNode
+        ?array $rootNode = []
     ) {
         $this->configLoader = $configLoader;
 
@@ -73,7 +74,10 @@ class Flyout
          */
         $this->nodes = $nodes;
 
-        /* The first node in the breadcrumbs
+        /* The first node(s) in the breadcrumbs
+         *
+         * You can optionally use this to prefix the breadcrumb trail if your flyout
+         * is in some deep part of the system
          */
         $this->rootNode = $rootNode;
     }
