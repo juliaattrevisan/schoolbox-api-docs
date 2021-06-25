@@ -92,7 +92,7 @@ class Specification
 
             try {
                 $result = (bool)$this->api->retrieveDocument($path['endpoint'], $path['params']);
-            } catch (\RuntimeException|\DomainException|\JsonException $e) {
+            } catch (\RuntimeException | \DomainException | \JsonException $e) {
                 $errorMessage = $e->getMessage();
                 $result = false;
             }

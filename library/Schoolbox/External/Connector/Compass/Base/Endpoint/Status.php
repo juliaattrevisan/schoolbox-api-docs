@@ -54,7 +54,7 @@ class Status implements IStatus
                 'lBound' => \Alaress_Date_Format::now()->getUsingFormat('c'),
                 'uBound' => \Alaress_Date_Format::now()->addDays(1)->getUsingFormat('c')
             ]);
-        } catch (\RuntimeException|\DomainException|\JsonException $e) {
+        } catch (\RuntimeException | \DomainException | \JsonException $e) {
             return false;
         }
 
