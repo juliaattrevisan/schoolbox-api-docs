@@ -111,7 +111,7 @@ module.exports = {
             './www/static/js/strtotime/strtotime.bundle.js',
 
             // Allow deference of form submit actions
-            './www/static/js/jquery.stallSubmit.js',
+            './www/static/js/form/jquery.stallSubmit.js',
 
             // Random Scripts
             // Various javascripts that are so tiny they didn't get
