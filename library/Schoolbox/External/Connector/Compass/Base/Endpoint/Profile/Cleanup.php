@@ -26,9 +26,9 @@ class Cleanup implements IStrategy
 
 
     /**
-     * @var LoggerInterface|null
+     * @var LoggerInterface
      */
-    private ?LoggerInterface $log;
+    private LoggerInterface $log;
 
 
     /**
@@ -70,7 +70,7 @@ class Cleanup implements IStrategy
     /**
      * Cleanup constructor.
      *
-     * @param LoggerInterface|null            $log
+     * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
@@ -79,7 +79,7 @@ class Cleanup implements IStrategy
      * @param UserProfile\Relationship\Mapper $relationshipMapper
      */
     public function __construct(
-        ?LoggerInterface $log,
+        LoggerInterface $log,
         bool $perform,
         UserProfile\Mapper $baseProfileMapper,
         UserProfile\Student\Mapper $studentProfileMapper,
