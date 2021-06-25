@@ -12,22 +12,18 @@ class Create extends \Payload\Request
 
 
 
-    public function __construct(string $badgeavatarselector,string $category,string $body,string $name)
+    public function __construct(string $badgeavatarselector,int $category,string $body,string $name)
     {
 
         $allowasgoal= true;
-        $tags = array();
         $this->setReferer("/learning/badge/create");
         $this->setFormParam('allow-as-goal', $allowasgoal);
         $this->setFormParam('badge-avatar-selector', $badgeavatarselector);
         $this->setFormParam('body', $body);
-        $this->setFormParam('category', $category);
-        $this->setFormParam('curriculumNodes', $tags);
+        $this->setFormParam('category', ['id' => $category]);
         $this->setFormParam('icon', '');
         $this->setFormParam('image','');
         $this->setFormParam('name', $name);
-        $this->setFormParam('tags', $tags);
-        $this->setFormParam('yearLevelIds', $tags);
 
         $this->setHeader('content-type','application/json');
     }

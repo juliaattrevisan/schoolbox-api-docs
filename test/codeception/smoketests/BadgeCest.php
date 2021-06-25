@@ -31,7 +31,7 @@ class BadgeCest
         #GIVEN
         $type= 'text';
         $badgeavatarselector = 'image';
-        $category = '{"id":"1"}';
+        $category = 1;
         $timestamp = time();
         $body     = 'Badge Description: Automation API Smoke Test' . $timestamp;
         $name = 'Badge Name Automation API Smoke Test'. $timestamp;
