@@ -14,13 +14,13 @@
 ) }}
 
 {# Include the editor and its configurator (required for comments) #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
 
 <div id="evidence-detail-container">
     <evidence-detail :evidence="{{ evidence|json_encode }}" :return-url="{{ RETURN_URL|json_encode }}" :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"></evidence-detail>
 </div>
-<script src="{{ CDN_PREFIX }}/javascript/components/learningMomentsEvidenceDetail.bundle.js"></script>
+<script src="{{ CDN_PREFIX }}/js/components/learningMomentsEvidenceDetail.bundle.js"></script>
 
 <script>
     $(function() {

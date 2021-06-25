@@ -12,12 +12,12 @@
         <p>Sorry, we could not find the document at this time.</p>
     </div>
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/apiloader.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
 <script type="text/javascript">
     $(function () {
         loadGoogleApi(['client:auth2'], function () {
             jQuery.ajax({
-                url: '{{ CDN_PREFIX }}/javascript/shared/google/picker.js',
+                url: '{{ CDN_PREFIX }}/js/google/picker.js',
                 dataType: 'script',
                 cache: true
             }).then(function () {

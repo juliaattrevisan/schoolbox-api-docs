@@ -12,7 +12,7 @@ module.exports = {
 
             // jQuery Validation
             './node_modules/jquery-validation/dist/jquery.validate.js',
-            './www/static/javascript/jquery.alaressValidate.js',
+            './www/static/js/jquery.alaressValidate.js',
 
             // jQuery UI
             // dependencies
@@ -39,29 +39,29 @@ module.exports = {
             // Choose the specific things we are utilising, rather
             // than just including everything
             // Note all of foundations has been placed in javascript/shared to remove references to Modernizr
-            './www/static/javascript/shared/foundation/foundation.js',
-            './www/static/javascript/shared/foundation/foundation.accordion.js',
-            './www/static/javascript/shared/foundation/foundation.alert.js',
-            './www/static/javascript/shared/foundation/foundation.equalizer.js',
-            './www/static/javascript/shared/foundation/foundation.offcanvas.js',
-            './www/static/javascript/shared/foundation/foundation.reveal.js',
-            './www/static/javascript/shared/foundation/foundation.slider.js',
-            './www/static/javascript/shared/foundation/foundation.tab.js',
-            './www/static/javascript/shared/foundation/foundation.tooltip.js',
-            './www/static/javascript/shared/foundation/foundation.dropdown.js',
-            './www/static/javascript/shared/jquery.tab-activator.js',
-            './www/static/javascript/shared/jquery.collapsable.js',
+            './www/static/js/foundation/foundation.js',
+            './www/static/js/foundation/foundation.accordion.js',
+            './www/static/js/foundation/foundation.alert.js',
+            './www/static/js/foundation/foundation.equalizer.js',
+            './www/static/js/foundation/foundation.offcanvas.js',
+            './www/static/js/foundation/foundation.reveal.js',
+            './www/static/js/foundation/foundation.slider.js',
+            './www/static/js/foundation/foundation.tab.js',
+            './www/static/js/foundation/foundation.tooltip.js',
+            './www/static/js/foundation/foundation.dropdown.js',
+            './www/static/js/jquery.tab-activator.js',
+            './www/static/js/jquery.collapsable.js',
 
             // Side Navigation
             // This includes the Flyout menu, on user profile drop down
             // Also fixes touch on side navigation and adds scroll to top
-            './www/static/javascript/shared/sidemenu/jquery.flyout.js',
-            './www/static/javascript/shared/sidemenu/jquery.touch-menu.js',
-            './www/static/javascript/shared/sidemenu/jquery.scroll-to.js',
+            './www/static/js/sidemenu/jquery.flyout.js',
+            './www/static/js/sidemenu/jquery.touch-menu.js',
+            './www/static/js/sidemenu/jquery.scroll-to.js',
 
             // CKEditor
-            './www/static/javascript/shared/editor/jquery.modal.js',
-            './www/static/javascript/shared/editor/jquery.proxy-replacement.js',
+            './www/static/js/editor/jquery.modal.js',
+            './www/static/js/editor/jquery.proxy-replacement.js',
             './node_modules/mediaelement/build/mediaelement-and-player.min.js',
 
             // DateTime
@@ -75,52 +75,52 @@ module.exports = {
             './node_modules/magnific-popup/dist/jquery.magnific-popup.js',
 
             // Notifier
-            './www/static/javascript/shared/notifications/jquery.notifier.js',
+            './www/static/js/notifications/jquery.notifier.js',
 
             // Confirm Dialog
-            './www/static/javascript/shared/jquery.confirm-dialog.js',
+            './www/static/js/jquery.confirm-dialog.js',
 
             // Data tables
             './node_modules/datatables.net/js/jquery.dataTables.js',
             './node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
 
             // Toasts, popups to notify something has happened
-            './www/static/javascript/shared/jquery.toast-timeout.js',
+            './www/static/js/jquery.toast-timeout.js',
 
             // File uploading
-            './www/static/javascript/resource/jquery.resourceAttach.js',
+            './www/static/js/resource/jquery.resourceAttach.js',
 
             // Image/File previewing
-            './www/static/javascript/preview/preview.js',
+            './www/static/js/preview/preview.js',
 
             // Course selector
-            './www/static/javascript/shared/course/jquery.course-selector.js',
+            './www/static/js/course/jquery.course-selector.js',
 
             // Date syncing
-            './www/static/javascript/shared/alaress-datetime-picker/jquery.sync-dates.js',
+            './www/static/js/alaress-datetime-picker/jquery.sync-dates.js',
 
             // Flatpickr date selector
             './node_modules/flatpickr/dist/flatpickr.js',
 
             // Loads Flatpickr into a modal
-            './www/static/javascript/shared/alaress-datetime-picker/attacher.datepicker.js',
-            './www/static/javascript/shared/alaress-datetime-picker/alaress-datetime-picker.js',
-            './www/static/javascript/shared/alaress-datetime-picker/alaress-datetime-modal.js',
+            './www/static/js/alaress-datetime-picker/attacher.datepicker.js',
+            './www/static/js/alaress-datetime-picker/alaress-datetime-picker.js',
+            './www/static/js/alaress-datetime-picker/alaress-datetime-modal.js',
 
             // This is a Webpack-built module for strtotime
-            './www/static/javascript/shared/strtotime.bundle.js',
+            './www/static/js/strtotime.bundle.js',
 
             // Allow deference of form submit actions
-            './www/static/javascript/shared/jquery.stallSubmit.js',
+            './www/static/js/jquery.stallSubmit.js',
 
             // Random Scripts
             // Various javascripts that are so tiny they didn't get
             // their own files/plugins
-            './www/static/javascript/shared/miscellaneous.js',
+            './www/static/js/miscellaneous.js',
 
             // Feature tours
             './node_modules/intro.js/intro.js',
-            './www/static/javascript/shared/tour/tour.js',
+            './www/static/js/tour/tour.js',
 
             // Lodash
             './node_modules/lodash/lodash.js',
@@ -128,7 +128,7 @@ module.exports = {
             // MS Immersive Reader
             './node_modules/@microsoft/immersive-reader-sdk/lib/immersive-reader-sdk.js',
 
-            './www/static/javascript/shared/calendar/jquery.getExportCalendarLink.js'
+            './www/static/js/calendar/jquery.getExportCalendarLink.js'
         ],
         masonry: {
             import: [
@@ -136,15 +136,15 @@ module.exports = {
                 './node_modules/spectrum-colorpicker/spectrum.js',
 
                 // homepage editing
-                './www/static/javascript/shared/masonry/jquery.masonry.js',
-                './www/static/javascript/shared/masonry/jquery.masonry.spectrum.js'
+                './www/static/js/masonry/jquery.masonry.js',
+                './www/static/js/masonry/jquery.masonry.spectrum.js'
             ],
             dependOn: 'main' //ensures jQuery is loaded prior
         },
 
         // Libraries
-        clipboard: './www/static/javascript/shared/clipboard/clipboard.main.js',
-        strtotime: './www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js',
+        clipboard: './www/static/js/clipboard/clipboard.main.js',
+        strtotime: './www/static/js/alaress-datetime-picker/strtotime.main.js',
 
         hybridbar: path.resolve(__dirname, 'resources/js/hybrid-bar/index.js'),
 
@@ -200,8 +200,8 @@ module.exports = {
         classList: './library/Schoolbox/Learning/vue/init-class-list.js'
     },
     output: {
-        path: path.resolve(__dirname, 'www/static/javascript/components'),
-        publicPath: '/static/javascript/components/',
+        path: path.resolve(__dirname, 'www/static/js/components'),
+        publicPath: '/static/js/components/',
         filename: '[name].bundle.js'
     },
     module: { //https://webpack.js.org/configuration/module/
@@ -341,7 +341,7 @@ module.exports = {
             '@schoolboxCalendarEvent': path.resolve(__dirname, 'library/Schoolbox/Calendar/Event/templates/vue'),
             '@schoolboxCommsNews': path.resolve(__dirname, 'library/Schoolbox/Comms/News'),
             '@schoolboxLearningMomentEvidence': path.resolve(__dirname, 'library/Schoolbox/Learning/Moment/Evidence/vue'),
-            '@shared': path.resolve(__dirname, 'www/static/javascript/shared'),
+            '@shared': path.resolve(__dirname, 'www/static/js/shared'),
             '@css': path.resolve(__dirname, 'www/static/css/foundation'),
             '@styles': path.resolve(__dirname, 'www/static/css/foundation')
         },

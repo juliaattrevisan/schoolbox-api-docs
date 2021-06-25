@@ -9,14 +9,14 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./www/static/javascript/shared/clipboard/clipboard.main.js":
+/***/ "./www/static/js/shared/clipboard/clipboard.main.js":
 /*!******************************************************************!*\
-  !*** ./www/static/javascript/shared/clipboard/clipboard.main.js ***!
+  !*** ./www/static/js/shared/clipboard/clipboard.main.js ***!
   \******************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! clipboard/dist/clipboard.min */ \"./node_modules/clipboard/dist/clipboard.min.js\");\n/* harmony import */ var clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0__);\n // Install clipboard extension into window\n\nwindow.ClipboardJS = (clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0___default());\n\n//# sourceURL=webpack://schoolbox/./www/static/javascript/shared/clipboard/clipboard.main.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! clipboard/dist/clipboard.min */ \"./node_modules/clipboard/dist/clipboard.min.js\");\n/* harmony import */ var clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0__);\n // Install clipboard extension into window\n\nwindow.ClipboardJS = (clipboard_dist_clipboard_min__WEBPACK_IMPORTED_MODULE_0___default());\n\n//# sourceURL=webpack://schoolbox/./www/static/js/shared/clipboard/clipboard.main.js?");
 
 /***/ }),
 
@@ -102,7 +102,7 @@ eval("/*!\n * clipboard.js v2.0.6\n * https://clipboardjs.com/\n * \n * Licensed
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./www/static/javascript/shared/clipboard/clipboard.main.js");
+/******/ 	var __webpack_exports__ = __webpack_require__("./www/static/js/shared/clipboard/clipboard.main.js");
 /******/ 	
 /******/ })()
 ;

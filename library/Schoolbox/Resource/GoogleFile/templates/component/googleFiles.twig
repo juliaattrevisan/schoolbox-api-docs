@@ -8,7 +8,7 @@
  # @param bool $hasError        A bool flag indicating something is misconfigured
  # @param Folder\Model $folder  The current homepage instance
 #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/apiloader.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
 {% if googleFiles is empty %}
     <div class="empty-state">
         <i class="icon-google-drive"></i>
@@ -126,7 +126,7 @@
         </div>
     </div>
 </div>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/google/picker.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript">
     $(function () {
         $('#find-files').googlePicker({

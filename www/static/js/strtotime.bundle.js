@@ -77,11 +77,11 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 /******/
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "/javascript/components/";
+/******/ 	__webpack_require__.p = "/js/components/";
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./www/static/js/alaress-datetime-picker/strtotime.main.js");
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -98,15 +98,15 @@ eval("\n\nvar reSpace = '[ \\\\t]+';\nvar reSpaceOpt = '[ \\\\t]*';\nvar reMerid
 
 /***/ }),
 
-/***/ "./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js":
+/***/ "./www/static/js/alaress-datetime-picker/strtotime.main.js":
 /*!********************************************************************************!*\
-  !*** ./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js ***!
+  !*** ./www/static/js/alaress-datetime-picker/strtotime.main.js ***!
   \********************************************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! locutus/php/datetime/strtotime */ \"./node_modules/locutus/php/datetime/strtotime.js\");\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__);\n // Stick it in the jQuery object I guess\n\nwindow.jQuery.fn.strtotime = locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default.a;\n\n//# sourceURL=webpack:///./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! locutus/php/datetime/strtotime */ \"./node_modules/locutus/php/datetime/strtotime.js\");\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__);\n // Stick it in the jQuery object I guess\n\nwindow.jQuery.fn.strtotime = locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default.a;\n\n//# sourceURL=webpack:///./www/static/js/alaress-datetime-picker/strtotime.main.js?");
 
 /***/ })
 

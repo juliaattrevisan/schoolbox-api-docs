@@ -2,7 +2,7 @@
  * A jquery plugin which gets a list of available textboxes
  * in a particular category id and returns them in a <select>
 
-<script type="text/javascript" src="/textbox/javascript/availableByCategory.js"></script>
+<script type="text/javascript" src="/textbox/js/availableByCategory.js"></script>
 $j(function() {
 	$j('a[name=go-to{COMPONENT_INSTANCE_ID}]').availableByCategory({
 		categoryId: '{TEXTBOX_CATEGORY_ID}',

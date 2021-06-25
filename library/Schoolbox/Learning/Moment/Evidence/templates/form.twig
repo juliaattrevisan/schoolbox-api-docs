@@ -70,11 +70,11 @@
 
 
 {# Set up CKEditor #}
-<script src="{{ CDN_PREFIX }}/javascript/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/javascript/shared/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/selectize/selectize.min.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/curriculum/javascript/jquery.curriculumSelector.js"></script>
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/selectize/selectize.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/curriculum/js/jquery.curriculumSelector.js"></script>
 {% block formJs %}
     {% autoescape 'js' %}
         <script type="text/javascript">

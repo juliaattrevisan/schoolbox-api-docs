@@ -55,7 +55,7 @@
             preview: '',
             channels: 1,
             sampleRate: 11025,
-            workerPath: '/javascript/recorder/webrtc/recorderWorker.js',
+            workerPath: '/js/recorder/webrtc/recorderWorker.js',
             audioElement: null
         },
         upload: {

@@ -99,7 +99,7 @@ $cdn-prefix: "../..";
 @import "components/geosnapshot/geosnapshot";
 
 // Slider
-@import "../../javascript/shared/swiper/dist/css/swiper";
+@import "../../js/swiper/dist/css/swiper";
 @import "ui/slider";
 
 // Feature Tour
@@ -152,7 +152,7 @@ $cdn-prefix: "../..";
 @import "ui/combobox";
 
 // jqmath
-@import "../../javascript/math/jqmath-0.4.0";
+@import "../../js/math/jqmath-0.4.0";
 
 // jQuery UI
 @import "/node_modules/jquery-ui/themes/base/draggable";

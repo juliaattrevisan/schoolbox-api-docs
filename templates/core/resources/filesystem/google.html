@@ -37,8 +37,8 @@
       display: inline;
     }
   </style>
-  <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/jquery/dist/jquery.min.js"></script>
-  <script type="text/javascript" src="{CDN_PREFIX}/javascript/shared/google/apiloader.js"></script>
+  <script type="text/javascript" src="{CDN_PREFIX}/js/jquery/dist/jquery.min.js"></script>
+  <script type="text/javascript" src="{CDN_PREFIX}/js/google/apiloader.js"></script>
   <script type="text/javascript">
 
       // get a fix on your IE9 origin
@@ -53,7 +53,7 @@
       loadGoogleApi(['client:auth2', 'picker'], function () {
           jQuery
           .ajax({
-              url: '{CDN_PREFIX}/javascript/shared/google/picker.js',
+              url: '{CDN_PREFIX}/js/google/picker.js',
               dataType: 'script',
               cache: true
           })

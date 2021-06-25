@@ -1,16 +1,16 @@
 {% import '@resourceBrowser/macro/nodeIcon.twig' as nodeIcon %}
 
 {# Load in required JS/CSS as we are not inside the chrome #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/main.bundle.js?v={{ site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/components/main.bundle.js?v={{ site_version }}"></script>
 {% include 'include/skin.twig' with { config: config } only %}
 
 {# Load JS for treeview #}
 
-<link rel="stylesheet" href="{{ CDN_PREFIX }}/javascript/shared/jstree/dist/themes/default/style.css" />
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/jstree/dist/jstree.min.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/jquery.resourceTree.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/shared/jquery.scrollTo.min.js"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/jquery.fileDrop.js"></script>
+<link rel="stylesheet" href="{{ CDN_PREFIX }}/js/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/jstree/dist/jstree.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/jquery.fileDrop.js"></script>
 
 
 

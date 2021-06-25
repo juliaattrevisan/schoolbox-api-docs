@@ -10,13 +10,13 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js":
+/***/ "./www/static/js/shared/alaress-datetime-picker/strtotime.main.js":
 /*!********************************************************************************!*\
-  !*** ./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js ***!
+  !*** ./www/static/js/shared/alaress-datetime-picker/strtotime.main.js ***!
   \********************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! locutus/php/datetime/strtotime */ \"./node_modules/locutus/php/datetime/strtotime.js\");\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__);\n // Stick it in the jQuery object I guess\n\nwindow.jQuery.fn.strtotime = (locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default());\n\n//# sourceURL=webpack://schoolbox/./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! locutus/php/datetime/strtotime */ \"./node_modules/locutus/php/datetime/strtotime.js\");\n/* harmony import */ var locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0__);\n // Stick it in the jQuery object I guess\n\nwindow.jQuery.fn.strtotime = (locutus_php_datetime_strtotime__WEBPACK_IMPORTED_MODULE_0___default());\n\n//# sourceURL=webpack://schoolbox/./www/static/js/shared/alaress-datetime-picker/strtotime.main.js?");
 
 /***/ }),
 
@@ -102,7 +102,7 @@ eval("\n\nvar reSpace = '[ \\\\t]+';\nvar reSpaceOpt = '[ \\\\t]*';\nvar reMerid
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	var __webpack_exports__ = __webpack_require__("./www/static/javascript/shared/alaress-datetime-picker/strtotime.main.js");
+/******/ 	var __webpack_exports__ = __webpack_require__("./www/static/js/shared/alaress-datetime-picker/strtotime.main.js");
 /******/ 	
 /******/ })()
 ;

@@ -359,7 +359,7 @@
     }
 
     /**
-     * @see http://css-tricks.com/snippets/javascript/test-if-dragenterdragover-event-contains-files/
+     * @see http://css-tricks.com/snippets/js/test-if-dragenterdragover-event-contains-files/
      * @param event
      * @returns {boolean}
      */
