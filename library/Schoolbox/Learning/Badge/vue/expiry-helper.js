@@ -1,3 +1,4 @@
+export const EXPIRY_NEVER = null;
 export const EXPIRY_DAY = 1;
 export const EXPIRY_WEEK = 7;
 export const EXPIRY_FORTNIGHT = 14;
@@ -7,7 +8,7 @@ export const EXPIRY_YEAR = 365;
 export const EXPIRY_OPTIONS = [
     {
         label: 'Forever',
-        value: null,
+        value: EXPIRY_NEVER,
     },
     {
         label: '1 day',

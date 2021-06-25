@@ -43,7 +43,7 @@ class Controller extends Base
     private const ACHIEVEMENT_EXPIRY_OPTIONS = [
         [
             'label' => 'Forever',
-            'value' => null,
+            'value' => Model::ACHIEVEMENT_EXPIRY_NEVER,
         ],
         [
             'label' => '1 day',
