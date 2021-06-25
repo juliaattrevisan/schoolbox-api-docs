@@ -24,6 +24,7 @@ use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -193,6 +194,7 @@ class Module extends BaseModule
         return new Rule\Any(
             new Rule\IsSuperuser(),
             $this->buildRuleHasWriteAccess(),
+            //Student who submitted the feedback and and their parents can view feedback, so long as the feedback is not a self-assessment
             new Rule\All(
                 new Rule\Any(
                     new ParentCanViewFeedback(),
@@ -200,7 +202,7 @@ class Module extends BaseModule
                 ),
                 new Rule\Callback(
                     static function (array $params = []) {
-                        if (isset($params['feedback']) && $params['feedback'] instanceof \Schoolbox\Learning\Assessment\DueWork\Feedback\Model) {
+                        if (isset($params['feedback']) && $params['feedback'] instanceof Feedback) {
                             $feedback = $params['feedback'];
                             if ($feedback->getReviewRoute() === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
                                 return;
