@@ -192,7 +192,7 @@
             });
 
             //when the 'Create Text Box' modal is opened, ensure the Title input field is given immediate focus to allow easier/faster Text Box creation
-            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () { //referenced from Event Bindings at https://get.foundation/sites/docs-v5/bundle/reveal.html
+            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () { //referenced from Event Bindings at https://get.foundation/sites/docs-v5/components/reveal.html
                 const openedModalDOMElement = $(this)[0];
                 const openedModalDOMElementID = openedModalDOMElement.id;
                 if (openedModalDOMElementID.includes('{{ component.instance.id }}')) {  //ensure the id matches the currently active component which contains the 'Create Text Box' modal just opened

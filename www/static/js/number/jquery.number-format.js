@@ -2,7 +2,7 @@
 
     /**
      * Convert bytes to kb, mb, gb etc
-     * http://codeaid.net/js/convert-size-in-bytes-to-human-readable-format-(javascript)
+     * http://codeaid.net/javascript/convert-size-in-bytes-to-human-readable-format-(javascript)
      *
      * ...and mangled by me
      *
