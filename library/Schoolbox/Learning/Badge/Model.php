@@ -38,6 +38,7 @@ class Model implements ISoftDeletable
     public const AVATAR_IMAGE = 'image';
 
 
+    public const ACHIEVEMENT_EXPIRY_NEVER = null;
     public const ACHIEVEMENT_EXPIRY_DAY = 1;
     public const ACHIEVEMENT_EXPIRY_WEEK = 7;
     public const ACHIEVEMENT_EXPIRY_FORTNIGHT = 14;
@@ -45,6 +46,7 @@ class Model implements ISoftDeletable
     public const ACHIEVEMENT_EXPIRY_HALF_YEAR = 183;
     public const ACHIEVEMENT_EXPIRY_YEAR = 365;
     public const VALID_ACHIEVEMENT_EXPIRY_VALUES = [
+        self::ACHIEVEMENT_EXPIRY_NEVER,
         self::ACHIEVEMENT_EXPIRY_DAY,
         self::ACHIEVEMENT_EXPIRY_WEEK,
         self::ACHIEVEMENT_EXPIRY_FORTNIGHT,
@@ -263,7 +265,7 @@ class Model implements ISoftDeletable
      */
     public function setAchievementExpiry(?int $achievementExpiry): self
     {
-        if (isset($achievementExpiry) && !in_array($achievementExpiry, self::VALID_ACHIEVEMENT_EXPIRY_VALUES, true)) {
+        if (!in_array($achievementExpiry, self::VALID_ACHIEVEMENT_EXPIRY_VALUES, true)) {
             throw new UnexpectedValueException(
                 sprintf(
                     'Achievement expiry must be one of: [%s], received %d instead',
