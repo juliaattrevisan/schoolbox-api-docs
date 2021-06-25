@@ -491,12 +491,13 @@ class Controller extends Base
         $this->getStudentRecordUpdateForm($record);
     }
 
+
     /**
      * Update pastoral care record
      *
      * @param Model $record
      *
-     * @throws SchoolboxException
+     * @throws \JsonException
      */
     public function getStudentRecordUpdateForm($record): void
     {
@@ -558,6 +559,26 @@ class Controller extends Base
             ];
         }
 
+        /* Build a hash lookup of (typeId => html) and (subtypeId => html) tuples
+         * for the front end's dropdowns. When those dropdowns change, sometimes
+         * the General Template should get updated and the easiest way is to simply
+         * perform an id lookup
+         */
+        $types = $this->pastoralTypeMapper->findAll();
+        $subtypes = $this->pastoralTypeMapper->findAll();
+
+        $typesIndex = [];
+
+        foreach ($types as $type) {
+            $typesIndex[$type->getId()] = $type->getTemplate();
+        }
+
+        $subtypesIndex = [];
+
+        foreach ($subtypes as $subtype) {
+            $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
+        }
+
         // Render this thing out
 
         $this->getResponse()->content->set(
@@ -568,8 +589,10 @@ class Controller extends Base
                     'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                     'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                     'allowParents'      => $allowParents,
-                    'types'             => $this->pastoralTypeMapper->findAll(),
-                    'subTypes'          => $this->pastoralSubTypeMapper->findAll(),
+                    'types'             => $types,
+                    'typesIndex'        => json_encode($typesIndex, JSON_THROW_ON_ERROR),
+                    'subTypes'          => $subtypes,
+                    'subtypesIndex'     => json_encode($subtypesIndex, JSON_THROW_ON_ERROR),
                     'severities'        => $severities,
                     'roles'             => $roles,
                     'roleUsers'         => $roleUsers,
