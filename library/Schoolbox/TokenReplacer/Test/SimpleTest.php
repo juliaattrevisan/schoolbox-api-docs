@@ -18,7 +18,6 @@ namespace Schoolbox\TokenReplacer\Test;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\TokenReplacer\Simple;
 
-
 /**
  * Class SimpleTest
  *

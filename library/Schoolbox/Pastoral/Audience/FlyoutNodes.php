@@ -1,8 +1,10 @@
 <?php
+
 /**
  * @copyright   Copyright 2021, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
@@ -10,7 +12,6 @@ namespace Schoolbox\Pastoral\Audience;
 use Aura\Router\Router;
 use Schoolbox\Pastoral\Type;
 use Schoolbox\Submenu\IFlyoutNodes;
-
 
 /**
  * Class FlyoutNodes
