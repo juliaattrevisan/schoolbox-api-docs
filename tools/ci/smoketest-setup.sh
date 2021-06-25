@@ -2,6 +2,8 @@
 
 ## Initial directory is where all the resources that are linked are included so save it for later use.
 initialdir=`pwd`;
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*}
 
 PHP_VERSION=$1
 
@@ -23,8 +25,8 @@ mariadb -e "create user 'schoolboxvagrant'@'%' IDENTIFIED BY 'abc123';"
 mariadb -e "grant all privileges on schoolbox.* to 'schoolboxvagrant'@'%';"
 
 # initialise the data itself
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb -u root mysql -pPassw0rd!
-mariadb schoolbox < $initialdir/configfiles/vagrant_config.sql
+mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
+mysql schoolbox < $initialdir/configfiles/vagrant_config.sql
 
 ## Make directories that will be used by our schoolbox instance
 mkdir vagrant
@@ -35,7 +37,7 @@ ln -sf /vagrant/data /var/lib/schoolbox
 chmod 777 mnt/data/php_tmp
 
 ## Move our specific config items into the correct folders
-cp -rf $initialdir/schoolbox-develop/* /vagrant
+cp -rf $fullpath/../../* /vagrant
 cp -f $initialdir/configfiles/dhparams.pem /etc/dhparams.pem
 cp -rf $initialdir/configfiles/nginx/* /etc/nginx
 cp -f $initialdir/configfiles/update-sql-no-prereq-test.sh /vagrant/tools/update-sql-nocheck.sh
@@ -54,13 +56,11 @@ cp tools/ci/etc/config.ini /etc/schoolbox/config.ini
 cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
 export INSTANCE_ID=smoketest
 
-## Currently, all smoke tests run on develop only.
-## Therefore, we don't need to infer or inform which build to use: we can just
-## use the develop build.
-tar xzf $initialdir/build-artifact/develop-build.tar.gz;
+# Extract the build files from either develop or stable depending on where we run
+tar xzf $initialdir/build-artifact/*-build.tar.gz;
 
 ## Extract the develop vendor build too
-tar xzf $initialdir/vendor-php-artifact-dev/develop-vendor-php-dev.tar.gz;
+tar xzf $initialdir/vendor-php-artifact-dev/*-vendor-php-dev.tar.gz;
 
 ## Make sure the data directory has no permissions issues.
 chmod 777 -R /vagrant/data/*

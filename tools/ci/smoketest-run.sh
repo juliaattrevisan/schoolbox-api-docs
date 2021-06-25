@@ -8,10 +8,13 @@ then
 	exit 1;
 fi
 
+filepath=`readlink -f $0`;
+fullpath=${filepath%/*}
+
 initialdir=`pwd`;
 
 ## Smoke test runs a setup script first
-./schoolbox-develop/tools/ci/smoketest-setup.sh
+"$fullpath"/smoketest-setup.sh
 echo "smoke tests setup"
 cd /vagrant
 echo "cd into vagrant"
@@ -21,7 +24,7 @@ smokeTestResult=$?;
 
 ## After the test is run we need to shut down the services
 cd $initialdir;
-./schoolbox-develop/tools/ci/smoketest-teardown.sh
+"$fullpath"/smoketest-teardown.sh
 
 ## Then we need to close off our test with a return value, just to ensure the script closes properly.
 if [ $smokeTestResult -ne 0 ];
