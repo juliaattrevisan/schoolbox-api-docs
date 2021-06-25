@@ -18,17 +18,11 @@ class Simple
 {
 
     /**
-     * Token format
-     */
-    private const TOKEN_FORMAT = '/[^]]/';
-
-
-    /**
-     * $replacements is a set of key-value tuples:
+     * $replacements is a set of key-value tuples just like phplib:
      *
      * [
-     *     'firstname' => $var1,
-     *     'lastname' => $var2,
+     *     '[firstname]' => $var1,
+     *     '[lastname]' => $var2,
      *     ...
      * ]
      *
@@ -47,9 +41,7 @@ class Simple
      */
     public function replace(string $body, array $replacements): string
     {
-        $newBody = '';
-
-        return $newBody;
+        return str_replace(array_keys($replacements), array_values($replacements), $body);
     }
 
 
@@ -57,9 +49,17 @@ class Simple
      * Diagnostic for seeing which tokens are available for substitutions
      *
      * @param string $body
+     * @return array
      */
     public function manifest(string $body): array
     {
-        return [];
+
+        /* Find all the tokens
+         */
+        preg_match_all('/\[[^]]+\]/m', $body, $matches);
+
+        /* Remove dupes and reindex
+         */
+        return array_values(array_unique($matches[0]));
     }
 }

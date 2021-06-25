@@ -53,7 +53,6 @@ class SimpleTest extends TestCase
     public function providerBodyManifest(): array
     {
         return [
-
             'No Tokens' => [
                 "noun. a list of the cargo carried by a ship, made for the use of 
                 various agents and officials at the ports of destination. a list or 
@@ -111,41 +110,141 @@ class SimpleTest extends TestCase
             ],
         ];
     }
-//
-//
-//    /**
-//     * @dataProvider providerBody
-//     *
-//     * @param string $input
-//     * @param string $expected
-//     * @throws \PHPUnit\Framework\ExpectationFailedException
-//     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
-//     */
-//    public function testSimple(string $input, string $expected): void
-//    {
-//
-//        /* Substitute this with a spec pattern or other conditional
-//         */
-//        $outcome = false;
-//
-//        if (is_numeric($input)) {
-//            $outcome = true;
-//        }
-//
-//        /* There are other assertions that you can try (ctrl-click to follow)
-//         */
-//        $this->assertEquals($expected, $outcome);
-//    }
-//
-//    /**
-//     * Data provider for testSimple
-//     *
-//     * @return array
-//     */
-//    public function providerBody(): array
-//    {
-//        return [
-//
-//        ];
-//    }
+
+
+    /**
+     * @dataProvider providerBody
+     *
+     * @param string $input
+     * @param array  $replacements
+     * @param string $expected
+     * @throws \PHPUnit\Framework\ExpectationFailedException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     */
+    public function testSimple(string $input, array $replacements, string $expected): void
+    {
+        $outcome = (new Simple())->replace($input, $replacements);
+
+        $this->assertEquals($expected, $outcome);
+    }
+
+    /**
+     * Data provider for testSimple
+     *
+     * @return array
+     */
+    public function providerBody(): array
+    {
+        return [
+            'Replacement: No Tokens' => [
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+                [],
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane."
+            ],
+
+            'Replacement: One token, start' => [
+                "[firstname]. a list of the cargo carried by a ship, made for the use of 
+                various agents and [firstname] at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+                [
+                    '[firstname]' => 'John'
+                ],
+                "John. a list of the cargo carried by a ship, made for the use of 
+                various agents and John at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane."
+            ],
+
+            'Replacement: One token, middle' => [
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and [firstname] at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+                [
+                    '[firstname]' => 'John'
+                ],
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and John at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane."
+            ],
+
+            'Replacement: One token, end' => [
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and blah at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.[firstname]",
+                [
+                    '[firstname]' => 'John'
+                ],
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and blah at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.John",
+            ],
+
+            'Replacement: Multiple tokens' => [
+                "[token1]. a list of the cargo carried [token4] a ship, made for the use of 
+                various agents and [firstname] at the ports of destination. a [token3] or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or [token2] carried on an airplane.[lastname]",
+                [
+                    '[token1]' => 'Robert',
+                    '[token4]' => 'En taro Adun',
+                    '[firstname]' => 'my life for Aiur',
+                    '[token3]' => 'You need to build additional pylons',
+                    '[token2]' => 'Explorer reporting!',
+                    '[lastname]' => 'cat'
+                ],
+                "Robert. a list of the cargo carried En taro Adun a ship, made for the use of 
+                various agents and my life for Aiur at the ports of destination. a You need to build additional pylons or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or Explorer reporting! carried on an airplane.cat"
+            ],
+
+            'Replacement: Multiple tokens duplicated' => [
+                "[token1]. a list of the cargo carried [token4] a ship, made for the use of 
+                various agents and [firstname] at the ports of [token4]. a [token3] or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or [firstname] carried on an airplane.[firstname]",
+                [
+                    '[token1]' => 'Robert',
+                    '[token4]' => 'En taro Adun',
+                    '[firstname]' => 'my life for Aiur',
+                    '[token3]' => 'You need to build additional pylons',
+                ],
+                "Robert. a list of the cargo carried En taro Adun a ship, made for the use of 
+                various agents and my life for Aiur at the ports of En taro Adun. a You need to build additional pylons or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or my life for Aiur carried on an airplane.my life for Aiur",
+            ],
+
+            'Replacement: Multiple tokens duplicated, misc characters' => [
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or [firstname   ] carried on an airplane.[firstname]",
+                [
+                    '[tok@#%*(&en1]' => 'Liara',
+                    '[__918]' => 'Shepard',
+                    '[[[[fox]' => 'Wrex',
+                    '[.cat]' => 'Grunt',
+                    '[   token3]' => 'Garrus',
+                    '[firstname   ]' => 'Tali',
+                    '[firstname]' => 'someone else might have gotten it wrong'
+                ],
+                "Liara. a list of the cargo carried Shepard a ship, made for the use of 
+                various agents and Wrex at the ports of Grunt. a Garrus or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or Tali carried on an airplane.someone else might have gotten it wrong",
+            ],
+        ];
+    }
 }
