@@ -330,15 +330,16 @@ export default {
             return "?" + new URLSearchParams(emptyQueryString).toString();
         },
 
+
         /**
          * Renders an expiry date, in the long date display format.
          *
          * @param {Date|null} date
-         * @returns {string}
+         * @returns {String}
          */
         renderExpiryDate(date) {
             return moment(date).format(this.expiryDateFormat);
-        }
+        },
     },
 }
 </script>
@@ -457,7 +458,7 @@ export default {
                     Award Achievement
                 </template>
                 <template v-slot:expiryMessage="slotProps">
-                    <p class="meta" v-if="currentBadge.achievementExpiry">
+                    <p class="meta" v-if="slotProps.expiryDate">
                         <template v-if="expiryDateFormat">
                             This achievement will expire in {{ slotProps.expiryLabel }},
                             on {{ renderExpiryDate(slotProps.expiryDate) }}.

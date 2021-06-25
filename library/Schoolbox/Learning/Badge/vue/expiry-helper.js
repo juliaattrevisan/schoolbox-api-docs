@@ -1,3 +1,7 @@
+/**
+ * Constants and functions for helping with badge expiry dates.
+ */
+
 export const EXPIRY_NEVER = null;
 export const EXPIRY_DAY = 1;
 export const EXPIRY_WEEK = 7;
@@ -59,7 +63,7 @@ export function translateExpiryToLabel(expiry) {
  * @returns {Date|null}
  */
 export function calculateExpiryDate(expiry, fromDate) {
-    if (expiry === null) {
+    if (expiry === EXPIRY_NEVER) {
         return null;
     }
     let date = fromDate instanceof Date ? new Date(fromDate.getTime()) : new Date();
