@@ -138,7 +138,7 @@ Data:
     <div class="row">
         {% if hscRankData %}
         <div class="column small-12">
-            {% include '@tigsSubjectReport/components/hscAssessmentRank.twig' with hscRankData|merge(extraComponentData) only %}
+            {% include '@tigsSubjectReport/bundle/hscAssessmentRank.twig' with hscRankData|merge(extraComponentData) only %}
         </div>
         {% endif %}
 
@@ -154,7 +154,7 @@ Data:
             <div class="column small-12 medium-6 nesa">
                 <div class="semester-{{ semester }}">
                 <h2 class="subheader">NESA Grade (Semester {{ semester }})</h2>
-                    {% include '@tigsSubjectReport/components/nesaScoreGraph.twig' with nesaGraphDatum|merge(extraComponentData) only %}
+                    {% include '@tigsSubjectReport/bundle/nesaScoreGraph.twig' with nesaGraphDatum|merge(extraComponentData) only %}
                 </div>
             </div>
             {% endfor %}
@@ -183,12 +183,12 @@ Data:
                         <div class="small-12 medium-4 columns">
                             {# Middle Years Task Marks #}
                             {% if middleYearsTaskMarks.data is defined and middleYearsTaskMarks.data[unitSpecId] is defined %}
-                                {% include '@tigsSubjectReport/components/middleYearsTaskMarks.twig' with middleYearsTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
+                                {% include '@tigsSubjectReport/bundle/middleYearsTaskMarks.twig' with middleYearsTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
                             {% endif %}
 
                             {# Were we given HSC Task Marks data for this unit? #}
                             {% if hscTaskMarks.data is defined and hscTaskMarks.data[unitSpecId] is defined %}
-                                {% include '@tigsSubjectReport/components/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
+                                {% include '@tigsSubjectReport/bundle/hscTaskMarks.twig' with hscTaskMarks.data[unitSpecId]|merge(extraComponentData) only %}
                             {% endif %}
                         </div>
                         <div class="small-12 medium-8 columns">
@@ -215,17 +215,17 @@ Data:
                 <div class="small-12 columns">
                     {# Were we given AAS data for this unit? #}
 {#                    {% if aasData.data is defined and aasData.data[unitSpecId] is defined %}#}
-{#                        {% include '@tigsSubjectReport/components/academicAchievementSummary.twig' with aasData.data[unitSpecId]|merge(extraComponentData) only %}#}
+{#                        {% include '@tigsSubjectReport/bundle/academicAchievementSummary.twig' with aasData.data[unitSpecId]|merge(extraComponentData) only %}#}
 {#                    {% endif %}#}
 
                     {# Were we given AAM data for this unit? #}
                     {% if aamData.data is defined and aamData.data[unitSpecId] is defined %}
-                        {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with aamData.data[unitSpecId]|merge(extraComponentData) only %}
+                        {% include '@tigsSubjectReport/bundle/academicAchievementMatrix.twig' with aamData.data[unitSpecId]|merge(extraComponentData) only %}
                     {% endif %}
 
                     {# Were we given HSC Task Marks data for this unit? This mark shares the same twig as AAM #}
                     {% if hscTaskMatrix.data is defined and hscTaskMatrix.data[unitSpecId] is defined %}
-                        {% include '@tigsSubjectReport/components/academicAchievementMatrix.twig' with hscTaskMatrix.data[unitSpecId]|merge(extraComponentData) only %}
+                        {% include '@tigsSubjectReport/bundle/academicAchievementMatrix.twig' with hscTaskMatrix.data[unitSpecId]|merge(extraComponentData) only %}
                     {% endif %}
                 </div>
             </div>

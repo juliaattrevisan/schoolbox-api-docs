@@ -108,7 +108,7 @@ module.exports = {
             './www/static/js/alaress-datetime-picker/alaress-datetime-modal.js',
 
             // This is a Webpack-built module for strtotime
-            './www/static/js/strtotime.bundle.js',
+            './www/static/js/strtotime.js',
 
             // Allow deference of form submit actions
             './www/static/js/jquery.stallSubmit.js',

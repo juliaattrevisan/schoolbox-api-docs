@@ -565,7 +565,7 @@
                         :encoded-segments='{{ encodedSegments|json_encode|raw }}'
                     />
                 </fieldset>
-                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/components/newsItemAudienceSelect.bundle.js"></script>
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemAudienceSelect.js"></script>
 
                 {# Only news moderator or superuser can change this setting
                  # This prevents teachers getting over eager about their content
@@ -626,7 +626,7 @@
                             locale-news="{{ locale.news }}"
                         />
                     </div>
-                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/components/newsItemFormActions.bundle.js"></script>
+                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemFormActions.js"></script>
                 </div>
             </div>
         </form>
