@@ -253,10 +253,9 @@ class Module extends BaseModule
             if (!isset($student, $response)) {
                 throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
             }
-        }
-        /* Otherwise spawn a floating feedback instead
-         */
-        elseif ($params['studentId']) {
+        } elseif ($params['studentId']) {
+            /* Otherwise spawn a floating feedback instead
+             */
             try {
                 $response = null;
                 $student  = \Schoolbox\UserMapper::getInstance()->findById($params['studentId']);
