@@ -12,7 +12,7 @@ module.exports = {
 
             // jQuery Validation
             './node_modules/jquery-validation/dist/jquery.validate.js',
-            './www/static/js/jquery.alaressValidate.js',
+            './www/static/js/form/jquery.alaressValidate.js',
 
             // jQuery UI
             // dependencies
