@@ -226,7 +226,7 @@
          * Template's current value is empty string
          */
         subtypeDropdown.on('change', function(event) {
-            init(null, $(this).val());
+            init(null, subtypeDropdown.val());
         });
 
         /* If subtypeId == null, look at the parent typeId. load its template
@@ -234,7 +234,7 @@
          * Type template or if the General Template's current value is empty string
          */
         typeDropdown.on('change', function(event) {
-            init($(this).val(), subtypeDropdown.val());
+            init(typeDropdown.val(), subtypeDropdown.val());
         });
 
         /* Also Initialise upon load
