@@ -281,20 +281,22 @@ class ArticleResolver implements IArticleResolver
         Collection $relatedAttributes,
         User $user
     ): array {
-        $pb = new Predicate\Builder($this->db->getQuoter(), '');
+        $tableAlias = 'simple';
+        $pb         = new Predicate\Builder($this->db->getQuoter(), '');
         foreach ($selfAttributes as $entityType => $entityValues) {
-            $pb->all($this->buildPredicate('simple', Model::RELATIONSHIP_SELF, $entityType, $entityValues));
+            $pb->all($this->buildPredicate($tableAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues));
         }
         $relationship = $this->getRelationshipModifier($user);
         foreach ($relatedAttributes as $entityType => $entityValues) {
             // If we had $relatedAttributes, we can assume here that $relationship is non-null
-            $pb->all($this->buildPredicate('simple', $relationship, $entityType, $entityValues));
+            $pb->all($this->buildPredicate($tableAlias, $relationship, $entityType, $entityValues));
         }
 
         $sql = "
-            SELECT comms_news_article_id
-            FROM comms_news_audience simple
-            WHERE {$pb->getWhereUnion()}
+            SELECT     cna.id
+            FROM       comms_news_audience {$tableAlias}
+            INNER JOIN comms_news_article cna ON {$tableAlias}.comms_news_article_id = cna.id
+            WHERE      {$pb->getWhereUnion()}
         ";
         return [$sql, $pb->getParams()];
     }
@@ -338,9 +340,10 @@ class ArticleResolver implements IArticleResolver
 
 
         $sql = "
-            SELECT comms_news_article_id
-            FROM comms_news_audience_complex {$tableAlias}
-            WHERE {$pb->getWhereIntersect()}
+            SELECT     cna.id
+            FROM       comms_news_audience_complex {$tableAlias}
+            INNER JOIN comms_news_article cna ON {$tableAlias}.comms_news_article_id = cna.id
+            WHERE      {$pb->getWhereIntersect()}
         ";
 
         return [$sql, $pb->getParams()];
