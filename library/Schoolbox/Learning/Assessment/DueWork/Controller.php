@@ -52,7 +52,6 @@ use Schoolbox\Learning\Assessment\DueWork\Response\Model as Submission;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradableWithResponse;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfReflectionWithResponse;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantMapper;
@@ -189,7 +188,7 @@ class Controller extends Assessment\Controller
         foreach ($assessment->getAllParticipants() as $participant) {
             // Iterate all feedbacks
             foreach ($participant->getAllFeedbacks() as $feedback) {
-                if ($feedback instanceof Feedback && $feedback->isPublished()) {
+                if ($feedback instanceof Feedback\Model && $feedback->isPublished()) {
                     return true;
                 }
             }
