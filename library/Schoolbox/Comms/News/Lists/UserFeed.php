@@ -47,15 +47,14 @@ class UserFeed
      * * approved article
      * * is in article audience
      *
-     * Optionally filters to a topic
-     *
-     * @param User        $user
+     * @param User     $user
+     * @param int|null $state If provided, find only articles in this state
      * @return array
      * @throws InvalidColumnException
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    public function find(User $user): array
+    public function find(User $user, ?int $state): array
     {
         return array_unique(
             array_merge(

@@ -876,7 +876,7 @@ class Controller extends Base
         $this->assertValidTopic($topicSlug);
 
         $userFeed   = new UserFeed($this->newsMapper, $this->articleResolver);
-        $articleIds = $userFeed->find($this->getUser());
+        $articleIds = $userFeed->find($this->getUser(), Model::STATE_PUBLISHED);
 
         $commentCounts = [];
         $attachmentCounts = [];
