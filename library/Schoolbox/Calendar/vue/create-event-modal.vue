@@ -138,6 +138,9 @@ export default {
          * @param loading
          */
         onSearch(query, loading) {
+            if (query.length < 3) {
+                return;
+            }
             loading(true);
             this.search(loading, query, this);
         },
@@ -235,7 +238,16 @@ export default {
 
                         <template v-if="canInvite">
                             <label>Invite Guests</label>
-                            <v-select class="schoolbox-vue-selectize" :options="options" :clear-search-on-blur="function(clearSearchOnSelect, multiple) { return true; }" :clear-search-on-select="false" :close-on-select="false" multiple @search="onSearch" label="name" placeholder="Search for people to invite" v-model="selected">
+                            <v-select class="schoolbox-vue-selectize"
+                                      :options="options"
+                                      :clear-search-on-blur="function() { return true; }"
+                                      :clear-search-on-select="true"
+                                      :close-on-select="false"
+                                      multiple
+                                      @search="onSearch"
+                                      label="name"
+                                      placeholder="Search for people to invite"
+                                      v-model="selected">
                                 <template slot="option" slot-scope="option">
                                     <span class="d-center">
                                         {{ option.name }}
