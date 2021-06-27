@@ -126,6 +126,9 @@ export default {
          * @param loading
          */
         onSearch(query, loading) {
+            if (query.length < 3) {
+                return;
+            }
             loading(true);
             this.search(loading, query, this);
         },
@@ -219,7 +222,16 @@ export default {
                 </div>
             </div>
 
-            <v-select class="schoolbox-vue-selectize" :options="options" multiple @search="onSearch" label="name" placeholder="Search for users to remove goal from" v-model="selected">
+            <v-select class="schoolbox-vue-selectize"
+                      :options="options"
+                      :clear-search-on-blur="function() { return true; }"
+                      :clear-search-on-select="true"
+                      :close-on-select="false"
+                      multiple
+                      @search="onSearch"
+                      label="name"
+                      placeholder="Search for users to remove goal from"
+                      v-model="selected">
                 <template slot="option" slot-scope="option">
                     <div class="d-center">
                         {{ option.name }}
