@@ -14,6 +14,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\Collection;
 use Schoolbox\Comms\News\Audience\ArticleResolver;
 use Schoolbox\Comms\News\Audience\Segment;
+use Schoolbox\Comms\News\Model;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access;
@@ -184,8 +185,9 @@ class Result extends Base
         );
 
         /* Is $user in the audience of the article?
+         * (I assume that this should fetch only public articles?)
          */
-        $articleIds = $articleResolver->findArticlesForUser($user);
+        $articleIds = $articleResolver->findArticlesForUser($user, Model::STATE_PUBLIC);
 
         /* Does $user have the News Moderator service permission?
          */

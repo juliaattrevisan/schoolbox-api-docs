@@ -18,10 +18,12 @@ interface IArticleResolver
     /**
      * Return the set of ids of articles whose audience contains this user
      *
-     * @param User $user
+     * @param User     $user
+     * @param int|null $state If provided, find only IDs of articles in this
+     *                        state
      * @return int[]
      */
-    public function findArticlesForUser(User $user): array;
+    public function findArticlesForUser(User $user, ?int $state): array;
 
 
     /**

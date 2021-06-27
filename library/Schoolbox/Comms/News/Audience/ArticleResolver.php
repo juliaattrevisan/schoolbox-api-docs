@@ -102,7 +102,9 @@ class ArticleResolver implements IArticleResolver
     /**
      * Returns the set of articles whose audience contains the specified user
      *
-     * @param User $user
+     * @param User     $user
+     * @param int|null $state If provided, find only IDs of articles in this
+     *                        state
      * @return int[]
      * @throws UnderflowException
      * @throws InvalidColumnException
@@ -110,7 +112,7 @@ class ArticleResolver implements IArticleResolver
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function findArticlesForUser(User $user): array
+    public function findArticlesForUser(User $user, ?int $state): array
     {
         /* Business Rules + Algorithm:
          * * An articles is targeted to 0:N audience segments.
