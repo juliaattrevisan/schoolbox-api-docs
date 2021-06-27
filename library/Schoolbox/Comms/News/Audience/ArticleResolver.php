@@ -160,13 +160,13 @@ class ArticleResolver implements IArticleResolver
         $subQueries = [];
 
         // We always need the simple subquery
-        [$sqlSimple, $params] = $this->generateSimpleSubquery($selfAttributes, $relatedAttributes, $user);
+        [$sqlSimple, $params] = $this->generateSimpleSubquery($selfAttributes, $relatedAttributes, $user, $state);
         $subQueries[] = $sqlSimple;
 
         // We can avoid the sub-query in the unlikely case the system is configured to not permit targeting
         // to 'self', as that is the implicit relationship modifier of all complex audiences segments.
         if ($selfAttributes->count()) {
-            [$sqlComplex, $paramsComplex] = $this->generateComplexSubquery($selfAttributes);
+            [$sqlComplex, $paramsComplex] = $this->generateComplexSubquery($selfAttributes, $state);
             $subQueries[] = $sqlComplex;
             $params       = array_merge($params, $paramsComplex);
         }
@@ -274,6 +274,7 @@ class ArticleResolver implements IArticleResolver
      * @param Collection|string[][]|null[][] $selfAttributes
      * @param Collection|string[][]|null[][] $relatedAttributes
      * @param User                           $user
+     * @param int|null                       $state
      * @return array
      * @throws InvalidColumnException
      * @throws UnderflowException
@@ -281,7 +282,8 @@ class ArticleResolver implements IArticleResolver
     private function generateSimpleSubquery(
         Collection $selfAttributes,
         Collection $relatedAttributes,
-        User $user
+        User $user,
+        ?int $state
     ): array {
         $tableAlias = 'simple';
         $pb         = new Predicate\Builder($this->db->getQuoter(), '');
@@ -308,11 +310,12 @@ class ArticleResolver implements IArticleResolver
      * Returns a query suitable for matching complex audience segments
      *
      * @param Collection|string[][]|null[][] $selfAttributes
+     * @param int|null                       $state
      * @return array
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function generateComplexSubquery(Collection $selfAttributes): array
+    private function generateComplexSubquery(Collection $selfAttributes, ?int $state): array
     {
         $tableAlias = 'complex';
         $pb1        = new Predicate\Builder($this->db->getQuoter(), '');
