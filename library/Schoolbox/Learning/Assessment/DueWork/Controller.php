@@ -176,7 +176,7 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Determine if there are any submission files available for download on the assessment
+     * Determine if there are any submission files or feedback available for download on the assessment
      * @param IAssessable $assessment
      * @return bool
      */
@@ -186,8 +186,14 @@ class Controller extends Assessment\Controller
 
         /** @var Participant $participant */
         foreach ($assessment->getAllParticipants() as $participant) {
-            // Iterate all their responses
+            // Iterate all feedbacks
+            foreach ($participant->getAllFeedbacks() as $feedback) {
+                if ($feedback instanceof Feedback\Model && $feedback->isPublished()) {
+                    return true;
+                }
+            }
 
+            // Iterate all their responses
             /** @var Submission $response */
             foreach ($participant->getAllResponses() as $response) {
                 // If the response is a submission...
