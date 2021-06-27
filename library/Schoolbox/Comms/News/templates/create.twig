@@ -444,7 +444,7 @@
         }
         return null;
     };
-    
+
     // Audience audienceSelectize where user can search for simple audience segments. The first is the jQuery DOM wrapper, the latter the Selecize plugin.
     /** @param {jQuery} $audienceSelectize */
     var $audienceSelectize;
@@ -553,16 +553,16 @@
                         {% include 'sub/attachzone.twig' with { attachzone: fileZone } %}
                     </div>
                 </fieldset>
-                
+
                 <fieldset class="content" id="audience-select-container">
-                    <news-item-audience-select 
+                    <news-item-audience-select
                         audience-browser-search-url="{{ routeLookup('commsNewsAudienceBrowser.getSearch') }}"
                         :audience-is-read-only="{{ audienceIsReadOnly ? 'true' : 'false' }}"
                         locale-news="{{ locale.news }}"
                         reject-route="{{ rejectRoute is defined ? rejectRoute : '' }}"
                         :article="{{ article | json_encode }}"
                         audience-placeholder="{{ audiencePlaceholder }}"
-                        :encoded-segments='{{ encodedSegments|json_encode|raw }}'
+                        :encoded-segments="{{ encodedSegments | json_encode }}"
                     />
                 </fieldset>
                 <script type="text/javascript" src="{{ CDN_PREFIX }}/javascript/components/newsItemAudienceSelect.bundle.js"></script>
@@ -615,7 +615,7 @@
             <div class="row">
                 <div class="small-12 columns">
                     <div id="create-form-actions">
-                        <news-item-form-actions 
+                        <news-item-form-actions
                             :initial-article-id="{{ article.id ?? '0' }}"
                             initial-approve-route="{{ approveRoute ?? '' }}"
                             :global-moderation="{{ config.global_moderation ? 'true' : 'false' }}"
