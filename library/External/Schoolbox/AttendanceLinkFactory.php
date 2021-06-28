@@ -27,7 +27,7 @@ class External_Schoolbox_AttendanceLinkFactory
     public function produce(?string $dataSource): External_AttendanceLinkInterface
     {
         if (Factory::TASS_API === $dataSource) {
-            return new \Schoolbox\External\Connector\TassApi\Base\Endpoint\AttendanceLink();
+            return new \External_Tass_AttendanceLink();
         }
 
         /* Default to Offline mode

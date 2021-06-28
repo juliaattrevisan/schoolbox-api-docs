@@ -89,6 +89,8 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
          */
         $this->attendanceLink = (new External_Schoolbox_AttendanceLinkFactory())
             ->produce($config->get('schooldata_import_data_source'));
+
+        $this->attendanceLink->init($config, $isStaff);
     }
 
 
