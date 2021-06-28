@@ -13,7 +13,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -36,6 +35,34 @@ class Profile implements IStrategy
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
     private const MAX_EMERGENCY_CONTACTS = 3;
+
+
+    /**
+     * Staff Category strings; they can be renamed to whatever you prefer
+     */
+    private const TEACHING_STAFF = 'Teaching Staff';
+    private const NON_TEACHING_STAFF = 'Non-Teaching Staff';
+
+
+    /**
+     * A string corresponding to a record that is considered Active
+     */
+    private const ACTIVE = 'Active';
+
+
+    /**
+     * These strings represent Boarders
+     *
+     * I'm not sure what the difference is between a Part Time boarder
+     * and a Weekday boarder, exactly...
+     *
+     * It seems like Part Time boarder might be someone who does everything
+     * except sleep at school 5 days a week.
+     *
+     * A Weekday boarder might be like a full time boarder but only
+     * for 5 days a week; they go home on weekends.
+     */
+    private const BOARDERS = ['Full Time', 'Part Time', 'Weekday'];
 
 
     /**
@@ -89,6 +116,22 @@ class Profile implements IStrategy
 
 
     /**
+     * Used for api calls
+     *
+     * @var string
+     */
+    private string $lBound;
+
+
+    /**
+     * Used for api calls
+     *
+     * @var string
+     */
+    private string $uBound;
+
+
+    /**
      * Profile constructor.
      *
      * @param LoggerInterface                 $log
@@ -119,27 +162,39 @@ class Profile implements IStrategy
         $this->parentProfileMapper = $parentProfileMapper;
         $this->staffProfileMapper = $staffProfileMapper;
         $this->relationshipMapper = $relationshipMapper;
+
+        /* Data is obtained daily; remember lower and upper bound values
+         * for api calls. It needs to be in a specific format so might
+         * as well remember that
+         */
+        $this->lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
+        $this->uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
     }
 
 
     /**
      * Import user profile data into sis_user_profile*
+     *
+     * @throws Exception
+     * @throws Mapper\DefinitionException
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \InvalidArgumentException
      */
     public function import(): void
     {
-
         /* Import students' profile data
          * Import their specific parents' profile data
          */
         $this->log->info('Processing students and their parents.');
 
         $this->importStudents();
-//
-//        /* Import staff profile data
-//         */
-//        $this->log->info('Processing staff.');
-//
-//        $this->importStaff();
+
+        /* Import staff profile data
+         */
+        $this->log->info('Processing staff.');
+
+        $this->importStaff();
     }
 
 
@@ -154,33 +209,30 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        $lBound = \Alaress_Date_Format::now()->startOfDay()->getUsingFormat('c');
-        $uBound = \Alaress_Date_Format::now()->endOfDay()->getUsingFormat('c');
-
         /* Shank all the parents active today
          */
         $this->log->info(sprintf(
             'Downloading parents active between %s and %s...',
-            $lBound,
-            $uBound
+            $this->lBound,
+            $this->uBound
         ));
 
         /* Save them into a hash lookup because compass guids are used to
          * identify parents and this is will be a fast way to get them
          */
-        $families = (new Families($this->api))->generate($lBound, $uBound);
+        $families = (new Families($this->api))->generate($this->lBound, $this->uBound);
 
         $this->log->info(sprintf(
             'Downloading students active between %s and %s...',
-            $lBound,
-            $uBound
+            $this->lBound,
+            $this->uBound
         ));
 
         /* Shank all the students active today
          */
         $students = $this->api->retrieveDocument('person/v1/GetStudents', [
-            'lBound' => $lBound,
-            'uBound' => $uBound
+            'lBound' => $this->lBound,
+            'uBound' => $this->uBound
         ]);
 
         foreach ($students['d'] as $student) {
@@ -318,7 +370,7 @@ class Profile implements IStrategy
                 ->setAlertComment(null)
                 ->setAlertLegal(null)
                 ->setAlertMedical($medical)
-                ->setAlertMessage($messages)
+                ->setAlertMessage(null)
                 ->setCampusName($campusName)
                 ->setEmail($email)
                 ->setEnrolmentDate($enrolment)
@@ -419,9 +471,7 @@ class Profile implements IStrategy
          * Commonality:                 wyndhamchristiancollege-integration
          */
         foreach ($importIdentifiers as $importIdentifier) {
-            $studentSchool = explode('.', $importIdentifier['school'])[0];
-
-            if (strpos($this->api->getHost(), $studentSchool) > -1) {
+            if ($this->matchesHost($importIdentifier['school'])) {
                 return $importIdentifier['importIdentifier'];
             }
         }
@@ -447,21 +497,9 @@ class Profile implements IStrategy
          *
          * I guess they're gonna return true, too
          */
-        $boarders = ['Full Time', 'Part Time', 'Weekday'];
+        $boarderType = $this->findDetailsField($studentDetails, 'boarderType');
 
-        foreach ($studentDetails as $studentDetail) {
-            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
-
-            if (strpos($this->api->getHost(), $studentSchool) > -1) {
-                if ('Active' === $studentDetail['status']) {
-                    if (in_array($studentDetail['boarderType'], $boarders, true)) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
+        return in_array($boarderType, self::BOARDERS, true);
     }
 
 
@@ -480,17 +518,7 @@ class Profile implements IStrategy
          *  so for now, just provide the first active guid corresponding to the current host
          *  (UPS can assign arbitrarily based on this guid)
          */
-        foreach ($organisationMilestones as $organisationMilestone) {
-            $studentSchool = explode('.', $organisationMilestone['organisationName'])[0];
-
-            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if (strpos($this->api->getHost(), $studentSchool) > -1) {
-                    return $organisationMilestone['homeCampus'];
-                }
-            }
-        }
-
-        return null;
+        return $this->findOrganisationMilestoneField($organisationMilestones, 'homeCampus');
     }
 
 
@@ -519,17 +547,80 @@ class Profile implements IStrategy
      */
     private function findEmail(array $studentDetails): ?string
     {
-        foreach ($studentDetails as $studentDetail) {
-            $studentSchool = explode('.', $studentDetail['organisationName'])[0];
+        return $this->findDetailsField($studentDetails, 'organisationUserEmail');
+    }
 
-            if (strpos($this->api->getHost(), $studentSchool) > -1) {
-                if ('Active' === $studentDetail['status']) {
-                    return $studentDetail['organisationUserEmail'];
-                }
+
+    /**
+     * Find the value of $field in the set of details $details
+     * This iterates to find the first Active record that corresponds
+     * to the current instance and organisationName
+     *
+     * @param array  $details
+     * @param string $field
+     * @return string|null
+     */
+    private function findDetailsField(array $details, string $field): ?string
+    {
+        foreach ($details as $detail) {
+            if ($this->isActiveDetailsField($detail)) {
+                return (string)$detail[$field];
             }
         }
 
         return null;
+    }
+
+
+    /**
+     * Find the value of $field in the set of details $details
+     * This iterates to find the first Active record that corresponds
+     * to the current instance and organisationName
+     *
+     * Returns an array because sometimes that's what's in the details set
+     *
+     * @param array  $details
+     * @param string $field
+     * @return array|null
+     */
+    private function findDetailsFieldArray(array $details, string $field): ?array
+    {
+        foreach ($details as $detail) {
+            if ($this->isActiveDetailsField($detail)) {
+                return $detail[$field];
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * Decide if $organisation matches the endpoint host in suds
+     * This is how we identify records shared across multiple schools
+     *
+     * @param string $organisationName
+     * @return bool
+     */
+    private function matchesHost(string $organisationName): bool
+    {
+        $school = explode('.', $organisationName)[0];
+
+        return strpos($this->api->getHost(), $school) > -1;
+    }
+
+
+    /**
+     * Decide if one of the records in studentDetails, parentDetails
+     * or staffDetails is Active based on its status field and also
+     * if it corresponds to the current host
+     *
+     * @param array $detail
+     * @return bool
+     */
+    private function isActiveDetailsField(array $detail): bool
+    {
+        return $this->matchesHost($detail['organisationName']) && self::ACTIVE === $detail['status'];
     }
 
 
@@ -671,9 +762,11 @@ class Profile implements IStrategy
     private function findOrganisationMilestoneField(array $organisationMilestones, string $field): ?string
     {
         foreach ($organisationMilestones as $organisationMilestone) {
-            if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
-                if ('' !== trim((string)$organisationMilestone[$field])) {
-                    return $organisationMilestone[$field];
+            if ($this->matchesHost($organisationMilestone['organisationName'])) {
+                if ((int)$organisationMilestone['isActive'] && (int)$organisationMilestone['isCurrent']) {
+                    if ('' !== trim((string)$organisationMilestone[$field])) {
+                        return $organisationMilestone[$field];
+                    }
                 }
             }
         }
@@ -844,89 +937,146 @@ class Profile implements IStrategy
             }
         }
     }
-//
-//
-//    /**
-//     * Import staff profile data
-//     */
-//    private function importStaff(): void
-//    {
-//        $staffs = [];
-//
-//        foreach ($staffs as $staff) {
-//            /* TODO Fill in basic staff vars
-//             */
-//            $externalId = '';
-//
-//            $firstname = '';
-//            $lastname = '';
-//            $building = '';
-//            $campusName = '';
-//            $category = '';
-//            $department = '';
-//            $email = '';
-//            $phone = '';
-//            $positionTitle = '';
-//            $room = '';
-//            $title = '';
-//            $username = '';
-//
-//            /* Find out if this externalId already has a staff profile
-//             * If one already exists, load it, update it, then save it
-//             * Otherwise make a new one for the given id
-//             */
-//            try {
-//                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
-//                $staffBaseProfile = $staffProfile->getBaseProfile();
-//            } catch (Exception $e) {
-//                $staffProfile = $this->staffProfileMapper->createModel();
-//                $staffBaseProfile = $this->baseProfileMapper->createModel();
-//
-//                $staffProfile->setBaseProfile($staffBaseProfile);
-//            }
-//
-//            $staffBaseProfile
-//                ->setExternalId($externalId)
-//                ->setTitle($title)
-//                ->setFirstname($firstname)
-//                ->setLastname($lastname);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding base profile for %s',
-//                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->baseProfileMapper->save($staffBaseProfile);
-//            }
-//
-//            $staffProfile
-//                ->setBuilding($building)
-//                ->setCampusName($campusName)
-//                ->setCategory($category)
-//                ->setDepartment($department)
-//                ->setEmail($email)
-//                ->setPhone($phone)
-//                ->setPositionTitle($positionTitle)
-//                ->setRoom($room)
-//                ->setUsername($username);
-//
-//            /* Log it
-//             */
-//            $this->log->info(sprintf(
-//                'Adding staff profile for %s',
-//                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
-//            ));
-//
-//            /* Then save it
-//             */
-//            if ($this->perform) {
-//                $this->staffProfileMapper->save($staffProfile);
-//            }
-//        }
-//    }
+
+
+    /**
+     * Import staff profile data
+     */
+    private function importStaff(): void
+    {
+        /* Shank all the staff active today
+         */
+        $this->log->info(sprintf(
+            'Downloading staff active between %s and %s...',
+            $this->lBound,
+            $this->uBound
+        ));
+
+        /* Shank all the students active today
+         */
+        $staffs = $this->api->retrieveDocument('person/v1/GetStaff', [
+            'lBound' => $this->lBound,
+            'uBound' => $this->uBound
+        ]);
+
+        foreach ($staffs['d'] as $staff) {
+            $externalId = $this->findExternalId($staff['importIdentifiers']);
+
+            /* Prioritise preferred names over official names
+             */
+            $firstname = (new FirstMeaningfulValue())->find([
+                $staff['preferredFirstName'],
+                $staff['firstName']
+            ]);
+
+            /* Prioritise preferred names over official names
+             */
+            $lastname = (new FirstMeaningfulValue())->find([
+                $staff['preferredLastName'],
+                $staff['lastName']
+            ]);
+
+            /* Haven't encountered data this specific
+             */
+            $building = '';
+            $campusName = '';
+
+            /* I guess I just assume this department for now
+             * Use it to indicate teaching/non teaching staff, I suppose
+             */
+            $category = (int)$this->findDetailsField($staff['staffDetails'], 'isTeachingStaff') ? self::TEACHING_STAFF : self::NON_TEACHING_STAFF;
+
+            /* This seems to be a set of organisationTitles elements
+             */
+            $department = implode(', ', $this->findDetailsFieldArray($staff['staffDetails'], 'organisationTitles'));
+
+            /* TODO Email addresses also exist inside staffDetails and are
+             *  instance-specific...what's the difference between those
+             *  emails and this emailAddress one?
+             *  Which one should take precedence?
+             */
+            $email = $this->findDetailsField($staff['staffDetails'], 'organisationUserEmail');
+
+            /* The "Phone" field in compass ui ends up mapping to homePhoneNumber
+             * so it's actually a generic Phone Number field
+             */
+            $phone = (new FirstMeaningfulValue())->find([
+                $this->findDetailsField($staff['staffDetails'], 'phoneExtension'),
+                $staff['homePhoneNumber'],
+                $staff['mobileNumber']
+            ]);
+
+            $positionTitle = $this->findDetailsField($staff['staffDetails'], 'roleInSchool');
+
+            /* What's Office Location, then?
+             * I can't save anything to it in the compass ui anyway
+             */
+            $room = $this->findDetailsField($staff['staffDetails'], 'room');
+
+            $title = trim((string)$staff['title']);
+            $username = trim((string)$staff['username']);
+
+            /* Find out if this externalId already has a staff profile
+             * If one already exists, load it, update it, then save it
+             * Otherwise make a new one for the given id
+             */
+            try {
+                $staffProfile = $this->staffProfileMapper->findByExternalId($externalId);
+                $staffBaseProfile = $staffProfile->getBaseProfile();
+            } catch (Exception $e) {
+                $staffProfile = $this->staffProfileMapper->createModel();
+
+                try {
+                    $staffBaseProfile = $this->baseProfileMapper->findOneByColumn('external_id', $externalId);
+                } catch (Exception $e) {
+                    $staffBaseProfile = $this->baseProfileMapper->createModel();
+                }
+
+                $staffProfile->setBaseProfile($staffBaseProfile);
+            }
+
+            $staffBaseProfile
+                ->setExternalId($externalId)
+                ->setTitle($title)
+                ->setFirstname($firstname)
+                ->setLastname($lastname);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding base profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->baseProfileMapper->save($staffBaseProfile);
+            }
+
+            $staffProfile
+                ->setBuilding($building)
+                ->setCampusName($campusName)
+                ->setCategory($category)
+                ->setDepartment($department)
+                ->setEmail($email)
+                ->setPhone($phone)
+                ->setPositionTitle($positionTitle)
+                ->setRoom($room)
+                ->setUsername($username);
+
+            /* Log it
+             */
+            $this->log->info(sprintf(
+                'Adding staff profile for %s',
+                trim("{$staffBaseProfile->getFirstname()} {$staffBaseProfile->getLastname()}")
+            ));
+
+            /* Then save it
+             */
+            if ($this->perform) {
+                $this->staffProfileMapper->save($staffProfile);
+            }
+        }
+    }
 }
