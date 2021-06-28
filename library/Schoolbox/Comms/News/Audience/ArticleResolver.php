@@ -329,32 +329,38 @@ class ArticleResolver implements IArticleResolver
     {
         $audienceAlias = 'complex';
         $articleAlias  = 'complex_article';
-        $pb1           = $this->complexMapper->getPredicateBuilder();
-        $pb2           = $this->complexMapper->getPredicateBuilder();
+
+        // All articles must be in one of the complex states.
+        $pb1 = $this->complexMapper->getPredicateBuilder();
+        $pb2 = $this->complexMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
-            $pb1->all($this->buildPredicate(
-                $audienceAlias,
-                null,
-                $entityType,
-                $entityValues,
-                Complex\Mapper::FIELD_ENTITY_TYPE_1,
-                Complex\Mapper::FIELD_ENTITY_VALUE_1
-            ));
-            $pb2->all($this->buildPredicate(
-                $audienceAlias,
-                null,
-                $entityType,
-                $entityValues,
-                Complex\Mapper::FIELD_ENTITY_TYPE_2,
-                Complex\Mapper::FIELD_ENTITY_VALUE_2
-            ));
+            $pb1 = $pb1->all(
+                $this->buildPredicate(
+                    $audienceAlias,
+                    null,
+                    $entityType,
+                    $entityValues,
+                    Complex\Mapper::FIELD_ENTITY_TYPE_1,
+                    Complex\Mapper::FIELD_ENTITY_VALUE_1
+                )
+            );
+            $pb2 = $pb2->all(
+                $this->buildPredicate(
+                    $audienceAlias,
+                    null,
+                    $entityType,
+                    $entityValues,
+                    Complex\Mapper::FIELD_ENTITY_TYPE_2,
+                    Complex\Mapper::FIELD_ENTITY_VALUE_2
+                )
+            );
         }
 
-        $pb = isset($state)
+        // Also: all articles must be in the requested state (if there was one)
+        $pb  = isset($state)
             ? $this->articleMapper->getPredicateForState($state, $articleAlias)
             : $this->articleMapper->getPredicateBuilder();
-        $pb = $pb->any($pb1)->any($pb2);
-
+        $pb  = $pb->any($pb1)->any($pb2);
         $sql = "
             SELECT     {$articleAlias}.id
             FROM       comms_news_audience_complex {$audienceAlias}
