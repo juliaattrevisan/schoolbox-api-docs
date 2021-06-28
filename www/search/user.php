@@ -1,10 +1,14 @@
 <?php
 
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 use Alaress\Color\ColorFactory;
 use Schoolbox\Collection;
 use Alaress\Mail\AbstractMailer;
 use Schoolbox\Config\Loader as ConfigLoader;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -615,6 +619,8 @@ if (is_numeric($this->arg[0])) {
     $config       = ConfigLoader::getInstance();
 
     $user = $userHandler->getByID($this->arg[0]);
+    /** @var \Schoolbox\User $viewer */
+    $viewer = $_SESSION['user'];
 
     if (!is_numeric($user['uid'])) {
         error(31);
@@ -627,10 +633,10 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             UserMapper::getInstance(),
-            new Eportfolio_Authenticator($_SESSION['user'], $user['uid'], 'profile'),
+            new Eportfolio_Authenticator($viewer, $user['uid'], 'profile'),
             $config
         );
-    } elseif ($groupHandler->isStudent($user['uid'])) {
+    } elseif ($groupHandler->isStudent($user['uid']) && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getViewStudentProfile())) {
         renderStudent(
             $this,
             $user,
@@ -639,7 +645,7 @@ if (is_numeric($this->arg[0])) {
             new External_Class(),
             UserMapper::getInstance(),
             FolderMapper::getInstance(),
-            new Eportfolio_Authenticator($_SESSION['user'], $user['uid'], 'profile'),
+            new Eportfolio_Authenticator($viewer, $user['uid'], 'profile'),
             ProfessionalDevelopmentMapper::getInstance(),
             $config
         );
@@ -649,7 +655,7 @@ if (is_numeric($this->arg[0])) {
             $user,
             $synUserHandler,
             UserMapper::getInstance(),
-            new Eportfolio_Authenticator($_SESSION['user'], $user['uid'], 'profile'),
+            new Eportfolio_Authenticator($viewer, $user['uid'], 'profile'),
             $config
         );
     } else {
