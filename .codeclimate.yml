@@ -46,7 +46,7 @@ exclude_patterns:
   - "**/tests/**/*"
   - "test/"
   - "**/Test/**/*"
-  - "javascript/components/"
+  - "javascript/bundle/"
   - "node_modules/"
   - "sql/"
   - "updates/"

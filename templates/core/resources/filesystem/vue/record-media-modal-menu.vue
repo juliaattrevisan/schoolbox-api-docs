@@ -6,7 +6,7 @@
  */
 
 import { gsap } from 'gsap/all';
-import recordMediaTypes from '@shared/record-media/recordMediaTypes';
+import recordMediaTypes from '@js/record-media/recordMediaTypes';
 
 
 export default {
@@ -178,7 +178,7 @@ export default {
 
 <style lang="scss" scoped>
 
-@import '@css/utils/variables';
+@import '@css/foundation/utils/variables';
 
 $font-family-icon: 'schoolbox';
 

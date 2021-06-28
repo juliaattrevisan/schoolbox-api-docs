@@ -10,8 +10,8 @@ Data:
     referrer            string
  #}
 <div id="toast" class="toast"></div>
-<script src="{{ CDN_PREFIX }}/javascript/shared/comms/articletabs.js"></script>
-<script src="{{ CDN_PREFIX }}/javascript/shared/comms/saveforlater.js"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/articletabs.js"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js"></script>
 <script>
     {% set querystringParams = [
         'c=' ~ compactMode,
@@ -39,7 +39,7 @@ Data:
             window.iframely && iframely.load();
 
             /**
-             * Since main.bundle.js is being executed first before VueJS content gets rendered,
+             * Since main.js is being executed first before VueJS content gets rendered,
              * the schoolboxResource_ProxyReplacement is unable to locate the DOM yet.
              * With that for a quick fix, we need to read the DOM when the contents has been loaded and let
              * schoolboxResource_ProxyReplacement do what it's supposed to do.

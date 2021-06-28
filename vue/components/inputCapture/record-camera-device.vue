@@ -8,8 +8,8 @@
 
 import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
-import recordMediaTypes from '@shared/record-media/recordMediaTypes';
-import recordMediaEvents from '@shared/record-media/recordMediaEvents';
+import recordMediaTypes from '@js/record-media/recordMediaTypes';
+import recordMediaEvents from '@js/record-media/recordMediaEvents';
 
 
 export default {

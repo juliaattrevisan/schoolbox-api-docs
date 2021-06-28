@@ -22,7 +22,7 @@ tools/save-data.sh
 www/test
 Vagrantfile
 vagrant*yaml
-www/static/javascript/components/*/node_modules
+www/static/js/bundle/*/node_modules
 .git*
 Gemfile*
 .bowerrc

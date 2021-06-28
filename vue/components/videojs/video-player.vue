@@ -8,7 +8,7 @@
 import 'video.js/dist/video-js.css';
 import videojs from 'video.js';
 import { gsap } from 'gsap/all';
-import { timeout } from '@shared/util/jsUtils';
+import { timeout } from '@js/util/jsUtils';
 
 
 export default {

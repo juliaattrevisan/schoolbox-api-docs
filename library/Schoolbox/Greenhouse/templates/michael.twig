@@ -1,15 +1,207 @@
-<style>
-.content { 
-    width: 600px;
-}
-</style>
+<script src="{{ CDN_PREFIX }}/js/bundle/calendarEventDetails.js"></script>
+<script src="{{ CDN_PREFIX }}/js/badges/jquery.icon-modal.js"></script>
+<script src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/badgeList.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/badgeListForm.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceDetail.js"></script>
+<script src="{{ CDN_PREFIX }}/js/iframe/jquery.responsive-iframe.js"></script>
+<script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
+<script src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.kami-export.js"></script>
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js" type="text/javascript"></script>
+<script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js" type="text/javascript"></script>
+<script src="{{ CDN_PREFIX }}/js/form/jquery.mage.js"></script>
+<script src="{{ CDN_PREFIX }}/js/assessment/validationRules.js"></script>
+<script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+<script src="{{ CDN_PREFIX }}/js/assessment/participation.js"></script>
+<script src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculumSelector.js"></script>
+<script src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js"></script>
+<script src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.js"></script>
+<script src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.mightyList.js"></script>
+<script src="{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageSpecificTotal.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageSpecificSystem.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageSpecificFiletype.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageSpecificFile.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalTotal.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalRole.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalSystem.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalFiletype.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/usageGlobalUser.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/admin/menu.js"></script>
+<script src="{{ CDN_PREFIX }}/js/browser/browser-redirect.js"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/articletabs.js"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/saveforlater.js"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/audience-bricks.js"></script>
+<script src="{{ CDN_PREFIX }}/js/vue/schoolbox-vue.min.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/articleThreads.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/comms/draft.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/articleList.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/visitationListFull.js"></script>
+<script src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/hybridbar.js"></script>
+<script src="{{CDN_PREFIX}}/js/signature/jquery.signaturepad.min.js"></script>
+<script src="{{CDN_PREFIX}}/js/evaluation/type/jquery.signature-pad.js"></script>
+<script src="{{ CDN_PREFIX }}/js/yandex/v1/widget.js"></script>
+<script src="{{CDN_PREFIX}}/js/vendors/swiper/dist/js/swiper.min.js"></script>
+<script src="{{CDN_PREFIX}}/js/gallery/jquery.alaressSlider.js"></script>
+<script src="{{CDN_PREFIX}}/js/submissions/jquery.combobox.js" type="text/javascript"></script>
+<script src="{{CDN_PREFIX}}/js/submissions/jquery.marksheet.js" type="text/javascript"></script>
+<script src="{{CDN_PREFIX}}/js/eportfolio/jquery.eportfolio.js"></script>
+<script src="{{CDN_PREFIX}}/js/playlist/jquery.media-playlist.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/print/jquery.artificial-print.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/timetable/jquery.timetable-resize.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/timetable/jquery.timetable-grid.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/eotc/jquery.eventModify.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/selectize/selectize.min.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/select-all/jquery.select-all.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/eotc/jquery.courseCodes.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/jquery-validation/dist/additional-methods.min.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/form/jquery.warning-length.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/tablesorter/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/form/jquery.ajax-form.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/masonry.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.fileDrop.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/jquery.evaluation-creator.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/jquery.evaluation.validation.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/jquery.evaluation.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/countdown/jquery.countdown.min.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/jquery.alphanumeric.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/jquery.evaluation.countdown.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.richtext.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.radio.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.fillgap.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.short.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.exact.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.numeric.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/promise/jquery.retry-promise.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/browser/jquery.keep-alive.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/jstree/dist/jstree.min.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/jquery.evaluation.review.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/submissions/jquery.context-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/main.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/fullcalendar/schoolbox-fullcalendar.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jscurry-0.3.0.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/math/jqmath-0.4.0.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/attacher/attacher.checkbox-group.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/attacher/attacher.hide-watch.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/collabdoc/jquery.collabdoc.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/google/apiloader.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/recordMediaModal.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/select-all/jquery.select-all.basic.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/vendors/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/number/jquery.number-format.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/server-usage/jquery.server-usage.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/admin/usage/total.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/admin/usage/group.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/admin/usage/type.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/admin/usage/tabulator.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/admin/calendar.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/jquery.evaluation.graphs.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.signature.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/evaluation/type/jquery.evaluation.ranking.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.mage.js"></script>
+<script type="text/javascript" src="//static.clickview.com.au/cv-events-api/1.0.1/cv-events-api.min.js"></script>
+<script type="text/javascript" src="//{CLICKVIEW_URL}/scripts/cv-online.view_player_embedding.js?e=1&i={VIDEO_ID}"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/pinterest/jquery.pinterest.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/chat/chat.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/textbox/availableByCategory.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/clipboard.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/clipboard/jquery.clipboard-selector.js"></script>
+<script type="text/javascript" src="{{CDN_PREFIX}}/js/search/jquery.search.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/highcharts-release/highcharts.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/custom/diocesan/achievementreport/js/schoolgrades/nameGraph.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/custom/diocesan/achievementreport/js/ncea/stackedBar.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/custom/stk/ncea/js/stackedBar.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/fullcalendar-scheduler/dist/scheduler.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/scrollTo/jquery.scrollTo.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/clipboard/jquery.clipboard-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/highcharts-release/highcharts-more.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/progress/overall.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/boxPlot.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/progress/unit.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/effort/scatter.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/learninganalytics/schoolboxTheme.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/tiles/jquery.tile-resize.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.hide-watch.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/masonry.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculumSelector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/checkbox/jquery.select-multi-checkboxes.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/calendarComponent.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/fullCalendar.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/calendar/jquery.eventModify.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/classList.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/upcomingDueWorkCalendar.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.context-selector.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.marksheet.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.ajax-form.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.all-work.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/reportCardBoxplot.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/eportfolio/jquery.eportfolio.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/popup/jquery.toast-timeout.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/evidenceMediaRecording.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.import-feedback.js'></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/course/jquery.course-builder.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.markType-gradingScheme.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jstree/dist/jstree.min.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/course/jquery.course-outline.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/assessmentCalendar.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.blog-commentary.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculum-browser.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/doT/doT.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/curriculum/jquery.curriculum-import.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/attacher/attacher.checkbox-group.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/adminSettingsSearch.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/adminGrades.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/server-usage/jquery.server-usage.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/staleUsersReport.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/clipboard.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.mightyList.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/sportsfixtures/jquery.division-lobby.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/notifications/jquery.msg-config.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsAuthored.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsRssLink.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemAudienceSelect.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemFormActions.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.alaressValidate.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/resourceBookingItemCalendar.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/resourceBookingCategoryCalendar.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/scroll/jquery.infiniscroll.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/promise/jquery.retry-promise.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ups/jquery.ups.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.dynagrade.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.rubric-editable.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/assessment/jquery.sequencer.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/resource/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/resource/jquery.fileDrop.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-resize.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/timetable/jquery.timetable-dashboard.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/textbox/jquery.inlineTextboxEditor.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/apiloader.js"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <div class="row">
     <div class="small-12 island">
         <section class="content">
-            <div id="record-media-modal">
-                <record-media-modal />
-            </div>
-            <script type="text/javascript" src="{{CDN_PREFIX}}/javascript/components/recordMediaModal.bundle.js?v={{ config.site_version }}"></script>
         </section>
     </div>
 </div>

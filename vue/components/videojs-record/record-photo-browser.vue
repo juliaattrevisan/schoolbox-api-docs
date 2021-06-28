@@ -13,11 +13,11 @@ import RecordRTC from 'recordrtc';
 import Record from 'videojs-record/dist/videojs.record.js';
 import RecordedMedia from '@schoolbox/videojs-record/recorded-media';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
-import { getRecordPhotoOptions } from '@shared/videojs/videojsOptions';
-import recordMediaTypes from '@shared/record-media/recordMediaTypes';
-import recordMediaEvents from '@shared/record-media/recordMediaEvents';
-import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@shared/record-media/recordMediaErrors';
-import { dataURLtoBlob } from '@shared/util/fileUtils';
+import { getRecordPhotoOptions } from '@js/videojs/videojsOptions';
+import recordMediaTypes from '@js/record-media/recordMediaTypes';
+import recordMediaEvents from '@js/record-media/recordMediaEvents';
+import { isDeviceAlreadyInUseError, isPermissionDeniedError } from '@js/record-media/recordMediaErrors';
+import { dataURLtoBlob } from '@js/util/fileUtils';
 
 
 export default {

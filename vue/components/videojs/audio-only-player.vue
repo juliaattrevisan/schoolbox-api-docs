@@ -8,7 +8,7 @@
 import 'video.js/dist/video-js.css';
 import 'videojs-wavesurfer/dist/css/videojs.wavesurfer.css'
 import videojs from 'video.js';
-import { timeout } from '@shared/util/jsUtils';
+import { timeout } from '@js/util/jsUtils';
 
 
 export default {

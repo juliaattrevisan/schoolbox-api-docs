@@ -9,11 +9,11 @@ import RecordPhoto from '@schoolbox/record/record-photo';
 import RecordCamera from '@schoolbox/record/record-camera';
 import RecordAudioOnly from '@schoolbox/record/record-audio-only';
 import OverMediaModal from '@schoolbox/videojs-record/over-media-modal';
-import recordMediaTypes from '@shared/record-media/recordMediaTypes';
+import recordMediaTypes from '@js/record-media/recordMediaTypes';
 import axios from 'axios';
 import filesize from 'filesize';
-import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
-import { isOfFileType, convertFilenameExtension } from '@shared/util/fileUtils';
+import { hasDeviceCapture } from '@js/util/featureDetectionUtils';
+import { isOfFileType, convertFilenameExtension } from '@js/util/fileUtils';
 
 
 export default {

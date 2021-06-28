@@ -8,7 +8,7 @@
  */
 
 import AdminSettingsSearchResult from './admin-settings-search-result';
-import { fetchAsJson } from '@shared/fetch/fetch';
+import { fetchAsJson } from '@js/fetch/fetch';
 import { gsap } from 'gsap/all'
 
 export default {

@@ -7,7 +7,7 @@
 
 import RecordPhotoDevice from '@schoolbox/inputCapture/record-photo-device';
 import RecordPhotoBrowser from '@schoolbox/videojs-record/record-photo-browser';
-import { hasDeviceCapture } from '@shared/util/featureDetectionUtils';
+import { hasDeviceCapture } from '@js/util/featureDetectionUtils';
 
 
 export default {

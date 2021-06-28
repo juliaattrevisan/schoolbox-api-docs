@@ -1,7 +1,7 @@
 <script>
     
     import VuejsPaginate from 'vuejs-paginate';
-    import { fetchAsJson } from '@shared/fetch/fetch';
+    import { fetchAsJson } from '@js/fetch/fetch';
     
     export default {
         components: {

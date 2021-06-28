@@ -153,7 +153,7 @@ export default {
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
 
-            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js
+            //file is referenced from /javascript/bundle/ckeditor4-vue.js according to the publicPath and filename props within output in webpack.config.js
             //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
             import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
                 .then(({ default: CKEditor }) => {

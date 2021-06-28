@@ -8,7 +8,7 @@
 
 <script>
 
-    // Valid sizes from https://get.foundation/sites/docs-v5/components/reveal.html
+    // Valid sizes from https://get.foundation/sites/docs-v5/bundle/reveal.html
     const VALID_SIZES = ['tiny', 'small', 'medium', 'large', 'xlarge', 'full'];
 
     export default {
@@ -31,7 +31,7 @@
              * This corresponds to the modal's `close_on_background_click`
              * setting.
              *
-             * @see https://get.foundation/sites/docs-v5/components/reveal.html
+             * @see https://get.foundation/sites/docs-v5/bundle/reveal.html
              */
             closeOnBackgroundClick: {
                 type: Boolean,
