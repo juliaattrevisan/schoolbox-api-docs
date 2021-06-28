@@ -287,23 +287,30 @@ class ArticleResolver implements IArticleResolver
     ): array {
         $audienceAlias = 'simple';
         $articleAlias  = 'simple_article';
-        $pb            = isset($state)
-            ? $this->articleMapper->getPredicateForState($state, $articleAlias)
-            : $this->articleMapper->getPredicateBuilder();
+
+        // All articles must have at least one of the simple audiences
+        $subPb = $this->articleMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
-            $pb->all($this->buildPredicate($audienceAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues));
+            $subPb = $subPb->all(
+                $this->buildPredicate($audienceAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues)
+            );
         }
         $relationship = $this->getRelationshipModifier($user);
         foreach ($relatedAttributes as $entityType => $entityValues) {
             // If we had $relatedAttributes, we can assume here that $relationship is non-null
-            $pb->all($this->buildPredicate($audienceAlias, $relationship, $entityType, $entityValues));
+            $subPb = $subPb->all($this->buildPredicate($audienceAlias, $relationship, $entityType, $entityValues));
         }
 
+        // Also: all articles must be in the requested state (if there was one)
+        $pb  = isset($state)
+            ? $this->articleMapper->getPredicateForState($state, $articleAlias)
+            : $this->articleMapper->getPredicateBuilder();
+        $pb  = $pb->any($subPb);
         $sql = "
             SELECT     {$articleAlias}.id
             FROM       comms_news_audience {$audienceAlias}
             INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
-            WHERE      {$pb->getWhereUnion()}
+            WHERE      {$pb->getWhereIntersect()}
         ";
         return [$sql, $pb->getParams()];
     }
