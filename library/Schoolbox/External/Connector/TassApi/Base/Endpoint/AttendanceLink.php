@@ -37,6 +37,10 @@ class AttendanceLink implements \External_AttendanceLinkInterface
     public function getAttendanceLink(string $classCode, ?string $campus, ?string $fileType, array $attendancePeriods, ?int $currentPeriod, Alaress_Date_Format $time, GenericCollection $campusList, int $campusId, ?string $externalId, int $dayNumber): string
     {
         // TODO: Implement getAttendanceLink() method.
+
+
+
+        return '';
     }
 
 
@@ -46,6 +50,8 @@ class AttendanceLink implements \External_AttendanceLinkInterface
     public function getAttendanceLinkTarget(): string
     {
         // TODO: Implement getAttendanceLinkTarget() method.
+
+        return '';
     }
 
 
@@ -68,5 +74,7 @@ class AttendanceLink implements \External_AttendanceLinkInterface
     public function isEnabled(string $classCode, ?bool $attendanceEnabled, Alaress_Date_Format $time): bool
     {
         // TODO: Implement isEnabled() method.
+
+        return false;
     }
 }
