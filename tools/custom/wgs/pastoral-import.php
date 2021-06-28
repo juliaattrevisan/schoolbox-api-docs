@@ -155,7 +155,7 @@ HELP;
         // Import csv
         $file = $this->getOpt(self::OPT_LONG_FILE);
 
-        $reader = new Reader($file, true, true);
+        $reader = new Reader($file, true, false);
         if (!$reader->readHeaderRow()) {
             $this->getLogger()->warning("Unable to read header from the file: {$file}");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
@@ -186,6 +186,9 @@ HELP;
 
         $reader->next();
         $count = 1;
+        $this->pastoralMapper->suppressNotification();
+        $this->pastoralAccessMapper->suppressNotification();
+        $this->pastoralAttachmentMapper->suppressNotification();
         $this->userMapper->getDatabase()->beginTransaction();
         while ($reader->valid()) {
             try {
