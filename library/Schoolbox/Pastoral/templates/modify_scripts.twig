@@ -265,7 +265,7 @@
          * @param template
          */
         function replaceTemplate(template) {
-            let current = $.trim(CKEDITOR.instances['body_public'].getData());
+            let current = $.trim(generalTemplate.getData());
 
             /* If the current data is the same as the template contents,
              * then you're safe to swap it to another template
