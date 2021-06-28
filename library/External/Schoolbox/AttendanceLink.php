@@ -5,14 +5,23 @@
  */
 declare(strict_types=1);
 
+use Schoolbox\IConfigLoader;
+
+
 /**
  * Class External_Schoolbox_AttendanceLink
  *
- * Generate the link to the sis, so a teaher can mark a student's attendance
+ * Generate the link to the sis, so a teacher can mark a student's attendance
  * in a particular class
  */
 class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterface
 {
+
+    /**
+     * @var External_AttendanceLinkInterface
+     */
+    private External_AttendanceLinkInterface $attendanceLink;
+
 
     /**
      * Generate the link to the sis, using the parts provided
@@ -33,11 +42,18 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
      */
     public function getAttendanceLink(string $classCode, ?string $campus, ?string $fileType, array $attendancePeriods, ?int $currentPeriod, Alaress_Date_Format $time, \Schoolbox\GenericCollection $campusList, int $campusId, ?string $externalId, int $dayNumber): string
     {
-        // TODO: Implement getAttendanceLink() method.
-
-        /* Default case if not applicable
-         */
-        return '';
+        return $this->attendanceLink->getAttendanceLink(
+            $classCode,
+            $campus,
+            $fileType,
+            $attendancePeriods,
+            $currentPeriod,
+            $time,
+            $campusList,
+            $campusId,
+            $externalId,
+            $dayNumber
+        );
     }
 
 
@@ -50,11 +66,7 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
      */
     public function getAttendanceLinkTarget(): string
     {
-        // TODO: Implement getAttendanceLinkTarget() method.
-
-        /* Default case if not applicable
-         */
-        return '_self';
+        return $this->attendanceLink->getAttendanceLinkTarget();
     }
 
 
@@ -64,10 +76,10 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
      *
      * @inheritDoc
      *
-     * @param \Schoolbox\IConfigLoader $config
-     * @param bool                     $isStaff
+     * @param IConfigLoader $config
+     * @param bool          $isStaff
      */
-    public function init(\Schoolbox\IConfigLoader $config, bool $isStaff): void
+    public function init(IConfigLoader $config, bool $isStaff): void
     {
         /* Any of the SUDS importers will be using the Schoolbox connector
          * but they'll all generate AttendanceLink information differently
@@ -75,8 +87,8 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
          * spawn - it should correspond to the Endpoint Data Source that's
          * current selected in the suds ui
          */
-
-        // TODO: Implement init() method.
+        $this->attendanceLink = (new AttendanceLinkFactory())
+            ->produce($config->get('schooldata_import_data_source'));
     }
 
 
@@ -90,10 +102,10 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
      */
     public function isEnabled(string $classCode, ?bool $attendanceEnabled, Alaress_Date_Format $time): bool
     {
-        // TODO: Implement isEnabled() method.
-
-        /* Default case if not applicable
-         */
-        return false;
+        return $this->attendanceLink->isEnabled(
+            $classCode,
+            $attendanceEnabled,
+            $time
+        );
     }
 }
