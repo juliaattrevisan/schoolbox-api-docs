@@ -251,45 +251,54 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
     /**
      * Returns a predicate for getting articles that are awaiting moderation
      *
+     * @param string|null $tableAlias If provided, use this alias for this
+     *                                mapper's table in the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateDraft(): IBuilder
+    public function getPredicateDraft(string $tableAlias = null): IBuilder
     {
+        $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
-                    ->isNull('submitted_at');
+                    ->isNull($prefix . 'submitted_at');
     }
 
 
     /**
      * Returns a predicate for getting articles that are rejected
      *
+     * @param string|null $tableAlias If provided, use this alias for this
+     *                                mapper's table in the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateRejected(): IBuilder
+    public function getPredicateRejected(string $tableAlias = null): IBuilder
     {
+        $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->notNull('rejected_at');
+                    ->notNull($prefix . 'submitted_at')
+                    ->notNull($prefix . 'rejected_at');
     }
 
 
     /**
      * Returns a predicate for getting articles that are awaiting moderation
      *
+     * @param string|null $tableAlias If provided, use this alias for this
+     *                                mapper's table in the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateAwaitingModeration(): IBuilder
+    public function getPredicateAwaitingModeration(string $tableAlias = null): IBuilder
     {
+        $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->isNull('accepted_at');
+                    ->notNull($prefix . 'submitted_at')
+                    ->isNull($prefix . 'rejected_at')
+                    ->isNull($prefix . 'accepted_at');
     }
 
 
@@ -301,30 +310,37 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * * publish_at > now
      *
      * @param Alaress_Date_Format|null $now
+     * @param string|null              $tableAlias If provided, use this alias
+     *                                             for this mapper's table in
+     *                                             the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateAwaitingPublication(Alaress_Date_Format $now = null): IBuilder
+    public function getPredicateAwaitingPublication(Alaress_Date_Format $now = null, string $tableAlias = null): IBuilder
     {
+        $prefix      = $this->determinePredicateBuilderPrefix($tableAlias);
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
         return $this->getPredicateBuilder()
-                    ->notNull('accepted_at')
-                    ->greaterThan('publish_at', $nowDatabase);
+                    ->notNull($prefix . 'accepted_at')
+                    ->greaterThan($prefix . 'publish_at', $nowDatabase);
     }
 
 
     /**
      * Returns a predicate for getting articles that are approved
      *
+     * @param string|null $tableAlias If provided, use this alias for this
+     *                                mapper's table in the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateApproved(): IBuilder
+    public function getPredicateApproved(string $tableAlias = null): IBuilder
     {
+        $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
-                    ->notNull('accepted_at');
+                    ->notNull($prefix . 'accepted_at');
     }
 
 
@@ -332,19 +348,23 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Returns a predicate for getting articles that are published
      *
      * @param Alaress_Date_Format|null $now
+     * @param string|null              $tableAlias If provided, use this alias
+     *                                             for this mapper's table in
+     *                                             the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicatePublished(Alaress_Date_Format $now = null): IBuilder
+    public function getPredicatePublished(Alaress_Date_Format $now = null, string $tableAlias = null): IBuilder
     {
+        $prefix      = $this->determinePredicateBuilderPrefix($tableAlias);
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->notNull('accepted_at')
-                    ->lessThanOrEqualTo('publish_at', $nowDatabase)
-                    ->greaterThan('expires_at', $nowDatabase);
+                    ->notNull($prefix . 'submitted_at')
+                    ->isNull($prefix . 'rejected_at')
+                    ->notNull($prefix . 'accepted_at')
+                    ->lessThanOrEqualTo($prefix . 'publish_at', $nowDatabase)
+                    ->greaterThan($prefix . 'expires_at', $nowDatabase);
     }
 
 
@@ -352,32 +372,38 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
      * Returns a predicate for getting articles that are expired
      *
      * @param Alaress_Date_Format|null $now
+     * @param string|null              $tableAlias If provided, use this alias
+     *                                             for this mapper's table in
+     *                                             the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateExpired(Alaress_Date_Format $now = null): IBuilder
+    public function getPredicateExpired(Alaress_Date_Format $now = null, string $tableAlias = null): IBuilder
     {
+        $prefix      = $this->determinePredicateBuilderPrefix($tableAlias);
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
         return $this->getPredicateBuilder()
-                    ->notNull('submitted_at')
-                    ->isNull('rejected_at')
-                    ->notNull('accepted_at')
-                    ->lessThanOrEqualTo('publish_at', $nowDatabase)
-                    ->lessThan('expires_at', $nowDatabase);
+                    ->notNull($prefix . 'submitted_at')
+                    ->isNull($prefix . 'rejected_at')
+                    ->notNull($prefix . 'accepted_at')
+                    ->lessThanOrEqualTo($prefix . 'publish_at', $nowDatabase)
+                    ->lessThan($prefix . 'expires_at', $nowDatabase);
     }
 
 
     /**
      * Returns a predicate that will match articles in the specified state.
      *
-     * @param int $state A bit-mask of atomic states
+     * @param int         $state      A bit-mask of atomic states
+     * @param string|null $tableAlias If provided, use this alias for this
+     *                                mapper's table in the returned predicate.
      * @return Builder
      * @throws InvalidColumnException
      * @throws UnderflowException       If state indicates no articles can ever match
      * @throws InvalidArgumentException If state is invalid
      */
-    public function getPredicateForState(int $state): Builder
+    public function getPredicateForState(int $state, string $tableAlias = null): Builder
     {
         if ($state === Model::STATE_NONE) {
             // We could generate a predicate that matches no articles (eg id=0) but that  would
@@ -397,22 +423,22 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $pb = $this->getPredicateBuilder();
 
         if ($state & Model::STATE_DRAFT) {
-            $pb->all($this->getPredicateDraft());
+            $pb->all($this->getPredicateDraft($tableAlias));
         }
         if ($state & Model::STATE_AWAITING_MODERATION) {
-            $pb->all($this->getPredicateAwaitingModeration());
+            $pb->all($this->getPredicateAwaitingModeration($tableAlias));
         }
         if ($state & Model::STATE_AWAITING_PUBLICATION) {
-            $pb->all($this->getPredicateAwaitingPublication());
+            $pb->all($this->getPredicateAwaitingPublication(null, $tableAlias));
         }
         if ($state & Model::STATE_REJECTED) {
-            $pb->all($this->getPredicateRejected());
+            $pb->all($this->getPredicateRejected($tableAlias));
         }
         if ($state & Model::STATE_PUBLISHED) {
-            $pb->all($this->getPredicatePublished());
+            $pb->all($this->getPredicatePublished(null, $tableAlias));
         }
         if ($state & Model::STATE_EXPIRED) {
-            $pb->all($this->getPredicateExpired());
+            $pb->all($this->getPredicateExpired(null, $tableAlias));
         }
         return $this->getPredicateBuilder()->any($pb);
     }
@@ -656,5 +682,17 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $statement->execute($pb->getParams());
 
         return (bool)$statement->fetch(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Determines the prefix to use in a predicate builder generated by one of
+     * the `getPredicate*` methods, based on the `$tableAlias` it receives.
+     *
+     * @param string|null $tableAlias
+     * @return string
+     */
+    private function determinePredicateBuilderPrefix(?string $tableAlias): string
+    {
+        return isset($tableAlias) ? "$tableAlias." : '';
     }
 }
