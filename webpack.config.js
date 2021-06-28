@@ -78,14 +78,14 @@ module.exports = {
             './www/static/js/notifications/jquery.notifier.js',
 
             // Confirm Dialog
-            './www/static/js/jquery.confirm-dialog.js',
+            './www/static/js/popup/jquery.confirm-dialog.js',
 
             // Data tables
             './node_modules/datatables.net/js/jquery.dataTables.js',
             './node_modules/datatables.net-fixedcolumns/js/dataTables.fixedColumns.js',
 
             // Toasts, popups to notify something has happened
-            './www/static/js/jquery.toast-timeout.js',
+            './www/static/js/popup/jquery.toast-timeout.js',
 
             // File uploading
             './www/static/js/resource/jquery.resourceAttach.js',
