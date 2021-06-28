@@ -1,4 +1,10 @@
 <script>
+
+/**
+ * The list header to display the record titles
+ *
+ */
+
 export default {
     
     props: {
@@ -15,30 +21,6 @@ export default {
             required: true
         }
     },
-
-    data () {
-        return {
-            
-        }
-    },
-
-    created () {
-        // debugger;
-    },
-
-    mounted () {
-        
-    },
-
-    computed: {
-
-
-    },
-
-    methods: {
-        
-
-    }
 
 }
 </script>

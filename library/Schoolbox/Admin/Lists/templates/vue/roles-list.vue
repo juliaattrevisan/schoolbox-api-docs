@@ -1,9 +1,15 @@
 <script>
 
+/**
+ * To view and edit the Roles List, currently showing Name and Role Type, with all others accessed via a Permissions popup
+ * The columns are refered to as 'fields', with the rows as 'records'
+ *
+ */
+
 import axios from 'axios';
 import RolesListHeader from './roles-list-header';
-import RolesListConfigureAccess from './roles-list-configure-access';
-import RolesListItem from './roles-list-item';
+import RolesListPermissions from './roles-list-permissions';
+import RolesListRecord from './roles-list-record';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 
@@ -11,8 +17,8 @@ export default {
     
     components: {
         RolesListHeader,
-        RolesListConfigureAccess,
-        RolesListItem,
+        RolesListPermissions,
+        RolesListRecord,
         Toast,
         RevealModal,
     },
@@ -33,37 +39,59 @@ export default {
         deleteRoute: { //url of row delete
             type: String,
             required: true
+        },
+        saveRoute: { //url of entire list save
+            type: String,
+            required: true
         }
     },
 
     data () {
         return {
-            fields: [], //to hold the header fields
-            records: [], //to hold initialRecords and manage any further changes
-            isConfigureAccessOpen: false, //to open and close the list
-            selectedId: -1 //when deleting a row, use the index 
-        }
+            records: [], //to display and possibly edit the records 
+            isPermissionsOpen: false, //to open and close the list
+            selectedRecord: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
+            saveStatus: 'Save All' //to update the button text when saving
+        }   
     },
 
     computed: {
 
         /**
-         * Currently need to wrangle the field display to only show Name and Role type, 
-         * the rest are to be shown only when Role Type is set to Staff
+         * Assign a key for each field for future reference, so can link the selectedRecord to the fields when editing permissions
          * 
+         * @returns { Array of Objects }
+         */
+        fields () {
+            const fields = Object.values(this.table.fields);
+            const recordKeyList = Object.keys(this.records[0]);
+            fields.forEach((field, index) => {
+                field.key = recordKeyList[index];
+            });
+            return fields;
+        }, 
+
+        /**
+         * Only Name and Role type are shown with
+         * the rest shown within #roles-list-permissions.vue
+         * 
+         * @returns { Array of Objects }
          */
         displayFields () {
             const onlyNameAndRoleTypeFields = this.fields.filter((field, index) => index < 2); //which are the first two fields
-            onlyNameAndRoleTypeFields.push( { caption: '', width: '8' } ); //and add another to allow space for Configuring access permissions 
+            onlyNameAndRoleTypeFields.push( { caption: 'Permissions', width: '6' } ); //and add another to allow space for Configuring access permissions 
             return onlyNameAndRoleTypeFields;
         },  
         
         /**
-         * To provide the access fields
+         * To provide the permission fields, pulling out Name and Role Type
          * 
+         * @returns { Array of Objects }
          */
-        accessFields () {
-            return this.fields.filter((field, index) => index > 2); //all excluding Name and Type
+        permissionFields () {
+            return this.fields.filter((field) => {
+                return (field.caption !== 'Name' && field.caption !== 'Role Type'); //all excluding name and type
+            });
         }, 
 
         /**
@@ -77,14 +105,12 @@ export default {
                 fixedList.push({ key: key, value: value });
             }
             return fixedList;
-        }
+        },
 
     },
 
     created () {
-        this.fields = Object.values(this.table.fields);
-        this.records = Object.values(this.initialRecords);
-        
+        this.initRecords();
     },
 
     mounted () {
@@ -92,6 +118,18 @@ export default {
     },
 
     methods: {
+
+        /**
+         * Add in the id so can link to the DB on form submit
+         * 
+         */
+        initRecords () {
+            this.records = Object.values(this.initialRecords);
+            const recordKeys = Object.keys(this.initialRecords);
+            this.records.forEach((record, index) => { 
+                record.id = recordKeys[index];
+            });
+        },
 
         /**
          * Init the sortable feature
@@ -104,7 +142,7 @@ export default {
         },
 
         /**
-         * Push in a new row as with basic guest access
+         * Push in a new row with basic guest access
          * 
          */
         onNewRowSelected () {
@@ -112,27 +150,27 @@ export default {
                 {
                     name: '',
                     type: 'guest',
+                    id: '-1',
                     canChangePassword: false
                 }
             )
         },
 
         /**
-         * Show the access options
+         * Show the permissions options
          * 
          */
-        onConfigureAccessSelected (selectedId) {
-            //fade out unselected ids
-            this.isConfigureAccessOpen = true;
+        onPermissionsSelected (selectedRecord) {
+            this.selectedRecord = selectedRecord;
+            this.isPermissionsOpen = true;
         },
 
         /**
-         * close the access options
+         * close the permissions options
          * 
          */
-        onConfigureAccessClosed () {
-            //fade in unselected ids
-            this.isConfigureAccessOpen = false;
+        onPermissionsClosed () {
+            this.isPermissionsOpen = false;
         },
 
         /**
@@ -140,26 +178,29 @@ export default {
          * 
          * @param { Number }
          */
-        onDeleteRowSelected (selectedId) {
-            this.selectedId = selectedId;
-            this.$refs.deleteModal.open();
+        onDeleteRecord (selectedRecord) {
+            this.selectedRecord = selectedRecord;
+            if (selectedRecord.id === '-1') { //hasn't been placed int he DB yet, so no need to confirm its removal
+                this.records = this.records.filter((record) => record.id !== this.selectedRecord.id);
+            } else {
+                this.$refs.deleteModal.open();
+            }
         },
 
         /**
          * Pull out the selected row index on delete confirmation
          *
          */
-        async onConfirmDeleteRowSelected () {
+        async onConfirmDeleteRecordSelected () {
             this.$refs.toast.activate('Deleting row...');
             try {
-                const id = this.selectedId + 1;
                 const params = { 
                     table: this.tableName,
-                    id: id
+                    id: this.selectedRecord.id
                 }
                 const response = await axios.post(this.deleteRoute, params);
                 if (response.result !== false) {
-                    this.records = this.records.filter((item, index) => index !== this.selectedId);
+                    this.records = this.records.filter((record) => record.id !== this.selectedRecord.id);
                     $toast.toastTimeout({text: 'Item deleted', css: 'success'});
                 } else {
                     $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});
@@ -189,6 +230,28 @@ export default {
             
         },
 
+        /**
+         * Save all permissions
+         *
+         */
+        async onSaveAllSelected () {
+            this.saveStatus = 'Saving...'
+            this.$refs.toast.activate('Saving row...');
+            try {
+                const formData = new FormData(this.$refs.form);
+                const response = await axios.post(this.saveRoute, formData);
+                if (response.status === 200) {
+                    this.saveStatus = 'Saved';
+                } 
+            } catch (error) {
+                this.$refs.toast.timeout('Unable to save', false, 2000);
+            } 
+            finally {
+                this.$refs.deleteModal.close();
+                this.saveStatus = 'Save All';
+            }
+        },
+
     }
 
 }
@@ -205,7 +268,7 @@ export default {
                 <p>The {{ table.title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
             </div>
 
-            <form v-else method="post" action="/adminv2/lists/save">
+            <form v-else method="post" action="/adminv2/lists/save" ref="form">
 
                 <input name="table" type="hidden" :value="tableName" />
 
@@ -224,37 +287,40 @@ export default {
 
                         <!-- {% set ulAttr = sortable ? 'class="information-list sortable ui-sortable" data-sortable data-list' : 'class="information-list unsortable" data-list' %} --> 
                         <ul :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`" data-sortable data-list>
-                            <roles-list-item 
+                            <roles-list-record 
                                 v-for="(record, index) in records"
                                 :key="index"
-                                :id="index+1"
                                 :display-fields="displayFields"
-                                :access-fields="accessFields"
+                                :permission-fields="permissionFields"
                                 :record="record"
+                                :selected-record="selectedRecord"
+                                :is-permissions-open="isPermissionsOpen"
                                 :is-sortable="table.sortable"
                                 :is-deletable="table.delete"
-                                @on-configure-access-selected="onConfigureAccessSelected"
-                                @on-delete-row-selected="onDeleteRowSelected"
+                                @on-permissions-selected="onPermissionsSelected"
+                                @on-delete-row-selected="onDeleteRecord"
                             />
                         </ul>
 
-                        <roles-list-configure-access
-                            :access-fields="accessFields" 
-                            :is-open="isConfigureAccessOpen" 
-                            @on-configure-access-closed="onConfigureAccessClosed"
+                        <roles-list-permissions
+                            :permission-fields="permissionFields" 
+                            :selected-record="selectedRecord"
+                            :is-open="isPermissionsOpen" 
+                            @on-permissions-closed="onPermissionsClosed"
                         />
+
+                        <div v-if="!table.noNewRecords" class="component-action">
+                            <section>
+                                <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button">Add New Row</a>
+                            </section>
+                        </div>
 
                     </div><!-- .list-container -->
 
-                    <div v-if="!table.noNewRecords" class="component-action">
-                        <section>
-                            <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button">Add New Row</a>
-                        </section>
-                    </div>
-
                 </section>
 
-                <input type="submit" value="Save"/>
+                <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" />
+                <!-- <input type="submit" value="Save All" /> -->
 
             </form>
 
@@ -266,7 +332,7 @@ export default {
             <h2>Please Confirm</h2>
             <div data-alert class="alert-box warning">{{ table.deleteWarning }}</div>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
+                <li><a @click.prevent="onConfirmDeleteRecordSelected" class="button submit">Yes</a></li>
                 <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
             </ul>
         </reveal-modal>

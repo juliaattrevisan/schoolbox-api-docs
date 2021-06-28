@@ -153,9 +153,10 @@
                 :table="{{ tables[table] | json_encode }}"
                 :initial-records="{{ records | json_encode }}"
                 delete-route={{ routeLookup('adminLists.postDelete') }}
+                save-route="/adminv2/lists/save"
             />
         </div>
-        <script type="text/javascript" src="{{CDN_PREFIX}}/javascript/components/rolesList.bundle.js?v={{ config.site_version }}"></script>
+        <script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/rolesList.js?v={{ config.site_version }}"></script>
 
         {% else %}
 
@@ -225,17 +226,21 @@
 
 </div>
 
-{# Draw cloneable row for use when adding new rows#}
-{# #ID# is used as a placeholder for an ID that is preg_replaced in JS when rows are inserted. #}
 
-{% if canSpawn %}
-<ul data-clone class="hide">
-    {% include '@adminLists/list-item.twig' with {
-        key: "#ID#",
-        recordIndex: "#ID#",
-        deleteAttr: 'data-delete-new'
-    } %}
-</ul>
+{% if table != 'roles' %}
+
+    {% if canSpawn %}
+    {# Draw cloneable row for use when adding new rows#}
+    {# #ID# is used as a placeholder for an ID that is preg_replaced in JS when rows are inserted. #}
+    <ul data-clone class="hide">
+        {% include '@adminLists/list-item.twig' with {
+            key: "#ID#",
+            recordIndex: "#ID#",
+            deleteAttr: 'data-delete-new'
+        } %}
+    </ul>
+    {% endif %}
+
+    <div id="toast" class="toast" data-alert></div>
+    
 {% endif %}
-
-<div id="toast" class="toast" data-alert></div>

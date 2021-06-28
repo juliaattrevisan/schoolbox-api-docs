@@ -1,12 +1,21 @@
 <script>
 
+/**
+ * Update an invidual records permissions
+ *
+ */
+
 import gsap from 'gsap/all';
 
 export default {
     
     props: {
-        accessFields: { //the fields to display within the list item
+        permissionFields: { //the fields to display within the list item
             type: Array,
+            required: true
+        },
+        selectedRecord: { //to know which options to display
+            type: Object,
             required: true
         },
         isOpen: { //to open and close the list
@@ -15,8 +24,32 @@ export default {
         },
     },
 
+    computed: {
+
+        /**
+         * Only show those fields relevant to the user type
+         * 
+         * @returns { Array of Objects }
+         */
+        roleSpecificPermissions () {
+            if (this.selectedRecord.type === 'staff') {
+                return this.permissionFields;
+            } else {
+                const onlyShowPasswordField = this.permissionFields.filter((field) => {
+                    return field.caption === 'Allow Password Change';
+                });
+                return onlyShowPasswordField;
+            }
+        }
+
+    },
+
     watch: {
         
+        /**
+         * To open or close depending on boolean value
+         * 
+         */
         isOpen (newValue) {
             if (newValue === true) {
                 this.open();
@@ -26,18 +59,6 @@ export default {
         }
 
     },
-
-    // data () {
-        
-    // },
-
-    // created () {
-        
-    // },
-
-    // mounted () {
-        
-    // },
 
     methods: {
         
@@ -51,11 +72,19 @@ export default {
         },
 
         /**
+         * Save all the options
+         * 
+         */
+        onSavePermissionsSelected () {
+            // 
+        },
+
+        /**
          * Show the access options
          * 
          */
         onClosePermissionsSelected () {
-            this.$emit('on-configure-access-closed');
+            this.$emit('on-permissions-closed');
         },
 
         /**
@@ -76,28 +105,20 @@ export default {
 <template>
     <div class="permissions-outer-container" ref="outerContainer">
         <div class="permissions-inner-container checklist" ref="innerContainer">
-            <h4>Access permissions for</h4>
+            <h4>{{ selectedRecord.name }} Permissions</h4>
             <a href="#close-permissions" class="close-permissions-button" @click.prevent="onClosePermissionsSelected">X</a>
             <ul class="option-list">
-                <li v-for="(field, index) in accessFields" :key="index">
-                    <!-- <input
-                        id="role[{{ role.id }}]"
-                        name="role[{{ role.id }}]"
-                        type="checkbox"
-                        value="{{ role.id }}"
-                        {% if role.id in enabled %}checked{% endif %}
-                    />
-                    <label for="role[{{ role.id }}]">{{ role.name }}</label> -->
+                <li v-for="(field, index) in roleSpecificPermissions" :key="index">
                     <input
                         :id="field.caption"
                         :name="field.caption"
                         type="checkbox"
-                        value=""
-                        checked
+                        v-model="selectedRecord[field.key]"
                     />
                     <label :for="field.caption">{{ field.caption }}</label>
                 </li>
             </ul>
+            <button @click.prevent="onSavePermissionsSelected" class="save-permissions-button">Save Permissions</button>
         </div>
     </div>
 </template>
@@ -112,8 +133,8 @@ export default {
     z-index: 1;
     right: 0px;
     top: 0px;
-    width: 66%;
-    max-width: 400px;
+    width: 60%;
+    max-width: 365px;
     height: 100%;
     overflow: hidden;
 }
@@ -131,9 +152,17 @@ export default {
 
 .close-permissions-button {
     position: absolute;
-    top: 1rem;
+    top: 0.5rem;
     right: 1rem;
+    padding: 5px 10px;
     font-size: 1.5rem;
+    &:hover {
+        background-color: $content-ui-hover;
+    }
+}
+
+.save-permissions-button {
+    width: 100%;
 }
 
 </style>
