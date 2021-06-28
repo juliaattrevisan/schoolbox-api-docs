@@ -498,19 +498,28 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
 
 
     /**
-     * Return a list of article id's that is authored or approved (If the user has a news moderator permissions) by the user
+     * Return a list of article id's that is authored or approved (If the user
+     * has a news moderator permissions) by the user
      *
-     * @param User $user
+     * @param User     $user
+     * @param int|null $state If provided, find only IDs of articles in this
+     *                        state
      * @return array
      * @throws InvalidColumnException
      */
-    public function findAuthoredOrAcceptedArticleIds(User $user): array
+    public function findAuthoredOrAcceptedArticleIds(User $user, ?int $state = null): array
     {
-        $pb = $this->getPredicateBuilder()
-                   ->equals('author_id', $user->getId())
-                   ->equals('accepted_by', $user->getId());
-
-        return $this->findIdsByPredicates($this->getPredicateBuilder()->any($pb));
+        $pb = isset($state)
+            ? $this->getPredicateForState($state)
+            : $this->getPredicateBuilder();
+        $pb = $pb->all(
+            $this->getPredicateBuilder()->any(
+                $this->getPredicateBuilder()
+                     ->equals('author_id', $user->getId())
+                     ->equals('accepted_by', $user->getId())
+            )
+        );
+        return $this->findIdsByPredicates($pb);
     }
 
 
