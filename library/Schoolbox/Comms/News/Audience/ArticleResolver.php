@@ -285,23 +285,24 @@ class ArticleResolver implements IArticleResolver
         User $user,
         ?int $state
     ): array {
-        $tableAlias = 'simple';
-        $pb         = isset($state)
-            ? $this->articleMapper->getPredicateForState($state)
+        $audienceAlias = 'simple';
+        $articleAlias  = 'simple_article';
+        $pb            = isset($state)
+            ? $this->articleMapper->getPredicateForState($state, $articleAlias)
             : $this->articleMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
-            $pb->all($this->buildPredicate($tableAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues));
+            $pb->all($this->buildPredicate($audienceAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues));
         }
         $relationship = $this->getRelationshipModifier($user);
         foreach ($relatedAttributes as $entityType => $entityValues) {
             // If we had $relatedAttributes, we can assume here that $relationship is non-null
-            $pb->all($this->buildPredicate($tableAlias, $relationship, $entityType, $entityValues));
+            $pb->all($this->buildPredicate($audienceAlias, $relationship, $entityType, $entityValues));
         }
 
         $sql = "
-            SELECT     comms_news_article.id
-            FROM       comms_news_audience {$tableAlias}
-            INNER JOIN comms_news_article ON {$tableAlias}.comms_news_article_id = comms_news_article.id
+            SELECT     {$articleAlias}.id
+            FROM       comms_news_audience {$audienceAlias}
+            INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
             WHERE      {$pb->getWhereUnion()}
         ";
         return [$sql, $pb->getParams()];
@@ -319,12 +320,13 @@ class ArticleResolver implements IArticleResolver
      */
     private function generateComplexSubquery(Collection $selfAttributes, ?int $state): array
     {
-        $tableAlias = 'complex';
-        $pb1        = $this->complexMapper->getPredicateBuilder();
-        $pb2        = $this->complexMapper->getPredicateBuilder();
+        $audienceAlias = 'complex';
+        $articleAlias  = 'complex_article';
+        $pb1           = $this->complexMapper->getPredicateBuilder();
+        $pb2           = $this->complexMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
             $pb1->all($this->buildPredicate(
-                $tableAlias,
+                $audienceAlias,
                 null,
                 $entityType,
                 $entityValues,
@@ -332,7 +334,7 @@ class ArticleResolver implements IArticleResolver
                 Complex\Mapper::FIELD_ENTITY_VALUE_1
             ));
             $pb2->all($this->buildPredicate(
-                $tableAlias,
+                $audienceAlias,
                 null,
                 $entityType,
                 $entityValues,
@@ -342,14 +344,14 @@ class ArticleResolver implements IArticleResolver
         }
 
         $pb = isset($state)
-            ? $this->articleMapper->getPredicateForState($state)
+            ? $this->articleMapper->getPredicateForState($state, $articleAlias)
             : $this->articleMapper->getPredicateBuilder();
         $pb = $pb->any($pb1)->any($pb2);
 
         $sql = "
-            SELECT     comms_news_article.id
-            FROM       comms_news_audience_complex {$tableAlias}
-            INNER JOIN comms_news_article ON {$tableAlias}.comms_news_article_id = comms_news_article.id
+            SELECT     {$articleAlias}.id
+            FROM       comms_news_audience_complex {$audienceAlias}
+            INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
             WHERE      {$pb->getWhereIntersect()}
         ";
 
