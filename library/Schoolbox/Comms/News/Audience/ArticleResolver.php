@@ -288,7 +288,7 @@ class ArticleResolver implements IArticleResolver
         $tableAlias = 'simple';
         $pb         = isset($state)
             ? $this->articleMapper->getPredicateForState($state)
-            : new Predicate\Builder($this->db->getQuoter(), '');
+            : $this->articleMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
             $pb->all($this->buildPredicate($tableAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues));
         }
@@ -320,8 +320,8 @@ class ArticleResolver implements IArticleResolver
     private function generateComplexSubquery(Collection $selfAttributes, ?int $state): array
     {
         $tableAlias = 'complex';
-        $pb1        = new Predicate\Builder($this->db->getQuoter(), '');
-        $pb2        = new Predicate\Builder($this->db->getQuoter(), '');
+        $pb1        = $this->complexMapper->getPredicateBuilder();
+        $pb2        = $this->complexMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
             $pb1->all($this->buildPredicate(
                 $tableAlias,
@@ -343,7 +343,7 @@ class ArticleResolver implements IArticleResolver
 
         $pb = isset($state)
             ? $this->articleMapper->getPredicateForState($state)
-            : new Predicate\Builder($this->db->getQuoter(), '');
+            : $this->articleMapper->getPredicateBuilder();
         $pb = $pb->any($pb1)->any($pb2);
 
         $sql = "
