@@ -79,6 +79,15 @@ export default {
             return (this.isPermissionsOpen && this.selectedRecord.id !== this.record.id) //is a record selected, and is it this record
         },
 
+        /**
+         * Only those permissions currently set to true
+         * 
+         * @returns { Array of Objects }
+         */
+        currentPermissionFields () {
+            return this.permissionFields.filter((field, index) => this.permissionOptions[index].value); //when the value is set to true, put in the list
+        }
+
     },
 
     created () {
@@ -138,11 +147,9 @@ export default {
                             <input :name="`mandatory-${recordOptions[index].key}[${key}]`" type="text" :placeholder="field.caption" v-model="record[field.key]" :maxlength="field.maxLength ? field.maxLength : 0">
                         </template>
                         <template v-else>
-                            <div class="permissions-list">
-                                <template v-for="(field, index) in permissionFields">    
-                                    <span v-if="permissionOptions[index].value" class="permission-list-item" :key="index">{{ field.caption }}</span>
-                                </template>
-                            </div>
+                            <transition-group name="permissions-list" tag="div" class="permissions-list">
+                                <span v-for="field in currentPermissionFields" :key="field.caption" class="permission-list-item" >{{ field.caption }}</span>
+                            </transition-group>
                         </template>
                     </div>
                 </template>
@@ -165,6 +172,7 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
+
 .list-item-container {
     transition: opacity 0.2s ease-out;
 }
@@ -174,22 +182,33 @@ export default {
 }
 
 .permissions-list {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 5px;
+    // display: flex;
+    // flex-wrap: wrap;
+    // align-items: center;
+    // gap: 5px;
     width: 100%;
-    min-height: 40px;
+    // min-height: 40px;
     border: 1px solid $form-border-color;
-    padding: 5px 5px;
+    padding: 2px;
+    transition: height 0.3s;
+}
+
+.permissions-list-enter, .permissions-list-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.permissions-list-leave-active {
+  position: absolute;
 }
 
 .permission-list-item {
-    display: block;
+    display: inline-block;
+    margin: 2px;
     padding: 5px 10px;
     font-size: 0.7rem;
     text-align: center;
     background: $body-bg;
+    transition: all 0.3s;
 }
 
 .configure-permissions-button {

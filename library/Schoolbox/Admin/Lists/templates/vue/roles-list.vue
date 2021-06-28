@@ -79,7 +79,7 @@ export default {
          */
         displayFields () {
             const onlyNameAndRoleTypeFields = this.fields.filter((field, index) => index < 2); //which are the first two fields
-            onlyNameAndRoleTypeFields.push( { caption: 'Permissions', width: '6' } ); //and add another to allow space for Configuring access permissions 
+            onlyNameAndRoleTypeFields.push( { caption: 'Permissions', width: '8' } ); //and add another to allow space for Configuring access permissions 
             return onlyNameAndRoleTypeFields;
         },  
         
