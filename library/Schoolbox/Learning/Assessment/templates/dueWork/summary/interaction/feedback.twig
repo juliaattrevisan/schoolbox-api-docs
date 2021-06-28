@@ -89,12 +89,16 @@ feedback: currentFeedback,
 
 {% if currentFeedback.isSelfGrading %}
     {% set prefix = prefix ~ ' '~ locale.selfAssessment.proper %}
+    {% set isSelf = true %}
 {% elseif currentFeedback.isSelfReflectionOnly %}
     {% set prefix = prefix ~ ' '~ locale.selfReflection.proper %}
+    {% set isSelf = true %}
 {% elseif currentFeedback.resubmissionRequired %}
     {% set prefix = prefix ~ ' Resubmission required by ' ~ currentFeedback.reviewer.fullname  %}
+    {% set isSelf = false %}
 {% else %}
     {% set prefix = prefix ~ ' Feedback by ' ~  currentFeedback.reviewer.fullname  %}
+    {% set isSelf = false %}
 {% endif %}
 
 {% set feedbackPublishDate = currentFeedback.published ? currentFeedback.publishedAt.short : currentFeedback.updatedAt.short %}
@@ -127,7 +131,7 @@ feedback: currentFeedback,
         </div>
         <nav>
             {% if hasCollapser %}
-                <a href="#" class="icon-down-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
+                <a href="#" class="icon-{{ collapsed ? 'up' : 'down' }}-arrow" data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"></a>
             {% endif %}
             {% if deleteRoute and deleteIcon %}
                 <a class="icon-delete" data-delete="{{ deleteRoute }}"></a>
@@ -135,9 +139,9 @@ feedback: currentFeedback,
         </nav>
 
         {% if currentFeedback.comment|length %}
-            <blockquote class="{{ collapsed? 'hide' : '' }}"
+            <blockquote class="{{ collapsed ? 'hide' : '' }}"
                     {% if hasCollapser %}
-                data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
+                data-collapse-state="{{ collapsed ? 'collapsed' : 'expanded' }}"
                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                     {% endif %}>
                 {{ currentFeedback.comment|linkify|nl2br }}
@@ -149,9 +153,11 @@ feedback: currentFeedback,
         {% endif %}
 
         {% if currentFeedback.allFiles | length %}
-            <ul class="information-list {{ collapsed? 'hide' : '' }}"
-                data-collapse-state="{{ collapsed? 'collapsed' : 'expanded' }}"
-                data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}">
+            <ul class="information-list {{ collapsed?  'hide' : '' }}"
+                {% if hasCollapser %}
+                data-collapse-state="{{ collapsed ? 'collapsed' : 'expanded' }}"
+                data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
+                {% endif %}>
                 {% for currentFile in currentFeedback.allFiles %}
                     {# Only show published feedback and therefore also
                      # only list files that are involved with a Published Feedback
@@ -168,7 +174,7 @@ feedback: currentFeedback,
                                     })
                                     : null
                                 %}
-                                {% if kamiViewRoute %}
+                                {% if kamiViewRoute and not isSelf %}
                                     <a href="{{ kamiViewRoute }}" title="{{ currentFile.filename }}">
                                         <img src="/ajax/mime/{{ currentFile.mime }}" alt="View Annotated Document" />
                                         <p>Annotated Feedback</p>
