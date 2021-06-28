@@ -286,7 +286,9 @@ class ArticleResolver implements IArticleResolver
         ?int $state
     ): array {
         $tableAlias = 'simple';
-        $pb         = new Predicate\Builder($this->db->getQuoter(), '');
+        $pb         = isset($state)
+            ? $this->articleMapper->getPredicateForState($state)
+            : new Predicate\Builder($this->db->getQuoter(), '');
         foreach ($selfAttributes as $entityType => $entityValues) {
             $pb->all($this->buildPredicate($tableAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues));
         }
@@ -297,9 +299,9 @@ class ArticleResolver implements IArticleResolver
         }
 
         $sql = "
-            SELECT     cna.id
+            SELECT     comms_news_article.id
             FROM       comms_news_audience {$tableAlias}
-            INNER JOIN comms_news_article cna ON {$tableAlias}.comms_news_article_id = cna.id
+            INNER JOIN comms_news_article ON {$tableAlias}.comms_news_article_id = comms_news_article.id
             WHERE      {$pb->getWhereUnion()}
         ";
         return [$sql, $pb->getParams()];
@@ -339,15 +341,15 @@ class ArticleResolver implements IArticleResolver
             ));
         }
 
-        $pb = (new Predicate\Builder($this->db->getQuoter(), ''))
-            ->any($pb1)
-            ->any($pb2);
-
+        $pb = isset($state)
+            ? $this->articleMapper->getPredicateForState($state)
+            : new Predicate\Builder($this->db->getQuoter(), '');
+        $pb = $pb->any($pb1)->any($pb2);
 
         $sql = "
-            SELECT     cna.id
+            SELECT     comms_news_article.id
             FROM       comms_news_audience_complex {$tableAlias}
-            INNER JOIN comms_news_article cna ON {$tableAlias}.comms_news_article_id = cna.id
+            INNER JOIN comms_news_article ON {$tableAlias}.comms_news_article_id = comms_news_article.id
             WHERE      {$pb->getWhereIntersect()}
         ";
 
