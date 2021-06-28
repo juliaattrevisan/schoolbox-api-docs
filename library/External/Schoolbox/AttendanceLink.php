@@ -34,6 +34,10 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
     public function getAttendanceLink(string $classCode, ?string $campus, ?string $fileType, array $attendancePeriods, ?int $currentPeriod, Alaress_Date_Format $time, \Schoolbox\GenericCollection $campusList, int $campusId, ?string $externalId, int $dayNumber): string
     {
         // TODO: Implement getAttendanceLink() method.
+
+        /* Default case if not applicable
+         */
+        return '';
     }
 
 
@@ -47,6 +51,10 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
     public function getAttendanceLinkTarget(): string
     {
         // TODO: Implement getAttendanceLinkTarget() method.
+
+        /* Default case if not applicable
+         */
+        return '_self';
     }
 
 
@@ -83,5 +91,9 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
     public function isEnabled(string $classCode, ?bool $attendanceEnabled, Alaress_Date_Format $time): bool
     {
         // TODO: Implement isEnabled() method.
+
+        /* Default case if not applicable
+         */
+        return false;
     }
 }
