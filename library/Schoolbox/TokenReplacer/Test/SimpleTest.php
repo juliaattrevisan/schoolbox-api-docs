@@ -244,6 +244,74 @@ class SimpleTest extends TestCase
                 invoice of goods transported by truck or train. a list of the cargo 
                 or Tali carried on an airplane.someone else might have gotten it wrong",
             ],
+
+            /* More esoteric cases
+             */
+            'Replacement: More tokens than replacements 1' => [
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or [firstname   ] carried on an airplane.[firstname]",
+                [],
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or [firstname   ] carried on an airplane.[firstname]"
+            ],
+
+            'Replacement: More tokens than replacements 2' => [
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or [firstname   ] carried on an airplane.[firstname]",
+                [
+                    '[firstname]' => 'someone else might have gotten it wrong'
+                ],
+                "[tok@#%*(&en1]. a list of the cargo carried [__918] a ship, made for the use of 
+                various agents and [[[[fox] at the ports of [.cat]. a [   token3] or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or [firstname   ] carried on an airplane.someone else might have gotten it wrong"
+            ],
+
+            'Replacement: More replacements than tokens 1' => [
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+                [
+                    '[tok@#%*(&en1]' => 'Liara',
+                    '[__918]' => 'Shepard',
+                    '[[[[fox]' => 'Wrex',
+                    '[.cat]' => 'Grunt',
+                    '[   token3]' => 'Garrus',
+                    '[firstname   ]' => 'Tali',
+                    '[firstname]' => 'someone else might have gotten it wrong'
+                ],
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the ports of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+            ],
+
+            'Replacement: More replacements than tokens 2' => [
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the [__918] of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+                [
+                    '[tok@#%*(&en1]' => 'Liara',
+                    '[__918]' => 'Shepard',
+                    '[[[[fox]' => 'Wrex',
+                    '[.cat]' => 'Grunt',
+                    '[   token3]' => 'Garrus',
+                    '[firstname   ]' => 'Tali',
+                    '[firstname]' => 'someone else might have gotten it wrong'
+                ],
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the Shepard of destination. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+            ],
         ];
     }
 }
