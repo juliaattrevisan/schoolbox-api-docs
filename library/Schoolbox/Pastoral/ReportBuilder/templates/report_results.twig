@@ -134,7 +134,7 @@
 
                                             {# Show comment body #}
                                             <p class="spaced">
-                                                {{ comment.body | e('html') | nl2br }}
+                                                {{ comment.body | purify }}
                                             </p>
                                         </div>
                                     </div>
