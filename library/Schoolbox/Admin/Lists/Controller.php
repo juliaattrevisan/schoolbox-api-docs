@@ -342,23 +342,20 @@ class Controller extends Base
                 'fields'            => [                                        // This is a list of all of the updateable fields
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
-                        'width'     => 7,                                       // Width of the column on anything bigger than 'small'
+                        'width'     => 2,                                       // Width of the column on anything bigger than 'small'
                         'maxLength' => 50,
                         'mandatory' => true,                                    // Set this true to avoid empty value for a text field.
                     ],
                     'type' => [
                         'caption'   => 'Role Type',
                         'lookup'    => $luRoleType,                             // If defined the column will appear as a select box
-                        'width'     => 3,
+                        'width'     => 2,
                         'mandatory' => true,                                    // Set this true to remove an empty option from a drop down field.
                     ],
                     'canChangePassword' => [
                         'caption'   => 'Allow Password Change',
-                        'lookup'    => [
-                            ['key' => 1, 'value' => 'Yes'],
-                            ['key' => 0, 'value' => 'No'],
-                        ],
-                        'width'     => 2,
+                        'checkbox'  => true,
+                        'width'     => 1,
                         'mandatory' => true,
                     ],
                     'viewStudentProfile' => [

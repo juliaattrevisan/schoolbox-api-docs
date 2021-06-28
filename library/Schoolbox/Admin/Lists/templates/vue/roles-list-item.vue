@@ -2,7 +2,15 @@
 export default {
     
     props: {
-        fields: { //the fields to display within the list item
+        id: { //to track and link to form data
+            type: Number, 
+            required: true
+        },
+        displayFields: { //the displayFields to display within the list item
+            type: Array,
+            required: true
+        },
+        accessFields: { //to pass through the access fields on form submit
             type: Array,
             required: true
         },
@@ -22,20 +30,11 @@ export default {
 
     data () {
         return {
-            
+            currentRoleType: '' //to track whether to display the configure access button if 'staff'
         }
     },
 
     computed: {
-
-        /**
-         * To track the list items
-         * 
-         * @returns { Number }
-         */
-        id () {
-            return this.$vnode.key + 1;
-        },
 
         /**
          * To retrieve the list of key/value pairs contained within the record object
@@ -48,12 +47,21 @@ export default {
                 recordOptions.push({ key: key, value: value });
             }
             return recordOptions;
-        }
+        },
+
+        /**
+         * To retrieve the list of key/value pairs contained within the record object
+         * 
+         * @returns { Array of Objects }
+         */
+        accessOptions () {
+            return this.recordOptions.filter((field, index) => index > 2); //all excluding Name and Type
+        },
 
     },
 
     created () {
-        
+        this.currentRoleType = this.recordOptions[1].value;
     },
 
     mounted () {
@@ -62,6 +70,22 @@ export default {
 
     methods: {
         
+        /**
+         * Show the access options
+         * 
+         */
+        onConfigureAccessSelected () {
+            this.$emit('on-configure-access-selected', this.$vnode.key);
+        },
+
+        /**
+         * To confirm whether should delete the row
+         * 
+         */
+        onDeleteRowSelected () {
+            this.$emit('on-delete-row-selected', this.$vnode.key);
+        },
+
         /**
          * To confirm whether should delete the row
          * 
@@ -76,42 +100,57 @@ export default {
 </script>
 
 <template>
+
     <li :data-record-id="id" class="list-item-container">
+        
         <input type="hidden" :name="`id[${id}]`" :value="id">
+        
+        <!-- the checkboxes are selected by #roles-list-configure-access.vue so need to track via hidden vars -->
+        <input v-for="(field, index) in accessOptions" :name="`checkbox-${field.key}[${id}]`" type="hidden" :value="`${Number(field.value)}`" :key="index">
+       
         <div :class="`actions-small-${ isDeletable ? '1' : '0' }`">
+            
             <div class="grip ui-sortable-handle"></div>
+            
             <div class="list-item">
-                <template v-for="(field, index) in fields">
+                <template v-for="(field, index) in displayFields">
                     <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
                         <p v-if="field.readonly">{{ recordOptions[index].value }}</p>
                         <label v-else>
                             <span class="hide-for-medium-up">{{ field.caption }}</span>
                             <template v-if="field.lookup">
-                                <select v-if="field.lookup.length === 0" :name="`value-${recordOptions[index].key}[${$vnode.key}]`" disabled>
-                                    <option value="" disabled>None Available</option>
-                                </select>  
-                                <select v-else :name="`value-${recordOptions[index].key}[${$vnode.key}]`" v-model="recordOptions[index].value" :title="recordOptions[index].value">
-                                    <option v-if="!field.mandatory" value="">Not Selected</option>
+                                <select :name="`value-${recordOptions[index].key}[${id}]`" v-model="currentRoleType" :title="recordOptions[index].value">
                                     <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
                                 </select>
                             </template>
                             <template v-else-if="field.mandatory">
                                 <input :name="`mandatory-${recordOptions[index].key}[${id}]`" type="text" :placeholder="field.caption" :value="recordOptions[index].value" :maxlength="field.maxLength ? field.maxLength : 0">
                             </template>
+                            <template v-else>
+                                <button @click.prevent="onConfigureAccessSelected" class="configure-access-button">Configure access</button>
+                            </template>
                         </label>
                     </div>
                 </template>
-            </div>
+            </div><!-- .list-item -->
+
             <nav>
-                <a @click.prevent="onDeleteRowSelected" class="delete-row icon-delete" href="#delete-row" title="Delete Row"></a>
+                <a @click.prevent="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
             </nav>
+
         </div>
+
     </li>
+
 </template>
 
 <style lang="scss" scoped>
 
-.delete-row {
+.configure-access-button {
+    margin: 0px;
+}
+
+.delete-row-button {
     width: 40px;
     height: 40px;
     margin: 14px 8px 0px 0px;
