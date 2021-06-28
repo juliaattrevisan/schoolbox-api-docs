@@ -83,6 +83,12 @@ HELP;
         $db     = $this->getDatabaseInternal();
         $logger = $this->getLogger();
 
+        if ($this->perform()) {
+            $logger->notice('Running in perform mode: tables will be altered');
+        } else {
+            $logger->notice('Running in dry-run mode: provide the `-p` flag to alter tables');
+        }
+
         $selectTablesToRepairQuery = $db->prepareQuery(
             "
                 SELECT TABLE_NAME
