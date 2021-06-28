@@ -43,7 +43,13 @@ class Simple
      */
     public function replace(string $body, array $replacements): string
     {
-        return str_replace(array_keys($replacements), array_values($replacements), $body);
+        $sanitisedReplacements = array_values($replacements);
+
+        $sanitisedReplacements = array_map(static function($val) {
+            return \Scrub::text($val);
+        }, $sanitisedReplacements);
+
+        return str_replace(array_keys($replacements), $sanitisedReplacements, $body);
     }
 
 

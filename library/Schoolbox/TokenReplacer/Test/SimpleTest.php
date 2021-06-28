@@ -312,6 +312,23 @@ class SimpleTest extends TestCase
                 invoice of goods transported by truck or train. a list of the cargo 
                 or passengers carried on an airplane.",
             ],
+
+            /* HTML shenanigans
+             */
+            'HTML 1' => [
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the [firstname] [lastname]. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+                [
+                    '[firstname]' => '<strong>Bro</strong>',
+                    '[lastname]' => '<em>what is this</em>'
+                ],
+                "noun. a list of the cargo carried by a ship, made for the use of 
+                various agents and officials at the &lt;strong&gt;Bro&lt;/strong&gt; &lt;em&gt;what is this&lt;/em&gt;. a list or 
+                invoice of goods transported by truck or train. a list of the cargo 
+                or passengers carried on an airplane.",
+            ],
         ];
     }
 }
