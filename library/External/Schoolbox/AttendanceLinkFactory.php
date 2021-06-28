@@ -15,7 +15,7 @@ use Schoolbox\External\Importer\Endpoint\Factory;
  * Spawn one of the suds AttendanceLink generators, if applicable
  * Defaults to Offline mode otherwise
  */
-class AttendanceLinkFactory
+class External_Schoolbox_AttendanceLinkFactory
 {
 
     /**

@@ -87,7 +87,7 @@ class External_Schoolbox_AttendanceLink implements External_AttendanceLinkInterf
          * spawn - it should correspond to the Endpoint Data Source that's
          * current selected in the suds ui
          */
-        $this->attendanceLink = (new AttendanceLinkFactory())
+        $this->attendanceLink = (new External_Schoolbox_AttendanceLinkFactory())
             ->produce($config->get('schooldata_import_data_source'));
     }
 
