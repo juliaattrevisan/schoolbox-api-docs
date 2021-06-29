@@ -37,7 +37,7 @@ if (Config::get('mail_enable') == 1) {
 
     if ($buildEmailFromId) {
         $studentExternalIds = explode(',', $_POST['selectedIds']);
-        $selectedGroups     = isset($_POST['selectedGroups']) ? explode(',', $_POST['selectedGroups']) : [];
+        $selectedGroups = isset($_POST['selectedGroups']) ? is_array($_POST['selectedGroups']) ? $_POST['selectedGroups'] : explode(',', $_POST['selectedGroups']) : [];
         /* Now get the parents of the students
          */
         if (in_array('parents', $selectedGroups)) {
