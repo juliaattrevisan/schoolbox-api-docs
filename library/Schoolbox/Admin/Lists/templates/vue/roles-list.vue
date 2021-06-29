@@ -2,7 +2,6 @@
 
 /**
  * To view and edit the Roles List, currently showing Name and Role Type, with all others accessed via a Permissions popup
- * The columns are refered to as 'fields', with the rows as 'records'
  *
  */
 
@@ -10,7 +9,7 @@ import axios from 'axios';
 import { gsap } from 'gsap/all'
 import RolesListHeader from './roles-list-header';
 import RolesListPermissions from './roles-list-permissions';
-import RolesListRecord from './roles-list-record';
+import RolesListRow from './roles-list-row';
 import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 
@@ -19,7 +18,7 @@ export default {
     components: {
         RolesListHeader,
         RolesListPermissions,
-        RolesListRecord,
+        RolesListRow,
         Toast,
         RevealModal,
     },
@@ -33,7 +32,7 @@ export default {
             type: Object,
             required: true
         },
-        initialRecords: { //list of currently active records
+        initialRows: { //list of currently active rows
             type: Object,
             required: true
         },
@@ -49,55 +48,60 @@ export default {
 
     data () {
         return {
-            records: [], //to display and possibly edit the records 
+            rows: [], //to display and possibly edit the rows 
             isPermissionsOpen: false, //to open and close the list
-            selectedRecord: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
+            selectedRow: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
             saveStatus: 'Save All', //to update the button text when saving
-            newId: 0, //to add another row to the db, decrement with each new row added
+            newId: 0, //to add another row to the db, decrement with each new row added,
+            selectedPermissionName: '' //to highlight all other rows that have that permission
         }   
     },
 
     computed: {
 
         /**
-         * Assign a key for each field for future reference, so can link the selectedRecord to the fields when editing permissions
+         * Assign a key for each column for future reference, so can link the selectedRow to the columns when editing permissions
          * 
          * @returns { Array of Objects }
          */
-        fields () {
-            const fields = Object.values(this.table.fields);
-            const recordKeyList = Object.keys(this.records[0]);
-            fields.forEach((field, index) => {
-                field.key = recordKeyList[index];
+        columns () {
+            const columns = Object.values(this.table.fields);
+            const rowKeysList = Object.keys(this.rows[0]);
+            columns.forEach((column, index) => {
+                column.key = rowKeysList[index];
             });
-            return fields;
+            return columns;
         }, 
 
         /**
          * Only Name and Role type are shown with
-         * the rest shown within #roles-list-permissions.vue
+         * the rest within #roles-list-permissions.vue
          * 
          * @returns { Array of Objects }
          */
-        displayFields () {
-            const onlyNameAndRoleTypeFields = this.fields.filter((field, index) => index < 2); //which are the first two fields
-            onlyNameAndRoleTypeFields.push( { caption: 'Permissions', width: '8' } ); //and add another to allow space for Configuring access permissions 
-            return onlyNameAndRoleTypeFields;
+        headerColumns () {
+            const headerColumns = this.columns.filter((column, index) => index < 2); //which are the first two columns
+            headerColumns.push( { //and add another to allow space for Permissions UI
+                caption: 'Permissions', 
+                width: '8', 
+                tooltip: 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.' 
+            } ); 
+            return headerColumns;
         },  
         
         /**
-         * To provide the permission fields, pulling out Name and Role Type
+         * To provide the permission columns, pulling out Name and Role Type
          * 
          * @returns { Array of Objects }
          */
-        permissionFields () {
-            return this.fields.filter((field) => {
-                return (field.caption !== 'Name' && field.caption !== 'Role Type'); //all excluding name and type
+        permissionColumns () {
+            return this.columns.filter((column) => {
+                return (column.caption !== 'Name' && column.caption !== 'Role Type'); //all excluding name and type
             });
         }, 
 
         /**
-         * To show list of fields that cannot be null
+         * To show list of columns that cannot be null
          * 
          * @returns { Array of Objects }
          */
@@ -112,7 +116,7 @@ export default {
     },
 
     created () {
-        this.initRecords();
+        this.initRows();
     },
 
     mounted () {
@@ -123,15 +127,15 @@ export default {
 
         /**
          * Add in the id so can link to the DB on form submit
-         * and a boolean to know whether the record is one being newly added
+         * and a boolean to know whether the row is one being newly added
          * 
          */
-        initRecords () {
-            this.records = Object.values(this.initialRecords);
-            const recordKeys = Object.keys(this.initialRecords);
-            this.records.forEach((record, index) => { 
-                record.id = recordKeys[index];
-                record.isNew = false;
+        initRows () {
+            this.rows = Object.values(this.initialRows);
+            const rowKeys = Object.keys(this.initialRows);
+            this.rows.forEach((row, index) => { 
+                row.id = rowKeys[index]; //for example 1: { name: 'Teacher' } - so retrieve the key of 1 which is the id to link with DB
+                row.isNew = false;
             });
         },
 
@@ -149,8 +153,8 @@ export default {
          * Show the permissions options
          * 
          */
-        onPermissionsSelected (selectedRecord) {
-            this.selectedRecord = selectedRecord;
+        onPermissionsSelected (selectedRow) {
+            this.selectedRow = selectedRow;
             this.isPermissionsOpen = true;
             document.querySelector('[data-sortable]').style.pointerEvents = 'none'; //prevent ediding/sorting while permissions is open
         },
@@ -169,7 +173,7 @@ export default {
          * 
          */
         onNewRowSelected () {
-            this.records.push(
+            this.rows.push(
                 {
                     name: '',
                     type: 'guest',
@@ -206,25 +210,26 @@ export default {
          * 
          * @param { Number }
          */
-        onDeleteRecord (selectedRecord) {
-            this.selectedRecord = selectedRecord;
-            if (selectedRecord.isNew) { //hasn't been placed int he DB yet, so no need to confirm its removal
-                this.records = this.records.filter((record) => record.id !== this.selectedRecord.id);
+        onDeleteRow (selectedRow) {
+            this.selectedRow = selectedRow;
+            if (selectedRow.isNew) { //hasn't been placed int he DB yet, so no need to confirm its removal
+                this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
             } else {
                 this.$refs.deleteModal.open();
             }
         },
 
         /**
-         * Pull out the selected row index on delete confirmation
+         * Notify the DB and pull out the selectedRow 
+         * on delete confirmation
          *
          */
-        async onConfirmDeleteRecordSelected () {
+        async onConfirmDeleteRowSelected () {
             this.$refs.toast.activate('Deleting row...');
             try {
                 const response = await axios.post(this.deleteRoute, this.getDeleteRowFormData());
                 if (response.result !== false) {
-                    this.records = this.records.filter((record) => record.id !== this.selectedRecord.id);
+                    this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
                     this.$refs.toast.timeout('Row Deleted', true, 2000);
                 } else {
                     this.$refs.toast.timeout('Unable to delete', false, 2000);
@@ -243,7 +248,7 @@ export default {
         getDeleteRowFormData () {
             const formData = new FormData();
             formData.append('table', this.tableName);
-            formData.append('id', this.selectedRecord.id);
+            formData.append('id', this.selectedRow.id);
             return formData;
         },
 
@@ -256,7 +261,7 @@ export default {
         },
 
         /**
-         * Save all permissions
+         * Save all data
          *
          */
         async onSaveAllSelected () {
@@ -276,8 +281,6 @@ export default {
             } 
         },
 
-
-
         /**
          * animate settings to help context when filtering
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
@@ -286,8 +289,8 @@ export default {
          * @param {DOMElement} element - the element that's animating
          *
          */
-        onBeforeEnter (element) {
-            gsap.set(element, { height: 0 } );
+        onBeforeEnter (row) {
+            gsap.set(row, { height: 0 } );
         },
 
         /**
@@ -297,8 +300,8 @@ export default {
          * @param {Function} done - to be called once animation is complete
          *
          */
-        onEnter (element, done) {
-            gsap.to(element, 0.3, { height: 'auto', onComplete: done } );
+        onEnter (row, done) {
+            gsap.to(row, 0.3, { height: 'auto', onComplete: done } );
         },
 
         /**
@@ -308,11 +311,23 @@ export default {
          * @param {Function} done - to be called once animation is complete
          *
          */
-        onLeave (element, done) {
-            gsap.to(element, 0.3, { height: 0, onComplete: done } );
+        onLeave (row, done) {
+            gsap.to(row, 0.3, { height: 0, onComplete: done } );
         },
 
-
+        /**
+         * To highlight all rows which also have the same permission
+         * maybe an easy way to check which rows have the permission?
+         * 
+         */
+        onPermissionNameSelected (permissionName) {
+            if (this.selectedPermissionName === permissionName) { //so can toggle on/off
+                this.selectedPermissionName = '';
+            } else {
+                this.selectedPermissionName = permissionName;
+            }
+            
+        }
 
     }
 
@@ -325,7 +340,7 @@ export default {
         
         <div class="small-12 island">
             
-            <div v-if="records.length === 0" id="listEmptyState" class="empty-state">
+            <div v-if="rows.length === 0" id="listEmptyState" class="empty-state">
                 <i class="icon-list"></i>
                 <p>The {{ table.title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
             </div>
@@ -334,21 +349,19 @@ export default {
 
                 <input name="table" type="hidden" :value="tableName" />
 
-                <!-- {# This is used when hidden fields cannot be NULL. Existing records should already be set in DB #} -->
-                <input v-for="(field, index) in fixedList" :key="index" type="hidden" :name="`fixed-${field.key}`" :value="field.value" />
+                <!-- {# This is used when hidden columns cannot be NULL. Existing rows should already be set in DB #} -->
+                <input v-for="(column, index) in fixedList" :key="index" type="hidden" :name="`fixed-${column.key}`" :value="column.value" />
 
                 <section id="listEditor">
 
                     <div class="list-container">
 
                         <roles-list-header 
-                            :display-fields="displayFields"
+                            :header-columns="headerColumns"
                             :is-sortable="table.sortable"
                             :is-deletable="table.delete"
                         />
 
-                        <!-- {% set ulAttr = sortable ? 'class="information-list sortable ui-sortable" data-sortable data-list' : 'class="information-list unsortable" data-list' %} --> 
-                        <!-- <ul :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`" data-sortable data-list ref="recordsList"> -->
                         <transition-group
                             name="staggered-fade"
                             tag="ul"
@@ -360,24 +373,26 @@ export default {
                             @enter="onEnter"
                             @leave="onLeave"
                         >    
-                            <roles-list-record 
-                                v-for="(record, index) in records"
-                                :key="`${record.id}-${index}`"
-                                :display-fields="displayFields"
-                                :permission-fields="permissionFields"
-                                :record="record"
-                                :selected-record="selectedRecord"
+                            <roles-list-row
+                                v-for="(row, index) in rows"
+                                :key="`${row.id}-${index}`"
+                                :header-columns="headerColumns"
+                                :permission-columns="permissionColumns"
+                                :row="row"
+                                :selected-row="selectedRow"
                                 :is-permissions-open="isPermissionsOpen"
+                                :selected-permission-name="selectedPermissionName"
                                 :is-sortable="table.sortable"
                                 :is-deletable="table.delete"
                                 @on-permissions-selected="onPermissionsSelected"
-                                @on-delete-row-selected="onDeleteRecord"
+                                @on-permission-name-selected="onPermissionNameSelected"
+                                @on-delete-row-selected="onDeleteRow"
                             />
                         </transition-group>
 
                         <roles-list-permissions
-                            :permission-fields="permissionFields" 
-                            :selected-record="selectedRecord"
+                            :permission-columns="permissionColumns" 
+                            :selected-row="selectedRow"
                             :is-open="isPermissionsOpen" 
                             :save-route="saveRoute" 
                             @on-permissions-closed="onPermissionsClosed"
@@ -405,7 +420,7 @@ export default {
             <h2>Please Confirm</h2>
             <div data-alert class="alert-box warning">{{ table.deleteWarning }}</div>
             <ul class="flex-list buttons">
-                <li><a @click.prevent="onConfirmDeleteRecordSelected" class="button submit">Yes</a></li>
+                <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
                 <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
             </ul>
         </reveal-modal>
@@ -416,7 +431,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.list-container {
+.list-container { //so roles aren't shown when animating on/off on add/remove
     position: relative;
     overflow: hidden;
 }

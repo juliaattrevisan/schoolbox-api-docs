@@ -1,7 +1,7 @@
 <script>
 
 /**
- * Update an invidual records permissions
+ * Update an invidual rows permissions
  *
  */
 
@@ -16,11 +16,11 @@ export default {
     },
 
     props: {
-        permissionFields: { //the fields to display within the list item
+        permissionColumns: { //the columns to display within the list
             type: Array,
             required: true
         },
-        selectedRecord: { //to know which options to display
+        selectedRow: { //to know which row permission fields to display
             type: Object,
             required: true
         },
@@ -49,10 +49,10 @@ export default {
          * @returns { Array of Objects }
          */
         roleSpecificPermissions () {
-            if (this.selectedRecord.type === 'staff') {
-                return this.permissionFields;
+            if (this.selectedRow.type === 'staff') {
+                return this.permissionColumns;
             } else {
-                const onlyShowPasswordField = this.permissionFields.filter((field) => {
+                const onlyShowPasswordField = this.permissionColumns.filter((field) => {
                     return field.caption === 'Allow Password Change';
                 });
                 return onlyShowPasswordField;
@@ -136,14 +136,14 @@ export default {
 <template>
     <div class="permissions-outer-container" ref="outerContainer">
         <div class="permissions-inner-container checklist" ref="innerContainer">
-            <h4>{{ selectedRecord.name }} Permissions</h4>
+            <h4>{{ selectedRow.name }} Permissions</h4>
             <a href="#close-permissions" class="close-permissions-button" @click.prevent="onClosePermissionsSelected">X</a>
             <ul class="option-list" data-option-list>
                 <li v-for="(field, index) in roleSpecificPermissions" :key="index">
                     <input
                         :id="field.caption"
                         type="checkbox"
-                        v-model="selectedRecord[field.key]"
+                        v-model="selectedRow[field.key]"
                     />
                     <label :for="field.caption">{{ field.caption }}</label>
                 </li>

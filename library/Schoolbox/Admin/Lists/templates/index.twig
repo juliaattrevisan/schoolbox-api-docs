@@ -151,7 +151,7 @@
             <roles-list 
                 table-name="{{ table }}"
                 :table="{{ tables[table] | json_encode }}"
-                :initial-records="{{ records | json_encode }}"
+                :initial-rows="{{ records | json_encode }}"
                 delete-route={{ routeLookup('adminLists.postDelete') }}
                 save-route="/adminv2/lists/save"
             />

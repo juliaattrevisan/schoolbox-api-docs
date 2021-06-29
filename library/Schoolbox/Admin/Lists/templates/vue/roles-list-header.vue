@@ -8,7 +8,7 @@
 export default {
     
     props: {
-        displayFields: { //the displayFields to display within the header
+        headerColumns: { //the headerColumns to display within the header
             type: Array,
             required: true
         },
@@ -29,9 +29,9 @@ export default {
     <div :class="`${ isSortable ? 'sortable' : '' }`">
         <header :class="`list-header actions-small-${ isDeletable ? '1' : '0' }`">
             <div class="list-item">
-                <div v-for="(field, index) in displayFields" :key="index" :class="`small-12 medium-${ field.width ? field.width : '2' } columns`">
-                    {{ field.caption }}
-                    <span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span>
+                <div v-for="(column, index) in headerColumns" :key="index" :class="`small-12 medium-${ column.width ? column.width : '2' } columns`">
+                    {{ column.caption }}
+                    <span v-if="column.tooltip" :class="`hint has-tip tip-${ column.tooltipPosition ? column.tooltipPosition : 'top' }`" data-tooltip :title="column.tooltip">?</span>
                 </div>
             </div>
         </header>
