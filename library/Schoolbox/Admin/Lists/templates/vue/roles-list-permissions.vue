@@ -6,9 +6,15 @@
  */
 
 import gsap from 'gsap/all';
+import axios from 'axios';
+import Toast from '@schoolbox/toast';
 
 export default {
     
+    components: {
+        Toast
+    },
+
     props: {
         permissionFields: { //the fields to display within the list item
             type: Array,
@@ -22,12 +28,23 @@ export default {
             type: Boolean,
             required: true
         },
+        saveRoute: { //url of entire list save
+            type: String,
+            required: true
+        }
+    },
+
+    data () {
+        return {
+            saveStatus: 'Save Permissions' //to update the button text when saving
+        }
     },
 
     computed: {
 
         /**
-         * Only show those fields relevant to the user type
+         * Only show those fields relevant to the user type,
+         * showing all for staff and just password change for all others
          * 
          * @returns { Array of Objects }
          */
@@ -72,11 +89,25 @@ export default {
         },
 
         /**
-         * Save all the options
+         * Save all the permissions options, currently just using the 
+         * existing save all route
          * 
          */
-        onSavePermissionsSelected () {
-            // 
+        async onSavePermissionsSelected () {
+            this.saveStatus = 'Saving...';
+            this.$refs.toast.activate('Saving...');
+            try {
+                const formData = new FormData(this.$parent.$refs.form);
+                const response = await axios.post(this.saveRoute, formData);
+                if (response.status === 200) {
+                    this.saveStatus = 'Save Permissions';
+                    this.$refs.toast.timeout('Save successful', true, 2000);
+                } else {
+                    this.$refs.toast.timeout('Unable to save', false, 2000);
+                }
+            } catch (error) {
+                this.$refs.toast.timeout('Unable to save', false, 2000);
+            } 
         },
 
         /**
@@ -107,19 +138,19 @@ export default {
         <div class="permissions-inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRecord.name }} Permissions</h4>
             <a href="#close-permissions" class="close-permissions-button" @click.prevent="onClosePermissionsSelected">X</a>
-            <ul class="option-list">
+            <ul class="option-list" data-option-list>
                 <li v-for="(field, index) in roleSpecificPermissions" :key="index">
                     <input
                         :id="field.caption"
-                        :name="field.caption"
                         type="checkbox"
                         v-model="selectedRecord[field.key]"
                     />
                     <label :for="field.caption">{{ field.caption }}</label>
                 </li>
             </ul>
-            <button @click.prevent="onSavePermissionsSelected" class="save-permissions-button">Save Permissions</button>
+            <button @click.prevent="onSavePermissionsSelected" class="save-permissions-button">{{ saveStatus }}</button>
         </div>
+        <toast ref="toast"></toast>
     </div>
 </template>
 
@@ -134,7 +165,7 @@ export default {
     right: 0px;
     top: 0px;
     width: 60%;
-    max-width: 365px;
+    max-width: 295px;
     height: 100%;
     overflow: hidden;
 }

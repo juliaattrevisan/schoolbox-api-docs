@@ -38,12 +38,6 @@ export default {
         },
     },
 
-    data () {
-        return {
-            key: -1, //to track the index to use in form submit, which starts at 1 rather than 0
-        }
-    },
-
     computed: {
 
         /**
@@ -60,13 +54,14 @@ export default {
         },
 
         /**
-         * To loop through those <input hidden> options that won't be shown or used
+         * To loop through and add <input hidden> options for permission settings
+         * removing those that are added otherwise, or not part of the form data to submit
          * 
          * @returns { Array of Objects }
          */
         permissionOptions () {
             return this.recordOptions.filter((field) => {
-                return (field.key !== 'name' && field.key !== 'type' && field.key !== 'id');
+                return (field.key !== 'name' && field.key !== 'type' && field.key !== 'id' && field.key !== 'isNew');
             }); 
         },
 
@@ -76,7 +71,7 @@ export default {
          * @returns { Boolean }
          */
         isUnSelectedRecord () {
-            return (this.isPermissionsOpen && this.selectedRecord.id !== this.record.id) //is a record selected, and is it this record
+            return (this.isPermissionsOpen && this.selectedRecord.id !== this.record.id) //is a record selected, and is it this record if so
         },
 
         /**
@@ -86,17 +81,38 @@ export default {
          */
         currentPermissionFields () {
             return this.permissionFields.filter((field, index) => this.permissionOptions[index].value); //when the value is set to true, put in the list
+        },
+
+        /**
+         * For the form variables to reference
+         * 
+         */
+        initialIndex () {
+            return this.$vnode.key + 1;
         }
 
     },
 
-    created () {
-        this.key = this.$vnode.key + 1;
-    },
+    watch: {
 
-    // mounted () {
-    //     if (this.$vnode.key === 0) debugger; 
-    // },
+        /**
+         * Preset the permission options when setting between staff / all others
+         * 
+         */
+        'record.type': function (newValue) {
+            if (newValue === 'staff') { //set all enabled when staff
+                this.permissionOptions.forEach((option) => {
+                    this.record[option.key] = true;
+                });
+            } else { //otherwise only allowPasswordChange
+                this.permissionOptions.forEach((option) => {
+                    this.record[option.key] = false;
+                });
+                this.record['canChangePassword'] = true;
+            }
+        }
+
+    },
 
     methods: {
         
@@ -123,12 +139,9 @@ export default {
 
 <template>
 
-    <li :data-record-id="record.id" :class="[ isUnSelectedRecord ? 'un-selected-record' : '', 'list-item-container' ]">
+    <li :class="[ isUnSelectedRecord ? 'un-selected-record' : '', 'list-item-container' ]">
         
-        <input type="hidden" :name="`id[${key}]`" :value="record.id">
-        
-        <!-- the checkboxes are selected by #roles-list-configure-access.vue so need to track via hidden vars -->
-        <input v-for="(field, index) in permissionOptions" :name="`checkbox-${field.key}[${record.id}]`" type="hidden" :value="`${Number(field.value)}`" :key="index">
+        <input type="hidden" :name="`id[${initialIndex}]`" :value="record.id">
        
         <div :class="`actions-small-${ isDeletable ? '1' : '0' }`">
             
@@ -139,24 +152,27 @@ export default {
                     <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
                         <span class="hide-for-medium-up">{{ field.caption }}</span>
                         <template v-if="field.lookup">
-                            <select :name="`value-${recordOptions[index].key}[${key}]`" v-model="record[field.key]" :title="recordOptions[index].value">
+                            <select :name="`value-${recordOptions[index].key}[${initialIndex}]`" v-model="record[field.key]" :title="recordOptions[index].value">
                                 <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
                             </select>
                         </template>
                         <template v-else-if="field.mandatory">
-                            <input :name="`mandatory-${recordOptions[index].key}[${key}]`" type="text" :placeholder="field.caption" v-model="record[field.key]" :maxlength="field.maxLength ? field.maxLength : 0">
+                            <input :name="`mandatory-${recordOptions[index].key}[${initialIndex}]`" type="text" :placeholder="field.caption" v-model="record[field.key]" :maxlength="field.maxLength ? field.maxLength : 0">
                         </template>
                         <template v-else>
-                            <transition-group name="permissions-list" tag="div" class="permissions-list">
-                                <span v-for="field in currentPermissionFields" :key="field.caption" class="permission-list-item" >{{ field.caption }}</span>
-                            </transition-group>
+                            <div class="permissions-list-container">
+                                <transition-group name="permissions-list" tag="div" class="permissions-list">
+                                    <span v-for="field in currentPermissionFields" :key="field.caption" class="permission-list-item" >{{ field.caption }}</span>
+                                </transition-group>
+                                <button @click.prevent="onPermissionsSelected" class="configure-permissions-button">Update Permissions</button>
+                            </div>
                         </template>
                     </div>
                 </template>
-                <div class="small-12 medium-2 column">
-                    <button @click.prevent="onPermissionsSelected" class="configure-permissions-button">Configure Permissions</button>
-                </div>
             </div><!-- .list-item -->
+
+            <!-- the checkboxes are selected by #roles-list-configure-access.vue so need to track via hidden vars -->
+            <input v-for="(field, index) in permissionOptions" :name="`checkbox-${field.key}[${initialIndex}]`" type="hidden" :value="`${Number(field.value)}`" :key="index">
 
             <nav>
                 <a @click.prevent="onDeleteRowSelected" class="delete-record-button icon-delete" href="#delete-row" title="Delete Row"></a>
@@ -178,7 +194,14 @@ export default {
 }
 
 .un-selected-record {
-    opacity: 0.25;
+    opacity: 0.2;
+}
+
+.permissions-list-container {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    border: 1px solid $form-border-color;
 }
 
 .permissions-list {
@@ -188,14 +211,14 @@ export default {
     // gap: 5px;
     width: 100%;
     // min-height: 40px;
-    border: 1px solid $form-border-color;
+    // border: 1px solid $form-border-color;
     padding: 2px;
     transition: height 0.3s;
 }
 
 .permissions-list-enter, .permissions-list-leave-to {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translateY(5px);
 }
 .permissions-list-leave-active {
   position: absolute;
@@ -212,8 +235,9 @@ export default {
 }
 
 .configure-permissions-button {
-    width: 100%;
+    flex: 0 0 220px;
     margin: 0px;
+    padding: 0px;
 }
 
 .delete-record-button {

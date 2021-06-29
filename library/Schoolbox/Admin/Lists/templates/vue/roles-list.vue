@@ -7,6 +7,7 @@
  */
 
 import axios from 'axios';
+import { gsap } from 'gsap/all'
 import RolesListHeader from './roles-list-header';
 import RolesListPermissions from './roles-list-permissions';
 import RolesListRecord from './roles-list-record';
@@ -51,7 +52,8 @@ export default {
             records: [], //to display and possibly edit the records 
             isPermissionsOpen: false, //to open and close the list
             selectedRecord: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
-            saveStatus: 'Save All' //to update the button text when saving
+            saveStatus: 'Save All', //to update the button text when saving
+            newId: 0, //to add another row to the db, decrement with each new row added
         }   
     },
 
@@ -121,6 +123,7 @@ export default {
 
         /**
          * Add in the id so can link to the DB on form submit
+         * and a boolean to know whether the record is one being newly added
          * 
          */
         initRecords () {
@@ -128,6 +131,7 @@ export default {
             const recordKeys = Object.keys(this.initialRecords);
             this.records.forEach((record, index) => { 
                 record.id = recordKeys[index];
+                record.isNew = false;
             });
         },
 
@@ -142,6 +146,25 @@ export default {
         },
 
         /**
+         * Show the permissions options
+         * 
+         */
+        onPermissionsSelected (selectedRecord) {
+            this.selectedRecord = selectedRecord;
+            this.isPermissionsOpen = true;
+            document.querySelector('[data-sortable]').style.pointerEvents = 'none'; //prevent ediding/sorting while permissions is open
+        },
+
+        /**
+         * Close the permissions options
+         * 
+         */
+        onPermissionsClosed () {
+            this.isPermissionsOpen = false;
+            document.querySelector('[data-sortable]').style.pointerEvents = 'auto';
+        },
+
+        /**
          * Push in a new row with basic guest access
          * 
          */
@@ -150,27 +173,32 @@ export default {
                 {
                     name: '',
                     type: 'guest',
-                    id: '-1',
-                    canChangePassword: false
+                    canChangePassword: true,
+                    viewStudentProfile: false,
+                    viewStudentGrades: false,
+                    viewStudentCalendar: false,
+                    viewParentProfile: false,
+                    accessEportfolio: false,
+                    accessPastoral: false,
+                    createBadges: false,
+                    createEvidence: false,
+                    viewParentDirectory: false,
+                    viewStaffDirectory: false,
+                    id: this.getNextId(),
+                    isNew: true,
                 }
-            )
+            );
         },
 
         /**
-         * Show the permissions options
+         * Retrieve the lowest id and decrement for it to 
+         * be used for the new row
          * 
+         * @param { String }
          */
-        onPermissionsSelected (selectedRecord) {
-            this.selectedRecord = selectedRecord;
-            this.isPermissionsOpen = true;
-        },
-
-        /**
-         * close the permissions options
-         * 
-         */
-        onPermissionsClosed () {
-            this.isPermissionsOpen = false;
+        getNextId () {
+            this.newId--;
+            return this.newId.toString();
         },
 
         /**
@@ -180,7 +208,7 @@ export default {
          */
         onDeleteRecord (selectedRecord) {
             this.selectedRecord = selectedRecord;
-            if (selectedRecord.id === '-1') { //hasn't been placed int he DB yet, so no need to confirm its removal
+            if (selectedRecord.isNew) { //hasn't been placed int he DB yet, so no need to confirm its removal
                 this.records = this.records.filter((record) => record.id !== this.selectedRecord.id);
             } else {
                 this.$refs.deleteModal.open();
@@ -194,24 +222,29 @@ export default {
         async onConfirmDeleteRecordSelected () {
             this.$refs.toast.activate('Deleting row...');
             try {
-                const params = { 
-                    table: this.tableName,
-                    id: this.selectedRecord.id
-                }
-                const response = await axios.post(this.deleteRoute, params);
+                const response = await axios.post(this.deleteRoute, this.getDeleteRowFormData());
                 if (response.result !== false) {
                     this.records = this.records.filter((record) => record.id !== this.selectedRecord.id);
-                    $toast.toastTimeout({text: 'Item deleted', css: 'success'});
+                    this.$refs.toast.timeout('Row Deleted', true, 2000);
                 } else {
-                    $toast.toastTimeout({text: 'Deletion Failed. ' + response.message, css: 'alert'});
+                    this.$refs.toast.timeout('Unable to delete', false, 2000);
                 }
-
             } catch (error) {
                 this.$refs.toast.timeout('Unable to delete', false, 2000);
-            } 
-            finally {
+            } finally {
                 this.$refs.deleteModal.close();
             }
+        },
+
+        /**
+         * Cancel the the selected row deletion
+         *
+         */
+        getDeleteRowFormData () {
+            const formData = new FormData();
+            formData.append('table', this.tableName);
+            formData.append('id', this.selectedRecord.id);
+            return formData;
         },
 
         /**
@@ -223,34 +256,63 @@ export default {
         },
 
         /**
-         * Close the permissions modal
-         *
-         */
-        onClosePermissionsSelected () {
-            
-        },
-
-        /**
          * Save all permissions
          *
          */
         async onSaveAllSelected () {
-            this.saveStatus = 'Saving...'
-            this.$refs.toast.activate('Saving row...');
+            this.saveStatus = 'Saving...';
+            this.$refs.toast.activate('Saving...');
             try {
                 const formData = new FormData(this.$refs.form);
                 const response = await axios.post(this.saveRoute, formData);
                 if (response.status === 200) {
-                    this.saveStatus = 'Saved';
-                } 
+                    this.saveStatus = 'Save All';
+                    this.$refs.toast.timeout('Save successful', true, 2000);
+                } else {
+                    this.$refs.toast.timeout('Unable to save', false, 2000);
+                }
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
             } 
-            finally {
-                this.$refs.deleteModal.close();
-                this.saveStatus = 'Save All';
-            }
         },
+
+
+
+        /**
+         * animate settings to help context when filtering
+         * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
+         * what happens before shown
+         *
+         * @param {DOMElement} element - the element that's animating
+         *
+         */
+        onBeforeEnter (element) {
+            gsap.set(element, { height: 0 } );
+        },
+
+        /**
+         * how it element animates on
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onEnter (element, done) {
+            gsap.to(element, 0.3, { height: 'auto', onComplete: done } );
+        },
+
+        /**
+         * how the element animates off
+         *
+         * @param {DOMElement} element - the element that's animating
+         * @param {Function} done - to be called once animation is complete
+         *
+         */
+        onLeave (element, done) {
+            gsap.to(element, 0.3, { height: 0, onComplete: done } );
+        },
+
+
 
     }
 
@@ -286,10 +348,21 @@ export default {
                         />
 
                         <!-- {% set ulAttr = sortable ? 'class="information-list sortable ui-sortable" data-sortable data-list' : 'class="information-list unsortable" data-list' %} --> 
-                        <ul :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`" data-sortable data-list>
+                        <!-- <ul :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`" data-sortable data-list ref="recordsList"> -->
+                        <transition-group
+                            name="staggered-fade"
+                            tag="ul"
+                            :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`"
+                            v-bind:css="false"
+                            data-sortable 
+                            data-list 
+                            @before-enter="onBeforeEnter"
+                            @enter="onEnter"
+                            @leave="onLeave"
+                        >    
                             <roles-list-record 
                                 v-for="(record, index) in records"
-                                :key="index"
+                                :key="`${record.id}-${index}`"
                                 :display-fields="displayFields"
                                 :permission-fields="permissionFields"
                                 :record="record"
@@ -300,12 +373,13 @@ export default {
                                 @on-permissions-selected="onPermissionsSelected"
                                 @on-delete-row-selected="onDeleteRecord"
                             />
-                        </ul>
+                        </transition-group>
 
                         <roles-list-permissions
                             :permission-fields="permissionFields" 
                             :selected-record="selectedRecord"
                             :is-open="isPermissionsOpen" 
+                            :save-route="saveRoute" 
                             @on-permissions-closed="onPermissionsClosed"
                         />
 
@@ -320,7 +394,6 @@ export default {
                 </section>
 
                 <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" />
-                <!-- <input type="submit" value="Save All" /> -->
 
             </form>
 
@@ -344,6 +417,15 @@ export default {
 <style lang="scss" scoped>
 
 .list-container {
+    position: relative;
+    overflow: hidden;
+}
+
+.information-list {
+    position: relative;
+}
+
+.component-action {
     position: relative;
 }
 
