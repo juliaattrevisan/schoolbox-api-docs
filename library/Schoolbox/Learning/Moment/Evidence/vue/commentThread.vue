@@ -36,6 +36,10 @@ export default {
         },
         canComment: {
             type: Boolean,
+        },
+        siteVersion: {
+            type: String,
+            required: true
         }
     },
     data() {
@@ -151,17 +155,6 @@ export default {
 
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
-
-            //file is referenced from /js/bundle/ckeditor4-vue.js according to the publicPath and filename props within output in webpack.config.js
-            //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
-            // import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
-            //     .then(({ default: CKEditor }) => {
-            //         Vue.component('ckeditor', CKEditor.component); //register the component for use once ready
-            //         this.isCKEditorLoaded = true;
-            //     })
-            //     .catch(err => {
-            //         this.$refs.toast.timeout('Loading comments failed', false, 5000);
-            //     });
 
             const loadScripts = async () => {
                 

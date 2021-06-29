@@ -28,6 +28,12 @@ export default {
         foundationMixin,
         cdnPrefixMixin,
     ],
+    props: {
+        siteVersion: {
+            type: String,
+            required: true
+        }
+    },
     data() {
         return {
             data:     [],
@@ -315,10 +321,12 @@ export default {
                             </div>
 
                             <div class="feed-comments small-12 columns">
-                                <comment-thread :thread="evidence.object.discussionThread"
-                                                :create-thread-endpoint="evidence.object._links.createThread"
-                                                :can-comment="config.canComment"
-                                                :cdn-prefix="cdnPrefix"
+                                <comment-thread 
+                                    :thread="evidence.object.discussionThread"
+                                    :create-thread-endpoint="evidence.object._links.createThread"
+                                    :can-comment="config.canComment"
+                                    :cdn-prefix="cdnPrefix"
+                                    :site-version="siteVersion"
                                 />
                             </div>
                         </template>
