@@ -36,7 +36,8 @@ export default {
 
     data () {
         return {
-            saveStatus: 'Save Permissions' //to update the button text when saving
+            saveStatus: 'Save Permissions', //to update the button text when saving
+            isProcessing: false //to prevent multiple rapid-fire submissions
         }
     },
 
@@ -94,6 +95,7 @@ export default {
          * 
          */
         async onSavePermissionsSelected () {
+            this.isProcessing = true;
             this.saveStatus = 'Saving...';
             this.$refs.toast.activate('Saving...');
             try {
@@ -107,7 +109,9 @@ export default {
                 }
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
-            } 
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
         /**
@@ -185,7 +189,7 @@ export default {
     position: absolute;
     top: 0.5rem;
     right: 1rem;
-    padding: 5px 10px;
+    padding: 2px 8px;
     font-size: 1.5rem;
     &:hover {
         background-color: $content-ui-hover;

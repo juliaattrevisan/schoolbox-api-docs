@@ -53,7 +53,8 @@ export default {
             selectedRow: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
             saveStatus: 'Save All', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
-            selectedPermissionName: '' //to highlight all other rows that have that permission
+            selectedPermissionName: '', //to highlight all other rows that have that permission
+            isProcessing: false //to prevent multiple rapid-fire submissions
         }   
     },
 
@@ -225,6 +226,7 @@ export default {
          *
          */
         async onConfirmDeleteRowSelected () {
+            this.isProcessing = true;
             this.$refs.toast.activate('Deleting row...');
             try {
                 const response = await axios.post(this.deleteRoute, this.getDeleteRowFormData());
@@ -238,6 +240,7 @@ export default {
                 this.$refs.toast.timeout('Unable to delete', false, 2000);
             } finally {
                 this.$refs.deleteModal.close();
+                this.isProcessing = false;
             }
         },
 
@@ -265,6 +268,7 @@ export default {
          *
          */
         async onSaveAllSelected () {
+            this.isProcessing = true;
             this.saveStatus = 'Saving...';
             this.$refs.toast.activate('Saving...');
             try {
@@ -278,7 +282,9 @@ export default {
                 }
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
-            } 
+            } finally {
+                this.isProcessing = false;
+            }
         },
 
         /**
@@ -400,7 +406,7 @@ export default {
 
                         <div v-if="!table.noNewRecords" class="component-action">
                             <section>
-                                <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button">Add New Row</a>
+                                <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
                             </section>
                         </div>
 
@@ -408,7 +414,7 @@ export default {
 
                 </section>
 
-                <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" />
+                <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" :disabled="isProcessing" />
 
             </form>
 

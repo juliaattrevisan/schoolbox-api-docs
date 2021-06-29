@@ -100,7 +100,7 @@ export default {
     watch: {
 
         /**
-         * Preset the permission options when setting between staff / all others
+         * Preset the permission fields when setting between staff / all others
          * 
          */
         'row.type': function (newValue) {
@@ -121,7 +121,7 @@ export default {
     methods: {
         
         /**
-         * Show the permission options
+         * Show the permission columns
          * 
          */
         onPermissionsSelected () {
