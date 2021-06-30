@@ -54,7 +54,8 @@ export default {
             saveStatus: 'Save All', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
             selectedPermissionName: '', //to highlight all other rows that have that permission
-            isProcessing: false //to prevent multiple rapid-fire submissions
+            isProcessing: false, //to prevent multiple rapid-fire submissions
+            isSaving: false,
         }   
     },
 
@@ -81,7 +82,9 @@ export default {
          * @returns { Array of Objects }
          */
         headerColumns () {
-            const headerColumns = this.columns.filter((column, index) => index < 2); //which are the first two columns
+            const headerColumns = this.columns.filter((column) => {
+                return (column.caption === 'Name' || column.caption === 'Role Type'); 
+            }); 
             headerColumns.push( { //and add another to allow space for Permissions UI
                 caption: 'Permissions', 
                 width: '8', 
@@ -97,7 +100,7 @@ export default {
          */
         permissionColumns () {
             return this.columns.filter((column) => {
-                return (column.caption !== 'Name' && column.caption !== 'Role Type'); //all excluding name and type
+                return (column.caption !== 'Name' && column.caption !== 'Role Type' && column.caption !== 'sequence'); //all excluding Name, Role Type and sequence
             });
         }, 
 
@@ -112,6 +115,15 @@ export default {
                 fixedList.push({ key: key, value: value });
             }
             return fixedList;
+        },
+
+        /**
+         * To display the rows how they have been sorted
+         * 
+         * @returns { Array of Objects }
+         */
+        rowsSortedBySequence () {
+            return this.rows.slice().sort((a, b) => a.sequence - b.sequence);
         },
 
     },
@@ -189,10 +201,21 @@ export default {
                     createEvidence: false,
                     viewParentDirectory: false,
                     viewStaffDirectory: false,
+                    sequence: this.getNextSequence(),
                     id: this.getNextId(),
                     isNew: true,
                 }
             );
+        },
+
+        /**
+         * The new row is placed at the bottom of the list, so it'll 
+         * be the last number in the sequence
+         * 
+         * @param { Number }
+         */
+        getNextSequence () {
+            return this.rows.length + 1;
         },
 
         /**
@@ -268,6 +291,8 @@ export default {
          *
          */
         async onSaveAllSelected () {
+            this.isSaving = true;
+            this.updateSequenceOrder();
             this.isProcessing = true;
             this.saveStatus = 'Saving...';
             this.$refs.toast.activate('Saving...');
@@ -283,8 +308,22 @@ export default {
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
+                this.isSaving = false;
                 this.isProcessing = false;
             }
+        },
+
+        /**
+         * Ensure the correct sorting order is reflected
+         *
+         */
+        updateSequenceOrder () {
+            const allRowElements = document.querySelector('[data-list]').children;
+            Array.from(allRowElements).forEach( (rowElement, index) => {
+                const rowId = rowElement.dataset.rowId;
+                const matchingRowData = this.rows.find((row) => Number(row.id) === Number(rowId));
+                matchingRowData.sequence = ++index;
+            });
         },
 
         /**
@@ -296,7 +335,9 @@ export default {
          *
          */
         onBeforeEnter (row) {
-            gsap.set(row, { height: 0 } );
+            if (!this.isSaving) {
+                gsap.set(row, { height: 0 } );
+            }
         },
 
         /**
@@ -307,7 +348,11 @@ export default {
          *
          */
         onEnter (row, done) {
-            gsap.to(row, 0.3, { height: 'auto', onComplete: done } );
+            if (this.isSaving) {
+                done();
+            } else {
+                gsap.to(row, 0.3, { height: 'auto', onComplete: done } );
+            }
         },
 
         /**
@@ -318,7 +363,11 @@ export default {
          *
          */
         onLeave (row, done) {
-            gsap.to(row, 0.3, { height: 0, onComplete: done } );
+            if (this.isSaving) {
+                done();
+            } else {
+                gsap.to(row, 0.3, { height: 0, onComplete: done } );
+            }
         },
 
         /**
@@ -380,8 +429,9 @@ export default {
                             @leave="onLeave"
                         >    
                             <roles-list-row
-                                v-for="(row, index) in rows"
+                                v-for="(row, index) in rowsSortedBySequence"
                                 :key="`${row.id}-${index}`"
+                                :initial-index="index + 1"
                                 :header-columns="headerColumns"
                                 :permission-columns="permissionColumns"
                                 :row="row"

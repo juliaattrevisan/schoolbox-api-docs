@@ -418,6 +418,10 @@ class Controller extends Base
                         'width'     => 1,
                         'mandatory' => true,
                     ],
+                    'sequence'      => [
+                        'caption'   => 'sequence',
+                        'width'     => 0,
+                    ],
                 ]
             ],
             'house' => [

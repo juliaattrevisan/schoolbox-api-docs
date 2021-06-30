@@ -8,6 +8,10 @@
 export default {
     
     props: {
+        initialIndex: { 
+            type: Number,
+            required: true
+        },
         headerColumns: { //the headerColumns to display within the list item
             type: Array,
             required: true
@@ -65,7 +69,7 @@ export default {
          */
         permissionFields () {
             return this.rowFields.filter((field) => {
-                return (field.key !== 'name' && field.key !== 'type' && field.key !== 'id' && field.key !== 'isNew');
+                return (field.key !== 'name' && field.key !== 'type' && field.key !== 'id' && field.key !== 'isNew' && field.key !== 'sequence');
             }); 
         },
 
@@ -87,13 +91,13 @@ export default {
             return (this.isPermissionsOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
-        /**
-         * For the form variables to reference
-         * 
-         */
-        initialIndex () {
-            return this.$vnode.key + 1;
-        }
+        // /**
+        //  * For the form variables to reference
+        //  * 
+        //  */
+        // initialIndex () {
+        //     return this.$vnode.key + 1;
+        // }
 
     },
 
@@ -153,7 +157,7 @@ export default {
 
 <template>
 
-    <li :class="[ isUnselectedRow ? 'un-selected-row' : '', 'list-item-container' ]">
+    <li :class="[ isUnselectedRow ? 'un-selected-row' : '', 'list-item-container' ]" :data-row-id="row.id">
         
         <input type="hidden" :name="`id[${initialIndex}]`" :value="row.id">
        
@@ -187,6 +191,8 @@ export default {
 
             <!-- the checkboxes are selected by #roles-list-configure-access.vue so need to track via hidden vars -->
             <input v-for="(field, index) in permissionFields" :name="`checkbox-${field.key}[${initialIndex}]`" type="hidden" :value="`${Number(field.value)}`" :key="index">
+
+            <input type="hidden" :name="`sequence[${initialIndex}]`" :value="row.sequence">
 
             <nav>
                 <a @click.prevent="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
