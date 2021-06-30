@@ -174,6 +174,7 @@ module.exports = {
         badgeList: './library/Schoolbox/Learning/Badge/vue/badgeList.main.js',
         badgeListForm: './library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.main.js',
         evidenceMediaRecording: './library/Schoolbox/Learning/Moment/Evidence/vue/initEvidenceMediaRecording.js',
+        checkShareWorkButtons: './library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js',
 
         //Admin
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
@@ -194,13 +195,15 @@ module.exports = {
 
         //Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/initRecordMediaModal.js',
+        checkRecordButton: './templates/core/resources/filesystem/js/checkRecordButton.js',
+
+        // Class List
+        classList: './library/Schoolbox/Learning/vue/init-class-list.js',
 
         //Sass
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
         editor: './www/static/css/foundation/editor.scss',
 
-        // Class List
-        classList: './library/Schoolbox/Learning/vue/init-class-list.js'
     },
     output: {
         path: path.resolve(__dirname, 'www/static/js/bundle'),
