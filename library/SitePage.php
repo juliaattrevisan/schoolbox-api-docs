@@ -159,7 +159,7 @@ class SitePage extends Page
      */
     public function setSite()
     {
-        $this->site = $this->config->get('site_location');
+        $this->site = $this->config->get('site_school_code');
         return true;
     }
 

@@ -48,8 +48,8 @@ class Mailer extends \Alaress\Mail\AbstractMailer
     {
         $root = defined('MAIL_templates') ? MAIL_templates : SITE_root . '/templates';
 
-        if (is_file($root . '/' . Config::get('site_location') . '/email/' . $template)) {
-            return Config::get('site_location') . '/email/' . $template;
+        if (is_file($root . '/' . Config::get('site_school_code') . '/email/' . $template)) {
+            return Config::get('site_school_code') . '/email/' . $template;
         } else {
             return 'core/email/' . $template;
         }
@@ -92,20 +92,20 @@ class Mailer extends \Alaress\Mail\AbstractMailer
      * template path for this class.
      *
      * Gets around the issue with mail templates always being expected to be in
-     * "templates/{$site_location,core}/email".
+     * "templates/{$site_school_code,core}/email".
      *
      * I don't want it to be static either, but it has to be as I need to call
      * this method before the mailer object gets created.
      *
      * @param string $template  A path to a PHPLib template
      *                          Example: "modules/leave/someEmail.tpl" will
-     *                          check "templates/$site_location/" for this
+     *                          check "templates/$site_school_code/" for this
      *                          template first, then "templates/core"
      * @return string
      */
     public static function translateTemplatePathToMailPath($template)
     {
-        $schoolTemplate  = strtolower(Config::get('site_location')) . '/' . $template;
+        $schoolTemplate  = strtolower(Config::get('site_school_code')) . '/' . $template;
         $genericTemplate = 'core/' . $template;
         if (file_exists(SITE_root . '/templates/' . $schoolTemplate)) {
             return '../../' . $schoolTemplate;

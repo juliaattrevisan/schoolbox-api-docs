@@ -61,7 +61,7 @@ Visit [http://192.168.36.10/search?keyword=scott#all,1](http://192.168.36.10/sea
 All templates outside of Aura modules live within `templates/`.
 
 The default version of the template lives within `templates/core/`; if a
-version lives within `templates/${config.site_location}`, it will be used
+version lives within `templates/${config.site_school_code}`, it will be used
 instead.
 
 
@@ -84,5 +84,5 @@ Twig template namespace in addition to their default empty namespace.
 
 This `@core` namespace is exactly the same as the default
 empty namespace, except that it does not include the
-`templates/${config.site_location}` subfolder; this allows custom templates to
+`templates/${config.site_school_code}` subfolder; this allows custom templates to
 extend the core version (which will unambiguously point to the base version).

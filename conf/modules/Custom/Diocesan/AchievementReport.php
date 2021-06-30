@@ -26,7 +26,7 @@ class AchievementReport implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-//        if ($di->get('config')->get('site_location') == 'diocesan') {
+//        if ($di->get('config')->get('site_school_code') == 'diocesan') {
             $module = new Module($di);
             $module->init('/modules/custom/diocesan/achievementreport');
 //        }

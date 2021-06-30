@@ -208,7 +208,7 @@ class DataSync
         $this->config                 = $config;
         $this->persist                = $persist;
         $this->log                    = $log;
-        $this->siteLocation           = strtolower($config->get('site_location'));
+        $this->siteLocation           = strtolower($config->get('site_school_code'));
     }
 
 

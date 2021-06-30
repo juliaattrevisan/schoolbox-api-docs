@@ -273,7 +273,7 @@ class Session
             // Store password as hash for DAV authentication later
             $save = [
                 'username' => $username,
-                'hash'     => md5($username . ':' . Config::get('site_location') . ':' . $password)
+                'hash'     => md5($username . ':' . Config::get('site_school_code') . ':' . $password)
             ];
 
             // ensure a key is set on login

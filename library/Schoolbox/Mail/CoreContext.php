@@ -28,7 +28,7 @@ class CoreContext
             'school_name',
             'school_address',
             'site_hostname',
-            'site_location',
+            'site_school_code',
             'site_domain',
             'forgotten_password',
             'feedback_url',
@@ -57,7 +57,7 @@ class CoreContext
         // I'm reasonably sure that these logos are not used anymore.
         // I can find no reference to `config.logo` in twig templates.
         // TODO remove the old logo images completely
-//        $site = $this->context['config']['site_location'];
+//        $site = $this->context['config']['site_school_code'];
 //
 //        $possibleLogos = array(
 //            'email-logo',

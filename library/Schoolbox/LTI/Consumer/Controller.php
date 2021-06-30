@@ -410,7 +410,7 @@ class Controller extends Base
             'launch_presentation_return_url'         => $launchPresentationReturnUrl,
             'ext_content_return_types'               => $returnTypes,
             'ext_content_return_url'                 => $extContentReturnUrl,
-            'tool_consumer_instance_guid'            => $this->getConfigLoader()->get('site_location'),
+            'tool_consumer_instance_guid'            => $this->getConfigLoader()->get('site_school_code'),
             'tool_consumer_instance_name'            => $this->getConfigLoader()->get('school_name'),
             'tool_consumer_instance_description'     => 'Schoolbox LMS',
             'tool_consumer_instance_url'             => $this->baseUrl,

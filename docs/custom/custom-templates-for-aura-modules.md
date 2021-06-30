@@ -53,7 +53,7 @@ schools require template customisation.
 
 ### Folder layout
 
-School-specific templates are stored in the `custom/${config.site_location}`
+School-specific templates are stored in the `custom/${config.site_school_code}`
 subfolder of the module's template folder, as configured in the `Module`
 class' `initTemplatePaths` method.
 
@@ -90,5 +90,5 @@ Twig template namespace in addition to their default `@${namespace}` namespace.
 
 This `@${namespace}:core` namespace is exactly the same as the default
 `${namespace}` namespace, except that it does not include the
-`custom/${config.site_location}` subfolder; this allows custom templates to
+`custom/${config.site_school_code}` subfolder; this allows custom templates to
 extend the core version (which will unambiguously point to the base version).

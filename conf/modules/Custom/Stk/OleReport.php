@@ -29,7 +29,7 @@ class OleReport implements ModuleConfigInterface
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        if ($di->get('config')->get('site_location') === 'stk') {
+        if ($di->get('config')->get('site_school_code') === 'stk') {
             $module = new OleReportModule($di);
             $module->init('/modules/custom/stk/oleReport');
         }

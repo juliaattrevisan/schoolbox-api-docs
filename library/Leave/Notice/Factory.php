@@ -27,7 +27,7 @@ class Leave_Notice_Factory
     public function __construct($requestData)
     {
         $this->setRequestData($requestData);
-        $this->setClassname(ucwords(Config::get('site_location')));
+        $this->setClassname(ucwords(Config::get('site_school_code')));
     }
 
     /**

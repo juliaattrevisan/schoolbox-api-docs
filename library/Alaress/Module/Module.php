@@ -568,7 +568,7 @@ class Module
     /**
      * Helper method for adding a template path for this component's basename.
      *
-     * Now adds school-specific templates to "$dir/custom/$config[site_location]".
+     * Now adds school-specific templates to "$dir/custom/$config[site_school_code]".
      *
      * @param  IChainLoader $templateLoader
      * @param  string            $dir The directory to use as the template path
@@ -579,7 +579,7 @@ class Module
     protected function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '')
     {
         $basePath     = $dir;
-        $overridePath = $basePath . '/custom/' . $this->getConfig()->get('site_location');
+        $overridePath = $basePath . '/custom/' . $this->getConfig()->get('site_school_code');
         $namespace    = $basename ?: $this->basename;
 
         // Set up the loader for this namespace.

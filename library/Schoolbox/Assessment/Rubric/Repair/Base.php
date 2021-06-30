@@ -631,7 +631,7 @@ abstract class Base extends CliTool\App
             $subject = sprintf(
                 '%s (%s) has data which requires manual intervention',
                 $this->getConfig()->get('title'),
-                $this->getConfig()->get('site_location')
+                $this->getConfig()->get('site_school_code')
             );
             $this->sendMail(
                 'scriptOutput.twig',

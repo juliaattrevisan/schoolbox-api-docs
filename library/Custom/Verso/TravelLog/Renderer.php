@@ -173,7 +173,7 @@ class Renderer
     public function isTravelLogAvailable(?string $externalId): bool
     {
 
-        /* 1. school_code must be set to "verso" (note that site_location is VIST...)
+        /* 1. school_code must be set to "verso" (note that site_school_code is VIST...)
          * 2. api credentials must exist (they can be incorrect, but they must exist)
          * 3. an external id must exist
          */

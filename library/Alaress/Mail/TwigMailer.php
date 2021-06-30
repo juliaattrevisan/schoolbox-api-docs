@@ -47,7 +47,7 @@ class TwigMailer extends AbstractMailer
         // load up paths in order of preference (start with school-specific)
         $config = self::getConfig();
         $paths  = [];
-        if (is_dir(($custom = SITE_root . '/templates/' . $config->get('site_location') . '/email'))) {
+        if (is_dir(($custom = SITE_root . '/templates/' . $config->get('site_school_code') . '/email'))) {
             $paths[] = $custom;
         }
         $paths[] = SITE_root . '/templates/core/email';
