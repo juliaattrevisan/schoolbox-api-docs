@@ -37,6 +37,7 @@
         <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-upload share-file" title="Upload file">Upload file</a>
         <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-textbox share-text" title="Write something">Write something</a>
     </div>
+    <!-- Check that the device supports recording audio/video, and if not hide the buttons that aren't supported -->
     <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>

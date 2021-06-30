@@ -7,20 +7,74 @@
 
 import { gsap } from 'gsap/all';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
+import { hasDeviceCapture, supportsVideoRecording, supportsAudioRecording } from '@js/util/featureDetectionUtils.js';
 
 
 export default {
 
+    data () {
+        return {
+            isVideoSupported: false, //Don't show the record video if no video input is supported, hard to imagine a scenarios where video is available but not microphone?
+            isAudioSupported: false, //Don't show the record audio only or screen sharing if no audio input is supported, Screen sharing should not be used when audio input is not available
+            hasDeviceCapture: false //If true, it's assumed this is a mobile device that won't currently support screen sharing
+        }
+    },
+
+    computed: {
+
+        /** 
+         * The buttons should stretch the entire width regardless of the number available
+         * 
+         * @returns { String }
+         */
+        buttonWidth () {
+            if (this.isVideoSupported && this.isAudioSupported && !this.hasDeviceCapture) { //all 3 buttons, eg: a desktop pc with a webcam/microphone
+                return '33.4%';
+            } else if (this.isVideoSupported && this.isAudioSupported && this.hasDeviceCapture) { //video and audio only buttons, eg: a mobile/tablet device, which won't support screen-sharing
+                return '50%';    
+            } else if (!this.isVideoSupported && this.isAudioSupported && !this.hasDeviceCapture) { //audio and screen-sharing buttons, eg: a desktop pc with just a microphone
+                return '50%';
+            } 
+        }
+
+    },
+
     created () {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+        this.hasDeviceCapture = hasDeviceCapture();
     },
 
     mounted () {
-        this.updateContainerHeight();
-        this.animateOn();
+        this.displayAfterDeviceStatusCheck();
     },
 
     methods: {
+
+        /*
+         * Ensure the device has been checked before we display the buttons
+         *
+         */
+        async displayAfterDeviceStatusCheck () {
+            await this.checkDeviceStatus();
+            this.$nextTick(() => {
+                this.updateContainerHeight();
+                this.animateOn();
+            });
+        },
+
+        /*
+         * To display only the approriate buttons based on the devices record media features
+         *
+         */
+        async checkDeviceStatus () {
+            const deviceList = await navigator.mediaDevices.enumerateDevices(); //use the device list to check for video and audio input
+            if (supportsVideoRecording(deviceList)) {
+                this.isVideoSupported = true;
+            } 
+            if (supportsAudioRecording(deviceList)) {
+                this.isAudioSupported = true;
+            }
+        },
 
         /*
          * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
@@ -51,7 +105,7 @@ export default {
                     ease: 'power2.out',
                     delay: (index * 0.1) + 0.2,
                     onComplete: () => {
-                        if (index === 2) { //enable once everything's all animated
+                        if (index === (allMenuItems.length-1)) { //enable once everything's all animated
                             this.initMouseEvents();
                         }
                     }
@@ -152,21 +206,21 @@ export default {
 
 <template>
     <div class="pseudo-video" ref="pseudoVideo">
-        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
+        <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)" :style="{ width: buttonWidth }">
             <div>
                 <div class='icon-mic'></div>
                 <span>Audio</span>
                 <aside>Say something with an audio only recording.</aside>
             </div>
         </button>
-        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
+        <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)" :style="{ width: buttonWidth }">
             <div>
                 <div class='icon-video'></div>
                 <span>Video</span>
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
         </button>
-        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
+        <button v-if="isAudioSupported && !hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)" :style="{ width: buttonWidth }">
             <div>
                 <div class='icon-screen-capture'></div>
                 <span>Screen</span>
@@ -192,7 +246,6 @@ $font-family-icon: 'schoolbox';
 }
 
 .menu-item {
-    width: calc(33.4%);
     background: #FAFAFA;
     border: 1px solid #EDEDED;
     margin-right: 1rem;
