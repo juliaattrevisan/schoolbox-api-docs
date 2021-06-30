@@ -371,7 +371,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     public function getDayName($dayNumber): string
     {
         $query  = "SELECT Description FROM luDays WHERE Code = :code";
-        $result = $this->getDatabase()->getRow($query, ['code' => $dayNumber]);
+        $result = $this->getDatabase()->getRow($query, ['code' => (string)$dayNumber]);
 
         if ($result['Description']) {
             return $result['Description'];
