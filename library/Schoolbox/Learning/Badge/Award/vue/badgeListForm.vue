@@ -5,8 +5,7 @@ import RevealModal from "@schoolbox/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badgeList';
 import toastMixin from '@schoolbox/toast-mixin';
-import {calculateExpiryDate, translateExpiryToLabel} from "../../vue/expiry-helper";
-import moment from "moment";
+import {calculateExpiryDate} from "../../vue/expiry-helper";
 import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 /**
@@ -317,27 +316,6 @@ export default {
                 .finally(() => {
                     this.$refs.awardModalSubmit.disabled = false;
                 });
-        },
-
-        /**
-         * Translate this badge award's expiry into a text label.
-         *
-         * @param {Number|null} expiry
-         * @returns {String|null}
-         */
-        expiryLabel (expiry) {
-            return translateExpiryToLabel(expiry);
-        },
-
-        /**
-         * Renders an expiry date, in the long date display format.
-         *
-         * @param {Number|null} expiry
-         * @param {Date|null} fromDate
-         * @returns {String}
-         */
-        renderExpiryDate(expiry, fromDate) {
-            return moment(calculateExpiryDate(expiry, fromDate)).format(this.expiryDateFormat);
         },
 
         /**

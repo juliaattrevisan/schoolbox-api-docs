@@ -15,7 +15,7 @@ import "vue-select/dist/vue-select.css";
 import Deselect from '@schoolbox/selectize/Deselect';
 vSelect.props.components.default = () => ({ Deselect });
 
-import {calculateExpiryDate, translateExpiryToLabel} from '../../vue/expiry-helper'
+import {calculateExpiryDate} from '../../vue/expiry-helper'
 
 const EVENTS = {
     done: 'done',
@@ -161,15 +161,6 @@ export default {
         },
 
         /**
-         * Translate this badge award's expiry into a text label.
-         *
-         * @returns {String|null}
-         */
-        expiryLabel () {
-            return translateExpiryToLabel(this.expiry);
-        },
-
-        /**
          * Translate this badge award's expiry into a Date object.
          *
          * @param {Date|null} fromDate
@@ -271,10 +262,9 @@ export default {
 
         <!--
         @slot The expiry message for this badge award
-        @binding {String|null} expiryLabel A relative expiry date
         @binding {Date|null} expiryDate An actual expiry date object
         -->
-        <slot name="expiryMessage" :expiryLabel="expiryLabel" :expiryDate="expiryDate"></slot>
+        <slot name="expiryMessage" :expiryDate="expiryDate"></slot>
 
         <v-select class="schoolbox-vue-selectize"
                   :options="options"

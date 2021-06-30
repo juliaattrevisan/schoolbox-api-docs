@@ -10,7 +10,6 @@ import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
-import moment from 'moment';
 import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 const EVENT_CHANGE = 'change';
@@ -330,17 +329,6 @@ export default {
             let emptyQueryString = {};
             Object.keys(this.selectedFilters).forEach(k => emptyQueryString[k] = '');
             return "?" + new URLSearchParams(emptyQueryString).toString();
-        },
-
-
-        /**
-         * Renders an expiry date, in the long date display format.
-         *
-         * @param {Date|null} date
-         * @returns {String}
-         */
-        renderExpiryDate(date) {
-            return moment(date).format(this.expiryDateFormat);
         },
     },
 }
