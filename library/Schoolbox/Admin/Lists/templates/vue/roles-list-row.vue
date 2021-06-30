@@ -208,6 +208,11 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
+.column {
+    @media screen and (max-width: 1500px) {
+        padding: 0px 0.5rem;
+    }
+}
 
 .list-item-container {
     transition: opacity 0.3s ease-out;
@@ -258,9 +263,10 @@ export default {
 }
 
 .update-permissions-button {
-    flex: 0 0 220px;
+    flex: 0 0 120px;
     margin: 0px;
-    padding: 0px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
 }
 
 .delete-row-button {
