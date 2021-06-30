@@ -102,7 +102,9 @@ class ArticleResolver implements IArticleResolver
     /**
      * Returns the set of articles whose audience contains the specified user
      *
-     * @param User $user
+     * @param User     $user
+     * @param int|null $state If provided, find only IDs of articles in this
+     *                        state
      * @return int[]
      * @throws UnderflowException
      * @throws InvalidColumnException
@@ -110,7 +112,7 @@ class ArticleResolver implements IArticleResolver
      * @throws UnexpectedValueException
      * @throws Database\Exception
      */
-    public function findArticlesForUser(User $user): array
+    public function findArticlesForUser(User $user, ?int $state): array
     {
         /* Business Rules + Algorithm:
          * * An articles is targeted to 0:N audience segments.
@@ -158,13 +160,13 @@ class ArticleResolver implements IArticleResolver
         $subQueries = [];
 
         // We always need the simple subquery
-        [$sqlSimple, $params] = $this->generateSimpleSubquery($selfAttributes, $relatedAttributes, $user);
+        [$sqlSimple, $params] = $this->generateSimpleSubquery($selfAttributes, $relatedAttributes, $user, $state);
         $subQueries[] = $sqlSimple;
 
         // We can avoid the sub-query in the unlikely case the system is configured to not permit targeting
         // to 'self', as that is the implicit relationship modifier of all complex audiences segments.
         if ($selfAttributes->count()) {
-            [$sqlComplex, $paramsComplex] = $this->generateComplexSubquery($selfAttributes);
+            [$sqlComplex, $paramsComplex] = $this->generateComplexSubquery($selfAttributes, $state);
             $subQueries[] = $sqlComplex;
             $params       = array_merge($params, $paramsComplex);
         }
@@ -272,6 +274,7 @@ class ArticleResolver implements IArticleResolver
      * @param Collection|string[][]|null[][] $selfAttributes
      * @param Collection|string[][]|null[][] $relatedAttributes
      * @param User                           $user
+     * @param int|null                       $state
      * @return array
      * @throws InvalidColumnException
      * @throws UnderflowException
@@ -279,22 +282,35 @@ class ArticleResolver implements IArticleResolver
     private function generateSimpleSubquery(
         Collection $selfAttributes,
         Collection $relatedAttributes,
-        User $user
+        User $user,
+        ?int $state
     ): array {
-        $pb = new Predicate\Builder($this->db->getQuoter(), '');
+        $audienceAlias = 'simple';
+        $articleAlias  = 'simple_article';
+
+        // All articles must have at least one of the simple audiences
+        $subPb = $this->articleMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
-            $pb->all($this->buildPredicate('simple', Model::RELATIONSHIP_SELF, $entityType, $entityValues));
+            $subPb = $subPb->all(
+                $this->buildPredicate($audienceAlias, Model::RELATIONSHIP_SELF, $entityType, $entityValues)
+            );
         }
         $relationship = $this->getRelationshipModifier($user);
         foreach ($relatedAttributes as $entityType => $entityValues) {
             // If we had $relatedAttributes, we can assume here that $relationship is non-null
-            $pb->all($this->buildPredicate('simple', $relationship, $entityType, $entityValues));
+            $subPb = $subPb->all($this->buildPredicate($audienceAlias, $relationship, $entityType, $entityValues));
         }
 
+        // Also: all articles must be in the requested state (if there was one)
+        $pb  = isset($state)
+            ? $this->articleMapper->getPredicateForState($state, $articleAlias)
+            : $this->articleMapper->getPredicateBuilder();
+        $pb  = $pb->any($subPb);
         $sql = "
-            SELECT comms_news_article_id
-            FROM comms_news_audience simple
-            WHERE {$pb->getWhereUnion()}
+            SELECT     {$articleAlias}.id
+            FROM       comms_news_audience {$audienceAlias}
+            INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
+            WHERE      {$pb->getWhereIntersect()}
         ";
         return [$sql, $pb->getParams()];
     }
@@ -304,43 +320,52 @@ class ArticleResolver implements IArticleResolver
      * Returns a query suitable for matching complex audience segments
      *
      * @param Collection|string[][]|null[][] $selfAttributes
+     * @param int|null                       $state
      * @return array
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function generateComplexSubquery(Collection $selfAttributes): array
+    private function generateComplexSubquery(Collection $selfAttributes, ?int $state): array
     {
-        $tableAlias = 'complex';
-        $pb1        = new Predicate\Builder($this->db->getQuoter(), '');
-        $pb2        = new Predicate\Builder($this->db->getQuoter(), '');
+        $audienceAlias = 'complex';
+        $articleAlias  = 'complex_article';
+
+        // All articles must be in one of the complex states.
+        $pb1 = $this->complexMapper->getPredicateBuilder();
+        $pb2 = $this->complexMapper->getPredicateBuilder();
         foreach ($selfAttributes as $entityType => $entityValues) {
-            $pb1->all($this->buildPredicate(
-                $tableAlias,
-                null,
-                $entityType,
-                $entityValues,
-                Complex\Mapper::FIELD_ENTITY_TYPE_1,
-                Complex\Mapper::FIELD_ENTITY_VALUE_1
-            ));
-            $pb2->all($this->buildPredicate(
-                $tableAlias,
-                null,
-                $entityType,
-                $entityValues,
-                Complex\Mapper::FIELD_ENTITY_TYPE_2,
-                Complex\Mapper::FIELD_ENTITY_VALUE_2
-            ));
+            $pb1 = $pb1->all(
+                $this->buildPredicate(
+                    $audienceAlias,
+                    null,
+                    $entityType,
+                    $entityValues,
+                    Complex\Mapper::FIELD_ENTITY_TYPE_1,
+                    Complex\Mapper::FIELD_ENTITY_VALUE_1
+                )
+            );
+            $pb2 = $pb2->all(
+                $this->buildPredicate(
+                    $audienceAlias,
+                    null,
+                    $entityType,
+                    $entityValues,
+                    Complex\Mapper::FIELD_ENTITY_TYPE_2,
+                    Complex\Mapper::FIELD_ENTITY_VALUE_2
+                )
+            );
         }
 
-        $pb = (new Predicate\Builder($this->db->getQuoter(), ''))
-            ->any($pb1)
-            ->any($pb2);
-
-
+        // Also: all articles must be in the requested state (if there was one)
+        $pb  = isset($state)
+            ? $this->articleMapper->getPredicateForState($state, $articleAlias)
+            : $this->articleMapper->getPredicateBuilder();
+        $pb  = $pb->any($pb1)->any($pb2);
         $sql = "
-            SELECT comms_news_article_id
-            FROM comms_news_audience_complex {$tableAlias}
-            WHERE {$pb->getWhereIntersect()}
+            SELECT     {$articleAlias}.id
+            FROM       comms_news_audience_complex {$audienceAlias}
+            INNER JOIN comms_news_article {$articleAlias} ON {$audienceAlias}.comms_news_article_id = {$articleAlias}.id
+            WHERE      {$pb->getWhereIntersect()}
         ";
 
         return [$sql, $pb->getParams()];
