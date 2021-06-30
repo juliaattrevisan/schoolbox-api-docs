@@ -38,13 +38,19 @@ export const ENDPOINTS = Object.freeze({
      * Provision of the returnUrl allows us to return to the place
      * from whence thou cam'st
      *
-     * @param str        the path where we need to replace a var
-     * @param eventId    the event's id
-     * @param returnUrl  a url to visit after saving
-     * @return string
+     * @param {String}      str       the base path
+     * @param {Number|null} eventId   the event's id: if set will replace
+     *                                "{eventId}" in the generated path
+     * @param {String|null} returnUrl a url to visit after saving: if set will
+     *                                be appended as the "returnUrl" query param
+     * @return {String}
      */
     generateUrlFromConst(str, eventId, returnUrl) {
-        let url = str.replace('{eventId}', eventId);
+        let url = str;
+
+        if (eventId !== undefined && eventId !== null) {
+            url = url.replace('{eventId}', String(eventId));
+        }
 
         if (returnUrl !== undefined && returnUrl !== null) {
             url += '?returnUrl=' + returnUrl;
