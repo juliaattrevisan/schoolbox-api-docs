@@ -274,4 +274,14 @@ class SchoolboxCli extends \Codeception\Module
     {
         return \Schoolbox\Pastoral\Mapper::getInstance()->findOneByColumn('heading', $heading);
     }
+
+    /**
+     * Returns Badge based on the title
+     *
+     * @param string $name
+     */
+    public function grabFirstBadgeByTitle(string $name): \Schoolbox\Learning\Badge\Model
+    {
+        return \Schoolbox\Learning\Badge\Mapper::getInstance()->findOneByColumn('name', $name);
+    }
 }
