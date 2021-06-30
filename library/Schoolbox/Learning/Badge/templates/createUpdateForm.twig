@@ -192,12 +192,12 @@
 
                         {% set achievementExpiryLabels = {
                             never:     'Never',
-                            day:       '1 day after awarding',
-                            week:      '1 week after awarding',
-                            fortnight: '2 weeks after awarding',
-                            month:     '1 month after awarding',
-                            halfYear:  '6 months after awarding',
-                            year:      '1 year after awarding',
+                            day:       '1 day',
+                            week:      '1 week',
+                            fortnight: '2 weeks',
+                            month:     '1 month',
+                            halfYear:  '6 months',
+                            year:      '1 year',
                         } %}
                         <select name="achievementExpiry" id="badge-achievement-expiry">
                             {% for key, value in achievementExpiries %}
