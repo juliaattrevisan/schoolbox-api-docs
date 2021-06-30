@@ -13,6 +13,7 @@
                        The list of users may be placed in
                        `<span data-relation="dynamicUsersSlot">`
  #}
+
 <div data-reveal id="{{ id }}" aria-hidden="true" class="reveal-modal small">
     <h2>Share a Learning Moment</h2>
 
@@ -30,11 +31,48 @@
         </ul>
     {% endif %}
     <div class="share-work-buttons">
-        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
-        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-video share-video" title="Record a video">Record a video</a>
-        <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-audio share-audio" title="Record audio">Record audio</a>
+        <a data-action="shareLearningMoment" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
+        <a data-action="shareLearningMoment" data-record-video-button href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-video share-video" title="Record a video">Record a video</a>
+        <a data-action="shareLearningMoment" data-record-audio-button href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-audio share-audio" title="Record audio">Record audio</a>
         <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-upload share-file" title="Upload file">Upload file</a>
         <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-textbox share-text" title="Write something">Write something</a>
     </div>
     <a class="close-reveal-modal" aria-label="Close">×</a>
 </div>
+
+<script type="text/javascript">
+
+/**
+* Don't show buttons to record methods that the device doesn't support
+*
+*/
+const checkDeviceFeatures = async () => {
+
+    let isEnumerateDevicesSupported = true;
+    let hasAudio = false;
+    let hasVideo = false;
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        isEnumerateDevicesSupported = false;
+    }
+
+    if (isEnumerateDevicesSupported) {
+        try {
+            const deviceList = await navigator.mediaDevices.enumerateDevices();
+            deviceList.forEach((device) => {
+                if (device.kind === 'audioinput') {
+                    hasAudio = true;
+                } else if (device.kind === 'videoinput') {
+                    hasVideo = true;
+                }
+            });
+        } catch (error) {
+            console.log(`${err.name}:${err.message}`);
+        }
+    }
+
+}
+
+checkDeviceFeatures();
+
+</script>
