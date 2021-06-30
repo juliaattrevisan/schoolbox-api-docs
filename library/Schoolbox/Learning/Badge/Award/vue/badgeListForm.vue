@@ -364,7 +364,7 @@ export default {
                             <h3>{{ badge.name }}</h3>
                         </div>
                         <p class="meta" v-if="expiryField && badge[expiryField]">
-                            This achievement will expire <relative-time :datetime="calculateExpiryDate(badge[expiryField])" date-only></relative-time>.
+                            (expires <relative-time :datetime="calculateExpiryDate(badge[expiryField])" date-only></relative-time>)
                         </p>
                     </div>
                 </li>
