@@ -38,16 +38,41 @@ export const ENDPOINTS = Object.freeze({
      * Provision of the returnUrl allows us to return to the place
      * from whence thou cam'st
      *
-     * @param str        the path where we need to replace a var
-     * @param eventId    the event's id
-     * @param returnUrl  a url to visit after saving
-     * @return string
+     * @param {String}      str       the base path
+     * @param {Number|null} eventId   the event's id: if set will replace
+     *                                "{eventId}" in the generated path
+     * @param {String|null} returnUrl a url to visit after saving: if set will
+     *                                be appended as the "returnUrl" query param
+     * @return {String}
      */
     generateUrlFromConst(str, eventId, returnUrl) {
-        let url = str.replace('{eventId}', eventId);
+        let url = str;
+
+        if (eventId !== undefined && eventId !== null) {
+            url = url.replace('{eventId}', String(eventId));
+        }
 
         if (returnUrl !== undefined && returnUrl !== null) {
-            url += '?returnUrl=' + returnUrl;
+            // url could be one of:
+            // an absolute URL: set the return URL, and return the full URL
+            // a relative URL: set the return URL, and return the relative part
+            // an invalid URL: just append a query string param for return URL
+            try {
+                // URL is absolute
+                let urlObject = new URL(url);
+                urlObject.searchParams.set('returnUrl', returnUrl);
+                url = urlObject.toString();
+            } catch (e1) {
+                try {
+                    // URL is relative
+                    let urlObject = new URL(url, 'https://base.url');
+                    urlObject.searchParams.set('returnUrl', returnUrl);
+                    url = urlObject.pathname + urlObject.search + urlObject.hash;
+                } catch (e2) {
+                    // URL is invalid
+                    url += '?returnUrl=' + returnUrl;
+                }
+            }
         }
 
         return url;
