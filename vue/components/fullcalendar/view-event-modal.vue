@@ -121,11 +121,13 @@ export default {
 
             // Modify/delete links
             if (metadata?.editable) {
+                let returnUrl = btoa(window.location.pathname);
                 if (data?.custom?.modifyLink) {
-                    modifyLink = data?.custom?.modifyLink;
+                    // Attempt to inject a return URL here too?
+                    // Maybe the destination will understand it, maybe it won't
+                    modifyLink = ENDPOINTS.generateUrlFromConst(data?.custom?.modifyLink,null, returnUrl);
                 } else if (metadata?.eventId) {
                     // this.returnUrl does not get updated while switching months
-                    let returnUrl = btoa(window.location.pathname);
                     modifyLink = ENDPOINTS.generateUrlFromConst(this.eventModifyFormUrl, metadata?.eventId, returnUrl);
                     deleteLink = ENDPOINTS.generateUrlFromConst(this.eventDeleteUrl, metadata?.eventId, returnUrl);
                 }
