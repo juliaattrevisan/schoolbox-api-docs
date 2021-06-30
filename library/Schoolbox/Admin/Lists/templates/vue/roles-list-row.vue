@@ -91,14 +91,6 @@ export default {
             return (this.isPermissionsOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
-        // /**
-        //  * For the form variables to reference
-        //  * 
-        //  */
-        // initialIndex () {
-        //     return this.$vnode.key + 1;
-        // }
-
     },
 
     watch: {
