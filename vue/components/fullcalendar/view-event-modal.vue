@@ -123,8 +123,8 @@ export default {
             if (metadata?.editable) {
                 let returnUrl = btoa(window.location.pathname);
                 if (data?.custom?.modifyLink) {
-                    // Attempt to inject a return URL here too?
-                    // Maybe the destination will understand it, maybe it won't
+                    // Inject a return URL:
+                    // maybe the destination will understand it, maybe it won't
                     modifyLink = ENDPOINTS.generateUrlFromConst(data?.custom?.modifyLink,null, returnUrl);
                 } else if (metadata?.eventId) {
                     // this.returnUrl does not get updated while switching months
