@@ -7,6 +7,7 @@ import BadgeList from '../../vue/badgeList';
 import toastMixin from '@schoolbox/toast-mixin';
 import {calculateExpiryDate, translateExpiryToLabel} from "../../vue/expiry-helper";
 import moment from "moment";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -22,6 +23,7 @@ export default {
     mixins: [toastMixin],
 
     components: {
+        RelativeTime,
         BadgeList,
         BadgeImage,
         RevealModal,
@@ -336,6 +338,17 @@ export default {
          */
         renderExpiryDate(expiry, fromDate) {
             return moment(calculateExpiryDate(expiry, fromDate)).format(this.expiryDateFormat);
+        },
+
+        /**
+         * Calculate an expiry date from the value of a badge's expiry field.
+         *
+         * @param {Number|null} expiry
+         * @param {Date|null} fromDate
+         * @returns {Date|null}
+         */
+        calculateExpiryDate(expiry, fromDate) {
+            return calculateExpiryDate(expiry, fromDate);
         }
     },
 }
@@ -373,7 +386,7 @@ export default {
                             <h3>{{ badge.name }}</h3>
                         </div>
                         <p class="meta" v-if="expiryField && badge[expiryField]">
-                            Expires in {{ expiryLabel(badge[expiryField]) }}, on {{ renderExpiryDate(badge[expiryField]) }}
+                            This achievement will expire <relative-time :datetime="calculateExpiryDate(badge[expiryField])" date-only></relative-time>.
                         </p>
                     </div>
                 </li>

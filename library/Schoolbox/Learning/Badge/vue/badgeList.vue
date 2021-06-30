@@ -11,6 +11,7 @@ import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdr
 import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
 import moment from 'moment';
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 const EVENT_CHANGE = 'change';
 
@@ -46,6 +47,7 @@ export default {
     mixins: [foundationMixin],
 
     components: {
+        RelativeTime,
         BadgeAward,
         BadgeDetail,
         BadgeAchievementWithdrawModal,
@@ -459,13 +461,7 @@ export default {
                 </template>
                 <template v-slot:expiryMessage="slotProps">
                     <p class="meta" v-if="slotProps.expiryDate">
-                        <template v-if="expiryDateFormat">
-                            This achievement will expire in {{ slotProps.expiryLabel }},
-                            on {{ renderExpiryDate(slotProps.expiryDate) }}.
-                        </template>
-                        <template v-else>
-                            This achievement will expire in {{ slotProps.expiryLabel }}.
-                        </template>
+                        This achievement will expire <relative-time :datetime="slotProps.expiryDate" date-only></relative-time>.
                     </p>
                 </template>
             </badge-award>
