@@ -224,10 +224,14 @@
                 <legend>Campus <span class='hint has-tip tip-top' data-tooltip title="Select the campuses which will be able to view this event.">?</span></legend>
 
                 <div class="small-12 columns">
-                    <!-- BEGIN event_campus_list -->
-                    <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
-                    <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
-                    <!-- END event_campus_list -->
+                    <ul class="option-list">
+                        <!-- BEGIN event_campus_list -->
+                        <li>
+                            <input id="campusCheckbox{EVENT_CAMPUS_ID}" type="checkbox" name="campus[]" value="{EVENT_CAMPUS_ID}" {EVENT_CAMPUS_ID_SELECTED} />
+                            <label for="campusCheckbox{EVENT_CAMPUS_ID}" class="checkbox-label">{EVENT_CAMPUS_NAME}</label>
+                        </li>
+                        <!-- END event_campus_list -->
+                    </ul>
                 </div>
             </fieldset>
 
@@ -235,10 +239,14 @@
                 <legend>Role <span class='hint has-tip tip-top' data-tooltip title="Select the roles which will be able to view this event.">?</span></legend>
 
                 <div class="small-12 columns">
-                    <!-- BEGIN event_role_list -->
-                    <input id="roleCheckbox{EVENT_ROLE_ID}" type="checkbox" name="role[]" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
-                    <label for="roleCheckbox{EVENT_ROLE_ID}" class="checkbox-label">{EVENT_ROLE_NAME}</label>
-                    <!-- END event_role_list -->
+                    <ul class="option-list">
+                        <!-- BEGIN event_role_list -->
+                        <li>
+                            <input id="roleCheckbox{EVENT_ROLE_ID}" type="checkbox" name="role[]" value="{EVENT_ROLE_ID}" {EVENT_ROLE_ID_SELECTED} />
+                            <label for="roleCheckbox{EVENT_ROLE_ID}" class="checkbox-label">{EVENT_ROLE_NAME}</label>
+                        </li>
+                        <!-- END event_role_list -->
+                    </ul>
                 </div>
             </fieldset>
 
