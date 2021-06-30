@@ -80,5 +80,3 @@ define('TEMPLATE_body', $config['TEMPLATE_body']);
 define('TEMPLATE_content', $config['TEMPLATE_content']);
 define('SENTRY_TOKEN', $config['SENTRY_TOKEN']);
 define('SENTRY_PROJECT', $config['SENTRY_PROJECT']);
-// TODO IST-581 move this to instance's config table
-define('ETHERPAD_HOST', $config['ETHERPAD_HOST']);
