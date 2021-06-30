@@ -23,8 +23,8 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\IMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DueWork\Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Authorizer\Rule\CanSelfAssess;
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as Feedback;
 use Schoolbox\Learning\Assessment\DueWork\Response\File\Plagscan\Mapper as PlagscanMapper;
 use Schoolbox\Learning\Assessment\Feedback\DataSource as FeedbackMapperProxy;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -202,7 +202,7 @@ class Module extends BaseModule
                 ),
                 new Rule\Callback(
                     static function (array $params = []) {
-                        if (isset($params['feedback']) && $params['feedback'] instanceof Feedback) {
+                        if (isset($params['feedback']) && $params['feedback'] instanceof Feedback\Model) {
                             $feedback = $params['feedback'];
                             if ($feedback->getReviewRoute() === ReturnedWork::REVIEW_ROUTE_INSTRUCTOR) {
                                 return;
@@ -370,12 +370,19 @@ class Module extends BaseModule
         $participant    = $assessment->getParticipant($submission->getOwner());
         $response       = $this->getResponseMapperProxy()->findInAssessment($submission->getId(), $assessment);
 
+        // fill response feedback, as it's not hydrated
+        foreach ($participant->getAllFeedbacks() as $feedback) {
+            if ($feedback->getResponse()->getID() === $response->getId()) {
+                $response->getAllFeedback()->add($feedback);
+            }
+        }
+
         return [
             'kami'        => $kami,
             'assessment'  => $assessment,
             'student'     => $participant->getUser(),
             'response'    => $response,
-            'feedback'    => $participant->findMostRecentInstructorGivenPublishedFeedback(),
+            'feedback'    => $response->findMostRecentInstructorGivenPublishedFeedback(),
         ];
     }
 
