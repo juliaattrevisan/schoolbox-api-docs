@@ -73,7 +73,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 continue;
             }
 
-            if ($this->getConfigLoader()->get('site_school_code') === 'wenona' && $child['gid'] == 3) {
+            if (strtoupper(trim($this->getConfigLoader()->get('site_school_code'))) === 'WSL' && $child['gid'] === 3) {
                 continue;
             }
 
@@ -120,12 +120,13 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
             /* Diocesan Junior School Students don't have links to subjects
              */
-            if ($this->getConfigLoader()->get('site_school_code') === 'diocesan') {
-                if ((new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)) {
-                    $this->setVar([
-                        'subject_item' => ''
-                    ]);
-                }
+            if (
+                (strtoupper(trim($this->getConfigLoader()->get('site_school_code'))) === 'DSFG') &&
+                (new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)
+            ) {
+                $this->setVar([
+                    'subject_item' => ''
+                ]);
             }
 
             /* Output calendar date to show */
@@ -207,7 +208,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             // School-specific buttons
-            if ('tigs' === $this->getConfigLoader()->get('site_school_code')) {
+            if ('TIGS' === strtoupper(trim($this->getConfigLoader()->get('site_school_code')))) {
                 $this->setBlock('student_block', 'continuous_report', 'continuous_report_block');
                 $route  = 'tigsParticipationReport.getReport';
                 $params = ['userId' => $userChild->getId(), 'user' => $userChild,];

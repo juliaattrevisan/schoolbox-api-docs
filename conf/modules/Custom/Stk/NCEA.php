@@ -25,7 +25,7 @@ class NCEA implements ModuleConfigInterface
     {
         $di = $kernel->getDependencyInjector();
 
-        if ($di->get('config')->get('site_school_code') === 'stk') {
+        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'SK') {
             $module = new NCEAModule($di);
             $module->init('/modules/custom/stk/ncea');
         }

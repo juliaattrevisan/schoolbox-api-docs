@@ -27,7 +27,7 @@ class Pastoral implements ModuleConfigInterface
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        if ($di->get('config')->get('site_school_code') == 'meriden') {
+        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'MS') {
             $pastoralModule = new Module($di);
             $pastoralModule->init('/modules/custom/meriden/pastoral');
         }

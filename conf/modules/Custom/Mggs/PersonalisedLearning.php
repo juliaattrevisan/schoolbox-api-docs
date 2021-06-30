@@ -32,7 +32,7 @@ class PersonalisedLearning implements ModuleConfigInterface
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        if ($di->get('config')->get('site_school_code') === 'mggs') {
+        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'MGGS') {
             $masteryModule = new MasteryModule($di);
             $masteryModule ->init("/learning/mastery");
 

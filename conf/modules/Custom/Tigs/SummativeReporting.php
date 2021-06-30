@@ -30,7 +30,7 @@ class SummativeReporting extends ModuleLoader
         /** @var IConfigLoader $config */
         $config = $di->get('config');
 
-        if ($config->get('site_school_code') !== 'tigs') {
+        if (strtoupper(trim($config->get('site_school_code'))) !== 'TIGS') {
             return;
         }
 

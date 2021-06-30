@@ -28,7 +28,7 @@ class Survey extends ModuleLoader implements ModuleConfigInterface
 
         $di = $kernel->getDependencyInjector();
 
-        if ($di->get('config')->get('site_school_code') == 'loyola') {
+        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'LC') {
             $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
             $this->loadModule($kernel, EportfolioComponentModule::class, "/{$namespace}");
         }
