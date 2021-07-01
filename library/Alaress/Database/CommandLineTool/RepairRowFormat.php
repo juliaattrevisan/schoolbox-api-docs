@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Alaress\Database\CommandLineTool;
 
+use PDOException;
 use Schoolbox\Application\CliTool;
 
 /**
