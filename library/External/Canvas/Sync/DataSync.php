@@ -124,7 +124,7 @@ class DataSync
     private $log;
 
     /** @var string */
-    private $siteLocation;
+    private string $siteSchoolCode;
 
     /**
      * @param IConnector              $canvasDb
@@ -208,7 +208,7 @@ class DataSync
         $this->config                 = $config;
         $this->persist                = $persist;
         $this->log                    = $log;
-        $this->siteLocation           = strtolower($config->get('site_school_code'));
+        $this->siteSchoolCode         = strtolower($config->get('site_school_code'));
     }
 
 
@@ -233,7 +233,7 @@ class DataSync
             $this->schoolboxDb->beginTransaction();
         }
 
-        $bridgeFactory = new BridgeFactory($this->siteLocation);
+        $bridgeFactory = new BridgeFactory($this->siteSchoolCode);
 
         $this->log->notice("Building data structures to map Canvas entities to Schoolbox entities...");
         $accountBridge            = new Bridge\Account($this->schoolboxDb);
