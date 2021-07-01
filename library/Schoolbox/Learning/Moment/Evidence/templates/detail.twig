@@ -13,12 +13,13 @@
     ['Learning Moment']
 ) }}
 
-{# Include the editor and its configurator (required for comments) #}
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
-
 <div id="evidence-detail-container">
-    <evidence-detail :evidence="{{ evidence|json_encode }}" :return-url="{{ RETURN_URL|json_encode }}" :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"></evidence-detail>
+    <evidence-detail
+        :evidence="{{ evidence|json_encode }}" 
+        :return-url="{{ RETURN_URL|json_encode }}" 
+        :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"
+        site-version="{{ config.siteVersion }}"
+    />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceDetail.js"></script>
 

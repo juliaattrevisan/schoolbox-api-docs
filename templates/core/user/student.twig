@@ -580,12 +580,14 @@
             </dl>
         {% endif %}
 
-        <div class="profile-tabs tabs-content">
-
+        <div class="profile-tabs tabs-content">   
             {% if showActivityFeed %}
             <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                 <div id="activity-feed">
-                    <activity-feed cdn-prefix="{{ CDN_PREFIX }}"></activity-feed>
+                    <activity-feed 
+                        cdn-prefix="{{ CDN_PREFIX }}"
+                        site-version="{{ config.site_version }}"
+                    />
                 </div>
             </div>
             {% endif %}
@@ -593,13 +595,19 @@
             {% if showAchievementsTab %}
             <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                 <div id="goal-feed" class="goals-achievements">
-                    <goal-feed cdn-prefix="{{ CDN_PREFIX }}"></goal-feed>
+                    <goal-feed 
+                        cdn-prefix="{{ CDN_PREFIX }}"
+                        site-version="{{ config.site_version }}"
+                    />
                 </div>
             </div>
 
             <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                 <div id="achievement-feed" class="goals-achievements">
-                    <achievement-feed cdn-prefix="{{ CDN_PREFIX }}"></achievement-feed>
+                    <achievement-feed 
+                        cdn-prefix="{{ CDN_PREFIX }}"
+                        site-version="{{ config.site_version }}"
+                    />
                 </div>
             </div>
             {% endif %}

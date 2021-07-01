@@ -226,13 +226,13 @@ export default {
 
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
-
+            
             const loadScripts = async () => {
 
                 try {
-
-                    await this.injectScript(this.cdnPrefix + '/javascript/ckeditor/ckeditor.js?v=' + this.siteVersion);
-                    await this.injectScript(this.cdnPrefix + '/javascript/shared/editor/jquery.editor.js?v=' + this.siteVersion);
+                    
+                    await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
+                    await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
 
                     $.fn.alaressEditor({
                         targetElements: $('#comment'),

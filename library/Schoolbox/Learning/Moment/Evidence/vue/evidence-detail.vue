@@ -30,6 +30,7 @@ export default {
         'evidence',
         'returnUrl',
         'canComment',
+        'siteVersion',
     ],
 
     /**
@@ -172,10 +173,12 @@ export default {
                         </div>
 
                         <!-- Discussion thread -->
-                        <comment-thread :thread="evidence.discussionThread"
-                                        :create-thread-endpoint="evidence._links.createThread"
-                                        :can-comment="this.canComment"
-                                        :cdn-prefix="cdnPrefix"
+                        <comment-thread 
+                            :thread="evidence.discussionThread"
+                            :create-thread-endpoint="evidence._links.createThread"
+                            :can-comment="this.canComment"
+                            :cdn-prefix="cdnPrefix"
+                            :site-version="siteVersion"
                         />
                     </div>
                 </section>
