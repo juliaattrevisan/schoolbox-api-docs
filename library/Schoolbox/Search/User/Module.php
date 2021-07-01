@@ -20,7 +20,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 
 /**
- * The module for the mock version of the search API.
+ * The module for user profile page.
  */
 class Module extends BaseModule
 {
