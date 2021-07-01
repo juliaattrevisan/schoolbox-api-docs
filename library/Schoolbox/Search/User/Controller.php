@@ -44,17 +44,69 @@ use Twig\Environment;
 class Controller extends BaseController
 {
 
+    /**
+     * UserMapper
+     */
     private UserMapper                    $userMapper;
+
+    /**
+     * RoleMapper
+     */
     private RoleMapper                    $roleMapper;
+
+    /**
+     * FolderMapper
+     */
     private FolderMapper                  $folderMapper;
+
+    /**
+     * Access
+     */
     private Access                        $access;
+
+    /**
+     * External_UserInterface
+     */
     private External_UserInterface        $externalUser;
+
+    /**
+     * External_ClassInterface
+     */
     private External_ClassInterface       $externalClass;
+
+    /**
+     * ProfileButtonMapper
+     */
     private ProfileButtonMapper           $profileButtonMapper;
+
+    /**
+     * Timetable_ColourMapper
+     */
     private Timetable_ColourMapper        $timetableColourMapper;
+
+    /**
+     * Eportfolio_Authenticator
+     */
     private Eportfolio_Authenticator      $eportfolioAuthenticator;
+
+    /**
+     * ProfessionalDevelopmentMapper
+     */
     private ProfessionalDevelopmentMapper $professionalDevelopmentMapper;
 
+
+    /**
+     * Constructor
+     * @param UserMapper                    $userMapper
+     * @param RoleMapper                    $roleMapper
+     * @param FolderMapper                  $folderMapper
+     * @param Access                        $access
+     * @param External_UserInterface        $externalUser
+     * @param External_ClassInterface       $externalClass
+     * @param ProfileButtonMapper           $profileButtonMapper
+     * @param Timetable_ColourMapper        $timetableColourMapper
+     * @param ProfessionalDevelopmentMapper $professionalDevelopmentMapper
+     */
     public function __construct(
         UserMapper $userMapper,
         RoleMapper $roleMapper,
@@ -81,7 +133,10 @@ class Controller extends BaseController
      * User profile.
      * @param User $user
      * @throws MapperException
-     * @api   GET /search/user/{$id}
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
      */
     public function getProfile(User $user): void
     {
@@ -433,11 +488,10 @@ class Controller extends BaseController
                 }
 
                 // Only show the parent contacts to the parent themselves, hide divorced parents from each other
-                if (
-                    $this->getUser()->getRole()->isStaff() || ($this->getUser()->getRole()->isParent() && (
-                            $contact['StudentContactID'] == $this->getUser()->getExternalId() ||
-                            $contact['StudentContactSpouseID'] == $this->getUser()->getExternalId())
-                    )
+                if ($this->getUser()->getRole()->isStaff()
+                    || ($this->getUser()->getRole()->isParent()
+                        && ($contact['StudentContactID'] == $this->getUser()->getExternalId() ||
+                            $contact['StudentContactSpouseID'] == $this->getUser()->getExternalId()))
                 ) {
                     $contact['main']   = $main;
                     $contact['spouse'] = $spouse;
