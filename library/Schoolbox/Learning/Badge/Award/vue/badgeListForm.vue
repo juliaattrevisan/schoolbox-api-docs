@@ -5,8 +5,6 @@ import RevealModal from "@schoolbox/reveal-modal";
 import BadgeImage from '../../vue/badge-image';
 import BadgeList from '../../vue/badgeList';
 import toastMixin from '@schoolbox/toast-mixin';
-import {calculateExpiryDate} from "../../vue/expiry-helper";
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 /**
  * Form for awarding badges to users, by selecting them from a list of badges.
@@ -22,7 +20,6 @@ export default {
     mixins: [toastMixin],
 
     components: {
-        RelativeTime,
         BadgeList,
         BadgeImage,
         RevealModal,
@@ -67,28 +64,6 @@ export default {
         users: {
             type: Array,
             required: true,
-        },
-
-        /**
-         * The Moment date format which is used to render the date when an
-         * awarding of a badge will expire.
-         *
-         * If not provided, the date will not be rendered.
-         */
-        expiryDateFormat: {
-            type: String,
-            default: null,
-        },
-
-        /**
-         * The field to use to determine when a badge award should expire.
-         *
-         * If this value is set: the award modal will show this value for each
-         * badge that is selected, as the amount of time until it will expire.
-         */
-        expiryField: {
-            type: String,
-            default: null,
         },
 
         /**
@@ -317,17 +292,6 @@ export default {
                     this.$refs.awardModalSubmit.disabled = false;
                 });
         },
-
-        /**
-         * Calculate an expiry date from the value of a badge's expiry field.
-         *
-         * @param {Number|null} expiry
-         * @param {Date|null} fromDate
-         * @returns {Date|null}
-         */
-        calculateExpiryDate(expiry, fromDate) {
-            return calculateExpiryDate(expiry, fromDate);
-        }
     },
 }
 </script>
@@ -363,9 +327,6 @@ export default {
                             <badge-image :badge="badge"></badge-image>
                             <h3>{{ badge.name }}</h3>
                         </div>
-                        <p class="meta" v-if="expiryField && badge[expiryField]">
-                            (expires <relative-time :datetime="calculateExpiryDate(badge[expiryField])" date-only></relative-time>)
-                        </p>
                     </div>
                 </li>
             </ul>
