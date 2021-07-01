@@ -303,7 +303,6 @@ export default {
                     :get-badge-create-form-route="getBadgeCreateFormRoute"
                     :allow-selection="true"
                     :show-badge-menus="false"
-                    :expiry-date-format="expiryDateFormat"
                     @[badgeListChangeEvent]="updateSelectedBadges"
         ></badge-list>
 
