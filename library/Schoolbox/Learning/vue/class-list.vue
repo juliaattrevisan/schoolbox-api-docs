@@ -234,6 +234,7 @@ export default {
             loadingText: 'Please Wait...',
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
             currentClassCode: null,
+            emailGroupsWithSelection: this.emailGroups,
         }
     },
     mounted: function () {
@@ -463,7 +464,7 @@ export default {
         selectedGroups: function () {
             let groups = [],
                 self = this;
-            self.emailGroups.forEach(function (group) {
+            self.emailGroupsWithSelection.forEach(function (group) {
                 if (group.isChecked) {
                     groups.push(group.value);
                 }
@@ -636,7 +637,7 @@ export default {
                 <fieldset class="checklist">
                     <legend>Recipients</legend>
                     <ul class="option-list">
-                        <li v-for="(group, index) in emailGroups" :key="index">
+                        <li v-for="(group, index) in emailGroupsWithSelection" :key="index">
                             <input :id="group.label"
                                    name="selectedGroups[]"
                                    type="checkbox"
