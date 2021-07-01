@@ -3,6 +3,7 @@
 import Vue from 'vue';
 import axios  from 'axios';
 import moment from 'moment';
+import ckeditor from 'ckeditor4-vue';
 
 import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
@@ -15,7 +16,8 @@ export default {
         MediaArticle,
         Storage,
         Toast,
-        RevealModal
+        RevealModal,
+        ckeditor
     },
     mixins: [cdnPrefixMixin],
     props: {
@@ -51,6 +53,7 @@ export default {
             editorUrl: this.cdnPrefix + '/js/ckeditor/ckeditor.js',
             isCKEditorLoading: false,
             isCKEditorLoaded: false,
+            isCKEditorReady: false,
             ckeditorConfig: {
                 embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
                 removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
@@ -175,44 +178,63 @@ export default {
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
             
-            const loadScripts = async () => {
+            // const loadScripts = async () => {
                 
-                try {
+            //     try {
 
-                    await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
-                    await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
+            //         await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
+            //         await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
                     
-                    $.fn.alaressEditor({
-                        targetElements: document.getElementById(`ckeditor-${this.ucid}`),
-                        startupFocus: true,
-                        height: '4rem',
-                        removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
-                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-                        toolbarGroups: [
-                            {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                            {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                            {name: 'links', groups: ['links']},
-                            {name: 'insert', groups: ['insert']},
-                            {name: 'schoolbox', groups: ['schoolboxlink']}
-                        ],
-                        on: {
-                            change: (event) => {
-                                this.pendingComment = CKEDITOR.instances[`ckeditor-${this.ucid}`].getData(); // Bind the content of CKEditor into the comment model on change
-                            },
-                            instanceReady: (event) => { //can display the loaded CKEditor now
-                                this.isCKEditorLoading = false;
-                                this.isCKEditorLoaded = true;
-                            }
-                        }
-                    });
+            //         $.fn.alaressEditor({
+            //             targetElements: document.getElementById(`ckeditor-${this.ucid}`),
+            //             startupFocus: true,
+            //             height: '4rem',
+            //             removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
+            //             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+            //             toolbarGroups: [
+            //                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+            //                 {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
+            //                 {name: 'links', groups: ['links']},
+            //                 {name: 'insert', groups: ['insert']},
+            //                 {name: 'schoolbox', groups: ['schoolboxlink']}
+            //             ],
+            //             on: {
+            //                 change: (event) => {
+            //                     this.pendingComment = CKEDITOR.instances[`ckeditor-${this.ucid}`].getData(); // Bind the content of CKEditor into the comment model on change
+            //                 },
+            //                 instanceReady: (event) => { //can display the loaded CKEditor now
+            //                     this.isCKEditorLoading = false;
+            //                     this.isCKEditorLoaded = true;
+            //                 }
+            //             }
+            //         });
                     
-                } catch (error) {
+            //     } catch (error) {
+            //         this.$refs.toast.timeout('Loading comments failed', false, 5000);
+	        //     }
+            // }
+
+            // loadScripts();    
+
+            //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js
+            //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
+            import(/* webpackChunkName: "ckeditor4-vue" */ 'ckeditor4-vue')
+                .then(({ default: CKEditor }) => {
+                    Vue.component('ckeditor', CKEditor.component); //register the component for use once ready
+                    this.isCKEditorLoaded = true;
+                })
+                .catch(err => {
                     this.$refs.toast.timeout('Loading comments failed', false, 5000);
-	            }
-            }
+                });
 
-            loadScripts();    
+        },
 
+        /**
+         * Once CKEditor is ready, we can display it and hide the prompt button
+         */
+        onCKEditorReady (event) {
+            this.isCKEditorReady = true;
+            this.isCKEditorLoading = false;
         },
 
         /**
@@ -349,10 +371,10 @@ export default {
             <div class="discussion-threads">
                 <p class="comment-count">Comments <span v-if="!hasComments">(0)</span><span v-else>({{ commentThread.children.metadata.count }})</span></p>
                 <template v-if="canComment">
-                    <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
+                    <button class="btn-show-ckeditor" v-show="!isCKEditorReady" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                     <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
-                    <div :style="[isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">    
-                        <textarea :id="`ckeditor-${ucid}`" name="comment" rows="5"></textarea>
+                    <div v-if="isCKEditorLoaded" :style="[isCKEditorReady ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]"> 
+                        <ckeditor tag-name="textarea" v-model="pendingComment" @ready="onCKEditorReady" :editor-url="editorUrl" :config="ckeditorConfig" :read-only="saveInProgress"></ckeditor>
                         <a class="button submit"
                         @click="postComment"
                         :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
