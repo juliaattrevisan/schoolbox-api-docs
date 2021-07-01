@@ -402,8 +402,16 @@ class Provisioner
                             $internalUser->setUpdatedAt(Alaress_Date_Format::now());
                             try {
                                 $this->userMapper->save($internalUser);
-                            } catch (MapperException|UnexpectedValueException $e) {
-                                $this->logger->warning(sprintf("Failed to mark $originalName as having been updated ({$internalUser->getExternalId()}) (%s): ", $e->getMessage()), $context);
+                            } catch (MapperException | UnexpectedValueException $e) {
+                                $this->logger->warning(
+                                    sprintf(
+                                        "Failed to mark %s as having been updated (%s) (%s): ",
+                                        $originalName,
+                                        $internalUser->getExternalId(),
+                                        $e->getMessage()
+                                    ),
+                                    $context
+                                );
                             }
                         }
                         ++$skipped;
