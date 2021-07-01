@@ -2,7 +2,7 @@
 vagrant ssh
 cd /vagrant
 # dump Dio's custom SCSS into dio.scss
-node_modules/.bin/sass www/custom/diocesan/achievementreport/css/styles.scss
+node_modules/.bin/sass www/custom/dsfg/achievementreport/css/styles.scss
 
 then delete the comments from the output and copypasta that compiled css
 into their skin config textarea
@@ -27,42 +27,42 @@ into their skin config textarea
         display: block;
 
         &.achievement {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/achievement.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/achievement.png");
         }
 
         &.duework {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/duework.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/duework.png");
         }
 
         &.contacts {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/contacts.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/contacts.png");
         }
 
         &.calendar {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/calendar.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/calendar.png");
         }
 
         &.timetable {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/timetable.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/timetable.png");
         }
 
         &.attendance {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/attendance.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/attendance.png");
         }
 
         &.documents {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/documents.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/documents.png");
         }
 
         &.eportfolio {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/blog.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/blog.png");
         }
 
         /* Specify the color to override icon- global style
          * until Profile Buttons supports enabling/disabling of icons in some manner
          */
         &.juniorschoolblog {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/juniorschoolblog.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/juniorschoolblog.png");
             color: #0066b0
         }
 
@@ -77,7 +77,7 @@ into their skin config textarea
          * until Profile Buttons supports enabling/disabling of icons in some manner
          */
         &.enrolmy {
-            background-image: url("#{$cdn-prefix}/custom/diocesan/achievementreport/img/enrolmy.png");
+            background-image: url("#{$cdn-prefix}/custom/dsfg/achievementreport/img/enrolmy.png");
             color: #0066b0
         }
 
