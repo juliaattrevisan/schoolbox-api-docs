@@ -45,7 +45,7 @@ class Controller extends Base
     /**
      * Displays a list of reports for the specified student
      *
-     * @api   POST /modules/custom/stk/oleReport/{studentId}
+     * @api   POST /modules/custom/sk/oleReport/{studentId}
      * @since 160
      *
      * @param User $student
@@ -107,7 +107,7 @@ class Controller extends Base
     /**
      * Downloads an the specified OLE report for the specified user
      *
-     * @api   POST /modules/custom/stk/oleReport/{studentId}/{$reportId}/sendReport
+     * @api   POST /modules/custom/sk/oleReport/{studentId}/{$reportId}/sendReport
      * @since 160
      *
      * @param User $student

@@ -169,7 +169,7 @@ class StatisticsTest extends TestCase
             ],
             'real-world' => [
                 // Real-world example from:
-                // https://schoolboxdev.meriden.nsw.edu.au/modules/custom/meriden/pastoral/1915/2017/-2080-N
+                // https://schoolboxdev.meriden.nsw.edu.au/modules/custom/ms/pastoral/1915/2017/-2080-N
                 [
                     "70",
                     "78",
