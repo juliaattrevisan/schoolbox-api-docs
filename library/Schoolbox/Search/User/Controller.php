@@ -47,47 +47,47 @@ class Controller extends BaseController
     /**
      * UserMapper
      */
-    private UserMapper                    $userMapper;
+    private UserMapper $userMapper;
 
     /**
      * RoleMapper
      */
-    private RoleMapper                    $roleMapper;
+    private RoleMapper $roleMapper;
 
     /**
      * FolderMapper
      */
-    private FolderMapper                  $folderMapper;
+    private FolderMapper $folderMapper;
 
     /**
      * Access
      */
-    private Access                        $access;
+    private Access $access;
 
     /**
      * External_UserInterface
      */
-    private External_UserInterface        $externalUser;
+    private External_UserInterface $externalUser;
 
     /**
      * External_ClassInterface
      */
-    private External_ClassInterface       $externalClass;
+    private External_ClassInterface $externalClass;
 
     /**
      * ProfileButtonMapper
      */
-    private ProfileButtonMapper           $profileButtonMapper;
+    private ProfileButtonMapper $profileButtonMapper;
 
     /**
      * Timetable_ColourMapper
      */
-    private Timetable_ColourMapper        $timetableColourMapper;
+    private Timetable_ColourMapper $timetableColourMapper;
 
     /**
      * Eportfolio_Authenticator
      */
-    private Eportfolio_Authenticator      $eportfolioAuthenticator;
+    private Eportfolio_Authenticator $eportfolioAuthenticator;
 
     /**
      * ProfessionalDevelopmentMapper
@@ -488,10 +488,11 @@ class Controller extends BaseController
                 }
 
                 // Only show the parent contacts to the parent themselves, hide divorced parents from each other
-                if ($this->getUser()->getRole()->isStaff()
+                if (
+                    $this->getUser()->getRole()->isStaff()
                     || ($this->getUser()->getRole()->isParent()
-                        && ($contact['StudentContactID'] == $this->getUser()->getExternalId() ||
-                            $contact['StudentContactSpouseID'] == $this->getUser()->getExternalId()))
+                        && ($contact['StudentContactID'] == $this->getUser()->getExternalId()
+                            || $contact['StudentContactSpouseID'] == $this->getUser()->getExternalId()))
                 ) {
                     $contact['main']   = $main;
                     $contact['spouse'] = $spouse;

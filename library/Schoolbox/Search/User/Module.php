@@ -93,7 +93,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return UserMapper|Mapper
+     * @return UserMapper
      */
     private function getUserMapper(): UserMapper
     {
