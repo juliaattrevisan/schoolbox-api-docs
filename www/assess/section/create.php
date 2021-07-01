@@ -114,6 +114,8 @@ if (!empty($_POST)) {
     // get a crunchy biscuit base
     $crumbs = $trail->getFolderCrumbs($folder, $_GET[Redirect::RETURN_URL]);
 
+    $returnUrl = $_GET[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_GET[Redirect::RETURN_URL]}" : "";
+
     if ($assessment->getContext() instanceof Project) {
         $crumbs = array_merge($crumbs, [
             [
@@ -121,7 +123,7 @@ if (!empty($_POST)) {
                 'href'  => $this->getDi()->get('router')->generate('learningAssessment.getStatus', [
                     'assessmentId' => $assessment->getContext()->getId(),
                     'assessment'   => $assessment->getContext(),
-                ]),
+                ]) . $returnUrl,
                 'class' => '',
             ],
         ]);
@@ -131,7 +133,7 @@ if (!empty($_POST)) {
     $crumbs = array_merge($crumbs, [
         [
             'text' => $assess['title'],
-            'href' => "/assess/summary/{$assess['assess_id']}",
+            'href' => "/assess/summary/{$assess['assess_id']}{$returnUrl}",
             'class' => '',
         ],
         [
