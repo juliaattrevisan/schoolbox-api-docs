@@ -127,7 +127,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $paths = [];
         $settings = null;
 
-        $siteLocation = Config::get('site_school_code');
+        $siteSchoolCode = Config::get('site_school_code');
         $fallbackEnabled = Config::get('webdav_fallback_enabled');
 
         /** @var Collection $davs */
@@ -194,7 +194,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         if (count($paths) == 0 && $fallbackEnabled) {
             // There was no WebDAV configuration applied, fallback to historical method (aka. that big long if-else statement)
             // Now extracted for your convenience
-            $config   = LegacyConfigFactory::build($siteLocation, $user, $_SESSION);
+            $config   = LegacyConfigFactory::build($siteSchoolCode, $user, $_SESSION);
             $settings = $config['settings'];
             $paths    = $config['paths'];
         }
