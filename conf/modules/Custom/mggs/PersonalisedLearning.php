@@ -12,7 +12,6 @@ use Alaress\Application\Kernel;
 use Aura\Di\Exception\ServiceNotFound;
 use Config\Modules\ModuleConfigInterface;
 use Custom\Mggs\Learning\Personalised\Admin\Module as AdminModule;
-use Custom\Mggs\Learning\Upcoming\Module as UpcomingModule;
 use Schoolbox\Learning\Mastery\Module as MasteryModule;
 use Custom\Mggs\Personalised;
 

@@ -33,7 +33,7 @@ class BridgeFactory
      */
     public function __construct(string $siteSchoolCode)
     {
-        $this->siteSchoolCode = strtolower($siteSchoolCode);
+        $this->siteSchoolCode = ucfirst(strtolower($siteSchoolCode));
     }
 
     /**

@@ -89,7 +89,7 @@ class Controller extends Base
     /**
      * Output a printable version of the report for this student.
      *
-     * @api   GET /modules/custom/ms/pastoral/{studentId}/print/{year}
+     * @api   GET /modules/custom/meriden/pastoral/{studentId}/print/{year}
      * @since 20.1.6
      *
      * @param int  $year

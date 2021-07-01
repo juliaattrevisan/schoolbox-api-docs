@@ -1,13 +1,13 @@
 <?php
+
 /**
  * Defines global constants that will be used throughout the system.
  * This file is architecturally compatible with both on-premises/cloud installs (ie single/multi tenant)
- * TODO - currently this file is in the puppet repo, it should be part of the schoolbox repo
  */
+
 declare(strict_types=1);
 
-# This file may be inside a sym-linked directory, so we cannot rely on its position in the filesystem.
-define('SITE_root', '/vagrant');
+define('SITE_root', dirname(__DIR__, 2));
 define('WEB_root', SITE_root . '/www');
 
 # TODO remove this when we standardise environments, this will always be 'schoolbox'
@@ -26,6 +26,7 @@ if (PHP_SAPI === 'cli') {
     // CLI invocation.
     $instanceOpt = getopt('', ['instance:']);
     $instanceId  = $instanceOpt['instance'] ?? (getenv('INSTANCE_ID', true) ?: null);
+
     // TODO temp hack while we back-port multi-instance arch.
     if (!$instanceId && count($instances) === 1) {
         $instanceId = array_keys($instances)[0];
@@ -52,18 +53,12 @@ if (PHP_SAPI === 'cli') {
     foreach ($instances as $instanceIdKey => $instance) {
         if (in_array($hostname, $instance['hostnames'], true)) {
             $instanceId = $instanceIdKey;
+            $dbHost     = $instance['db_host'] ?? null;
+            $dbSchema   = $instance['db_schema'] ?? null;
+            $dbUser     = $instance['db_user'] ?? null;
+            $dbPass     = $instance['db_pass'] ?? null;
             break;
         }
-    }
-    // TODO temp hack while we back-port multi-instance arch.
-    if (!$instanceId && count($instances) === 1) {
-        $instanceId = array_keys($instances)[0];
-    }
-    if ($instanceId && array_key_exists($instanceId, $instances)) {
-        $dbHost   = $instance['db_host'] ?? null;
-        $dbSchema = $instance['db_schema'] ?? null;
-        $dbUser   = $instance['db_user'] ?? null;
-        $dbPass   = $instance['db_pass'] ?? null;
     }
 }
 define('INSTANCE_ID_LIST', array_keys($instances));
