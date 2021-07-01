@@ -234,6 +234,8 @@ export default {
             loadingText: 'Please Wait...',
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
             currentClassCode: null,
+            emailGroupsWithSelection: this.emailGroups,
+            emailFormBeingSubmitted: false,
         }
     },
     mounted: function () {
@@ -286,7 +288,7 @@ export default {
             let self = this;
 
             // While the system is preparing the email lists, disable the button
-            self.enableSendEmailButton = false;
+            this.emailFormBeingSubmitted = true;
             self.sendEmailButtonText = self.loadingText;
             this.$refs.form.submit();
         },
@@ -468,7 +470,7 @@ export default {
         selectedGroups: function () {
             let groups = [],
                 self = this;
-            self.emailGroups.forEach(function (group) {
+            self.emailGroupsWithSelection.forEach(function (group) {
                 if (group.isChecked) {
                     groups.push(group.value);
                 }
@@ -476,7 +478,7 @@ export default {
             return groups;
         },
         enableSendEmailButton: function () {
-            return this.selectedGroups.length > 0;
+            return this.selectedGroups.length > 0 && !this.emailFormBeingSubmitted;
         },
     },
     filters: {
@@ -637,25 +639,22 @@ export default {
             <ul class="meta">
                 <li>Composing for <span data-relation="dynamicUsersSlot"></span></li>
             </ul>
-
-            <fieldset class="checklist">
-                <legend>Recipients</legend>
-                <ul class="option-list">
-                    <li v-for="(group, index) in emailGroups" :key="index">
-                        <input :id="group.label"
-                               name="groups[]"
-                               type="checkbox"
-                               :value="group.value"
-                               v-model="group.isChecked"/>
-                        <label :for="group.label">{{ group.label }}</label>
-                    </li>
-                </ul>
-            </fieldset>
-
             <form ref="form" action="/mail/createMail.php" method="post" v-on:submit.prevent class="class-list-form">
+                <fieldset class="checklist">
+                    <legend>Recipients</legend>
+                    <ul class="option-list">
+                        <li v-for="(group, index) in emailGroupsWithSelection" :key="index">
+                            <input :id="group.label"
+                                   name="selectedGroups[]"
+                                   type="checkbox"
+                                   :value="group.value"
+                                   v-model="group.isChecked"/>
+                            <label :for="group.label">{{ group.label }}</label>
+                        </li>
+                    </ul>
+                </fieldset>
                 <input type="hidden" name="replyto" :value="replyTo"/>
                 <input type="hidden" id="selectedIds" name="selectedIds" :value="selectedStudentExternalIds.join(',')"/>
-                <input type="hidden" id="selectedGroups" name="selectedGroups" :value="selectedGroups.join(',')"/>
                 <button type="submit" class="button" :disabled="!enableSendEmailButton" @click="sendEmail">
                     {{ sendEmailButtonText }}
                 </button>
