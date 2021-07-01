@@ -82,7 +82,6 @@ class Kernel extends WebKernelAbstract
             $conf = $di->get('config');
             return new Instance(
                 INSTANCE_ID,
-                $conf->get('site_school_code'),
                 $conf->get('site_hostname'),
                 $conf->get('site_domain'),
                 $conf->get('site_version'),

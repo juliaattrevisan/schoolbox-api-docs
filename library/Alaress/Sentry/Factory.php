@@ -64,7 +64,7 @@ class Factory
                 $scope->setTags([
                     'php_version'      => PHP_VERSION,
                     'site_version'     => $instance->getVersion(),
-                    'site_school_code' => $instance->getSchoolCode() ?: $instance->getLocation(),
+                    'site_school_code' => $instance->getSchoolCode(),
                 ]);
             });
 
