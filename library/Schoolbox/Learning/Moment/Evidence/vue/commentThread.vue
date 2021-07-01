@@ -3,7 +3,6 @@
 import Vue from 'vue';
 import axios  from 'axios';
 import moment from 'moment';
-import ckeditor from 'ckeditor4-vue';
 
 import MediaArticle from '@schoolbox/media-article';
 import Storage from '@schoolbox/storage';
@@ -16,8 +15,7 @@ export default {
         MediaArticle,
         Storage,
         Toast,
-        RevealModal,
-        ckeditor
+        RevealModal
     },
     mixins: [cdnPrefixMixin],
     props: {
@@ -71,8 +69,7 @@ export default {
                 height: '4rem',
                 resize_enabled: false,
                 startupFocus: true,
-            },
-            ucid: '' //to ensure ckeditor instances are unique
+            }
         }
     },
     computed: {
@@ -151,70 +148,16 @@ export default {
 
     },
 
-    created () {
-        this.ucid = this.uuidv4();
-    },
-
     methods: {
 
-        /* Generate a really unique identifier
-        * instances of reveal-modal may inadevertently generate conflicting identifier strings
-        * when they're based on an autoincrementing integer, since the dom is a universal pool
-        * of ids, but reveal-modal ucids aren't shared among each other
-        *
-        * https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
-        */
-        uuidv4() {
-            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
-        },
 
         /**
          * Loads ckeditor only when required rather than on page load
          */
         loadCKEditor () {
-
+            
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
-            
-            // const loadScripts = async () => {
-                
-            //     try {
-
-            //         await this.injectScript(this.cdnPrefix + '/js/ckeditor/ckeditor.js?v=' + this.siteVersion);
-            //         await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
-                    
-            //         $.fn.alaressEditor({
-            //             targetElements: document.getElementById(`ckeditor-${this.ucid}`),
-            //             startupFocus: true,
-            //             height: '4rem',
-            //             removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
-            //             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
-            //             toolbarGroups: [
-            //                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-            //                 {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-            //                 {name: 'links', groups: ['links']},
-            //                 {name: 'insert', groups: ['insert']},
-            //                 {name: 'schoolbox', groups: ['schoolboxlink']}
-            //             ],
-            //             on: {
-            //                 change: (event) => {
-            //                     this.pendingComment = CKEDITOR.instances[`ckeditor-${this.ucid}`].getData(); // Bind the content of CKEditor into the comment model on change
-            //                 },
-            //                 instanceReady: (event) => { //can display the loaded CKEditor now
-            //                     this.isCKEditorLoading = false;
-            //                     this.isCKEditorLoaded = true;
-            //                 }
-            //             }
-            //         });
-                    
-            //     } catch (error) {
-            //         this.$refs.toast.timeout('Loading comments failed', false, 5000);
-	        //     }
-            // }
-
-            // loadScripts();    
 
             //file is referenced from /javascript/components/ckeditor4-vue.bundle.js according to the publicPath and filename props within output in webpack.config.js
             //see https://webpack.js.org/guides/code-splitting/ and https://webpack.js.org/guides/public-path/ (code-splitting) for further details
@@ -235,21 +178,6 @@ export default {
         onCKEditorReady (event) {
             this.isCKEditorReady = true;
             this.isCKEditorLoading = false;
-        },
-
-        /**
-         * Async inject a <script> tag into the DOM
-         * https://stackoverflow.com/a/39008859
-         *
-         */
-        injectScript (src) {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.addEventListener('load', resolve);
-                script.addEventListener('error', e => reject(e.error));
-                document.head.appendChild(script);
-            });
         },
 
         /**
@@ -316,7 +244,6 @@ export default {
                     self.commentThread.children.data.unshift(response.data);
                     self.$refs.toast.timeout('Comment posted', true, 2000);
                     self.pendingComment = '';
-                    CKEDITOR.instances[`ckeditor-${this.ucid}`].setData(self.pendingComment); //clear out the CKEditor for another possible post
                 })
                 .catch(() => self.$refs.toast.timeout('Comment post failed', false, 5000))
                 .finally(() => self.saveInProgress = false)

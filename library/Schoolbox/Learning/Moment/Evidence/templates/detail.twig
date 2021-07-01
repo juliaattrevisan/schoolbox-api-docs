@@ -19,6 +19,7 @@
         :return-url="{{ RETURN_URL|json_encode }}" 
         :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"
         site-version="{{ config.site_version }}"
+        cdn-prefix="{{ CDN_PREFIX }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceDetail.js"></script>
