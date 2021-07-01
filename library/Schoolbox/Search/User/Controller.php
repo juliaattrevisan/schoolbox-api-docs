@@ -27,6 +27,7 @@ use Schoolbox\Profile\ValidDetailsVisible;
 use Schoolbox\Profile\ValidEmailVisible;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Code\SubjectCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\SubjectMatcherBase;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -256,7 +257,7 @@ class Controller extends BaseController
                 $subject['folder'] = $this->folderMapper->createModel()
                                                         ->setName($subject['name'])
                                                         ->setCodes(FolderCode::createCollection())
-                                                        ->addCode((new FolderCode())->setCode($codeMatcher->generateFolderCode($subject['campusCode'], $subject['code'])));
+                                                        ->addCode((new FolderCode())->setCode(SubjectMatcherBase::generateFolderCode($subject['campusCode'], $subject['code'])));
                 $subject['perms']  = UserAccess::ACCESS_DENY;
                 $taughtFolderCodes = $subject['folder']->getCodeString();
             } else {

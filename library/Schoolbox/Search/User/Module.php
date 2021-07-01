@@ -69,16 +69,6 @@ class Module extends BaseModule
 
 
     /**
-     * @inheritDoc
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector): void
-    {
-        // Build a Faker instance and shove it in
-        $injector->params[Controller::class] = [
-        ];
-    }
-
-    /**
      * Preload a User instance
      *
      * @param array $params
@@ -107,7 +97,9 @@ class Module extends BaseModule
      */
     private function getUserMapper(): UserMapper
     {
-        return $this->getMapperFactory()->get(UserMapper::class);
+        /** @var UserMapper $userMapper */
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+        return $userMapper;
     }
 
 }
