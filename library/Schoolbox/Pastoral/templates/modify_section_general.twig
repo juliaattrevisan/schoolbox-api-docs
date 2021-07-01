@@ -56,8 +56,7 @@
                 <input id="tags" name="tags" value="{% for tag in record.tags %}{{ tag.name }},{% endfor %}"> </label>
         </div>
         <div class="small-12 columns">
-            <label for="parent-comments-allowed">Allow parents to comment</label>
-            <span class="hint has-tip tip-top" data-tooltip title="Turn this ON to allow parent(s) of the student to comment on this record.">?</span>
+            <label for="parent-comments-allowed">Allow parents to comment <span class="hint has-tip tip-top" data-tooltip title="Turn this ON to allow parent(s) of the student to comment on this record.">?</span></label>
             <div class="switch">
                 <input id="parent-comments-allowed" type="checkbox"
                        name="parent comments allowed" value="1" {% if record.parentCommentsAllowed %}checked="checked"{% endif %}>
