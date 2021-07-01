@@ -8,7 +8,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\Diocesan;
+namespace Config\Modules\Custom\dsfg;
 
 use Alaress\Application\Kernel;
 use Custom\Diocesan\AchievementReport\Module;

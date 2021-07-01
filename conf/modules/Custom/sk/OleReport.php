@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\Stk;
+namespace Config\Modules\Custom\sk;
 
 use Alaress\Application\Kernel;
 use Custom\Stk\OleReport\Module as OleReportModule;

@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\Loyola;
+namespace Config\Modules\Custom\lc;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
