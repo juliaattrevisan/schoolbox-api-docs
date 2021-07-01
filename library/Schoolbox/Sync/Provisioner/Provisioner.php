@@ -405,9 +405,8 @@ class Provisioner
                             } catch (MapperException | UnexpectedValueException $e) {
                                 $this->logger->warning(
                                     sprintf(
-                                        "Failed to mark %s as having been updated (%s) (%s): ",
+                                        "Failed to mark %s as having been updated (%s): ",
                                         $originalName,
-                                        $internalUser->getExternalId(),
                                         $e->getMessage()
                                     ),
                                     $context
