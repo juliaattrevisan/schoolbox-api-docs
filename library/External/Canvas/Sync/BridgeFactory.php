@@ -16,7 +16,6 @@ use External\Canvas\Sync\Bridge\CourseSection;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Learning\Assessment\WorkType;
 
 /**
  * Creates a bridge class for a canvas entity
@@ -24,27 +23,27 @@ use Schoolbox\Learning\Assessment\WorkType;
 class BridgeFactory
 {
     /** @var string */
-    private $siteLocation;
+    private string $siteSchoolCode;
 
     private const BASE = "External\\Canvas\\Sync\\Bridge\\";
 
     /**
      * Constructor
-     * @param string $siteLocation
+     * @param string $siteSchoolCode
      */
-    public function __construct(string $siteLocation)
+    public function __construct(string $siteSchoolCode)
     {
-        $this->siteLocation = ucfirst($siteLocation);
+        $this->siteSchoolCode = strtolower($siteSchoolCode);
     }
 
     /**
-     * Generates class name depending on the site location
+     * Generates class name depending on the site school code
      * @param string $filename
      * @return string
      */
     private function getClassName(string $filename): string
     {
-        $className = self::BASE . $this->siteLocation . '\\' . $filename;
+        $className = self::BASE . $this->siteSchoolCode . '\\' . $filename;
         if (!class_exists($className)) {
             $className = self::BASE . $filename;
         }
