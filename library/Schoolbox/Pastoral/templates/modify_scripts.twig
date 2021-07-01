@@ -265,16 +265,25 @@
          * @param template
          */
         function replaceTemplate(template) {
-            let current = $.trim(generalTemplate.getData());
+            /**
+             * Normalizes spaces in the value: required for determining whether a
+             * CKEditor's current value has meaningfully changed from its template.
+             *
+             * @param {String} value
+             * @returns {String}
+             */
+            let normalizeSpace = function (value) {
+                return $.trim(value.replace(/\s+/g, ' '));
+            };
+            let current = normalizeSpace(generalTemplate.getData());
 
             /* If the current data is the same as the template contents,
              * then you're safe to swap it to another template
              *
              * If the current data is empty, you can fill it with another template
              */
-            if (current === lastTemplate || current === '') {
+            if (current === '' || current === normalizeSpace(lastTemplate)) {
                 generalTemplate.setData(template);
-
                 lastTemplate = template;
             }
         }
