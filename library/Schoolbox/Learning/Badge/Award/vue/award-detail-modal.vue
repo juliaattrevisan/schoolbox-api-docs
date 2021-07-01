@@ -139,17 +139,17 @@ export default {
                         Awarded <relative-time :datetime="award.awardedAt" :key="award.id"></relative-time> by
                         <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
                     </template>
+                    <template v-if="award.expiresAt">
+                        <template v-if="award.expiresAt && award.isGoal">
+                            expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
+                        </template>
+                        <template v-else>
+                            expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
+                        </template>
+                    </template>
                 </p>
                 <p class="meta" v-if="award.isGoal && award.award">
                     Goal has been achieved <relative-time :datetime="award.award.awardedAt" :key="award.id"></relative-time>
-                </p>
-                <p class="meta" v-if="award.expiresAt">
-                    <template v-if="award.isGoal">
-                        Goal expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
-                    </template>
-                    <template v-else>
-                        Achievement expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
-                    </template>
                 </p>
 
                 <article v-html="award.badge.body"></article>
