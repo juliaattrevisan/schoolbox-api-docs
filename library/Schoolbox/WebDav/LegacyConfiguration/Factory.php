@@ -56,23 +56,6 @@ class Factory
                     '/StudentData/',
                 );
             }
-        } elseif ($siteSchoolCode === 'jpc') {
-            $settings = array(
-                'baseUri' => 'https://malastare/',
-                'userName' => "jpc/" . strtolower($session['username']),
-                'password' => $session['password'],
-            );
-
-            if ($user->getRole()->isStaff()) {
-                $paths = array(
-                    '/Staff/' . strtolower($session['username']) . '/',
-                    '/doclib/',
-                );
-            } else {
-                $paths = array(
-                    '/Students/' . (date('Y') - ((int)$year->getName() - 7)) . '/' . strtolower($session['username']) . '/',
-                );
-            }
         } elseif ($siteSchoolCode === 'TCS') {
             $settings = array(
                 'baseUri' => 'http://senior-server.school.cathedral.qld.edu.au/',
@@ -442,22 +425,6 @@ class Factory
                     'http://WebDavHomeStudent.redeemer.net.au/' . $session['username'] . '/'
                 );
             }
-        } elseif ($siteSchoolCode === 'accac') {
-            $settings = array(
-                'baseUri' => 'http://webdav.aquinas.qld.edu.au:8080',
-                'userName' => $session['username'],
-                'password' => $session['password'],
-            );
-
-            if ($user->getRole()->isStaff()) {
-                $paths = array(
-                    '/'
-                );
-            } elseif ($user->getRole()->isStudent()) {
-                $paths = array(
-                    '/'
-                );
-            }
         } elseif ($siteSchoolCode === 'SLMP') {
             $settings = array(
                 'baseUri' => 'https://sldm-wdav-01.stlouisaspendale.catholic.edu.au/',
@@ -587,14 +554,6 @@ class Factory
                     $settings['baseUri'] . 'distribution/',
                 ];
             }
-//        } elseif (in_array($siteLocation, array('core', 'demo'))) {
-//            $settings = array(
-//                'baseUri'  => 'http://127.0.0.1:8881/',
-//                'userName' => $session['username'],
-//                'password' => $session['password'],
-//            );
-//
-//            $paths = ['/'];
         }
 
         return [
