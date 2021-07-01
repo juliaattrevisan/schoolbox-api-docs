@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace External\Canvas\Sync\Bridge\Staloy;
+namespace External\Canvas\Sync\Bridge\staloy;
 
 use function array_keys;
 use function count;
