@@ -6,9 +6,9 @@
  */
 
 export default {
-    
+
     props: {
-        initialIndex: { 
+        initialIndex: {
             type: Number,
             required: true
         },
@@ -50,7 +50,7 @@ export default {
 
         /**
          * To retrieve the list of key/value pairs contained within the row object
-         * 
+         *
          * @returns { Array of Objects }
          */
         rowFields () {
@@ -64,18 +64,18 @@ export default {
         /**
          * To loop through and add <input hidden> options for permission settings
          * removing those that are added otherwise, or not part of the form data to submit
-         * 
+         *
          * @returns { Array of Objects }
          */
         permissionFields () {
             return this.rowFields.filter((field) => {
                 return (field.key !== 'name' && field.key !== 'type' && field.key !== 'id' && field.key !== 'isNew' && field.key !== 'sequence');
-            }); 
+            });
         },
 
         /**
          * To show only those permissions currently set to true
-         * 
+         *
          * @returns { Array of Objects }
          */
         activePermissionFields () {
@@ -84,7 +84,7 @@ export default {
 
         /**
          * To vary the display whether selected or not
-         * 
+         *
          * @returns { Boolean }
          */
         isUnselectedRow () {
@@ -97,7 +97,7 @@ export default {
 
         /**
          * Preset the permission fields when setting between staff / all others
-         * 
+         *
          */
         'row.type': function (newValue) {
             if (newValue === 'staff') { //set all enabled when staff
@@ -115,10 +115,10 @@ export default {
     },
 
     methods: {
-        
+
         /**
          * Show the permission columns
-         * 
+         *
          */
         onPermissionsSelected () {
             this.$emit('on-permissions-selected', this.row);
@@ -127,7 +127,7 @@ export default {
 
         /**
          * To confirm whether should delete the row
-         * 
+         *
          */
         onDeleteRowSelected () {
             this.$emit('on-delete-row-selected', this.row);
@@ -136,7 +136,7 @@ export default {
 
         /**
          * To confirm whether should delete the row
-         * 
+         *
          */
         onPermissionNameSelected (permissionName) {
             this.$emit('on-permission-name-selected', permissionName);
@@ -150,13 +150,13 @@ export default {
 <template>
 
     <li :class="[ isUnselectedRow ? 'un-selected-row' : '', 'list-item-container' ]" :data-row-id="row.id">
-        
+
         <input type="hidden" :name="`id[${initialIndex}]`" :value="row.id">
-       
+
         <div :class="`actions-small-${ isDeletable ? '1' : '0' }`">
-            
+
             <div class="grip ui-sortable-handle"></div>
-            
+
             <div class="list-item">
                 <template v-for="(column, index) in headerColumns">
                     <div :class="`small-12 medium-${ column.width ? column.width : '2' } column`" :key="index">
@@ -174,7 +174,7 @@ export default {
                                 <transition-group name="permissions-list" tag="div" class="permissions-list">
                                     <button v-for="field in activePermissionFields" :key="field.caption" :class="[ selectedPermissionName === field.caption ? 'permission-list-item-active' : '', 'permission-list-item']" @click.prevent="onPermissionNameSelected(field.caption)">{{ field.caption }}</button>
                                 </transition-group>
-                                <button @click.prevent="onPermissionsSelected" class="update-permissions-button">Update Permissions</button>
+                                <button @click.prevent="onPermissionsSelected" class="update-permissions-button button icon-modify" title="Modify Permissions"></button>
                             </div>
                         </template>
                     </div>
@@ -255,10 +255,9 @@ export default {
 }
 
 .update-permissions-button {
-    flex: 0 0 120px;
+    flex: 0 0 35px;
     margin: 0px;
     padding: 5px 10px;
-    font-size: 0.8rem;
 }
 
 .delete-row-button {

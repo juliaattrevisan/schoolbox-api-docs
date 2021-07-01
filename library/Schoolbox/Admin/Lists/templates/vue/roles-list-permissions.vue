@@ -10,7 +10,7 @@ import axios from 'axios';
 import Toast from '@schoolbox/toast';
 
 export default {
-    
+
     components: {
         Toast
     },
@@ -46,7 +46,7 @@ export default {
         /**
          * Only show those fields relevant to the user type,
          * showing all for staff and just password change for all others
-         * 
+         *
          * @returns { Array of Objects }
          */
         roleSpecificPermissions () {
@@ -63,10 +63,10 @@ export default {
     },
 
     watch: {
-        
+
         /**
          * To open or close depending on boolean value
-         * 
+         *
          */
         isOpen (newValue) {
             if (newValue === true) {
@@ -79,10 +79,10 @@ export default {
     },
 
     methods: {
-        
+
         /**
          * Animate the view on
-         * 
+         *
          */
         open () {
             this.$refs.outerContainer.style.display = 'block';
@@ -90,9 +90,9 @@ export default {
         },
 
         /**
-         * Save all the permissions options, currently just using the 
+         * Save all the permissions options, currently just using the
          * existing save all route
-         * 
+         *
          */
         async onSavePermissionsSelected () {
             this.isProcessing = true;
@@ -116,7 +116,7 @@ export default {
 
         /**
          * Show the access options
-         * 
+         *
          */
         onClosePermissionsSelected () {
             this.$emit('on-permissions-closed');
@@ -124,7 +124,7 @@ export default {
 
         /**
          * Close the view
-         * 
+         *
          */
         close () {
             gsap.to(this.$refs.innerContainer, { right: '-100%', duration: 0.3, onComplete: () => {
@@ -141,7 +141,7 @@ export default {
     <div class="permissions-outer-container" ref="outerContainer">
         <div class="permissions-inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} Permissions</h4>
-            <a href="#close-permissions" class="close-permissions-button" @click.prevent="onClosePermissionsSelected">X</a>
+            <a href="#close-permissions" class="close-permissions-button icon-close" @click.prevent="onClosePermissionsSelected"></a>
             <ul class="option-list" data-option-list>
                 <li v-for="(field, index) in roleSpecificPermissions" :key="index">
                     <input
@@ -189,7 +189,7 @@ export default {
     position: absolute;
     top: 0.5rem;
     right: 1rem;
-    padding: 2px 8px;
+    padding: 2px 2px 2px 10px;
     font-size: 1.5rem;
     &:hover {
         background-color: $content-ui-hover;
