@@ -67,8 +67,9 @@ export default {
                 ],
                 height: '4rem',
                 resize_enabled: false,
-                startupFocus: true
-            }
+                startupFocus: true,
+            },
+            ucid: '' //to ensure ckeditor instances are unique
         }
     },
     computed: {
@@ -146,7 +147,25 @@ export default {
         },
 
     },
+
+    created () {
+        this.ucid = this.uuidv4();
+    },
+
     methods: {
+
+        /* Generate a really unique identifier
+        * instances of reveal-modal may inadevertently generate conflicting identifier strings
+        * when they're based on an autoincrementing integer, since the dom is a universal pool
+        * of ids, but reveal-modal ucids aren't shared among each other
+        *
+        * https://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid
+        */
+        uuidv4() {
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        },
 
         /**
          * Loads ckeditor only when required rather than on page load
@@ -155,7 +174,7 @@ export default {
 
             //to replace 'Add a Comment' with 'Loading' once the prompt button is selected
             this.isCKEditorLoading = true;
-
+            
             const loadScripts = async () => {
                 
                 try {
@@ -164,7 +183,7 @@ export default {
                     await this.injectScript(this.cdnPrefix + '/js/editor/jquery.editor.js?v=' + this.siteVersion);
                     
                     $.fn.alaressEditor({
-                        targetElements: $('#comment'),
+                        targetElements: document.getElementById(`ckeditor-${this.ucid}`),
                         startupFocus: true,
                         height: '4rem',
                         removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
@@ -178,7 +197,7 @@ export default {
                         ],
                         on: {
                             change: (event) => {
-                                this.pendingComment = CKEDITOR.instances['comment'].getData(); // Bind the content of CKEditor into the comment model on change
+                                this.pendingComment = CKEDITOR.instances[`ckeditor-${this.ucid}`].getData(); // Bind the content of CKEditor into the comment model on change
                             },
                             instanceReady: (event) => { //can display the loaded CKEditor now
                                 this.isCKEditorLoading = false;
@@ -275,7 +294,7 @@ export default {
                     self.commentThread.children.data.unshift(response.data);
                     self.$refs.toast.timeout('Comment posted', true, 2000);
                     self.pendingComment = '';
-                    CKEDITOR.instances['comment'].setData(self.pendingComment); //clear out the CKEditor for another possible post
+                    CKEDITOR.instances[`ckeditor-${this.ucid}`].setData(self.pendingComment); //clear out the CKEditor for another possible post
                 })
                 .catch(() => self.$refs.toast.timeout('Comment post failed', false, 5000))
                 .finally(() => self.saveInProgress = false)
@@ -333,7 +352,7 @@ export default {
                     <button class="btn-show-ckeditor" v-show="!isCKEditorLoaded" @click.once="loadCKEditor">{{ getAddCommentButtonText }}</button>
                     <!-- startupFocus: true on the CKEditor was not working when hiding by more practical display none means... -->
                     <div :style="[isCKEditorLoaded ? { 'position': 'static' } : { 'position': 'absolute', 'left': '-9999px' }]">    
-                        <textarea id="comment" name="comment" rows="5"></textarea>
+                        <textarea :id="`ckeditor-${ucid}`" name="comment" rows="5"></textarea>
                         <a class="button submit"
                         @click="postComment"
                         :disabled="pendingComment.trim() === '' || saveInProgress">Post comment</a>
