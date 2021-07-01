@@ -27,7 +27,7 @@ class NCEA implements ModuleConfigInterface
 
         if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'SK') {
             $module = new NCEAModule($di);
-            $module->init('/modules/custom/sk/ncea');
+            $module->init('/modules/custom/stk/ncea');
         }
     }
 }
