@@ -6,34 +6,53 @@
     {% set title = type.name ~ ': ' ~ subtype.name %}
 {% endif %}
 
-
 {% import 'sub/breadcrumbs.twig' as bread %}
-{{ bread.crumbs(
-    [ locale.pastoralCare.proper,      routeLookup('pastoral.getIndex') ],
-    [ 'Visibility Defaults',      routeLookup('pastoralAudience.getAudiences') ],
-    [ title ]
-) }}
+{{ bread.crumbsArray(breadcrumbs) }}
 
-<div class='row'>
-    <div class='small-12 columns'>
-        <h1>{{ title }} Visibility Defaults</h1>
+<div class="admin-container row">
+
+    {# Default text is "Manage Type Defaults"
+     # But you can set that to empty string to remove it
+    #}
+    {% include '@submenu/flyout.twig' with {
+        nodes: flyout.nodes,
+        pageCurrent: flyout.pageCurrent,
+        subpageCurrent: flyout.subpageCurrent
+    } %}
+
+    <div class="admin-content">
+        <div class="small-12 island" id="formPastoral">
+            <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="{{ action }}">
+                <h2 class="subheader">General Template</h2>
+
+                <p class="meta">
+                    This text will automatically populate into the general text of a {{ locale.pastoral }} record when this type is selected.  You may use the following tokens that will be substituted with the students details on creation: [firstname], [surname], [year], [house]
+                </p>
+
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+                <script>
+                    $(function() {
+                        $('#template').alaressEditor();
+                    });
+                </script>
+
+                <textarea id="template" name="template">{% if subtype %}{{ subtype.template }}{% elseif type %}{{ type.template }}{% endif %}</textarea>
+
+                {% include "@pastoral/modify_section_visibility.twig" with
+                    {
+                        record: record,
+                        allowIndividual: allowIndividual,
+                        groups: groups,
+                        allowParents: allowParents,
+                        roles: roles,
+                        roleUsers: roleUsers,
+                        bulkCreate: false,
+                    } only
+                %}
+
+                <input type="submit" value="Save">
+            </form>
+        </div>
     </div>
-</div>
-
-<div class="small-12 island" id="formPastoral">
-    <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data"
-          action="{{ action }}">
-        {% include "@pastoral/modify_section_visibility.twig" with
-            {
-                record: record,
-                allowIndividual: allowIndividual,
-                groups: groups,
-                allowParents: allowParents,
-                roles: roles,
-                roleUsers: roleUsers,
-                bulkCreate: false,
-            } only
-        %}
-        <input type="submit" value="Save Visibility">
-    </form>
 </div>

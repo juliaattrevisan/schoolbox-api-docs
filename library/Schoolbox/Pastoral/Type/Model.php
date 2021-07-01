@@ -29,6 +29,13 @@ class Model implements ISoftDeletable, Sequential
     /** @var string */
     protected $name;
 
+
+    /**
+     * @var string|null
+     */
+    private ?string $template = null;
+
+
     /** @var DocumentClassification */
     protected $documentClassification;
 
@@ -124,6 +131,26 @@ class Model implements ISoftDeletable, Sequential
     public function setSubTypes(Collection $subTypes): self
     {
         $this->subTypes->replaceWith($subTypes);
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getTemplate(): ?string
+    {
+        return $this->template;
+    }
+
+
+    /**
+     * @param string|null $template
+     * @return Model
+     */
+    public function setTemplate(?string $template): self
+    {
+        $this->template = $template;
         return $this;
     }
 }

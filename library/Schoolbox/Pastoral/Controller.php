@@ -55,6 +55,7 @@ use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\TokenReplacer\Simple;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -491,12 +492,13 @@ class Controller extends Base
         $this->getStudentRecordUpdateForm($record);
     }
 
+
     /**
      * Update pastoral care record
      *
      * @param Model $record
      *
-     * @throws SchoolboxException
+     * @throws \JsonException
      */
     public function getStudentRecordUpdateForm($record): void
     {
@@ -558,6 +560,26 @@ class Controller extends Base
             ];
         }
 
+        /* Build a hash lookup of (typeId => html) and (subtypeId => html) tuples
+         * for the front end's dropdowns. When those dropdowns change, sometimes
+         * the General Template should get updated and the easiest way is to simply
+         * perform an id lookup
+         */
+        $types = $this->pastoralTypeMapper->findAll();
+        $subtypes = $this->pastoralSubTypeMapper->findAll();
+
+        $typesIndex = [];
+
+        foreach ($types as $type) {
+            $typesIndex[$type->getId()] = $type->getTemplate();
+        }
+
+        $subtypesIndex = [];
+
+        foreach ($subtypes as $subtype) {
+            $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
+        }
+
         // Render this thing out
 
         $this->getResponse()->content->set(
@@ -568,8 +590,10 @@ class Controller extends Base
                     'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                     'allowIndividual'   => $this->config->get('pastoral_individual_access'),
                     'allowParents'      => $allowParents,
-                    'types'             => $this->pastoralTypeMapper->findAll(),
-                    'subTypes'          => $this->pastoralSubTypeMapper->findAll(),
+                    'types'             => $types,
+                    'typesIndex'        => $typesIndex,
+                    'subTypes'          => $subtypes,
+                    'subtypesIndex'     => $subtypesIndex,
                     'severities'        => $severities,
                     'roles'             => $roles,
                     'roleUsers'         => $roleUsers,
@@ -988,11 +1012,20 @@ class Controller extends Base
                 throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
             $record->setSeverity($severity);
-
             $record->setModifiedBy($this->getUser());
             $record->setHeading($heading);
             $record->setPoints($post->get('points'));
-            $record->setBodyPublic(trim($post->get('body_public')));
+
+            /* Perform token replacements, basically a square bracket phplib
+             * that performs a one-way substitution
+             */
+            $record->setBodyPublic((new Simple())->replace(trim($post->get('body_public')), [
+                '[firstname]' => $student->getFirstname(),
+                '[surname]' => $student->getLastname(),
+                '[year]' => $student->getYear() ? $student->getYear()->getLongName() : '',
+                '[house]' => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : ''
+            ]));
+
             $record->setBodyPrivate(trim($post->get('body_private')));
             $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
 

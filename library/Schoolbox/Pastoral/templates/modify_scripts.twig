@@ -205,5 +205,89 @@
         loadAudience();
 });
 </script>
+<script>
+    $(function() {
+
+        /* Sequential dependency on loadAudience()
+         */
+        const subtypesIndex = {{ subtypesIndex|json_encode|raw }};
+        const typesIndex = {{ typesIndex|json_encode|raw }};
+
+        /* Some convenient selectors
+         */
+        const typeDropdown = $('#typeId');
+        const subtypeDropdown = $('#subtypeId');
+        const generalTemplate = CKEDITOR.instances['body_public'];
+
+        /* The template html that was most recently chosen
+         */
+        let lastTemplate = '';
+
+        /* Whenever Subtype changes, see if the now-selected subtypeId is null
+         * Decide which template to load
+         */
+        subtypeDropdown.on('change', function(event) {
+            init(typeDropdown.val(), subtypeDropdown.val());
+        });
+
+        /* Also Initialise upon load
+         */
+        init(typeDropdown.val(), subtypeDropdown.val());
+
+        /**
+         * If this Type has a Subtype template, change to that
+         * Otherwise see if there's a Type template
+         *
+         * For some reason these html chunks might have a preceding space
+         */
+        function init(typeVal, subtypeVal) {
+            if (null !== subtypeVal) {
+
+                /* If subtypeId != null, load its template html iff the General Template's
+                 * current value is the same as the Subtype template or if the General
+                 * Template's current value is empty string
+                 */
+                replaceTemplate($.trim(subtypesIndex[subtypeVal]));
+            } else {
+
+                /* If subtypeId == null, look at the parent typeId. load its template
+                 * html iff the General Template's current value is the same as the
+                 * Type template or if the General Template's current value is empty string
+                 */
+                replaceTemplate($.trim(typesIndex[typeVal]));
+            }
+        }
+
+
+        /**
+         * Put a Subtype template html into General
+         *
+         * @param template
+         */
+        function replaceTemplate(template) {
+            /**
+             * Normalizes spaces in the value: required for determining whether a
+             * CKEditor's current value has meaningfully changed from its template.
+             *
+             * @param {String} value
+             * @returns {String}
+             */
+            let normalizeSpace = function (value) {
+                return $.trim(value.replace(/\s+/g, ' '));
+            };
+            let current = normalizeSpace(generalTemplate.getData());
+
+            /* If the current data is the same as the template contents,
+             * then you're safe to swap it to another template
+             *
+             * If the current data is empty, you can fill it with another template
+             */
+            if (current === '' || current === normalizeSpace(lastTemplate)) {
+                generalTemplate.setData(template);
+                lastTemplate = template;
+            }
+        }
+    });
+</script>
 {% endautoescape %}
 

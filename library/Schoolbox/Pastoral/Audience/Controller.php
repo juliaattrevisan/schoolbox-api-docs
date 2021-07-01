@@ -12,9 +12,11 @@ namespace Schoolbox\Pastoral\Audience;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Schoolbox\GenericCollection;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Pastoral;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
+use Schoolbox\Submenu\Flyout;
 use Schoolbox\UserMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -38,6 +40,18 @@ class Controller extends Base
 
 
     /**
+     * @var Pastoral\SubType\Mapper
+     */
+    private Pastoral\SubType\Mapper $pastoralSubTypeMapper;
+
+
+    /**
+     * @var RosettaStone
+     */
+    private RosettaStone $rosettaStone;
+
+
+    /**
      * Constructor
      *
      * @param UserMapper              $userMapper
@@ -45,36 +59,77 @@ class Controller extends Base
      * @param Mapper                  $pastoralAudienceMapper
      * @param RoleMapper              $roleMapper
      * @param Pastoral\Type\Mapper    $pastoralTypeMapper
+     * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
      */
     public function __construct(
         UserMapper $userMapper,
         Pastoral\Group\Mapper $pastoralGroupMapper,
         Mapper $pastoralAudienceMapper,
         RoleMapper $roleMapper,
-        Pastoral\Type\Mapper $pastoralTypeMapper
+        Pastoral\Type\Mapper $pastoralTypeMapper,
+        Pastoral\SubType\Mapper $pastoralSubTypeMapper,
+        RosettaStone $rosettaStone
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
         $this->pastoralAudienceMapper = $pastoralAudienceMapper;
         $this->roleMapper             = $roleMapper;
         $this->pastoralTypeMapper     = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
+        $this->rosettaStone           = $rosettaStone;
     }
 
 
     /**
      * Display default audiences for pastoral types and sub-types
      *
-     * @api   GET /pastoral/management/audience
      * @since 18.2
+     * @api   GET /pastoral/management/audience
      */
     public function getAudiences(): void
     {
+        $types = $this->pastoralTypeMapper->findAll();
+
+        foreach ($types as $type) {
+            /* Find the first Type that didn't have any Subtypes
+             * You can't edit Types if they have Subtypes
+             */
+            if ($type->getSubTypes()->count()) {
+                foreach ($type->getSubTypes() as $subtype) {
+                    /* Find the first available subtype
+                     * and redirect to its modify screen
+                     */
+                    $this->getResponse()->redirect->to(
+                        $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
+                            'subtypeId' => $subtype->getId()
+                        ])
+                    );
+
+                    return;
+                }
+            }
+
+            /* If there aren't any subtypes, find the first available type
+             * and redirect to its modify screen
+             */
+            $this->getResponse()->redirect->to(
+                $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
+                    'typeId' => $type->getId(),
+                    'type' => $type
+                ])
+            );
+
+            return;
+        }
+
+        /* Otherwise if there are neither subtypes nor types, then you've
+         * not configured the Pastoral Module sufficiently
+         * Empty State
+         */
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences.twig',
-            'data'     => [
-                'types'    => $this->pastoralTypeMapper->findAll(),
-            ],
-            'title'    => 'Pastoral Group Management',
+            'data' => [],
+            'title' => 'Pastoral Group Management',
         ]);
     }
 
@@ -110,9 +165,11 @@ class Controller extends Base
      *
      * @api   GET /pastoral/management/audience/type/{typeId}/subtype/{subtypeId}/modify
      * @since 18.2
+     *
      * @param Pastoral\Type\Model         $type
      * @param Pastoral\SubType\Model|null $subType
      * @throws InvalidColumnException
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     private function getAudiencesModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $subType): void
     {
@@ -135,9 +192,38 @@ class Controller extends Base
         $record['id']     = "fakeId";
         $record['access'] = $this->getAudienceForType($type, $subType);
 
+        /* Set up flyout menu; identify our current url to see what should
+         * be selected in the flyout menu. Since the modify route addresses both
+         * Pastoral Types and Pastoral Subtypes we have to figure out which one we
+         * are actually in...
+         */
+        if (null !== $subType) {
+            $url = $this->router->generate('pastoralAudience.getAudiencesSubTypeModify', [
+                'typeId' => $type->getId(),
+                'subtypeId' => $subType->getId()
+            ]);
+        } else {
+            $url = $this->router->generate('pastoralAudience.getAudiencesTypeModify', [
+                'typeId' => $type->getId(),
+            ]);
+        }
+
+        /* Set up flyout with special prefix breadcrumbs because we're in some deep
+         * part of the system where the flyout doesn't represent the full app hierarchy
+         */
+        $flyout = (new Flyout(
+            $this->getConfigLoader(),
+            new FlyoutNodes($this->router, $this->pastoralTypeMapper)
+        ))->prefixBreadcrumbs([
+            [$this->rosettaStone->translate('pastoralCare', false, true), $this->router->generate('pastoral.getIndex')],
+            ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
+        ]);
+
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences_modify.twig',
             'data'     => [
+                'flyout'          => $flyout->generateVars($url),
+                'breadcrumbs'     => $flyout->generateBreadcrumbs($url),
                 'record'          => $record,
                 'allowIndividual' => $this->getConfigLoader()->get('pastoral_individual_access'),
                 'allowParents'    => false,  //prevent user search from including student parents
@@ -201,8 +287,31 @@ class Controller extends Base
         // Fetch the exiting rules
         if ($subType) {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $subType->getId()]);
+
+            /* Save the "General Template" content
+             */
+            $subType->setTemplate($post['template']);
+            $this->pastoralSubTypeMapper->save($subType);
+
+            /* Reload this page
+             */
+            $redirect = $this->getRouteIfAuthorized('pastoralAudience.getAudiencesSubTypeModify', [
+                'subtypeId' => $subType->getId()
+            ]);
         } else {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['type_id' => $type->getId()]);
+
+            /* Save the "General Template" content
+             */
+            $type->setTemplate($post['template']);
+            $this->pastoralTypeMapper->save($type);
+
+            /* Reload this page
+             */
+            $redirect = $this->getRouteIfAuthorized('pastoralAudience.getAudiencesTypeModify', [
+                'typeId' => $type->getId(),
+                'type' => $type
+            ]);
         }
 
         // Build the posted rules
@@ -287,7 +396,14 @@ class Controller extends Base
         $this->pastoralAudienceMapper->save($rulesToAdd);
         $this->pastoralAudienceMapper->save($rulesToUpdate);
 
-        $this->response->redirect->to($this->getRouteIfAuthorized('pastoralAudience.getAudiences'));
+        /* TODO Reload the current page.
+         *  Because getAudiences() now redirects you to the first meaningful record,
+         *  after you save you'll be redirected to a whole different record than the
+         *  one you just saw, which is a disorienting experience
+         *
+         * TODO Possibly replace this with an async toast
+         */
+        $this->response->redirect->to($redirect);
     }
 
 

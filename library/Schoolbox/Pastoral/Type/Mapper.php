@@ -32,6 +32,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('pastoral_document_classification_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassification', 'documentClassification');
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('template', self::TYPE_STRING);
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
