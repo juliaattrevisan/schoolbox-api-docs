@@ -402,8 +402,8 @@ class Provisioner
                             $internalUser->setUpdatedAt(Alaress_Date_Format::now());
                             try {
                                 $this->userMapper->save($internalUser);
-                            } catch (MapperException $e) {
-                                $this->logger->debug("Failed to touch user: " . $internalUser->getId() . ' : ' . $e->getMessage(), $commonContext);
+                            } catch (MapperException|UnexpectedValueException $e) {
+                                $this->logger->warning(sprintf("Failed to mark $originalName as having been updated ({$internalUser->getExternalId()}) (%s): ", $e->getMessage()), $context);
                             }
                         }
                         ++$skipped;
