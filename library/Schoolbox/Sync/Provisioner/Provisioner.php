@@ -400,7 +400,18 @@ class Provisioner
                         if ($update && ($action === 'update')) {
                             $this->logger->debug("Marking $originalName as having been updated", $commonContext);
                             $internalUser->setUpdatedAt(Alaress_Date_Format::now());
-                            $this->userMapper->save($internalUser);
+                            try {
+                                $this->userMapper->save($internalUser);
+                            } catch (MapperException | UnexpectedValueException $e) {
+                                $this->logger->warning(
+                                    sprintf(
+                                        "Failed to mark %s as having been updated (%s): ",
+                                        $originalName,
+                                        $e->getMessage()
+                                    ),
+                                    $context
+                                );
+                            }
                         }
                         ++$skipped;
                         continue;
