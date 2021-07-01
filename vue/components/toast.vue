@@ -48,7 +48,6 @@
              *                        when the toast times out
              */
             timeout(text, successful, duration, fadeDuration, timeoutCallback) {
-                let self   = this;
                 this.text  = text;
                 this.state = successful ? STATE_DONE : STATE_FAILED;
                 if (duration === undefined) {
@@ -59,16 +58,15 @@
                 if (fadeDuration) {
                     this.fadeDuration = fadeDuration;
                 }
-                setTimeout(
-                    function () {
-                        self.state  = STATE_HIDDEN;
-                        self.hidden = true;
+                setTimeout(() => {
+                        this.state  = STATE_HIDDEN;
+                        this.hidden = true;
                         if (timeoutCallback instanceof Function) {
                             timeoutCallback();
                         }
                     },
                     duration
-                )
+                );
             },
         },
         computed: {
@@ -90,7 +88,7 @@
 
 <template>
     <transition name="fade" :duration="{ enter: fadeDuration, leave: fadeDuration }">
-        <div ref="toast" v-if="!isHidden" :class="{toast: true, alert: isFailed, success: isDone}" :style="{opacity: 1}">
+        <div ref="toast" v-if="!isHidden" :class="{ pop: !hidden, toast: true, alert: isFailed, success: isDone }" :style="{ opacity: 1 }">
             {{ text }}
         </div>
     </transition>

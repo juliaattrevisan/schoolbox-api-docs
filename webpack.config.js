@@ -177,6 +177,7 @@ module.exports = {
         adminGrades: './library/Schoolbox/Admin/Grades/vue/adminGrades.main.js',
         adminSettingsSearch: './library/Schoolbox/Admin/Navigation/vue/initAdminSettingsSearch.js',
         staleUsersReport: './library/Schoolbox/Admin/User/vue/staleUsersReports/initStaleUsersReport.js',
+        rolesList: './library/Schoolbox/Admin/Lists/templates/vue/initRolesList.js',
 
         usageGlobalTotal: './library/Schoolbox/Admin/Usage/vue/global/total.main.js',
         usageGlobalRole: './library/Schoolbox/Admin/Usage/vue/global/role.main.js',
