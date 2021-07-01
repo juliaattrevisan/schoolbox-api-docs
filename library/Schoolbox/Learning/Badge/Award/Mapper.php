@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
+use Alaress_Date_Format;
 use PDOStatement;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Badge;
@@ -48,6 +49,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('status', self::TYPE_STRING);
         $this->joins('awarded_by', UserMapper::class, 'id', null, null, 'awardedBy', 'awardedBy');
         $this->uses('awarded_at', self::TYPE_DATETIME);
+        $this->uses('expires_at', self::TYPE_DATE);
         $this->joins('award_id', static::class, 'id', null, null, 'award', 'award');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
@@ -191,13 +193,18 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Find awarded badges in the last year (the most recent rolling 12 months)
      *
-     * @param User   $user
-     * @param string $awardStatus
+     * @param User                     $user
+     * @param string                   $awardStatus
+     * @param Alaress_Date_Format|null $expiryDate  If provided, only get awards
+     *                                              which aren't expired by this
+     *                                              date.
      * @return GenericCollection
-     * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function findRecentForUser(User $user, string $awardStatus): GenericCollection
-    {
+    public function findRecentForUser(
+        User $user,
+        string $awardStatus,
+        ?Alaress_Date_Format $expiryDate
+    ): GenericCollection {
         /* Ensure $awardStatus is one we allow; empty collection returned if invalid
          */
         if (!in_array($awardStatus, [ Model::AWARD_STATUS_GOAL, Model::AWARD_STATUS_ACHIEVEMENT ], true)) {
@@ -206,14 +213,21 @@ class Mapper extends \Schoolbox\Mapper
 
         /* Otherwise get the $awardStatus records
          */
-        $from = \Alaress_Date_Format::now()->addYears(-1);
-        $to = \Alaress_Date_Format::now();
+        $from = Alaress_Date_Format::now()->addYears(-1);
+        $to = Alaress_Date_Format::now();
 
         $pb = $this->getPredicateBuilder()
             ->equals('recipient_id', $user->getId())
             ->equals('status', $awardStatus)
             ->isNull('award_id')
             ->betweenDates('awarded_at', $from, $to);
+        if ($expiryDate) {
+            $pb = $pb->any(
+                $this->getPredicateBuilder()
+                     ->isNull('expires_at')
+                     ->greaterThanOrEqualTo('expires_at', $expiryDate->getDatabaseDate())
+            );
+        }
 
         return $this->findByPredicates($pb, [
             'order' => [

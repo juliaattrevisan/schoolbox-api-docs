@@ -52,6 +52,8 @@
                              get-badge-create-form-route="{{ routeLookupIfAuthorized('learningBadge.getCreateForm')
                              ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null }}"
                              :users="{{ users | json_encode }}"
+                             expiry-date-format="{{ config.date_long | momentJsFormat }}"
+                             expiry-field="{{ expiryField }}"
                              :award-to-self-only="Boolean('{{ awardToSelfOnly }}')"
                              post-award-route-lookup="{{ postAwardRouteLookup }}"
                              toast-activate-message-singular="{{ messages.toastActivate.singular }}"

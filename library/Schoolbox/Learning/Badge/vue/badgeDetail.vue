@@ -1,6 +1,8 @@
 <script>
 import BadgeImage from './badge-image';
 
+import {translateExpiryToLabel} from './expiry-helper';
+
 export default {
     components: {
         BadgeImage
@@ -26,6 +28,9 @@ export default {
                 return this.badge.curriculumNodes.filter(v => v.code.length);
             }
             return [];
+        },
+        achievementExpiryLabel() {
+            return translateExpiryToLabel(this.badge?.achievementExpiry);
         }
     },
     methods: {},
@@ -37,6 +42,7 @@ export default {
         <badge-image :badge="badge" class="badge-img-container"></badge-image>
         <h2>{{ badge.name }}</h2>
         <p class="meta" v-if="badge.category">Category: {{ badge.category.name }}</p>
+        <p class="meta" v-if="badge.achievementExpiry">Achievement Expires: {{ achievementExpiryLabel }} after awarding</p>
         <p class="meta" v-if="badgeTagNames.length > 0">Tags: {{ badgeTagNames }}</p>
         <article v-html="badge.body"></article>
         <div v-if="badge.curriculumNodes.length">

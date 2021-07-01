@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Moment\Feed;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
@@ -99,7 +100,13 @@ class Controller extends Base
     public function getFeedForUser(User $user): void
     {
         $encodedCursor   = $this->request->query->get('cursor');
-        $cursor          = new Cursor($this->database, $user, self::FEED_ITEMS_PER_PAGE, $this->getConfigLoader());
+        $cursor          = new Cursor(
+            $this->database,
+            $user,
+            Alaress_Date_Format::now(),
+            self::FEED_ITEMS_PER_PAGE,
+            $this->getConfigLoader(),
+        );
         $hydrator        = new Hydrator($this->evidenceMapper, $this->badgeAwardMapper);
         $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
         $translator      = new ModelToArray(

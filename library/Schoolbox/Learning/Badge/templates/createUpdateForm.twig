@@ -184,6 +184,32 @@
                         </select>
                     </div>
                     <div class="small-12 columns">
+                        <label for="badge-achievement-expiry">
+                            Achievement Expiry
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                                  title="After this period of time the achievement will no longer be valid">?</span>
+                        </label>
+
+                        {% set achievementExpiryLabels = {
+                            never:     'Never',
+                            day:       '1 day',
+                            week:      '1 week',
+                            fortnight: '2 weeks',
+                            month:     '1 month',
+                            halfYear:  '6 months',
+                            year:      '1 year',
+                        } %}
+                        <select name="achievementExpiry" id="badge-achievement-expiry">
+                            {% for key, value in achievementExpiries %}
+                                <option value="{{ value }}"
+                                        label="{{ achievementExpiryLabels[key] }}"
+                                        {% if (badge.achievementExpiry ?? null) is same as value %}selected{% endif %}>
+                                    {{ achievementExpiryLabels[key] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="small-12 columns">
                         {% set toolTipTitle = 'Select the year levels to associate with this badge' %}
                         <label>
                             Year Levels
@@ -314,10 +340,11 @@
                         'tags': [],
                         'badge-avatar-selector': formData.get('badge-avatar-selector')
                     },
-                    categoryId      = formData.get('category'),
-                    tags            = formData.get('tags'),
-                    toast           = $('#toast'),
-                    submit          = $('#badge-submit');
+                    categoryId        = formData.get('category'),
+                    achievementExpiry = formData.get('achievementExpiry'),
+                    tags              = formData.get('tags'),
+                    toast             = $('#toast'),
+                    submit            = $('#badge-submit');
 
 
                 if (categoryId) {
@@ -325,6 +352,11 @@
                         id: categoryId
                     }
                 }
+
+                payload.achievementExpiry = achievementExpiry
+                    ? Number(achievementExpiry)
+                    : null;
+
                 let yearLevels = form.querySelector('#yearLevels').selectize.items;
                 payload.yearLevelIds = yearLevels.map(
                         (v) => {

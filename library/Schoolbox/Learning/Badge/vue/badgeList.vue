@@ -10,6 +10,7 @@ import BadgeDetail from "./badgeDetail";
 import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdraw-modal";
 import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from './badge-image';
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 const EVENT_CHANGE = 'change';
 
@@ -45,6 +46,7 @@ export default {
     mixins: [foundationMixin],
 
     components: {
+        RelativeTime,
         BadgeAward,
         BadgeDetail,
         BadgeAchievementWithdrawModal,
@@ -86,6 +88,17 @@ export default {
         allowSelection: {
             type: Boolean,
             default: false,
+        },
+
+        /**
+         * The Moment date format which is used to render the date when an
+         * awarding of a badge will expire.
+         *
+         * If not provided, the date will not be rendered.
+         */
+        expiryDateFormat: {
+            type: String,
+            default: null,
         },
     },
     data() {
@@ -420,6 +433,7 @@ export default {
             <badge-award v-if="currentBadge"
                          :badge="currentBadge"
                          :endpoint="currentBadge._links.awardAsAchievement"
+                         :expiry="currentBadge.achievementExpiry"
                          @cancel="closeAwardAsAchievementModal"
                          @done="closeAwardAsAchievementModal"
                          placeholder="Search for users to award achievement to"
@@ -432,6 +446,11 @@ export default {
                 </template>
                 <template v-slot:confirmButton>
                     Award Achievement
+                </template>
+                <template v-slot:expiryMessage="slotProps">
+                    <p class="meta" v-if="slotProps.expiryDate">
+                        This achievement will expire <relative-time :datetime="slotProps.expiryDate" date-only></relative-time>.
+                    </p>
                 </template>
             </badge-award>
         </reveal-modal>

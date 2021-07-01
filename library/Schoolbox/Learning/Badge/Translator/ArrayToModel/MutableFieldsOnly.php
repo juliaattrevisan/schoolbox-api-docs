@@ -25,15 +25,16 @@ namespace Schoolbox\Learning\Badge\Translator\ArrayToModel;
 class MutableFieldsOnly extends AllFields
 {
     private const MUTABLE_FIELDS = [
-        'name'            => true,
-        'body'            => true,
-        'icon'            => true,
-        'image'           => true,
-        'allow-as-goal'   => true,
-        'category'        => true,
-        'tags'            => true,
-        'yearLevelIds'    => true,
-        'curriculumNodes' => true,
+        'name'              => true,
+        'body'              => true,
+        'icon'              => true,
+        'image'             => true,
+        'allow-as-goal'     => true,
+        'category'          => true,
+        'tags'              => true,
+        'yearLevelIds'      => true,
+        'curriculumNodes'   => true,
+        'achievementExpiry' => true,
     ];
 
 

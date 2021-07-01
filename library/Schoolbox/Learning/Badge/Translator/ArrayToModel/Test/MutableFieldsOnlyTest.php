@@ -106,6 +106,14 @@ class MutableFieldsOnlyTest extends TestCase
                 ->setImage($storage),
             new MutableFieldsOnly($collectorFactoryMock),
         ];
+
+        yield 'achievement expiry' => [
+            [
+                'achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_DAY,
+            ],
+            (new Model())
+                ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY),
+        ];
     }
 
 
@@ -224,7 +232,7 @@ class MutableFieldsOnlyTest extends TestCase
             (clone $baseModel)->setBody('new body'),
         ];
 
-        yield 'update bodye - left+right trim' => [
+        yield 'update body - left+right trim' => [
             ['body' => ' new body ',],
             (clone $baseModel),
             (clone $baseModel)->setBody('new body'),
@@ -240,6 +248,18 @@ class MutableFieldsOnlyTest extends TestCase
             ['category' => ['id' => null],],
             (clone $baseModel),
             (clone $baseModel)->setCategory((new Category())->setId(null)),
+        ];
+
+        yield 'update achievement expiry' => [
+            ['achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_MONTH,],
+            (clone $baseModel),
+            (clone $baseModel)->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_MONTH),
+        ];
+
+        yield 'null achievement expiry' => [
+            ['achievementExpiry' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setAchievementExpiry(null),
         ];
 
         yield 'update created by' => [

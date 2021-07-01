@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Badge\Award;
 
+use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Badge;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -60,9 +61,15 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var \Alaress_Date_Format|null
+     * @var Alaress_Date_Format|null
      */
-    private ?\Alaress_Date_Format $awardedAt = null;
+    private ?Alaress_Date_Format $awardedAt = null;
+
+
+    /**
+     * When does this achievement/goal expire?
+     */
+    private ?Alaress_Date_Format $expiresAt = null;
 
 
     /**
@@ -176,23 +183,44 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
-    public function getAwardedAt(): \Alaress_Date_Format
+    public function getAwardedAt(): Alaress_Date_Format
     {
         return $this->awardedAt;
     }
 
 
     /**
-     * @param \Alaress_Date_Format $awardedAt
+     * @param Alaress_Date_Format $awardedAt
      * @return Model
      */
-    public function setAwardedAt(\Alaress_Date_Format $awardedAt): self
+    public function setAwardedAt(Alaress_Date_Format $awardedAt): self
     {
         $this->awardedAt = $awardedAt;
         return $this;
     }
+
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getExpiresAt(): ?Alaress_Date_Format
+    {
+        return $this->expiresAt;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format|null $expiresAt
+     * @return $this
+     */
+    public function setExpiresAt(?Alaress_Date_Format $expiresAt): self
+    {
+        $this->expiresAt = $expiresAt;
+        return $this;
+    }
+
 
 
     /**

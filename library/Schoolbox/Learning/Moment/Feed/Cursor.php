@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Moment\Feed;
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
 use Alaress\Database\Connector\IConnector;
+use Alaress_Date_Format;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
@@ -54,6 +55,12 @@ class Cursor implements ICursor
 
 
     /**
+     * If provided: don't fetch any badge awards which expire before this date.
+     */
+    private ?Alaress_Date_Format $expiryDate;
+
+
+    /**
      * The maximum number of results to fetch in one query.
      */
     private int $limit;
@@ -80,21 +87,24 @@ class Cursor implements ICursor
     /**
      * Constructor
      *
-     * @param IConnector    $database
-     * @param User          $user
-     * @param int           $limit
-     * @param IConfigLoader $config
-     * @param ICodec|null   $codec
+     * @param IConnector               $database
+     * @param User                     $user
+     * @param Alaress_Date_Format|null $expiryDate
+     * @param int                      $limit
+     * @param IConfigLoader            $config
+     * @param ICodec|null              $codec
      */
     public function __construct(
         IConnector $database,
         User $user,
+        ?Alaress_Date_Format $expiryDate,
         int $limit,
         IConfigLoader $config,
         ?ICodec $codec = null
     ) {
         $this->database               = $database;
         $this->user                   = $user;
+        $this->expiryDate             = $expiryDate;
         $this->limit                  = $limit;
         $this->codec                  = $codec ?? new Base64();
         $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED) && $user->getLearningMomentsEnabled();
@@ -144,11 +154,14 @@ class Cursor implements ICursor
             );
         }
         if ($this->badgesEnabled) {
-            $countQueries[] = $this->database->executeQuery(
-                "SELECT COUNT(*) FROM badge_user WHERE recipient_id = ? AND deleted_at IS NULL",
-                [$this->user->getId()]
-            );
-        };
+            $badgeCountQuery  = "SELECT COUNT(*) FROM badge_user WHERE recipient_id = ? AND deleted_at IS NULL";
+            $badgeCountParams = [$this->user->getId()];
+            if ($this->expiryDate) {
+                $badgeCountQuery    .= ' AND (expires_at IS NULL OR expires_at >= ?)';
+                $badgeCountParams[] =  $this->expiryDate->getDatabaseDate();
+            }
+            $countQueries[] = $this->database->executeQuery($badgeCountQuery, $badgeCountParams);
+        }
 
         foreach ($countQueries as $countQuery) {
             $count += (int)$countQuery->fetchColumn();
@@ -205,7 +218,7 @@ class Cursor implements ICursor
             $params['userIdEvidence']        = $this->user->getId();
         }
         if ($this->badgesEnabled) {
-            $queries[]                         = '
+            $badgeQuery                        = '
                 SELECT
                     id                       AS id,
                     :discriminatorBadgeAward AS discriminator,
@@ -215,6 +228,12 @@ class Cursor implements ICursor
             ';
             $params['discriminatorBadgeAward'] = self::DISCRIMINATOR_BADGE_AWARD;
             $params['userIdBadgeAward']        = $this->user->getId();
+
+            if ($this->expiryDate) {
+                $badgeQuery                 .= ' AND (expires_at IS NULL OR expires_at >= :expiryBadgeAward)';
+                $params['expiryBadgeAward'] =  $this->expiryDate->getDatabaseDate();
+            }
+            $queries[] = $badgeQuery;
         }
 
         if (count($queries) === 0) {
