@@ -235,6 +235,7 @@ export default {
             noEmailsFoundText: 'Sorry we cannot send an email to the selected users as they do not have an email',
             currentClassCode: null,
             emailGroupsWithSelection: this.emailGroups,
+            emailFormBeingSubmitted: false,
         }
     },
     mounted: function () {
@@ -284,6 +285,11 @@ export default {
             });
         },
         sendEmail: function () {
+            let self = this;
+
+            // While the system is preparing the email lists, disable the button
+            this.emailFormBeingSubmitted = true;
+            self.sendEmailButtonText = self.loadingText;
             this.$refs.form.submit();
         },
         addPastoralRecord: function () {
@@ -472,7 +478,7 @@ export default {
             return groups;
         },
         enableSendEmailButton: function () {
-            return this.selectedGroups.length > 0;
+            return this.selectedGroups.length > 0 && !this.emailFormBeingSubmitted;
         },
     },
     filters: {
