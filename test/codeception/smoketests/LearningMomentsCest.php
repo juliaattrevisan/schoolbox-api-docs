@@ -26,39 +26,38 @@ class LearningMomentsCest
     /** Create a learning moment by writing something and submitting it
      * check if response code is 200
      *
-     * @param IntegrationTester    $i
+     * @param IntegrationTester $i
      */
     public function createLearningMomentText(IntegrationTester $i): void
     {
         #GIVEN
         $student_jreed = $i->grabUser('jreed');
-        $type= 'text';
-        $timestamp = time();
-        $body     = 'Learning Moment Text: Automation API Smoke Test' . $timestamp;
+        $type          = 'text';
+        $timestamp     = time();
+        $body          = 'Learning Moment Text: Automation API Smoke Test' . $timestamp;
 
         #WHEN
-        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(),$type, $body);
+        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(), $type, $body);
         $i->amGoingTo('Send request to create a learning moment');
         $i->sendRequest($learningMomentPayload);
 
         #THEN
         $i->seeResponseCodeIs(200);
-
     }
 
     /** Update a text learning moment submitting it
      * check if response code is 200
      *
-     * @param IntegrationTester    $i
+     * @param IntegrationTester $i
      */
     public function modifyLearningMomentText(IntegrationTester $i): void
     {
         #GIVEN
-        $student_jreed = $i->grabUser('jreed');
-        $type= 'text';
-        $timestamp = time();
-        $body     = 'Learning Moment Text: Automation API Smoke Test' . $timestamp;
-        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(),$type, $body);
+        $student_jreed         = $i->grabUser('jreed');
+        $type                  = 'text';
+        $timestamp             = time();
+        $body                  = 'Learning Moment Text: Automation API Smoke Test' . $timestamp;
+        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(), $type, $body);
         $i->amGoingTo('Send request to create a learning moment');
         $i->sendRequest($learningMomentPayload);
         $i->seeResponseCodeIs(200);
@@ -66,31 +65,30 @@ class LearningMomentsCest
         $evidence = $i->grabLearningMomentByBody($body);
 
         #WHEN
-        $body     = 'Learning Moment Text: Automation API Smoke Test - getting this text updated' . $timestamp;
-        $type= 'text';
-        $learningMomentPayloadModify = new Payload\LearningMoment\Modify($evidence->getId(), $type,  $body);
+        $body                        = 'Learning Moment Text: Automation API Smoke Test - getting this text updated' . $timestamp;
+        $type                        = 'text';
+        $learningMomentPayloadModify = new Payload\LearningMoment\Modify($evidence->getId(), $type, $body);
         $i->amGoingTo('Send request to update a learning moment');
         $i->sendRequest($learningMomentPayloadModify);
 
         #THEN
         $i->seeResponseCodeIs(200);
-
     }
 
 
     /** Delete a learning moment
      * check if response code is 200
      *
-     * @param IntegrationTester    $i
+     * @param IntegrationTester $i
      */
     public function deleteLearningMomentText(IntegrationTester $i): void
     {
         #GIVEN
-        $student_jreed = $i->grabUser('jreed');
-        $type= 'text';
-        $timestamp = time();
-        $body     = 'Learning Moment Text To Be DELETED: Automation API Smoke Test' . $timestamp;
-        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(),$type, $body);
+        $student_jreed         = $i->grabUser('jreed');
+        $type                  = 'text';
+        $timestamp             = time();
+        $body                  = 'Learning Moment Text To Be DELETED: Automation API Smoke Test' . $timestamp;
+        $learningMomentPayload = new Payload\LearningMoment\Create($student_jreed->getId(), $type, $body);
         $i->amGoingTo('Send request to create a learning moment');
         $i->sendRequest($learningMomentPayload);
         $i->seeResponseCodeIs(200);
@@ -98,15 +96,13 @@ class LearningMomentsCest
         $evidence = $i->grabLearningMomentByBody($body);
 
         #WHEN
-        $learningMomentPayloadDelete = new Payload\LearningMoment\Delete($student_jreed->getId(),$evidence->getId());
+        $learningMomentPayloadDelete = new Payload\LearningMoment\Delete($student_jreed->getId(), $evidence->getId());
         $i->amGoingTo('Send request to delete a learning moment');
         $i->sendRequest($learningMomentPayloadDelete);
 
         #THEN
         $i->seeResponseCodeIs(200);
-
     }
-
 
 
 }
