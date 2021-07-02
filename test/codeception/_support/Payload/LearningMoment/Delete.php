@@ -1,16 +1,12 @@
 <?php
 
-
 namespace Payload\LearningMoment;
-
-
 
 use Payload\DeleteTrait;
 use Payload\Pastoral\FormTrait;
 
 class Delete extends \Payload\Request
 {
-
     use DeleteTrait;
     use FormTrait;
 
@@ -20,9 +16,9 @@ class Delete extends \Payload\Request
     {
 
         $this->evidenceId =  $evidenceId;
-        $file= null;
+        $file = null;
         $this->setReferer("/search/user/$studentId");
-        $this->setHeader('content-type','application/json');
+        $this->setHeader('content-type', 'application/json');
     }
 
 

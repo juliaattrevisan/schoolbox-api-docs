@@ -10,7 +10,6 @@ use Payload\Request;
 
 class Modify extends Request
 {
-
     use PutTrait;
     use FormTrait;
 
@@ -19,12 +18,12 @@ class Modify extends Request
     public function __construct(int $evidenceId, string $type, string $body)
     {
         $this->evidenceId =  $evidenceId;
-        $file= null;
+        $file = null;
         $this->setReferer("/learning/evidence/$evidenceId/modify");
         $this->setFormParam('body', $body);
         $this->setFormParam('file', $file);
         $this->setFormParam('type', $type);
-        $this->setHeader('content-type','application/json');
+        $this->setHeader('content-type', 'application/json');
     }
 
 
@@ -32,5 +31,4 @@ class Modify extends Request
     {
         return "/learning/evidence/$this->evidenceId";
     }
-
 }

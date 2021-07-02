@@ -10,7 +10,6 @@ use Payload\Request;
 
 class Create extends Request
 {
-
     use PostTrait;
     use FormTrait;
 
@@ -19,12 +18,12 @@ class Create extends Request
     public function __construct(int $studentId, string $type, string $body)
     {
         $this->studentId =  $studentId;
-        $file= null;
+        $file = null;
         $this->setReferer("/learning/evidence/user/$studentId/create?momentType=$type");
         $this->setFormParam('body', $body);
         $this->setFormParam('file', $file);
         $this->setFormParam('type', $type);
-        $this->setHeader('content-type','application/json');
+        $this->setHeader('content-type', 'application/json');
     }
 
     protected function getUrl(): string

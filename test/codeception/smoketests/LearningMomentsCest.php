@@ -7,7 +7,6 @@ namespace SmokeTests;
 use IntegrationTester;
 use Payload;
 
-
 class LearningMomentsCest
 {
 
@@ -103,6 +102,4 @@ class LearningMomentsCest
         #THEN
         $i->seeResponseCodeIs(200);
     }
-
-
 }

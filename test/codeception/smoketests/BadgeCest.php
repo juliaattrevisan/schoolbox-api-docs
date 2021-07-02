@@ -141,6 +141,4 @@ class BadgeCest
         #THEN
         $i->seeResponseCodeIs(200);
     }
-
-
 }
