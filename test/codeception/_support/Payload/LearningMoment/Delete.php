@@ -4,8 +4,9 @@ namespace Payload\LearningMoment;
 
 use Payload\DeleteTrait;
 use Payload\Pastoral\FormTrait;
+use Payload\Request;
 
-class Delete extends \Payload\Request
+class Delete extends Request
 {
     use DeleteTrait;
     use FormTrait;
@@ -16,7 +17,6 @@ class Delete extends \Payload\Request
     {
 
         $this->evidenceId =  $evidenceId;
-        $file = null;
         $this->setReferer("/search/user/$studentId");
         $this->setHeader('content-type', 'application/json');
     }
