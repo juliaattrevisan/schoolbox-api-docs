@@ -39,18 +39,21 @@ class Module extends BaseModule
             ),
         );
 
-        $viewAwardedBadges = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\IsUserOrParentOfUser(
-                    $this->getExternalUser(),
-                    UserMapper::getInstance(),
-                    'userId'
-                )
-            ),
-        );
+        $viewAwardedBadges =  new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsUserOrParentOfUser(
+                        $this->getExternalUser(),
+                        UserMapper::getInstance(),
+                        'userId'
+                    )
+                ),
+            );
+        });
+
 
         $setGoalForSelfRule = new Rule\All(
             new Rule\IsLoggedIn(),

@@ -37,11 +37,13 @@ class Module extends BaseModule
         // Permissions:
         // Current user must have permission to post to ALL user IDs provided
         // (they must be a staff member, parent of or the user themselves)
-        $isParentOrUserRule = new Rule\IsUserOrParentOfUser(
-            $this->getExternalUser(),
-            UserMapper::getInstance(),
-            'userId'
-        );
+        $isParentOrUserRule = new Rule\LazyCallback(function () {
+            return new Rule\IsUserOrParentOfUser(
+                $this->getExternalUser(),
+                UserMapper::getInstance(),
+                'userId'
+            );
+        });
 
         // In addition: if posting a moment for someone else,
         // that someone else must be a student in a year level which learning_moments_enabled is true

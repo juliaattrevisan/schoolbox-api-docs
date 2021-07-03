@@ -35,18 +35,20 @@ class Module extends BaseModule
         // * Staff and superusers may view anyone's
         // * Students may view their own
         // * Parents may view their own and their kid's
-        $feedPermissions = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-                new Rule\IsUserOrParentOfUser(
-                    $this->getExternalUser(),
-                    UserMapper::getInstance(),
-                    'userId'
+        $feedPermissions =  new Rule\LazyCallback(function () {
+            return new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasRole(Role::STAFF),
+                    new Rule\IsUserOrParentOfUser(
+                        $this->getExternalUser(),
+                        UserMapper::getInstance(),
+                        'userId'
+                    ),
                 ),
-            ),
-        );
+            );
+        });
         $feedPreload = Closure::fromCallable([$this, 'preloadUser']);
 
         $this->register(
