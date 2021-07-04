@@ -9,9 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\User;
 
-use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\RoleMapper;
@@ -39,7 +40,7 @@ class Module extends BaseModule
             return $this->preloadUser($params);
         };
 
-        $this->register(self::METHOD_GET, '/{userId:\d+}', 'getProfile', null, $preloadUser);
+        $this->register(self::METHOD_GET, '/{userId:\d+}', 'getProfile', new IsLoggedIn(), $preloadUser);
     }
 
 
@@ -73,7 +74,7 @@ class Module extends BaseModule
      *
      * @param array $params
      * @return array
-     * @throws InvalidPath
+     * @throws NotFound
      */
     private function preloadUser(array $params): array
     {
@@ -82,13 +83,13 @@ class Module extends BaseModule
         }
 
         if (!\array_key_exists('userId', $params)) {
-            throw new InvalidPath("No 'userId' found in route params");
+            throw new NotFound("No 'userId' found in route params");
         }
 
         try {
             return ['user' => $this->getUserMapper()->findById($params['userId'])];
         } catch (Mapper\Exception $e) {
-            throw new InvalidPath('User Not Found', 0, $e);
+            throw new NotFound('User Not Found', 0, $e);
         }
     }
 
