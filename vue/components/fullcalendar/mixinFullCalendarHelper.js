@@ -140,11 +140,9 @@ export const mixinFullCalendarHelper = {
             // The amount of space between the top of the window and the start of the calendar
             const calendarOffset = this.jQuery(this.$el).find('.fc-view-harness').offset().top;
             // <section> margin-bottom and #container padding-bottom
-            const footerHeight = this.jQuery('#footer').outerHeight();
-            // const footerHeight = document.getElementById('footer').offsetHeight;
             const otherPadding = 32;
-            const contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
-
+            const contentHeight = windowHeight - calendarOffset  - otherPadding;
+            
             // Force a min height of 500px
             if (contentHeight < 500) {
                 return 500;
