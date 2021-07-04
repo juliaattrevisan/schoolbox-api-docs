@@ -24,8 +24,8 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
+use Laminas\Uri\Exception\InvalidArgumentException;
+use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Classes

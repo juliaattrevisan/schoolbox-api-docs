@@ -18,7 +18,7 @@ use Schoolbox\External\Connector\Kamar\Base\Endpoint\Receiver;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Timetable;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
-use Zend\Uri\Exception\InvalidUriPartException;
+use Laminas\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
 

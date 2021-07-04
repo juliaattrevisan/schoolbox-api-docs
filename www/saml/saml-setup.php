@@ -47,7 +47,7 @@ if (Config::get('saml_auth_context') !== 'unspecified') {
 SAMLDebugLog(json_encode($settingsInfo));
 
 try {
-    $url = new \Zend\Uri\Uri(Config::get('saml_idp_metadata_url'));
+    $url = new \Laminas\Uri\Uri(Config::get('saml_idp_metadata_url'));
     $idpMetadataUrl = $url->toString();
 
     $cache = new Alaress_Saml_Cache();

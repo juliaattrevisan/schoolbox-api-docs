@@ -12,8 +12,8 @@ namespace Schoolbox\Url\Test;
 use Schoolbox\Config\TestLoader;
 use Schoolbox\Url\Factory;
 use PHPUnit\Framework\TestCase;
-use Zend\Uri\Uri;
-use Zend\Uri\UriInterface;
+use Laminas\Uri\Uri;
+use Laminas\Uri\UriInterface;
 
 /**
  * @covers \Schoolbox\Url\Factory

@@ -15,8 +15,8 @@ use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
 use Schoolbox\Preview\Chain\Strategy\Internal\Redirect;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Uri;
+use Laminas\Uri\Exception\InvalidArgumentException;
+use Laminas\Uri\Uri;
 
 /**
  * Class Internal

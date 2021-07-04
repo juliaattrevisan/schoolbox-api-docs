@@ -37,7 +37,7 @@ use Schoolbox\MapperFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Throwable;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Alaress\DebugBar\DataCollector\TidewaysCollector;
 use Database;
@@ -104,7 +104,7 @@ class Kernel extends WebKernelAbstract
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     public function run()
     {
@@ -243,7 +243,7 @@ class Kernel extends WebKernelAbstract
      * @throws \Aura\Web\Exception\InvalidStatusCode
      * @throws \DebugBar\DebugBarException
      * @throws \ReflectionException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      * @throws Throwable
      */
     private function outputAuraContent(Route $route, array $server): void

@@ -12,7 +12,7 @@ namespace Alaress\Paginator\Test;
 
 use Alaress\Paginator\Paginator;
 use Alaress\Paginator\UrlPaginator;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 
 class UrlPaginatorTest extends TestCase

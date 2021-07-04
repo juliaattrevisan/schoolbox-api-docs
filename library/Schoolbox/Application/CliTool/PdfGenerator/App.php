@@ -27,8 +27,8 @@ use Schoolbox\Realtime\Pipe\PipeManager;
 use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use TheCodingMachine\Gotenberg;
-use Zend\Uri\Uri;
-use Zend\Uri\UriInterface;
+use Laminas\Uri\Uri;
+use Laminas\Uri\UriInterface;
 use ZipArchive;
 
 /**

@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace Schoolbox\Comms\News;
 
 use Alaress\Paginator\UrlPaginator;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriException;
-use Zend\Uri\Uri;
+use Laminas\Uri\Exception\InvalidArgumentException;
+use Laminas\Uri\Exception\InvalidUriException;
+use Laminas\Uri\Uri;
 
 class Paginator extends UrlPaginator
 {
@@ -31,7 +31,7 @@ class Paginator extends UrlPaginator
     {
         // Building a URL using PHP builtins is a complete pain!
         // (There's no http_build_str equivalent for parse_str)
-        // That's why I use Zend\Uri internally.
+        // That's why I use Laminas\Uri internally.
         $url = new Uri($this->url);
         $query = $url->getQueryAsArray();
         $query[$this->param] = $page;

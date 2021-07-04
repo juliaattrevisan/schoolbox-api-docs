@@ -26,7 +26,7 @@ use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\MobileApp\ServiceMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 
 class Controller extends Base
 {

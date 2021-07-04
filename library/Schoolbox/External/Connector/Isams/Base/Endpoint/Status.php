@@ -11,8 +11,8 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
 use Schoolbox\External\Importer\Endpoint\Status\IStatus;
-use Zend\Uri\Exception\InvalidArgumentException;
-use Zend\Uri\Exception\InvalidUriPartException;
+use Laminas\Uri\Exception\InvalidArgumentException;
+use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Status
