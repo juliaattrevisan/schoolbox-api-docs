@@ -51,7 +51,7 @@
         "php": "^7.4",
         "gggeek/phpxmlrpc": "0.1.0",
         "zendframework/zendservice-apple-apns": "~1.0",
-        "symfony/http-foundation": "~5.2.3",
+        "symfony/http-foundation": "~5.2",
         "league/oauth2-client": "^2.4",
         "sabre/dav": "~4.1.2",
         "sabre/vobject" : "~4.3.0",
