@@ -1,17 +1,17 @@
 <?php
 
 namespace Payload\Badge;
+
 use Payload\Pastoral\FormTrait;
 use Payload\PostTrait;
 use phpDocumentor\Reflection\Types\Boolean;
 
 class Create extends \Payload\Request
 {
-
     use PostTrait;
     use FormTrait;
 
-    public function __construct(string $badgeavatarselector,int $category, string $body,string $name, bool $allowasgoal)
+    public function __construct(string $badgeavatarselector, int $category, string $body, string $name, bool $allowasgoal, int $expiry)
     {
 
         $this->setReferer("/learning/badge/create");
@@ -20,8 +20,9 @@ class Create extends \Payload\Request
         $this->setFormParam('body', $body);
         $this->setFormParam('category', ['id' => $category]);
         $this->setFormParam('name', $name);
+        $this->setFormParam('achievementExpiry', $expiry);
 
-        $this->setHeader('content-type','application/json');
+        $this->setHeader('content-type', 'application/json');
     }
 
     protected function getUrl(): string
