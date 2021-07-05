@@ -141,15 +141,19 @@
           modal;
 
       if (target) {
-        if (typeof target.selector !== 'undefined') {
-          // Find the named node; only use the first one found, since the rest of the code assumes there's only one node
+        
+        if (target.data) {
+            
+            // Find the named node; only use the first one found, since the rest of the code assumes there's only one node
           modal = self.S('#' + target.data(self.data_attr('reveal-id'))).first();
         } else {
+        
           modal = self.S(this.scope);
 
           ajax_settings = target;
         }
       } else {
+        
         modal = self.S(this.scope);
       }
 
@@ -165,6 +169,7 @@
         var open_modal = self.S('[' + self.attr_name() + '].open');
 
         if (typeof modal.data('css-top') === 'undefined') {
+
           modal.data('css-top', parseInt(modal.css('top'), 10))
             .data('offset', this.cache_offset(modal));
         }
