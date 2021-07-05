@@ -79,11 +79,11 @@ class FlyoutNodes implements IFlyoutNodes
              */
             if (!isset($stack[$typeUrl])) {
                 $stack[$typeUrl] = [
-                    'name'        => $type->getName(),
-                    'visible'     => true,
-                    'searchable'  => true,
-                    'description' => $type->getName(),
-                    'children'    => [],
+                    'name'              => $type->getName(),
+                    'visible'           => true,
+                    'hasBreadcrumbLink' => true,
+                    'description'       => $type->getName(),
+                    'children'          => [],
                 ];
             }
 
@@ -98,13 +98,13 @@ class FlyoutNodes implements IFlyoutNodes
 
                 /* Add the current SubType to the children of its parent Type
                  */
-                $stack[$typeUrl]['searchable'] = false;
+                $stack[$typeUrl]['hasBreadcrumbLink'] = false;
                 $stack[$typeUrl]['children'][$subtypeUrl] = [
-                    'name'        => $subtype->getName(),
-                    'visible'     => true,
-                    'searchable'  => true,
-                    'description' => $subtype->getName(),
-                    'children'    => []
+                    'name'               => $subtype->getName(),
+                    'visible'            => true,
+                    'hasBreadcrumbLink'  => true,
+                    'description'        => $subtype->getName(),
+                    'children'           => []
                 ];
             }
         }
