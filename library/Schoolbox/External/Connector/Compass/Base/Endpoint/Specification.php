@@ -71,11 +71,18 @@ class Specification
                     'lBound' => $lBound,
                     'uBound' => $uBound
                 ]
-            ]
+            ],
 
             /**
              * Staff Profile nodes
              */
+            [
+                'endpoint' => 'person/v1/GetStaff',
+                'params' => [
+                    'lBound' => $lBound,
+                    'uBound' => $uBound
+                ]
+            ],
 
 
             /**
