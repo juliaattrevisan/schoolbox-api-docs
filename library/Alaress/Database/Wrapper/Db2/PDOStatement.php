@@ -19,7 +19,7 @@ class PDOStatement extends BasePDOStatement
     /** @var resource $connection */
     protected $connection;
 
-    /** @var resource $statement */
+    /** @var resource|bool $statement */
     protected $statement;
 
     /** @var string $sql */
@@ -73,6 +73,10 @@ class PDOStatement extends BasePDOStatement
 
         $this->statement = db2_prepare($this->connection, $sql, ['cursor' => DB2_SCROLLABLE]);
 
+        if (!$this->statement) {
+            return false;
+        }
+
         // The commented code below *should* work for binding both input and output parameters as far as I can tell-
         // but I am receiving "Describe Param Failed" on my test database. Disabling this for now, which limits us
         // to using input type parameters only for now.
@@ -108,6 +112,10 @@ class PDOStatement extends BasePDOStatement
      */
     public function fetch($fetch_style = null, $cursor_orientation = PDO::FETCH_ORI_NEXT, $cursor_offset = 0)
     {
+        if (!$this->statement) {
+            return false;
+        }
+
         if ($fetch_style == null) {
             $fetch_style = $this->fetchStyleDefault;
         }
@@ -328,7 +336,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * Return underlying DB2 statement resource. You should not need to use this externally.
      *
-     * @return resource
+     * @return resource|null
      */
     public function getStatement()
     {
