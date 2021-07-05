@@ -143,15 +143,18 @@ class ExternalEvents extends Base implements IExternalEvents
         /* Get personal events for $user - it doesn't matter which role this user is
          */
         $paramSuffix = 0;
-        $allEvents[] = $this->buildQueryForProductCode(null, $paramSuffix);
-        $params      = $this->buildQueryForProductCodeParams(
-            $start,
-            $end,
-            null,
-            $user->getExternalId(),
-            $paramSuffix
-        );
-        $paramSuffix++;
+
+        if ($user->getExternalId()) {
+            $allEvents[] = $this->buildQueryForProductCode(null, $paramSuffix);
+            $params      = $this->buildQueryForProductCodeParams(
+                $start,
+                $end,
+                null,
+                $user->getExternalId(),
+                $paramSuffix
+            );
+            $paramSuffix++;
+        }
 
         /* Get role-specific set of events
          */
