@@ -94,10 +94,12 @@ class Flyout
      * There are multiple implementations of breadcrumbs but there should be only one
      * Those should be removed in favour of this implementation
      *
-     * @param string $url
+     * @param string      $url
+     * @param string|null $overrideUrl
+     * @param string|null $overrideName
      * @return array
      */
-    public function generateBreadcrumbs(string $url): array
+    public function generateBreadcrumbs(string $url, ?string $overrideUrl = null, ?string $overrideName = null): array
     {
         $allCrumbs = $this->rootNode;
 
@@ -119,7 +121,10 @@ class Flyout
                         }
 
                         $childHasBreadcrumbLink = $childData['hasBreadcrumbLink'] ?? true;
-                        $allCrumbs[]            = [$childData['name'], $childHasBreadcrumbLink ? $childUrl : null];
+                        $allCrumbs[] = [
+                            $overrideName ?? $childData['name'],
+                            $overrideUrl ?? ($childHasBreadcrumbLink ? $childUrl : null),
+                        ];
                     }
                 }
             }
