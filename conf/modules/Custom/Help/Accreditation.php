@@ -8,7 +8,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\help;
+namespace Config\Modules\Custom\Help;
 
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;

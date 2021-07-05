@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\mggs;
+namespace Config\Modules\Custom\Mggs;
 
 use Alaress\Application\Kernel;
 use Aura\Di\Exception\ServiceNotFound;

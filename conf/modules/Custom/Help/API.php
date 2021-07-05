@@ -1,19 +1,21 @@
 <?php
 
 /**
- * @author      Damian Sloane <damian.sloane@alaress.com.au>
+ *
+ * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\help;
+namespace Config\Modules\Custom\Help;
 
 use Config\ModuleLoader;
+use Custom\Help\CourseParticipation;
 use Alaress\Application\Kernel;
-use Custom\Help\Marketo\Component\Dashboard\Module as MarketoModule;
 
-class Marketo extends ModuleLoader
+class API extends ModuleLoader
 {
+
     /**
      * Run configuration for the given module
      *
@@ -22,8 +24,6 @@ class Marketo extends ModuleLoader
      */
     public function configure($kernel)
     {
-        $namespace = 'marketo';
-
-        $this->loadModule($kernel, MarketoModule::class, "/modules/custom/help/{$namespace}");
+        $this->loadModule($kernel, CourseParticipation\Module::class, '/api/course-participation');
     }
 }

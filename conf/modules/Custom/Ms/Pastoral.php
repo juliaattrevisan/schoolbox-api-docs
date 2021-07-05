@@ -8,7 +8,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\ms;
+namespace Config\Modules\Custom\Ms;
 
 use Alaress\Application\Kernel;
 use Custom\Meriden\Pastoral\Module;

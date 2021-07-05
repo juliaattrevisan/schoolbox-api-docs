@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Config\Modules\Custom\lc;
+namespace Config\Modules\Custom\Lc;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;

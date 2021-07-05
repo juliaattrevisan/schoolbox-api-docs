@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Config\Modules\Custom\tigs;
+namespace Config\Modules\Custom\Tigs;
 
 use Alaress\Application\Kernel;
 use Config\ModuleLoader;
