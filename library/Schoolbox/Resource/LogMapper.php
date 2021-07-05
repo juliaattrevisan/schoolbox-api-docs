@@ -125,16 +125,30 @@ class LogMapper extends Mapper
      */
     public function findRecent(int $limit = 30): array
     {
-        $stmt = $this->database->prepare("
-            (SELECT `date` occurred, login, ip, title, firstname, lastname FROM login_log LEFT JOIN `user` ON `user`.`username`=login_log.username AND `user`.`deleted_at` IS NULL ORDER BY DATE DESC LIMIT 0, {$limit})
-            UNION
-            (SELECT `time` occurred, `action`, object, title, firstname, lastname FROM cmsLog LEFT JOIN `user` ON `user`.id=`cmsLog`.`user` AND `user`.`deleted_at` IS NULL ORDER BY `time` DESC LIMIT 0, {$limit})
-            ORDER BY occurred DESC LIMIT 0,{$limit}
-        ");
+        $query = "
+        (
+            SELECT `date` `occurred`, `login` as `action`, `ip`, `title`, `firstname`, `lastname`
+            FROM `login_log`
+                     LEFT JOIN `user` ON `user`.`username` = `login_log`.`username` AND `user`.`deleted_at` IS NULL
+            ORDER BY `occurred` DESC
+            LIMIT 0, {$limit}
+        )
+        UNION
+        (
+            SELECT `time` `occurred`, `action`, `object`, `title`, `firstname`, `lastname`
+            FROM `cmsLog`
+                     LEFT JOIN `user` ON `user`.`id` = `cmsLog`.`user` AND `user`.`deleted_at` IS NULL
+            ORDER BY `time` DESC
+            LIMIT 0, {$limit}
+        )
+        ORDER BY `occurred` DESC
+        LIMIT 0,{$limit}
+        ";
+        $statement = $this->database->prepare($query);
 
-        $stmt->execute();
+        $statement->execute();
 
-        return $stmt->fetchAll();
+        return $statement->fetchAll();
     }
 
 
