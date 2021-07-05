@@ -107,7 +107,7 @@ class Flyout
             // Those nodes aren't searchable because they don't link anywhere
             // unique or useful, so don't generate breadcrumb links for those
             // nodes either.
-            $parentSearchable = $parentData['searchable'] ?? false;
+            $parentSearchable = $parentData['searchable'] ?? true;
             if ($parentUrl === $url) {
                 $allCrumbs[] = [$parentData['name'], $parentSearchable ? $parentUrl : null];
             }
@@ -123,8 +123,8 @@ class Flyout
                             $allCrumbs[] = [$parentData['name'], $parentSearchable ? $parentUrl : null];
                         }
 
-                        $childSearchable = $childData['searchable'] ?? false;
-                        $allCrumbs[] = [$childData['name'], $childSearchable ? $childUrl : null];
+                        $childSearchable = $childData['searchable'] ?? true;
+                        $allCrumbs[]     = [$childData['name'], $childSearchable ? $childUrl : null];
                     }
                 }
             }
