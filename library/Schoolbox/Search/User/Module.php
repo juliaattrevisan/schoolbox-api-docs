@@ -102,5 +102,4 @@ class Module extends BaseModule
         $userMapper = $this->getMapperFactory()->get(UserMapper::class);
         return $userMapper;
     }
-
 }

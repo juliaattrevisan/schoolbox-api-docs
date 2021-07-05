@@ -154,7 +154,7 @@ class Controller extends BaseController
     /**
      * @param User $parent
      */
-    private function renderParent(User $parent)
+    private function renderParent(User $parent): void
     {
         $externalUser = $parent->getExternalId() ? $this->externalUser->getParent($parent->getExternalId()) : [];
 
@@ -509,8 +509,10 @@ class Controller extends BaseController
         $isPrimaryCarer    = false;
         if ($isParentOfStudent && isset($contactList)) {
             // Only the primary parent will see emergency contact information
-            if ($contactList[0]['StudentContactID'] == $this->getUser()->getExternalId()
-                || $contactList[0]['StudentContactSpouseID'] == $this->getUser()->getExternalId()) {
+            if (
+                $contactList[0]['StudentContactID'] == $this->getUser()->getExternalId()
+                || $contactList[0]['StudentContactSpouseID'] == $this->getUser()->getExternalId()
+            ) {
                 $isPrimaryCarer = true;
             }
         }
