@@ -142,7 +142,7 @@
                     .done(function () {
                         $toast.toastTimeout({text: 'Settings saved.', css: 'success', duration: duration});
                     })
-                    .error(function(){
+                    .fail(function(){
                         $toast.toastTimeout({text: 'Unable to save.', css: 'alert', duration: duration});
                     })
                     .always(function() {

@@ -52,7 +52,7 @@
 
                     toast.toastTimeout({text: username + ' accredited.', css: 'success'});
                 })
-                .error(function() {
+                .fail(function() {
                     toast.toastTimeout({text: 'Could not accredit ' + username, css: 'alert'});
                 });
         });

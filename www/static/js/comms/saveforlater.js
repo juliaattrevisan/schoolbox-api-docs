@@ -71,7 +71,7 @@
                     var otherAction = action === 'add' ? 'remove' : 'add';
                     $wrapper.find('[data-action=' + otherAction + ']').removeClass('hide');
                     config.onChangeSuccess(action === 'add', $wrapper.attr('data-save-for-later'));
-                }).error(function () {
+                }).fail(function () {
                     var textSuffix = action === 'add' ? 'save article for later' : 'remove article from saved list';
                     $toast.toastTimeout({
                         text: 'Error: Unable to ' + textSuffix,

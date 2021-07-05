@@ -27,7 +27,7 @@
                             $('#empty').removeClass('hide');
                         }
                         toaster.toastTimeout({text: 'Removed from queue', css: 'success'});
-                    }).error(function () {
+                    }).fail(function () {
                         toaster.toastTimeout({text: 'Error removing item from queue', css: 'alert'});
                     });
                 }

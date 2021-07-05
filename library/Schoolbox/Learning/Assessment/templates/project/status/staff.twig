@@ -76,7 +76,7 @@ Data:
                                     }
                                 });
                             })
-                            .error(function() {
+                            .fail(function() {
                                 {# Toast alert #}
                                 toast.toastTimeout({text: 'Could not delete ' + assessmentName, css: 'alert'});
                             });

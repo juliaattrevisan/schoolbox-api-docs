@@ -26,7 +26,7 @@
                         });
                         $(event.target).closest('tr').remove();
                     })
-                    .error(function(response) {
+                    .fail(function(response) {
                         var temp = $.parseJSON(response.responseText);
 
                         $toast.toastTimeout({
@@ -61,7 +61,7 @@
                         });
                         $(event.target).closest('tr').remove();
                     })
-                    .error(function(response) {
+                    .fail(function(response) {
                         var temp = $.parseJSON(response.responseText);
 
                         $toast.toastTimeout({

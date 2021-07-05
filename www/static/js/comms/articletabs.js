@@ -88,7 +88,7 @@
                     window.history.pushState('', response.title, response.url);
                 }
 
-            }).error(function (response) {
+            }).fail(function (response) {
             });
         }
 

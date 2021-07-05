@@ -46,7 +46,7 @@ Data:
              */
             $.fn.schoolboxResource_ProxyReplacement('#component'+'{{ componentInstanceId }}');
 
-        }).error(function (response) {
+        }).fail(function (response) {
             console.log(response);
         });
 

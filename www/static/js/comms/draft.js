@@ -172,7 +172,7 @@
           // Resolve the deferred for stallSubmit
           deferred.resolve();
         })
-        .error(function(response) {
+        .fail(function(response) {
           var temp = $.parseJSON(response.responseText);
 
           config.toaster.toastTimeout({

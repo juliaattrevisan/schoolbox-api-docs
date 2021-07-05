@@ -62,7 +62,7 @@ Data:
                                 });
 
                                 window.location.href = response.redirect;
-                            }).error(function (response) {
+                            }).fail(function (response) {
                                 var temp = $.parseJSON(response.responseText);
 
                                 $toast.toastTimeout({
@@ -386,7 +386,7 @@ Data:
                         });
 
                         window.location.href = response.redirect;
-                    }).error(function (response) {
+                    }).fail(function (response) {
                         var temp = $.parseJSON(response.responseText);
 
                         $toast.toastTimeout({
@@ -425,7 +425,7 @@ Data:
                     dataType: 'json'
                 }).done(function (response) {
                     window.location.href = response.redirect;
-                }).error(function (response) {
+                }).fail(function (response) {
 
                     $toast.toastActivate({
                         text: 'Error: ' + response.responseJSON.message,

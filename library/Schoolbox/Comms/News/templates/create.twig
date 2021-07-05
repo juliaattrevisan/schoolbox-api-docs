@@ -53,7 +53,7 @@
                                 });
 
                                 window.location.href = response.redirect;
-                            }).error(function (response) {
+                            }).fail(function (response) {
                                 var temp = $.parseJSON(response.responseText);
 
                                 $toast.toastTimeout({
@@ -282,7 +282,7 @@
                             });
 
                             window.location.href = response.redirect;
-                        }).error(function (response) {
+                        }).fail(function (response) {
                             var temp = $.parseJSON(response.responseText);
 
                             $toast.toastTimeout({
