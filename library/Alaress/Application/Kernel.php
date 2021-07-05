@@ -1555,7 +1555,7 @@ abstract class Kernel
 
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
-            strtolower(trim($this->getDependencyInjector()->get('config')->get('site_school_code')))
+            ucfirst(strtolower(trim($this->getDependencyInjector()->get('config')->get('site_school_code'))))
         );
         $modulePaths = array_merge(
             glob(SITE_root . '/conf/modules/*.php'),
