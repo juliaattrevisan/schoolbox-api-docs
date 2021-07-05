@@ -306,7 +306,10 @@
 		if (ch8r >= 37 && ch8r <= 40) {
 			return;
 		}
-		var target = elementAtCursor();
+        if (ch8r > 123) {
+            return;
+        }
+        var target = elementAtCursor();
 		if (!elementAtCursor) {
 			return;
 		}
