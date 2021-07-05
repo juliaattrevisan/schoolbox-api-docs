@@ -422,7 +422,7 @@ class Controller extends Base
                 ->setAwardedBy($this->getUser())
                 ->setAwardedAt(Alaress_Date_Format::now())
                 ->setExpiresAt(
-                    $badge->getAchievementExpiry()
+                    $status === AwardModel::AWARD_STATUS_ACHIEVEMENT && $badge->getAchievementExpiry()
                         ? Alaress_Date_Format::now()->addDays($badge->getAchievementExpiry())
                         : null
                 );
