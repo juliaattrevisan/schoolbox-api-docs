@@ -24,18 +24,18 @@ class BadgeCest
     /** Create a Badge
      * check if response code is 200
      *
-     * @param IntegrationTester    $i
+     * @param IntegrationTester $i
      */
     public function createBadge(IntegrationTester $i): void
     {
         #GIVEN
         $badgeavatarselector = 'image';
-        $category = 1;
-        $timestamp = time();
-        $body     = 'Badge Description: Automation API Smoke Test' . $timestamp;
-        $name = 'Badge Name Automation API Smoke Test'. $timestamp;
-        $image_name = "homepageUploadTestDragDrop{$timestamp}.png";
-        $image_location = '/UploadTestFiles/fish2.png';
+        $category            = 1;
+        $timestamp           = time();
+        $body                = 'Badge Description: Automation API Smoke Test' . $timestamp;
+        $name                = 'Badge Name Automation API Smoke Test' . $timestamp;
+        $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
+        $image_location      = '/UploadTestFiles/fish2.png';
 
 
         $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
@@ -44,8 +44,8 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector,$category, $body,$name,false);
-        $badgePayload->setFormParam('image',$json_reply['hash'] . ":fish2.png");
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false);
+        $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
 
         #WHEN
 
@@ -54,13 +54,12 @@ class BadgeCest
 
         #THEN
         $i->seeResponseCodeIs(200);
-
     }
 
     /** Modify a Badge
      * check if response code is 200
      *
-     * @param IntegrationTester    $i
+     * @param IntegrationTester $i
      */
     public function modifyBadge(IntegrationTester $i): void
     {
@@ -68,12 +67,12 @@ class BadgeCest
          */
         #GIVEN
         $badgeavatarselector = 'image';
-        $category = 1;
-        $timestamp = time();
-        $body     = 'Badge Description: Automation API Smoke Test' . $timestamp;
-        $name = 'Badge Name Automation API Smoke Test'. $timestamp;
-        $image_name = "homepageUploadTestDragDrop{$timestamp}.png";
-        $image_location = '/UploadTestFiles/fish2.png';
+        $category            = 1;
+        $timestamp           = time();
+        $body                = 'Badge Description: Automation API Smoke Test' . $timestamp;
+        $name                = 'Badge Name Automation API Smoke Test' . $timestamp;
+        $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
+        $image_location      = '/UploadTestFiles/fish2.png';
 
         $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
         $i->amGoingTo('Upload image to the badge');
@@ -81,31 +80,30 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector,$category, $body,$name,false);
-        $badgePayload->setFormParam('image',$json_reply['hash'] . ":fish2.png");
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false);
+        $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
         $i->amGoingTo('Send request to create a badge');
         $i->sendRequest($badgePayload);
         $i->seeResponseCodeIs(200);
         $badge = $i->grabFirstBadgeByTitle($name);
 
         /** modifying the Badge
-        */
+         */
         #WHEN
-        $name = 'Badge Name Automation API Smoke Test updated with allow as a goal on'. $timestamp;
-        $badgeModifyPayload= new Payload\Badge\Modify($badge->getId(),$badgeavatarselector,$category, $body,$name,true);
-        $badgeModifyPayload->setFormParam('image',$json_reply['hash']);
+        $name               = 'Badge Name Automation API Smoke Test updated with allow as a goal on' . $timestamp;
+        $badgeModifyPayload = new Payload\Badge\Modify($badge->getId(), $badgeavatarselector, $category, $body, $name, true);
+        $badgeModifyPayload->setFormParam('image', $json_reply['hash']);
         $i->amGoingTo('Send request to update a badge');
         $i->sendRequest($badgeModifyPayload);
 
         #THEN
         $i->seeResponseCodeIs(200);
-
     }
 
     /** Delete a Badge
      * check if response code is 200
      *
-     * @param IntegrationTester    $i
+     * @param IntegrationTester $i
      */
     public function deleteBadge(IntegrationTester $i): void
     {
@@ -113,12 +111,12 @@ class BadgeCest
          */
         #GIVEN
         $badgeavatarselector = 'image';
-        $category = 1;
-        $timestamp = time();
-        $body     = 'Badge Description: Automation API Smoke Test to be deleted' . $timestamp;
-        $name = 'Badge Name Automation API Smoke Test to be deleted'. $timestamp;
-        $image_name = "homepageUploadTestDragDrop{$timestamp}.png";
-        $image_location = '/UploadTestFiles/fish2.png';
+        $category            = 1;
+        $timestamp           = time();
+        $body                = 'Badge Description: Automation API Smoke Test to be deleted' . $timestamp;
+        $name                = 'Badge Name Automation API Smoke Test to be deleted' . $timestamp;
+        $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
+        $image_location      = '/UploadTestFiles/fish2.png';
 
         $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
         $i->amGoingTo('Upload image to the badge');
@@ -126,8 +124,8 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector,$category, $body,$name,false);
-        $badgePayload->setFormParam('image',$json_reply['hash'] . ":fish2.png");
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false);
+        $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
         $i->amGoingTo('Send request to create a badge');
         $i->sendRequest($badgePayload);
         $i->seeResponseCodeIs(200);
@@ -142,9 +140,5 @@ class BadgeCest
 
         #THEN
         $i->seeResponseCodeIs(200);
-
     }
-
-
-
 }

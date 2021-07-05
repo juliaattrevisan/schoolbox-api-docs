@@ -32,7 +32,7 @@ namespace Helper;
 class SchoolboxCli extends \Codeception\Module
 {
     /** @var \Schoolbox\Application\CliTool\Kernel */
-    public $cliKernel;
+    public \Schoolbox\Application\CliTool\Kernel $cliKernel;
 
     /**
      * HOOK: executed after configuration is loaded
@@ -283,5 +283,16 @@ class SchoolboxCli extends \Codeception\Module
     public function grabFirstBadgeByTitle(string $name): \Schoolbox\Learning\Badge\Model
     {
         return \Schoolbox\Learning\Badge\Mapper::getInstance()->findOneByColumn('name', $name);
+    }
+
+    /**
+     * Returns the first learning moment based on its title.
+     *
+     * @param string $body
+     * @return \Schoolbox\Learning\Moment\Evidence\Model;
+     */
+    public function grabLearningMomentByBody(string $body): \Schoolbox\Learning\Moment\Evidence\Model
+    {
+        return \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance()->findOneByColumn('body', $body);
     }
 }
