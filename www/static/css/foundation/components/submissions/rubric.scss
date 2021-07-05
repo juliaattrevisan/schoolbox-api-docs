@@ -302,7 +302,7 @@ table.rb {
 .rb-final-summary {
     background-color: $input-border-color !important;
     // DONE use contrasting color
-    color: $form-bg-hover-color-contrast;
+    color: $input-border-color-contrast;
 }
 
 .rb-description, .rb-value {
