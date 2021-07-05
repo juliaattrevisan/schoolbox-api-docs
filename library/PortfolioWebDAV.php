@@ -798,7 +798,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
      * @throws OutOfBoundsException
      * @return string
      */
-    function fetchToFile($fileId)
+    public function fetchToFile($fileId)
     {
         return $this->getFile($fileId);
     }
