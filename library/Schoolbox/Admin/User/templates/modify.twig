@@ -4,7 +4,7 @@
 <div class="admin-container row">
 
     {# Shared navigation menu #}
-    {{ renderAdminNavigation(pageCurrent) }}
+    {{ renderAdminNavigation(pageCurrent, method == 'Create' ? 'Create User' : 'Modify User') }}
 
     <div class="admin-content">
 {% if method=='Update' %}
@@ -301,7 +301,7 @@
                             {% if user.isSuperuser %}
                                 <input type="hidden" name="superuser" value="1" />
                             {% endif %}
-                            <li>    
+                            <li>
                                 <input id="superuser"
                                     type="checkbox"
                                     name="superuser"

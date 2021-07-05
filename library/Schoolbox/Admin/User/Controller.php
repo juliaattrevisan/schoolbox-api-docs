@@ -341,8 +341,11 @@ class Controller extends Base
                 'identifiers' => self::IDENTIFIERS,
                 'accessLevel' => self::ACCESS_LEVELS,
                 'pageCurrent' => $this->router->generate('adminUser.getInsert'),
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminUser.getInsert')),
-                'method' => 'Update',
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs(
+                    $this->router->generate('adminUser.getInsert'),
+                    $this->router->generate('adminUser.getModify', ['userId' => $user->getId()]),
+                    'Modify User'
+                ),                'method' => 'Update',
                 'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),

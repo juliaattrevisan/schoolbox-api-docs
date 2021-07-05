@@ -867,13 +867,14 @@ class Subnav
      * Render the self-contained subnav as a purely html fragment
      * so you can slam it straight into a phplib sigh
      *
-     * @param string $url
+     * @param string      $url
+     * @param string|null $title this title will be used on the page, if provided
      * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function generateHtml(string $url): string
+    public function generateHtml(string $url, ?string $title = null): string
     {
 
         /* Look ahead for $url
@@ -900,7 +901,8 @@ class Subnav
         return $this->twig->render('subnav.twig', [
             'adminSubnav' => $this->generate(),
             'pageCurrent' => $pageCurrent,
-            'subpageCurrent' => $subpageCurrent
+            'subpageCurrent' => $subpageCurrent,
+            'titleOverride' => $title,
         ]);
     }
 
@@ -932,10 +934,12 @@ class Subnav
      * There are multiple implementations of breadcrumbs but there should be only one
      * Those should be removed in favour of this implementation
      *
-     * @param string $url
-     * @return array
+     * @param string      $url
+     * @param string|null $overrideUrl
+     * @param string|null $overrideName
+     * * @return array
      */
-    public function generateBreadcrumbs(string $url): array
+    public function generateBreadcrumbs(string $url, ?string $overrideUrl = null, ?string $overrideName = null): array
     {
         $allCrumbs = [
             ['Administration', '/adminv2/home']
@@ -959,7 +963,10 @@ class Subnav
                         }
 
                         $childHasBreadcrumbLink = $childData['hasBreadcrumbLink'] ?? true;
-                        $allCrumbs[]            = [$childData['name'], $childHasBreadcrumbLink ? $childUrl : null];
+                        $allCrumbs[] = [
+                            $overrideName ?? $childData['name'],
+                            $overrideUrl ?? ($childHasBreadcrumbLink ? $childUrl : null),
+                        ];
                     }
                 }
             }
