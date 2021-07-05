@@ -19,7 +19,7 @@ class PDOStatement extends BasePDOStatement
     /** @var resource $connection */
     protected $connection;
 
-    /** @var resource $statement */
+    /** @var resource|bool $statement */
     protected $statement;
 
     /** @var string $sql */
@@ -336,7 +336,7 @@ class PDOStatement extends BasePDOStatement
     /**
      * Return underlying DB2 statement resource. You should not need to use this externally.
      *
-     * @return resource
+     * @return resource|null
      */
     public function getStatement()
     {
