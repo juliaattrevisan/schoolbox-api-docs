@@ -942,8 +942,9 @@ class Subnav
         ];
 
         foreach ($this->generate() as $parentUrl => $parentData) {
+            $parentHasBreadcrumbLink = $parentData['hasBreadcrumbLink'] ?? true;
             if ($parentUrl === $url) {
-                $allCrumbs[] = [$parentData['name'], $parentUrl];
+                $allCrumbs[] = [$parentData['name'], $parentHasBreadcrumbLink ? $parentUrl : null];
             }
 
             if (\count($parentData['children'])) {
@@ -954,10 +955,11 @@ class Subnav
                          * need the parent node if it was different to its child node
                          */
                         if ($parentUrl !== $url) {
-                            $allCrumbs[] = [$parentData['name'], $parentUrl];
+                            $allCrumbs[] = [$parentData['name'], $parentHasBreadcrumbLink ? $parentUrl : null];
                         }
 
-                        $allCrumbs[] = [$childData['name'],  $childUrl];
+                        $childHasBreadcrumbLink = $childData['hasBreadcrumbLink'] ?? true;
+                        $allCrumbs[]            = [$childData['name'], $childHasBreadcrumbLink ? $childUrl : null];
                     }
                 }
             }

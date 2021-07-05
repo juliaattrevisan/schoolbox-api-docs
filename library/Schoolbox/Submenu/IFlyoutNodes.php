@@ -30,6 +30,12 @@ interface IFlyoutNodes
      *            'name' => 'Node 1',
      *            'visible' => true,
      *            'description' => 'Description for node 1',
+     *            // false to make this node not appear in searches:
+     *            // true if not provided
+     *            'searchable' => true,
+     *            // false to make this node not have a link in a breadcrumb:
+     *            // true if not provided
+     *            'hasBreadcrumbLink' => true,
      *            'children' => [
      *                'url_1_1' => [
      *                    'name' => 'Node 1.1',
