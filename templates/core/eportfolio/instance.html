@@ -347,14 +347,18 @@
                                 Group Permissions
                                 <span class="hint has-tip tip-top" data-tooltip title="Allow predefined groups to view your ePortfolio page.">?</span>
                             </label>
-                            <!-- BEGIN has_group_permissions -->
-                            <!-- BEGIN group_permission -->
-                            <input type="checkbox" name="group_permission[]" id="group-permission-{GROUP_PERMISSION_GROUP_ID}" value="{GROUP_PERMISSION_GROUP_ID}" {GROUP_PERMISSION_SELECTED}/>
-                            <label for="group-permission-{GROUP_PERMISSION_GROUP_ID}" class="checkbox-label">
-                                {GROUP_PERMISSION_NAME}
-                            </label>
-                            <!-- END group_permission -->
-                            <!-- END has_group_permissions -->
+                            <ul class="option-list">
+                                <!-- BEGIN has_group_permissions -->
+                                <!-- BEGIN group_permission -->
+                                <li>
+                                    <input type="checkbox" name="group_permission[]" id="group-permission-{GROUP_PERMISSION_GROUP_ID}" value="{GROUP_PERMISSION_GROUP_ID}" {GROUP_PERMISSION_SELECTED}/>
+                                    <label for="group-permission-{GROUP_PERMISSION_GROUP_ID}" class="checkbox-label">
+                                        {GROUP_PERMISSION_NAME}
+                                    </label>
+                                </li>
+                                <!-- END group_permission -->
+                                <!-- END has_group_permissions -->
+                            </ul>
                         </div>
                         <div class="small-12 large-4 columns">
                             <label>
