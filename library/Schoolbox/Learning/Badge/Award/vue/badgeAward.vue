@@ -246,7 +246,7 @@ export default {
 }
 </script>
 <template>
-    <div>
+    <div :key="badge.id">
         <!--
         @slot The header for this badge award form
         @binding {Object} badge The badge that is being shown in this component
