@@ -173,11 +173,12 @@ table.rb {
 
     .rb-group-summary {
         // DONE use CSS lighten
-        background-color: css-lighten($input-border-color, 10%) !important;
+        //background-color: $form-bg-hover-color !important;
         // DONE use contrasting color
         color: $form-bg-hover-color-contrast;
 
         label {
+            //color: $form-bg-hover-color-contrast;
             font-weight: bold!important;
             display: block;
         }
