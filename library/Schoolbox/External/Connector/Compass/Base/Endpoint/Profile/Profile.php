@@ -998,13 +998,18 @@ class Profile implements IStrategy
             $email = $this->findDetailsField($staff['staffDetails'], 'organisationUserEmail');
 
             /* The "Phone" field in compass ui ends up mapping to homePhoneNumber
-             * so it's actually a generic Phone Number field
+             * so it's actually a generic Phone Number field.
+             *
+             * However: we've been instructed to never import private phone
+             * numbers, and IMO there's too much risk of these numbers being
+             * private; so we will just import the extension.
              */
-            $phone = (new FirstMeaningfulValue())->find([
-                $this->findDetailsField($staff['staffDetails'], 'phoneExtension'),
-                $staff['homePhoneNumber'],
-                $staff['mobileNumber']
-            ]);
+            $phone = $this->findDetailsField($staff['staffDetails'], 'phoneExtension');
+//            $phone = (new FirstMeaningfulValue())->find([
+//                $this->findDetailsField($staff['staffDetails'], 'phoneExtension'),
+//                $staff['homePhoneNumber'],
+//                $staff['mobileNumber']
+//            ]);
 
             $positionTitle = $this->findDetailsField($staff['staffDetails'], 'roleInSchool');
 
