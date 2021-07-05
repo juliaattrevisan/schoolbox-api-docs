@@ -21,7 +21,14 @@ class Mailer extends \Alaress\Mail\AbstractMailer
      */
     public $t_label = 'tplBODY';
 
-    function __construct($template, $subject = "", $to = "", $host = '')
+    /**
+     * Mailer constructor.
+     * @param        $template
+     * @param string $subject
+     * @param string $to
+     * @param string $host
+     */
+    public function __construct($template, $subject = "", $to = "", $host = '')
     {
 
         parent::__construct($template, $subject, $to, $host);
@@ -38,13 +45,19 @@ class Mailer extends \Alaress\Mail\AbstractMailer
         }
     }
 
-
-    function loadTemplate($file)
+    /**
+     * @param $file
+     */
+    public function loadTemplate($file)
     {
         $this->template->set_file($this->t_label, $this->getTemplate($file));
     }
 
-    function getTemplate($template)
+    /**
+     * @param $template
+     * @return string
+     */
+    public function getTemplate($template)
     {
         $root = defined('MAIL_templates') ? MAIL_templates : SITE_root . '/templates';
 
@@ -55,34 +68,54 @@ class Mailer extends \Alaress\Mail\AbstractMailer
         }
     }
 
-    function setVar($name, $value = '')
+    /**
+     * @param        $name
+     * @param string $value
+     */
+    public function setVar($name, $value = '')
     {
         $this->template->set_var($name, $value);
     }
 
-    function setBlock($parent, $handle, $name)
+    /**
+     * @param $parent
+     * @param $handle
+     * @param $name
+     */
+    public function setBlock($parent, $handle, $name)
     {
         $this->template->set_block($parent, $handle, $name);
     }
 
-    function parse($target, $handle, $append = false)
+    /**
+     * @param       $target
+     * @param       $handle
+     * @param false $append
+     */
+    public function parse($target, $handle, $append = false)
     {
         $this->template->parse($target, $handle, $append);
     }
 
-    function composeHTML()
+    /**
+     * @return bool|string|null
+     */
+    public function composeHTML()
     {
         //initialise the email document
         return $this->template->parse("final", $this->t_label);
     }
 
-    function composePlain()
+    /**
+     * @return string
+     */
+    public function composePlain()
     {
         $converter = new Alaress\Html\ToText($this->composeHTML());
         return $converter->getText();
     }
 
-    function printEmail()
+    public function printEmail()
     {
         print $this->composeHTML();
     }
