@@ -102,8 +102,14 @@ class Flyout
         $allCrumbs = $this->rootNode;
 
         foreach ($this->generate() as $parentUrl => $parentData) {
+            // The "searchable" key was added so that nodes could be excluded
+            // from search results, because those nodes did not link anywhere.
+            // Those nodes aren't searchable because they don't link anywhere
+            // unique or useful, so don't generate breadcrumb links for those
+            // nodes either.
+            $parentSearchable = $parentData['searchable'] ?? false;
             if ($parentUrl === $url) {
-                $allCrumbs[] = [$parentData['name'], $parentUrl];
+                $allCrumbs[] = [$parentData['name'], $parentSearchable ? $parentUrl : null];
             }
 
             if (\count($parentData['children'])) {
@@ -114,10 +120,11 @@ class Flyout
                          * need the parent node if it was different to its child node
                          */
                         if ($parentUrl !== $url) {
-                            $allCrumbs[] = [$parentData['name'], $parentUrl];
+                            $allCrumbs[] = [$parentData['name'], $parentSearchable ? $parentUrl : null];
                         }
 
-                        $allCrumbs[] = [$childData['name'],  $childUrl];
+                        $childSearchable = $childData['searchable'] ?? false;
+                        $allCrumbs[] = [$childData['name'], $childSearchable ? $childUrl : null];
                     }
                 }
             }
