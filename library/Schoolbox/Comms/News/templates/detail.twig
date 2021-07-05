@@ -55,7 +55,7 @@ Data:
                                 url: $element.attr('href'),
                                 data: {articleId: {{ article.id }}},
                                 dataType: 'json'
-                            }).success(function (response) {
+                            }).done(function (response) {
                                 $toast.toastTimeout({
                                     text: title + ' was deleted',
                                     css: 'success'
@@ -379,7 +379,7 @@ Data:
                         url: $element.attr('href'),
                         data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
                         dataType: 'json'
-                    }).success(function (response) {
+                    }).done(function (response) {
                         $toast.toastTimeout({
                             text: title + ' was {{ rejectVerb|lower }}ed',
                             css: 'success'
@@ -423,7 +423,7 @@ Data:
                     url: form.attr('action'),
                     data: {articleId: {{ article.id }}},
                     dataType: 'json'
-                }).success(function (response) {
+                }).done(function (response) {
                     window.location.href = response.redirect;
                 }).error(function (response) {
 

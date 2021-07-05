@@ -18,7 +18,7 @@
                             id: $(event.target).attr('data-install-package')
                         }
                     })
-                    .success(function() {
+                    .done(function() {
                         $toast.toastTimeout({
                             text: 'Package has been successfully installed!',
                             css: 'success'

@@ -196,7 +196,7 @@ Usage:
             // immediately.
             if (href) {
                 $.post(href, data)
-                    .success(function(response){
+                    .done(function(response){
 
                         // Did we get not get JSON ?
                         if('object' !== typeof response){

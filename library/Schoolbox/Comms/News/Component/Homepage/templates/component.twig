@@ -31,7 +31,7 @@ Data:
             type: 'GET',
             url: "{{ getListHomePagePath }}?{{ querystringParams|raw }}",
             dataType: 'json'
-        }).success(function (response) {
+        }).done(function (response) {
             $articleList.html(response.fragment);
             if ($articleList.find('.information-list').length > 0) {
                 $actionBar.removeClass('hide');

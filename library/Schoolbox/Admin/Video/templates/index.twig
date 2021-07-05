@@ -21,7 +21,7 @@
                     $.post('{{ routeLookup('adminVideo.postSubmit') }}', {
                         videoId: deleteId,
                         videoAction: 'delete'
-                    }).success(function () {
+                    }).done(function () {
                         $(row).remove();
                         if ($('[data-delete]').length == 0) {
                             $('#empty').removeClass('hide');

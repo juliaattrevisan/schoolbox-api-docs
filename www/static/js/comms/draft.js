@@ -161,7 +161,7 @@
         data: formContents,
         dataType: "json"
       })
-        .success(function(responseText) {
+        .done(function(responseText) {
           config.toaster.toastTimeout({
             text: "Saved",
             css: "success"

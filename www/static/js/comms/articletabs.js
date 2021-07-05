@@ -76,7 +76,7 @@
                 type: 'GET',
                 url: url,
                 dataType: 'json'
-            }).success(function (response) {
+            }).done(function (response) {
                 $(config.element).html(response.fragment);
 
                 // Fire onChangeSuccess callback

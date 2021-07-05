@@ -45,7 +45,7 @@
             toast.toastActivate({text: 'Accreditting ' + username + '...'});
 
             $.post($(this).attr('href'), {userId: $(this).attr('data-accredit')})
-                .success(function(response) {
+                .done(function(response) {
                     if (response.status == 1) {
                         self.removeClass().addClass('icon-approve');
                     }

@@ -62,7 +62,7 @@
                 $.ajax({
                     type: 'POST',
                     url: $element.attr('href')
-                }).success(function () {
+                }).done(function () {
                     $toast.toastTimeout({
                         text: $element.attr('data-toast-complete'),
                         css: 'success'
