@@ -345,7 +345,8 @@ class Controller extends Base
                     $this->router->generate('adminUser.getInsert'),
                     $this->router->generate('adminUser.getModify', ['userId' => $user->getId()]),
                     'Modify User'
-                ),                'method' => 'Update',
+                ),
+                'method' => 'Update',
                 'yearLevels' => $this->yearLevelMapper->findAll(),
                 'campuses' => $this->campusMapper->findAll(),
                 'roles' => $this->roleMapper->findAll(),

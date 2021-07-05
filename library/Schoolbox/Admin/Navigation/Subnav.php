@@ -898,12 +898,15 @@ class Subnav
             }
         }
 
-        return $this->twig->render('subnav.twig', [
-            'adminSubnav' => $this->generate(),
-            'pageCurrent' => $pageCurrent,
-            'subpageCurrent' => $subpageCurrent,
-            'titleOverride' => $title,
-        ]);
+        return $this->twig->render(
+            'subnav.twig',
+            [
+                'adminSubnav' => $this->generate(),
+                'pageCurrent' => $pageCurrent,
+                'subpageCurrent' => $subpageCurrent,
+                'titleOverride' => $title,
+            ]
+        );
     }
 
 
@@ -937,7 +940,7 @@ class Subnav
      * @param string      $url
      * @param string|null $overrideUrl
      * @param string|null $overrideName
-     * * @return array
+     * @return array
      */
     public function generateBreadcrumbs(string $url, ?string $overrideUrl = null, ?string $overrideName = null): array
     {
