@@ -439,7 +439,7 @@ class Subnav
                     ],
                     '/adminv2/lists/pastoral-severity'                => [
                         'name'        => 'Pastoral Record Severity',
-                        'visible'     => $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED),
+                        'visible'     => ($this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED) && $this->configLoader->get('pastoral_severity')),
                         'children'    => [],
                         'description' => 'Setup appropriate severity or importance of your pastoral records.',
                     ],
