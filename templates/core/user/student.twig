@@ -7,19 +7,19 @@
 
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
-{% set isStaff = isSuperuser or session.user.role.staff %}
+{% set isStaffWhoCanView = isSuperuser or (USER.role.staff and USER.role.viewStudentProfile) %}
 {% set isSelf = session.user.id == user.id %}
 
 {# medical: if allowed in config, and user is staff or parent of this child #}
-{% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaff %}
-{% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaff %}
-{% set showComments = config.synergetic_student_comment and isStaff %}
+{% set showMedicalAlert = not config.protect_medicalspecial_profile and isStaffWhoCanView %}
+{% set showSpecialAlert = not config.protect_medicalspecial_profile and isStaffWhoCanView %}
+{% set showComments = config.synergetic_student_comment and isStaffWhoCanView %}
 
 {% set showButtons = showDetails %}
 {# contacts: su, staff or parent #}
 {# Should a student see their own contact details? I think so #}
-{% set showContacts = (isStaff or isParentOfStudent) and not hideContacts and contacts|length > 0 %}
-{% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaff and externalUser is defined %}
+{% set showContacts = (isStaffWhoCanView or isParentOfStudent) and not hideContacts and contacts|length > 0 %}
+{% set showContactsAlert = config.synergetic_community_alerts and showContacts and isStaffWhoCanView and externalUser is defined %}
 
 {# Emergency Contact Information, due to non-normalisation, must be manually inspected
  # for contents in three possible places; name, phone, phone alt. Information can exist
@@ -41,7 +41,7 @@
 {% endfor %}
 
 {% set showEmergencyContacts =
-    (isPrimaryCarer or isStaff)
+    (isPrimaryCarer or isStaffWhoCanView)
     and not hideContacts
     and hasEmergencyContacts
 %}
@@ -54,8 +54,8 @@
 {% set showGroups = showDetails and groups is not empty %}
 {% set showTitle = user.hasPositionTitle() %}
 
-{% set showActivityFeed = ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled) and (isStaff or isSelf or isParentOfStudent) %}
-{% set showAchievementsTab = config.badges_enabled and (isStaff or isSelf or isParentOfStudent) %}
+{% set showActivityFeed = ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled) and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
+{% set showAchievementsTab = config.badges_enabled and (isStaffWhoCanView or isSelf or isParentOfStudent) %}
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
     {
@@ -148,7 +148,7 @@
                         {% endif %}
 
                         {% block individualEducationPlan %}
-                            {% if isStaff and externalUser.countIndividualEducationPlans is defined and externalUser.countIndividualEducationPlans > 0 %}
+                            {% if isStaffWhoCanView and externalUser.countIndividualEducationPlans is defined and externalUser.countIndividualEducationPlans > 0 %}
                                 <div class="alert-box highlight icon-curriculum">
                                     Individual Education Plan
                                 </div>
@@ -356,7 +356,7 @@
 
 
                             {% if showPastoral %}
-                                {% if isStaff or isParentOfStudent %}
+                                {% if isStaffWhoCanView or isParentOfStudent %}
                                     <li>
                                         <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
                                            class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
@@ -367,7 +367,7 @@
                             {% block buttons_calendar %}
                                 <li>
                                     <a href='/calendar/{{ now.urlDate }}/{{ user.id }}'
-                                       class="icon-calendar">{TPL_LOCAL_CALENDAR_PC}</a>
+                                       class="icon-calendar">{{ locale.calendar.proper }}</a>
                                 </li>
                             {% endblock buttons_calendar %}
 
@@ -390,7 +390,7 @@
                             {% endblock buttons_boarderLeave %}
 
                             {% block buttons_pastoralCare %}
-                                {% if isStaff and config.external_type == 'synergetic' and config.external_staff_portal %}
+                                {% if isStaffWhoCanView and config.external_type == 'synergetic' and config.external_staff_portal %}
                                     <li>
                                         <a href="{{ config.external_staff_portal }}/stud.aspx?id={{ user.externalId }}"
                                            class="icon-synergetic"
@@ -411,7 +411,7 @@
                             {% endblock buttons_documents %}
 
                             {% block buttons_email_all_staff %}
-                                {% if isStaff and config.email_all_staff and session.user.email %}
+                                {% if isStaffWhoCanView and config.email_all_staff and session.user.email %}
                                     {% set replyTo = session.user.getFormattedEmailDisplay %}
                                     <li>
                                         <a class="icon-email" id="email-all-staff" title="Includes all teachers, year coordinator, head of house, tutor and coach.">Email All Teachers</a>
@@ -424,7 +424,7 @@
                             {% endblock  buttons_email_all_staff  %}
 
                             {% block buttons_email_parents %}
-                                {% if isStaff and config.email_all_parents and session.user.email and not hideContacts %}
+                                {% if isStaffWhoCanView and config.email_all_parents and session.user.email and not hideContacts %}
                                     <li>
                                         <a class="icon-email" id="email-all-parents" title="Emails the parents that have email addresses and can be contacted">Email Parents</a>
                                         <form action="/mail/createMail.php" method="post" class="no-margin" id="email-contacts-form">
@@ -683,7 +683,7 @@
                                     <h2 class="subheader">{{ group }}</h2>
                                 </div>
                             </div>
-                            {% if isStaff and config.email_all_staff and config.mail_enable %}
+                            {% if isStaffWhoCanView and config.email_all_staff and config.mail_enable %}
                                 {% for subject in subjectGroup %}
                                     {% for teacher in subject.teachers %}
                                         {% if not teacher.email is empty %}

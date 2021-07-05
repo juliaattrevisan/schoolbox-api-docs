@@ -57,22 +57,25 @@ class VisibilityTest extends TestCase
     {
 
         // viewer, viewee, visibility
-        $studentRole = (new Role())->setType(Role::STUDENT);
-        $staffRole   = (new Role())->setType(Role::STAFF);
-        $parentRole  = (new Role())->setType(Role::PARENT);
-        $guestRole   = (new Role())->setType(Role::GUEST);
+        $studentRole = (new Role())->setType(Role::STUDENT)->setViewStudentProfile(false);
+        $staffRoleCanView   = (new Role())->setType(Role::STAFF)->setViewStudentProfile(true);
+        $staffRoleCannotView   = (new Role())->setType(Role::STAFF)->setViewStudentProfile(false);
+        $parentRole  = (new Role())->setType(Role::PARENT)->setViewStudentProfile(false);
+        $guestRole   = (new Role())->setType(Role::GUEST)->setViewStudentProfile(false);
 
-        $superUser1 = (new User())->setId(1)->setFirstname('Super user 1')->setSuperuser(true)->setRole($staffRole)->setAltEmail('-');
-        $staff1     = (new User())->setId(2)->setFirstname('Test Staff 1')->setSuperuser(false)->setRole($staffRole)->setAltEmail('-');
+        $superUser1 = (new User())->setId(1)->setFirstname('Super user 1')->setSuperuser(true)->setRole($staffRoleCanView)->setAltEmail('-');
+        $staff1     = (new User())->setId(2)->setFirstname('Test Staff 1')->setSuperuser(false)->setRole($staffRoleCanView)->setAltEmail('-');
         $student1   = (new User())->setId(3)->setFirstname('Test Student 1')->setSuperuser(false)->setRole($studentRole)->setAltEmail('-');
         $parent1    = (new User())->setId(4)->setFirstname('Test Parent 1')->setSuperuser(false)->setRole($parentRole)->setAltEmail('-')
                                   ->setExternalId('parent1');
         $guest1     = (new User())->setId(5)->setFirstname('Test Guest 1')->setSuperuser(false)->setRole($guestRole)->setAltEmail('-');
-        $superUser2 = (new User())->setId(6)->setFirstname('Super user 2')->setSuperuser(true)->setRole($staffRole)->setAltEmail('-');
-        $staff2     = (new User())->setId(7)->setFirstname('Test Staff 2')->setSuperuser(false)->setRole($staffRole)->setAltEmail('-');
+        $superUser2 = (new User())->setId(6)->setFirstname('Super user 2')->setSuperuser(true)->setRole($staffRoleCanView)->setAltEmail('-');
+        $staff2     = (new User())->setId(7)->setFirstname('Test Staff 2')->setSuperuser(false)->setRole($staffRoleCanView)->setAltEmail('-');
         $student2   = (new User())->setId(8)->setFirstname('Test Student 2')->setSuperuser(false)->setRole($studentRole)->setAltEmail('-');
         $parent2    = (new User())->setId(9)->setFirstname('Test Parent 2')->setSuperuser(false)->setRole($parentRole)->setAltEmail('-');
         $guest2     = (new User())->setId(10)->setFirstname('Test Guest 2')->setSuperuser(false)->setRole($guestRole)->setAltEmail('-');
+        $superUser3 = (new User())->setId(11)->setFirstname('Super user 3')->setSuperuser(true)->setRole($staffRoleCannotView)->setAltEmail('-');
+        $staff3     = (new User())->setId(12)->setFirstname('Test Staff ')->setSuperuser(false)->setRole($staffRoleCannotView)->setAltEmail('-');
 
         // viewer, viewee, reportStaffAccess, restrictParentEmail, expected
 
@@ -108,6 +111,9 @@ class VisibilityTest extends TestCase
 
                         [$parent1, $student2, $reportStaffAccess, $restrictParentEmail, false],
                         [$parent1, $guest2, $reportStaffAccess, $restrictParentEmail, false],
+
+                        [$superUser3, $student2, $reportStaffAccess, $restrictParentEmail, true],
+                        [$staff3, $guest2, $reportStaffAccess, $restrictParentEmail, false],
                     ];
 
                 $testDataset = array_merge($testDataset, $currentDataset);
@@ -168,10 +174,10 @@ class VisibilityTest extends TestCase
     public function provider_isDetailsVisibleComprehensive(): array
     {
         // viewer, viewee, visibility
-        $studentRole = (new Role())->setType(Role::STUDENT);
-        $staffRole   = (new Role())->setType(Role::STAFF);
-        $parentRole  = (new Role())->setType(Role::PARENT);
-        $guestRole   = (new Role())->setType(Role::GUEST);
+        $studentRole = (new Role())->setType(Role::STUDENT)->setViewStudentProfile(false);
+        $staffRole   = (new Role())->setType(Role::STAFF)->setViewStudentProfile(true);
+        $parentRole  = (new Role())->setType(Role::PARENT)->setViewStudentProfile(false);
+        $guestRole   = (new Role())->setType(Role::GUEST)->setViewStudentProfile(false);
 
         $superUser1 = (new User())->setId(1)->setFirstname('Super user 1')->setSuperuser(true)->setRole($staffRole)->setAltEmail('-');
         $staff1     = (new User())->setId(2)->setFirstname('Test Staff 1')->setSuperuser(false)->setRole($staffRole)->setAltEmail('-');
@@ -713,7 +719,7 @@ class VisibilityTest extends TestCase
     public function provider_isEmailVisible(): array
     {
         // viewer, viewee, visibility
-        $studentRole = (new Role())->setType(Role::STUDENT);
+        $studentRole = (new Role())->setType(Role::STUDENT)->setViewStudentProfile(false);
 
         $student1   = (new User())->setId(3)->setFirstname('Test Student 1')->setSuperuser(false)->setRole($studentRole)->setAltEmail('-');
         $student1a   = (new User())->setId(3)->setFirstname('Test Student 1a')->setSuperuser(false)->setRole($studentRole)->setAltEmail('');
