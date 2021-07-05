@@ -108,7 +108,8 @@ $navigation-foreground-highlight-contrast:  var(--navigation-foreground-highligh
  * but if for some reason you need different border colours
  * you can choose that here
  */
-$input-border-color:			   $form-border-color;
+$input-border-color:          $form-border-color;
+$input-border-color-contrast: $form-border-color-contrast;
 
 /* Action-list specific colouring:
  * Hover colour for action-list rows
