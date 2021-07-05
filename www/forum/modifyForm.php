@@ -160,7 +160,7 @@ if (is_numeric($_POST['categoryID'])) {
         error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
     }
 
-    $thread->setLocked($thread->isLocked() ? false : true);
+    $thread->setLocked($thread->isLocked() ? 'false' : 'true');
 
     ThreadMapper::getInstance()->save($thread);
 
