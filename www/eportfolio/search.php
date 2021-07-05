@@ -8,6 +8,12 @@
  * @link        https://schoolbox.com.au/
  */
 
+// Enforce direct script access
+if (isset($this)) {
+    /** @var SitePage $this */
+    $this->pageNotFound();
+}
+
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
