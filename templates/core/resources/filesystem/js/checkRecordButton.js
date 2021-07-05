@@ -8,7 +8,7 @@ const checkRecordButton = async () => {
     if (isEnumerateDevicesSupported()) { //if can't even enumerate, assumed there's no devices to access
         try {
             const deviceList = await navigator.mediaDevices.enumerateDevices(); //use the device list to check for video and audio input
-            if (!supportsVideoRecording(deviceList) && supportsAudioRecording(deviceList)) {
+            if (!supportsVideoRecording(deviceList) && !supportsAudioRecording(deviceList)) {
                 hideRecordButton();
             } 
         } catch (error) {

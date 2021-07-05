@@ -20,25 +20,6 @@ export default {
         }
     },
 
-    computed: {
-
-        /** 
-         * The buttons should stretch the entire width regardless of the number available
-         * 
-         * @returns { String }
-         */
-        buttonWidth () {
-            if (this.isVideoSupported && this.isAudioSupported && !this.hasDeviceCapture) { //all 3 buttons, eg: a desktop pc with a webcam/microphone
-                return '33.4%';
-            } else if (this.isVideoSupported && this.isAudioSupported && this.hasDeviceCapture) { //video and audio only buttons, eg: a mobile/tablet device, which won't support screen-sharing
-                return '50%';    
-            } else if (!this.isVideoSupported && this.isAudioSupported && !this.hasDeviceCapture) { //audio and screen-sharing buttons, eg: a desktop pc with just a microphone
-                return '50%';
-            } 
-        }
-
-    },
-
     created () {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
         this.hasDeviceCapture = hasDeviceCapture();
@@ -206,21 +187,21 @@ export default {
 
 <template>
     <div class="pseudo-video" ref="pseudoVideo">
-        <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)" :style="{ width: buttonWidth }">
+        <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
                 <div class='icon-mic'></div>
                 <span>Audio</span>
                 <aside>Say something with an audio only recording.</aside>
             </div>
         </button>
-        <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)" :style="{ width: buttonWidth }">
+        <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
             <div>
                 <div class='icon-video'></div>
                 <span>Video</span>
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
         </button>
-        <button v-if="isAudioSupported && !hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)" :style="{ width: buttonWidth }">
+        <button v-if="isAudioSupported && !hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
             <div>
                 <div class='icon-screen-capture'></div>
                 <span>Screen</span>
@@ -246,11 +227,13 @@ $font-family-icon: 'schoolbox';
 }
 
 .menu-item {
-    background: #FAFAFA;
+    flex-grow: 1;
+    flex-basis: 0;
     border: 1px solid #EDEDED;
     margin-right: 1rem;
     margin-top: 1rem;
     padding: 20px;
+    background: #FAFAFA;
     &:last-child {
         margin-right: 0;
     }
