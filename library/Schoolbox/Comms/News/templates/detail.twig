@@ -166,6 +166,9 @@ Data:
                     article:     article,
                     modifyRoute: modifyRoute,
                     isAuthor:    isAuthor,
+                    availableEntityTypes: availableEntityTypes,
+                    entityTypesData: entityTypesData,
+                    encodedSegments: encodedSegments,
                     commentsIsEnabled: policies.commentsIsEnabled
                 } only %}
             </div>
@@ -255,103 +258,6 @@ Data:
 <div id="recipientsModal" class="reveal-modal" data-reveal>
     <a class="close-reveal-modal">&#215;</a>
 </div>
-
-<script src="{{ CDN_PREFIX }}/js/comms/audience-bricks.js"></script>
-<script src="{{ CDN_PREFIX }}/js/vue/schoolbox-vue.min.js"></script>
-{% autoescape 'js' %}
-<script>
-    /**
-     * Encapsulates information about a type of audience, eg 'folder' or 'campus'
-     *
-     * @param {string}  entityType
-     * @param {string}  name
-     * @param {string}  namePlural
-     * @constructor
-     */
-    var AudienceOption = function(entityType, name, namePlural){
-        this.entityType     = entityType;
-        this.name           = name;
-        this.namePlural     = namePlural;
-    };
-
-    /** @var {AudienceOption[]|Object} audienceOptions */
-    var audienceOptions = {};
-    {% for entityType in availableEntityTypes | filter(entityType => entityTypesData[entityType] is defined)  %}
-    {% set data = entityTypesData[entityType] %}
-    {% if data %}
-    audienceOptions['{{ entityType }}'] = new AudienceOption(
-        '{{ entityType }}',
-        '{{ data.name }}',
-        '{{ data.namePlural | raw }}'
-    );
-    {% endif %}
-    {% endfor %}
-
-    // Bricks need to render various human-friendly labels, so inject the entityType labels
-    // into the BrickManager so it can supply it to Bricks that it creates.
-    var entityTypeLabelMap = {
-        composite: { // -_-
-            singular: 'Composite Audience',
-            plural: 'Composite Audience'
-        }
-    };
-    for (var entityType in audienceOptions) {
-        entityTypeLabelMap[entityType] = {
-            singular: audienceOptions[entityType].name,
-            plural: audienceOptions[entityType].namePlural
-        };
-    }
-
-    var brickManager;
-    var codec = new Codec();
-
-    var app = new Vue({
-        el: '#audience-container',
-        delimiters: ['${', '}'],
-        mounted: function() {
-            var vue          = this;
-            brickManager = new BrickManager(codec, entityTypeLabelMap);
-
-            var audienceSegments = {{ encodedSegments|json_encode|raw }};
-
-            for(key in audienceSegments) {
-                var segment = audienceSegments[key];
-                brickManager.onAddSegment(null, vue.audienceBricks, segment.key, segment.name, segment, segment.labels);
-            }
-        },
-        data: {
-            audienceBricks: [],
-            selectedCompositeBrick: {}
-        },
-        methods: {
-            showCompositeInfo: function(audienceBrick) {
-                this.selectedCompositeBrick = audienceBrick;
-                // Show modal
-                $('#audience-composite').foundation('reveal', 'open');
-            },
-            brickHref: function(audienceBrick) {
-                // Only bricks with a single folder dimensions, and a single value, have a href
-                if(audienceBrick.getDimensions().length !== 1){
-                    return '';
-                }
-                var soleDimension = audienceBrick.getDimensions()[0];
-                if(soleDimension.getEntityType() === 'folder' && soleDimension.getEntityValues().length === 1){
-                    var decodedValue = codec.decodeEncodedValue(soleDimension.getEntityValues()[0]);
-                    return typeof decodedValue == 'string'
-                        ? '/homepage/' + decodedValue
-                        : '' ;
-                }
-                return '';
-            },
-            brickName: function(audienceBrick) {
-                return audienceBrick.modifierLabel.length > 0
-                    ? audienceBrick.nameLabel + ' ' + audienceBrick.modifierLabel
-                    : audienceBrick.nameLabel;
-            }
-        }
-    });
-</script>
-{% endautoescape %}
 
 {% if article.canBeRejected and rejectRoute %}
 <script>
