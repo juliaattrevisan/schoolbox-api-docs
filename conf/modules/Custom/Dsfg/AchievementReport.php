@@ -11,7 +11,7 @@
 namespace Config\Modules\Custom\Dsfg;
 
 use Alaress\Application\Kernel;
-use Custom\Diocesan\AchievementReport\Module;
+use Custom\Dsfg\AchievementReport\Module;
 use Config\Modules\ModuleConfigInterface;
 
 class AchievementReport implements ModuleConfigInterface

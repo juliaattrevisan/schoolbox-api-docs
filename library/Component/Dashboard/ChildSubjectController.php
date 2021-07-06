@@ -8,7 +8,7 @@
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Permission\Access\UserAccess;
-use Custom\Diocesan\ValidJuniorSchoolStudent;
+use Custom\Dsfg\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Custom\Verso\TravelLog\Renderer;
