@@ -68,7 +68,7 @@ class Model
      */
     public function setCaption(string $caption): self
     {
-        $this->caption = $caption;
+        $this->caption = trim($caption);
         return $this;
     }
 
