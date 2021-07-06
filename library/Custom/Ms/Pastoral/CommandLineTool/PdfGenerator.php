@@ -7,14 +7,14 @@
 
 declare(strict_types=1);
 
-namespace Custom\Meriden\Pastoral\CommandLineTool;
+namespace Custom\Ms\Pastoral\CommandLineTool;
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Database\Connector\IConnector;
 use Aura\Router\Router;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
+use Custom\Ms\Pastoral\StudentInvolvement\Report\Factory;
+use Custom\Ms\Pastoral\StudentInvolvement\Gateway;
 use InvalidArgumentException;
 use Schoolbox\Application\CliTool\PdfGenerator\App;
 use Schoolbox\Application\CliTool\PdfGenerator\SourceBundle;

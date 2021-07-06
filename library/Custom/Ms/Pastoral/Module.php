@@ -8,7 +8,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral;
+namespace Custom\Ms\Pastoral;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;

@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
+namespace Custom\Ms\Pastoral\StudentInvolvement\Report;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\User;

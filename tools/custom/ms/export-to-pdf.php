@@ -9,7 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
-use Custom\Meriden\Pastoral\CommandLineTool\PdfGenerator;
+use Custom\Ms\Pastoral\CommandLineTool\PdfGenerator;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 

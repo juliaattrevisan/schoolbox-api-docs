@@ -7,10 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Custom\Meriden\Pastoral\CommandLineTool;
+namespace Custom\Ms\Pastoral\CommandLineTool;
 
 use Aura\Router\Router;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
+use Custom\Ms\Pastoral\StudentInvolvement\Report\Factory;
 use Schoolbox\User;
 use Laminas\Uri\UriInterface;
 

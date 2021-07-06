@@ -7,9 +7,9 @@
 
 declare(strict_types=1);
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
+namespace Custom\Ms\Pastoral\StudentInvolvement\Report\TutorGroup;
 
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Base as BaseReport;
+use Custom\Ms\Pastoral\StudentInvolvement\Report\Base as BaseReport;
 use Schoolbox\User;
 
 /**

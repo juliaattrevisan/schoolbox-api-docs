@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
+namespace Custom\Ms\Pastoral\StudentInvolvement\Report\TutorGroup;
 
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Resource\Folder\Model as Folder;

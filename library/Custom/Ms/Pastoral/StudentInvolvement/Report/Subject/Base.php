@@ -5,9 +5,9 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
+namespace Custom\Ms\Pastoral\StudentInvolvement\Report\Subject;
 
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Base as BaseReport;
+use Custom\Ms\Pastoral\StudentInvolvement\Report\Base as BaseReport;
 
 /**
  * Base representation of report data for all subject reports.

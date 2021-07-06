@@ -5,7 +5,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
+namespace Custom\Ms\Pastoral\StudentInvolvement\Report\TutorGroup;
 
 /**
  * Representation of report data for a middle school student's tutor group.

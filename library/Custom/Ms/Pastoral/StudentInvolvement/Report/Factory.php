@@ -5,10 +5,10 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral\StudentInvolvement\Report;
+namespace Custom\Ms\Pastoral\StudentInvolvement\Report;
 
 use Alaress\Statistics\Statistics;
-use Custom\Meriden\Pastoral\StudentInvolvement\Gateway;
+use Custom\Ms\Pastoral\StudentInvolvement\Gateway;
 use RangeException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 use Schoolbox\Learning\Assessment\AssessmentType;

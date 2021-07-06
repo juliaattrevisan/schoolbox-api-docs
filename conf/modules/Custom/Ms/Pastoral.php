@@ -11,7 +11,7 @@
 namespace Config\Modules\Custom\Ms;
 
 use Alaress\Application\Kernel;
-use Custom\Meriden\Pastoral\Module;
+use Custom\Ms\Pastoral\Module;
 use Config\Modules\ModuleConfigInterface;
 use External_User;
 

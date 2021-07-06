@@ -8,12 +8,12 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Meriden\Pastoral;
+namespace Custom\Ms\Pastoral;
 
 use Alaress\Web\Controller\Base;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\Subject;
-use Custom\Meriden\Pastoral\StudentInvolvement\Report\TutorGroup;
+use Custom\Ms\Pastoral\StudentInvolvement\Report\Factory;
+use Custom\Ms\Pastoral\StudentInvolvement\Report\Subject;
+use Custom\Ms\Pastoral\StudentInvolvement\Report\TutorGroup;
 use RangeException;
 use Schoolbox\Role;
 use Schoolbox\User;
