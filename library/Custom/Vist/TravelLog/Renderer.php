@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Custom\Verso\TravelLog;
+namespace Custom\Vist\TravelLog;
 
 use Alaress\Redis;
 use Twig\Environment;
@@ -20,7 +20,7 @@ use Twig\Error\SyntaxError;
  *
  * Render a TravelLog data set for a given student $externalId
  *
- * @package Custom\Verso\TravelLog
+ * @package Custom\Vist\TravelLog
  */
 class Renderer
 {

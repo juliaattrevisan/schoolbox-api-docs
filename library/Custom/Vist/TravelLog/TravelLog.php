@@ -5,7 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Custom\Verso\TravelLog;
+namespace Custom\Vist\TravelLog;
 
 use Alaress\Redis;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
@@ -20,16 +20,16 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 class TravelLog
 {
 
-    // The Verso Gateway API URL for SchoolBox
+    // The Vist Gateway API URL for SchoolBox
     private const API_URL = 'https://gateway.verso.school/';
 
-    // Verso Gateway API URL to get token
+    // Vist Gateway API URL to get token
     private const VERSO_TOKEN_URL = 'https://verso-gateway.auth.ap-southeast-1.amazoncognito.com/oauth2/token';
 
     // Path for student's locations
     private const LOCATION_LOG_PATH = 'location/student/';
 
-    // Verso Grant Type
+    // Vist Grant Type
     private const GRANT_TYPE = 'clientCredentials';
 
     /**
@@ -52,7 +52,7 @@ class TravelLog
      */
     public function __construct(string $clientId, string $clientSecret, Redis $cache)
     {
-        // Initiate provider for Verso Gateway OAuth authentication
+        // Initiate provider for Vist Gateway OAuth authentication
         $this->provider = new GenericProvider([
             'clientId'                => $clientId,
             'clientSecret'            => $clientSecret,
@@ -66,7 +66,7 @@ class TravelLog
     }
 
     /**
-     * Gets the token from Verso Gateway API for the requests
+     * Gets the token from Vist Gateway API for the requests
      *
      * @return AccessTokenInterface
      * @throws IdentityProviderException

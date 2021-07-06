@@ -607,7 +607,7 @@ class Controller extends BaseController
         $showEmails    = (new ValidEmailVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
 
         // Get the Verso school's Travel Log data
-        $travelLogRenderer = new Custom\Verso\TravelLog\Renderer(
+        $travelLogRenderer = new Custom\Vist\TravelLog\Renderer(
             $this->getConfigLoader()->get('site_school_code'),
             $this->getConfigLoader()->get('verso_client_id'),
             $this->getConfigLoader()->get('verso_client_secret'),

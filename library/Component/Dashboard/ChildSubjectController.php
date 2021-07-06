@@ -11,7 +11,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Custom\Dsfg\ValidJuniorSchoolStudent;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
-use Custom\Verso\TravelLog\Renderer;
+use Custom\Vist\TravelLog\Renderer;
 
 class Component_Dashboard_ChildSubjectController extends Component_Dashboard_ControllerAbstract
 {
