@@ -228,15 +228,15 @@ export default {
 }
 
 .permissions-list-enter, .permissions-list-leave-to { //to animate on/off when toggling in #roles-list-permissions.vue
-  opacity: 0;
-  transform: translateY(5px);
+    opacity: 0;
+    transform: translateY(5px);
 }
+
 .permissions-list-leave-active {
-  position: absolute;
+    position: absolute;
 }
 
 .permission-list-item {
-    display: inline-block;
     min-height: auto;
     margin: 2px;
     padding: 5px 10px;
@@ -255,9 +255,13 @@ export default {
 }
 
 .update-permissions-button {
-    flex: 0 0 35px;
+    flex: 0 0 40px;
     margin: 0px;
-    padding: 5px 10px;
+    padding: 0.5rem;
+    &:before { //to fix weird button wiggle on press otherwise
+        float: none;
+        padding: 0;
+    }
 }
 
 .delete-row-button {
