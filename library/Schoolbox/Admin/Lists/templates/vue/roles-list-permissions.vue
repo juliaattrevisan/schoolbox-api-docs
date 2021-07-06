@@ -168,8 +168,7 @@ export default {
     z-index: 1;
     right: 0px;
     top: 0px;
-    width: 60%;
-    max-width: 295px;
+    width: 320px;
     height: 100%;
     overflow: hidden;
 }
@@ -187,13 +186,10 @@ export default {
 
 .close-permissions-button {
     position: absolute;
-    top: 0.5rem;
-    right: 1rem;
+    top: 0;
+    right: 0;
     padding: 2px 2px 2px 10px;
     font-size: 1.5rem;
-    &:hover {
-        background-color: $content-ui-hover;
-    }
 }
 
 .save-permissions-button {
