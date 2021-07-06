@@ -463,7 +463,7 @@ class HtmlTemplate
             }
         }
 
-        if (isset($result) && count($result)) {
+        if (isset($result)) {
             return $result;
         } else {
             return false;

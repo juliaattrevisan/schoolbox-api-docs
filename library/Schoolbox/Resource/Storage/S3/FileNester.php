@@ -56,7 +56,7 @@ class FileNester extends CliTool\App
     /**
      * Is tool running in 'move' or 'copy' mode?
      *
-     * @var bool
+     * @var string
      */
     private $actionMode;
 
@@ -210,23 +210,22 @@ class FileNester extends CliTool\App
         $usingS3   = $otfsAdapter === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3;
         $badConfig = empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($this->bucketName);
 
-        // Using S3 but invalid config. Error out.
-        if ($usingS3 && $badConfig) {
-            $this->getLogger()->error("S3 config appears invalid");
-            exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
-        }
-        // Using S3 and good config, continue
-        if ($usingS3 && !$badConfig) {
-            $this->getLogger()->notice("S3 config appears valid");
-        }
-        // Not using S3, invalid config. Tool probably not relevant, just exit.
-        if (!$usingS3 && $badConfig) {
-            $this->getLogger()->notice("S3 config appears invalid, but not using S3, exiting");
-            exit(CliTool\Kernel::EXIT_STATUS_OK);
-        }
-        // Not using S3, but S3 config present. Assume files exists in both places (eg Vagrant case)
-        if (!$usingS3 && !$badConfig) {
-            $this->getLogger()->warning("S3 config appears valid, but not using S3, connection error probably ok to ignore");
+        if ($usingS3) { // Using S3 but invalid config. Error out.
+            if ($badConfig) {
+                $this->getLogger()->error("S3 config appears invalid");
+                exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
+            } else {
+                // Using S3 and good config, continue
+                $this->getLogger()->notice("S3 config appears valid");
+            }
+        } else {  // Not using S3, invalid config. Tool probably not relevant, just exit.
+            if ($badConfig) {
+                $this->getLogger()->notice("S3 config appears invalid, but not using S3, exiting");
+                exit(CliTool\Kernel::EXIT_STATUS_OK);
+            } else {
+                // Not using S3, but S3 config present. Assume files exists in both places (eg Vagrant case)
+                $this->getLogger()->warning("S3 config appears valid, but not using S3, connection error probably ok to ignore");
+            }
         }
 
         $this->s3Client = new S3Client([

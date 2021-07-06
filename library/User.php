@@ -39,44 +39,12 @@ class User extends DeprecatedModel
         return $this->userNotifier;
     }
 
-
-    /**
-     * Gets the ID associated with a particular campus name. Returns false if
-     * the campus name was not matched.
-     *
-     * @param  string $name
-     *
-     * @return int
-     */
-    public function getCampusID($name)
-    {
-        $query = "SELECT id FROM luCampus WHERE name LIKE '$name' AND luCampus.deleted_at IS NULL";
-        return $this->db->getOne($query);
-    }
-
-    public function getGroupID($name)
-    {
-        $query = "SELECT id FROM groups WHERE name LIKE '$name'";
-        return $this->db->getOne($query);
-    }
-
     public function getAllInCategory($categoryID)
     {
         $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
                   FROM user, userAccess
                   WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "'
                   AND type > 0
-                  AND user.deleted_at IS NULL
-                  ORDER BY lastname, firstname";
-        return $this->db->getAll($query);
-    }
-
-    public function getManagers($categoryID)
-    {
-        $query = "SELECT title, id as uid, firstname, lastname, type, username, local_email, alt_email, synergy_id
-                  FROM user, userAccess
-                  WHERE id = uid AND service = '" . UserAccess::SERVICE_HOMEPAGE . "' AND sid = '" . $categoryID . "'
-                  and type in(3,2)
                   AND user.deleted_at IS NULL
                   ORDER BY lastname, firstname";
         return $this->db->getAll($query);
@@ -112,14 +80,6 @@ class User extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
-    public function getSuperusers()
-    {
-        $query = "SELECT user.id uid, title, firstname, lastname, username, local_email, alt_email
-                FROM superusers JOIN user ON superusers.id = user.id
-                WHERE user.deleted_at IS NULL";
-        return $this->db->getAll($query);
-    }
-
     public function getUserCampus($id)
     {
         $campusList  = array();
@@ -151,31 +111,6 @@ class User extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
-    /**
-     * Search for a user by synergy ID, restricted to a group or group array
-     *
-     * @param int $sid
-     * @param int|array $gid
-     *
-     * @return array|bool
-     */
-    public function getBySynergyAndGroup($sid, $gid)
-    {
-        $query = "SELECT user.id AS uid, title, firstname, lastname, username, groups.name AS gname, group_id,
-                        position_title, hide_timetable, hide_contacts, synergy_id, local_email, alt_email, userCampus.campus, year, eportfolio_enabled, house, enabled
-                FROM user
-                    LEFT JOIN groups ON user.group_id = groups.id
-                    LEFT JOIN userCampus ON user.id = userCampus.uid
-                WHERE user.synergy_id = '$sid'
-                AND user.deleted_at IS NULL
-                AND ";
-        if (is_array($gid)) {
-            $query .= "group_id IN (" . implode(", ", $gid) . ")";
-        } else {
-            $query .= "group_id = '$gid'";
-        }
-        return $this->db->getRow($query);
-    }
 
     /**
      * Gets the part of a WHERE query that filters out parents from:
@@ -416,34 +351,6 @@ class User extends DeprecatedModel
         return $this->db->getAll($query);
     }
 
-    /**
-     * Sets the user's password in the database.
-     *
-     * @param int    $userID
-     * @param string $newPassword
-     *
-     * @return bool
-     */
-    public function setPasswordInternal($userID, $newPassword)
-    {
-        // Babushka doll - a mapper in a handler!
-        // This is going to be slow as hell but the only place user handler
-        // should still save users is in the sync scripts, so who cares.
-        // Also, most syncs don't even save passwords.
-        $userMapper = \Schoolbox\UserMapper::getInstance();
-        try {
-            $user            = $userMapper->findById($userID);
-            $passwordService = new \Alaress\Password\Service();
-            $user
-                ->setRetrievablePassword($newPassword)
-                ->setPassword($passwordService->hash($newPassword));
-            $userMapper->save($user);
-            return 1;
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            return 0;
-        }
-    }
-
     public function getCampusList()
     {
         $query = "SELECT * FROM luCampus WHERE luCampus.deleted_at IS NULL ORDER BY sequence";
@@ -455,12 +362,6 @@ class User extends DeprecatedModel
         $query = "SELECT * FROM groups
                   WHERE deleted_at IS NULL
                   ORDER BY name";
-        return $this->db->getAll($query);
-    }
-
-    public function getTitleList()
-    {
-        $query = "SELECT * FROM luTitle";
         return $this->db->getAll($query);
     }
 
@@ -482,193 +383,6 @@ class User extends DeprecatedModel
         $query = "SELECT date, ip, login FROM login_log WHERE username like "
             . $this->db->smartQuote($username)
             . " ORDER BY date DESC LIMIT 0,$limit";
-        return $this->db->getAll($query);
-    }
-
-    /**
-     * Deletes this user.
-     *
-     * As of 16.0 it no longer deletes all traces - users are now soft deleted.
-     *
-     * @param  int $id
-     * @param  int $trans
-     * @return bool
-     */
-    public function delete($id, $trans = 0)
-    {
-        trigger_error('User::delete() is deprecated - use UserMapper instead', E_USER_DEPRECATED);
-        $userMapper = \Schoolbox\UserMapper::getInstance();
-        $user       = $userMapper->findById($id);
-        $result     = $userMapper->delete($user);
-        if ($trans) {
-            $userMapper->transferOwnership($id, $trans);
-        }
-        return $result;
-    }
-
-    /**
-     * Update an existing user's details
-     *
-     * TODO remove this and update/remove everywhere which uses it:
-     * * sync scripts
-     * * bulk user modify
-     *
-     * @param array $user
-     * @return bool
-     */
-    public function update($user)
-    {
-        /* Check if the username already exists before updating. If it does
-              * exist already, prevent existence of duplicate usernames
-              */
-        if ($dupeUser = $this->getByUsername($user['username'])) {
-            if ($dupeUser['uid'] != $user['id']) {
-                return false;
-            }
-        }
-        $campusArray = $user['campus'];
-        unset($user['campus']);
-        /* Check if $user['su'] exists and not equal to null
-              */
-        if (isset($user['su'])) {
-            $this->db->delete('superusers', 'id', $user['id']);
-            if ($user['su']) {
-                $this->db->insert('superusers', array('id' => $user['id']));
-            }
-            unset($user['su']);
-        } /* Check if $user['su'] exists and is null
-         */
-        else {
-            if (array_key_exists('su', $user)) {
-                unset($user['su']);
-            }
-        }
-        if (isset($user['password'])) {
-            $this->setPasswordInternal($user['id'], $user['password']);
-            unset($user['password']);
-        }
-        parent::update($user);
-        if (is_array($campusArray)) {
-            $this->db->delete('userCampus', 'uid', $user['id']);
-            foreach ($campusArray as $campus) {
-                $insertCampus = array(
-                    'uid'    => $user['id'],
-                    'campus' => $campus,
-                );
-                $this->db->insert('userCampus', $insertCampus);
-            }
-        } else {
-            if (is_numeric($campusArray) && $campusArray > 0) {
-                /* Note that this can insert multiple campus if the update only specified a single value like in a bulk load */
-                $campusquery = "INSERT IGNORE INTO userCampus (uid, campus) VALUES ('{$user['id']}', '$campusArray')";
-                $this->db->query($campusquery);
-            }
-        }
-        // Filthily notify the binder that user was updated
-        if (isset($_SESSION) && isset($_SESSION['user'])) {
-            $this->getUserNotifier()->manualNotifyUpdated($user['id'], $_SESSION['user']);
-        }
-
-        return true;
-    }
-
-    /**
-     * Create a new user record
-     *
-     * TODO remove this and update/remove everywhere which uses it:
-     * * sync scripts
-     * * bulk user modify
-     *
-     * @param array $user
-     *
-     * @return int|bool ID of new user, or false if failed
-     */
-    public function create($user)
-    {
-        /* Check if the username already exists
-              */
-        if (is_array($this->getByUsername($user['username']))) {
-            return false;
-        }
-        $campusArray   = $user['campus'];
-        $defaultCampus = $user['defaultCampus'];
-        $su            = $user['su'];
-        $password      = $user['password'];
-        unset($user['campus']);
-        unset($user['defaultCampus']);
-        unset($user['su']);
-        unset($user['password']);
-        $user['key'] = substr(md5(uniqid() . time()), 0, 25);
-        if (is_array($campusArray) && count($campusArray)) {
-            $id = parent::create($user);
-            if ($password) {
-                $this->setPasswordInternal($id, $password);
-            }
-            if (is_array($campusArray) && $id) {
-                foreach ($campusArray as $campus) {
-                    $insertCampus = array(
-                        'uid'           => $id,
-                        'campus'        => $campus,
-                        'defaultCampus' => $campus == $defaultCampus ? 1 : 0
-                    );
-                    $this->db->insert('userCampus', $insertCampus);
-                }
-            } else {
-                if ($id && $campusArray) {
-                    $this->db->insert('userCampus', [
-                        'uid'           => $id,
-                        'campus'        => $campusArray,
-                        'defaultCampus' => $campusArray == $defaultCampus ? 1 : 0,
-                    ]);
-                }
-            }
-            /* If ticked, add the new user into the Superusers table as well.
-                      */
-            if ($su) {
-                $this->db->insert('superusers', array('id' => $id));
-            }
-            // Filthily notify the binder that there's a new user
-            if (isset($_SESSION) && isset($_SESSION['user'])) {
-                $this->getUserNotifier()->manualNotifyCreated($id, $_SESSION['user']);
-            }
-
-            return $id;
-        }
-        return false;
-    }
-
-
-    /**
-     * Gets all in the system who are in a particular groupID, restricted by index and limit
-     *
-     * @param int|array $groupID
-     * @param bool $hasSynergy
-     * @param int  $index
-     * @param int  $limit
-     * @return array
-     */
-    public function getSelectionByGroup($groupID, $hasSynergy = false, $index = 0, $limit = 0)
-    {
-        $query = "SELECT *
-                  FROM {$this->_table}
-                  WHERE group_id";
-        if (is_array($groupID)) {
-            $query .= " IN " . '(' . implode(',', $groupID) . ')';
-        } else {
-            $query .= " = '$groupID'";
-        }
-        /* Optionally exclude those without synergy ids
-              */
-        if ($hasSynergy) {
-            $query .= " AND synergy_id IS NOT NULL
-                        AND synergy_id > 0 ";
-        }
-        $query .= "
-            AND deleted_at IS NULL
-            ORDER BY lastname ASC, firstname ASC";
-        if ($limit) {
-            $query .= " LIMIT $index, $limit";
-        }
         return $this->db->getAll($query);
     }
 
@@ -738,36 +452,5 @@ class User extends DeprecatedModel
         } else {
             return 'Unknown User';
         }
-    }
-
-    /**
-     * Logs user-related activity in the database.
-     *
-     * @param string $user    The user's username.
-     * @param string $event   A simple code to describe the error, 20 chars max.
-     * @param string $level   The log level: trace, debug, info, warning, error
-     * @param string $message Optional extra information, 250 chars max.
-     *
-     * @return bool
-     */
-    public function logUserPasswordChange($user, $event, $level, $message = '')
-    {
-        //
-        // I will NOT log passwords here!
-        // when user changes password (change_pwd, info)
-        // when user tries to change password but enters wrong password (change_pwd_fail, warn)
-        // when user tries but is foild by Synergetic (change_pwd_syn_fail, warn)
-        // when an admin or someone changes other user's password (change_other_password, info)
-        return $this->db->insert(
-            'user_activity_log',
-            array(
-                'username' => $user,
-                'date'     => 'NOW()',
-                'ip'       => $_SERVER['REMOTE_ADDR'],
-                'event'    => $event,
-                'level'    => $level,
-                'message'  => $message,
-            )
-        );
     }
 }

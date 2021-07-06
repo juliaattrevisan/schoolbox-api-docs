@@ -532,7 +532,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                         /* Paste teacher in. There are dupe records for teachers at this point,
                          * so accept the first in the list
                          */
-                        if (!strlen($finalTimetable[$currentRow['QROW'] - 1]['staffID'])) {
+                        if (!strlen($finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffID'])) {
                             $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffID'] = $teacherKey;
                             $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffTitle'] = $user->getTitle();
                             $finalTimetable[$currentRow['QROW'] - 1]['class'][0]['staffFirstname'] = $user->getFirstname();

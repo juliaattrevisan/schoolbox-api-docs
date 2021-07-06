@@ -2,6 +2,8 @@ parameters:
     bootstrapFiles:
         - %rootDir%/../../../conf/core/require.php
     level: 4
+    parallel:
+        processTimeout: 300.0
     paths:
         - conf
         - dav

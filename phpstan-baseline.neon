@@ -1491,11 +1491,6 @@ parameters:
 			path: library/Custom/Tps/AssessmentFeedbackImporter.php
 
 		-
-			message: "#^Property Custom\\\\Verso\\\\TravelLog\\\\Renderer\\:\\:\\$cachingTimeout \\(string\\) does not accept int\\.$#"
-			count: 1
-			path: library/Custom/Verso/TravelLog/Renderer.php
-
-		-
 			message: "#^Method DAV_Auth_Digest\\:\\:getDigestHash\\(\\) should return string\\|null but returns false\\.$#"
 			count: 1
 			path: library/DAV/Auth/Digest.php
@@ -2462,11 +2457,6 @@ parameters:
 
 		-
 			message: "#^Return type \\(bool\\) of method External_Maze_Timetable\\:\\:getDayNumber\\(\\) should be compatible with return type \\(int\\) of method External_TimetableInterface\\:\\:getDayNumber\\(\\)$#"
-			count: 1
-			path: library/External/Maze/Timetable.php
-
-		-
-			message: "#^Offset 'staffID' does not exist on array\\('periodName' \\=\\> mixed, 'periodStart' \\=\\> mixed, 'periodEnd' \\=\\> mixed, 'periodNumber' \\=\\> mixed, 'periodSequence' \\=\\> 1, 'class' \\=\\> array\\(array\\('description' \\=\\> mixed, \\?'code' \\=\\> string, \\?'staffID' \\=\\> mixed, \\?'staffTitle' \\=\\> string, \\?'staffFirstname' \\=\\> string, \\?'staffSurname' \\=\\> string, \\?'room' \\=\\> string, \\?'campus' \\=\\> string\\)\\)\\)\\.$#"
 			count: 1
 			path: library/External/Maze/Timetable.php
 
@@ -5631,11 +5621,6 @@ parameters:
 			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
 
 		-
-			message: "#^Ternary operator condition is always false\\.$#"
-			count: 1
-			path: library/Schoolbox/Learning/Assessment/DataModel/MapperProxy.php
-
-		-
 			message: "#^Property Schoolbox\\\\Learning\\\\Assessment\\\\DataModel\\\\Model\\:\\:\\$id \\(int\\) does not accept null\\.$#"
 			count: 1
 			path: library/Schoolbox/Learning/Assessment/DataModel/Model.php
@@ -7801,11 +7786,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Routing/RouteTXRX.php
 
 		-
-			message: "#^Method Schoolbox\\\\Realtime\\\\Routing\\\\Subscription\\\\Loader\\\\BindingLoader\\:\\:getUserSubscriptions\\(\\) should return array\\<string\\> but returns array\\<string, true\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Realtime/Routing/Subscription/Loader/BindingLoader.php
-
-		-
 			message: "#^Return type \\(string\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\Subscription\\\\Test\\\\NestTestResolver\\:\\:getValue\\(\\) should be compatible with return type \\(bool\\) of method Schoolbox\\\\Realtime\\\\Routing\\\\Subscription\\\\Resolver\\:\\:getValue\\(\\)$#"
 			count: 1
 			path: library/Schoolbox/Realtime/Routing/Subscription/Test/NestTestResolver.php
@@ -8324,16 +8304,6 @@ parameters:
 			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
 			count: 1
 			path: library/Schoolbox/Resource/Storage/Model.php
-
-		-
-			message: "#^Property Schoolbox\\\\Resource\\\\Storage\\\\S3\\\\FileNester\\:\\:\\$actionMode \\(bool\\) does not accept string\\.$#"
-			count: 1
-			path: library/Schoolbox/Resource/Storage/S3/FileNester.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between bool and 'move' will always evaluate to false\\.$#"
-			count: 2
-			path: library/Schoolbox/Resource/Storage/S3/FileNester.php
 
 		-
 			message: "#^If condition is always true\\.$#"
@@ -8911,16 +8881,6 @@ parameters:
 			path: library/User.php
 
 		-
-			message: "#^Method User\\:\\:setPasswordInternal\\(\\) should return bool but returns int\\.$#"
-			count: 2
-			path: library/User.php
-
-		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: library/User.php
-
-		-
 			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
 			count: 1
 			path: library/Wiki.php
@@ -8974,11 +8934,6 @@ parameters:
 			message: "#^Variable \\$addParamsShort might not be defined\\.$#"
 			count: 1
 			path: tools/markbook/sync.php
-
-		-
-			message: "#^Variable \\$hash might not be defined\\.$#"
-			count: 1
-			path: tools/mq/diagnose-pqueue.php
 
 		-
 			message: "#^Negated boolean expression is always false\\.$#"

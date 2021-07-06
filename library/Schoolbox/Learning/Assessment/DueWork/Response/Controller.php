@@ -126,7 +126,7 @@ class Controller extends Base
         $reviewRoute = ReturnedWork::REVIEW_ROUTE_INSTRUCTOR;
         if ($selfReflectedWithResponse) {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_REFLECTION;
-        } elseif ($selfAssessedWithResponse) {
+        } else {
             $reviewRoute = ReturnedWork::REVIEW_ROUTE_SELF_GRADING;
         }
 

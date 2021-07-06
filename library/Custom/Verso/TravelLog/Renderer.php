@@ -72,7 +72,7 @@ class Renderer
 
 
     /**
-     * @var string
+     * @var int
      */
     private $cachingTimeout;
 

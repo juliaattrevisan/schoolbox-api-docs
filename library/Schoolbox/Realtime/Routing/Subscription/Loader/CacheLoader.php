@@ -82,9 +82,9 @@ class CacheLoader implements ILoader
 
     /**
      * @param int $userId
-     * @return string[]
+     * @return array
      */
-    public function getUserSubscriptions($userId)
+    public function getUserSubscriptions($userId): array
     {
         return $this->getRoutes(function ($key) use ($userId) {
             return $key == $userId;
@@ -105,9 +105,9 @@ class CacheLoader implements ILoader
 
     /**
      * @param callable $filter
-     * @return string[]
+     * @return array
      */
-    private function getRoutes(callable $filter)
+    private function getRoutes(callable $filter): array
     {
         $routes = [];
 

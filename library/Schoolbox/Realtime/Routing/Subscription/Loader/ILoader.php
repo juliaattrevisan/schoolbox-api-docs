@@ -30,9 +30,9 @@ interface ILoader
 
     /**
      * @param int $userId
-     * @return string[]
+     * @return array
      */
-    public function getUserSubscriptions($userId);
+    public function getUserSubscriptions($userId): array;
 
     /**
      * @return Traversable

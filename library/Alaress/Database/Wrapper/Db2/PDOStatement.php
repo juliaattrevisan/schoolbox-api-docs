@@ -259,6 +259,7 @@ class PDOStatement extends BasePDOStatement
     public function setFetchMode($mode, $params = null)
     {
         $this->fetchStyleDefault = $mode;
+        return true;
     }
 
     /**

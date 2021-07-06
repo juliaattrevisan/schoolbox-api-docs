@@ -164,18 +164,16 @@ class Controller extends Base\Base
         $courseExists = $course instanceof CourseSpecification && $course->getId();
         $unitExists = $unit instanceof UnitSpecification && $unit->getId();
 
-        // Do the folders already have a Unit and Course attached ?
-        if ($courseExists && $unitExists) {
-            $errors[] = "Course (id: {$course->getId()}) and Unit (id: {$unit->getId()}) already linked.";
-            $this->returnJson($errors, 400);
-            return;
-        }
-
-        // Does Unit already exist and belong to different Course?
-        if ($unitExists && !$courseExists) {
-            $errors[] = "Unit (id: {$unit->getId()}) already exists in Course (id: {$unit->getCourse()->getId()})";
-            $this->returnJson($errors, 400);
-            return;
+        if ($unitExists) {
+            if ($courseExists) { // Do the folders already have a Unit and Course attached ?
+                $errors[] = "Course (id: {$course->getId()}) and Unit (id: {$unit->getId()}) already linked.";
+                $this->returnJson($errors, 400);
+                return;
+            } else {   // Does Unit already exist and belong to different Course?
+                $errors[] = "Unit (id: {$unit->getId()}) already exists in Course (id: {$unit->getCourse()->getId()})";
+                $this->returnJson($errors, 400);
+                return;
+            }
         }
 
         // Is the proposed unit folder the same as the course folder?
@@ -200,21 +198,18 @@ class Controller extends Base\Base
             }
         }
 
-        // Check the proposed Unit
-        if (!$unitExists) {
-            // Does user have WRITE+ access to the Unit folder?
-            $unitFolderAccess = $this->access->getFolderAccess($this->getUser(), $unitFolder->getId());
+        // Does user have WRITE+ access to the Unit folder?
+        $unitFolderAccess = $this->access->getFolderAccess($this->getUser(), $unitFolder->getId());
 
-            if ($unitFolderAccess < UserAccess::ACCESS_WRITE) {
-                $errors[] = 'Unit Folder permission error: ' . $unitFolder->getId();
-            }
+        if ($unitFolderAccess < UserAccess::ACCESS_WRITE) {
+            $errors[] = 'Unit Folder permission error: ' . $unitFolder->getId();
+        }
 
-            // Does the proposed Unit Folder already have a Course ?
-            $unitFolderCourse = $unitFolder->getCourseSpecification();
+        // Does the proposed Unit Folder already have a Course ?
+        $unitFolderCourse = $unitFolder->getCourseSpecification();
 
-            if ($unitFolderCourse instanceof CourseSpecification && $unitFolderCourse->getId()) {
-                $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
-            }
+        if ($unitFolderCourse instanceof CourseSpecification && $unitFolderCourse->getId()) {
+            $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
         }
 
         if (\count($errors)) {
