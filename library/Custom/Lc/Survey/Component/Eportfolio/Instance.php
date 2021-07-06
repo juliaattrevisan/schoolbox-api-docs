@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Loyola\Survey\Component\Eportfolio;
+namespace Custom\Lc\Survey\Component\Eportfolio;
 
 use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;

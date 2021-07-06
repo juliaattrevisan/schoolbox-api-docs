@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Loyola\Survey\Component\Homepage;
+namespace Custom\Lc\Survey\Component\Homepage;
 
 use Component_Definition;
 use Schoolbox\User;

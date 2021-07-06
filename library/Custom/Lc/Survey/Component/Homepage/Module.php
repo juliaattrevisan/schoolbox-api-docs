@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Loyola\Survey\Component\Eportfolio;
+namespace Custom\Lc\Survey\Component\Homepage;
 
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
@@ -17,7 +17,7 @@ class Module extends BaseModule
     /**
      * @var string
      */
-    protected $basename = 'surveyEportfolio';
+    protected $basename = 'surveyHomepage';
 
     /**
      * {@inheritdoc}

@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Loyola\Survey\Component\Eportfolio;
+namespace Custom\Lc\Survey\Component\Eportfolio;
 
 use Component_Eportfolio_ControllerAbstract;
 use Component_Instance;
@@ -21,7 +21,7 @@ use SitePage;
  * {@inheritDoc}
  *
  * Class Controller
- * @package Custom\Loyola\Survey\Component\Eportfolio
+ * @package Custom\Lc\Survey\Component\Eportfolio
  */
 class Controller extends Component_Eportfolio_ControllerAbstract
 {

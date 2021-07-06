@@ -10,9 +10,9 @@ namespace Config\Modules\Custom\Lc;
 
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
-use Custom\Loyola\Survey\Component\Eportfolio\Module as EportfolioComponentModule;
+use Custom\Lc\Survey\Component\Eportfolio\Module as EportfolioComponentModule;
 use Config\Modules\ModuleConfigInterface;
-use Custom\Loyola\Survey\Module as SurveyModule;
+use Custom\Lc\Survey\Module as SurveyModule;
 
 class Survey extends ModuleLoader implements ModuleConfigInterface
 {

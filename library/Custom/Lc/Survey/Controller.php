@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Custom\Loyola\Survey;
+namespace Custom\Lc\Survey;
 
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;

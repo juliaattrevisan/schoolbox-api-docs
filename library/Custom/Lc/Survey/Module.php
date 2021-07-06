@@ -6,7 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Custom\Loyola\Survey;
+namespace Custom\Lc\Survey;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
