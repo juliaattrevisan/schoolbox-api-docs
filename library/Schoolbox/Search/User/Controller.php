@@ -248,9 +248,9 @@ class Controller extends BaseController
             if (is_array($externalUser['AlertMessage'])) {
                 $externalUser['AlertMessages'] = $externalUser['AlertMessage'];
             } else {
-                $externalUser['AlertMessages'] = empty(trim($externalUser['AlertMessage'])) ? [] : [$externalUser['AlertMessage']];
+                $externalUser['AlertMessages'] = empty($externalUser['AlertMessage']) ? [] : [trim($externalUser['AlertMessage'])];
             }
-            if (trim($externalUser["CourtOrderType"]) !== '') {
+            if ($externalUser["CourtOrderType"] && (trim($externalUser["CourtOrderType"]) !== '')) {
                 $externalUser['AlertMessages'][] = "Court Order - " . trim($externalUser["CourtOrderType"]);
             }
         }
