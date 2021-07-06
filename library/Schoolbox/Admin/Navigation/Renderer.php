@@ -39,18 +39,19 @@ class Renderer extends Extension\AbstractExtension
     /**
      * @param Environment $twig
      * @param string      $pageCurrent
+     * @param string|null $title this title will be used on the page, if provided
      * @return string
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function renderAdminNavigation(Environment $twig, string $pageCurrent): string
+    public function renderAdminNavigation(Environment $twig, string $pageCurrent, ?string $title = null): string
     {
         // Grab navigation items from old admin class
         // TODO SA-8354: inject this
 
         // Render this thing out
-        return (new Subnav(new Loader()))->generateHtml($pageCurrent);
+        return (new Subnav(new Loader()))->generateHtml($pageCurrent, $title);
     }
 
     /**
