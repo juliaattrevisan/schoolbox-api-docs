@@ -9,13 +9,13 @@
 namespace Config\Modules\Custom\Sk;
 
 use Alaress\Application\Kernel;
-use Custom\Stk\OleReport\Module as OleReportModule;
+use Custom\Sk\OleReport\Module as OleReportModule;
 use Config\Modules\ModuleConfigInterface;
 
 /**
  * Configuration for the SaintKentigern-specific OLE report.
  *
- * @package Config\Modules\Custom\Stk
+ * @package Config\Modules\Custom\Sk
  */
 class OleReport implements ModuleConfigInterface
 {

@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Stk\OleReport;
+namespace Custom\Sk\OleReport;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
@@ -22,7 +22,7 @@ use Schoolbox\UserMapper;
 /**
  * Module definition for SaintKentigern's custom OLE report.
  *
- * @package Custom\Stk\OleReport
+ * @package Custom\Sk\OleReport
  */
 class Module extends BaseModule
 {

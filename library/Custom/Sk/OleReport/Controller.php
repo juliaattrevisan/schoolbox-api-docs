@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Custom\Stk\OleReport;
+namespace Custom\Sk\OleReport;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
@@ -17,7 +17,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 /**
  * Controller for SaintKentigern's OLE Report page.
  *
- * @package Custom\Stk\OleReport
+ * @package Custom\Sk\OleReport
  */
 class Controller extends Base
 {

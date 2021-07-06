@@ -8,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Custom\Stk\NCEA;
+namespace Custom\Sk\NCEA;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;

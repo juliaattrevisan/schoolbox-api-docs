@@ -8,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Custom\Stk\NCEA;
+namespace Custom\Sk\NCEA;
 
 use Alaress\Database\Connector\IConnector;
 
@@ -49,7 +49,7 @@ class Acquisition
     public function getRecords(int $externalId, int $year): array
     {
         $statement = $this->database->prepareQuery('
-            SELECT 
+            SELECT
                 R.FileYear,
                 R.ID,
                 R.StudentPreferred,

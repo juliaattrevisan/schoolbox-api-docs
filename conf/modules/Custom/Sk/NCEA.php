@@ -9,7 +9,7 @@
 namespace Config\Modules\Custom\Sk;
 
 use Alaress\Application\Kernel;
-use Custom\Stk\NCEA\Module as NCEAModule;
+use Custom\Sk\NCEA\Module as NCEAModule;
 use Config\Modules\ModuleConfigInterface;
 
 class NCEA implements ModuleConfigInterface

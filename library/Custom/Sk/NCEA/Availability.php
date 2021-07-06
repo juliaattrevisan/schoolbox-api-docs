@@ -8,7 +8,7 @@
  * @link        https://schoolbox.com.au/
  */
 
-namespace Custom\Stk\NCEA;
+namespace Custom\Sk\NCEA;
 
 use Alaress\Database\Connector\IConnector;
 
@@ -36,7 +36,7 @@ class Availability
     private function findMeta(int $yearLevel): array
     {
         $query = '
-            SELECT * 
+            SELECT *
             FROM uluShowNCEAReport
             WHERE YearLevel = :yearLevel
             AND ShowOnOLE = 1
