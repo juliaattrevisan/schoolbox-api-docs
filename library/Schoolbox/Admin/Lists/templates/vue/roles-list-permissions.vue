@@ -110,7 +110,7 @@ export default {
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
-                this.isProcessing = false;
+                location.reload();
             }
         },
 
