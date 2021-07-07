@@ -91,6 +91,7 @@ class Installer implements IPackageInstall
                 ->setIcon('/images/badges' . $row['Image'])
                 ->setCategory($badgeCategoryLocator->locate($row['Category'], $user))
                 ->setAchievementExpiry(Badge\Model::EXPIRY_NEVER)
+                ->setGoalExpiry(Badge\Model::EXPIRY_NEVER)
                 ->setAllowAsGoal((bool)$row['Goal'])
                 ->setYearLevels($yearList)
                 ->setCurriculumNodes($nodeCollection)
