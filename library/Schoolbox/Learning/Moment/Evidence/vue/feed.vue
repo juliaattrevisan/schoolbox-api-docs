@@ -310,11 +310,11 @@ export default {
                                       Tags:
                                       <template v-for="(curriculumNode, index) in evidence.object.curriculumNodes">
                                           <template v-if="index !== 0">, </template>
-                                          <span :title="curriculumNode.name" :key="index">{{ curriculumNode.code }}</span>
+                                          <span :title="curriculumNode.name" :key="`${index}-${curriculumNode.code}`">{{ curriculumNode.code }}</span>
                                       </template>
                                       <template v-if="evidence.object.curriculumNodes.length > 0 && evidence.object.tags.length > 0">, </template>
                                       <template v-for="(tag, index) in evidence.object.tags">
-                                          <template v-if="index !== 0">, </template><span :key="index">{{ tag.name }}</span>
+                                          <template v-if="index !== 0">, </template><span :key="`${index}-${tag.name}`">{{ tag.name }}</span>
                                       </template>
                                   </p>
                                 </div>
