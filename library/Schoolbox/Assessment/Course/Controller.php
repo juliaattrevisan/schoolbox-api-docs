@@ -244,28 +244,25 @@ class Controller extends Base\Base
             $course->setFolder($courseFolder);
         }
 
-        // Create Unit if required
-        if (!$unitExists) {
-            /* Unit folder might have been deleted at some point in the past
-             * See if there's a deleted row we can recycle since foreign keys
-             * will stop us from inserting a tuple that already exists
-             */
-            try {
-                $unit = $this->unitSpecificationMapper->findOneByColumn('folder_id', $unitFolder->getId(), [
-                    'deleted' => true
-                ]);
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        /* Unit folder might have been deleted at some point in the past
+         * See if there's a deleted row we can recycle since foreign keys
+         * will stop us from inserting a tuple that already exists
+         */
+        try {
+            $unit = $this->unitSpecificationMapper->findOneByColumn('folder_id', $unitFolder->getId(), [
+                'deleted' => true
+            ]);
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
 
-                /** @var UnitSpecification $deletedUnit */
-                $deletedUnit = $e->getDeletedObject();
+            /** @var UnitSpecification $deletedUnit */
+            $deletedUnit = $e->getDeletedObject();
 
-                $unit = $deletedUnit->setDeletedAt(null);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $unit = $this->unitSpecificationMapper->createModel();
-            }
-
-            $unit->setFolder($unitFolder);
+            $unit = $deletedUnit->setDeletedAt(null);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $unit = $this->unitSpecificationMapper->createModel();
         }
+
+        $unit->setFolder($unitFolder);
 
         // Link Course and Unit
         $unit->setCourse($course);
@@ -279,11 +276,9 @@ class Controller extends Base\Base
             $response['course'] = $course->getId();
         }
 
-        // Create Unit if required
-        if (!$unitExists) {
-            $this->unitSpecificationMapper->save($unit);
-            $response['unit'] = $unit->getId();
-        }
+        // Create Unit
+        $this->unitSpecificationMapper->save($unit);
+        $response['unit'] = $unit->getId();
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
