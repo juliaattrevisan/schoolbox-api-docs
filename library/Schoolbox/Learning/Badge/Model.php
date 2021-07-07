@@ -118,6 +118,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * In how many days will a goal created from this badge expire?
+     */
+    private ?int $goalExpiry;
+
+
+    /**
      * @var GenericCollection|null
      */
     private ?GenericCollection $yearLevels = null;
@@ -288,6 +294,35 @@ class Model implements ISoftDeletable
             );
         }
         $this->achievementExpiry = $achievementExpiry;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getGoalExpiry(): ?int
+    {
+        return $this->goalExpiry;
+    }
+
+
+    /**
+     * @param int|null $goalExpiry
+     * @return static
+     */
+    public function setGoalExpiry(?int $goalExpiry): self
+    {
+        if (!in_array($goalExpiry, self::VALID_GOAL_EXPIRY_VALUES, true)) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Goal expiry must be one of: [%s], received %d instead',
+                    implode(',', self::VALID_GOAL_EXPIRY_VALUES),
+                    $goalExpiry,
+                )
+            );
+        }
+        $this->goalExpiry = $goalExpiry;
         return $this;
     }
 
