@@ -68,12 +68,12 @@
                 url: path,
                 data: data,
                 dataType: 'json',
-            }).success(function (response) {
+            }).done(function (response) {
                 if (typeof $weightInput !== 'undefined') {
                     $weightInput.removeClass('invalid-data');
                 }
                 $toast.toastTimeout({text: response.message, css: 'success'});
-            }).error(function (response) {
+            }).fail(function (response) {
                 if (typeof $weightInput !== 'undefined') {
                     $weightInput.focus().addClass('invalid-data');
                 }

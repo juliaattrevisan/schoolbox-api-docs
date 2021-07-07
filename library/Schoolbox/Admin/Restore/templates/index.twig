@@ -19,14 +19,14 @@
                             id: $(event.target).attr('data-restore-folder')
                         }
                     })
-                    .success(function() {
+                    .done(function() {
                         $toast.toastTimeout({
                             text: 'Folder recovered!',
                             css: 'success'
                         });
                         $(event.target).closest('tr').remove();
                     })
-                    .error(function(response) {
+                    .fail(function(response) {
                         var temp = $.parseJSON(response.responseText);
 
                         $toast.toastTimeout({
@@ -54,14 +54,14 @@
                             id: $(event.target).attr('data-restore-assessment')
                         }
                     })
-                    .success(function() {
+                    .done(function() {
                         $toast.toastTimeout({
                             text: 'Assessment recovered!',
                             css: 'success'
                         });
                         $(event.target).closest('tr').remove();
                     })
-                    .error(function(response) {
+                    .fail(function(response) {
                         var temp = $.parseJSON(response.responseText);
 
                         $toast.toastTimeout({

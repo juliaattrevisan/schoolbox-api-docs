@@ -132,7 +132,7 @@
 
                     $.post('{{ routeLookup('adminProfileButton.postDelete') }}', {
                         id: id
-                    }).success(function (e) {
+                    }).done(function (e) {
                         $(listItem).remove();
 
                         if ($('#profile-button-list').find('[data-profile-button]').length == 0) {

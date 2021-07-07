@@ -70,7 +70,7 @@
                         componentId: componentInstanceId
                     }) }}'.replace(/providerId/g, '{{ learningfieldProviderId }}'), {
                         url: $('#learningfieldUrl').val()
-                    }).success(function () {
+                    }).done(function () {
                         window.location.reload();
                     });
                 });
@@ -96,7 +96,7 @@
                             providerId: 'providerId',
                             componentId: componentInstanceId
                         }) }}'.replace(/providerId/g, providerId)
-                    ).success(function (result) {
+                    ).done(function (result) {
 
                         {# Hide preloader #}
                         $('#lti-select-preloader{{ componentInstanceId }}').hide();

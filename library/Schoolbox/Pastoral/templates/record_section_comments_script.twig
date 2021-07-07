@@ -13,7 +13,7 @@
                     deleteCommentRoute
                         .replace(/recordId/g, {{ record.id }})
                         .replace(/commentId/g, $(event.target).attr('data-delete-comment'))
-                ).success(function () {
+                ).done(function () {
                     $(event.target).closest('li').remove();
                 });
             }

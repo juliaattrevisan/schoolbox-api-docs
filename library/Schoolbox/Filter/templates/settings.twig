@@ -139,10 +139,10 @@
                 var duration = 2000;
 
                 $.post(href, data)
-                    .success(function () {
+                    .done(function () {
                         $toast.toastTimeout({text: 'Settings saved.', css: 'success', duration: duration});
                     })
-                    .error(function(){
+                    .fail(function(){
                         $toast.toastTimeout({text: 'Unable to save.', css: 'alert', duration: duration});
                     })
                     .always(function() {

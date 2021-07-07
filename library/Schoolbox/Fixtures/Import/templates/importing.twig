@@ -5,7 +5,7 @@
 
         function update() {
             $.get('{{ routeLookup('sportsfixturesImport.getImportProgress', {id: id}) }}/' + window.skipCount)
-            .success(function (data) {
+            .done(function (data) {
                 if (data.errors.length > 0) {
 
                     // Add any new errors to the end of the table body

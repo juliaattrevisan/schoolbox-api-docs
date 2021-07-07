@@ -84,7 +84,7 @@
                 $.post('{{ routeLookup('adminMenuTop.postOrder') }}', {
                     order: order
                 })
-                        .success(function () {
+                        .done(function () {
                         });
             }
         });
@@ -100,7 +100,7 @@
                 confirmEvent: function () {
                     $.post('{{ routeLookup('adminMenuTop.postDelete') }}', {
                         id: id
-                    }).success(function (e) {
+                    }).done(function (e) {
                         $(listItem).remove();
 
                         if ($('[data-menu-top]').length == 0) {

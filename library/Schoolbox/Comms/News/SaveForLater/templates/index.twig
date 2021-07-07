@@ -131,7 +131,7 @@
                                 type: 'POST',
                                 url: element.attr('href'),
                                 dataType: 'json'
-                            }).success(function () {
+                            }).done(function () {
                                 toast.toastTimeout({
                                     text: 'Removed',
                                     css: 'success'
@@ -143,7 +143,7 @@
                                     $('#savedArticlesSection').remove();
                                     $('#emptyState').show();
                                 }
-                            }).error(function () {
+                            }).fail(function () {
                                 toast.toastTimeout({
                                     text: 'Unable to remove item from list',
                                     css: 'alert'

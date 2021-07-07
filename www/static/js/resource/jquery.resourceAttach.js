@@ -526,7 +526,7 @@
             if (method === 'inline') {
                 panel.load(url, null);
             } else if (method === 'iframe') {
-                panel.html($('<iframe/>').attr('src', url).height(MAX_IFRAME_HEIGHT));
+                panel.html($('<iframe></iframe>').attr('src', url).height(MAX_IFRAME_HEIGHT));
             }
 
         });

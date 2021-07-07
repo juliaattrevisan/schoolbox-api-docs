@@ -208,7 +208,7 @@
                     toast.toastActivate({text: 'Deleting attempt...'});
 
                     $.post(element.attr('href'), {attemptId: element.attr('data-delete')})
-                        .success(function() {
+                        .done(function() {
                             toast.toastTimeout({text: 'Attempt deleted.', css: 'success'});
 
                             listItem.fadeOut({
@@ -222,7 +222,7 @@
                                 }
                             });
                         })
-                        .error(function() {
+                        .fail(function() {
                             toast.toastTimeout({text: 'Could not delete attempt', css: 'alert'});
                         });
                 }

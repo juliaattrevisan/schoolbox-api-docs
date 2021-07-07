@@ -55,14 +55,14 @@ Data:
                                 url: $element.attr('href'),
                                 data: {articleId: {{ article.id }}},
                                 dataType: 'json'
-                            }).success(function (response) {
+                            }).done(function (response) {
                                 $toast.toastTimeout({
                                     text: title + ' was deleted',
                                     css: 'success'
                                 });
 
                                 window.location.href = response.redirect;
-                            }).error(function (response) {
+                            }).fail(function (response) {
                                 var temp = $.parseJSON(response.responseText);
 
                                 $toast.toastTimeout({
@@ -379,14 +379,14 @@ Data:
                         url: $element.attr('href'),
                         data: {articleId: {{ article.id }}, rejectedReason: $('#rejectedReason').val()},
                         dataType: 'json'
-                    }).success(function (response) {
+                    }).done(function (response) {
                         $toast.toastTimeout({
                             text: title + ' was {{ rejectVerb|lower }}ed',
                             css: 'success'
                         });
 
                         window.location.href = response.redirect;
-                    }).error(function (response) {
+                    }).fail(function (response) {
                         var temp = $.parseJSON(response.responseText);
 
                         $toast.toastTimeout({
@@ -423,9 +423,9 @@ Data:
                     url: form.attr('action'),
                     data: {articleId: {{ article.id }}},
                     dataType: 'json'
-                }).success(function (response) {
+                }).done(function (response) {
                     window.location.href = response.redirect;
-                }).error(function (response) {
+                }).fail(function (response) {
 
                     $toast.toastActivate({
                         text: 'Error: ' + response.responseJSON.message,

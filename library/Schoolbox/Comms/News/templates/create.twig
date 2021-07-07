@@ -40,20 +40,20 @@
                             $toast.toastActivate({
                                 text: 'Deleting ' + title
                             });
-
+                        
                             $.ajax({
                                 type: 'POST',
                                 url: $element.attr('href'),
                                 data: {articleId: {{ article.id }}},
                                 dataType: 'json'
-                            }).success(function (response) {
+                            }).done(function (response) {
                                 $toast.toastTimeout({
                                     text: title + ' was deleted',
                                     css: 'success'
                                 });
 
                                 window.location.href = response.redirect;
-                            }).error(function (response) {
+                            }).fail(function (response) {
                                 var temp = $.parseJSON(response.responseText);
 
                                 $toast.toastTimeout({
@@ -275,14 +275,14 @@
                             url: $element.attr('href'),
                             data: {articleId: {{ article.id is defined ?: null }}, rejectedReason: $('#rejectedReason').val()},
                             dataType: 'json'
-                        }).success(function (response) {
+                        }).done(function (response) {
                             $toast.toastTimeout({
                                 text: title + ' was '+ unpublishVerb +'ed',
                                 css: 'success'
                             });
 
                             window.location.href = response.redirect;
-                        }).error(function (response) {
+                        }).fail(function (response) {
                             var temp = $.parseJSON(response.responseText);
 
                             $toast.toastTimeout({

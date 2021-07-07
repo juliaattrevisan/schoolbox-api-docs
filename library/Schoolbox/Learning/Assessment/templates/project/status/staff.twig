@@ -62,7 +62,7 @@ Data:
                     toast.toastActivate({text: 'Deleting ' + assessmentName + '...'});
 
                     $.post($(element).attr('href'), {assessmentId: assessmentId})
-                            .success(function() {
+                            .done(function() {
                                 toast.toastTimeout({text: assessmentName + ' deleted.', css: 'success'});
                                 listItem.fadeOut({
                                     done: function() {
@@ -76,7 +76,7 @@ Data:
                                     }
                                 });
                             })
-                            .error(function() {
+                            .fail(function() {
                                 {# Toast alert #}
                                 toast.toastTimeout({text: 'Could not delete ' + assessmentName, css: 'alert'});
                             });

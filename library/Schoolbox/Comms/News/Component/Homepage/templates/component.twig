@@ -31,7 +31,7 @@ Data:
             type: 'GET',
             url: "{{ getListHomePagePath }}?{{ querystringParams|raw }}",
             dataType: 'json'
-        }).success(function (response) {
+        }).done(function (response) {
             $articleList.html(response.fragment);
             if ($articleList.find('.information-list').length > 0) {
                 $actionBar.removeClass('hide');
@@ -46,7 +46,7 @@ Data:
              */
             $.fn.schoolboxResource_ProxyReplacement('#component'+'{{ componentInstanceId }}');
 
-        }).error(function (response) {
+        }).fail(function (response) {
             console.log(response);
         });
 

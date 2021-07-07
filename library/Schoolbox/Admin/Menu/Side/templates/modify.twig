@@ -25,7 +25,7 @@
                 confirmEvent: function () {
                     $.post('{{ routeLookup('adminMenuSide.postDelete') }}', {
                         id: id
-                    }).success(function (e) {
+                    }).done(function (e) {
                         window.location.href = '{{ routeLookup('adminMenuSide.getIndex') }}';
                     });
                 }

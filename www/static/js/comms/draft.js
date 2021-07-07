@@ -161,7 +161,7 @@
         data: formContents,
         dataType: "json"
       })
-        .success(function(responseText) {
+        .done(function(responseText) {
           config.toaster.toastTimeout({
             text: "Saved",
             css: "success"
@@ -172,7 +172,7 @@
           // Resolve the deferred for stallSubmit
           deferred.resolve();
         })
-        .error(function(response) {
+        .fail(function(response) {
           var temp = $.parseJSON(response.responseText);
 
           config.toaster.toastTimeout({
