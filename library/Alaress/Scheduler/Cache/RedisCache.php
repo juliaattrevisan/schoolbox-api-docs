@@ -71,19 +71,40 @@ class RedisCache implements ICache
         $i = 0;
 
         foreach ($itemKeys as $itemKey) {
-            $this->log->debug("Restoring $itemKey");
+            $this->log->debug(sprintf("Restoring %s", $itemKey));
 
-            /** @var CrudEventInterface $event */
-            $event = unserialize(gzuncompress($this->redis->get($itemKey)), []);
-
-            /** @var IPropagator $propagator */
-            if ($event instanceof CrudEventInterface) {
-                $propagator->propagateEvent($event);
-
-                ++$i;
-            } else {
-                $this->log->error("Error decompressing cached data");
+            // Fetch from Redis
+            $value = $this->redis->get($itemKey);
+            if (!isset($value)) {
+                $this->log->warning(sprintf("Key %s does not exist: cannot restore", $itemKey));
+                continue;
             }
+
+            // Decompress
+            $uncompressedValue = gzuncompress($value);
+            if ($uncompressedValue === false) {
+                $this->log->warning(sprintf("Error decompressing data in key %s: cannot restore", $itemKey));
+                continue;
+            }
+
+            // Unserialize
+            $event = unserialize($uncompressedValue, []);
+            if (!$event instanceof CrudEventInterface) {
+                $this->log->warning(
+                    sprintf(
+                        "Error unserializing data in key %s (expected %s, received %s): cannot restore",
+                        $itemKey,
+                        CrudEventInterface::class,
+                        is_object($event) ? get_class($event) : 'non-object',
+                    )
+                );
+                continue;
+            }
+
+            // Restore (by re-propagating)
+            $this->log->debug(sprintf("Restoring event in key %s", $itemKey));
+            $propagator->propagateEvent($event);
+            ++$i;
         }
 
         $this->log->debug("Restored $i events");
