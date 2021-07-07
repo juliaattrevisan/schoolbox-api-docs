@@ -1,5 +1,7 @@
 <?php
 
+use Laminas\Uri\Uri;
+
 /**
  * Base class for queries to the iSAMS Batch API.
  *
@@ -45,7 +47,7 @@ class External_Isams_Batch_BaseApi
      */
     public function retrieveDocument($filter = '')
     {
-        $url = new \Zend\Uri\Uri();
+        $url = new Uri();
         $url->setScheme('https')
             ->setHost($this->getHost())
             ->setPath('/api/batch/1.0/xml.ashx')

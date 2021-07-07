@@ -21,7 +21,7 @@ use Schoolbox\Help\InstanceRegistry\Mapper as InstanceRegistryMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 
 /**
  * Controller for SSO endpoints

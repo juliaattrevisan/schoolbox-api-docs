@@ -12,8 +12,8 @@ namespace Schoolbox\External\Connector\Isams\Base\Endpoint;
 
 use Alaress_Curl_Url;
 use RuntimeException;
-use Zend\Uri\Exception;
-use Zend\Uri\Uri;
+use Laminas\Uri\Exception;
+use Laminas\Uri\Uri;
 
 /**
  * Class Api

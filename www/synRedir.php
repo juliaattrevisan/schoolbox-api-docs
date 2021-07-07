@@ -6,7 +6,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 $user = $_SESSION['user'];
-$url = new \Zend\Uri\Uri(Config::get('external_portal'));
+$url = new \Laminas\Uri\Uri(Config::get('external_portal'));
 
 /* If the user has already passed by the login, we can go directly to the page */
 if ($_SESSION['communityLogin']) {

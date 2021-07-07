@@ -14,7 +14,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\User;
 use Session;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 
 class Controller extends Base
 {

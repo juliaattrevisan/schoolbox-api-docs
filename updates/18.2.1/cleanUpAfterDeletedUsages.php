@@ -41,7 +41,7 @@ use Psr\Log\LoggerInterface as Logger;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Application\Daemon\App;
 use Schoolbox\Learning\Course\DataModel\Specification;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 use Schoolbox\Application\Daemon;
 
 require_once __DIR__ . '/../../conf/core/require.php';

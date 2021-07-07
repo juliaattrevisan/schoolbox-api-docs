@@ -11,7 +11,7 @@ namespace Schoolbox\Auth\Remote;
 
 use GuzzleHttp\ClientInterface;
 use Schoolbox\Realtime\Pipe\PipeManager;
-use Zend\Uri\UriInterface;
+use Laminas\Uri\UriInterface;
 
 /**
  * Class for creating a session which is authenticated as a particular user.

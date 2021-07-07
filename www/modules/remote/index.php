@@ -1,7 +1,7 @@
 <?php
 
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Zend\Uri\Http as HttpUri;
+use Laminas\Uri\Http as HttpUri;
 
 // Figure out if the URL ends with /window - and don't include it in the
 // decoded URL if it does.

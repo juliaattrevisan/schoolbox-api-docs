@@ -12,7 +12,7 @@
 namespace Alaress\Paginator;
 
 use OutOfRangeException;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 
 class UrlPaginator implements IUrlPaginator
 {
@@ -49,7 +49,7 @@ class UrlPaginator implements IUrlPaginator
     {
         // Building a URL using PHP builtins is a complete pain!
         // (There's no http_build_str equivalent for parse_str)
-        // That's why I use Zend\Uri internally.
+        // That's why I use Laminas\Uri internally.
         $url = new Uri($this->url);
         $query = $url->getQueryAsArray();
         $query[$this->param] = $page;

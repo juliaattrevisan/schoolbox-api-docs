@@ -13,7 +13,7 @@ use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\GenericCollection;
 use Schoolbox\User;
-use Zend\Uri\UriInterface;
+use Laminas\Uri\UriInterface;
 
 /**
  * Test application for the CLI PDF generator.

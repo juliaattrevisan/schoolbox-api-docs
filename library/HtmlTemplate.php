@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:ignoreFile - we don't care if this file has coding standard issues
+
 /**
  * This code that was derived from the original PHPLIB Template class
  * is copyright by Kristian Koehntopp, NetUSE AG and was released
@@ -463,7 +465,7 @@ class HtmlTemplate
             }
         }
 
-        if (isset($result) && count($result)) {
+        if (isset($result)) {
             return $result;
         } else {
             return false;

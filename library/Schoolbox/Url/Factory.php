@@ -10,16 +10,14 @@ declare(strict_types=1);
 namespace Schoolbox\Url;
 
 use Schoolbox\IConfigLoader;
-use Zend\Uri\Uri;
-use Zend\Uri\UriInterface;
+use Laminas\Uri\Uri;
+use Laminas\Uri\UriInterface;
 
 /**
  * Factory for building URLs based upon Schoolbox configuration.
  *
- * Currently it creates `\Zend\Uri\UriInterface` instances: this seems to be the
- * most modern URI/URL object in use in Schoolbox, even though it has been
- * replaced by `laminas/laminas-uri`. Changing that is out of scope for now
- * though.
+ * Currently it creates `\Laminas\Uri\UriInterface` instances: this seems to be the
+ * most modern URI/URL object in use in Schoolbox
  */
 class Factory
 {

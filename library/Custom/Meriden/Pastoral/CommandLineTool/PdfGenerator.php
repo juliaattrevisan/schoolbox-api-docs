@@ -26,7 +26,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
-use Zend\Uri\UriInterface;
+use Laminas\Uri\UriInterface;
 
 /**
  * Command-line PDF generator for Meriden's eReports.

@@ -70,7 +70,7 @@ class Leave_Request
      * @param Alaress_Date_Format $datetimeStart
      * @param Alaress_Date_Format $datetimeFinish
      *
-     * @return Boolean
+     * @return bool
      */
     public function getOccupancy($datetimeStart, $datetimeFinish)
     {

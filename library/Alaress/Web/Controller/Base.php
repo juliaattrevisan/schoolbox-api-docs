@@ -24,7 +24,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Throwable;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 
 abstract class Base
 {

@@ -10,7 +10,7 @@ namespace Schoolbox\Cyberhound\Url;
 
 use Schoolbox\Config\Loader as ConfigLoader;
 use Symfony\Component\HttpFoundation\IpUtils;
-use Zend\Uri\Uri;
+use Laminas\Uri\Uri;
 
 /**
  * Translates a URL to a CyberHound URL

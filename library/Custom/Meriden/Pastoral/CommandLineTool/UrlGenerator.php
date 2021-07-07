@@ -12,7 +12,7 @@ namespace Custom\Meriden\Pastoral\CommandLineTool;
 use Aura\Router\Router;
 use Custom\Meriden\Pastoral\StudentInvolvement\Report\Factory;
 use Schoolbox\User;
-use Zend\Uri\UriInterface;
+use Laminas\Uri\UriInterface;
 
 /**
  * Class UrlGenerator

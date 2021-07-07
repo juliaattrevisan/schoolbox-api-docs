@@ -15,7 +15,7 @@ use Schoolbox\External\Connector\Isams\Base\Endpoint\Batchxml;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\MockFileApi;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Specification;
 use Schoolbox\External\Importer\Endpoint\Specification\CliRenderer;
-use Zend\Uri\Exception\InvalidUriPartException;
+use Laminas\Uri\Exception\InvalidUriPartException;
 
 require_once __DIR__ . '/../../../../conf/core/require.php';
 

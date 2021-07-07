@@ -164,18 +164,16 @@ class Controller extends Base\Base
         $courseExists = $course instanceof CourseSpecification && $course->getId();
         $unitExists = $unit instanceof UnitSpecification && $unit->getId();
 
-        // Do the folders already have a Unit and Course attached ?
-        if ($courseExists && $unitExists) {
-            $errors[] = "Course (id: {$course->getId()}) and Unit (id: {$unit->getId()}) already linked.";
-            $this->returnJson($errors, 400);
-            return;
-        }
-
-        // Does Unit already exist and belong to different Course?
-        if ($unitExists && !$courseExists) {
-            $errors[] = "Unit (id: {$unit->getId()}) already exists in Course (id: {$unit->getCourse()->getId()})";
-            $this->returnJson($errors, 400);
-            return;
+        if ($unitExists) {
+            if ($courseExists) { // Do the folders already have a Unit and Course attached ?
+                $errors[] = "Course (id: {$course->getId()}) and Unit (id: {$unit->getId()}) already linked.";
+                $this->returnJson($errors, 400);
+                return;
+            } else {   // Does Unit already exist and belong to different Course?
+                $errors[] = "Unit (id: {$unit->getId()}) already exists in Course (id: {$unit->getCourse()->getId()})";
+                $this->returnJson($errors, 400);
+                return;
+            }
         }
 
         // Is the proposed unit folder the same as the course folder?
@@ -200,21 +198,18 @@ class Controller extends Base\Base
             }
         }
 
-        // Check the proposed Unit
-        if (!$unitExists) {
-            // Does user have WRITE+ access to the Unit folder?
-            $unitFolderAccess = $this->access->getFolderAccess($this->getUser(), $unitFolder->getId());
+        // Does user have WRITE+ access to the Unit folder?
+        $unitFolderAccess = $this->access->getFolderAccess($this->getUser(), $unitFolder->getId());
 
-            if ($unitFolderAccess < UserAccess::ACCESS_WRITE) {
-                $errors[] = 'Unit Folder permission error: ' . $unitFolder->getId();
-            }
+        if ($unitFolderAccess < UserAccess::ACCESS_WRITE) {
+            $errors[] = 'Unit Folder permission error: ' . $unitFolder->getId();
+        }
 
-            // Does the proposed Unit Folder already have a Course ?
-            $unitFolderCourse = $unitFolder->getCourseSpecification();
+        // Does the proposed Unit Folder already have a Course ?
+        $unitFolderCourse = $unitFolder->getCourseSpecification();
 
-            if ($unitFolderCourse instanceof CourseSpecification && $unitFolderCourse->getId()) {
-                $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
-            }
+        if ($unitFolderCourse instanceof CourseSpecification && $unitFolderCourse->getId()) {
+            $errors[] = 'Proposed Unit folder already has a Course: ' . $unitFolderCourse->getId();
         }
 
         if (\count($errors)) {
@@ -249,28 +244,25 @@ class Controller extends Base\Base
             $course->setFolder($courseFolder);
         }
 
-        // Create Unit if required
-        if (!$unitExists) {
-            /* Unit folder might have been deleted at some point in the past
-             * See if there's a deleted row we can recycle since foreign keys
-             * will stop us from inserting a tuple that already exists
-             */
-            try {
-                $unit = $this->unitSpecificationMapper->findOneByColumn('folder_id', $unitFolder->getId(), [
-                    'deleted' => true
-                ]);
-            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+        /* Unit folder might have been deleted at some point in the past
+         * See if there's a deleted row we can recycle since foreign keys
+         * will stop us from inserting a tuple that already exists
+         */
+        try {
+            $unit = $this->unitSpecificationMapper->findOneByColumn('folder_id', $unitFolder->getId(), [
+                'deleted' => true
+            ]);
+        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
 
-                /** @var UnitSpecification $deletedUnit */
-                $deletedUnit = $e->getDeletedObject();
+            /** @var UnitSpecification $deletedUnit */
+            $deletedUnit = $e->getDeletedObject();
 
-                $unit = $deletedUnit->setDeletedAt(null);
-            } catch (\Schoolbox\Mapper\Exception $e) {
-                $unit = $this->unitSpecificationMapper->createModel();
-            }
-
-            $unit->setFolder($unitFolder);
+            $unit = $deletedUnit->setDeletedAt(null);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $unit = $this->unitSpecificationMapper->createModel();
         }
+
+        $unit->setFolder($unitFolder);
 
         // Link Course and Unit
         $unit->setCourse($course);
@@ -284,11 +276,9 @@ class Controller extends Base\Base
             $response['course'] = $course->getId();
         }
 
-        // Create Unit if required
-        if (!$unitExists) {
-            $this->unitSpecificationMapper->save($unit);
-            $response['unit'] = $unit->getId();
-        }
+        // Create Unit
+        $this->unitSpecificationMapper->save($unit);
+        $response['unit'] = $unit->getId();
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }

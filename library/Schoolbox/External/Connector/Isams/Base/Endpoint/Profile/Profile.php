@@ -22,7 +22,7 @@ use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
 use UnexpectedValueException;
-use Zend\Uri\Exception\InvalidUriPartException;
+use Laminas\Uri\Exception\InvalidUriPartException;
 
 /**
  * Class Profile
@@ -127,7 +127,7 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      * @throws InvalidUriPartException
      */
     public function import(): void
@@ -176,7 +176,7 @@ class Profile implements IStrategy
      * @throws RuntimeException
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      * @throws InvalidUriPartException
      */
     private function importStudents(): void
@@ -371,7 +371,7 @@ class Profile implements IStrategy
      * @param string $studentId
      * @return string
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      * @throws InvalidUriPartException
      */
     private function findComments(string $studentId): string
@@ -415,7 +415,7 @@ class Profile implements IStrategy
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     private function findHousemaster(string $houseName): array
     {
@@ -441,7 +441,7 @@ class Profile implements IStrategy
      * @throws InvalidArgumentException
      * @throws InvalidUriPartException
      * @throws RuntimeException
-     * @throws \Zend\Uri\Exception\InvalidArgumentException
+     * @throws \Laminas\Uri\Exception\InvalidArgumentException
      */
     private function findFormTeacher(string $form): array
     {
