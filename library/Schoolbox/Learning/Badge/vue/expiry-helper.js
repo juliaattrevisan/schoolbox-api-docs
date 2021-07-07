@@ -7,6 +7,7 @@ export const EXPIRY_DAY = 1;
 export const EXPIRY_WEEK = 7;
 export const EXPIRY_FORTNIGHT = 14;
 export const EXPIRY_MONTH = 31;
+export const EXPIRY_QUARTER_YEAR = 92;
 export const EXPIRY_HALF_YEAR = 183;
 export const EXPIRY_YEAR = 365;
 export const EXPIRY_OPTIONS = [
@@ -29,6 +30,10 @@ export const EXPIRY_OPTIONS = [
     {
         label: '1 month',
         value: EXPIRY_MONTH,
+    },
+    {
+        label: '3 months',
+        value: EXPIRY_QUARTER_YEAR,
     },
     {
         label: '6 months',

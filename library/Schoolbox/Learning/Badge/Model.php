@@ -47,6 +47,7 @@ class Model implements ISoftDeletable
     public const EXPIRY_WEEK                     = 7;
     public const EXPIRY_FORTNIGHT                = 14;
     public const EXPIRY_MONTH                    = 31;
+    public const EXPIRY_QUARTER_YEAR             = 92;
     public const EXPIRY_HALF_YEAR                = 183;
     public const EXPIRY_YEAR                     = 365;
     public const VALID_ACHIEVEMENT_EXPIRY_VALUES = [
@@ -55,6 +56,7 @@ class Model implements ISoftDeletable
         self::EXPIRY_WEEK,
         self::EXPIRY_FORTNIGHT,
         self::EXPIRY_MONTH,
+        self::EXPIRY_QUARTER_YEAR,
         self::EXPIRY_HALF_YEAR,
         self::EXPIRY_YEAR,
     ];
@@ -64,6 +66,7 @@ class Model implements ISoftDeletable
         self::EXPIRY_WEEK,
         self::EXPIRY_FORTNIGHT,
         self::EXPIRY_MONTH,
+        self::EXPIRY_QUARTER_YEAR,
         self::EXPIRY_HALF_YEAR,
         self::EXPIRY_YEAR,
     ];

@@ -43,13 +43,14 @@ class Controller extends Base
      * out of the controller.
      */
     private const EXPIRY_OPTION_VALUES = [
-        'never'     => Model::EXPIRY_NEVER,
-        'day'       => Model::EXPIRY_DAY,
-        'week'      => Model::EXPIRY_WEEK,
-        'fortnight' => Model::EXPIRY_FORTNIGHT,
-        'month'     => Model::EXPIRY_MONTH,
-        'halfYear'  => Model::EXPIRY_HALF_YEAR,
-        'year'      => Model::EXPIRY_YEAR,
+        'never'       => Model::EXPIRY_NEVER,
+        'day'         => Model::EXPIRY_DAY,
+        'week'        => Model::EXPIRY_WEEK,
+        'fortnight'   => Model::EXPIRY_FORTNIGHT,
+        'month'       => Model::EXPIRY_MONTH,
+        'quarterYear' => Model::EXPIRY_QUARTER_YEAR,
+        'halfYear'    => Model::EXPIRY_HALF_YEAR,
+        'year'        => Model::EXPIRY_YEAR,
     ];
 
 
