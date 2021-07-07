@@ -114,6 +114,14 @@ class MutableFieldsOnlyTest extends TestCase
             (new Model())
                 ->setAchievementExpiry(Model::EXPIRY_DAY),
         ];
+
+        yield 'goal expiry' => [
+            [
+                'goalExpiry' => Model::EXPIRY_DAY,
+            ],
+            (new Model())
+                ->setGoalExpiry(Model::EXPIRY_DAY),
+        ];
     }
 
 
@@ -260,6 +268,18 @@ class MutableFieldsOnlyTest extends TestCase
             ['achievementExpiry' => null,],
             (clone $baseModel),
             (clone $baseModel)->setAchievementExpiry(null),
+        ];
+
+        yield 'update goal expiry' => [
+            ['goalExpiry' => Model::EXPIRY_MONTH,],
+            (clone $baseModel),
+            (clone $baseModel)->setGoalExpiry(Model::EXPIRY_MONTH),
+        ];
+
+        yield 'null goal expiry' => [
+            ['goalExpiry' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setGoalExpiry(null),
         ];
 
         yield 'update created by' => [
