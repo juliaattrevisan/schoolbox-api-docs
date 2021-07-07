@@ -359,6 +359,7 @@
                     },
                     categoryId        = formData.get('category'),
                     achievementExpiry = formData.get('achievementExpiry'),
+                    goalExpiry        = formData.get('goalExpiry'),
                     tags              = formData.get('tags'),
                     toast             = $('#toast'),
                     submit            = $('#badge-submit');
@@ -372,6 +373,10 @@
 
                 payload.achievementExpiry = achievementExpiry
                     ? Number(achievementExpiry)
+                    : null;
+
+                payload.goalExpiry = goalExpiry
+                    ? Number(goalExpiry)
                     : null;
 
                 let yearLevels = form.querySelector('#yearLevels').selectize.items;
