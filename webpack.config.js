@@ -164,6 +164,7 @@ module.exports = {
         articleThreads: './library/Schoolbox/Comms/News/templates/vue/initArticleThreads.js',
         newsAuthored: './library/Schoolbox/Comms/News/vue/initNewsAuthored.js',
         newsItemAudienceSelect: './library/Schoolbox/Comms/News/vue/initNewsItemAudienceSelect.js',
+        newsItemAudienceInfo: './library/Schoolbox/Comms/News/vue/initNewsItemAudienceInfo.js',
         newsItemFormActions: './library/Schoolbox/Comms/News/vue/initNewsItemFormActions.js',
         newsRssLink: './library/Schoolbox/Comms/News/vue/initNewsRssLink.js',
 

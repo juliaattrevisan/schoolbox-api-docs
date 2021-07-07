@@ -11,6 +11,7 @@
             <h1>{{ article.title |default("(untitled)") }}</h1>
             {% if modifyRoute or isAuthor %}{{ indicator.render(article) }}{% endif %}
         </div>
+
         {% if routeLookupIfAuthorized('immersiveReader.getTokenAndSubdomain') %}
             <script src="{{ CDN_PREFIX }}/js/immersive-reader/jquery.immersive-reader.js" type="text/javascript"></script>
             <script type="text/javascript">
@@ -34,42 +35,63 @@
                 </span>
             {% endif %}
 
-            <span id="audience-container" v-if="audienceBricks.length > 0">
-                <template v-show="audienceBricks.length" v-for="(audienceBrick, index) in audienceBricks">
-                    <span class="pipe meta">
-                        <span v-if="audienceBrick.isComposite()" class="meta">
-                            <a href="#" title="Click to view audience information" v-if="audienceBrick.isComposite()" @click.prevent="showCompositeInfo(audienceBrick)">${ audienceBrick.nameLabel }</a>
-                        </span>
-                        <span v-else-if="brickHref(audienceBrick)"><a :href="brickHref(audienceBrick)">${ brickName(audienceBrick) }</a></span>
-                        <span v-else>${ brickName(audienceBrick) }</span> {#- Dessicate -#}
-                    </span>
-                </template>
+            <script src="{{ CDN_PREFIX }}/js/comms/audience-bricks.js"></script>
+            {% autoescape 'js' %}
+            <script>
+                /**
+                * Encapsulates information about a type of audience, eg 'folder' or 'campus'
+                *
+                * @param {string}  entityType
+                * @param {string}  name
+                * @param {string}  namePlural
+                * @constructor
+                */
+                const AudienceOption = function(entityType, name, namePlural){
+                    this.entityType     = entityType;
+                    this.name           = name;
+                    this.namePlural     = namePlural;
+                };
 
-                {# modal #}
-                <div data-reveal id="audience-composite" class="reveal-modal">
-                    <a class="close-reveal-modal" aria-label="Close">×</a>
-                    <p v-if="selectedCompositeBrick.modalData">
-                        This portion of the audience consists of users who are in <strong>both</strong> one or more of these
-                        <strong>${ selectedCompositeBrick.modalData[0].typeLabel.plural.toLowerCase() }</strong> and one or more of these
-                        <strong>${ selectedCompositeBrick.modalData[1].typeLabel.plural.toLowerCase() }</strong>.
-                    </p>
+                /** @var {AudienceOption[]|Object} audienceOptions */
+                const audienceOptions = {};
+                {% for entityType in availableEntityTypes | filter(entityType => entityTypesData[entityType] is defined)  %}
+                {% set data = entityTypesData[entityType] %}
+                {% if data %}
+                audienceOptions['{{ entityType }}'] = new AudienceOption(
+                    '{{ entityType }}',
+                    '{{ data.name }}',
+                    '{{ data.namePlural | raw }}'
+                );
+                {% endif %}
+                {% endfor %}
 
-                    <hr />
+                // Bricks need to render various human-friendly labels, so inject the entityType labels
+                // into the BrickManager so it can supply it to Bricks that it creates.
+                const entityTypeLabelMap = {
+                    composite: { // -_-
+                        singular: 'Composite Audience',
+                        plural: 'Composite Audience'
+                    }
+                };
+                for (let entityType in audienceOptions) {
+                    entityTypeLabelMap[entityType] = {
+                        singular: audienceOptions[entityType].name,
+                        plural: audienceOptions[entityType].namePlural
+                    };
+                }
 
-                    <div class="row">
-                        <div class="small-12 medium-6 columns no-pad audience-composite-row" v-for="dimensionData in selectedCompositeBrick.modalData">
-                            <p><strong>${ dimensionData.typeLabel.plural }</strong></p>
+                //these two will be referenced within library/Schoolbox/Comms/News/vue/news-item-audience-info.vue
+                const audienceSegments = {{ encodedSegments|json_encode|raw }};
+                const codec = new Codec();
 
-                            <ul>
-                                <template v-for="(label, index) in dimensionData.valueLabels">
-                                <li>${ label }</li>
-                                </template>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+            </script>
+            {% endautoescape %}
+            <span id="audience-info-container">
+                <news-item-audience-info />
             </span>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/newsItemAudienceInfo.js?v={{ config.site_version }}"></script>
         </div>
+
         <article>
             {{ article.body|purify }}
         </article>
