@@ -111,8 +111,8 @@ class Module extends Thread\Module
      */
     protected function buildGetCommentsAuthorizationRule(): Auth\Rule\IAuthorizationRule
     {
-        /** @var UserMapper $userMapper */
         return new Auth\Rule\LazyCallback(function () {
+            /** @var UserMapper $userMapper */
             $userMapper = $this->getMapperFactory()->get(UserMapper::class);
             return new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
