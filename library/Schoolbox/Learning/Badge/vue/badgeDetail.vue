@@ -1,7 +1,7 @@
 <script>
 import BadgeImage from './badge-image';
 
-import {translateExpiryToLabel} from './expiry-helper';
+import {translateDaysToExpiryLabel} from './expiry-helper';
 
 export default {
     components: {
@@ -30,10 +30,10 @@ export default {
             return [];
         },
         achievementExpiryLabel() {
-            return translateExpiryToLabel(this.badge?.achievementExpiry);
+            return translateDaysToExpiryLabel(this.badge?.achievementExpiry);
         },
         goalExpiryLabel() {
-            return translateExpiryToLabel(this.badge?.goalExpiry);
+            return translateDaysToExpiryLabel(this.badge?.goalExpiry);
         },
     },
     methods: {},
