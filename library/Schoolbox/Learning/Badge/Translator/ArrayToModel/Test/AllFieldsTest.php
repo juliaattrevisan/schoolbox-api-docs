@@ -116,10 +116,10 @@ class AllFieldsTest extends TestCase
 
         yield 'achievement expiry' => [
             [
-                'achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_DAY,
+                'achievementExpiry' => Model::EXPIRY_DAY,
             ],
             (new Model())
-                ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY),
+                ->setAchievementExpiry(Model::EXPIRY_DAY),
         ];
     }
 
@@ -145,7 +145,7 @@ class AllFieldsTest extends TestCase
             ->setBody('test')
             ->setImage((new Storage())->setHash('1234567890123456789012345678901234567890'))
             ->setCategory((new Category())->setId($oldId))
-            ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY)
+            ->setAchievementExpiry(Model::EXPIRY_DAY)
             ->setCreatedBy((new User())->setId($oldId))
             ->setUpdatedBy((new User())->setId($oldId));
 
@@ -265,9 +265,9 @@ class AllFieldsTest extends TestCase
         ];
 
         yield 'update achievement expiry' => [
-            ['achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_MONTH,],
+            ['achievementExpiry' => Model::EXPIRY_MONTH,],
             (clone $baseModel),
-            (clone $baseModel)->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_MONTH),
+            (clone $baseModel)->setAchievementExpiry(Model::EXPIRY_MONTH),
         ];
 
         yield 'null achievement expiry' => [

@@ -42,13 +42,13 @@ class Controller extends Base
      * out of the controller.
      */
     private const ACHIEVEMENT_EXPIRY_OPTION_VALUES = [
-        'never'     => Model::ACHIEVEMENT_EXPIRY_NEVER,
-        'day'       => Model::ACHIEVEMENT_EXPIRY_DAY,
-        'week'      => Model::ACHIEVEMENT_EXPIRY_WEEK,
-        'fortnight' => Model::ACHIEVEMENT_EXPIRY_FORTNIGHT,
-        'month'     => Model::ACHIEVEMENT_EXPIRY_MONTH,
-        'halfYear'  => Model::ACHIEVEMENT_EXPIRY_HALF_YEAR,
-        'year'      => Model::ACHIEVEMENT_EXPIRY_YEAR,
+        'never'     => Model::EXPIRY_NEVER,
+        'day'       => Model::EXPIRY_DAY,
+        'week'      => Model::EXPIRY_WEEK,
+        'fortnight' => Model::EXPIRY_FORTNIGHT,
+        'month'     => Model::EXPIRY_MONTH,
+        'halfYear'  => Model::EXPIRY_HALF_YEAR,
+        'year'      => Model::EXPIRY_YEAR,
     ];
 
 
