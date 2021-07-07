@@ -36,12 +36,13 @@ class Controller extends Base
 
 
     /**
-     * Expiry options for achievements, with an identifiable key for each.
+     * Expiry options for achievements and goals, with an identifiable key for
+     * each.
      *
      * The value labels are in the template: this keeps the presentation logic
      * out of the controller.
      */
-    private const ACHIEVEMENT_EXPIRY_OPTION_VALUES = [
+    private const EXPIRY_OPTION_VALUES = [
         'never'     => Model::EXPIRY_NEVER,
         'day'       => Model::EXPIRY_DAY,
         'week'      => Model::EXPIRY_WEEK,
@@ -267,7 +268,7 @@ class Controller extends Base
                     'badge' => [],
                     'attachzone' => $attachzone->getTwigContext(),
                     'categories' => $this->categoryMapper->findAll(),
-                    'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTION_VALUES,
+                    'expiries' => self::EXPIRY_OPTION_VALUES,
                     'yearLevels' => $yearLevels,
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
@@ -374,7 +375,7 @@ class Controller extends Base
             'badge' => $badge,
             'attachzone' => $attachzone->getTwigContext(),
             'categories' => $this->categoryMapper->findAll(),
-            'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTION_VALUES,
+            'expiries' => self::EXPIRY_OPTION_VALUES,
             'yearLevels' => $yearLevels,
             'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'iconRegistry' => [

@@ -22,6 +22,17 @@
     ) }}
 {% endif %}
 
+{# Labels for goal and achievement expiries #}
+{% set expiryLabels = {
+    never:     'Never',
+    day:       '1 day',
+    week:      '1 week',
+    fortnight: '2 weeks',
+    month:     '1 month',
+    halfYear:  '6 months',
+    year:      '1 year',
+} %}
+
 <div class="row">
     <div class="small-12 column">
         {% if badge %}
@@ -165,6 +176,22 @@
                             </label>
                         </div>
                     </div>
+                    <div class="small-12 columns">
+                        <label for="badge-goal-expiry">
+                            Goal Expiry
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                                  title="After this period of time the goal will no longer be valid">?</span>
+                        </label>
+                        <select name="goalExpiry" id="badge-goal-expiry">
+                            {% for key, value in expiries %}
+                                <option value="{{ value }}"
+                                        label="{{ expiryLabels[key] }}"
+                                        {% if (badge.goalExpiry ?? null) is same as value %}selected{% endif %}>
+                                    {{ expiryLabels[key] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </fieldset>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -189,22 +216,12 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
                                   title="After this period of time the achievement will no longer be valid">?</span>
                         </label>
-
-                        {% set achievementExpiryLabels = {
-                            never:     'Never',
-                            day:       '1 day',
-                            week:      '1 week',
-                            fortnight: '2 weeks',
-                            month:     '1 month',
-                            halfYear:  '6 months',
-                            year:      '1 year',
-                        } %}
                         <select name="achievementExpiry" id="badge-achievement-expiry">
-                            {% for key, value in achievementExpiries %}
+                            {% for key, value in expiries %}
                                 <option value="{{ value }}"
-                                        label="{{ achievementExpiryLabels[key] }}"
+                                        label="{{ expiryLabels[key] }}"
                                         {% if (badge.achievementExpiry ?? null) is same as value %}selected{% endif %}>
-                                    {{ achievementExpiryLabels[key] }}
+                                    {{ expiryLabels[key] }}
                                 </option>
                             {% endfor %}
                         </select>
