@@ -145,7 +145,7 @@ class Database implements IDatabase, Serializable
                 $username,
                 $password,
                 array(
-                    PDO::ATTR_PERSISTENT         => empty($options['debug']),
+                    PDO::ATTR_PERSISTENT         => false,
                     PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
                 )
             );
