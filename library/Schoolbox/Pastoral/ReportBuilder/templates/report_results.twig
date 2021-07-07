@@ -82,7 +82,7 @@
                                     <p class="spaced meta">
                                         {% for attachment in record.attachments %}
                                             <a target="_blank"
-                                               href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}">{{ attachment.storage.filename }}</a>
+                                               href="{{ routeLookup('pastoral.getStudentRecordAttachment', { recordId: record.id, studentId: record.student.id, attachmentId: attachment.id }) }}">{{ attachment.realname }}</a>
                                             <br>
                                         {% endfor %}
                                     </p>

@@ -38,6 +38,9 @@ class Model implements IStorage, ISoftDeletable, IModel
     /** @var bool $private */
     private $private;
 
+    /** @var string */
+    private $realname;
+
     /**
      * Returns whether this is a public attachment
      *
@@ -57,7 +60,7 @@ class Model implements IStorage, ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setPastoral(Pastoral $pastoral)
+    public function setPastoral(Pastoral $pastoral): self
     {
         $this->pastoral = $pastoral;
 
@@ -67,7 +70,7 @@ class Model implements IStorage, ISoftDeletable, IModel
     /**
      * @return Pastoral
      */
-    public function getPastoral()
+    public function getPastoral(): Pastoral
     {
         return $this->pastoral;
     }
@@ -77,7 +80,7 @@ class Model implements IStorage, ISoftDeletable, IModel
      *
      * @return self
      */
-    public function setPrivate($private)
+    public function setPrivate($private): self
     {
         $this->private = $private;
 
@@ -87,19 +90,37 @@ class Model implements IStorage, ISoftDeletable, IModel
     /**
      * @return bool
      */
-    public function getPrivate()
+    public function getPrivate(): bool
     {
         return $this->private;
     }
 
     /**
-     * Proxy filename request through to storage, as this mapper doesn't store
-     * a filename.
+     * Real filename
+     * @return string
+     */
+    public function getRealname(): string
+    {
+        return $this->realname;
+    }
+
+    /**
+     * @param string $realname
+     * @return $this
+     */
+    public function setRealname(string $realname): self
+    {
+        $this->realname = $realname;
+        return $this;
+    }
+
+    /**
+     * Proxy filename request through to storage
      *
      * @return string
      */
-    public function getFilename()
+    public function getFilename(): string
     {
-        return $this->storage->getFilename();
+        return $this->realname;
     }
 }

@@ -27,7 +27,7 @@
                                     {% else %}
                                         <img src="/ajax/mime/{{ attachment.storage.mime }}" alt="Attachment" class="mime {{ attachment.storage.mimetype }}"/>
                                     {% endif %}
-                                    {{ attachment.storage.filename }}
+                                    {{ attachment.realname }}
                                 </a>
                                 <p class="meta">{{ attachment.storage.size | bytes }}</p>
                             </div>

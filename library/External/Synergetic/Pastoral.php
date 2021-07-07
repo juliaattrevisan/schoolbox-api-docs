@@ -1059,7 +1059,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         $query = $this->connector->prepareQuery($sql, [
-            'filename' => ['value' => $storage->getFilename()],
+            'filename' => ['value' => $upload->getRealname()],
             'classificationCode' => ['value' => $classificationCode],
             'createdById' => ['value' => $externalId],
             'modifiedById' => ['value' => $externalId],
@@ -1089,7 +1089,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 DocumentType = :documentType
                 ORDER BY tDocumentsSeq DESC",
                 [
-                    'filename'           => ['value' => $storage->getFilename()],
+                    'filename'           => ['value' => $upload->getRealname()],
                     'classificationCode' => ['value' => $classificationCode],
                     'createdById'        => ['value' => $externalId],
                     'createdDate'        => ['value' => $date],
