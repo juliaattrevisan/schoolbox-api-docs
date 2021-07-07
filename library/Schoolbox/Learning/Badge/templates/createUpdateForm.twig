@@ -22,9 +22,16 @@
     ) }}
 {% endif %}
 
-{# Labels for goal and achievement expiries #}
+{##
+ # Labels for goal and achievement expiries.
+ #
+ # Note the disconnect between "never" and "forever". This is because the expiry
+ # question is asked slightly differently in the API and in the UI:
+ # * API: "when does the badge expire?"
+ # * UI:  "how long should the badge last?"
+ #}
 {% set expiryLabels = {
-    never:       'Never',
+    never:       'Forever',
     day:         '1 day',
     week:        '1 week',
     fortnight:   '2 weeks',
@@ -179,9 +186,9 @@
                     </div>
                     <div class="small-12 columns">
                         <label for="badge-goal-expiry">
-                            Goal Expiry
+                            Goal Valid for
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
-                                  title="After this period of time the goal will no longer be valid">?</span>
+                                  title="How long will a goal set to achieve this badge last? (After the goal expires, it will no longer be visible on a user's profile.)">?</span>
                         </label>
                         <select name="goalExpiry" id="badge-goal-expiry">
                             {% for key, value in expiries %}
@@ -213,9 +220,9 @@
                     </div>
                     <div class="small-12 columns">
                         <label for="badge-achievement-expiry">
-                            Achievement Expiry
+                            Achievement Valid for
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
-                                  title="After this period of time the achievement will no longer be valid">?</span>
+                                  title="How long will this badge last once it is awarded as an achievement? (After the achievement expires, it will no longer be visible on a user's profile.)">?</span>
                         </label>
                         <select name="achievementExpiry" id="badge-achievement-expiry">
                             {% for key, value in expiries %}
