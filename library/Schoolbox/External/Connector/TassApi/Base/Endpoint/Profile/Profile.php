@@ -501,7 +501,7 @@ class Profile implements IStrategy
             foreach ($emergencyContacts['commrules'][0]['addresses'] as $emergencyContact) {
                 /* Use addressee instead of m_ and f_ fields
                  */
-                $name = $emergencyContact['addressee'];
+                $name = (string)$emergencyContact['addressee'];
 
                 /* + Assumption: Indeterminant phone numbers
                  * Phone numbers are indeterminant; we can't tell to whom they belong
