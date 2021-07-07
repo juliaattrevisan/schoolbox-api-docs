@@ -127,9 +127,9 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
              */
             if ($request->isPending()) {
                 $combined[$key]['row_css_class'][] = 'leave-pending';
-            } /* Non-pending requests (authorised requests)
-             */
-            else {
+            } else {
+                /* Non-pending requests (authorised requests)
+                 */
                 if ($request->getId()) {
                     $combined[$key]['request_authorisation_user_id'][$request->getAuthorisationUser()->getId()]
                                                        = Scrub::smartQuotes(trim($request->getAuthorisationUser()->formatName()));
