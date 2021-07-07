@@ -80,6 +80,14 @@ class User extends DeprecatedModel
         return $this->db->getRow($query);
     }
 
+    public function getSuperusers()
+    {
+        $query = "SELECT user.id uid, title, firstname, lastname, username, local_email, alt_email
+                FROM superusers JOIN user ON superusers.id = user.id
+                WHERE user.deleted_at IS NULL";
+        return $this->db->getAll($query);
+    }
+
     public function getUserCampus($id)
     {
         $campusList  = array();
