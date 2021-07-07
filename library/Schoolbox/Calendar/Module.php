@@ -16,6 +16,7 @@ use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
 use Alaress\Authorizer\Rule\IsUserOrParentOfUser;
+use Alaress\Authorizer\Rule\LazyCallback;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Router\PathMatcher;
@@ -101,24 +102,26 @@ class Module extends BaseModule
         $this->addRoutePermission(
             $authorizer,
             'getCalendar',
-            new All(
-                new IsLoggedIn(),
-                new Any(
-                    new IsSuperuser(),
-                    new HasRole(Role::STAFF),
-                    new All(
-                        new IsUserOrParentOfUser(
-                            $this->getExternalUser(),
-                            UserMapper::getInstance(),
-                            'userId'
-                        ),
-                        new Any(
-                            new HasRole(Role::PARENT),
-                            new HasRole(Role::STUDENT)
+            new LazyCallback(function () {
+                return new All(
+                    new IsLoggedIn(),
+                    new Any(
+                        new IsSuperuser(),
+                        new HasRole(Role::STAFF),
+                        new All(
+                            new IsUserOrParentOfUser(
+                                $this->getExternalUser(),
+                                UserMapper::getInstance(),
+                                'userId'
+                            ),
+                            new Any(
+                                new HasRole(Role::PARENT),
+                                new HasRole(Role::STUDENT)
+                            )
                         )
                     )
-                )
-            )
+                );
+            })
         );
     }
 
