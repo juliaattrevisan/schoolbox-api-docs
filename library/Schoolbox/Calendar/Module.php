@@ -114,8 +114,10 @@ class Module extends BaseModule
                             static function (array $params = [], User $viewer = null) {
                                 /** @var User $viewee */
                                 $viewee = $params['user'];
-                                if ($viewer->getRole()->isStaff()
-                                    && (!$viewee->getRole()->isStudent() || $viewer->getRole()->getViewStudentCalendar())) {
+                                if (
+                                    $viewer->getRole()->isStaff()
+                                    && (!$viewee->getRole()->isStudent() || $viewer->getRole()->getViewStudentCalendar())
+                                ) {
                                     return;
                                 }
                                 throw new Unauthorized();

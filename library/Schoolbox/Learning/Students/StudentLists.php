@@ -62,7 +62,7 @@ class StudentLists
     private $mailHandle;
 
     /** @var RosettaStone */
-    private            $rosettaStone;
+    private $rosettaStone;
 
     /** Authorizer */
     private Authorizer $authorizer;
