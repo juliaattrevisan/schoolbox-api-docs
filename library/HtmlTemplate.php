@@ -1,5 +1,7 @@
 <?php
 
+// phpcs:ignoreFile - we don't care if this file has coding standard issues
+
 /**
  * This code that was derived from the original PHPLIB Template class
  * is copyright by Kristian Koehntopp, NetUSE AG and was released
