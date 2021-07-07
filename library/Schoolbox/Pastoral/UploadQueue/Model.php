@@ -44,6 +44,9 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $message;
 
+    /** @var string */
+    protected $realname;
+
     /**
      * @param Pastoral $pastoral
      *
@@ -83,6 +86,25 @@ class Model implements ISoftDeletable
     {
         return $this->pastoral;
     }
+
+    /**
+     * @return string
+     */
+    public function getRealname(): string
+    {
+        return $this->realname;
+    }
+
+    /**
+     * @param string $realname
+     * @return static
+     */
+    public function setRealname($realname)
+    {
+        $this->realname = $realname;
+        return $this;
+    }
+
 
     /**
      * @return int

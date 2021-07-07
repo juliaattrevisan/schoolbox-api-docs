@@ -38,6 +38,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->uses('realname', self::TYPE_STRING);
         $this->uses('external_id', self::TYPE_INTEGER);
         $this->uses('student_external_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_STRING);
@@ -53,12 +54,12 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            
+
             SELECT      {$this->getColumnString()},
                         {$this->getJoinColumnString('pastoral', 'p')},
                         {$this->getJoinMapper('storage')->getColumnString('s')},
 				        {$this->getJoinMapper('storage')->getJoinColumnString('allowedFileExtension', 'mime')}
-            FROM        {$this->getTable()} 
+            FROM        {$this->getTable()}
             INNER JOIN  {$this->getJoinSql('pastoral', '', 'p', true)}
 			INNER JOIN  {$this->getJoinSql('storage', '', 's')}
 			LEFT JOIN   {$this->getJoinMapper('storage')->getJoinSql('allowedFileExtension', 's', 'mime')}

@@ -1178,7 +1178,7 @@ class Controller extends Base
             header("Content-Type: application/octet-stream");
         }
 
-        $basename = $attachment->getStorage()->getBasename();
+        $basename = $attachment->getBasename();
 
         header("Pragma: ");
         header("Cache-control: private");
@@ -1203,6 +1203,7 @@ class Controller extends Base
 
         foreach ([true, false] as $isPrivate) {
             $attachzone = $isPrivate ? self::ATTACHZONE_PRIVATE : self::ATTACHZONE_PUBLIC;
+            $processedHash = [];
 
             // If there are any new attachments, compare and replace
             if (is_array($post[$attachzone . '_attachments'])) {
@@ -1211,11 +1212,16 @@ class Controller extends Base
 
                 /** @var Storage $storageObject */
                 foreach ($attachmentObjects as $storageObject) {
+                    if (in_array($storageObject->getHash(), $processedHash)) {
+                        continue;
+                    }
                     // Only add attachments which don't already exist
-                    $attachment = $this->pastoralAttachmentMapper->createModel();
-                    $attachment->setStorage($storageObject);
-                    $attachment->setPrivate($isPrivate);
+                    $attachment = $this->pastoralAttachmentMapper->createModel()
+                                                                 ->setRealname($storageObject->getFilename())
+                                                                 ->setStorage($storageObject)
+                                                                 ->setPrivate($isPrivate);
                     $newAttachments->add($attachment);
+                    $processedHash[] = $storageObject->getHash();
                 }
             }
         }

@@ -37,6 +37,8 @@ use Schoolbox\UserMapper;
 
 class External_Synergetic_Pastoral implements External_PastoralInterface
 {
+    use External_MssqlConnector;
+    use External_Synergetic_ValidateExternalIdTrait;
 
     /**
      * A style for converting data types
@@ -45,9 +47,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      * @see https://docs.microsoft.com/en-us/sql/t-sql/functions/cast-and-convert-transact-sql?view=sql-server-2017
      */
     private const STYLE_ODBC_CANONICAL_WITH_MILLISECONDS = 121; // yyyy-mm-dd hh:mi:ss.mmm(24h);
-
-    use External_MssqlConnector;
-    use External_Synergetic_ValidateExternalIdTrait;
 
     // Mappers
 
@@ -1059,7 +1058,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         ";
 
         $query = $this->connector->prepareQuery($sql, [
-            'filename' => ['value' => $storage->getFilename()],
+            'filename' => ['value' => $upload->getRealname()],
             'classificationCode' => ['value' => $classificationCode],
             'createdById' => ['value' => $externalId],
             'modifiedById' => ['value' => $externalId],
@@ -1089,7 +1088,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 DocumentType = :documentType
                 ORDER BY tDocumentsSeq DESC",
                 [
-                    'filename'           => ['value' => $storage->getFilename()],
+                    'filename'           => ['value' => $upload->getRealname()],
                     'classificationCode' => ['value' => $classificationCode],
                     'createdById'        => ['value' => $externalId],
                     'createdDate'        => ['value' => $date],

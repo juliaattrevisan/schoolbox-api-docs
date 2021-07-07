@@ -41,6 +41,7 @@ class Mapper extends BaseMapper
         $this->uses('private', self::TYPE_BOOLEAN);
         $this->joins('pastoral_id', PastoralMapper::class, 'id', null, null, 'pastoral', 'pastoral');
         $this->joins('hash', StorageMapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->uses('realname', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -131,6 +132,7 @@ class Mapper extends BaseMapper
             $queue->setExternalId($model->getPastoral()->getOwner()->getExternalId());
             $queue->setStudentExternalId($model->getPastoral()->getStudent()->getExternalId());
             $queue->setStorage($model->getStorage());
+            $queue->setRealname($model->getRealname());
             $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
             $pastoralUploadQueueMapper->save($queue);
         }
@@ -159,7 +161,8 @@ class Mapper extends BaseMapper
     public function diffAttachments(Collection $newAttachments, Collection $oldAttachments): array
     {
         $diffMethod = static function (Model $a, Model $b) {
-            return $a->getStorage()->getHash() === $b->getStorage()->getHash();
+            return $a->getRealname() === $b->getRealname()
+                && $a->getStorage()->getHash() === $b->getStorage()->getHash();
         };
         return [
             // created attachments
