@@ -464,11 +464,7 @@ class Controller extends Base
             ->setStatus(AwardModel::AWARD_STATUS_GOAL)
             ->setAwardedBy($this->getUser())
             ->setAwardedAt(Alaress_Date_Format::now())
-            ->setExpiresAt(
-                $badge->getAchievementExpiry()
-                    ? Alaress_Date_Format::now()->addDays($badge->getAchievementExpiry())
-                    : null
-            );
+            ->setExpiresAt(null);
 
         (new Transactor($history, $this->mapper))->award($award);
 
