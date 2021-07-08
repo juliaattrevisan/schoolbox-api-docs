@@ -174,10 +174,11 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
+                    {% set allowAsGoal = not badge or badge.allowAsGoal %}
                     <div class="small-12 columns">
                         <label for="badge-allow-as-goal">Allow Use as Goal</label>
                         <div class="switch">
-                            <input id="badge-allow-as-goal" type="checkbox" name="allow-as-goal" {% if not badge or badge.allowAsGoal %}checked="checked"{% endif %}>
+                            <input id="badge-allow-as-goal" type="checkbox" name="allow-as-goal" {% if allowAsGoal %}checked="checked"{% endif %}>
                             <label for="badge-allow-as-goal">
                                 <span>On</span>
                                 <span>Off</span>
@@ -190,7 +191,7 @@
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
                                   title="How long will a goal set to achieve this badge last? (After the goal expires, it will no longer be visible on a user's profile.)">?</span>
                         </label>
-                        <select name="goalExpiry" id="badge-goal-expiry">
+                        <select name="goalExpiry" id="badge-goal-expiry" {% if not allowAsGoal %}disabled{% endif %}>
                             {% for key, value in expiries %}
                                 <option value="{{ value }}"
                                         label="{{ expiryLabels[key] }}"
@@ -285,6 +286,13 @@
         // Update the editor's form input on change
         // (required so that validation triggers)
         CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
+
+        // Disable goal expiry input if this badge isn't a goal
+        let $badgeGoalExpiryInput = $('#badge-goal-expiry');
+        $('#badge-allow-as-goal').on('change', function () {
+            $badgeGoalExpiryInput.prop('disabled', !this.checked);
+        });
 
 
         // Set up validation and save
