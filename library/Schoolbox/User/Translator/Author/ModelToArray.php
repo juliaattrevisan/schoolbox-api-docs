@@ -17,6 +17,12 @@ use Schoolbox\User;
  *
  * This variant translates only the subset of fields that are relevant for
  * conveying that the user is the author of content.
+ *
+ * The information returned by this translator is guaranteed to be fit for all
+ * audiences: it contains only publicly available information such as:
+ * * the user's ID
+ * * any names
+ * * links to the profile page and profile image
  */
 class ModelToArray extends User\Translator\ModelToArray
 {

@@ -424,7 +424,7 @@ class Controller extends Base
         $prefixGenerator = new PrefixGenerator($this->getConfigLoader());
         return new Composite(
             new Translator\ModelToArray(
-                new User\Translator\ModelToArray(),
+                new User\Translator\Author\ModelToArray(),
                 new Storage\Translator\ModelToArray($prefixGenerator),
                 new ScrubAdapter(),
                 new Translator\Links($this->getRouter(), $this->getAuthorizer(), $this->getUser(), $prefixGenerator)
