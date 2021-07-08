@@ -160,7 +160,9 @@ class FetchPagesFromCsvCest
         #THEN
         try {
             $i->seeResponseCodeIs('400');
-            $skippedTest = true;
+            if ($example[4] == '401') {
+                $skippedTest = true;
+            }
         } catch (\Exception $e) {
             //If its a different code don't catch it
         }
