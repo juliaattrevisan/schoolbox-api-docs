@@ -49,7 +49,7 @@ export default {
          */
         async checkDeviceStatus () {
             const deviceList = await navigator.mediaDevices.enumerateDevices(); //use the device list to check for video and audio input
-            if (supportsVideoRecording(deviceList)) {
+            if (supportsVideoRecording(deviceList) || this.hasDeviceCapture) {
                 this.isVideoSupported = true;
             } 
             if (supportsAudioRecording(deviceList)) {
