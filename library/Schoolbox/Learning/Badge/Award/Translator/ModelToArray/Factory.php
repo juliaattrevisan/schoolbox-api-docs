@@ -80,9 +80,9 @@ class Factory
     public function build(): ModelToArray
     {
         return new ModelToArray(
-            new User\Translator\ModelToArray(),
+            new User\Translator\Author\ModelToArray(),
             new \Schoolbox\Learning\Badge\Translator\ModelToArray(
-                new User\Translator\ModelToArray(),
+                new User\Translator\Author\ModelToArray(),
                 new \Schoolbox\Resource\Storage\Translator\ModelToArray($this->prefixGenerator),
                 new ScrubAdapter(),
                 new BadgeLinksTranslator($this->router, $this->authorizer, $this->user, $this->prefixGenerator)
