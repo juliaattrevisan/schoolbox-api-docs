@@ -1171,6 +1171,47 @@ class External_Synergetic_User implements External_UserInterface
 
     /**
      * @inheritdoc
+     * @throws \Alaress\Database\Exception
+     */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        // Make sure an array of valid external ID's was passed
+
+        $ids = array_filter($externalUserIds, function ($externalUserId) {
+            return self::isExternalIdValid($externalUserId);
+        });
+
+        if (count($ids) == 0) {
+            return [];
+        }
+
+        $fileYearSemester = $this->findFileYearAndSemester();
+
+        /** @var PredicateBuilder $predicateBuilder */
+        $predicateBuilder = $this->getConnector()
+                                 ->buildPredicateBuilder('vStudentsAll')
+                                 ->equals('vStudentsAll.FileYear', $fileYearSemester['year'])
+                                 ->in('vStudentsAll.StudentID', $ids);
+
+        $where = implode(' AND ', $predicateBuilder->getWhere());
+
+        $sql = "
+            SELECT DISTINCT OccupEmail FROM Community
+            JOIN luTutor ON luTutor.ID = Community.ID
+            JOIN vStudentsAll ON vStudentsAll.StudentTutor = luTutor.Code
+            WHERE {$where}
+        ";
+
+        $bindings = $predicateBuilder->getParams();
+
+        return $this->getConnector()
+                    ->executeQuery($sql, $bindings)
+                    ->fetchColumnArray('OccupEmail');
+    }
+
+
+    /**
+     * @inheritdoc
      */
     public function getStudentForms(): array
     {

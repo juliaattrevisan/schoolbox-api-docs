@@ -364,6 +364,14 @@ interface External_UserInterface extends External\IConnector
     public function getHousemasterEmails(array $externalUserIds): array;
 
     /**
+     * Returns email addresses of tutors for students in $externalUserIds
+     *
+     * @param string[] $externalUserIds
+     * @return string[]
+     */
+    public function getTutorEmails(array $externalUserIds): array;
+
+    /**
      * List of campuses a staff member is involved in based on timetable
      *
      * @importance low - used in a few sync scripts.

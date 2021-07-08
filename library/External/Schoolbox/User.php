@@ -333,6 +333,15 @@ class External_Schoolbox_User implements External_UserInterface
 
 
     /**
+     * @inheritDoc
+     */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+
+    /**
      * {@inheritDoc}
      */
     public function getStudentForms(): array

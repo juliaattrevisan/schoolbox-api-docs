@@ -57,6 +57,9 @@ if (Config::get('mail_enable') == 1) {
         if (in_array('housemasters', $selectedGroups)) {
             $addressLists['bcc'] = array_merge($addressLists['bcc'], $externalHandler->getHousemasterEmails($studentExternalIds));
         }
+        if (in_array('tutors', $selectedGroups)) {
+            $addressLists['bcc'] = array_merge($addressLists['bcc'], $externalHandler->getTutorEmails($studentExternalIds));
+        }
     }
 
     foreach ($addressLists as $type => $request) {

@@ -150,6 +150,15 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     /**
      * @inheritdoc
      */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return $this->getCachedResult(__FUNCTION__, func_get_args());
+    }
+
+
+    /**
+     * @inheritdoc
+     */
     public function getStaffContactListExtended(): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());

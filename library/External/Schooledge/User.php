@@ -537,6 +537,14 @@ class External_Schooledge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCampusFromTimetable(string $staffID): array
     {
         return [];

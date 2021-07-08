@@ -778,6 +778,14 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritDoc
      */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getStudentForms(): array
     {
         return [];

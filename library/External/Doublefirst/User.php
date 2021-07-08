@@ -186,7 +186,7 @@ class External_Doublefirst_User implements External_UserInterface
                     )
                   )
                 ) AS MobilePhone,
-                
+
                 LTRIM(
                   RTRIM(
                     COALESCE(
@@ -997,6 +997,14 @@ class External_Doublefirst_User implements External_UserInterface
      * @inheritdoc
      */
     public function getHousemasterEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTutorEmails(array $externalUserIds): array
     {
         return [];
     }

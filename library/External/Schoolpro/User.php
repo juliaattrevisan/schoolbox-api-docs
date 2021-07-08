@@ -488,6 +488,14 @@ class External_Schoolpro_User implements External_UserInterface
     /**
      * @inheritDoc
      */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getStaffContactListExtended(): array
     {
         // TODO: Implement getStaffContactListExtended() method.

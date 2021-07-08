@@ -876,6 +876,14 @@ class External_Maze_User implements External_UserInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
      * Not yet implemented for this connector
      *
      * @return array
