@@ -6,6 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
+use Schoolbox\Profile\ValidEmailVisible;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
@@ -124,14 +125,16 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
             }
 
             if ($_GET['email']) {
-                $email = $emailObj->formatEmailFromArray($user);
-
-                if ($email) {
-                    $fullEmail = $user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>';
-                    $return[] = [
-                        'name' => $fullEmail,
-                        'id' => $fullEmail,
-                    ];
+                $emailVisible ??= new ValidEmailVisible($kernel->get('externalUser'), $kernel->get('config'));
+                if ($emailVisible->isSatisfiedBy($userMapper->findById($user["uid"]), $_SESSION['user'])) {
+                    $email = $emailObj->formatEmailFromArray($user);
+                    if ($email) {
+                        $fullEmail = $user['firstname'] . " " . $user['lastname'] . ' <' . $email . '>';
+                        $return[] = [
+                            'name' => $fullEmail,
+                            'id'   => $fullEmail,
+                        ];
+                    }
                 }
             } else {
                 $person = "{$user['firstname']} {$user['lastname']} - ";
