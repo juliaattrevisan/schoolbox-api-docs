@@ -8,7 +8,6 @@
 declare(strict_types=1);
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\Database\Predicate\IBuilder as PredicateBuilder;
 use Schoolbox\External\Normalise\TupleStack;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -1137,9 +1136,11 @@ class External_Synergetic_User implements External_UserInterface
     {
         // Make sure an array of valid external ID's was passed
 
-        $ids = array_filter($externalUserIds, function ($externalUserId) {
+        $ids = array_filter(
+            $externalUserIds, function ($externalUserId) {
             return self::isExternalIdValid($externalUserId);
-        });
+        }
+        );
 
         if (count($ids) == 0) {
             return [];
@@ -1147,9 +1148,9 @@ class External_Synergetic_User implements External_UserInterface
 
         $fileYearSemester = $this->findFileYearAndSemester();
 
-        /** @var PredicateBuilder $predicateBuilder */
-        $predicateBuilder = $this->getConnector()
-            ->buildPredicateBuilder('StudentYears')
+        /** @var Builder $predicateBuilder */
+        $predicateBuilder = $this->getConnector()->buildPredicateBuilder('StudentYears');
+        $predicateBuilder
             ->equals('StudentYears.FileYear', $fileYearSemester['year'])
             ->in('StudentYears.ID', $ids);
 
@@ -1165,8 +1166,8 @@ class External_Synergetic_User implements External_UserInterface
         $bindings = $predicateBuilder->getParams();
 
         return $this->getConnector()
-            ->executeQuery($sql, $bindings)
-            ->fetchColumnArray('OccupEmail');
+                    ->executeQuery($sql, $bindings)
+                    ->fetchColumnArray('OccupEmail');
     }
 
     /**
@@ -1177,9 +1178,11 @@ class External_Synergetic_User implements External_UserInterface
     {
         // Make sure an array of valid external ID's was passed
 
-        $ids = array_filter($externalUserIds, function ($externalUserId) {
+        $ids = array_filter(
+            $externalUserIds, function ($externalUserId) {
             return self::isExternalIdValid($externalUserId);
-        });
+        }
+        );
 
         if (count($ids) == 0) {
             return [];
@@ -1187,11 +1190,11 @@ class External_Synergetic_User implements External_UserInterface
 
         $fileYearSemester = $this->findFileYearAndSemester();
 
-        /** @var PredicateBuilder $predicateBuilder */
-        $predicateBuilder = $this->getConnector()
-                                 ->buildPredicateBuilder('vStudentsAll')
-                                 ->equals('vStudentsAll.FileYear', $fileYearSemester['year'])
-                                 ->in('vStudentsAll.StudentID', $ids);
+        /** @var Builder $predicateBuilder */
+        $predicateBuilder = $this->getConnector()->buildPredicateBuilder('StudentYears');
+        $predicateBuilder
+            ->equals('vStudentsAll.FileYear', $fileYearSemester['year'])
+            ->in('vStudentsAll.StudentID', $ids);
 
         $where = implode(' AND ', $predicateBuilder->getWhere());
 
