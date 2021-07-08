@@ -210,6 +210,64 @@ class ExpiryHelperTest extends TestCase
     }
 
     /**
+     * Data provider for `testDetermineExpiryOnIncompleteObject`.
+     *
+     * @return iterable
+     */
+    public function getTestDetermineExpiryOnIncompleteObjectData(): iterable
+    {
+        $awardedAt = Alaress_Date_Format::newDatabaseDate('2021-01-01 00:00:00');
+        yield 'no badge' => [
+            (new Badge\Award\Model())
+                ->setAwardedAt($awardedAt)
+                ->setStatus(Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT)
+        ];
+        yield 'badge has no goal expiry' => [
+            (new Badge\Award\Model())
+                ->setBadge((new Badge\Model())->setAchievementExpiry(Badge\Model::EXPIRY_MONTH))
+                ->setAwardedAt($awardedAt)
+                ->setStatus(Badge\Award\Model::AWARD_STATUS_GOAL)
+        ];
+        yield 'badge has no achievement expiry' => [
+            (new Badge\Award\Model())
+                ->setBadge((new Badge\Model())->setGoalExpiry(Badge\Model::EXPIRY_MONTH))
+                ->setAwardedAt($awardedAt)
+                ->setStatus(Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT)
+        ];
+        yield 'no status' => [
+            (new Badge\Award\Model())
+                ->setBadge(
+                    (new Badge\Model())
+                        ->setGoalExpiry(Badge\Model::EXPIRY_MONTH)
+                        ->setAchievementExpiry(Badge\Model::EXPIRY_MONTH)
+                )
+                ->setAwardedAt($awardedAt)
+        ];
+        yield 'no awarded at date' => [
+            (new Badge\Award\Model())
+                ->setBadge(
+                    (new Badge\Model())
+                        ->setGoalExpiry(Badge\Model::EXPIRY_MONTH)
+                        ->setAchievementExpiry(Badge\Model::EXPIRY_MONTH)
+                )
+                ->setStatus(Badge\Award\Model::AWARD_STATUS_ACHIEVEMENT)
+        ];
+    }
+
+    /**
+     * Test for expected errors which occur when the badge award isn't fully
+     * instantiated.
+     *
+     * @dataProvider getTestDetermineExpiryOnIncompleteObjectData
+     * @param Badge\Award\Model $award
+     */
+    public function testDetermineExpiryOnIncompleteObject(Badge\Award\Model $award): void
+    {
+        $this->expectError();
+        (new Badge\Award\ExpiryHelper())->determineExpiry($award);
+    }
+
+    /**
      * Helper function for generating a badge award for testing.
      *
      * @param int|null            $achievementExpiry
