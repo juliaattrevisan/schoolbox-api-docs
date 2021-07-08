@@ -146,7 +146,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
         });
 
         // Inject calendar icon. Unfortunately, fullcalendar doesn't support injecting our own icons into the custom buttons yet...
