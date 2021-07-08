@@ -201,7 +201,7 @@ export default {
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
         </button>
-        <button v-if="isAudioSupported && !hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
+        <button v-if="!hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
             <div>
                 <div class='icon-screen-capture'></div>
                 <span>Screen</span>
