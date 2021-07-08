@@ -195,7 +195,6 @@ module.exports = {
 
         //Record Media Modal
         recordMediaModal: './templates/core/resources/filesystem/vue/initRecordMediaModal.js',
-        checkRecordButton: './templates/core/resources/filesystem/js/checkRecordButton.js',
 
         // Class List
         classList: './library/Schoolbox/Learning/vue/init-class-list.js',
