@@ -14,7 +14,6 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Scheduler\Cache\RedisCache;
 use Predis\ClientInterface;
 use Schoolbox\Di\Configurator;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\MQ\Connector;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
@@ -44,11 +43,8 @@ try {
          */
 
         // the passive part is important: it means the queue won't be created if it doesn't already exist
-        $mq = new Connector([
-        'passive' => true
-        ]);
-
-        $q = 'sb.schedule';
+        $mq = new Connector(['passive' => true]);
+        $q  = Schedule\Broker::QUEUE;
 
         try {
             $mq->declareQueue($q);
@@ -58,7 +54,7 @@ try {
             exit(0);
         } catch (RuntimeException $e) {
             // the queue does NOT exist. this means we need to create it, then populate it with whatever is in Redis
-            $log->notice("Queue  '{$q}' does not exist; creating and re-populating from cache.", [ 'char' => '+' ]);
+            $log->notice("Queue '{$q}' does not exist; creating and re-populating from cache.", [ 'char' => '+' ]);
 
             try {
                 // get the cache handler

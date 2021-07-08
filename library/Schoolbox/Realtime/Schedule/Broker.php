@@ -16,7 +16,7 @@ use Predis\ClientInterface;
 
 class Broker extends StompRedis\Broker
 {
-    const QUEUE = 'sb.schedule';
+    public const QUEUE = 'sb.schedule';
 
     /** @var string */
     private $instanceId;
