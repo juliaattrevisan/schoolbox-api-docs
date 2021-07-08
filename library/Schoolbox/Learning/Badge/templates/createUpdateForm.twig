@@ -175,7 +175,7 @@
                 </fieldset>
                 <fieldset class="content">
                     {% set allowAsGoal = not badge or badge.allowAsGoal %}
-                    <div class="small-12 columns">
+                    <div class="small-6 columns">
                         <label for="badge-allow-as-goal">Allow Use as Goal</label>
                         <div class="switch">
                             <input id="badge-allow-as-goal" type="checkbox" name="allow-as-goal" {% if allowAsGoal %}checked="checked"{% endif %}>
@@ -185,7 +185,7 @@
                             </label>
                         </div>
                     </div>
-                    <div class="small-12 columns">
+                    <div class="small-6 columns">
                         <label for="badge-goal-expiry">
                             Goal Valid for
                             <span data-tooltip class="hint has-tip tip-top" data-width="200"
@@ -196,6 +196,22 @@
                                 <option value="{{ value }}"
                                         label="{{ expiryLabels[key] }}"
                                         {% if (badge.goalExpiry ?? null) is same as value %}selected{% endif %}>
+                                    {{ expiryLabels[key] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="badge-achievement-expiry">
+                            Achievement Valid for
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                                  title="How long will this badge last once it is awarded as an achievement? (After the achievement expires, it will no longer be visible on a user's profile.)">?</span>
+                        </label>
+                        <select name="achievementExpiry" id="badge-achievement-expiry">
+                            {% for key, value in expiries %}
+                                <option value="{{ value }}"
+                                        label="{{ expiryLabels[key] }}"
+                                        {% if (badge.achievementExpiry ?? null) is same as value %}selected{% endif %}>
                                     {{ expiryLabels[key] }}
                                 </option>
                             {% endfor %}
@@ -216,22 +232,6 @@
                                     {% set selected = 'selected="selected"' %}
                                 {% endif %}
                                 <option value="{{ category.id }}" label="{{ category.name }}" {{ selected }}>{{ category.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="small-12 columns">
-                        <label for="badge-achievement-expiry">
-                            Achievement Valid for
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
-                                  title="How long will this badge last once it is awarded as an achievement? (After the achievement expires, it will no longer be visible on a user's profile.)">?</span>
-                        </label>
-                        <select name="achievementExpiry" id="badge-achievement-expiry">
-                            {% for key, value in expiries %}
-                                <option value="{{ value }}"
-                                        label="{{ expiryLabels[key] }}"
-                                        {% if (badge.achievementExpiry ?? null) is same as value %}selected{% endif %}>
-                                    {{ expiryLabels[key] }}
-                                </option>
                             {% endfor %}
                         </select>
                     </div>
