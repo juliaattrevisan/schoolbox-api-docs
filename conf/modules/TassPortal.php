@@ -12,6 +12,7 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use External\Tass\Portal;
+use Schoolbox\External\Importer\Endpoint\Factory;
 
 class TassPortal implements ModuleConfigInterface
 {
@@ -24,7 +25,9 @@ class TassPortal implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        if ($kernel->getDependencyInjector()->get('config')->get('external_type') == 'tass') {
+        $config = $kernel->getDependencyInjector()->get('config');
+
+        if ($config->get('external_type') == 'tass' || $config->get('schooldata_import_data_source') == Factory::TASS_API) {
             $module = new Portal\Module($kernel->getDependencyInjector());
             $module->init('/modules/tassportal');
         }
