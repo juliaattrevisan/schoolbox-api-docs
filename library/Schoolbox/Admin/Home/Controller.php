@@ -25,7 +25,6 @@ use Schoolbox\Resource\LogMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
-use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
 use function array_column;
