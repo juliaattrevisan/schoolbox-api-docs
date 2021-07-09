@@ -16,6 +16,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Predis;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\File;
 
@@ -42,12 +43,15 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
     /** @var LoggerInterface[] */
     protected $logs;
 
+    /**
+     * How are log messages formatted?
+     */
+    private FormatterInterface $formatter;
 
     /**
-     * @param string                 $filename A temporary filename to log to.
-     *                                         Will be deleted on __destruct or flushToStorage
-     * @param Storage\Receiver       $receiver
-     * @param FormatterInterface     $formatter
+     * @param string                  $filename
+     * @param Storage\Receiver        $receiver
+     * @param FormatterInterface|null $formatter
      */
     public function __construct(
         $filename,
@@ -55,20 +59,13 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
         FormatterInterface $formatter = null
     ) {
         $this->file = $filename;
-        if (!$this->file) {
-            throw new \RuntimeException('Temp file does not exist!');
-        }
 
         $this->receiver = $receiver;
 
-        $handler = new StreamHandler($this->file, Logger::INFO);
-
         // default to JSON formatting
-        if (!$formatter) {
-            $formatter = new JsonFormatter();
-        }
+        $this->formatter = $formatter ?? new JsonFormatter();
 
-        $handler = $handler->setFormatter($formatter);
+        $handler = $this->createHandler(false);
 
         // use Monolog default for the base functionality
         $this->pushComposite(new Logger('storefile', [$handler]));
@@ -79,7 +76,39 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      */
     public function __destruct()
     {
-        unlink($this->file);
+        // The file might not exist: if it doesn't that's okay
+        if (file_exists($this->file)) {
+            unlink($this->file);
+        }
+    }
+
+
+    /**
+     * Create the stream handler this class will log to.
+     *
+     * The stream handler will be re-created with an empty file after calling
+     * `flushToStorage`, because the receiver deletes the temp file after moving
+     * it to storage.
+     *
+     * @param bool $createFileIfNotExists
+     * @return StreamHandler
+     * @throws RuntimeException if `$this->file` doesn't exist, and
+     *                          `$createFileIfNotExists` is false
+     */
+    private function createHandler(bool $createFileIfNotExists): StreamHandler
+    {
+        // Has the file gone missing?
+        if (!$this->file) {
+            if ($createFileIfNotExists) {
+                file_put_contents($this->file, '');
+            } else {
+                throw new RuntimeException('Temp file does not exist!');
+            }
+        }
+
+        $handler = new StreamHandler($this->file, Logger::INFO);
+        $handler->setFormatter($this->formatter);
+        return $handler;
     }
 
 
@@ -114,6 +143,10 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
 
         // Clear stream contents I guess
         file_put_contents($this->file, '');
+
+        // Clear logs, and put them back
+        $this->logs = [];
+        $this->pushComposite(new Logger('storefile', [$this->createHandler(true)]));
 
         // all done - pass back the new object
         return $storage;
