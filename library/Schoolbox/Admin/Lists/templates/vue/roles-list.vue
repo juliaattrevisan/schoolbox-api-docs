@@ -308,13 +308,12 @@ export default {
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
-                this.isSaving = false;
-                this.isProcessing = false;
+                location.reload();
             }
         },
 
         /**
-         * Ensure the correct sorting order is reflected
+         * Ensure the correct sorting order is reflected for page reload
          *
          */
         updateSequenceOrder () {
