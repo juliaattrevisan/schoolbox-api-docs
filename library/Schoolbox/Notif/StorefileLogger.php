@@ -28,6 +28,11 @@ use Schoolbox\File;
 class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterface
 {
     /**
+     * The name of the file logger which this object contains.
+     */
+    private const LOGGER_NAME = 'storefile';
+
+    /**
      * The file to which logging is done.
      *
      * @var string
@@ -41,7 +46,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
     protected $receiver;
 
     /** @var LoggerInterface[] */
-    protected $logs;
+    protected $logs = [];
 
     /**
      * How are log messages formatted?
@@ -65,10 +70,9 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
         // default to JSON formatting
         $this->formatter = $formatter ?? new JsonFormatter();
 
-        $handler = $this->createHandler(false);
-
-        // use Monolog default for the base functionality
-        $this->pushComposite(new Logger('storefile', [$handler]));
+        // Create the stream handler
+        // (the file must exist at construct time at least)
+        $this->recreateStreamHandler(false);
     }
 
     /**
@@ -84,19 +88,30 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
 
 
     /**
-     * Create the stream handler this class will log to.
+     * Clears all existing loggers, and adds the logger this stream handler
+     * will log to.
      *
      * The stream handler will be re-created with an empty file after calling
      * `flushToStorage`, because the receiver deletes the temp file after moving
      * it to storage.
      *
      * @param bool $createFileIfNotExists
-     * @return StreamHandler
      * @throws RuntimeException if `$this->file` doesn't exist, and
      *                          `$createFileIfNotExists` is false
      */
-    private function createHandler(bool $createFileIfNotExists): StreamHandler
+    private function recreateStreamHandler(bool $createFileIfNotExists): void
     {
+        // Clear existing storefile logger
+        $tempLogs = [];
+        foreach ($this->logs as $log) {
+            if ($log instanceof Logger && $log->getName() === self::LOGGER_NAME) {
+                unset($log);
+            } else {
+                $tempLogs[] = $log;
+            }
+        }
+        $this->logs = $tempLogs;
+
         // Has the file gone missing?
         if (!$this->file) {
             if ($createFileIfNotExists) {
@@ -108,7 +123,9 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
 
         $handler = new StreamHandler($this->file, Logger::INFO);
         $handler->setFormatter($this->formatter);
-        return $handler;
+
+        // use Monolog default logger for the base functionality
+        $this->pushComposite(new Logger(self::LOGGER_NAME, [$handler]));
     }
 
 
@@ -144,9 +161,9 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
         // Clear stream contents I guess
         file_put_contents($this->file, '');
 
-        // Clear logs, and put them back
-        $this->logs = [];
-        $this->pushComposite(new Logger('storefile', [$this->createHandler(true)]));
+        // Recreate the stream handler,
+        // because $this->receiver->accept deleted its file
+        $this->recreateStreamHandler(true);
 
         // all done - pass back the new object
         return $storage;
