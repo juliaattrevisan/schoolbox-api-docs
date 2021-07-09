@@ -122,7 +122,7 @@
             previewsContainer: $(this.element).find(opt.previewsContainerSelector)[0],
             previewTemplate: this.tpl.html(),
             capture: opt.capture,
-            timeout: 300000,
+            timeout: 30 * 60 * 1000, // 30 minutes. Nginx does not connect to php-fpm until upload completes.
 
             fallback: function () {
                 var mk = opt.fallbackButtonMarkup || '<a href="#" data-attach-fallback class="button icon-attach">' + opt.dictDefaultMessage + '</a>',
