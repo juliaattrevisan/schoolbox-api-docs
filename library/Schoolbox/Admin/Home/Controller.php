@@ -25,6 +25,7 @@ use Schoolbox\Resource\LogMapper;
 use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
+use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
 use function array_column;
@@ -161,11 +162,12 @@ class Controller extends Base
             // Check primary LDAP server bind
 
             if (trim($this->getConfigLoader()->get('ldap_host')) != "") {
-                $ds = ldap_connect($this->getConfigLoader()->get('ldap_host'));
-                ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-                ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                ldap_set_option($ds, LDAP_OPT_TIMELIMIT, 1);
-                $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape($this->getConfigLoader()->get('ldap_user')), utf8_encode($this->getConfigLoader()->get('ldap_pass')));
+                $ldapbind = $tempsession->ldapConnect(
+                    $this->getConfigLoader()->get('ldap_host'),
+                    $this->getConfigLoader()->get('ldap_user'),
+                    $this->getConfigLoader()->get('ldap_pass'),
+                    $this->getConfigLoader()->get('ldap_ca_certificate')
+                );
 
                 if ($ldapbind) {
                     $ldap_light = 'success';
@@ -181,11 +183,12 @@ class Controller extends Base
             // Check secondary LDAP server bind
 
             if (trim($this->getConfigLoader()->get('ldap_host_alt')) != "") {
-                $ds = ldap_connect($this->getConfigLoader()->get('ldap_host_alt'));
-                ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
-                ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                ldap_set_option($ds, LDAP_OPT_TIMELIMIT, 1);
-                $ldapbind = @ldap_bind($ds, $tempsession->ldap_escape($this->getConfigLoader()->get('ldap_user_alt')), utf8_encode($this->getConfigLoader()->get('ldap_pass')));
+                $ldapbind = $tempsession->ldapConnect(
+                    $this->getConfigLoader()->get('ldap_host_alt'),
+                    $this->getConfigLoader()->get('ldap_user_alt'),
+                    $this->getConfigLoader()->get('ldap_pass'),
+                    $this->getConfigLoader()->get('ldap_ca_certificate')
+                );
 
                 if ($ldapbind) {
                     $ldap_alt_light = 'success';

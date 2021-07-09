@@ -292,31 +292,41 @@ class Session
     /**
      * Connect to the provided LDAP host.
      *
-     * @param string      $host       The LDAP host's URL
-     * @param string      $username   A username for auth to the LDAP host.
-     *                                This is distinct from the username that is
-     *                                being searched for within LDAP.
-     * @param string      $password   A password for auth to the LDAP host.
-     *                                This is distinct from the password for the
-     *                                username that is being searched for.
-     * @param string|null $caCertPath If provided, a local path to a cert.
-     *                                This must be a local file, because the
-     *                                LDAP extension needs to access this file.
+     * @param string      $host           The LDAP host's URL
+     * @param string      $username       A username for auth to the LDAP host.
+     *                                    This is distinct from the username that is
+     *                                    being searched for within LDAP.
+     * @param string      $password       A password for auth to the LDAP host.
+     *                                    This is distinct from the password for the
+     *                                    username that is being searched for.
+     * @param string|null $ldapCaCertHash If provided, hash of a local path to a cert.
+     *                                    This must be a local file, because the
+     *                                    LDAP extension needs to access this file.
      * @return bool|resource The connection, or false if none could be created.
+     * @throws MapperException
      */
-    private function ldapConnect(string $host, string $username, string $password, ?string $caCertPath)
+    public function ldapConnect(string $host, string $username, string $password, ?string $ldapCaCertHash)
     {
         if ($host) {
+            if ($ldapCaCertHash) {
+                // Copy this file to local cache somewhere (stream_dir I guess)
+                $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
+                $ldapCaCertPath = sprintf(
+                    '%s/ldap-ca-cert-%s-%s',
+                    Config::get('stream_dir'),
+                    INSTANCE_ID,
+                    $ldapCaCert->getHash()
+                );
+                if (!file_exists($ldapCaCertPath)) {
+                    file_put_contents($ldapCaCertPath, $ldapCaCert->read());
+                }
+                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
+                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
+            }
             $ds = ldap_connect($host);
             if ($ds) {
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                if ($caCertPath) {
-                    // https://bugs.php.net/bug.php?id=73558
-                    // suggests that both CA cert dir and file need to be set.
-                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTDIR, dirname($caCertPath));
-                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTFILE, $caCertPath);
-                }
                 @ldap_bind($ds, $this->ldap_escape($username), utf8_encode($password));
                 return $ds;
             }
@@ -433,22 +443,8 @@ class Session
         $ldapUsernameField = Config::get('ldap_username');
         $ldapSearchFilter  = Config::get('ldap_search_filter');
         $ldapCaCertHash    = Config::get('ldap_ca_certificate');
-        $ldapCaCertPath    = null;
-        if ($ldapCaCertHash) {
-            // Copy this file to local cache somewhere (stream_dir I guess)
-            $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
-            $ldapCaCertPath = sprintf(
-                '%s/ldap-ca-cert-%s-%s',
-                Config::get('stream_dir'),
-                INSTANCE_ID,
-                $ldapCaCert->getHash()
-            );
-            if (!file_exists($ldapCaCertPath)) {
-                file_put_contents($ldapCaCertPath, $ldapCaCert->read());
-            }
-        }
         foreach ($ldapConfigs as $ldapConfig) {
-            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertPath);
+            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
             if (
                 $ds && $this->ldapAuth(
                     $ds,
