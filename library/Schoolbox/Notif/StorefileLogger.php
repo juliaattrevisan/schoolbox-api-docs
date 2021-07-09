@@ -14,7 +14,6 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Predis;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\Resource\Storage;
