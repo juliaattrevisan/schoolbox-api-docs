@@ -109,10 +109,18 @@ class MutableFieldsOnlyTest extends TestCase
 
         yield 'achievement expiry' => [
             [
-                'achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_DAY,
+                'achievementExpiry' => Model::EXPIRY_DAY,
             ],
             (new Model())
-                ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY),
+                ->setAchievementExpiry(Model::EXPIRY_DAY),
+        ];
+
+        yield 'goal expiry' => [
+            [
+                'goalExpiry' => Model::EXPIRY_DAY,
+            ],
+            (new Model())
+                ->setGoalExpiry(Model::EXPIRY_DAY),
         ];
     }
 
@@ -251,15 +259,27 @@ class MutableFieldsOnlyTest extends TestCase
         ];
 
         yield 'update achievement expiry' => [
-            ['achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_MONTH,],
+            ['achievementExpiry' => Model::EXPIRY_MONTH,],
             (clone $baseModel),
-            (clone $baseModel)->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_MONTH),
+            (clone $baseModel)->setAchievementExpiry(Model::EXPIRY_MONTH),
         ];
 
         yield 'null achievement expiry' => [
             ['achievementExpiry' => null,],
             (clone $baseModel),
             (clone $baseModel)->setAchievementExpiry(null),
+        ];
+
+        yield 'update goal expiry' => [
+            ['goalExpiry' => Model::EXPIRY_MONTH,],
+            (clone $baseModel),
+            (clone $baseModel)->setGoalExpiry(Model::EXPIRY_MONTH),
+        ];
+
+        yield 'null goal expiry' => [
+            ['goalExpiry' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setGoalExpiry(null),
         ];
 
         yield 'update created by' => [

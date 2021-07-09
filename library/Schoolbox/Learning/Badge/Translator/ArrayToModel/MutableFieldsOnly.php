@@ -35,6 +35,7 @@ class MutableFieldsOnly extends AllFields
         'yearLevelIds'      => true,
         'curriculumNodes'   => true,
         'achievementExpiry' => true,
+        'goalExpiry'        => true,
     ];
 
 

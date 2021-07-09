@@ -22,6 +22,25 @@
     ) }}
 {% endif %}
 
+{##
+ # Labels for goal and achievement expiries.
+ #
+ # Note the disconnect between "never" and "forever". This is because the expiry
+ # question is asked slightly differently in the API and in the UI:
+ # * API: "when does the badge expire?"
+ # * UI:  "how long should the badge last?"
+ #}
+{% set expiryLabels = {
+    never:       'Forever',
+    day:         '1 day',
+    week:        '1 week',
+    fortnight:   '2 weeks',
+    month:       '1 month',
+    quarterYear: '3 months',
+    halfYear:    '6 months',
+    year:        '1 year',
+} %}
+
 <div class="row">
     <div class="small-12 column">
         {% if badge %}
@@ -155,15 +174,48 @@
                     </div>
                 </fieldset>
                 <fieldset class="content">
-                    <div class="small-12 columns">
+                    {% set allowAsGoal = not badge or badge.allowAsGoal %}
+                    <div class="small-6 columns">
                         <label for="badge-allow-as-goal">Allow Use as Goal</label>
                         <div class="switch">
-                            <input id="badge-allow-as-goal" type="checkbox" name="allow-as-goal" {% if not badge or badge.allowAsGoal %}checked="checked"{% endif %}>
+                            <input id="badge-allow-as-goal" type="checkbox" name="allow-as-goal" {% if allowAsGoal %}checked="checked"{% endif %}>
                             <label for="badge-allow-as-goal">
                                 <span>On</span>
                                 <span>Off</span>
                             </label>
                         </div>
+                    </div>
+                    <div class="small-6 columns">
+                        <label for="badge-goal-expiry">
+                            Goal Valid for
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                                  title="How long will a goal set to achieve this badge last? (After the goal expires, it will no longer be visible on a user's profile.)">?</span>
+                        </label>
+                        <select name="goalExpiry" id="badge-goal-expiry" {% if not allowAsGoal %}disabled{% endif %}>
+                            {% for key, value in expiries %}
+                                <option value="{{ value }}"
+                                        label="{{ expiryLabels[key] }}"
+                                        {% if (badge.goalExpiry ?? null) is same as value %}selected{% endif %}>
+                                    {{ expiryLabels[key] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="small-12 columns">
+                        <label for="badge-achievement-expiry">
+                            Achievement Valid for
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
+                                  title="How long will this badge last once it is awarded as an achievement? (After the achievement expires, it will no longer be visible on a user's profile.)">?</span>
+                        </label>
+                        <select name="achievementExpiry" id="badge-achievement-expiry">
+                            {% for key, value in expiries %}
+                                <option value="{{ value }}"
+                                        label="{{ expiryLabels[key] }}"
+                                        {% if (badge.achievementExpiry ?? null) is same as value %}selected{% endif %}>
+                                    {{ expiryLabels[key] }}
+                                </option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </fieldset>
                 <fieldset class="content">
@@ -180,32 +232,6 @@
                                     {% set selected = 'selected="selected"' %}
                                 {% endif %}
                                 <option value="{{ category.id }}" label="{{ category.name }}" {{ selected }}>{{ category.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="small-12 columns">
-                        <label for="badge-achievement-expiry">
-                            Achievement Expiry
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200"
-                                  title="After this period of time the achievement will no longer be valid">?</span>
-                        </label>
-
-                        {% set achievementExpiryLabels = {
-                            never:     'Never',
-                            day:       '1 day',
-                            week:      '1 week',
-                            fortnight: '2 weeks',
-                            month:     '1 month',
-                            halfYear:  '6 months',
-                            year:      '1 year',
-                        } %}
-                        <select name="achievementExpiry" id="badge-achievement-expiry">
-                            {% for key, value in achievementExpiries %}
-                                <option value="{{ value }}"
-                                        label="{{ achievementExpiryLabels[key] }}"
-                                        {% if (badge.achievementExpiry ?? null) is same as value %}selected{% endif %}>
-                                    {{ achievementExpiryLabels[key] }}
-                                </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -260,6 +286,13 @@
         // Update the editor's form input on change
         // (required so that validation triggers)
         CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
+
+
+        // Disable goal expiry input if this badge isn't a goal
+        let $badgeGoalExpiryInput = $('#badge-goal-expiry');
+        $('#badge-allow-as-goal').on('change', function () {
+            $badgeGoalExpiryInput.prop('disabled', !this.checked);
+        });
 
 
         // Set up validation and save
@@ -342,6 +375,7 @@
                     },
                     categoryId        = formData.get('category'),
                     achievementExpiry = formData.get('achievementExpiry'),
+                    goalExpiry        = formData.get('goalExpiry'),
                     tags              = formData.get('tags'),
                     toast             = $('#toast'),
                     submit            = $('#badge-submit');
@@ -355,6 +389,10 @@
 
                 payload.achievementExpiry = achievementExpiry
                     ? Number(achievementExpiry)
+                    : null;
+
+                payload.goalExpiry = goalExpiry
+                    ? Number(goalExpiry)
                     : null;
 
                 let yearLevels = form.querySelector('#yearLevels').selectize.items;

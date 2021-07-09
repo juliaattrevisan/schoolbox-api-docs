@@ -36,19 +36,21 @@ class Controller extends Base
 
 
     /**
-     * Expiry options for achievements, with an identifiable key for each.
+     * Expiry options for achievements and goals, with an identifiable key for
+     * each.
      *
      * The value labels are in the template: this keeps the presentation logic
      * out of the controller.
      */
-    private const ACHIEVEMENT_EXPIRY_OPTION_VALUES = [
-        'never'     => Model::ACHIEVEMENT_EXPIRY_NEVER,
-        'day'       => Model::ACHIEVEMENT_EXPIRY_DAY,
-        'week'      => Model::ACHIEVEMENT_EXPIRY_WEEK,
-        'fortnight' => Model::ACHIEVEMENT_EXPIRY_FORTNIGHT,
-        'month'     => Model::ACHIEVEMENT_EXPIRY_MONTH,
-        'halfYear'  => Model::ACHIEVEMENT_EXPIRY_HALF_YEAR,
-        'year'      => Model::ACHIEVEMENT_EXPIRY_YEAR,
+    private const EXPIRY_OPTION_VALUES = [
+        'never'       => Model::EXPIRY_NEVER,
+        'day'         => Model::EXPIRY_DAY,
+        'week'        => Model::EXPIRY_WEEK,
+        'fortnight'   => Model::EXPIRY_FORTNIGHT,
+        'month'       => Model::EXPIRY_MONTH,
+        'quarterYear' => Model::EXPIRY_QUARTER_YEAR,
+        'halfYear'    => Model::EXPIRY_HALF_YEAR,
+        'year'        => Model::EXPIRY_YEAR,
     ];
 
 
@@ -267,7 +269,7 @@ class Controller extends Base
                     'badge' => [],
                     'attachzone' => $attachzone->getTwigContext(),
                     'categories' => $this->categoryMapper->findAll(),
-                    'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTION_VALUES,
+                    'expiries' => self::EXPIRY_OPTION_VALUES,
                     'yearLevels' => $yearLevels,
                     'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                     'iconRegistry' => [
@@ -374,7 +376,7 @@ class Controller extends Base
             'badge' => $badge,
             'attachzone' => $attachzone->getTwigContext(),
             'categories' => $this->categoryMapper->findAll(),
-            'achievementExpiries' => self::ACHIEVEMENT_EXPIRY_OPTION_VALUES,
+            'expiries' => self::EXPIRY_OPTION_VALUES,
             'yearLevels' => $yearLevels,
             'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
             'iconRegistry' => [

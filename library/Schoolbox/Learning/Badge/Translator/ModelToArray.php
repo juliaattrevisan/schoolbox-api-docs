@@ -141,6 +141,7 @@ class ModelToArray
                 ]
                 : null,
             'achievementExpiry' => $model->getAchievementExpiry(),
+            'goalExpiry'        => $model->getGoalExpiry(),
             'curriculumNodes'   => $curriculumNodes
                 ? $curriculumNodes
                     ->map(

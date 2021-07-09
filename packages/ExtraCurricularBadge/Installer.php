@@ -37,7 +37,8 @@ class Installer implements IPackageInstall
             $badge->setBody('<p>' . $row['Description'] . '</p>');
             $badge->setIcon('/images/badges' . $row['Image']);
             $badge->setCategory($badgeCategoryLocator->locate($row['Category'], $user));
-            $badge->setAchievementExpiry(Badge\Model::ACHIEVEMENT_EXPIRY_NEVER);
+            $badge->setAchievementExpiry(Badge\Model::EXPIRY_NEVER);
+            $badge->setGoalExpiry(Badge\Model::EXPIRY_NEVER);
             $badge->setAllowAsGoal((bool)$row['Goal']);
 
             $curriculumCodes = explode(',', $row['Curriculum']);

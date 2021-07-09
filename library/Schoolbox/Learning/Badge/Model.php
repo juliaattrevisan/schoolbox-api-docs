@@ -39,23 +39,36 @@ class Model implements ISoftDeletable
 
 
     /**
-     * Constants for when an achievement awarded from a badge will expire.
+     * Constants for when an achievement or goal awarded from a badge will
+     * expire.
      */
-    public const ACHIEVEMENT_EXPIRY_NEVER = null;
-    public const ACHIEVEMENT_EXPIRY_DAY = 1;
-    public const ACHIEVEMENT_EXPIRY_WEEK = 7;
-    public const ACHIEVEMENT_EXPIRY_FORTNIGHT = 14;
-    public const ACHIEVEMENT_EXPIRY_MONTH = 31;
-    public const ACHIEVEMENT_EXPIRY_HALF_YEAR = 183;
-    public const ACHIEVEMENT_EXPIRY_YEAR = 365;
+    public const EXPIRY_NEVER                    = null;
+    public const EXPIRY_DAY                      = 1;
+    public const EXPIRY_WEEK                     = 7;
+    public const EXPIRY_FORTNIGHT                = 14;
+    public const EXPIRY_MONTH                    = 31;
+    public const EXPIRY_QUARTER_YEAR             = 92;
+    public const EXPIRY_HALF_YEAR                = 183;
+    public const EXPIRY_YEAR                     = 365;
     public const VALID_ACHIEVEMENT_EXPIRY_VALUES = [
-        self::ACHIEVEMENT_EXPIRY_NEVER,
-        self::ACHIEVEMENT_EXPIRY_DAY,
-        self::ACHIEVEMENT_EXPIRY_WEEK,
-        self::ACHIEVEMENT_EXPIRY_FORTNIGHT,
-        self::ACHIEVEMENT_EXPIRY_MONTH,
-        self::ACHIEVEMENT_EXPIRY_HALF_YEAR,
-        self::ACHIEVEMENT_EXPIRY_YEAR,
+        self::EXPIRY_NEVER,
+        self::EXPIRY_DAY,
+        self::EXPIRY_WEEK,
+        self::EXPIRY_FORTNIGHT,
+        self::EXPIRY_MONTH,
+        self::EXPIRY_QUARTER_YEAR,
+        self::EXPIRY_HALF_YEAR,
+        self::EXPIRY_YEAR,
+    ];
+    public const VALID_GOAL_EXPIRY_VALUES        = [
+        self::EXPIRY_NEVER,
+        self::EXPIRY_DAY,
+        self::EXPIRY_WEEK,
+        self::EXPIRY_FORTNIGHT,
+        self::EXPIRY_MONTH,
+        self::EXPIRY_QUARTER_YEAR,
+        self::EXPIRY_HALF_YEAR,
+        self::EXPIRY_YEAR,
     ];
 
 
@@ -105,6 +118,12 @@ class Model implements ISoftDeletable
      * In how many days will an achievement created from this badge expire?
      */
     private ?int $achievementExpiry;
+
+
+    /**
+     * In how many days will a goal created from this badge expire?
+     */
+    private ?int $goalExpiry;
 
 
     /**
@@ -278,6 +297,35 @@ class Model implements ISoftDeletable
             );
         }
         $this->achievementExpiry = $achievementExpiry;
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getGoalExpiry(): ?int
+    {
+        return $this->goalExpiry;
+    }
+
+
+    /**
+     * @param int|null $goalExpiry
+     * @return static
+     */
+    public function setGoalExpiry(?int $goalExpiry): self
+    {
+        if (!in_array($goalExpiry, self::VALID_GOAL_EXPIRY_VALUES, true)) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'Goal expiry must be one of: [%s], received %d instead',
+                    implode(',', self::VALID_GOAL_EXPIRY_VALUES),
+                    $goalExpiry,
+                )
+            );
+        }
+        $this->goalExpiry = $goalExpiry;
         return $this;
     }
 

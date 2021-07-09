@@ -5,6 +5,7 @@ import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
 import userProfileMixin from '../../../vue/user-profile/mixin';
+import moment from "moment";
 
 /**
  * Award detail modal.
@@ -77,6 +78,17 @@ export default {
      * Access the results of a function as if they were a property of an object.
      */
     computed: {
+        /**
+         * Has this award's expiry date been reached?
+         *
+         * @returns {Boolean}
+         */
+        isExpired() {
+            if (this.award.expiry === null) {
+                return false;
+            }
+            return moment(this.award.expiresAt).isBefore(moment(), moment.day);
+        }
     },
 
     /**
@@ -132,20 +144,17 @@ export default {
                 <p class="meta">Category: {{ award.badge.category.name }}</p>
                 <p class="meta">
                     <template v-if="award.isGoal">
-                        Goal set <relative-time :datetime="award.awardedAt" :key="award.id"></relative-time> by
-                        <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                        Goal set
                     </template>
                     <template v-else>
-                        Awarded <relative-time :datetime="award.awardedAt" :key="award.id"></relative-time> by
-                        <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a>
+                        Awarded
                     </template>
-                    <template v-if="award.expiresAt">
-                        <template v-if="award.expiresAt && award.isGoal">
-                            expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
-                        </template>
-                        <template v-else>
-                            expires <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
-                        </template>
+                    <relative-time :datetime="award.awardedAt" :key="award.id"></relative-time>
+                    by
+                    <a :href="award.awardedBy._links.profile">{{ award.awardedBy.fullName }}</a><template v-if="award.expiresAt">,
+                        <template v-if="isExpired">expired</template>
+                        <template v-else>expires</template>
+                        <relative-time :datetime="award.expiresAt" date-only :key="award.id"></relative-time>
                     </template>
                 </p>
                 <p class="meta" v-if="award.isGoal && award.award">

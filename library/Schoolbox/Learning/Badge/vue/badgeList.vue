@@ -461,6 +461,7 @@ export default {
                          :key="'setGoal-' + String(currentBadge.id)"
                          :badge="currentBadge"
                          :endpoint="currentBadge._links.setAsGoal"
+                         :expiry="currentBadge.goalExpiry"
                          @cancel="closeSetAsGoalModal"
                          @done="closeSetAsGoalModal"
                          placeholder="Search for users to set a goal for"
@@ -473,6 +474,11 @@ export default {
                 </template>
                 <template v-slot:confirmButton>
                     Set goal
+                </template>
+                <template v-slot:expiryMessage="slotProps">
+                    <p class="meta" v-if="slotProps.expiryDate">
+                        This goal will expire <relative-time :datetime="slotProps.expiryDate" date-only></relative-time>.
+                    </p>
                 </template>
             </badge-award>
         </reveal-modal>

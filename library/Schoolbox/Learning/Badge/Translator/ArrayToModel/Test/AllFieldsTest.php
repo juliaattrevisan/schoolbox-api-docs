@@ -116,10 +116,18 @@ class AllFieldsTest extends TestCase
 
         yield 'achievement expiry' => [
             [
-                'achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_DAY,
+                'achievementExpiry' => Model::EXPIRY_DAY,
             ],
             (new Model())
-                ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY),
+                ->setAchievementExpiry(Model::EXPIRY_DAY),
+        ];
+
+        yield 'goal expiry' => [
+            [
+                'goalExpiry' => Model::EXPIRY_DAY,
+            ],
+            (new Model())
+                ->setGoalExpiry(Model::EXPIRY_DAY),
         ];
     }
 
@@ -145,7 +153,8 @@ class AllFieldsTest extends TestCase
             ->setBody('test')
             ->setImage((new Storage())->setHash('1234567890123456789012345678901234567890'))
             ->setCategory((new Category())->setId($oldId))
-            ->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_DAY)
+            ->setAchievementExpiry(Model::EXPIRY_DAY)
+            ->setGoalExpiry(Model::EXPIRY_DAY)
             ->setCreatedBy((new User())->setId($oldId))
             ->setUpdatedBy((new User())->setId($oldId));
 
@@ -265,15 +274,27 @@ class AllFieldsTest extends TestCase
         ];
 
         yield 'update achievement expiry' => [
-            ['achievementExpiry' => Model::ACHIEVEMENT_EXPIRY_MONTH,],
+            ['achievementExpiry' => Model::EXPIRY_MONTH,],
             (clone $baseModel),
-            (clone $baseModel)->setAchievementExpiry(Model::ACHIEVEMENT_EXPIRY_MONTH),
+            (clone $baseModel)->setAchievementExpiry(Model::EXPIRY_MONTH),
         ];
 
         yield 'null achievement expiry' => [
             ['achievementExpiry' => null,],
             (clone $baseModel),
             (clone $baseModel)->setAchievementExpiry(null),
+        ];
+
+        yield 'update goal expiry' => [
+            ['goalExpiry' => Model::EXPIRY_MONTH,],
+            (clone $baseModel),
+            (clone $baseModel)->setGoalExpiry(Model::EXPIRY_MONTH),
+        ];
+
+        yield 'null goal expiry' => [
+            ['goalExpiry' => null,],
+            (clone $baseModel),
+            (clone $baseModel)->setGoalExpiry(null),
         ];
 
         // Created by is not nullable
@@ -504,6 +525,29 @@ class AllFieldsTest extends TestCase
 
         /** @noinspection PhpUnhandledExceptionInspection */
         $converter(['achievementExpiry' => $invalidValue,], new Model());
+    }
+
+
+    /**
+     * Test that setting an invalid goal expiry value raises an error.
+     *
+     * The invalid values for goal expiry are the same as achievement expiry, so
+     * the data provider is the same.
+     *
+     * @dataProvider getTestInvokeInvalidAchievementExpiryData
+     * @covers       \Schoolbox\Learning\Badge\Translator\ArrayToModel\AllFields::__invoke
+     *
+     * @param int $invalidValue
+     * @noinspection PhpDocMissingThrowsInspection We know this will be thrown, and catch it
+     */
+    public function testInvokeInvalidGoalExpiry(int $invalidValue): void
+    {
+        $converter = $this->createConverterIfNull();
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        /** @noinspection PhpUnhandledExceptionInspection */
+        $converter(['goalExpiry' => $invalidValue,], new Model());
     }
 
 

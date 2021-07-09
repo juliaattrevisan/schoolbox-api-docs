@@ -7,49 +7,83 @@ export const EXPIRY_DAY = 1;
 export const EXPIRY_WEEK = 7;
 export const EXPIRY_FORTNIGHT = 14;
 export const EXPIRY_MONTH = 31;
+export const EXPIRY_QUARTER_YEAR = 92;
 export const EXPIRY_HALF_YEAR = 183;
 export const EXPIRY_YEAR = 365;
 export const EXPIRY_OPTIONS = [
     {
-        label: 'Forever',
+        expiryLabel: 'Does not expire',
+        lifetimeLabel: 'Forever',
         value: EXPIRY_NEVER,
     },
     {
-        label: '1 day',
+        expiryLabel: '1 day',
+        lifetimeLabel: '1 day',
         value: EXPIRY_DAY,
     },
     {
-        label: '1 week',
+        expiryLabel: '1 week',
+        lifetimeLabel: '1 week',
         value: EXPIRY_WEEK,
     },
     {
-        label: '2 weeks',
+        expiryLabel: '2 weeks',
+        lifetimeLabel: '2 weeks',
         value: EXPIRY_FORTNIGHT,
     },
     {
-        label: '1 month',
+        expiryLabel: '1 month',
+        lifetimeLabel: '1 month',
         value: EXPIRY_MONTH,
     },
     {
-        label: '6 months',
+        expiryLabel: '3 months',
+        lifetimeLabel: '3 months',
+        value: EXPIRY_QUARTER_YEAR,
+    },
+    {
+        expiryLabel: '6 months',
+        lifetimeLabel: '6 months',
         value: EXPIRY_HALF_YEAR,
     },
     {
-        label: '1 year',
+        expiryLabel: '1 year',
+        lifetimeLabel: '1 year',
         value: EXPIRY_YEAR,
     }
 ];
 
 /**
- * Translates an expiry value (as a number of days) to a label.
+ * Translates an expiry value (as a number of days) to a label for when it will
+ * expire.
  *
  * @param {Number|null} expiry
  * @return {string|null}
  */
-export function translateExpiryToLabel(expiry) {
+export function translateDaysToExpiryLabel(expiry) {
     let match = EXPIRY_OPTIONS.find(v => v.value === expiry);
     if (match) {
-        return match.label;
+        return match.expiryLabel;
+    }
+    return null;
+}
+
+/**
+ * Translates an expiry value (as a number of days) to a label representing its
+ * lifetime.
+ *
+ * The difference between this and `translateDaysToExpiryLabel` is how a
+ * non-expiring badge is displayed:
+ * * Expiry label: "does not expire"
+ * * Lifetime label: "forever"
+ *
+ * @param {Number|null} expiry
+ * @return {string|null}
+ */
+export function translateDaysToLifetimeLabel(expiry) {
+    let match = EXPIRY_OPTIONS.find(v => v.value === expiry);
+    if (match) {
+        return match.lifetimeLabel;
     }
     return null;
 }

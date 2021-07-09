@@ -56,6 +56,13 @@ class Mapper extends \Schoolbox\Mapper
             'achievementExpiry',
             Model::VALID_ACHIEVEMENT_EXPIRY_VALUES,
         );
+        $this->uses(
+            'goal_expiry',
+            self::TYPE_INTEGER,
+            self::COLUMN_ENUM,
+            'goalExpiry',
+            Model::VALID_GOAL_EXPIRY_VALUES,
+        );
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
