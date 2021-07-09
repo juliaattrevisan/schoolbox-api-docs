@@ -7,6 +7,7 @@ import { toMoment } from '@fullcalendar/moment';
 import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
+const MAX_DAY_MAX_EVENT_ROWS = 4;
 
 export const mixinFullCalendarHelper = {
 
@@ -61,9 +62,9 @@ export const mixinFullCalendarHelper = {
          * @return {boolean}
          */
         $_fullCalendarHelper_eventRender(eventRenderInfo) {
-            
+
             const calEvent = eventRenderInfo.event;
-            
+
             // Always render placeholders in the most basic manner
             if (calEvent.id === 'placeholder') {
                 calEvent.setProp('display', 'block');
@@ -81,14 +82,14 @@ export const mixinFullCalendarHelper = {
                 calEvent.setProp('display', 'none');
                 return false;
             }
-            
+
             // Apply the visible class?
             if (calEvent?.extendedProps?.data?.styles?.visible) {
                 eventRenderInfo.el.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
-            
+
             calEvent.setProp('display', 'block');
-            
+
             return true;
         },
 
@@ -148,8 +149,29 @@ export const mixinFullCalendarHelper = {
                 return 500;
             }
             return contentHeight;
-        }
+        },
 
+
+        /**
+         * Translate the provided boolean `eventLimit` value into a sensible
+         * `dayMaxEventRows` value.
+         *
+         * Leaving `dayMaxEventRows` as `true` maxes out the number of rows at
+         * something which will fit in the height of a table cell: this causes
+         * a "Maximum call stack size exceeded" error with a large enough number
+         * of events.
+         *
+         * In experimentation, three rows of events seems to be the upper limit.
+         *
+         * @see https://fullcalendar.io/docs/dayMaxEventRows
+         *
+         * @param {Boolean} eventLimit Is the number of events limited?
+         * @returns {Number|Boolean} A number of rows to display per day, or
+         *                           false if the number of rows is not
+         *                           constrained.
+         */
+        $_fullCalendarHelper_determineDayMaxEventRows(eventLimit) {
+            return eventLimit ? MAX_DAY_MAX_EVENT_ROWS : false;
+        },
     }
-
 }
