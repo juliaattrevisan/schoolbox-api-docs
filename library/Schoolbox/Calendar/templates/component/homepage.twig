@@ -21,7 +21,7 @@
             ),
             importEventsUrl: "/calendar/import/{{ folder.id }}",
             canCreateEvent: Boolean("{{ canCreateEvent }}"),
-            momentJsDateShort:  '{{ config.date_short | momentJsFormat }}',
+            momentJsDateLong:  '{{ config.date_long | momentJsFormat }}',
             isDashboard: false
         };
     </script>

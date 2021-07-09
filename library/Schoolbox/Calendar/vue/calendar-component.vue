@@ -11,7 +11,7 @@ import axios              from "axios";
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
-import dayjs              from 'dayjs';
+import moment              from 'moment';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
@@ -72,7 +72,7 @@ export default {
                 list: {
                     type: 'list',
                     duration: { days: this.config.days },
-                    listDayFormat: this.config.momentJsDateShort,
+                    listDayFormat: this.config.momentJsDateLong,
                     listDaySideFormat: false
                 }
             },
@@ -113,7 +113,7 @@ export default {
 
             const headingElement = document.createElement('h2');
             headingElement.classList.add('subheader');
-            headingElement.innerText = dayjs(new Date()).format(this.config.momentJsDateShort);
+            headingElement.innerText = moment(new Date()).format(this.config.momentJsDateLong);
 
             /**
              * For example:
