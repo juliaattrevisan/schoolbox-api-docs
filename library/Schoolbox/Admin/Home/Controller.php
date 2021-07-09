@@ -176,7 +176,7 @@ class Controller extends Base
                     $ldap_status = 'Offline';
                 }
 
-                unset($ds, $ldapbind);
+                unset($ldapbind);
             }
 
             // Check secondary LDAP server bind
@@ -197,7 +197,7 @@ class Controller extends Base
                     $ldap_alt_status = 'Offline';
                 }
 
-                unset($ds, $ldapbind);
+                unset($ldapbind);
             }
         }
 

@@ -430,8 +430,8 @@ class Session
     }
 
     /**
-     * @param $username
-     * @param $password
+     * @param string $username
+     * @param string $password
      * @return bool
      * @throws MapperException
      */
@@ -493,8 +493,8 @@ class Session
     }
 
     /**
-     * @param       $str
-     * @param false $for_dn
+     * @param string $str
+     * @param bool   $for_dn
      * @return array|string|string[]
      */
     public function ldapEscape($str, $for_dn = false)
