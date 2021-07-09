@@ -928,7 +928,9 @@
                             <h2 class="subheader">Contact Information</h2>
                             {% if showContactsAlert %}
                                 {% if externalUser.ParentsSeparatedFlag ?? false %}
+                                    {% block parents_separated %}
                                 <div class="alert-box highlight icon-info">Parents Separated</div>
+                                    {% endblock parents_separated %}
                                 {% endif %}
                             {% endif %}
 
