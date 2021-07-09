@@ -45,6 +45,7 @@ export default {
             },
             eventsLoaded: false,
             hasEvents: null,
+            hasHeadingDisplayUpdated: false, //to ensure it doesn't fire multiple times
         }
     },
 
@@ -101,7 +102,7 @@ export default {
          * To check whether the heading needs to be updated on the homepage dashboard
          */
         onLoading (isLoading) {
-            if (!isLoading && this.config.isDashboard) {
+            if (!isLoading && this.config.isDashboard && !this.hasHeadingDisplayUpdated) {
                 this.updateHeadingDisplay();
             }
         },
@@ -110,6 +111,8 @@ export default {
          * To add the <h2 class="subheader"> and remove the lists own date display
          */
         updateHeadingDisplay () {
+
+            this.hasHeadingDisplayUpdated = true; //so it's not added multiple times...
 
             const headingElement = document.createElement('h2');
             headingElement.classList.add('subheader');
@@ -130,9 +133,11 @@ export default {
             const sectionElement = this.$el.parentElement.parentElement;
             containerElement.insertBefore(headingElement, sectionElement);
 
-            this.$nextTick().then(() => { //pull out the built in date display
-                this.$el.querySelector('[data-date]').style.display = 'none';
-            });
+            if (this.hasEvents) { //won't be available if there's no events to display
+                this.$nextTick().then(() => { //pull out the built in date display
+                    this.$el.querySelector('[data-date]').style.display = 'none';
+                });
+            }
 
         },
 
