@@ -103,7 +103,7 @@ class Controller extends Base
         $cursor          = new Cursor(
             $this->database,
             $user,
-            Alaress_Date_Format::now(),
+            null,
             self::FEED_ITEMS_PER_PAGE,
             $this->getConfigLoader(),
         );
