@@ -241,7 +241,7 @@ class Renderer extends Handler
                 if (
                     $currentUserIsParentOfResult
                     || $currentUserIsSuperuser
-                    || $currentUserIsStaff
+                    || ($currentUserIsStaff && (!$resultIsStudent || $currentUser->getRole()->getViewStudentCalendar()))
                     || $currentUserIsResult
                 ) {
                     $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');

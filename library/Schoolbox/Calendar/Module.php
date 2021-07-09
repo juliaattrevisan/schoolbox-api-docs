@@ -10,8 +10,10 @@ declare(strict_types=1);
 namespace Schoolbox\Calendar;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\All;
 use Alaress\Authorizer\Rule\Any;
+use Alaress\Authorizer\Rule\Callback;
 use Alaress\Authorizer\Rule\HasRole;
 use Alaress\Authorizer\Rule\IsLoggedIn;
 use Alaress\Authorizer\Rule\IsSuperuser;
@@ -27,6 +29,7 @@ use Calendar\Api\ModuleChecker;
 use Schoolbox\CampusMapper;
 use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -107,7 +110,19 @@ class Module extends BaseModule
                     new IsLoggedIn(),
                     new Any(
                         new IsSuperuser(),
-                        new HasRole(Role::STAFF),
+                        new Callback(
+                            static function (array $params = [], User $viewer = null) {
+                                /** @var User $viewee */
+                                $viewee = $params['user'];
+                                if (
+                                    $viewer->getRole()->isStaff()
+                                    && (!$viewee->getRole()->isStudent() || $viewer->getRole()->getViewStudentCalendar())
+                                ) {
+                                    return;
+                                }
+                                throw new Unauthorized();
+                            }
+                        ),
                         new All(
                             new IsUserOrParentOfUser(
                                 $this->getExternalUser(),

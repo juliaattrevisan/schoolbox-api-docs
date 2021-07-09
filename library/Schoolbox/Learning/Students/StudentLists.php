@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Students;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress_Date_Format;
 use Aura\Router\Router;
 use External_ClassInterface;
@@ -41,6 +42,9 @@ class StudentLists
     /** @var Folder\Model */
     private $folder;
 
+    /** Viewer */
+    private User $viewer;
+
     /** @var Router */
     private $router;
 
@@ -60,13 +64,18 @@ class StudentLists
     /** @var RosettaStone */
     private $rosettaStone;
 
+    /** Authorizer */
+    private Authorizer $authorizer;
+
     /**
      * StudentLists constructor.
      *
      * @param External_ClassInterface $externalClass
      * @param UserMapper              $userMapper
      * @param Model                   $folder
+     * @param User                    $viewer
      * @param LogMapper               $logMapper
+     * @param Authorizer              $authorizer
      * @param Router                  $router
      * @param bool                    $pastoralIsEnabled
      * @param bool                    $mailIsEnabled
@@ -79,7 +88,9 @@ class StudentLists
         External_ClassInterface $externalClass,
         UserMapper $userMapper,
         Model $folder,
+        User $viewer,
         LogMapper $logMapper,
+        Authorizer $authorizer,
         Router $router,
         bool $pastoralIsEnabled,
         bool $mailIsEnabled,
@@ -88,11 +99,11 @@ class StudentLists
         string $mailHandle,
         RosettaStone $rosettaStone
     ) {
-
         $this->externalClass              = $externalClass;
         $this->userMapper                 = $userMapper;
         $this->logMapper                  = $logMapper;
         $this->folder                     = $folder;
+        $this->viewer                     = $viewer;
         $this->router                     = $router;
         $this->pastoralIsEnabled          = $pastoralIsEnabled;
         $this->mailIsEnabled              = $mailIsEnabled;
@@ -100,6 +111,7 @@ class StudentLists
         $this->gradesEnabled              = $gradesEnabled;
         $this->mailHandle                 = $mailHandle;
         $this->rosettaStone               = $rosettaStone;
+        $this->authorizer                 = $authorizer;
     }
 
     /**
@@ -119,7 +131,7 @@ class StudentLists
                     // No external ID: there is nothing that can sensibly be shown
                     $externalId = $studentSisRecord['synergy_id'] ?? null;
                     if (isset($externalId)) {
-                        $students[$externalId] ??= $this->augmentStudentSisRecord($studentSisRecord);
+                        $students[$externalId]                 ??= $this->augmentStudentSisRecord($studentSisRecord);
                         $students[$externalId]['classCodes'][] = $code->getCode();
                     }
                 }
@@ -213,18 +225,20 @@ class StudentLists
         }
 
         // Calendar
-        $studentSisRecord['routes']['calendar'] = [
-            'label' => $this->rosettaStone->translate('calendar', false, true),
-            'href'  => $this->router->generate(
-                'calendar.getCalendar',
-                [
-                    'selectedDate' => Alaress_Date_Format::now()->getURLDate(),
-                    'userId'       => $user->getId()
-                ]
-            ),
-            'class' => 'icon-calendar',
-            'title' => '',
+        $routeParams       = [
+            'selectedDate' => Alaress_Date_Format::now()->getURLDate(),
+            'userId'       => $user->getId(),
+            'user'         => $user,
         ];
+        $canAccessCalendar = $this->authorizer->isPathAuthorizedForUser('calendar.getCalendar', $routeParams, $this->viewer);
+        if ($canAccessCalendar) {
+            $studentSisRecord['routes']['calendar'] = [
+                'label' => $this->rosettaStone->translate('calendar', false, true),
+                'href'  => $this->router->generate('calendar.getCalendar', $routeParams),
+                'class' => 'icon-calendar',
+                'title' => '',
+            ];
+        }
 
         // Timetable
         if (!$user->getHideTimetable()) {
