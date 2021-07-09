@@ -196,7 +196,7 @@ export default {
         this.$nextTick()
         .then(() => {
             this.calendarApi = this.$refs.fullCalendar.getApi();
-            this.calendarApi.setOption('height', this.$_fullCalendarHelper_contentHeight());
+            this.calendarApi.setOption('contentHeight', this.$_fullCalendarHelper_contentHeight());
         });
 
         this.registerListCustomInputFields();
@@ -206,7 +206,7 @@ export default {
         quickSwitchIcon.setAttribute('class', 'adtp-btn icon-calendar no-text');
         quickSwitchIcon.innerHTML += '<span class="splash animate"></span>';
         document.getElementsByClassName('fc-quickSwitchButton-button')[0].appendChild(quickSwitchIcon);
-        
+
     },
 
     methods: {
@@ -260,7 +260,7 @@ export default {
          * @param info
          */
         viewDidMount(info) {
-            
+
             const customGroup = document.querySelector('.fc-custom-group');
 
             this.currentDisplay = info.view.type;
@@ -283,7 +283,7 @@ export default {
             });
 
             if (this.currentViewIsList()) {
-                
+
                 this.registerListCustomInputFields();
 
                 /**
@@ -556,9 +556,9 @@ export default {
          * Register customised input fields for list view
          */
         registerListCustomInputFields() {
-            
+
             // Make sure that there's only one of the custom input field
-            if (!document.querySelector('.fc-custom-group')) 
+            if (!document.querySelector('.fc-custom-group'))
             {
                 // Prepare input fields
                 const container = document.createElement('div');
@@ -629,7 +629,7 @@ export default {
 
                             this.duration.days = this.$_fullCalendarHelper_dateDiff(startDateValue.format('YYYY-MM-DD'), endDateValue.format('YYYY-MM-DD')) + 1;
                             this.calendarApi.gotoDate(startDateValue.format('YYYY-MM-DD'));
-                            
+
                         }
                     }
                 });
