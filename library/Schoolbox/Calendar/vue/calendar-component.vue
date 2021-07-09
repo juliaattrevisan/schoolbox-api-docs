@@ -71,7 +71,7 @@ export default {
                 list: {
                     type: 'list',
                     duration: { days: this.config.days },
-                    listDayFormat: this.$_fullCalendarHelper_dayTitleFormat,
+                    listDayFormat: this.config.momentJsDateShort,
                     listDaySideFormat: false
                 }
             },
