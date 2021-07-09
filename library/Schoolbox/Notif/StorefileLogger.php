@@ -14,8 +14,8 @@ use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Predis;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Schoolbox\Resource\Storage;
 use Schoolbox\File;
 
@@ -26,6 +26,11 @@ use Schoolbox\File;
  */
 class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterface
 {
+    /**
+     * The name of the file logger which this object contains.
+     */
+    private const LOGGER_NAME = 'storefile';
+
     /**
      * The file to which logging is done.
      *
@@ -40,14 +45,17 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
     protected $receiver;
 
     /** @var LoggerInterface[] */
-    protected $logs;
-
+    protected $logs = [];
 
     /**
-     * @param string                 $filename A temporary filename to log to.
-     *                                         Will be deleted on __destruct or flushToStorage
-     * @param Storage\Receiver       $receiver
-     * @param FormatterInterface     $formatter
+     * How are log messages formatted?
+     */
+    private FormatterInterface $formatter;
+
+    /**
+     * @param string                  $filename
+     * @param Storage\Receiver        $receiver
+     * @param FormatterInterface|null $formatter
      */
     public function __construct(
         $filename,
@@ -55,23 +63,15 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
         FormatterInterface $formatter = null
     ) {
         $this->file = $filename;
-        if (!$this->file) {
-            throw new \RuntimeException('Temp file does not exist!');
-        }
 
         $this->receiver = $receiver;
 
-        $handler = new StreamHandler($this->file, Logger::INFO);
-
         // default to JSON formatting
-        if (!$formatter) {
-            $formatter = new JsonFormatter();
-        }
+        $this->formatter = $formatter ?? new JsonFormatter();
 
-        $handler = $handler->setFormatter($formatter);
-
-        // use Monolog default for the base functionality
-        $this->pushComposite(new Logger('storefile', [$handler]));
+        // Create the stream handler
+        // (the file must exist at construct time at least)
+        $this->recreateStreamHandler(false);
     }
 
     /**
@@ -79,7 +79,52 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      */
     public function __destruct()
     {
-        unlink($this->file);
+        // The file might not exist: if it doesn't that's okay
+        if (file_exists($this->file)) {
+            unlink($this->file);
+        }
+    }
+
+
+    /**
+     * Clears all existing loggers, and adds the logger this stream handler
+     * will log to.
+     *
+     * The stream handler will be re-created with an empty file after calling
+     * `flushToStorage`, because the receiver deletes the temp file after moving
+     * it to storage.
+     *
+     * @param bool $createFileIfNotExists
+     * @throws RuntimeException if `$this->file` doesn't exist, and
+     *                          `$createFileIfNotExists` is false
+     */
+    private function recreateStreamHandler(bool $createFileIfNotExists): void
+    {
+        // Clear existing storefile logger
+        $tempLogs = [];
+        foreach ($this->logs as $log) {
+            if ($log instanceof Logger && $log->getName() === self::LOGGER_NAME) {
+                unset($log);
+            } else {
+                $tempLogs[] = $log;
+            }
+        }
+        $this->logs = $tempLogs;
+
+        // Has the file gone missing?
+        if (!$this->file) {
+            if ($createFileIfNotExists) {
+                file_put_contents($this->file, '');
+            } else {
+                throw new RuntimeException('Temp file does not exist!');
+            }
+        }
+
+        $handler = new StreamHandler($this->file, Logger::INFO);
+        $handler->setFormatter($this->formatter);
+
+        // use Monolog default logger for the base functionality
+        $this->pushComposite(new Logger(self::LOGGER_NAME, [$handler]));
     }
 
 
@@ -112,8 +157,9 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
         // save the tempfile to storage (will throw a File\Exception if it fails)
         $storage = $this->receiver->accept($basename, $this->file, false);
 
-        // Clear stream contents I guess
-        file_put_contents($this->file, '');
+        // Recreate the stream handler,
+        // because $this->receiver->accept deleted its file
+        $this->recreateStreamHandler(true);
 
         // all done - pass back the new object
         return $storage;
@@ -125,7 +171,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function emergency($message, array $context = array())
     {
@@ -141,7 +187,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function alert($message, array $context = array())
     {
@@ -156,7 +202,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function critical($message, array $context = array())
     {
@@ -170,7 +216,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function error($message, array $context = array())
     {
@@ -186,7 +232,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function warning($message, array $context = array())
     {
@@ -199,7 +245,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function notice($message, array $context = array())
     {
@@ -214,7 +260,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function info($message, array $context = array())
     {
@@ -227,7 +273,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      *
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function debug($message, array $context = array())
     {
@@ -241,7 +287,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
      * @param mixed  $level
      * @param string $message
      * @param array  $context
-     * @return null
+     * @return void
      */
     public function log($level, $message, array $context = array())
     {

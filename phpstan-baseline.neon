@@ -7266,51 +7266,6 @@ parameters:
 			path: library/Schoolbox/Notif/StoredisLogger.php
 
 		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:alert\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:critical\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:debug\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:emergency\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:error\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:info\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:log\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:notice\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
-			message: "#^Method Schoolbox\\\\Notif\\\\StorefileLogger\\:\\:warning\\(\\) should return null but return statement is missing\\.$#"
-			count: 1
-			path: library/Schoolbox/Notif/StorefileLogger.php
-
-		-
 			message: "#^Access to an undefined property Schoolbox\\\\User\\:\\:\\$setRole\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Access/Mapper.php
