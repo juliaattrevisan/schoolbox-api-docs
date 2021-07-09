@@ -8,6 +8,8 @@
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
 {% set isStaffWhoCanView = isSuperuser or (USER.role.staff and USER.role.viewStudentProfile) %}
+{# Leaving isStaff for extended custom templates #}
+{% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
 
 {# medical: if allowed in config, and user is staff or parent of this child #}
@@ -580,11 +582,11 @@
             </dl>
         {% endif %}
 
-        <div class="profile-tabs tabs-content">   
+        <div class="profile-tabs tabs-content">
             {% if showActivityFeed %}
             <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                 <div id="activity-feed">
-                    <activity-feed 
+                    <activity-feed
                         cdn-prefix="{{ CDN_PREFIX }}"
                         site-version="{{ config.site_version }}"
                     />
@@ -595,7 +597,7 @@
             {% if showAchievementsTab %}
             <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                 <div id="goal-feed" class="goals-achievements">
-                    <goal-feed 
+                    <goal-feed
                         cdn-prefix="{{ CDN_PREFIX }}"
                         site-version="{{ config.site_version }}"
                     />
@@ -604,7 +606,7 @@
 
             <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                 <div id="achievement-feed" class="goals-achievements">
-                    <achievement-feed 
+                    <achievement-feed
                         cdn-prefix="{{ CDN_PREFIX }}"
                         site-version="{{ config.site_version }}"
                     />
