@@ -29,9 +29,9 @@ trait CSVTrait
     public function render(): string
     {
         /**
-         * have a preference to use memory(in bytes), before we make use of the filesystem
+         * have a preference to use memory(in bytes), before we make use of the filesystem.
          */
-        $fd = fopen('php://temp/maxmemory:10000', 'rw');
+        $fd = fopen('php://temp/maxmemory:100000', 'rw');
 
         /** @var Event $event */
         $event = $this->getEvent();
@@ -51,7 +51,7 @@ trait CSVTrait
 
         /**
          * it's important to capture the byte length of the generated line each time
-         * because it's reasonable to expect the size of a line can exceed 10k bytes
+         * because it's reasonable to expect the size of a line can exceed 100k bytes
          */
         $lineByteLength = fputcsv($fd, $data);
         rewind($fd);
