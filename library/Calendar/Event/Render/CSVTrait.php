@@ -28,7 +28,10 @@ trait CSVTrait
      */
     public function render(): string
     {
-        $fd = fopen('php://temp/maxmemory:10000', 'rw');
+        /**
+         * have a preference to use memory(in bytes), before we make use of the filesystem.
+         */
+        $fd = fopen('php://temp/maxmemory:100000', 'rw');
 
         /** @var Event $event */
         $event = $this->getEvent();
@@ -46,9 +49,18 @@ trait CSVTrait
             $event->canAttend() ? 1 : 0,
         ];
 
-        fputcsv($fd, $data);
+        /**
+         * it's important to capture the byte length of the generated line each time
+         * because it's reasonable to expect the size of a line can exceed 100k bytes
+         */
+        $lineByteLength = fputcsv($fd, $data);
         rewind($fd);
-        return fread($fd, 10000);
+
+        /**
+         * so that we don't accidentally truncate the string(which could remove trailing linefeeds)
+         * and consequently join two otherwise separate lines together
+         */
+        return fread($fd, $lineByteLength);
     }
 
     /**

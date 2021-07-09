@@ -531,11 +531,6 @@ parameters:
 			path: library/Alaress/Scheduler/Cache/RedisCache.php
 
 		-
-			message: "#^Else branch is unreachable because previous condition is always true\\.$#"
-			count: 1
-			path: library/Alaress/Scheduler/Cache/RedisCache.php
-
-		-
 			message: "#^Method Alaress\\\\Scheduler\\\\Event\\\\BlankEvent\\:\\:getEffector\\(\\) should return object but returns null\\.$#"
 			count: 1
 			path: library/Alaress/Scheduler/Event/BlankEvent.php
