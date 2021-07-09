@@ -11,6 +11,7 @@ import axios              from "axios";
 import { mixinFullCalendarHelper } from '@schoolbox/fullcalendar/mixinFullCalendarHelper';
 import {ENDPOINTS}        from '@schoolboxCalendarEvent/endpoints';
 import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
+import moment              from 'moment';
 
 // TODO let display formats be configurable
 const FORMAT_DISPLAY_DATE = 'ddd Do MMM';
@@ -71,7 +72,7 @@ export default {
                 list: {
                     type: 'list',
                     duration: { days: this.config.days },
-                    listDayFormat: this.$_fullCalendarHelper_dayTitleFormat,
+                    listDayFormat: this.config.momentJsDateLong,
                     listDaySideFormat: false
                 }
             },
@@ -82,7 +83,8 @@ export default {
             events: this.events,
             eventDidMount: this.$_fullCalendarHelper_eventRender,
             noEventsDidMount: null, //hide the no events message
-            eventClick: this.onEventClick
+            eventClick: this.onEventClick,
+            loading: this.onLoading,
         }
     },
 
@@ -94,6 +96,45 @@ export default {
     },
 
     methods: {
+
+        /**
+         * To check whether the heading needs to be updated on the homepage dashboard
+         */
+        onLoading (isLoading) {
+            if (!isLoading && this.config.isDashboard) {
+                this.updateHeadingDisplay();
+            }
+        },
+
+        /**
+         * To add the <h2 class="subheader"> and remove the lists own date display
+         */
+        updateHeadingDisplay () {
+
+            const headingElement = document.createElement('h2');
+            headingElement.classList.add('subheader');
+            headingElement.innerText = moment(new Date()).format(this.config.momentJsDateLong);
+
+            /**
+             * For example:
+             * <div class="small-12 island">
+             *      <h2 class="subheader">
+             *      <section>
+             *          <div id="calendar">
+             *              <calendar-component />
+             *          </div>
+             *      </section>
+             *  </div>
+             */
+            const containerElement = this.$el.parentElement.parentElement.parentElement;
+            const sectionElement = this.$el.parentElement.parentElement;
+            containerElement.insertBefore(headingElement, sectionElement);
+
+            this.$nextTick().then(() => { //pull out the built in date display
+                this.$el.querySelector('[data-date]').style.display = 'none';
+            });
+
+        },
 
         /**
          * Event source.

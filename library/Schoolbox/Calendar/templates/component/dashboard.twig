@@ -14,6 +14,8 @@
             exportUrl: '',
             importEventsUrl: "/calendar/import",
             canCreateEvent: false,
+            momentJsDateLong:  '{{ config.date_long | momentJsFormat }}',
+            isDashboard: true
         };
     </script>
 {% endautoescape %}
