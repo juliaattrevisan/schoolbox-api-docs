@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright   Copyright 2021, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
@@ -84,6 +89,7 @@ class Session
      * @param string $username New user's user.username
      * @param bool $remember Whether to store a 'remember' me cookie
      * @return bool Whether new Session started for proposed user
+     * @throws MapperException
      */
     public function create($username, $remember = false)
     {
@@ -181,6 +187,9 @@ class Session
         }
     }
 
+    /**
+     * Destroys session
+     */
     public function destroy()
     {
         @session_destroy();
@@ -292,32 +301,42 @@ class Session
     /**
      * Connect to the provided LDAP host.
      *
-     * @param string      $host       The LDAP host's URL
-     * @param string      $username   A username for auth to the LDAP host.
-     *                                This is distinct from the username that is
-     *                                being searched for within LDAP.
-     * @param string      $password   A password for auth to the LDAP host.
-     *                                This is distinct from the password for the
-     *                                username that is being searched for.
-     * @param string|null $caCertPath If provided, a local path to a cert.
-     *                                This must be a local file, because the
-     *                                LDAP extension needs to access this file.
+     * @param string      $host           The LDAP host's URL
+     * @param string      $username       A username for auth to the LDAP host.
+     *                                    This is distinct from the username that is
+     *                                    being searched for within LDAP.
+     * @param string      $password       A password for auth to the LDAP host.
+     *                                    This is distinct from the password for the
+     *                                    username that is being searched for.
+     * @param string|null $ldapCaCertHash If provided, hash of a local path to a cert.
+     *                                    This must be a local file, because the
+     *                                    LDAP extension needs to access this file.
      * @return bool|resource The connection, or false if none could be created.
+     * @throws MapperException
      */
-    private function ldapConnect(string $host, string $username, string $password, ?string $caCertPath)
+    public function ldapConnect(string $host, string $username, string $password, ?string $ldapCaCertHash)
     {
         if ($host) {
+            if ($ldapCaCertHash) {
+                // Copy this file to local cache somewhere (stream_dir I guess)
+                $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
+                $ldapCaCertPath = sprintf(
+                    '%s/ldap-ca-cert-%s-%s',
+                    Config::get('stream_dir'),
+                    INSTANCE_ID,
+                    $ldapCaCert->getHash()
+                );
+                if (!file_exists($ldapCaCertPath)) {
+                    file_put_contents($ldapCaCertPath, $ldapCaCert->read());
+                }
+                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
+                ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
+            }
             $ds = ldap_connect($host);
             if ($ds) {
                 ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, 3);
                 ldap_set_option($ds, LDAP_OPT_REFERRALS, 0);
-                if ($caCertPath) {
-                    // https://bugs.php.net/bug.php?id=73558
-                    // suggests that both CA cert dir and file need to be set.
-                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTDIR, dirname($caCertPath));
-                    ldap_set_option($ds, LDAP_OPT_X_TLS_CACERTFILE, $caCertPath);
-                }
-                @ldap_bind($ds, $this->ldap_escape($username), utf8_encode($password));
+                @ldap_bind($ds, $this->ldapEscape($username), utf8_encode($password));
                 return $ds;
             }
         }
@@ -354,7 +373,7 @@ class Session
         if (!$ds) {
             return false;
         }
-        $searchString = "(" . $usernameField . "=" . $this->ldap_escape($username) . ")";
+        $searchString = "(" . $usernameField . "=" . $this->ldapEscape($username) . ")";
         if ($searchFilter !== '') {
             $searchString = sprintf('(&(%s)%s)', $searchFilter, $searchString);
         }
@@ -398,8 +417,8 @@ class Session
                     }
                     @ldap_unbind($ds);
                     return false;
-                } // successful connection.
-                else {
+                } else {
+                    // successful connection.
                     @ldap_unbind($ds);
                     return true;
                 }
@@ -410,6 +429,12 @@ class Session
         return false;
     }
 
+    /**
+     * @param string $username
+     * @param string $password
+     * @return bool
+     * @throws MapperException
+     */
     private function authenticateLDAP($username, $password)
     {
         $ldapConfigs = [
@@ -433,22 +458,8 @@ class Session
         $ldapUsernameField = Config::get('ldap_username');
         $ldapSearchFilter  = Config::get('ldap_search_filter');
         $ldapCaCertHash    = Config::get('ldap_ca_certificate');
-        $ldapCaCertPath    = null;
-        if ($ldapCaCertHash) {
-            // Copy this file to local cache somewhere (stream_dir I guess)
-            $ldapCaCert     = StorageMapper::getInstance()->findByHash($ldapCaCertHash);
-            $ldapCaCertPath = sprintf(
-                '%s/ldap-ca-cert-%s-%s',
-                Config::get('stream_dir'),
-                INSTANCE_ID,
-                $ldapCaCert->getHash()
-            );
-            if (!file_exists($ldapCaCertPath)) {
-                file_put_contents($ldapCaCertPath, $ldapCaCert->read());
-            }
-        }
         foreach ($ldapConfigs as $ldapConfig) {
-            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertPath);
+            $ds = $this->ldapConnect($ldapConfig['host'], $ldapConfig['username'], $ldapPassword, $ldapCaCertHash);
             if (
                 $ds && $this->ldapAuth(
                     $ds,
@@ -481,7 +492,12 @@ class Session
         return $passwordValidator->checkPassword($username, $password);
     }
 
-    public function ldap_escape($str, $for_dn = false)
+    /**
+     * @param string $str
+     * @param bool   $for_dn
+     * @return array|string|string[]
+     */
+    public function ldapEscape($str, $for_dn = false)
     {
 
         // see:
@@ -502,6 +518,10 @@ class Session
         $str = str_replace($metaChars, $quotedMetaChars, $str); //replace them
         return ($str);
     }
+
+    /**
+     * @return bool
+     */
     public function checkBruteForce()
     {
         // Function to check that host isnt brute forceing the login
@@ -529,6 +549,7 @@ class Session
     /**
      * @param UserMapper $userMapper
      * @param User       $user
+     * @throws MapperException
      */
     private function setSynergyInfo(UserMapper $userMapper, User $user)
     {
