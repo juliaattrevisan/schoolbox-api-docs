@@ -57,6 +57,7 @@ echo "Deploying schoolbox config files"
 mkdir -p /etc/schoolbox
 cp tools/ci/etc/config.ini /etc/schoolbox/config.ini
 cp tools/ci/etc/instances.ini /etc/schoolbox/instances.ini
+tools/set-plan.php --plan=elite
 export INSTANCE_ID=smoketest
 
 # Extract the build files from either develop or stable depending on where we run
