@@ -65,7 +65,7 @@
 
             /* Remove default plugins; add Schoolbox Custom Plugins
              */
-            removePlugins: 'image,image2,uploadimage',
+            removePlugins: 'image,image2,uploadimage,autolink,autoembed',
             extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
 
             /* Other settings
@@ -159,7 +159,7 @@
         // removed all the Schoolboxlink plugins: comments should be plain text
         // anyway.
         return init({
-            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount',
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed',
             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
             toolbarGroups: [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},

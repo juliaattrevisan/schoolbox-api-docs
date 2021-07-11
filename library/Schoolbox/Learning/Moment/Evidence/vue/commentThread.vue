@@ -54,7 +54,7 @@ export default {
             isCKEditorReady: false,
             ckeditorConfig: {
                 embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
-                removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount',
+                removePlugins: 'image,uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed',
                 removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                 toolbarGroups: [
                     {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
