@@ -32,7 +32,7 @@ if (!isset($_GET['mime'])) {
 } elseif ('' === $_GET['mime']) {
     $mimeFilter = false;
 } else {
-    $mimeFilter = urldecode($_GET['mime']);
+    $mimeFilter = preg_replace('/[^a-zA-Z0-9_\-*;.\/]/', '', urldecode($_GET['mime']));
 }
 
 /* Whether there is a Use This Folder button
