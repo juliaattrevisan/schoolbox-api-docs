@@ -65,7 +65,7 @@
 
             /* Remove default plugins; add Schoolbox Custom Plugins
              */
-            removePlugins: 'image,image2,uploadimage,autolink,autoembed',
+            removePlugins: 'image,image2,uploadimage',
             extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
 
             /* Other settings
