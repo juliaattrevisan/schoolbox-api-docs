@@ -14,7 +14,6 @@
         var defaults =  {
             toolbarGroups: [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                {name: 'links', groups: ['links']},
                 /* Custom schoolbox-specific plugin stuff can go here
                  * This is a hole into which you may put once-off abilities
                  * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
@@ -164,7 +163,6 @@
             toolbarGroups: [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                 {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                {name: 'links', groups: ['links']},
                 {name: 'insert', groups: ['insert']},
                 // {name: 'schoolbox', groups: ['schoolboxlink']},
             ],

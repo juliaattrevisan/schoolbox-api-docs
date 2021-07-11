@@ -238,12 +238,11 @@ export default {
                         targetElements: $('#comment'),
                         startupFocus: true,
                         height: '8rem',
-                        removePlugins: 'uploadimage,link,schoolboxanchor,autolink,autoembed',
+                        removePlugins: 'uploadimage,schoolboxanchor',
                         removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                         toolbarGroups: [
                             {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                             {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                            {name: 'links', groups: ['links']},
                             {name: 'insert', groups: ['insert']},
                             {name: 'schoolbox', groups: ['schoolboxlink']}
                         ],

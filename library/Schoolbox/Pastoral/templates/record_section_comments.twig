@@ -80,12 +80,11 @@
             {# Disable the add comment button if text box is empty to prevent saving blank comments #}
             $(function () {
                 $.fn.alaressEditor({
-                    removePlugins: 'uploadimage,link,schoolboxanchor,autolink,autoembed',
+                    removePlugins: 'uploadimage,schoolboxanchor',
                     removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
                     toolbarGroups: [
                         {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                         {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                        {name: 'links', groups: ['links']},
                         {name: 'insert', groups: ['insert']},
 
                         /* Custom schoolbox-specific plugin stuff can go here

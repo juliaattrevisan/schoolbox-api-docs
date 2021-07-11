@@ -59,7 +59,6 @@ export default {
                 toolbarGroups: [
                     {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                     {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                    {name: 'links', groups: ['links']},
                     {name: 'insert', groups: ['insert']}
                 ],
                 contentsCss: [
