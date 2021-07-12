@@ -1,7 +1,6 @@
 <?php
 
 /**
- * ${NAME}
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
@@ -17,17 +16,14 @@ if (isset($this)) {
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
+/** @var SitePage $page */
+$pageHandler = $kernel->get('sitePage');
+$pageHandler->initSession();
+
 $return = array();
 if (isset($_GET['query']) && strlen($_GET['query']) && isset($_GET['groupID']) && strlen($_GET['groupID'])) {
-    $groupIds = $_GET['groupID'];
-
-    /* Allow for multiple groups search via autocompletes
-     */
-    if (strlen($groupIds) && strstr($groupIds, ';')) {
-        $groupIdArray = explode(';', $groupIds);
-    } else if (is_numeric($_GET['groupID'])) {
-        $groupIdArray = array($_GET['groupID']);
-    }
+    $groupIds = explode(';', $_GET['groupID']);
+    $groupIdArray = array_map('intval', array_filter($groupIds, 'is_numeric'));
 
     $userMapper = new Schoolbox\UserMapper();
 

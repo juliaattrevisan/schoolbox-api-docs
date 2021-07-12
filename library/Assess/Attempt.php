@@ -91,6 +91,6 @@ class Assess_Attempt extends Evaluation_Attempt
      */
     private function buildReviewableAttemptsForQuery(array $attemptIds)
     {
-        return implode(',', array_map([$this->db, 'quote'], $attemptIds));
+        return implode(',', array_map([$this->db, 'smartQuote'], $attemptIds));
     }
 }

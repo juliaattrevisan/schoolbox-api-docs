@@ -283,10 +283,10 @@ class User extends DeprecatedModel
     /**
      * Find a user based on a keyword, for an AJAX response.
      *
-     * @param string $keyword
-     * @param int    $group
-     * @param array  $residentialHouseIds
-     * @param bool   $limit
+     * @param string    $keyword
+     * @param int|array $group
+     * @param array     $residentialHouseIds
+     * @param int|bool  $limit
      * @return array|bool
      * @throws Exception
      */
@@ -327,8 +327,8 @@ class User extends DeprecatedModel
                     $query .= "( firstname like '%$param%' or lastname like '%$param%' or username like '%$param%' ) ";
                 }
             }
-            if (is_array($group)) {
-                $query .= "AND group_id IN (" . implode(',', array_map(array($this->db, 'quote'), $group)) . ") ";
+            if (is_array($group) && !empty($group)) {
+                $query .= "AND group_id IN (" . implode(',', array_map(array($this->db, 'smartQuote'), $group)) . ") ";
             } else {
                 if (is_numeric($group) && $group > 0) {
                     $param = $this->db->quote($group);
@@ -397,7 +397,7 @@ class User extends DeprecatedModel
     /**
      * Gets all in the system who are in a particular groupID
      *
-     * @param int $groupID
+     * @param int|array $groupID
      * @param bool $hasSynergy If true (default: false), only returns users with synergy IDs
      * @return array
      */

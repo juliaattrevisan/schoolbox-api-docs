@@ -544,30 +544,35 @@ class UserMapper extends Mapper
      * @throws Mapper\Exception
      * @throws \PDOException
      */
-    public function findByNameAndGroup($name, $permittedValues)
+    public function findByNameAndGroup($name, $permittedValues): Schoolbox\Collection
     {
         $collection = new Schoolbox\Collection();
+
+        if (empty($permittedValues)) {
+            return $collection;
+        }
+
         $roleMapper = new RoleMapper();
-        $userMapper = \Schoolbox\UserMapper::getInstance();
         $yearLevelMapper = \Schoolbox\YearLevel\Mapper::getInstance();
 
-        $permittedValuesSql = implode(',', $permittedValues);
+        $pb = $this->getPredicateBuilder();
+        $pb->any($this->getPredicateBuilder()->like('u.firstname', "%$name%")->like('u.lastname', "%$name%"));
+        $pb->in('u.group_id', $permittedValues);
 
         $query = "
             SELECT
                 {$this->getColumnString('u')},
                 {$roleMapper->getColumnString('g')},
-                {$userMapper->getJoinColumnString('year', 'lyl')}
+                {$this->getJoinColumnString('year', 'lyl')}
             FROM `{$this->table}` u
             LEFT JOIN `groups` g ON group_id = g.`id`
-            LEFT JOIN {$userMapper->getJoinSql('year', 'u', 'lyl')}
-            WHERE (firstname LIKE ? OR lastname LIKE ?)
-            AND group_id IN ({$permittedValuesSql})
-        ";
+            LEFT JOIN {$this->getJoinSql('year', 'u', 'lyl')}
+            WHERE
+        " . implode(' AND ', $pb->getWhere());
 
         $statement = $this->database->prepare($query);
 
-        $statement->execute(array("%$name%", "%$name%"));
+        $statement->execute($pb->getParams());
 
         foreach ($statement as $row) {
             $user = $this->hydrate($row, 'u');
