@@ -19,11 +19,10 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Filter\Selection as FilterSelection;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
-use Schoolbox\Role;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -56,7 +55,14 @@ class Module extends BaseModule
                 $basicPermissions,
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
+                    new Rule\Callback(
+                        function (array $params, User $user) {
+                            if ($user->getRole()->isStaff() && $user->getRole()->getViewStudentGrades()) {
+                                return true;
+                            }
+                            throw new Unauthorized();
+                        }
+                    ),
                     new Rule\IsUser('userId'),
                     new Rule\All(
                         new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),

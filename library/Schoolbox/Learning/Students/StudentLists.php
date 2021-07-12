@@ -195,7 +195,7 @@ class StudentLists
         }
 
         // Grades
-        if ($this->gradesEnabled) {
+        if ($this->gradesEnabled && (!$this->viewer->getRole()->isStaff() || $this->viewer->getRole()->getViewStudentGrades())) {
             $studentSisRecord['routes']['grades'] = [
                 'label' => $this->rosettaStone->translate('grades', true, true),
                 'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),

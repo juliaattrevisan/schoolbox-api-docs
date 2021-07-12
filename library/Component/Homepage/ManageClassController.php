@@ -203,18 +203,18 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         );
 
         /* Output student grades link to students (other users with READ access may be able to see this page) */
+        $route  = 'learningGrades.getGradesForSubject';
+        $params = [
+            'userId'    => $this->getUser()->getId(),
+            'termCode'  => $currentTerm->getCode(),
+            'subjectId' => $this->getContext()->getId(),
+        ];
         if (
             ($involvedInGroup || $involvedInClass)
-            && Config::get(ConfigMapper::NAME_GRADES_ENABLED)
             && UserAccess::ACCESS_READ === $this->getContentPermission()
-            && $this->getContext()->isGradePageEnabled()
+            && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())
+
         ) {
-            $route       = 'learningGrades.getGradesForSubject';
-            $params      = [
-                'userId'    => $this->getUser()->getId(),
-                'termCode'  => $currentTerm->getCode(),
-                'subjectId' => $this->getContext()->getId(),
-            ];
             $this->setVar('STUDENT_GRADE_LINK', $this->getRouter()->generate($route, $params));
             $this->parse('student_grades_block', 'student_grades');
             $hasClassActions = true;

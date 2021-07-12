@@ -380,6 +380,7 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         }, true);
 
         if ($allGroups->count() > 0) {
+            $hasGroup = false;
             foreach ($allGroups as $currentGroup) {
                 /* Check permissions on whether you can view this subject's homepage
                  * If you can get there, you can see it, otherwise it's hidden
@@ -402,10 +403,14 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
                         'group_linked_block' => '',
                         'group_unlinked_block' => '',
                     ));
+                    $hasGroup = true;
                 }
             }
-
-            $this->getPage()->parse('has_groups_block', 'has_groups');
+            if ($hasGroup) {
+                $this->getPage()->parse('has_groups_block', 'has_groups');
+            } else {
+                $this->getPage()->setVar('has_groups_block', '');
+            }
         } else {
             $this->getPage()->setVar('has_groups_block', '');
         }
