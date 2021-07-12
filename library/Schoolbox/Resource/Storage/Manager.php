@@ -267,7 +267,7 @@ class Manager
         } catch (FileNotFoundException $e) {
             return false;
         }
-        $sanitizedContent = $this->sanitizer->sanitize((string)$storage->getMimetype(), $unsafeContent);
+        $sanitizedContent = $this->sanitizer->sanitize($storage->getMime(), $unsafeContent);
         if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
             return false;
         }
