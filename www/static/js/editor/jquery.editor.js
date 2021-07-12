@@ -14,7 +14,6 @@
         var defaults =  {
             toolbarGroups: [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-                {name: 'links', groups: ['links']},
                 /* Custom schoolbox-specific plugin stuff can go here
                  * This is a hole into which you may put once-off abilities
                  * for the ckeditor (such as Make Blank, in Quiz/Fillgap)
@@ -159,12 +158,11 @@
         // removed all the Schoolboxlink plugins: comments should be plain text
         // anyway.
         return init({
-            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount',
+            removePlugins: 'uploadimage,link,schoolboxanchor,elementspath,wordcount,autolink,autoembed',
             removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
             toolbarGroups: [
                 {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                 {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
-                {name: 'links', groups: ['links']},
                 {name: 'insert', groups: ['insert']},
                 // {name: 'schoolbox', groups: ['schoolboxlink']},
             ],
