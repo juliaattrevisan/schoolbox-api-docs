@@ -286,7 +286,7 @@ class User extends DeprecatedModel
      * @param string    $keyword
      * @param int|array $group
      * @param array     $residentialHouseIds
-     * @param bool      $limit
+     * @param int|bool  $limit
      * @return array|bool
      * @throws Exception
      */
