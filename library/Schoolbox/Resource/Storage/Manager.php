@@ -8,7 +8,9 @@
 
 namespace Schoolbox\Resource\Storage;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress_Byte_Format;
+use enshrined\svgSanitize\Sanitizer as BaseSanitizer;
 use InvalidArgumentException;
 use League\Flysystem;
 use League\Flysystem\FileExistsException;
@@ -18,7 +20,6 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
 use Schoolbox\File\Exception as FileException;
 use Schoolbox\File\Mimetype;
-use enshrined\svgSanitize\Sanitizer;
 
 use function sprintf;
 
@@ -168,9 +169,7 @@ class Manager
     protected function copy(string $tmpFilePath, Model $storage): bool
     {
         try {
-            if (strtolower((string)$storage->getMimetype()) === 'image/svg+xml') {
-                $this->sanitize(self::FS_TEMP, $tmpFilePath);
-            }
+            $this->sanitize($storage, self::FS_TEMP, $tmpFilePath);
             return $this->mountManager->copy(
                 self::FS_TEMP . "://$tmpFilePath",
                 self::FS_STORAGE . '://' . $storage->getPath()
@@ -193,9 +192,7 @@ class Manager
      */
     private function move(string $tmpFilePath, Model $storage): bool
     {
-        if (strtolower((string)$storage->getMimetype()) === 'image/svg+xml') {
-            $this->sanitize(self::FS_TEMP, $tmpFilePath);
-        }
+        $this->sanitize($storage, self::FS_TEMP, $tmpFilePath);
 
         /** @var Filesystem $fsFrom */
         $fsFrom = $this->mountManager->getFilesystem(self::FS_TEMP);
@@ -238,30 +235,43 @@ class Manager
     }
 
     /**
-     * Sanitize before storing
-     * @param string $fileSystem
-     * @param string $path
-     * @param bool   $dryRun
+     * Sanitize file prior to storing.
+     *
+     * @param Model  $storage    The storage object for the file: required so
+     *                           that the sanitizer knows how to sanitise the
+     *                           file.
+     * @param string $fileSystem Which filesystem contains the file's current
+     *                           content? Required because this may operate on a
+     *                           file before it is actually stored: this may be
+     *                           a temp filesystem.
+     * @param string $path       Where is the file within `$fileSystem`?
+     * @param bool   $dryRun     If true: don't actually sanitize: just return
+     *                           whether it would have been.
      * @return bool
      */
-    public function sanitize(string $fileSystem, string $path, bool $dryRun = false): bool
+    public function sanitize(Model $storage, string $fileSystem, string $path, bool $dryRun = false): bool
     {
-        // purify before storing, if the file is svg
-        $sanitizer = new Sanitizer();
-        $sanitizer->minify(true);
+        // TODO inject this
+        $baseSanitizer = new BaseSanitizer();
+        $baseSanitizer->minify(true);
+        $sanitizer = new Sanitizer\Composite(
+            new Sanitizer\Svg($baseSanitizer),
+            new Sanitizer\Html(new ScrubAdapter())
+        );
+
         try {
-            $rawSVG = $this->mountManager->getFilesystem($fileSystem)->read($path);
+            $unsafeContent = $this->mountManager->getFilesystem($fileSystem)->read($path);
         } catch (FileNotFoundException $e) {
             return false;
         }
-        $purifiedSVG = $sanitizer->sanitize($rawSVG);
-        if (!$purifiedSVG || $rawSVG === $purifiedSVG) {
+        $sanitizedContent = $sanitizer->sanitize((string)$storage->getMimetype(), $unsafeContent);
+        if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
             return false;
         }
         if ($dryRun) {
             return true;
         }
-        return $this->mountManager->getFilesystem($fileSystem)->put($path, $purifiedSVG);
+        return $this->mountManager->getFilesystem($fileSystem)->put($path, $sanitizedContent);
     }
 
     /**

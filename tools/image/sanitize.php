@@ -30,7 +30,7 @@ $app = new class extends CliTool\App {
         $svgFiles      = $storageMapper->findByColumn('ext', 'svg');
         /** @var Storage $svgFile */
         foreach ($svgFiles as $svgFile) {
-            $result = $mountManager->sanitize($mountManager::FS_STORAGE, $svgFile->getPath(), !$this->perform());
+            $result = $mountManager->sanitize($svgFile, $mountManager::FS_STORAGE, $svgFile->getPath(), !$this->perform());
             if ($result) {
                 $this->getLogger()->debug(($this->perform() ? 'Sanitized: ' : 'Will be sanitized: ') . $svgFile->getHash());
             } else {
