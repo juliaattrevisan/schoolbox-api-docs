@@ -283,10 +283,10 @@ class User extends DeprecatedModel
     /**
      * Find a user based on a keyword, for an AJAX response.
      *
-     * @param string $keyword
-     * @param int    $group
-     * @param array  $residentialHouseIds
-     * @param bool   $limit
+     * @param string    $keyword
+     * @param int|array $group
+     * @param array     $residentialHouseIds
+     * @param bool      $limit
      * @return array|bool
      * @throws Exception
      */
