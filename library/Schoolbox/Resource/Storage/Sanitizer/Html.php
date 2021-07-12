@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Storage\Sanitizer;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
-use enshrined\svgSanitize\Sanitizer;
 
 /**
  * Sanitizer for HTML files.
