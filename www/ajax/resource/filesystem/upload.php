@@ -49,7 +49,7 @@ switch (count($this->arg)) {
 
 $this->setVar(array(
     'MAX_FILES'      => $maxFiles,
-    'ACCEPTED_FILES' => $allowedFiles
+    'ACCEPTED_FILES' => Scrub::text($allowedFiles)
 ));
 
 $this->injectGlobalVars();
