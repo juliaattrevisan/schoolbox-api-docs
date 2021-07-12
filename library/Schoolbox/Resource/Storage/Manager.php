@@ -262,6 +262,9 @@ class Manager
      */
     public function sanitize(Model $storage, string $fileSystem, string $path, bool $dryRun = false): bool
     {
+        if (!$this->sanitizer->accepts($storage->getMime())) {
+            return false;
+        }
         try {
             $unsafeContent = $this->mountManager->getFilesystem($fileSystem)->read($path);
         } catch (FileNotFoundException $e) {
