@@ -9,6 +9,7 @@
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use Schoolbox\Resource\Attachment\AbstractController;
+use Scrub;
 use SitePage;
 
 /**
@@ -27,7 +28,7 @@ class UploadController extends AbstractController
         if (is_null($this->mimeFilter) || $this->mimeFilter == '*/*') {
             $mime = 'null';
         } else {
-            $mime = "'{$this->mimeFilter}'";
+            $mime = "'" . Scrub::text($this->mimeFilter) . "'";
         }
 
         $page->setVar(array(

@@ -10,6 +10,7 @@ namespace Schoolbox\Resource\Attachment;
 
 use Schoolbox\IConfigLoader;
 use Schoolbox\L10n\RosettaStone;
+use Scrub;
 use SitePage;
 
 /**
@@ -61,7 +62,7 @@ abstract class NavigatorController extends AbstractController
         } elseif (false === $this->mimeFilter || '' === $this->mimeFilter) {
             $mimeFilter = 'false';
         } else {
-            $mimeFilter = "'" . urldecode($this->mimeFilter) . "'";
+            $mimeFilter = "'" . Scrub::text(urldecode($this->mimeFilter)) . "'";
         }
 
         /* Enable a Use This Folder button in the component action bar, but only
