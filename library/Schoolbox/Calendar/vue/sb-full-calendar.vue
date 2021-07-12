@@ -16,7 +16,7 @@ import axios                      from 'axios'
 import qs                         from "qs";
 import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
-import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@schoolbox/fullcalendar/customised-calendar-event';
 
 
 // Various URLs that FullCalendar may make use of.

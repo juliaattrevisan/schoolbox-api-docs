@@ -131,19 +131,29 @@ export const mixinFullCalendarHelper = {
          * Helper function to determine the FullCalendar component's content height.
          *
          * This is a straight port of the old jQuery FullCalendar content height
-         * callback.
+         * callback, updated to not break the call stack under FullCalendar 5.8.
          *
          * @return {number}
          */
         $_fullCalendarHelper_contentHeight() {
-
             const windowHeight = window.innerHeight;
-            // The amount of space between the top of the window and the start of the calendar
-            const calendarOffset = this.jQuery(this.$el).find('.fc-view-harness').offset().top;
+            // FullCalendar is prone to raising a maximum call stack exceeded
+            // error when:
+            // * dayMaxEventRows isn't false
+            // * this content height is calculated relative to the current size
+            //   of the calendar's view
+            // Therefore, the calculation has been adjusted to be relative to
+            // elements which are known to exist independent of the calendar;
+            // in this case, the content pane and the footer.
+            const calendarOffset = this.jQuery('#content').offset().top;
             // <section> margin-bottom and #container padding-bottom
-            const otherPadding = 32;
-            const contentHeight = windowHeight - calendarOffset  - otherPadding;
-            
+            const footerHeight = this.jQuery('#footer').outerHeight();
+
+            // A reasonable guess at the space between the start of the content
+            // and the calendar content.
+            const otherPadding = 180;
+            const contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
+
             // Force a min height of 500px
             if (contentHeight < 500) {
                 return 500;
