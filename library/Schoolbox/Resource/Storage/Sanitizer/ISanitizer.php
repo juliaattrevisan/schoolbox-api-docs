@@ -9,30 +9,19 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Sanitizer;
 
-use League\Flysystem\FilesystemInterface;
-
 /**
  * Interface for classes which may sanitize files before storage.
  */
 interface ISanitizer
 {
     /**
-     * Should this sanitizer attempt to sanitize files with this mimetype?
+     * Sanitize a file.
      *
-     * @param string $mimetype
-     * @return bool
+     * @param string $mimetype The file's mimetype: required to determine if
+     *                         this sanitizer can actually sanitize this file
+     * @param string $contents The file's contents
+     * @return string|null     Sanitized content, or null if this sanitizer does
+     *                         not accept files of type `$mimetype`
      */
-    public function accepts(string $mimetype): bool;
-
-    /**
-     * Sanitize a file before it is stored.
-     *
-     * @param FilesystemInterface $fileSystem Where does the file live?
-     * @param string              $path       Path on `$filesystem` where this
-     *                                        file lives
-     * @param bool                $dryRun     If true: only pretend to sanitize
-     *                                        the file
-     * @return bool Was the file actually changed?
-     */
-    public function sanitizeBeforeStorage(FilesystemInterface $fileSystem, string $path, bool $dryRun = false): bool;
+    public function sanitize(string $mimetype, string $contents): ?string;
 }

@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Sanitizer;
 
-use League\Flysystem\FilesystemInterface;
-
 /**
  * Composite sanitizer: attempts to sanitize a file using all of the sanitizers
  * passed into the constructor in order.
@@ -35,26 +33,14 @@ class Composite implements ISanitizer
     /**
      * @inheritdoc
      */
-    public function accepts(string $mimetype): bool
+    public function sanitize(string $mimetype, string $contents): ?string
     {
         foreach ($this->sanitizers as $sanitizer) {
-            if ($sanitizer->accepts($mimetype)) {
-                return true;
+            $result = $sanitizer->sanitize($mimetype, $contents);
+            if (isset($result)) {
+                return $result;
             }
         }
-        return false;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function sanitizeBeforeStorage(FilesystemInterface $fileSystem, string $path, bool $dryRun = false): bool
-    {
-        foreach ($this->sanitizers as $sanitizer) {
-            if ($sanitizer->sanitizeBeforeStorage($fileSystem, $path, $dryRun)) {
-                return true;
-            }
-        }
-        return false;
+        return null;
     }
 }
