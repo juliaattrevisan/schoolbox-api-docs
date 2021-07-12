@@ -8,9 +8,7 @@
 
 namespace Schoolbox\Resource\Storage;
 
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress_Byte_Format;
-use enshrined\svgSanitize\Sanitizer as BaseSanitizer;
 use InvalidArgumentException;
 use League\Flysystem;
 use League\Flysystem\FileExistsException;
@@ -43,13 +41,26 @@ class Manager
     protected $mountManager;
 
     /**
-     * @param MountManager        $mountManager
-     * @param Alaress_Byte_Format $alaressByteFormat
+     * Sanitizer object, for ensuring that uploaded files are sanitized
+     * appropriately.
      */
-    public function __construct(MountManager $mountManager, Alaress_Byte_Format $alaressByteFormat)
-    {
+    private Sanitizer\ISanitizer $sanitizer;
+
+    /**
+     * Constructor
+     *
+     * @param MountManager         $mountManager
+     * @param Alaress_Byte_Format  $alaressByteFormat
+     * @param Sanitizer\ISanitizer $sanitizer
+     */
+    public function __construct(
+        MountManager $mountManager,
+        Alaress_Byte_Format $alaressByteFormat,
+        Sanitizer\ISanitizer $sanitizer
+    ) {
         $this->mountManager      = $mountManager;
         $this->alaressByteFormat = $alaressByteFormat;
+        $this->sanitizer         = $sanitizer;
     }
 
     /**
@@ -251,20 +262,12 @@ class Manager
      */
     public function sanitize(Model $storage, string $fileSystem, string $path, bool $dryRun = false): bool
     {
-        // TODO inject this
-        $baseSanitizer = new BaseSanitizer();
-        $baseSanitizer->minify(true);
-        $sanitizer = new Sanitizer\Composite(
-            new Sanitizer\Svg($baseSanitizer),
-            new Sanitizer\Html(new ScrubAdapter())
-        );
-
         try {
             $unsafeContent = $this->mountManager->getFilesystem($fileSystem)->read($path);
         } catch (FileNotFoundException $e) {
             return false;
         }
-        $sanitizedContent = $sanitizer->sanitize((string)$storage->getMimetype(), $unsafeContent);
+        $sanitizedContent = $this->sanitizer->sanitize((string)$storage->getMimetype(), $unsafeContent);
         if (!isset($sanitizedContent) || $unsafeContent === $sanitizedContent) {
             return false;
         }
