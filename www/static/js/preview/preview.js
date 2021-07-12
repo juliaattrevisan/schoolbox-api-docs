@@ -83,10 +83,23 @@
                             });
                         }
                         else if( response.type == 'iframe') {
+                            // The iframe is always sandboxed, which prevents
+                            // scripts running within it.
+                            // The full sandbox will be appropriate for the main
+                            // use-case for iframes (HTML and text uploaded to
+                            // storage), but could interfere with another case
+                            // (link component links pointing to non-embeddable
+                            //  safe iframes)
                             $.magnificPopup.open({
                                 items: {
                                     src: response.fragment,
                                     type: 'iframe'
+                                },
+                                iframe: {
+                                    markup: '<div class="mfp-iframe-scaler">'+
+                                        '<div class="mfp-close"></div>'+
+                                        '<iframe class="mfp-iframe" src="//about:blank" frameborder="0" allowfullscreen sandbox></iframe>'+
+                                        '</div>'
                                 }
                             });
                         }
