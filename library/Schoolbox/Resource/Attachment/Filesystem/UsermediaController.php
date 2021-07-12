@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Attachment\Filesystem;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
+use Scrub;
 use SitePage;
 
 /**
@@ -33,7 +34,7 @@ class UsermediaController extends AbstractController
         if (is_null($this->mimeFilter) || $this->mimeFilter == '*/*') {
             $mime = 'null';
         } else {
-            $mime = "'{$this->mimeFilter}'";
+            $mime = "'" . Scrub::text($this->mimeFilter) . "'";
         }
 
         /** @var IConfigLoader $config */
