@@ -15,6 +15,14 @@ namespace Schoolbox\Resource\Storage\Sanitizer;
 interface ISanitizer
 {
     /**
+     * Should this sanitizer attempt to sanitize files with this mimetype?
+     *
+     * @param string $mimetype
+     * @return bool
+     */
+    public function accepts(string $mimetype): bool;
+
+    /**
      * Sanitize a file.
      *
      * @param string $mimetype The file's mimetype: required to determine if

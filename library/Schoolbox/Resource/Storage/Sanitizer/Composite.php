@@ -33,6 +33,19 @@ class Composite implements ISanitizer
     /**
      * @inheritdoc
      */
+    public function accepts(string $mimetype): bool
+    {
+        foreach ($this->sanitizers as $sanitizer) {
+            if ($sanitizer->accepts($mimetype)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function sanitize(string $mimetype, string $contents): ?string
     {
         foreach ($this->sanitizers as $sanitizer) {

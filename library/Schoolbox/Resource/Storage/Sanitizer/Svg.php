@@ -39,11 +39,18 @@ class Svg implements ISanitizer
     /**
      * @inheritdoc
      */
+    public function accepts(string $mimetype): bool
+    {
+        return $mimetype === self::ACCEPTED_MIMETYPE;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function sanitize(string $mimetype, string $contents): ?string
     {
-        if ($mimetype !== self::ACCEPTED_MIMETYPE) {
-            return null;
-        }
-        return $this->sanitizer->sanitize($contents);
+        return $this->accepts($mimetype)
+            ? $this->sanitizer->sanitize($contents)
+            : null;
     }
 }
