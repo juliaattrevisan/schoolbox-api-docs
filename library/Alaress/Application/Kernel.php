@@ -12,6 +12,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Database\Factory as AlaressDatabaseFactory;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Redis;
 use Alaress\Session\Factory;
@@ -29,6 +30,7 @@ use Aura\Di;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
 use Config\Modules\ModuleConfigInterface;
+use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use External_Class;
 use External_ClassInterface;
 use External_Markbook;
@@ -118,6 +120,7 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 use Schoolbox\Realtime\Subscription\Redis\UnreadRetriever;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\Sanitizer;
 use Schoolbox\Role;
 use Schoolbox\Sync\Grammar\Factory as SyncGrammarFactory;
 use Schoolbox\Sync\Log\Mapper as SyncLogMapper;
@@ -1491,6 +1494,19 @@ abstract class Kernel
                 return new \Alaress\Lock\InstanceLockFactory(
                     new LockFactory(new RedisStore($di->get('redis'))),
                     INSTANCE_ID
+                );
+            })
+        );
+
+        // Storage upload/download sanitizer
+        $di->set(
+            'storage.sanitizer',
+            $di->lazy(function () {
+                $baseSvgSanitizer = new BaseSvgSanitizer();
+                $baseSvgSanitizer->minify(true);
+                return new Sanitizer\Composite(
+                    new Sanitizer\Svg($baseSvgSanitizer),
+                    new Sanitizer\Html(new ScrubAdapter())
                 );
             })
         );

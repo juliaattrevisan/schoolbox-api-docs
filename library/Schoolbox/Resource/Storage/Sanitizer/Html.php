@@ -1,0 +1,56 @@
+<?php
+
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Resource\Storage\Sanitizer;
+
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+
+/**
+ * Sanitizer for HTML files.
+ */
+class Html implements ISanitizer
+{
+    /**
+     * Which mime types does this sanitizer accept?
+     */
+    private const ACCEPTED_MIMETYPE = 'text/html';
+
+    /**
+     * The internal sanitizer this class uses to actually sanitize HTML.
+     */
+    private ScrubAdapter $scrubAdapter;
+
+    /**
+     * Constructor
+     *
+     * @param ScrubAdapter $scrubAdapter
+     */
+    public function __construct(ScrubAdapter $scrubAdapter)
+    {
+        $this->scrubAdapter = $scrubAdapter;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function accepts(string $mimetype): bool
+    {
+        return $mimetype === self::ACCEPTED_MIMETYPE;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function sanitize(string $mimetype, string $contents): ?string
+    {
+        return $this->accepts($mimetype)
+            ? $this->scrubAdapter->purify($contents)
+            : null;
+    }
+}

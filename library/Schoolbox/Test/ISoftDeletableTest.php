@@ -109,7 +109,13 @@ class ISoftDeletableTest extends TestCase
             if ($mapper instanceof Resource\Storage\Mapper) {
                 $fileSystem = new Filesystem(new NullAdapter());
                 $mgr        = new MountManager([Resource\Storage\Manager::FS_STORAGE => $fileSystem]);
-                $mapper->setManager(new Resource\Storage\Manager($mgr, new Alaress_Byte_Format()));
+                $mapper->setManager(
+                    new Resource\Storage\Manager(
+                        $mgr,
+                        new Alaress_Byte_Format(),
+                        new Resource\Storage\Sanitizer\Composite()
+                    )
+                );
             }
             $mappers[] = [$mapper, $reflection, $className];
         }
