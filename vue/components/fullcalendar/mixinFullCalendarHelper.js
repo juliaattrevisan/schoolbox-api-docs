@@ -7,7 +7,7 @@ import { toMoment } from '@fullcalendar/moment';
 import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
-const MAX_DAY_MAX_EVENT_ROWS = 4;
+const MAX_DAY_MAX_EVENT_ROWS = 3;
 
 export const mixinFullCalendarHelper = {
 
