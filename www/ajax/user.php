@@ -75,22 +75,23 @@ if (is_string($keyword) && strlen($keyword) > 1 && strlen($keyword) < 64 && (str
 
             $groupID = array_merge($groupID, $thisRoleGroups);
         }
-    } elseif (strstr($groupID, ';')) {
-        // Search in a list of role types.
-
-        $groupID = explode(';', $groupID);
     } else {
-        // Search group 0 (all groups)
-
-        $groupID = 0;
+        $groupID = explode(';', $groupID);
+        $groupID = array_map('intval', array_filter($groupID, 'is_numeric'));
     }
 
-    $userList = $userHandler->ajaxSearch(
-        $keyword,
-        $groupID,
-        $residentialHouseID,
-        30
-    );
+    $userList = false;
+
+    // If groupID is empty array, we should not return any users
+    // If groupID = [0], we should return all matching users regardless of role
+    if (!empty($groupID)) {
+        $userList = $userHandler->ajaxSearch(
+            $keyword,
+            $groupID,
+            $residentialHouseID,
+            30
+        );
+    }
 
     $student = null;
 
