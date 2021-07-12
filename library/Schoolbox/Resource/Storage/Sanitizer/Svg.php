@@ -14,7 +14,7 @@ use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
 
 /**
- * Class Svg
+ * Sanitizer for SVG files.
  */
 class Svg implements ISanitizer
 {
