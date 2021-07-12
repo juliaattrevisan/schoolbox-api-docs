@@ -9,9 +9,7 @@
 namespace Schoolbox\Resource\Storage;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress_Byte_Format;
-use enshrined\svgSanitize\Sanitizer as BaseSanitizer;
 use League\Flysystem\FileNotFoundException;
 use PDO;
 use PDOStatement;
@@ -410,14 +408,8 @@ class Mapper extends BaseMapper implements Receiver
         if ($this->manager === null) {
             $factory = new FilesystemFactory();
 
-            // Set up sanitizer
-            $baseSanitizer = new BaseSanitizer();
-            $baseSanitizer->minify(true);
-            $sanitizer = new Sanitizer\Composite(
-                new Sanitizer\Svg($baseSanitizer),
-                new Sanitizer\Html(new ScrubAdapter())
-            );
-
+            /** @var Sanitizer\ISanitizer $sanitizer  */
+            $sanitizer     = self::getDi()->get('storage.sanitizer');
             $this->manager = new Manager(
                 $factory->build($this->config_loader->get('storage_dir')),
                 new Alaress_Byte_Format(),

@@ -8,6 +8,8 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
+use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use Schoolbox\Application\WebKernelAbstract;
 use Aura\Di;
 use Psr\Log\NullLogger;
@@ -25,6 +27,7 @@ use Schoolbox\L10n\RosettaStoneFactory;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Storage\Sanitizer;
 use SitePage;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
@@ -346,6 +349,19 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'sitePage',
             $di->lazyNew(SitePage::class, ['di' => $di])
+        );
+
+        // Storage upload/download sanitizer
+        $di->set(
+            'storage.sanitizer',
+            $di->lazy(function () {
+                $baseSvgSanitizer = new BaseSvgSanitizer();
+                $baseSvgSanitizer->minify(true);
+                return new Sanitizer\Composite(
+                    new Sanitizer\Svg($baseSvgSanitizer),
+                    new Sanitizer\Html(new ScrubAdapter())
+                );
+            })
         );
 
         return $di;
