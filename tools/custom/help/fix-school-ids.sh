@@ -19,7 +19,7 @@ parse_args() {
   local this_dir;
   this_file=$(readlink -f "$0");
   this_dir=${this_file%/*};
-  site_root=$(readlink -f "$this_dir"/../../)
+  site_root=$(readlink -f "$this_dir"/../../../)
   if [[ ${site_root##*/} == 'schoolboxdev' ]]; then
     package='schoolboxdev'
   else
