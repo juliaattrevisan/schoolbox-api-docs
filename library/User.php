@@ -397,7 +397,7 @@ class User extends DeprecatedModel
     /**
      * Gets all in the system who are in a particular groupID
      *
-     * @param int $groupID
+     * @param int|array $groupID
      * @param bool $hasSynergy If true (default: false), only returns users with synergy IDs
      * @return array
      */

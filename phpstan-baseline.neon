@@ -8826,16 +8826,6 @@ parameters:
 			path: library/Url.php
 
 		-
-			message: "#^Call to function is_array\\(\\) with int will always evaluate to false\\.$#"
-			count: 2
-			path: library/User.php
-
-		-
-			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
-			count: 1
-			path: library/User.php
-
-		-
 			message: "#^Call to function is_numeric\\(\\) with bool will always evaluate to false\\.$#"
 			count: 1
 			path: library/Wiki.php
