@@ -2,12 +2,12 @@
     {% set eventData = {
         "id"      : event.id,
         "title"   : event.title,
-        "location": event.location,
+        "location": event.location | purify,
         "author"  : {
             id      : event.author.id,
             fullName: event.author.fullName,
         },
-        "detail"  : event.detail,
+        "detail"  : event.detail | purify,
         "options" : {
             "allDay": event.allDay,
             "type"  : {
