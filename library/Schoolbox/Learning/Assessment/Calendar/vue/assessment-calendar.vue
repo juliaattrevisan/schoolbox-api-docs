@@ -193,7 +193,7 @@ export default {
                     click: this.clickToday,
                 },
                 customDayGridMonth: {
-                    dayMaxEventRows: this.$_fullCalendarHelper_determineDayMaxEventRows(this.config.eventLimit),
+                    dayMaxEventRows: this.config.eventLimit,
                     text: 'Month',
                     click: this.clickMonthView,
                 },

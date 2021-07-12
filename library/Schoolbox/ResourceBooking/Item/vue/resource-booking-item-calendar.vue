@@ -131,7 +131,7 @@ export default {
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView || 'timeGridWeek',
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            dayMaxEventRows: this.$_fullCalendarHelper_determineDayMaxEventRows(this.config.eventLimit),
+            dayMaxEventRows: this.config.eventLimit,
             firstDay: this.config.firstDay,
             events: this.events,
             eventDidMount: this.eventRender,
