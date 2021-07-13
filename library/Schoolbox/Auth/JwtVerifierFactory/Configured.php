@@ -12,6 +12,9 @@ namespace Schoolbox\Auth\JwtVerifierFactory;
 use Okta\JwtVerifier\Adaptors\Adaptor;
 use Okta\JwtVerifier\JwtVerifier;
 
+/**
+ * Factory for JWT verifiers, based upon the configured identity provider type.
+ */
 class Configured implements IFactory
 {
     private const IDENTITY_PROVIDER_TYPE_GENERIC = 'generic';
