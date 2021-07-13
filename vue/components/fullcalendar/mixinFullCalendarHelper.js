@@ -61,9 +61,9 @@ export const mixinFullCalendarHelper = {
          * @return {boolean}
          */
         $_fullCalendarHelper_eventRender(eventRenderInfo) {
-            
+
             const calEvent = eventRenderInfo.event;
-            
+
             // Always render placeholders in the most basic manner
             if (calEvent.id === 'placeholder') {
                 calEvent.setProp('display', 'block');
@@ -81,14 +81,14 @@ export const mixinFullCalendarHelper = {
                 calEvent.setProp('display', 'none');
                 return false;
             }
-            
+
             // Apply the visible class?
             if (calEvent?.extendedProps?.data?.styles?.visible) {
                 eventRenderInfo.el.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
-            
+
             calEvent.setProp('display', 'block');
-            
+
             return true;
         },
 
@@ -145,8 +145,9 @@ export const mixinFullCalendarHelper = {
             // elements which are known to exist independent of the calendar;
             // in this case, the content pane and the footer.
             const calendarOffset = this.jQuery('#content').offset().top;
-            // <section> margin-bottom and #container padding-bottom
-            const footerHeight = this.jQuery('#footer').outerHeight();
+
+            // A reasonable guess at the footer height, as it doesn't yet exist.
+            const footerHeight = 40;
 
             // A reasonable guess at the space between the start of the content
             // and the calendar content.
