@@ -222,7 +222,7 @@ class Controller extends Base
         foreach ($logsRecent as $log) {
             $action = '';
 
-            switch ($log['login']) {
+            switch ($log['action']) {
                 case '1':
                     $action = 'Logged in';
                     break;
