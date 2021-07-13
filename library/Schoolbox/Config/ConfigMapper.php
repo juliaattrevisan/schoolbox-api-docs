@@ -104,8 +104,8 @@ class ConfigMapper extends Mapper
     public const NAME_LMS_RESUBMIT_WINDOW        = 'lms_resubmit_window';
 
     public const PREFIX_CLOUDWORK_OAUTH                  = 'cloudwork_oauth_';
-    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER_TYPE = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
-    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER      = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider_type';
+    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER_TYPE = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider_type';
+    public const _CLOUDWORK_OAUTH_IDENTITY_PROVIDER      = self::PREFIX_CLOUDWORK_OAUTH . 'identity_provider';
     public const _CLOUDWORK_OAUTH_CLIENT_ID              = self::PREFIX_CLOUDWORK_OAUTH . 'client_id';
     public const _CLOUDWORK_OAUTH_CLIENT_SECRET          = self::PREFIX_CLOUDWORK_OAUTH . 'client_secret';
     public const _CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS     = self::PREFIX_CLOUDWORK_OAUTH . 'identifying_claims';
