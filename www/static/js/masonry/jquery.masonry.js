@@ -303,9 +303,12 @@
 
                         // do different things depending on which action was clicked
                         if (removeBtn.data('remove')) {
+                            
+                            debugger; 
+                            
                             // send deletion request to server
                             $.post(opt.component.url, removeBtn.closest('form').serialize());
-
+                               
                             // animate a disappearance (P.S. this is revolting)
                             removeBtn.closest(opt.component.selector).animate({ opacity: 0 }, 300, function () {
                                 $(this).slideUp(200, function () {
@@ -444,6 +447,11 @@
                     masonry.newComponentInstance(cl)
                         .done(function(response) {
                             masonry.insertComponentInstance($(response), ui.item, true, true);
+                            document.dispatchEvent(new CustomEvent('jquery.masonry__onComponentAdded', { //dispatch to allow sortableComponents.js to add to sortable list
+                                detail: {
+                                    componentID: $(response).attr('id') //id will be used to set the new sortable
+                                }
+                            })); 
                         })
                         .fail(function() {
                             ui.item.addClass(failedClass).slideUp(

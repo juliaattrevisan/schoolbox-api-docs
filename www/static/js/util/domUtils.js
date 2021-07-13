@@ -134,3 +134,14 @@ export const isElementAboveOtherElement = (firstElement, secondElement) => {
 export const isElementBelowOtherElement = (firstElement, secondElement) => {
     return (getElementsMidPoint(firstElement).top < getElementsMidPoint(secondElement).top);
 }
+
+/**
+ * Is the midpoint of an element below the midpoint of another element
+ * 
+ * @param { DOMElement }  
+* @param { Styles } for example { position: 'absolute', top: '20px' } 
+ * 
+ */
+export const setStylesOnElement = (element,styles) => {
+    Object.assign(element.style, styles);
+}
