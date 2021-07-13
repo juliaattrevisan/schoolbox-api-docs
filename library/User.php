@@ -327,8 +327,12 @@ class User extends DeprecatedModel
                     $query .= "( firstname like '%$param%' or lastname like '%$param%' or username like '%$param%' ) ";
                 }
             }
-            if (is_array($group) && !empty($group)) {
-                $query .= "AND group_id IN (" . implode(',', array_map(array($this->db, 'smartQuote'), $group)) . ") ";
+            if (is_array($group)) {
+                // If group = [0]: return all matching users regardless of role
+                $group = array_filter($group);
+                if (!empty($group)) {
+                    $query .= "AND group_id IN (" . implode(',', array_map(array($this->db, 'smartQuote'), $group)) . ") ";
+                }
             } else {
                 if (is_numeric($group) && $group > 0) {
                     $param = $this->db->quote($group);
