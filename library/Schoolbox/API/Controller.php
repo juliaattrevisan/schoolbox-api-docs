@@ -326,7 +326,7 @@ class Controller extends Base
 
         $jwtVerifierFactory = new JwtVerifierFactory\Configured(
             $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER_TYPE),
-            new FirebasePhpJwt()
+            new FirebasePhpJwt(null, $sessionLength)
         );
 
         $tokenParser = new TokenParser(
