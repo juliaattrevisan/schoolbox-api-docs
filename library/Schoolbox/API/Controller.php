@@ -324,10 +324,9 @@ class Controller extends Base
             $sessionLength = self::SESSION_LENGTH_DEFAULT;
         }
 
-        $adaptor            = new FirebasePhpJwt();
-        $jwtVerifierFactory = new JwtVerifierFactory\Composite(
-            new JwtVerifierFactory\Azure($adaptor),
-            new JwtVerifierFactory\Cloudwork($adaptor),
+        $jwtVerifierFactory = new JwtVerifierFactory\Configured(
+            $config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER_TYPE),
+            new FirebasePhpJwt()
         );
 
         $tokenParser = new TokenParser(
