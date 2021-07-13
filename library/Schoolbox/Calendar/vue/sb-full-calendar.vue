@@ -174,7 +174,7 @@ export default {
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView || 'dayGridMonth',
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            dayMaxEventRows: (this.config.eventLimit ? 3 : null),
+            dayMaxEventRows: this.config.eventLimit,
             firstDay: this.config.firstDay,
             eventSources: [
                 {
