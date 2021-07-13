@@ -16,7 +16,7 @@ import axios                      from 'axios'
 import qs                         from "qs";
 import { mixinFullCalendarHelper } from "@schoolbox/fullcalendar/mixinFullCalendarHelper";
 import {ENDPOINTS}                from '@schoolboxCalendarEvent/endpoints';
-import CustomisedCalendarEvent	  from '@schoolbox/fullcalendar/customised-calendar-event';
+import CustomisedCalendarEvent    from '@schoolbox/fullcalendar/customised-calendar-event';
 
 
 // Various URLs that FullCalendar may make use of.
@@ -174,7 +174,7 @@ export default {
             initialDate: this.config.defaultDate,
             initialView: this.config.defaultView || 'dayGridMonth',
             scrollTime: this.config.dateDisplayFormats.calendarStartTime,
-            dayMaxEventRows: this.$_fullCalendarHelper_determineDayMaxEventRows(this.config.eventLimit),
+            dayMaxEventRows: this.config.eventLimit,
             firstDay: this.config.firstDay,
             eventSources: [
                 {

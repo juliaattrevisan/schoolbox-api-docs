@@ -7,7 +7,6 @@ import { toMoment } from '@fullcalendar/moment';
 import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
 import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 
-const MAX_DAY_MAX_EVENT_ROWS = 4;
 
 export const mixinFullCalendarHelper = {
 
@@ -62,9 +61,9 @@ export const mixinFullCalendarHelper = {
          * @return {boolean}
          */
         $_fullCalendarHelper_eventRender(eventRenderInfo) {
-
+            
             const calEvent = eventRenderInfo.event;
-
+            
             // Always render placeholders in the most basic manner
             if (calEvent.id === 'placeholder') {
                 calEvent.setProp('display', 'block');
@@ -82,14 +81,14 @@ export const mixinFullCalendarHelper = {
                 calEvent.setProp('display', 'none');
                 return false;
             }
-
+            
             // Apply the visible class?
             if (calEvent?.extendedProps?.data?.styles?.visible) {
                 eventRenderInfo.el.classList.add(calEvent?.extendedProps?.data?.styles?.visible);
             }
-
+            
             calEvent.setProp('display', 'block');
-
+            
             return true;
         },
 
@@ -131,47 +130,36 @@ export const mixinFullCalendarHelper = {
          * Helper function to determine the FullCalendar component's content height.
          *
          * This is a straight port of the old jQuery FullCalendar content height
-         * callback.
+         * callback, updated to not break the call stack under FullCalendar 5.8.
          *
          * @return {number}
          */
         $_fullCalendarHelper_contentHeight() {
-
             const windowHeight = window.innerHeight;
-            // The amount of space between the top of the window and the start of the calendar
-            const calendarOffset = this.jQuery(this.$el).find('.fc-view-harness').offset().top;
+            // FullCalendar is prone to raising a maximum call stack exceeded
+            // error when:
+            // * dayMaxEventRows isn't false
+            // * this content height is calculated relative to the current size
+            //   of the calendar's view
+            // Therefore, the calculation has been adjusted to be relative to
+            // elements which are known to exist independent of the calendar;
+            // in this case, the content pane and the footer.
+            const calendarOffset = this.jQuery('#content').offset().top;
             // <section> margin-bottom and #container padding-bottom
-            const otherPadding = 32;
-            const contentHeight = windowHeight - calendarOffset  - otherPadding;
-            
+            const footerHeight = this.jQuery('#footer').outerHeight();
+
+            // A reasonable guess at the space between the start of the content
+            // and the calendar content.
+            const otherPadding = 180;
+            const contentHeight = windowHeight - calendarOffset - footerHeight - otherPadding;
+
             // Force a min height of 500px
             if (contentHeight < 500) {
                 return 500;
             }
             return contentHeight;
-        },
+        }
 
-
-        /**
-         * Translate the provided boolean `eventLimit` value into a sensible
-         * `dayMaxEventRows` value.
-         *
-         * Leaving `dayMaxEventRows` as `true` maxes out the number of rows at
-         * something which will fit in the height of a table cell: this causes
-         * a "Maximum call stack size exceeded" error with a large enough number
-         * of events.
-         *
-         * In experimentation, three rows of events seems to be the upper limit.
-         *
-         * @see https://fullcalendar.io/docs/dayMaxEventRows
-         *
-         * @param {Boolean} eventLimit Is the number of events limited?
-         * @returns {Number|Boolean} A number of rows to display per day, or
-         *                           false if the number of rows is not
-         *                           constrained.
-         */
-        $_fullCalendarHelper_determineDayMaxEventRows(eventLimit) {
-            return eventLimit ? MAX_DAY_MAX_EVENT_ROWS : false;
-        },
     }
+
 }
