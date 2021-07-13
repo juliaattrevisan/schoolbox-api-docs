@@ -18,6 +18,7 @@ declare hashes=("02e74016681e294cc39938665bfb2b7fcac2d5ac" "07f4123f169da13a2638
   "e7d4dfab9492feb7f049b8772998402145a6e15e" "ee1a98bdb62736c687ead53f9b4e4b102a071b7a" "f0b1317c9f0811a8b10a43f9a8b4d2ca11da191c"
   "f9fa0b4fe67c890e089dc041f379ef61a76b5879" "fe3c0af58f070998a4ce7dd2823f707374f1241c"
 )
+declare instance_id;
 
 readonly LOG="/usr/bin/alaress-logger"
 readonly L_INFO=200
@@ -41,6 +42,7 @@ parse_args() {
   fi
   local this_file;
   local this_dir;
+  instance_id=$INSTANCE_ID
   this_file=$(readlink -f "$0");
   this_dir=${this_file%/*};
   site_root=$(readlink -f "$this_dir"/../../../)
@@ -60,10 +62,10 @@ parse_args() {
 }
 
 set_image() {
-  sql_host=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host)
-  sql_user=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user)
-  sql_pass=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd)
-  sql_db=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db)
+  sql_host=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host)
+  sql_user=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user)
+  sql_pass=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd)
+  sql_db=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db)
 
   for i in $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "
     select synergy_id from user where group_id in ('6','7','8','13') and synergy_id is not null and synergy_id != '' and " 2>/dev/null); do

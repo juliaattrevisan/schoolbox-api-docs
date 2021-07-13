@@ -4,6 +4,7 @@ readonly LOG="/usr/bin/alaress-logger"
 readonly L_ERROR=400
 
 declare package
+declare instance_id;
 
 error() {
   $LOG $L_ERROR "$1"
@@ -17,6 +18,7 @@ parse_args() {
   fi
   local this_file;
   local this_dir;
+  instance_id=$INSTANCE_ID
   this_file=$(readlink -f "$0");
   this_dir=${this_file%/*};
   site_root=$(readlink -f "$this_dir"/../../../)
@@ -36,10 +38,12 @@ parse_args() {
 }
 
 fix_ids() {
-  sql_host=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host)
-  sql_user=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user)
-  sql_pass=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd)
-  sql_db=$($INSTANCE_ID schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db)
+  sql_host=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_host);
+  sql_user=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_user);
+  sql_pass=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_passwd);
+  sql_db=$(INSTANCE_ID=$instance_id schoolbox-read-instances --ini "/etc/$package/instances.ini" --option SQL_db);
+
+  echo $sql_host;
 
   if [[ ! $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET synergy_id=id WHERE synergy_id IS NULL or synergy_id = ''") ]]; then
     error "failed to set IDs"
