@@ -1,5 +1,6 @@
 
 import { gsap, Draggable, InertiaPlugin, Flip, CSSPlugin } from 'gsap/all';
+import { insertElementBefore, insertElementAfter, getClosestElement, getElementsMidPoint, isElementAboveOtherElement, isElementBelowOtherElement } from '@js/util/domUtils';
 
 gsap.registerPlugin(Draggable, InertiaPlugin, Flip, CSSPlugin);
 
@@ -72,7 +73,6 @@ const initSortables = () => {
     placeholderElement = getPlaceholderElement(sortableElement);
     placeholderElement.style.opacity = 0.25; //displayed as reference where the sortable is currently placed 
     pullDraggedElementOut(sortableElement);
-    
 }
 
 /**
@@ -99,9 +99,6 @@ const initSortables = () => {
  * Just snap back to where it now belongs
  */
  const onDragEnd = () => {
-    window.removeEventListener('scroll', onScroll);
-    document.body.style.overflowX = 'auto'; 
-    document.documentElement.style.scrollBehavior = 'smooth'; 
     snapElementBack(sortableElement);
 }
 
@@ -118,23 +115,23 @@ const onScroll = () => {
 
 /**
  * Create a clone of the element being dragged to use as a placeholder 
- * and to keep it in position as the actually dragged element will be pulled out
+ * and to keep it in position as the actually dragged element will be pulled out of context
  * 
- * @param { Element }  
+ * @param { DOMElement }  
  * 
- * @returns { Element }  
+ * @returns { DOMElement }  
  */
-const getPlaceholderElement = (element) => {
-    const clone = element.cloneNode(true);
-    element.parentNode.insertBefore(clone, element);
-    return clone;
+const getPlaceholderElement = (elementToClone) => {
+    const cloneElement = elementToClone.cloneNode(true);
+    insertElementBefore(elementToClone, cloneElement);
+    return cloneElement;
 }
 
 /**
  * With the placeholder element in place, the dragged element is pulled 
  * out so it doesn't impact our ability to sort through the items
  * 
- * @param { Element }  
+ * @param { DOMElement }  
  */
 const pullDraggedElementOut = (element) => {
     document.body.appendChild(element);
@@ -146,7 +143,7 @@ const pullDraggedElementOut = (element) => {
  *  Update position and styles to match as the dragged element
  *  has now been moved out of its context
  * 
- * @param { Element } 
+ * @param { DOMElement } 
  */
  const updateDraggedElementStyles = (element) => {
 
@@ -165,7 +162,7 @@ const pullDraggedElementOut = (element) => {
  }
 
 /**
- *  To see whether the sortable element is being dragged into the range of a new parent container
+ *  To see whether the sortable element is being dragged into the range of a new parent container,
  *  and if so pass the new container back so it can be used to shift the sortableElement into
  * 
  * @retruns { Boolean, Element } 
@@ -181,81 +178,20 @@ const willChangeContainer = () => {
 }
 
 /**
- * Find the closest element to the element being dragged, which can be the dragged element
- * itself if haven't dragged very far (or the items are very tall)
- * 
- * @param { x, y }  
- * @param { NodeList }  
- * 
- * @returns { Element }   
- */
-const getClosestElement = (targetPoint, elements) => {
-    let closestElement = elements[0];
-    let minDistance = 99999; //if this doesn't get overwritten we got issues...
-    elements.forEach((element) => { //loop through each element and find the closest element using pythagoras theorem
-        const elementsMidPoint = getElementsMidPoint(element);
-        const distance = Math.sqrt((elementsMidPoint.left - targetPoint.left) * (elementsMidPoint.left - targetPoint.left) + (elementsMidPoint.top - targetPoint.top) * (elementsMidPoint.top - targetPoint.top));
-        if (distance < minDistance) {
-            minDistance = distance;
-            closestElement = element;
-        }
-    });
-    return closestElement;
-};
-
-/**
- * To get an elements mid point relative to the document
- * 
- * @param { Element }  
- * 
- * @returns { x, y }   
- */
-const getElementsMidPoint = (element) => {
-    return {
-        left: element.getBoundingClientRect().left + (element.offsetWidth / 2),
-        top: (element.getBoundingClientRect().top + window.scrollY) + (element.offsetHeight / 2)
-    };
-}
-
-/**
- * Is the midpoint of an element above the midpoint of another element
- * 
- * @param { Element }  
- * @param { Element }  
- * 
- * @returns { Boolean }  
- */
-const isElementAboveOtherElement = (firstElement, secondElement) => {
-    return (getElementsMidPoint(firstElement).top > getElementsMidPoint(secondElement).top);
-}
-
-/**
- * Is the midpoint of an element below the midpoint of another element
- * 
- * @param { Element }  
- * @param { Element }  
- * 
- * @returns { Boolean }  
- */
-const isElementBelowOtherElement = (firstElement, secondElement) => {
-    return (getElementsMidPoint(firstElement).top < getElementsMidPoint(secondElement).top);
-}
-
-/**
  * Use Flip to shift the elements around, recording the difference in shift 
  * for when the dragged element is released
  * Refer to https://greensock.com/docs/v3/Plugins/Flip for more info on Flip
  * 
- * @param { Element }  
- * @param { Element }  
+ * @param { DOMElement }  
+ * @param { DOMElement }  
  * @param { Boolean }  
  */
 const flipState = (draggedElement, closestElement, isShiftingDown) => {
     const state = Flip.getState(document.querySelectorAll(sortablesSelector));
     if (isShiftingDown) {
-        insertAfter(closestElement, placeholderElement);
+        insertElementAfter(closestElement, placeholderElement);
     } else {
-        insertBefore(closestElement, placeholderElement);
+        insertElementBefore(closestElement, placeholderElement);
     }
     draggedElement.dataset.leftDifference = placeholderElement.getBoundingClientRect().left - parseInt(placeholderElement.dataset.originalLeft);
     draggedElement.dataset.topDifference = (placeholderElement.getBoundingClientRect().top + window.scrollY) - parseInt(placeholderElement.dataset.originalTop);
@@ -269,31 +205,11 @@ const flipState = (draggedElement, closestElement, isShiftingDown) => {
 }
 
 /**
- * Insert the target node before the reference
- * 
- * @param { Element }  
- * @param { Element }  
- */
-const insertBefore = (referenceNode, targetNode) => {
-  referenceNode.parentNode.insertBefore(targetNode, referenceNode);
-}
-
-/**
- * Insert the target node after the reference
- * 
- * @param { Element }  
- * @param { Element }  
- */
-const insertAfter = (referenceNode, targetNode) => {
-  referenceNode.parentNode.insertBefore(targetNode, referenceNode.nextSibling);
-}
-
-/**
  * Snap the dragged element back to its original OR new position
  * and then remove the placeholder element once complete, 
- * setting up for another drag
+ * setting up for another drag, returning various variables back to there pre dragging state
  * 
- * @param { Element }  
+ * @param { DOMElement }  
  */
 const snapElementBack = (element) => {
     gsap.to(element, {
@@ -303,12 +219,14 @@ const snapElementBack = (element) => {
         duration: 0.3,
         overwrite: true,
         onComplete: () => {
-            insertAfter(placeholderElement, element);
+            insertElementAfter(placeholderElement, element);
             gsap.set(element, { x: 0, y: 0, width: '100%' });
             element.style.position = 'static';
             element.style.boxShadow = 'none';
             element.setAttribute('data-component', '');
             document.body.style.overflowX = 'auto';
+            document.documentElement.style.scrollBehavior = 'smooth'; 
+            window.removeEventListener('scroll', onScroll);
             placeholderElement.remove();
             updateSortables();
     } });

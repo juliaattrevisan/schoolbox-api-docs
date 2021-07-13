@@ -200,6 +200,9 @@ module.exports = {
 
         // Google Files
         googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
+        
+        //Sortable components for homepages
+        sortableComponents: './templates/core/homepage/js/sortableComponents.js',
 
         //Sass
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
