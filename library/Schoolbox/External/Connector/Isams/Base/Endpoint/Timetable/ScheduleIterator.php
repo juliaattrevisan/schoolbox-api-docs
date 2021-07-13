@@ -36,7 +36,7 @@ class ScheduleIterator implements Iterator
     /**
      * @var array|SimpleXMLElement[]
      */
-    private array $schedules;
+    private $schedules;
 
 
     /**
