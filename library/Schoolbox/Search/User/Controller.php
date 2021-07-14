@@ -214,6 +214,7 @@ class Controller extends BaseController
     {
         $detailsVisible = new ValidDetailsVisible($this->externalUser, $this->getConfigLoader());
         $customButtons  = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
+        $externalUser   = $staff->getExternalId() ? $this->externalUser->getStaff($staff->getExternalId()) : [];
 
         $this->response->content->set(
             $this->buildHtmlOutput(
@@ -221,7 +222,7 @@ class Controller extends BaseController
                 [
                     'session'        => $_SESSION,
                     'user'           => $staff,
-                    'externalUser'   => $this->externalUser,
+                    'externalUser'   => $externalUser,
                     'eportfolioAuth' => $this->eportfolioAuthenticator->canView(),
                     'customButtons'  => $customButtons,
                     'now'            => Alaress_Date_Format::now(),

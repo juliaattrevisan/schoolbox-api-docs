@@ -87,7 +87,11 @@ class Module extends BaseModule
         }
 
         try {
-            return ['user' => $this->getUserMapper()->findById($params['userId'])];
+            $user = $this->getUserMapper()->findById($params['userId']);
+            if ($user->getRole()->isGuest()) {
+                throw new NotFound('User Not Found', 0);
+            }
+            return ['user' => $user];
         } catch (Mapper\Exception $e) {
             throw new NotFound('User Not Found', 0, $e);
         }
