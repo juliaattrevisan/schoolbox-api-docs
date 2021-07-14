@@ -111,6 +111,8 @@ const initComponentLockSwitchListener = () => {
  */
 const onDragStart = (event) => {
     
+    updateSortableElements(); //ensure we have the most up to date positions
+
     window.addEventListener('scroll', onScroll); //prevent sorting check while moving up/down window
     
     document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
