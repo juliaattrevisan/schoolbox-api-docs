@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 // Was file directly accessed (ie not a SitePage include)?
 if (!isset($this)) {
     require_once __DIR__ . '/../../../conf/core/require.php';
@@ -12,14 +19,15 @@ if (!Config::get('staff_directory_enabled')) {
     $this->pageNotFound();
 }
 
-$groupHandler = new Group();
+/** @var \Schoolbox\User $currentUser */
+$currentUser = $_SESSION['user'];
 
-// If policy allows parents let them in, else only allow staff
+// If policy allows parents let them in, else only allow staff with permission
 if (
-    !(Config::get('report_staff_access') == 1 && $groupHandler->isParent() ) &&
-    !$groupHandler->isStaff()
+    !(Config::get('report_staff_access') && $currentUser->getRole()->isParent()) &&
+    !($currentUser->getRole()->isStaff() && $currentUser->getRole()->getViewStaffDirectory())
 ) {
-    error(19);
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $parentReport = new Report_StaffDepartment($this);
