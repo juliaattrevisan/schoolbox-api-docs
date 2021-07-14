@@ -1,8 +1,21 @@
 <?php
 
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 // Check if module is enabled
 if (!Config::get('parent_directory_enabled')) {
     $this->pageNotFound();
+}
+
+/** @var \Schoolbox\User $currentUser */
+$currentUser = $_SESSION['user'];
+if (!$currentUser->getRole()->getViewParentDirectory()) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
 $searchName = '';
