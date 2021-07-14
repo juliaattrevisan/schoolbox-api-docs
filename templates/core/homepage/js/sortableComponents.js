@@ -23,6 +23,9 @@ const initSortables = () => {
         draggables.push(getDraggable(sortableItem));
     });
     draggables.forEach((draggable) => draggable.disable()); //disabled at start until the #component-lock-switch is toggled
+    draggables.forEach((draggable) => {
+        console.error(draggable.target.id);
+    }); //disabled at start until the #component-lock-switch is toggled
     updateSortables();
 }
 
@@ -93,9 +96,9 @@ const initComponentLockSwitchListener = () => {
  */
  const initOnComponentRemovedListener = () => {
     document.addEventListener('jquery.masonry__onComponentRemoved', (event) => {
-        const newDraggable = getDraggable(document.getElementById(event.detail.componentID));
-        newDraggable.enabled(draggables[0].enabled()); //just base the active status on the first Draggable instance
-        draggables.push(newDraggable); //add the component into the sortable list
+        const draggableToRemove = draggables.find((draggable) => getComponentID(draggable.target) === event.detail.componentID);
+        draggableToRemove.kill(); //disables the Draggable instance
+        draggables = draggables.filter((draggable) => getComponentID(draggable.target) !== event.detail.componentID); //update the draggables list, pullling out the removed component
         updateSortables(); //update the position of all elements due to the new element being added
     });
 }

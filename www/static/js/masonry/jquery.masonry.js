@@ -304,8 +304,6 @@
                         // do different things depending on which action was clicked
                         if (removeBtn.data('remove')) {
                             
-                            debugger; 
-                            
                             // send deletion request to server
                             $.post(opt.component.url, removeBtn.closest('form').serialize());
                                
@@ -316,9 +314,14 @@
                                     // if it was the last component in a column, reshow the placeholder
                                     masonry.refreshColumns();
                                     masonry.refreshPalette();
+                                    document.dispatchEvent(new CustomEvent('jquery.masonry__onComponentRemoved', { //dispatch to allow sortableComponents.js to remove from sortable list
+                                        detail: {
+                                            componentID: removeBtn.closest('form')[0].querySelector('[data-remove-component-id]').value //id will be used to remove the sortable
+                                        }
+                                    })); 
                                 });
                             });
-
+                            
                         } else {
                             target.off('click', opt.component.removeActionSelector).slideUp();
                             targetBtns.data('state', 'closed');
@@ -447,11 +450,6 @@
                     masonry.newComponentInstance(cl)
                         .done(function(response) {
                             masonry.insertComponentInstance($(response), ui.item, true, true);
-                            document.dispatchEvent(new CustomEvent('jquery.masonry__onComponentAdded', { //dispatch to allow sortableComponents.js to add to sortable list
-                                detail: {
-                                    componentID: $(response).attr('id') //id will be used to set the new sortable
-                                }
-                            })); 
                         })
                         .fail(function() {
                             ui.item.addClass(failedClass).slideUp(
@@ -668,6 +666,15 @@
             if (masonry.spectrum) {
                 masonry.spectrum.masonrySpectrum('reapplyColors');
             }
+
+            if (animate) {
+                document.dispatchEvent(new CustomEvent('jquery.masonry__onComponentAdded', { //dispatch to allow sortableComponents.js to add to sortable list
+                    detail: {
+                        componentID: response.attr('id') //id will be used to set the new sortable
+                    }
+                })); 
+            }
+
         };
 
         if (animate) {
