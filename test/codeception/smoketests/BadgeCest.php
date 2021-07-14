@@ -6,6 +6,7 @@ namespace SmokeTests;
 
 use IntegrationTester;
 use Payload;
+use Schoolbox\Learning\Badge\Model as BadgeModel;
 
 class BadgeCest
 {
@@ -36,7 +37,8 @@ class BadgeCest
         $name                = 'Badge Name Automation API Smoke Test' . $timestamp;
         $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
         $image_location      = '/UploadTestFiles/fish2.png';
-        $expire              = 1;
+        $achievementExpiry   = BadgeModel::EXPIRY_DAY;
+        $goalExpiry          = BadgeModel::EXPIRY_DAY;
 
 
         $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
@@ -45,7 +47,7 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $expire);
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $achievementExpiry, $goalExpiry);
         $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
 
         #WHEN
@@ -74,7 +76,8 @@ class BadgeCest
         $name                = 'Badge Name Automation API Smoke Test' . $timestamp;
         $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
         $image_location      = '/UploadTestFiles/fish2.png';
-        $expire              = 1;
+        $achievementExpiry   = BadgeModel::EXPIRY_DAY;
+        $goalExpiry          = BadgeModel::EXPIRY_MONTH;
 
         $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
         $i->amGoingTo('Upload image to the badge');
@@ -82,7 +85,7 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $expire);
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $achievementExpiry, $goalExpiry);
         $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
         $i->amGoingTo('Send request to create a badge');
         $i->sendRequest($badgePayload);
@@ -93,8 +96,9 @@ class BadgeCest
          */
         #WHEN
         $name               = 'Badge Name Automation API Smoke Test updated with allow as a goal on' . $timestamp;
-        $expire             = 7;
-        $badgeModifyPayload = new Payload\Badge\Modify($badge->getId(), $badgeavatarselector, $category, $body, $name, true, $expire);
+        $achievementExpiry  = BadgeModel::EXPIRY_WEEK;
+        $goalExpiry         = BadgeModel::EXPIRY_YEAR;
+        $badgeModifyPayload = new Payload\Badge\Modify($badge->getId(), $badgeavatarselector, $category, $body, $name, true, $achievementExpiry, $goalExpiry);
         $badgeModifyPayload->setFormParam('image', $json_reply['hash']);
         $i->amGoingTo('Send request to update a badge');
         $i->sendRequest($badgeModifyPayload);
@@ -120,7 +124,8 @@ class BadgeCest
         $name                = 'Badge Name Automation API Smoke Test to be deleted' . $timestamp;
         $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
         $image_location      = '/UploadTestFiles/fish2.png';
-        $expire              = 14;
+        $achievementExpiry   = BadgeModel::EXPIRY_FORTNIGHT;
+        $goalExpiry          = BadgeModel::EXPIRY_NEVER;
 
         $storageUpload = new Payload\Resource\File\StorageUpload('upload', $image_name, $image_location);
         $i->amGoingTo('Upload image to the badge');
@@ -128,7 +133,7 @@ class BadgeCest
         $i->seeResponseCodeIs(200);
         $json_reply = json_decode($i->grabResponse(), true);
 
-        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $expire);
+        $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $achievementExpiry, $goalExpiry);
         $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
         $i->amGoingTo('Send request to create a badge');
         $i->sendRequest($badgePayload);

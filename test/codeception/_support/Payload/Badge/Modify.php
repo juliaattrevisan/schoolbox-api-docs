@@ -19,7 +19,8 @@ class Modify extends \Payload\Request
         string $body,
         string $name,
         bool $allowasgoal,
-        ?int $achievementExpiry
+        ?int $achievementExpiry,
+        ?int $goalExpiry
     ) {
         $this->badgeId = $badgeId;
         $this->setReferer("/learning/badge/$badgeId/update");
@@ -29,6 +30,7 @@ class Modify extends \Payload\Request
         $this->setFormParam('category', ['id' => $category]);
         $this->setFormParam('name', $name);
         $this->setFormParam('achievementExpiry', $achievementExpiry);
+        $this->setFormParam('goalExpiry', $goalExpiry);
 
         $this->setHeader('content-type', 'application/json');
     }
