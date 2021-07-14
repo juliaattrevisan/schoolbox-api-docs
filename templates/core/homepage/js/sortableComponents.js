@@ -23,10 +23,6 @@ const initSortables = () => {
         draggables.push(getDraggable(sortableItem));
     });
     draggables.forEach((draggable) => draggable.disable()); //disabled at start until the #component-lock-switch is toggled
-    draggables.forEach((draggable) => {
-        console.error(draggable.target.id);
-    }); //disabled at start until the #component-lock-switch is toggled
-    updateSortables();
 }
 
 /**
@@ -116,7 +112,7 @@ const onDragStart = (event) => {
     sortableElement = event.target.closest(sortablesSelector); //use the parent container regardless of selection
     placeholderElement = getPlaceholderElement(sortableElement);
     placeholderElement.style.opacity = 0.25; //displayed as reference where the sortable is currently placed 
-    pullDraggedElementOut(sortableElement);
+    pullOutDraggedElement(sortableElement);
 
 }
 
@@ -178,10 +174,10 @@ const getPlaceholderElement = (elementToClone) => {
  * 
  * @param { DOMElement }  
  */
-const pullDraggedElementOut = (element) => {
+const pullOutDraggedElement = (element) => {
     document.body.appendChild(element);
     element.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
-    updateDraggedElementStyles(element);
+    updateDraggedElementStylesOnPulledOut(element);
 }
 
 /**
@@ -190,19 +186,21 @@ const pullDraggedElementOut = (element) => {
  * 
  * @param { DOMElement } 
  */
-const updateDraggedElementStyles = (element) => {
+const updateDraggedElementStylesOnPulledOut = (element) => {
 
     setStylesOnElement(element, {
         position: 'absolute',
         top: `${placeholderElement.getBoundingClientRect().top + window.scrollY}px`,
-        left: `${placeholderElement.getBoundingClientRect().left - 16 }px`,
-        width: `${placeholderElement.getBoundingClientRect().width + 32 }px`,
+        left: `${placeholderElement.getBoundingClientRect().left - 16 }px`, //subtracting 16 to deal with 1rem padding-left that's applied
+        width: `${placeholderElement.getBoundingClientRect().width + 32 }px`, //and adding 32 to also deal with 1rem padding-left, padding-right that's applied each side
     });
 
-    const headBg = getComputedStyle(placeholderElement).getPropertyValue('--top-head-bg');
+    const containerPosition = placeholderElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
+
+    const headBg = getComputedStyle(placeholderElement).getPropertyValue(`--${containerPosition}-head-bg`); //use placeholderElement as it still exists in the correct context
     element.querySelectorAll('.component-titlebar').forEach( (item) => item.style.backgroundColor = headBg );
 
-    const headFont = getComputedStyle(placeholderElement).getPropertyValue('--top-head-font');
+    const headFont = getComputedStyle(placeholderElement).getPropertyValue(`--${containerPosition}-head-font`);
     element.querySelectorAll('.component-titlebar h2').forEach( (item) => item.style.color = headFont );
     element.querySelectorAll('.component-titlebar a').forEach( (item) => item.style.color = headFont );
 
@@ -276,18 +274,45 @@ const snapElementBack = (element) => {
  * @param { DOMElement }  
  */
  const onSnapElementBackComplete =  (element) => {
-    insertElementAfter(placeholderElement, element); //the element was taken out, so put it back where it belongs
-    placeholderElement.remove(); //and now the placeholder can be pulled out
+
     gsap.set(element, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
-    element.style.position = 'static'; //was absolute, now sitting as it should
+    updateDraggedElementStylesOnSnappedBack(element);
     element.setAttribute('data-component', ''); //so it can be dragged again
+    
+    insertElementAfter(placeholderElement, element); //the element was taken out, so put it back where it now belongs
+    placeholderElement.remove(); //and now the placeholder can be pulled out
+
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
+    
     window.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
+    
     updateSortables();
     submitNewComponentOrder();
+
 }
+
+/**
+ *  Update position and styles to match the new container
+ *  as it may have changed
+ * 
+ * @param { DOMElement } 
+ */
+ const updateDraggedElementStylesOnSnappedBack = (element) => {
+
+    element.style.position = 'static'; //was absolute, now sitting as it should
+
+    const containerPosition = placeholderElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
+
+    const headBg = getComputedStyle(placeholderElement).getPropertyValue(`--${containerPosition}-head-bg`); //use placeholderElement as it still exists in the correct context
+    element.querySelectorAll('.component-titlebar').forEach( (item) => item.style.backgroundColor = headBg );
+
+    const headFont = getComputedStyle(placeholderElement).getPropertyValue(`--${containerPosition}-head-font`);
+    element.querySelectorAll('.component-titlebar h2').forEach( (item) => item.style.color = headFont );
+    element.querySelectorAll('.component-titlebar a').forEach( (item) => item.style.color = headFont );
+
+ }
 
 /**
  * Submit the new component order to the DB
@@ -349,6 +374,7 @@ const getComponentID = (componentElement) => {
  */
 export const init = () => {
     initSortables();
+    updateSortables();
     initListeners();
 }
 

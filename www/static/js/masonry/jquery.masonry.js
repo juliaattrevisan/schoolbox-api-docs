@@ -667,7 +667,7 @@
                 masonry.spectrum.masonrySpectrum('reapplyColors');
             }
 
-            if (animate) {
+            if (animate) { //only new components are animated, so can be used to dispatch event
                 document.dispatchEvent(new CustomEvent('jquery.masonry__onComponentAdded', { //dispatch to allow sortableComponents.js to add to sortable list
                     detail: {
                         componentID: response.attr('id') //id will be used to set the new sortable
