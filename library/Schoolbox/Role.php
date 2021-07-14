@@ -107,6 +107,16 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
 
     public const DIGEST_NEVER = '0';
 
+    public const PERMISSION_VIEW_STUDENT_PROFILE  = 'viewStudentProfile';
+    public const PERMISSION_VIEW_STUDENT_GRADES   = 'viewStudentGrades';
+    public const PERMISSION_VIEW_STUDENT_CALENDAR = 'viewStudentCalendar';
+    public const PERMISSION_VIEW_PARENT_PROFILE   = 'viewParentProfile';
+    public const PERMISSION_ACCESS_EPORTFOLIO     = 'accessEportfolio';
+    public const PERMISSION_ACCESS_PASTORAL       = 'accessPastoral';
+    public const PERMISSION_CREATE_BADGES         = 'createBadges';
+    public const PERMISSION_CREATE_EVIDENCE       = 'createEvidence';
+    public const PERMISSION_VIEW_PARENT_DIRECTORY = 'viewParentDirectory';
+    public const PERMISSION_VIEW_STAFF_DIRECTORY  = 'viewStaffDirectory';
 
     /**
      * Return the set of role types

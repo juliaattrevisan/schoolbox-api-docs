@@ -22,7 +22,7 @@ use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
-use Schoolbox\User;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -55,14 +55,7 @@ class Module extends BaseModule
                 $basicPermissions,
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\Callback(
-                        function (array $params, User $user) {
-                            if ($user->getRole()->isStaff() && $user->getRole()->getViewStudentGrades()) {
-                                return true;
-                            }
-                            throw new Unauthorized();
-                        }
-                    ),
+                    new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
                     new Rule\IsUser('userId'),
                     new Rule\All(
                         new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),

@@ -213,7 +213,6 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             ($involvedInGroup || $involvedInClass)
             && UserAccess::ACCESS_READ === $this->getContentPermission()
             && $this->getAuthorizer()->isPathAuthorizedForUser($route, $params, $this->getUser())
-
         ) {
             $this->setVar('STUDENT_GRADE_LINK', $this->getRouter()->generate($route, $params));
             $this->parse('student_grades_block', 'student_grades');
