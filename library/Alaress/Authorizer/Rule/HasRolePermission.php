@@ -9,6 +9,8 @@
 
 namespace Alaress\Authorizer\Rule;
 
+use InvalidArgumentException;
+use Schoolbox\Role;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 
@@ -24,17 +26,21 @@ class HasRolePermission extends All
      * The role to check against (optional).
      * One of Schoolbox\Role::(GUEST|STAFF|PARENT|STUDENT).
      */
-    protected ?string $role;
+    protected ?string $roleType;
 
     /**
      * @param string      $permission The permission to check
-     * @param string|null $role       The role to check. Matches one of the consts in Role
-     * @throws \InvalidArgumentException
+     * @param string|null $roleType   The role type to check. Matches one of the consts in Role
+     * @throws InvalidArgumentException
      */
-    public function __construct(string $permission, ?string $role)
+    public function __construct(string $permission, ?string $roleType)
     {
+        if (!in_array($permission, Role::VALID_PERMISSIONS)) {
+            throw new InvalidArgumentException('Invalid permission provided.');
+        }
+
         $this->permission = $permission;
-        $this->role       = $role;
+        $this->roleType   = $roleType;
 
         parent::__construct(
             new IsLoggedIn(),
@@ -49,7 +55,7 @@ class HasRolePermission extends All
     public function authorizeMethod(array $params = [], User $user = null)
     {
         if ($user instanceof User) {
-            if ($this->role && ($user->getRole()->getType() !== $this->role)) {
+            if ($this->roleType && ($user->getRole()->getType() !== $this->roleType)) {
                 throw new Unauthorized();
             }
         }
