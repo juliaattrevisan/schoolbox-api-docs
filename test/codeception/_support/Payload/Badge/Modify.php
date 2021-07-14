@@ -4,7 +4,6 @@ namespace Payload\Badge;
 
 use Payload\Pastoral\FormTrait;
 use Payload\PostTrait;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class Modify extends \Payload\Request
 {
@@ -13,9 +12,15 @@ class Modify extends \Payload\Request
 
     private int $badgeId;
 
-    public function __construct(int $badgeId, string $badgeavatarselector, int $category, string $body, string $name, bool $allowasgoal, int $expiry)
-    {
-
+    public function __construct(
+        int $badgeId,
+        string $badgeavatarselector,
+        int $category,
+        string $body,
+        string $name,
+        bool $allowasgoal,
+        ?int $achievementExpiry
+    ) {
         $this->badgeId = $badgeId;
         $this->setReferer("/learning/badge/$badgeId/update");
         $this->setFormParam('allow-as-goal', $allowasgoal);
@@ -23,7 +28,7 @@ class Modify extends \Payload\Request
         $this->setFormParam('body', $body);
         $this->setFormParam('category', ['id' => $category]);
         $this->setFormParam('name', $name);
-        $this->setFormParam('achievementExpiry', $expiry);
+        $this->setFormParam('achievementExpiry', $achievementExpiry);
 
         $this->setHeader('content-type', 'application/json');
     }
