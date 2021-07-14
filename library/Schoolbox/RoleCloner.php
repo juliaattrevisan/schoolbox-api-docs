@@ -40,6 +40,16 @@ class RoleCloner
         $destination->setType($source->getType());
         $destination->setDigestSchedule($source->getDigestSchedule());
         $destination->setCanChangePassword($source->getCanChangePassword());
+        $destination->setViewStudentProfile($source->getViewStudentProfile());
+        $destination->setViewStudentGrades($source->getViewStudentGrades());
+        $destination->setViewStudentCalendar($source->getViewStudentCalendar());
+        $destination->setViewParentProfile($source->getViewParentProfile());
+        $destination->setAccessEportfolio($source->getAccessEportfolio());
+        $destination->setAccessPastoral($source->getAccessPastoral());
+        $destination->setCreateBadges($source->getCreateBadges());
+        $destination->setCreateEvidence($source->getCreateEvidence());
+        $destination->setViewParentDirectory($source->getViewParentDirectory());
+        $destination->setViewStaffDirectory($source->getViewStaffDirectory());
 
         // persist that
         RoleMapper::getInstance()->save($destination);
