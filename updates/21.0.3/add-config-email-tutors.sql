@@ -5,7 +5,7 @@ WHERE type_id = (SELECT lct.id FROM lu_config_type lct WHERE lct.type = 'Policy'
 INSERT INTO config (`name`, `value`, `title`, `description`, `field_id`, `type_id`, `editable`, `hidden`, `required`,
                     `module`, `sequence`)
 VALUES ('email_tutors',
-        '1',
+        '0',
         'Allow Email Tutors from Class List',
         'If ticked, allows staff to email housemasters of a class with a single button',
         (SELECT lcf.id FROM lu_config_field lcf WHERE lcf.field = 'boolean'),

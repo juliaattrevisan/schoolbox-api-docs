@@ -337,7 +337,30 @@ class External_Schoolbox_User implements External_UserInterface
      */
     public function getTutorEmails(array $externalUserIds): array
     {
-        return [];
+        $emailList = [];
+        $idList   = array_filter($externalUserIds);
+
+        if (empty($idList)) {
+            return [];
+        }
+
+        $predicate = PredicateBuilder::getArrayBindings($idList, 'externalId');
+
+        $tutorIterator = $this->internalDatabase->getQueryIterator(
+            "SELECT sis_user_profile_staff.email AS TutorEmail
+                FROM sis_user_profile_staff
+                JOIN sis_user_profile_student ON sis_user_profile_student.tutor_teacher_id = sis_user_profile_staff.sis_user_profile_id
+                JOIN sis_user_profile ON sis_user_profile.id = sis_user_profile_student.sis_user_profile_id
+                WHERE sis_user_profile.external_id IN ({$predicate['placeholders']})
+            ",
+            $predicate['bindings']
+        );
+
+        foreach ($tutorIterator as $tutor) {
+            $emailList[] = $tutor['TutorEmail'];
+        }
+
+        return (new TupleStack())->normaliseValues($emailList);
     }
 
 
