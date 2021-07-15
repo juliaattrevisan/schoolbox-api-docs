@@ -147,6 +147,9 @@ class Migration extends CliTool\App
         $this->filesInS3  = [];
         $this->getLogger()->notice("Fetching file list from S3, this may take a while on large datasets...");
         foreach ($s3Client->getIterator('ListObjects', ['Bucket' => $bucketName, 'Prefix' => FilesystemFactory::PREFIX_STORAGE]) as $i => $object) {
+            if($i % 1000 === 1){
+                $this->getLogger()->debug("Files in S3 $i...");
+             }
             $this->filesInS3[$object['Key']] = true;
         }
     }
@@ -308,6 +311,7 @@ class Migration extends CliTool\App
      */
     private function getDirectorySize(string $dirName): int
     {
+        $this->getLogger()->info("Calculating local storage dir size. This may take a while...");
         return (int)shell_exec("du -sb {$dirName} | cut -f 1");
     }
 
