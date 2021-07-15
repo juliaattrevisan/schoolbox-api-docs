@@ -349,9 +349,10 @@ class External_Schoolbox_User implements External_UserInterface
         $tutorIterator = $this->internalDatabase->getQueryIterator(
             "SELECT sis_user_profile_staff.email AS TutorEmail
                 FROM sis_user_profile_staff
-                JOIN sis_user_profile_student ON sis_user_profile_student.tutor_teacher_id = sis_user_profile_staff.sis_user_profile_id
-                JOIN sis_user_profile ON sis_user_profile.id = sis_user_profile_student.sis_user_profile_id
-                WHERE sis_user_profile.external_id IN ({$predicate['placeholders']})
+                JOIN sis_user_profile staff ON staff.id = sis_user_profile_staff.sis_user_profile_id
+                JOIN sis_user_profile_student ON sis_user_profile_student.tutor_teacher_id = staff.external_id
+                JOIN sis_user_profile student ON student.id = sis_user_profile_student.sis_user_profile_id
+                WHERE student.external_id IN ({$predicate['placeholders']})
             ",
             $predicate['bindings']
         );
