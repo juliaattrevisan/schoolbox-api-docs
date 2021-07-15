@@ -61,12 +61,15 @@
             </ul>
         </section>
     {% else %}
-        {% set label = search ? "create a new course called '"~search~"'" : "create a new course" %}
         <div class="row">
             <div class="small-12 columns">
                 <div class="empty-state">
                     <i class="icon-course"></i>
-                    <p>Your search for '{{ search }}' did not return any matches.<br>Please try your search again or <a  href="/course/new/{{ search | url_encode }}">{{ label }}</a>.</p>
+                    {% if search is defined and search is not empty %}
+                        <p>Your search for '{{ search }}' did not return any matches.<br>Please try your search again or <a href="{{ routeLookup('course.newCourse', {name: (search | url_encode)}) }}">create a new course called '{{ search }}'</a>.</p>
+                    {% else %}
+                        <p><a href="{{ routeLookup('course.newCourse') }}">Create your first course</a>, a template of activities and assessments for importing to your class.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
