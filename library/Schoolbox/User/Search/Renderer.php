@@ -140,7 +140,7 @@ class Renderer extends Handler
                 $this->getPage()->setVar('grades_button_block', '');
                 if (Config::get(ConfigMapper::NAME_GRADES_ENABLED)) {
                     if (
-                        $currentUserIsStaff
+                        ($currentUserIsStaff && $currentUser->getRole()->getViewStudentGrades())
                         || ($currentUserIsStudent && $currentUserIsResult)
                         || ($currentUserIsParent
                             && $currentUserIsParentOfResult

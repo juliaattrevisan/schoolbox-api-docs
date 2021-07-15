@@ -209,6 +209,9 @@ class CommentNotifier extends AbstractModuleNotifier
 
         // and send to class teacher(s)
         foreach ($category->getTeachers() as $staff) {
+            if (!$staff->getRole()->getViewStudentGrades()) {
+                continue;
+            }
             $envelope->targetToUser($staff->getId(), $bob->build());
         }
 

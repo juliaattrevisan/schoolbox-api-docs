@@ -195,7 +195,8 @@ class StudentLists
         }
 
         // Grades
-        if ($this->gradesEnabled) {
+        $canViewGrades = $this->authorizer->isPathAuthorizedForUser('learningGrades.getGrades', ['userId' => $user->getId()], $this->viewer);
+        if ($canViewGrades) {
             $studentSisRecord['routes']['grades'] = [
                 'label' => $this->rosettaStone->translate('grades', true, true),
                 'href'  => $this->router->generate('learningGrades.getGrades', ['userId' => $user->getId()]),

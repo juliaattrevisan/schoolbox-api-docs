@@ -19,7 +19,6 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error;
 use Schoolbox\Filter\Selection as FilterSelection;
-use Schoolbox\GenericCollection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
@@ -56,7 +55,7 @@ class Module extends BaseModule
                 $basicPermissions,
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
+                    new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
                     new Rule\IsUser('userId'),
                     new Rule\All(
                         new Rule\IsTrue(!$this->getConfig()->get('restrict_parent_grades')),
