@@ -47,7 +47,7 @@ class Module extends BaseModule
         // staff may view anyone's due work
         $access = new Rule\Any(
             new Rule\IsUser('studentId'),
-            new Rule\HasRole(Role::STAFF)
+            new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF)
         );
         // parents may view their child's work only if config.restrict_parent_duework_access is off
         if (!$this->getConfig()->get('restrict_parent_duework_access')) {
