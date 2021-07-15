@@ -15,10 +15,9 @@ class Create extends Request
 
     private int $studentId;
 
-    public function __construct(int $studentId, string $type, string $body)
+    public function __construct(int $studentId, string $type, string $body, ?string $file)
     {
         $this->studentId =  $studentId;
-        $file = null;
         $this->setReferer("/learning/evidence/user/$studentId/create?momentType=$type");
         $this->setFormParam('body', $body);
         $this->setFormParam('file', $file);

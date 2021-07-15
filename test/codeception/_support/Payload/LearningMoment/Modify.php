@@ -15,10 +15,9 @@ class Modify extends Request
 
     private int $evidenceId;
 
-    public function __construct(int $evidenceId, string $type, string $body)
+    public function __construct(int $evidenceId, string $type, string $body, ?string $file)
     {
         $this->evidenceId =  $evidenceId;
-        $file = null;
         $this->setReferer("/learning/evidence/$evidenceId/modify");
         $this->setFormParam('body', $body);
         $this->setFormParam('file', $file);
