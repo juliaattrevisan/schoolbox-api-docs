@@ -84,10 +84,10 @@ export default {
          * @returns {Boolean}
          */
         isExpired() {
-            if (this.award.expiry === null) {
+            if (this.award.expiresAt === null) {
                 return false;
             }
-            return moment(this.award.expiresAt).isBefore(moment(), moment.day);
+            return moment(this.award.expiresAt).isBefore(moment(), 'd');
         }
     },
 
