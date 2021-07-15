@@ -26,6 +26,8 @@ use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
+use Schoolbox\Version;
+use Schoolbox\InstanceRegistry\InstanceRegistry;
 
 use function array_column;
 use function array_map;
@@ -48,19 +50,52 @@ class Controller extends Base
     /** @var null|IConnector */
     private $databaseExternal;
 
+    /** @var ConfigMapper  */
+    private ConfigMapper $configMapper;
 
     /**
      * @param Kami\IConnector  $kamiConnector
      * @param Database\Factory $databaseFactory
      * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
      */
-    public function __construct(Kami\IConnector $kamiConnector, Database\Factory $databaseFactory, ?IConnector $databaseExternal)
+    public function __construct(Kami\IConnector $kamiConnector, Database\Factory $databaseFactory, ?IConnector $databaseExternal, ConfigMapper $configMapper)
     {
         $this->kamiConnector    = $kamiConnector;
         $this->databaseFactory  = $databaseFactory;
         $this->databaseExternal = $databaseExternal;
+        $this->configMapper     = $configMapper;
     }
 
+    /**
+     * save that the currently logged in administrator does not want to be reminded
+     * to upgrade to the current major version
+     *
+     * @api GET /adminv2/home/dismiss-upgrade-reminder
+     */
+    public function dismissUpgradeReminder()
+    {
+//        $existingConfigs = $this->configMapper->findByPredicates($pb)->indexBy(ConfigMapper::COL_NAME);
+//        $existingConfig->setValue($newValue);
+//        $this->configMapper->save($existingConfig);
+
+
+        $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
+
+        $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
+        $configDismissUpgradeReminder->setValue($latestVersionMajor);
+        $this->configMapper->save($configDismissUpgradeReminder);
+
+        //update the config item with the current instance major version
+        $this->getResponse()->status->set(200);
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput(
+                [
+                    'success'  => true,
+                    'messages' => []
+                ]
+            )
+        );
+    }
 
     /**
      * Display admin settings homepage
@@ -268,33 +303,36 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/index.twig',
                 'data' => array(
-                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
-                    'usageInGraph' => $usageInGraph,
-                    'disk_used' => $disk_used,
-            //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
-                    'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
-                    'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
-                    'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
-                    'memory_total' => Alaress_Byte_Format::bytesToString($memory_total),
-                    'memory_percentage' => $memory_percentage,
-                    'memory_gradient' => $memory_gradient,
-                    'external_db' => $external_db,
-                    'external_db_version' => $external_db_version,
-                    'external_db_light' => $external_db_light,
-                    'external_db_status' => $external_db_status,
-                    'email_light' => $email_light,
-                    'email_status' => $email_status,
-                    'ldap_light' => $ldap_light,
-                    'ldap_status' => $ldap_status,
-                    'ldap_alt_light' => $ldap_alt_light,
-                    'ldap_alt_status' => $ldap_alt_status,
-                    'www_light' => $www_light,
-                    'www_status' => $www_status,
-                    'logs' => $logs,
-                    'kamiEnabled' => $this->kamiConnector->isEnabled(),
-                    'kamiOnline' => $this->kamiConnector->isOnline(),
-                    'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
+                    'pageCurrent'          => $this->router->generate('adminHome.getIndex'),
+                    'allBreadcrumbs'       => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
+                    'usageInGraph'         => $usageInGraph,
+                    'showUpgradeReminder'  => (new Version($this->getConfigLoader()))->showUpgradeReminder(),
+                    'major_site_version'   => (new Version($this->getConfigLoader()))->getMajor(),
+                    'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
+                    'disk_used'            => $disk_used,
+                    //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+                    'disk_total'           => Alaress_Byte_Format::bytesToString($disk_total),
+                    'disk_percentage'      => Alaress_Byte_Format::bytesToString($disk_percentage),
+                    'memory_used'          => Alaress_Byte_Format::bytesToString($memory_used),
+                    'memory_total'         => Alaress_Byte_Format::bytesToString($memory_total),
+                    'memory_percentage'    => $memory_percentage,
+                    'memory_gradient'      => $memory_gradient,
+                    'external_db'          => $external_db,
+                    'external_db_version'  => $external_db_version,
+                    'external_db_light'    => $external_db_light,
+                    'external_db_status'   => $external_db_status,
+                    'email_light'          => $email_light,
+                    'email_status'         => $email_status,
+                    'ldap_light'           => $ldap_light,
+                    'ldap_status'          => $ldap_status,
+                    'ldap_alt_light'       => $ldap_alt_light,
+                    'ldap_alt_status'      => $ldap_alt_status,
+                    'www_light'            => $www_light,
+                    'www_status'           => $www_status,
+                    'logs'                 => $logs,
+                    'kamiEnabled'          => $this->kamiConnector->isEnabled(),
+                    'kamiOnline'           => $this->kamiConnector->isOnline(),
+                    'backupsEnabled'       => $this->getDisasterRecoveryBackupsEnabled(),
                 ),
             )
         );

@@ -1,0 +1,140 @@
+<?php
+
+/**
+ * @copyright Copyright 2021, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox;
+
+use Schoolbox\InstanceRegistry\InstanceRegistry;
+
+class Version
+{
+    /**
+     * Constructor
+     *
+     * @param IConfigLoader $config
+     */
+    public function __construct(IConfigLoader $config)
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * get a complete representation of this schoolbox instances version.
+     *
+     * @example these would look something like:
+     *  - 21.0.2-1
+     *  - 20.2.11-1
+     *  - 20.1.8-2
+     *  - 20.0.12-1
+     *  - 19.1.12-3
+     *  - 18.1.8-1
+     *
+     * @return string
+     */
+    public function getFull(): string
+    {
+        return $this->config->get('site_version');
+    }
+
+    /**
+     * get the major version section of this running schoolbox instance.
+     *
+     * @example these would look something like:
+     *  - 21.0
+     *  - 20.2
+     *  - 20.1
+     *  - 20.0
+     *  - 19.1
+     *  - 18.1
+     *
+     * @return string
+     */
+    public function getMajor(): string
+    {
+        $majorVersion = "";
+        /**
+         * given the full version, everything leading up to the second
+         * period is considered the major version
+         */
+        if (preg_match('/^(\d+\.\d+)\.*/', $this->getFull(), $matches)) {
+            $majorVersion = $matches[1];
+        }
+        return $majorVersion;
+    }
+
+    /**
+     * get the minor version section of this running schoolbox instance.
+     *
+     * @example these would look something like:
+     *          - .4-1
+     *          - .11-1
+     *          - .8-2
+     *
+     * @return string
+     */
+    public function getMinor(): string
+    {
+        $minorVersion = '';
+        /**
+         * given the full version, everything after the second
+         * period is defined as the minor version
+         */
+        if (preg_match('/^\d+\.\d+\.(.)/', $this->getFull(), $matches)) {
+            $minorVersion = $matches[0];
+        }
+        return $minorVersion;
+    }
+    /**
+     * is this schoolbox instance client hosted?
+     *
+     * @return boolean
+     */
+    public function isClientHosted(): bool
+    {
+        return (bool)$this->config->get('site_environment') == "client-hosted";
+    }
+
+    /**
+     * is this schoolbox instance cloud hosted?
+     *
+     * @return bool
+     */
+    public function isCloudHosted(): bool
+    {
+        return (bool)$this->config->get('site_environment') == "cloud-hosted";
+    }
+
+    public function showUpgradeReminder(): bool
+    {
+        /**
+         * if the instance is not client hosted(cloud hosted), they dont need the reminder
+         */
+        if (!$this->isClientHosted()) {
+            return false;
+        }
+
+        /**
+         * if the instance is the same or ahead of the current latest release,
+         * then they dont need the reminder
+         */
+        $latestMajorVersion = (new InstanceRegistry($this->config))->getLatestVersionMajor();
+        if ($this->getMajor() >= $latestMajorVersion) {
+            return false;
+        }
+
+        /**
+         * it looks like someone has already seen and dismissed this upgrade reminder.
+         * let's not bombard them anymore until there is a new major version released
+         */
+        if ($this->config->get('dismiss_version') == $latestMajorVersion) {
+            return false;
+        }
+
+        return true;
+    }
+}

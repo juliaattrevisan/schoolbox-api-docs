@@ -111,148 +111,155 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 large-5 island">
 
-            <!-- Usage Graphs -->
+        <!-- Upgrade Reminder -->
+        {% if showUpgradeReminder %}
+            {% include '@adminHome/upgrade-reminder.twig' %}
+        {% endif %}
 
-            <h2 class="subheader">Server Usage</h2>
-            {% if usageInGraph %}
-            <section>
-                <div data-graph="usage"></div>
-            </section>
-            {% else %}
-                <table>
-                    <tbody>
-                    <tr><th>Storage</th><td>{{ disk_used }}</td></tr>
-                    <tr><th>Memory</th><td>{{ memory_used }} / {{ memory_total }}</td></tr>
-                    </tbody>
-                </table>
-            {% endif %}
+        <div class="row">
+            <div class="small-12 large-5 island">
 
-            <!-- Service Statuses -->
+                <!-- Usage Graphs -->
 
-            <h2 class="subheader">Status of Services</h2>
-            <section>
-                <ul class="information-list">
-                    <li>
-                        <div class="small-5 columns content">
-                            {% if external_db %}
-                                <a href="{{ routeLookup('adminHome.getHealthcheck') }}">{{ external_db }}{% if external_db_version is not empty %} ({{ external_db_version }}){% endif %}</a>
-                            {% else %}
-                                <span>External Database (None)</span>
-                            {% endif %}
-
-                        </div>
-                        <div class="small-7 columns content">
-                            <span class="full-width {{ external_db_light }} label">{{ external_db_status }}</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="small-5 columns content">
-                            Email
-                        </div>
-                        <div class="small-7 columns content">
-                            <span class="full-width {{ email_light }} label">{{ email_status }}</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="small-5 columns content">
-                            LDAP Primary
-                        </div>
-                        <div class="small-7 columns content">
-                            <span class="full-width {{ ldap_light }} label">{{ ldap_status }}</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="small-5 columns content">
-                            LDAP Secondary
-                        </div>
-                        <div class="small-7 columns content">
-                            <span class="full-width {{ ldap_alt_light }} label">{{ ldap_alt_status }}</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="small-5 columns content">
-                            WWW
-                        </div>
-                        <div class="small-7 columns content">
-                            <span class="full-width {{ www_light }} label" data-light="www">{{ www_status }}</span>
-                        </div>
-                    </li>
-                    {% if kamiEnabled %}
-                        {% set kamiStatus = kamiOnline ? 'success' : 'alert' %}
-                        {% set kamiLabel = kamiOnline ? 'Online' : 'Offline' %}
-                        <li>
-                            <div class="small-5 columns content">Kami</div>
-                            <div class="small-7 columns content">
-                                <span class="full-width {{ kamiStatus }} label">{{ kamiLabel }}</span>
-                            </div>
-                        </li>
-                    {% endif %}
-                    {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
-                    {% if drRoute %}
-                    <li>
-                        <div class="small-5 columns content">
-                            <a href="{{ drRoute }}">Disaster Recovery</a>
-                        </div>
-                        <div class="small-7 columns content">
-                            <span class="full-width {% if backupsEnabled %}success{% else%}highlight{% endif %} label">{% if backupsEnabled %}Enabled{% else%}Disabled{% endif %}</span>
-                        </div>
-                    </li>
-                    {% endif %}
-                </ul>
-            </section>
-
-            <!-- Role Statistics -->
-
-            <h2 class="subheader">Role Statistics</h2>
-            <section>
-                <div class="loading"></div>
-                <div class="scrollable">
-                    <table id="group-summary">
-                        <colgroup>
-                            <col width="50%" />
-                            <col width="20%" />
-                            <col width="30%" />
-                        </colgroup>
-                        <thead>
-                        <tr>
-                            <th>Role</th>
-                            <th>Total</th>
-                            <th>Logged In</th>
-                        </tr>
-                        </thead>
+                <h2 class="subheader">Server Usage</h2>
+                {% if usageInGraph %}
+                    <section>
+                        <div data-graph="usage"></div>
+                    </section>
+                {% else %}
+                    <table>
                         <tbody>
+                        <tr><th>Storage</th><td>{{ disk_used }}</td></tr>
+                        <tr><th>Memory</th><td>{{ memory_used }} / {{ memory_total }}</td></tr>
                         </tbody>
                     </table>
-                </div>
-            </section>
-        </div>
+                {% endif %}
 
-        <!-- Recent Log Entries -->
+                <!-- Service Statuses -->
 
-        <div class="small-12 large-7 island">
-            <div class="actions-small-2 row">
-                <div class="list-item">
-                    <div class="small-12 columns">
-                        <h2 class="subheader">Recent Activity</h2>
+                <h2 class="subheader">Status of Services</h2>
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="small-5 columns content">
+                                {% if external_db %}
+                                    <a href="{{ routeLookup('adminHome.getHealthcheck') }}">{{ external_db }}{% if external_db_version is not empty %} ({{ external_db_version }}){% endif %}</a>
+                                {% else %}
+                                    <span>External Database (None)</span>
+                                {% endif %}
+
+                            </div>
+                            <div class="small-7 columns content">
+                                <span class="full-width {{ external_db_light }} label">{{ external_db_status }}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="small-5 columns content">
+                                Email
+                            </div>
+                            <div class="small-7 columns content">
+                                <span class="full-width {{ email_light }} label">{{ email_status }}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="small-5 columns content">
+                                LDAP Primary
+                            </div>
+                            <div class="small-7 columns content">
+                                <span class="full-width {{ ldap_light }} label">{{ ldap_status }}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="small-5 columns content">
+                                LDAP Secondary
+                            </div>
+                            <div class="small-7 columns content">
+                                <span class="full-width {{ ldap_alt_light }} label">{{ ldap_alt_status }}</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="small-5 columns content">
+                                WWW
+                            </div>
+                            <div class="small-7 columns content">
+                                <span class="full-width {{ www_light }} label" data-light="www">{{ www_status }}</span>
+                            </div>
+                        </li>
+                        {% if kamiEnabled %}
+                            {% set kamiStatus = kamiOnline ? 'success' : 'alert' %}
+                            {% set kamiLabel = kamiOnline ? 'Online' : 'Offline' %}
+                            <li>
+                                <div class="small-5 columns content">Kami</div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width {{ kamiStatus }} label">{{ kamiLabel }}</span>
+                                </div>
+                            </li>
+                        {% endif %}
+                        {% set drRoute = routeLookupIfAuthorized('adminHome.getDisasterRecovery') %}
+                        {% if drRoute %}
+                            <li>
+                                <div class="small-5 columns content">
+                                    <a href="{{ drRoute }}">Disaster Recovery</a>
+                                </div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width {% if backupsEnabled %}success{% else%}highlight{% endif %} label">{% if backupsEnabled %}Enabled{% else%}Disabled{% endif %}</span>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </section>
+
+                <!-- Role Statistics -->
+
+                <h2 class="subheader">Role Statistics</h2>
+                <section>
+                    <div class="loading"></div>
+                    <div class="scrollable">
+                        <table id="group-summary">
+                            <colgroup>
+                                <col width="50%" />
+                                <col width="20%" />
+                                <col width="30%" />
+                            </colgroup>
+                            <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Total</th>
+                                <th>Logged In</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
-                </div>
-                <nav>
-                    <a href="/adminv2/reports/login/all" class="icon-progress" title="Login Report"></a>
-                    <a href="/adminv2/reports/activity/all" class="icon-list" title="Activity Report"></a>
-                </nav>
+                </section>
             </div>
-            <section>
-                <table>
-                    <thead>
+
+            <!-- Recent Log Entries -->
+
+            <div class="small-12 large-7 island">
+                <div class="actions-small-2 row">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Recent Activity</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="/adminv2/reports/login/all" class="icon-progress" title="Login Report"></a>
+                        <a href="/adminv2/reports/activity/all" class="icon-list" title="Activity Report"></a>
+                    </nav>
+                </div>
+                <section>
+                    <table>
+                        <thead>
                         <tr>
                             <th>Date</th>
                             <th>Action</th>
                             <th>User</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         {% for log in logs %}
                             <tr>
                                 <td>{{ log.date }}</td>
@@ -260,10 +267,13 @@
                                 <td>{{ log.name}}</td>
                             </tr>
                         {% endfor %}
-                    </tbody>
-                </table>
-            </section>
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+
         </div>
+
     </div>
 </div>
 

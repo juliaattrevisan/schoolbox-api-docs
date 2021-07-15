@@ -11,13 +11,14 @@
 namespace Schoolbox\Admin\Home;
 
 use Alaress\Authorizer\Authorizer;
+use Alaress\Authorizer\Rule;
 use Alaress\Database;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Rule;
+use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Alaress\Twig\Loader\IChainLoader;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 
 class Module extends BaseModule
@@ -32,6 +33,7 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'getIndex', $basePath, "");
         $this->addGetRoute($router, 'getHealthcheck', $basePath, "/healthcheck");
         $this->addGetRoute($router, 'getDisasterRecovery', $basePath, "/disaster-recovery");
+        $this->addGetRoute($router, 'dismissUpgradeReminder', $basePath, "/dismiss-upgrade-reminder");
     }
 
     /**
@@ -59,15 +61,18 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, [
+            'configMapper'     => $this->getMapperFactory()->getLazy(ConfigMapper::class),
             'kamiConnector'    => $this->getInjector()->lazyGet('kamiConnector'),
             'databaseFactory'  => $this->getInjector()->lazyGet('databaseFactory'),
-            'databaseExternal' => $injector->lazy(static function () use ($injector) {
-                try {
-                    return $injector->get('databaseExternal');
-                } catch (Database\Exception $e) {
-                    return null;
+            'databaseExternal' => $injector->lazy(
+                static function () use ($injector) {
+                    try {
+                        return $injector->get('databaseExternal');
+                    } catch (Database\Exception $e) {
+                        return null;
+                    }
                 }
-            }),
+            ),
         ]));
     }
 
