@@ -423,8 +423,8 @@ class External_Pcschools_User implements External_UserInterface
         $classArray = $this->getDatabase()->getAll($query, $params);
 
         foreach ($classArray as $class) {
-            $code = $period['TIME_PERIOD'] . '/' . $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
-            $classes[$code] = [
+            $code = $class['YEAR'] . $class['ABBREV'] . $class['CLASS'];
+            $classes[$period['TIME_PERIOD'] . '/' . $code] = [
                 'code'       => $code,
                 'name'       => $class['DESC'],
                 'classType'  => '',
