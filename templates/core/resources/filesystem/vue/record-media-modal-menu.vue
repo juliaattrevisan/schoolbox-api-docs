@@ -14,18 +14,16 @@ export default {
 
     data () {
         return {
+            hasChecked: false, 
             isVideoSupported: false, //Don't show the record video if no video input is supported, hard to imagine a scenarios where video is available but not microphone?
             isAudioSupported: false, //Don't show the record audio only or screen sharing if no audio input is supported, Screen sharing should not be used when audio input is not available
             hasDeviceCapture: false //If true, it's assumed this is a mobile device that won't currently support screen sharing
         }
     },
 
-    created () {
+    mounted () {
         this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
         this.hasDeviceCapture = hasDeviceCapture();
-    },
-
-    mounted () {
         this.displayAfterDeviceStatusCheck();
     },
 
@@ -37,6 +35,7 @@ export default {
          */
         async displayAfterDeviceStatusCheck () {
             await this.checkDeviceStatus();
+            this.hasChecked = true;
             this.$nextTick(() => {
                 this.updateContainerHeight();
                 this.animateOn();
@@ -186,7 +185,7 @@ export default {
 </script>
 
 <template>
-    <div class="pseudo-video" ref="pseudoVideo">
+    <div class="pseudo-video" ref="pseudoVideo" v-if="hasChecked">
         <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
                 <div class='icon-mic'></div>
