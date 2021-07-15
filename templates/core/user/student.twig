@@ -357,13 +357,12 @@
 
 
 
-                            {% if showPastoral %}
-                                {% if isStaffWhoCanView or isParentOfStudent %}
-                                    <li>
-                                        <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
-                                           class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
-                                    </li>
-                                {% endif %}
+                            {% set pastoralUrl = routeLookupIfAuthorized('pastoral.getStudent',{studentId: user.id}) %}
+                            {% if showPastoral and pastoralUrl %}
+                                <li>
+                                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
+                                       class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
+                                </li>
                             {% endif %}
 
                             {% set calendarUrl = routeLookupIfAuthorized('calendar.getCalendar', {selectedDate: now.urlDate, userId: user.id, user: user})  %}
