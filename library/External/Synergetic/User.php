@@ -1135,11 +1135,11 @@ class External_Synergetic_User implements External_UserInterface
     public function getHousemasterEmails(array $externalUserIds): array
     {
         // Make sure an array of valid external ID's was passed
-
         $ids = array_filter(
-            $externalUserIds, function ($externalUserId) {
-            return self::isExternalIdValid($externalUserId);
-        }
+            $externalUserIds,
+            function ($externalUserId) {
+                return self::isExternalIdValid($externalUserId);
+            }
         );
 
         if (count($ids) == 0) {
@@ -1179,9 +1179,10 @@ class External_Synergetic_User implements External_UserInterface
         // Make sure an array of valid external ID's was passed
 
         $ids = array_filter(
-            $externalUserIds, function ($externalUserId) {
-            return self::isExternalIdValid($externalUserId);
-        }
+            $externalUserIds,
+            function ($externalUserId) {
+                return self::isExternalIdValid($externalUserId);
+            }
         );
 
         if (count($ids) == 0) {
