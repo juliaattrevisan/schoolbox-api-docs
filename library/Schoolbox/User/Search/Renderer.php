@@ -115,7 +115,7 @@ class Renderer extends Handler
                 $this->getPage()->setVar('due_work_block', '');
                 if (Config::get(ConfigMapper::NAME_UPCOMING_ASSESSMENTS_ENABLED)) {
                     if (
-                        $currentUserIsStaff
+                        ($currentUserIsStaff && $currentUser->getRole()->getViewStudentGrades())
                         || ($currentUserIsStudent && $currentUserIsResult)
                         || ($currentUserIsParent
                             && $currentUserIsParentOfResult

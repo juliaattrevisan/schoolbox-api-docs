@@ -54,10 +54,6 @@ class StudentLists
     /** @var bool */
     private $mailIsEnabled;
 
-    private bool $upcomingAssessmentsEnabled;
-
-    private bool $gradesEnabled;
-
     /** @var string */
     private $mailHandle;
 
@@ -79,8 +75,6 @@ class StudentLists
      * @param Router                  $router
      * @param bool                    $pastoralIsEnabled
      * @param bool                    $mailIsEnabled
-     * @param bool                    $upcomingAssessmentsEnabled
-     * @param bool                    $gradesEnabled
      * @param string                  $mailHandle
      * @param RosettaStone            $rosettaStone
      */
@@ -94,8 +88,6 @@ class StudentLists
         Router $router,
         bool $pastoralIsEnabled,
         bool $mailIsEnabled,
-        bool $upcomingAssessmentsEnabled,
-        bool $gradesEnabled,
         string $mailHandle,
         RosettaStone $rosettaStone
     ) {
@@ -107,8 +99,6 @@ class StudentLists
         $this->router                     = $router;
         $this->pastoralIsEnabled          = $pastoralIsEnabled;
         $this->mailIsEnabled              = $mailIsEnabled;
-        $this->upcomingAssessmentsEnabled = $upcomingAssessmentsEnabled;
-        $this->gradesEnabled              = $gradesEnabled;
         $this->mailHandle                 = $mailHandle;
         $this->rosettaStone               = $rosettaStone;
         $this->authorizer                 = $authorizer;
@@ -185,7 +175,8 @@ class StudentLists
         $studentSisRecord['classCodes']             = [];
 
         // Upcoming assessments
-        if ($this->upcomingAssessmentsEnabled) {
+        $canViewUpcomingAssessments = $this->authorizer->isPathAuthorizedForUser('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()], $this->viewer);
+        if ($canViewUpcomingAssessments) {
             $studentSisRecord['routes']['dueWork'] = [
                 'label' => $this->rosettaStone->translate('dueWork', false, true),
                 'href'  => $this->router->generate('learningUpcoming.getUpcomingForStudent', ['studentId' => $user->getId()]),
