@@ -158,7 +158,7 @@ class Renderer extends Handler
                     $resultIsStudent
                     && Config::get('pastoral_enabled')
                     && (
-                        $currentUserIsStaff
+                        ($currentUserIsStaff && $currentUser->getRole()->getAccessPastoral())
                         || ($currentUserIsParentOfResult && Config::get('pastoral_parent_access'))
                     )
                 ) {

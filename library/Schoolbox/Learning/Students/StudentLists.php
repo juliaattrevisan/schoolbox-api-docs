@@ -91,17 +91,17 @@ class StudentLists
         string $mailHandle,
         RosettaStone $rosettaStone
     ) {
-        $this->externalClass              = $externalClass;
-        $this->userMapper                 = $userMapper;
-        $this->logMapper                  = $logMapper;
-        $this->folder                     = $folder;
-        $this->viewer                     = $viewer;
-        $this->router                     = $router;
-        $this->pastoralIsEnabled          = $pastoralIsEnabled;
-        $this->mailIsEnabled              = $mailIsEnabled;
-        $this->mailHandle                 = $mailHandle;
-        $this->rosettaStone               = $rosettaStone;
-        $this->authorizer                 = $authorizer;
+        $this->externalClass     = $externalClass;
+        $this->userMapper        = $userMapper;
+        $this->logMapper         = $logMapper;
+        $this->folder            = $folder;
+        $this->viewer            = $viewer;
+        $this->router            = $router;
+        $this->pastoralIsEnabled = $pastoralIsEnabled && $viewer->getRole()->getAccessPastoral();
+        $this->mailIsEnabled     = $mailIsEnabled;
+        $this->mailHandle        = $mailHandle;
+        $this->rosettaStone      = $rosettaStone;
+        $this->authorizer        = $authorizer;
     }
 
     /**
