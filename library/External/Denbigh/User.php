@@ -542,6 +542,14 @@ class External_Denbigh_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getStudentContactListExtended(string $yearLevel, string $name, string $boardingStatus, string $form): array
     {
         return [];

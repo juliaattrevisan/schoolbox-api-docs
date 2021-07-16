@@ -487,6 +487,14 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * @inheritDoc
      */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function getCampusFromTimetable(string $staffID): array
     {
         // Non-core promise

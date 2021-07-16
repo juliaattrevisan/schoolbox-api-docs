@@ -421,6 +421,14 @@ class External_Isams_User implements External_UserInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getStudentForms(): array

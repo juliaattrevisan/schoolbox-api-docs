@@ -421,6 +421,14 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
      * @inheritdoc
      */
     public function getStaffContactListExtended(): array

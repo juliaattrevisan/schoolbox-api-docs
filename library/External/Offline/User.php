@@ -120,6 +120,14 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     }
 
     /**
+     * @inheritDoc
+     */
+    public function getTutorEmails(array $externalUserIds): array
+    {
+        return [];
+    }
+
+    /**
      * @inheritdoc
      */
     public function getStaffContactListExtended(): array

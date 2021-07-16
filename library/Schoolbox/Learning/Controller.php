@@ -465,6 +465,10 @@ class Controller extends Base
                 self::LABEL_KEY   => 'Head of House for selected students',
                 self::LABEL_VALUE => 'housemasters',
             ],
+            'email_tutors' => [
+                self::LABEL_KEY   => 'Tutor for selected students',
+                self::LABEL_VALUE => 'tutors',
+            ],
         ];
 
         $result[] = [

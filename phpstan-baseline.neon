@@ -2561,11 +2561,6 @@ parameters:
 			path: library/External/Synergetic/Timetable.php
 
 		-
-			message: "#^Call to an undefined method Alaress\\\\Database\\\\Predicate\\\\IBuilder\\:\\:in\\(\\)\\.$#"
-			count: 1
-			path: library/External/Synergetic/User.php
-
-		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: library/External/Synergetic/User.php
