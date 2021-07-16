@@ -7,7 +7,7 @@ INSERT INTO config (`name`, `value`, `title`, `description`, `field_id`, `type_i
 VALUES ('email_tutors',
         '0',
         'Allow Email Tutors from Class List',
-        'If ticked, allows staff to email housemasters of a class with a single button',
+        'If ticked, allows staff to email tutors of a class with a single button',
         (SELECT lcf.id FROM lu_config_field lcf WHERE lcf.field = 'boolean'),
         (SELECT lct.id FROM lu_config_type lct WHERE lct.type = 'Policy'),
         'true',
