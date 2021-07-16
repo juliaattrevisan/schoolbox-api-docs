@@ -154,7 +154,9 @@ export default {
          *
          */
         updateContainerHeight () {
-            this.targetHeight = (this.$refs.container.getBoundingClientRect().width * this.currentRatio) + 'px'; //so there's no height jumps on switching videos
+            if (!this.hasClosed) { //won't be available when the modal has been closed
+                this.targetHeight = `${this.$refs.container.getBoundingClientRect().width * this.currentRatio}px`; //so there's no height jumps on switching videos
+            }
         },
 
         /**

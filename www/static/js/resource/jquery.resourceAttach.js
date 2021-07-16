@@ -523,17 +523,19 @@
             * Inline content starts with a preloader class which should be removed
             * once content has loaded
             */
+           
             if (method === 'inline') {
-                panel.load(url, null);
+                fetch(url).then((response) => {
+                    response.text().then((text) => {
+                        panel.html(text);
+                    });
+                });
             } else if (method === 'iframe') {
                 panel.html($('<iframe></iframe>').attr('src', url).height(MAX_IFRAME_HEIGHT));
             }
 
         });
 
-        /* Activate default tab
-        */
-        $('#attachment-browser-filesystems a').first().trigger('click');
 
     };
 

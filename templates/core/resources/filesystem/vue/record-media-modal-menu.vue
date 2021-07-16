@@ -7,20 +7,54 @@
 
 import { gsap } from 'gsap/all';
 import recordMediaTypes from '@js/record-media/recordMediaTypes';
+import { hasDeviceCapture, supportsVideoRecording, supportsAudioRecording } from '@js/util/featureDetectionUtils.js';
 
 
 export default {
 
-    created () {
-        this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+    data () {
+        return {
+            hasChecked: false, 
+            isVideoSupported: false, //Don't show the record video if no video input is supported, hard to imagine a scenarios where video is available but not microphone?
+            isAudioSupported: false, //Don't show the record audio only or screen sharing if no audio input is supported, Screen sharing should not be used when audio input is not available
+            hasDeviceCapture: false //If true, it's assumed this is a mobile device that won't currently support screen sharing
+        }
     },
 
     mounted () {
-        this.updateContainerHeight();
-        this.animateOn();
+        this.recordMediaTypes = recordMediaTypes; //to be able to move between media types
+        this.hasDeviceCapture = hasDeviceCapture();
+        this.displayAfterDeviceStatusCheck();
     },
 
     methods: {
+
+        /*
+         * Ensure the device has been checked before we display the buttons
+         *
+         */
+        async displayAfterDeviceStatusCheck () {
+            await this.checkDeviceStatus();
+            this.hasChecked = true;
+            this.$nextTick(() => {
+                this.updateContainerHeight();
+                this.animateOn();
+            });
+        },
+
+        /*
+         * To display only the approriate buttons based on the devices record media features
+         *
+         */
+        async checkDeviceStatus () {
+            const deviceList = await navigator.mediaDevices.enumerateDevices(); //use the device list to check for video and audio input
+            if (supportsVideoRecording(deviceList) || this.hasDeviceCapture) {
+                this.isVideoSupported = true;
+            } 
+            if (supportsAudioRecording(deviceList)) {
+                this.isAudioSupported = true;
+            }
+        },
 
         /*
          * To set up appropriate initial height on container, keeping the same size as a 4/3 video element
@@ -51,7 +85,7 @@ export default {
                     ease: 'power2.out',
                     delay: (index * 0.1) + 0.2,
                     onComplete: () => {
-                        if (index === 2) { //enable once everything's all animated
+                        if (index === (allMenuItems.length-1)) { //enable once everything's all animated
                             this.initMouseEvents();
                         }
                     }
@@ -151,22 +185,22 @@ export default {
 </script>
 
 <template>
-    <div class="pseudo-video" ref="pseudoVideo">
-        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
+    <div class="pseudo-video" ref="pseudoVideo" v-if="hasChecked">
+        <button v-if="isAudioSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.AUDIO_ONLY)">
             <div>
                 <div class='icon-mic'></div>
                 <span>Audio</span>
                 <aside>Say something with an audio only recording.</aside>
             </div>
         </button>
-        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
+        <button v-if="isVideoSupported" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.CAMERA)">
             <div>
                 <div class='icon-video'></div>
                 <span>Video</span>
                 <aside>Use a computer camera to create a video recording.</aside>
             </div>
         </button>
-        <button class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
+        <button v-if="!hasDeviceCapture" class="menu-item" @click="recordMediaTypeSelected(recordMediaTypes.SCREEN)">
             <div>
                 <div class='icon-screen-capture'></div>
                 <span>Screen</span>
@@ -192,12 +226,13 @@ $font-family-icon: 'schoolbox';
 }
 
 .menu-item {
-    width: calc(33.4%);
-    background: #FAFAFA;
+    flex-grow: 1;
+    flex-basis: 0;
     border: 1px solid #EDEDED;
     margin-right: 1rem;
     margin-top: 1rem;
     padding: 20px;
+    background: #FAFAFA;
     &:last-child {
         margin-right: 0;
     }
