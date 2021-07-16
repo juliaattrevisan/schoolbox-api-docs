@@ -74,11 +74,6 @@ class Controller extends Base
      */
     public function dismissUpgradeReminder()
     {
-//        $existingConfigs = $this->configMapper->findByPredicates($pb)->indexBy(ConfigMapper::COL_NAME);
-//        $existingConfig->setValue($newValue);
-//        $this->configMapper->save($existingConfig);
-
-
         $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
 
         $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');

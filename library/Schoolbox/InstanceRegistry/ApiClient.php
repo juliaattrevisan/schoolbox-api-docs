@@ -61,7 +61,7 @@ class ApiClient
     }
 
     /**
-     * Find $forecastLimit days worth of information about $location
+     * fetch information from the instance registry
      *
      * @param string $requestUrl
      * @return array
