@@ -18,10 +18,11 @@ readonly L_ERROR=400
 
 # Global vars
 declare verbose=0
-declare package           # One of [schoolbox|schoolboxdev]
-declare site_root         # No trailing slash, eg '/vagrant'
-declare is_primary_host   # One of [0|1]
-declare instance_list     # Set of instances for this package
+declare single_instance_mode=0
+declare package                # One of [schoolbox|schoolboxdev]
+declare site_root              # No trailing slash, eg '/vagrant'
+declare is_primary_host        # One of [0|1]
+declare instance_list          # Set of instances for this package
 
 # Logging helpers
 function debug(){
@@ -45,7 +46,7 @@ function help(){
   echo "Args:"
   echo "  --is-primary-host  Required. Is this a primary (1) or non-primary (0) host."
   echo "                               (Primary host has daemons/crons + runs SQL updates)"
-  echo "  --instance-id      Optional. The instance id to run the upgrade against"
+  echo "  --instance-id      Optional. If specified, only upgrade this instance"
   echo "  -v,--verbose       Optional. Log with increased verbosity"
   echo "  -h,--help          Optional. Print this help message and exit"
 }
@@ -84,6 +85,7 @@ function parse_args() {
         ;;
       --instance-id)
         instance_list=$2
+        single_instance_mode=1
         shift; shift;
         ;;
       *)
@@ -131,6 +133,7 @@ function parse_global_vars(){
   debug "site_root: '$site_root'"
   debug "package: '$package'"
   debug "instance_list: $(echo -e "$instance_list" | tr '\n' ' ')"
+  debug "single_instance_mode: $single_instance_mode"
 }
 
 
@@ -249,7 +252,16 @@ function rebuild_cron_jobs(){
   else
     log "---removing cron jobs on secondary host---";
   fi
-  schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host"
+
+  if [[ $verbose == 0 ]] && [[ $single_instance_mode == 0 ]]; then
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host"
+  elif [[ $verbose == 0 ]] && [[ $single_instance_mode == 1 ]]; then
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" --instance "$instance_list"
+  elif [[ $verbose == 1 ]] && [[ $single_instance_mode == 0 ]]; then
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" -v
+  else
+    schoolboxcloud-rebuild-cronjobs --site-root "$site_root" --is-primary-host "$is_primary_host" --instance "$instance_list" -v
+  fi
 }
 
 function reload_binding_cache(){
