@@ -150,14 +150,20 @@ function upgrade_instances(){
   for i in $instance_list; do
   {
     # Ensure instance's log file's directory exists
-    mkdir -p /var/log/"$package"/"$i"
-    instance_log_file=/var/log/"$package"/"$i"/upgrade.log;
+    mkdir -p /var/log/schoolbox/"$i"
+    instance_log_file=/var/log/schoolbox/"$i"/upgrade.log;
     log "upgrade starting for instance $i - logging to $instance_log_file";
 
     # If log exists in old location, move to new location. TODO remove once all instances upgrade past 20.2.12
     old_filename=/var/lib/"$package"/"$i"_upgrade.log
     if [[ -f  "$old_filename" ]]; then
       mv "$old_filename" "$instance_log_file"
+    fi
+
+    # Ensure 'schoolboxdev' logs moved TODO remove once all instances upgrade 21.0.4+
+    if [[ -f /var/log/schoolboxdev/"$i"/upgrade.log ]]; then
+      cat /var/log/schoolboxdev/"$i"/upgrade.log >> /var/log/schoolbox/"$i"/upgrade.log
+      rm /var/log/schoolboxdev/"$i"/upgrade.log
     fi
 
     # TODO, consider case where:
@@ -260,7 +266,7 @@ function reload_binding_cache(){
     log "---reloading binding cache (in parallel)---";
     for i in $instance_list; do
     {
-      instance_log_file_2=/var/log/"$package"/"$i"/upgrade.log;
+      instance_log_file_2=/var/log/schoolbox/"$i"/upgrade.log;
       log "binding cache refresh starting for instance $i - logging to $instance_log_file_2";
       ${package}cloud-reload-binding-cache "$i" >> "$instance_log_file_2" 2>&1;
       log "binding cache refresh finished for instance $i";
