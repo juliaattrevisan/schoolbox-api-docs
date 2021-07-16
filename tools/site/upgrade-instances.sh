@@ -134,15 +134,6 @@ function parse_global_vars(){
 }
 
 
-# Ensures all data dirs defined by instances exist on disk
-function create_data_dirs(){
-  if [[ $verbose == 1 ]]; then
-    "$site_root"/tools/site/create-data-dirs.sh --verbose
-  else
-    "$site_root"/tools/site/create-data-dirs.sh
-  fi
-}
-
 # Ensures data-dirs exist (all hosts) then runs SQL updates (primary hosts only)
 function upgrade_instances(){
 
