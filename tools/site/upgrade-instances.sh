@@ -214,8 +214,8 @@ function upgrade_instances(){
 }
 
 function restart_php_fpm(){
-  log "Restarting php7.4-fpm ..."
-  service php7.4-fpm restart         # Allow web requests again, ensure upgraded code is used
+  log "Reloading php7.4-fpm ..."
+  service php7.4-fpm reload         # Ensure web requests use upgraded code
 }
 
 function remove_maintenance_page(){
