@@ -23,6 +23,7 @@ declare package                # One of [schoolbox|schoolboxdev]
 declare site_root              # No trailing slash, eg '/vagrant'
 declare is_primary_host        # One of [0|1]
 declare instance_list          # Set of instances for this package
+declare socketd_ports          # Use these if provided, otherwise fetch from IR. Eg '--socketd-ports vagrantx:9081'
 
 # Logging helpers
 function debug(){
@@ -44,11 +45,13 @@ function help(){
   echo "Usage:"
   echo "  $0 --is-primary-host [0|1] [-v|--verbose]"
   echo "Args:"
-  echo "  --is-primary-host  Required. Is this a primary (1) or non-primary (0) host."
-  echo "                               (Primary host has daemons/crons + runs SQL updates)"
-  echo "  --instance-id      Optional. If specified, only upgrade this instance"
-  echo "  -v,--verbose       Optional. Log with increased verbosity"
-  echo "  -h,--help          Optional. Print this help message and exit"
+  echo "  --is-primary-host      Required. Is this a primary (1) or non-primary (0) host."
+  echo "                                   (Primary host has daemons/crons + runs SQL updates)"
+  echo "  --instance-id          Optional. If specified, only upgrade this instance"
+  echo "  --socketd-ports [MAP]  Optional. If specified, use this [instance_id:port] map, otherwise fetch from IR."
+  echo "                                   Eg '--socketd-ports vagrantx:9081'"
+  echo "  -v,--verbose           Optional. Log with increased verbosity"
+  echo "  -h,--help              Optional. Print this help message and exit"
 }
 
 # Check script is running with sufficient permissions
@@ -86,6 +89,10 @@ function parse_args() {
       --instance-id)
         instance_list=$2
         single_instance_mode=1
+        shift; shift;
+        ;;
+      --socketd-ports)
+        socketd_ports=$2
         shift; shift;
         ;;
       *)
@@ -232,11 +239,14 @@ function remove_maintenance_page(){
 function rebuild_and_restart_daemons(){
   if [[ $is_primary_host == '1' ]]; then
     log "---rebuilding + restarting daemon on primary host---";
-    # TODO, if we want to run this script in vagrant, and for better performance when invoked from puppet, need to add support for the --socketd-ports flag
-    if [[ $verbose == 1 ]]; then
-      /usr/local/bin/schoolbox-rebuild-daemons --fetch -v
-    else
+    if [[ -z $socketd_ports ]] && [[ $verbose == 0 ]]; then
       /usr/local/bin/schoolbox-rebuild-daemons --fetch
+    elif [[ -z $socketd_ports ]] && [[ $verbose == 1 ]]; then
+      /usr/local/bin/schoolbox-rebuild-daemons --fetch -v
+    elif [[ -n $socketd_ports ]] && [[ $verbose == 0 ]]; then
+      /usr/local/bin/schoolbox-rebuild-daemons --socketd-ports "$socketd_ports"
+    else
+      /usr/local/bin/schoolbox-rebuild-daemons --socketd-ports "$socketd_ports" -v
     fi
     for instance in $instance_list; do
       ${package}cloud-restart-daemons "$instance";
