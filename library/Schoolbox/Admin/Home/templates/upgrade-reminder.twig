@@ -15,9 +15,7 @@
         {# if the user closes the upgrade reminder alert, lets make sure we
         record the interaction to prevent the reminder from showing again #}
         $('#alert-upgrade-reminder').on("close.fndtn.alert", function() {
-            $.get(url, function() {
-                console.log("succeeded in dismissing the upgrade reminder");
-            });
+            $.get(url);
         });
     });
 </script>
