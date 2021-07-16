@@ -208,15 +208,12 @@ class StudentLists
 
         // Pastoral
         if ($this->pastoralIsEnabled) {
-            $canViewPastoral = $this->authorizer->isPathAuthorizedForUser('pastoral.getStudent', ['studentId' => $user->getId()], $this->viewer);
-            if ($canViewPastoral) {
-                $studentSisRecord['routes']['pastoral'] = [
-                    'label' => $this->rosettaStone->translate('pastoralCare', false, true),
-                    'href'  => $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
-                    'class' => 'icon-pastoral',
-                    'title' => '',
-                ];
-            }
+            $studentSisRecord['routes']['pastoral'] = [
+                'label' => $this->rosettaStone->translate('pastoralCare', false, true),
+                'href'  => $this->router->generate('pastoral.getStudent', ['studentId' => $user->getId()]),
+                'class' => 'icon-pastoral',
+                'title' => '',
+            ];
         }
 
         // Calendar
