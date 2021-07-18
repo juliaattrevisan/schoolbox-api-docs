@@ -10,6 +10,7 @@
 
 namespace Schoolbox\External\Connector\Schoolbox\Base;
 
+use Alaress_Date_Format;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\External\Connector\ISync;
 use Schoolbox\Sync\Iterator;
@@ -40,11 +41,12 @@ class Sync extends Base implements ISync
                 sups.campus_name                            AS student_campus
             FROM        `sis_user_profile` `sup`
             JOIN        `sis_user_profile_student` sups ON sup.id = sups.sis_user_profile_id
+            WHERE       (sups.leaving_date IS NULL OR sups.leaving_date >= :now)
             ORDER BY    sup.external_id ASC
         ";
 
         return new Iterator\Student(
-            $this->databaseExternal->getQueryIterator($query)
+            $this->databaseExternal->getQueryIterator($query, ['now' => Alaress_Date_Format::now()->getDatabaseDate()])
         );
     }
 
