@@ -79,11 +79,12 @@ class Sync extends Base implements ISync
             JOIN    sis_user_profile_relation supr ON child.id = supr.child_profile_id
             JOIN    sis_user_profile parent ON supr.user_profile_id = parent.id
             JOIN    sis_user_profile_parent supp on parent.id = supp.sis_user_profile_id
+            WHERE   (sups.leaving_date IS NULL OR sups.leaving_date >= :now)
             ORDER BY parent.external_id ASC
         ';
 
         return new Iterator\Guardian(
-            $this->databaseExternal->getQueryIterator($query)
+            $this->databaseExternal->getQueryIterator($query, ['now' => Alaress_Date_Format::now()->getDatabaseDate()])
         );
     }
 
