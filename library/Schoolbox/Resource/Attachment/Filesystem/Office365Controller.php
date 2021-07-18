@@ -10,6 +10,7 @@ namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
 use Schoolbox\IConfigLoader;
+use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Resource\Attachment\NavigatorController;
 
 /**
@@ -21,14 +22,16 @@ class Office365Controller extends NavigatorController
 {
 
     /**
-     * @param bool          $multi
-     * @param string        $mimeFilter
-     * @param IConfigLoader $conf
+     * @param bool               $multi
+     * @param string             $mimeFilter
+     * @param IConfigLoader|null $conf
+     * @param RosettaStone|null  $rosetta
+     * @param bool               $useFolder
      * @throws OutOfRangeException
      */
-    public function __construct($multi, $mimeFilter = null, $conf = null)
+    public function __construct($multi, $mimeFilter = null, $conf = null, $rosetta = null, $useFolder = true)
     {
-        parent::__construct($multi, $mimeFilter);
+        parent::__construct($multi, $mimeFilter, $conf, $rosetta, $useFolder);
 
         if (!$conf->get('office365_tenant')) {
             throw new OutOfRangeException("Office 365 tenancy not specified");
