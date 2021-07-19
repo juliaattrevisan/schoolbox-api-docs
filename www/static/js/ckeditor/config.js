@@ -38,12 +38,6 @@ CKEDITOR.editorConfig = function( config ) {
 
 	// Dialog background colour
 	config.dialog_backgroundCoverColor = "#000000";
-
-    // File paste upload
-    config.uploadUrl = '/storage/asyncUpload.php';
-    config.fileUploadRequest = function (event) {
-        let xhr = event.data.fileLoader.xhr;
-    }
 };
 
 // Inject nanospell

@@ -127,9 +127,13 @@
 
             // File paste upload
             uploadUrl: '/storage/asyncUpload.php',
-            fileUploadRequest: function (event) {
-                let xhr = event.data.fileLoader.xhr;
-            }
+            fileUploadResponse: function (event) {
+                let response        = JSON.parse(event.data.fileLoader.xhr.responseText);
+                event.data.message  = response.message;
+                event.data.uploaded = 1;
+                event.data.url      = response.meta.file._links.fetch;
+                event.stop();
+            },
         };
 
         var derived = {
@@ -255,6 +259,12 @@
                     event.removeListener();
                 }
             });
+
+            // Apply fileUploadResponse manually if it's there:
+            // somehow, it's not applied when passed as a config option
+            if (config.fileUploadResponse) {
+                CKEDITOR.instances[identifier].on('fileUploadResponse', config.fileUploadResponse);
+            }
         }
     };
 
