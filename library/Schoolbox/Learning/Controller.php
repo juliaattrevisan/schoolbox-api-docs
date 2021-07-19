@@ -438,7 +438,7 @@ class Controller extends Base
                 'specialNeeds'           => $this->rosettaStone->translate('specialNeeds', true, true),
                 'replyTo'                => $this->getUser()->getEmail(),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
-                'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled'),
+                'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->getRole()->getAccessPastoral(),
                 'learningMomentsEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
                 'badgesEnabled'          => $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED),
                 'emailGroups'            => $this->getClassListsEmailGroups(),
