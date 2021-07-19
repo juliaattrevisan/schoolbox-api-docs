@@ -239,7 +239,7 @@ export default {
                         startupFocus: true,
                         height: '8rem',
                         removePlugins: 'schoolboxanchor',
-                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
                         toolbarGroups: [
                             {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                             {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},
