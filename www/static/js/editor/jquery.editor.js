@@ -123,6 +123,12 @@
             /* A callback to fire when editor blurs
              */
             blur: function(element) {
+            },
+
+            // File paste upload
+            uploadUrl: '/storage/asyncUpload.php',
+            fileUploadRequest: function (event) {
+                let xhr = event.data.fileLoader.xhr;
             }
         };
 
