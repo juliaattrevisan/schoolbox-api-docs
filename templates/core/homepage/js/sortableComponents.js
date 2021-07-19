@@ -10,14 +10,18 @@ import { insertElementBefore, insertElementAfter, getClosestElement, getElements
 
 gsap.registerPlugin(Draggable, Flip);
 
+const sortablesContainersSelector = '[data-components-container]'; //the top/left/right parent containers
+const sortablesSelector = '[data-component]'; //any component that will be sorted
+const sortablesTriggerSelector = '[data-component-titlebar-container]'; //the top bar of the component that will be used as the drag trigger
+const MAX_ELEMENT_HEIGHT = 2000;
+
 let draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
 let activeElement; //the element that's currently being dragged/sorted around
 let placeholderElement; //the element that subs in for the activeElement being sorted
-let sortablesContainersSelector = '[data-components-container]'; //the top/left/right parent containers
-let sortablesSelector = '[data-component]'; //any component that will be sorted
-let sortablesTriggerSelector = '[data-component-titlebar-container]'; //the top bar of the component that will be used as the drag trigger
 let isScrollingTimeout = false; //to prevent sorting when moving a sortable up/down the window
 let isScrolling = false;
+let isFlipping = false; //prevent quick shifts / odd flickers while using FLIP
+let hasShrunk = false; //if required, wait for the element to shrink down before dragging as some elements are too long to move around effectively
 
 
 /**
@@ -25,7 +29,7 @@ let isScrolling = false;
  */
 const initDraggables = () => {
     document.querySelectorAll(sortablesSelector).forEach((sortableItem) => {
-        draggablesList.push(getDraggable(sortableItem));
+        draggablesList = [...draggablesList, getDraggable(sortableItem)];
     });
     draggablesList.forEach((draggable) => draggable.disable()); //disabled at start until the #component-lock-switch is toggled
 }
@@ -39,22 +43,11 @@ const initDraggables = () => {
         type: 'x, y',
         trigger: sortableItem.querySelector(sortablesTriggerSelector),
         autoScroll: 1,
-        onDragStart: (event) => onDragStart(event),
+        onPress: (event) => onDragStart(event),
+        // onDragStart: (event) => onDragStart(event),
         onDrag: () => onDrag(),
-        onDragEnd: () => onDragEnd(),
+        onRelease: () => onDragEnd(),
     })[0];
-}
-
-/**
- * To be able to sort elements and snap back to correct position
- */
- const updateSortableElements = () => {
-    document.querySelectorAll(sortablesSelector).forEach((sortableItem, index) => {
-        sortableItem.dataset.originalLeft = sortableItem.getBoundingClientRect().left;
-        sortableItem.dataset.leftDifference = 0;
-        sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
-        sortableItem.dataset.topDifference = 0;
-    });
 }
 
 /**
@@ -67,17 +60,26 @@ const initDraggables = () => {
 }
 
 /**
- * Enable/disable the sorting based on the status of #component-lock-switch
+ * Listen to changes and enable/disable the sorting based on the status of #component-lock-switch
  */
 const initComponentLockSwitchListener = () => {
     const componentLockSwitch = document.getElementById('component-lock-switch').querySelector('input');
     componentLockSwitch.addEventListener('change', (event) => {
-        if (event.target.checked) {
-            draggablesList.forEach((draggable) => draggable.enable()); //run through each Draggable instance and enable
-        } else {
-            draggablesList.forEach((draggable) => draggable.disable());
-        }
+        updateDraggablesStatus(event.target.checked);
     });
+}
+
+/**
+ * Run through each Draggable instance and enable/disable
+ * 
+ * @param { Boolean }  
+ */
+ const updateDraggablesStatus = (enable) => {
+    if (enable) {
+        draggablesList.forEach((draggable) => draggable.enable()); //run through each Draggable instance and enable
+    } else {
+        draggablesList.forEach((draggable) => draggable.disable());
+    }
 }
 
 /**
@@ -111,19 +113,67 @@ const initComponentLockSwitchListener = () => {
  */
 const onDragStart = (event) => {
     
-    updateSortableElements(); //ensure we have the most up to date positions
-
-    window.addEventListener('scroll', onScroll); //prevent sorting check while moving up/down window
+    activeElement = event.target.closest(sortablesSelector); //use the parent container regardless of selection to ensure correct dimensions etc
+    activeElement.querySelector('[data-collapsable]').style.pointerEvents = 'none'; //prevent any mouse interactions interferring while dragging
+    activeElement.style.overflow = 'hidden';
     
     document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
     document.documentElement.style.scrollBehavior = 'auto'; //disable smooth scroll as it can jar while moving elements around 
-    
-    activeElement = event.target.closest(sortablesSelector); //use the parent container regardless of selection to ensure correct dimensions etc
+
+    window.addEventListener('scroll', onScroll); //prevent sorting check while moving up/down window
+
+    disableAllOtherDraggables();
 
     placeholderElement = getPlaceholderElement();
-    placeholderElement.style.opacity = 0.25; //displayed as reference where the activeElement is currently placed 
     pullOutActiveElement();
 
+    if (activeElement.getBoundingClientRect().height > MAX_ELEMENT_HEIGHT) {
+        
+        hasShrunk = false;
+        
+        gsap.to(placeholderElement, { height: 40, duration: 0.3 } );
+
+        gsap.to(activeElement, { height: 40, duration: 0.3, onComplete: () => {
+            
+            hasShrunk = true;
+
+            
+
+            updateSortableElements(); //ensure we have the most up to date positions
+
+        } } );
+    
+    } else {
+
+        hasShrunk = true;
+
+    }
+
+}
+
+/**
+ * To be able to sort elements and snap back to correct position
+ */
+ const updateSortableElements = () => {
+    document.querySelectorAll(sortablesSelector).forEach((sortableItem) => {
+        sortableItem.dataset.originalLeft = sortableItem.getBoundingClientRect().left;
+        sortableItem.dataset.leftDifference = 0;
+        sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
+        sortableItem.dataset.topDifference = 0;
+        sortableItem.dataset.currentHeight = sortableItem.getBoundingClientRect().height;
+        sortableItem.dataset.heightRatio = sortableItem.getBoundingClientRect().height / sortableItem.getBoundingClientRect().width; //to keep the height accurate when moving between containers
+    });
+}
+
+/**
+ * Disable all others until current drag is finished to avoid rapid fire / double click issues
+ */
+ const disableAllOtherDraggables = () => {
+    draggablesList.forEach((draggable) => { 
+        if (draggable.target.id !== activeElement.id) { //to avoid disabling the current
+            draggable.disable();
+        }
+    }); 
 }
 
 /**
@@ -147,6 +197,15 @@ const onDragStart = (event) => {
  */
  const getPlaceholderElement = () => {
     const cloneElement = activeElement.cloneNode(true);
+    // const cloneElement = document.createElement('div');
+    // activeElement.classList.forEach((className) => cloneElement.classList.add(className));
+    // for (const [key, value] of Object.entries(activeElement.dataset)) {
+    //     cloneElement.dataset[key] = value;
+    // }
+    // cloneElement.style.width = `100%`;
+    // cloneElement.style.height = `${activeElement.getBoundingClientRect().height }px`;
+    // cloneElement.style.background = `white`;
+    cloneElement.style.opacity = 0.5; //displayed as reference where the activeElement is currently placed 
     insertElementBefore(activeElement, cloneElement);
     return cloneElement;
 }
@@ -191,7 +250,7 @@ const updateActiveElementComputedStyles = () => {
  */
 const onDrag = () => {
     
-    if (!isScrolling) { //don't be checking while scrolling, as can jar the window and produce weird behaviour
+    if (!isScrolling && hasShrunk) { //don't be checking while scrolling, as can jar the window and produce weird behaviour
         
         let sortablesToCheckList = Array.from(document.querySelectorAll(sortablesSelector)); //grab all sortable elements 
         
@@ -238,21 +297,31 @@ const onDrag = () => {
  */
 const flipState = (closestElement, isShiftingDown) => {
     
-    const state = Flip.getState(document.querySelectorAll(sortablesSelector));
-    
-    if (isShiftingDown) {
-        insertElementAfter(closestElement, placeholderElement);
-    } else {
-        insertElementBefore(closestElement, placeholderElement);
+    if (!isFlipping) { //don't allow multiple FLIPs to prevent quick shifts / weird jarring behaviour
+
+        isFlipping = true;
+
+        const state = Flip.getState(document.querySelectorAll(sortablesSelector));
+        
+        if (isShiftingDown) {
+            insertElementAfter(closestElement, placeholderElement);
+        } else {
+            insertElementBefore(closestElement, placeholderElement);
+        }
+
+        activeElement.dataset.leftDifference = placeholderElement.getBoundingClientRect().left - parseInt(placeholderElement.dataset.originalLeft);
+        activeElement.dataset.topDifference = (placeholderElement.getBoundingClientRect().top + window.scrollY) - parseInt(placeholderElement.dataset.originalTop);
+
+        Flip.from(state, {
+            duration: 0.3,
+            ease: 'power1.InOut',
+            onComplete: () => {
+                isFlipping = false;
+                onDrag(); //check after Flip to see if another is required
+            }
+        });
+        
     }
-
-    activeElement.dataset.leftDifference = placeholderElement.getBoundingClientRect().left - parseInt(placeholderElement.dataset.originalLeft);
-    activeElement.dataset.topDifference = (placeholderElement.getBoundingClientRect().top + window.scrollY) - parseInt(placeholderElement.dataset.originalTop);
-
-    Flip.from(state, {
-        duration: 0.3,
-        ease: 'power1.InOut'
-    });
 
 }
 
@@ -260,10 +329,12 @@ const flipState = (closestElement, isShiftingDown) => {
  * Just snap back to where it now belongs
  */
  const onDragEnd = () => {
+    updateDraggablesStatus(false); //prevent quick reclicks on elements
     gsap.to(activeElement, {
         x: 0 + parseInt(activeElement.dataset.leftDifference), //to accommodate for potential position changes that have occured
         y: 0 + parseInt(activeElement.dataset.topDifference),
         width: placeholderElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
+        height: 'auto',
         duration: 0.3,
         overwrite: true,
         onComplete: () => onSnapActiveElementBackComplete()
@@ -282,9 +353,14 @@ const flipState = (closestElement, isShiftingDown) => {
     activeElement.style.position = 'static'; //was absolute, now sitting as it should
     updateActiveElementComputedStyles();
     activeElement.setAttribute('data-component', ''); //so it can be dragged again
-    
+    activeElement.querySelector('[data-collapsable]').style.pointerEvents = 'auto'; //re-enable mouse interactions
+
     insertElementAfter(placeholderElement, activeElement); //the element was taken out, so put it back where it now belongs
     placeholderElement.remove(); //and now the placeholder can be pulled out
+
+    activeElement.style.overflow = 'visible'
+
+    // gsap.to(activeElement, { height: 'auto', duration: 0.3, onComplete: () => activeElement.style.overflow = 'visible' } ); 
 
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
@@ -294,6 +370,7 @@ const flipState = (closestElement, isShiftingDown) => {
     
     updateSortableElements();
     submitNewComponentOrder();
+    updateDraggablesStatus(true); //ensure all are enabled again once animation is complete
 
 }
 
@@ -357,7 +434,6 @@ const getComponentID = (componentElement) => {
  */
 export const init = () => {
     initDraggables();
-    updateSortableElements();
     initListeners();
 }
 

@@ -76,7 +76,7 @@ export const insertElementAfter = (referenceElement, targetElement) => {
 }
 
 /**
- * Find the closest element in a list a NodeList, based on a x,y of a targetPoint
+ * Find the closest element (relative to its mid point) in a NodeList, based on a x,y of a targetPoint 
  * 
  * @param { x, y }  
  * @param { NodeList }  
