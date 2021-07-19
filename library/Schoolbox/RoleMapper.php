@@ -44,7 +44,7 @@ class RoleMapper extends Mapper
         $this->uses('access_eportfolio', self::TYPE_BOOLEAN);
         $this->uses('access_pastoral', self::TYPE_BOOLEAN);
         $this->uses('create_badges', self::TYPE_BOOLEAN);
-        $this->uses('create_evidence', self::TYPE_BOOLEAN);
+        $this->uses('access_evidence', self::TYPE_BOOLEAN);
         $this->uses('view_parent_directory', self::TYPE_BOOLEAN);
         $this->uses('view_staff_directory', self::TYPE_BOOLEAN);
         $this->uses('digest_schedule', self::TYPE_STRING);

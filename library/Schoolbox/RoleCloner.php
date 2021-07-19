@@ -47,7 +47,7 @@ class RoleCloner
         $destination->setAccessEportfolio($source->getAccessEportfolio());
         $destination->setAccessPastoral($source->getAccessPastoral());
         $destination->setCreateBadges($source->getCreateBadges());
-        $destination->setCreateEvidence($source->getCreateEvidence());
+        $destination->setAccessEvidence($source->getAccessEvidence());
         $destination->setViewParentDirectory($source->getViewParentDirectory());
         $destination->setViewStaffDirectory($source->getViewStaffDirectory());
 
