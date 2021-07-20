@@ -148,6 +148,8 @@
                 .hideTitleBar()
                 .build();
             picker.setVisible(true);
+            
+            config.onLoaded.call(this, picker);
 
             /* Shut google modal when we shut our modal
              * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func

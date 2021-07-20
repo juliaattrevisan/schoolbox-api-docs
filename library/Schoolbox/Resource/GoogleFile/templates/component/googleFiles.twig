@@ -126,6 +126,31 @@
         </div>
     </div>
 </div>
+{# <div class="google-files-modal" data-modal>
+    <div class="google-files-modal-container" data-modal-container></div>
+</div> #}
+<style>
+.google-files-modal { 
+    position: fixed; 
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.google-files-modal-container {
+    position: absolute;
+    overflow: hidden;
+    left: 50%;
+    top: 50%;
+    width: 500px;
+    height: 500px;
+    margin: -250px 0px 0px -250px;
+    background: white;
+}
+</style>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript">
     $(function () {
@@ -153,7 +178,7 @@
                 $('#gfile-google-ids').val(JSON.stringify(selected));
             },
             onLoaded: function (picker) {
-                picker.setVisible(true);
+                
             }
         });
         let $permModal = $('#gfile-permission');
