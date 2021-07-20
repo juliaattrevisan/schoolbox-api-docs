@@ -28,12 +28,12 @@ $app = new class extends CliTool\App {
         /** @var ClientInterface $redis */
         $redis = $this->getDi()->get('redis');
 
-        if (!$redis) {
+        if (!$redis instanceof ClientInterface) {
             $this->getLogger()->error("Unable to fetch redis connection");
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
 
-        $i=0;
+        $i = 0;
         $search = new Keyspace($redis, 'sessionstorage:*');
         foreach ($search as $key) {
             $this->getLogger()->debug("Found sessionstorage object: $key");
@@ -45,13 +45,12 @@ $app = new class extends CliTool\App {
         $this->getLogger()->info("Setting ttl on sessions to ensure they expire");
         $search = new Keyspace($redis, 'session:*');
         foreach ($search as $key) {
-
             $contents = $redis->get($key);
-            $ttl = $redis->ttl($key);
+            $ttl      = $redis->ttl($key);
             $this->getLogger()->debug("Found session object: $key, $ttl: $contents");
-            $contents = json_decode($contents,true);
-            if(is_int($contents['validUntil']) && $contents['validUntil'] > 0) {
-                $redis->expireAt($key, $contents['validUntil']);
+            $contents = json_decode($contents, true);
+            if (is_int($contents['validUntil']) && $contents['validUntil'] > 0) {
+                $redis->expireat($key, $contents['validUntil']);
                 $s++;
             }
         }
