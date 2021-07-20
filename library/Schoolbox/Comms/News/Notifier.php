@@ -52,8 +52,7 @@ class Notifier extends AbstractModuleNotifier
 
     private const PATTERN_POSTED_TITLE    = ':user :action :title';
     private const PATTERN_SUBMITTED_TITLE = ':user submitted an article, :title';
-    private const PATTERN_POSTED_HREF     = '/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
-    private const PATTERN_ARTICLE_HREF    = '/news/%d';
+    private const PATTERN_ARTICLE_HREF    = '/news/%d?ref=' . Statistics\Mapper::REFERRER_EMAIL;
 
     /** @var IUserResolver */
     private $audienceResolver;
@@ -583,7 +582,7 @@ class Notifier extends AbstractModuleNotifier
             $thumb = $this->prefixGenerator->generate() . '/images/emails/spacer.gif';
         }
 
-        $href = sprintf(self::PATTERN_POSTED_HREF, $articleId);
+        $href = sprintf(self::PATTERN_ARTICLE_HREF, $articleId);
 
         $heading = $article->getTitle();
 
