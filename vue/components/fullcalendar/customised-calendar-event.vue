@@ -10,7 +10,7 @@ import { EVENT_VARIANTS } from '@schoolboxCalendarEvent/event-variants';
 import { ATTENDANCE_STATUS } from '@schoolboxCalendarEvent/attendance-status';
 
 export default {
-    
+
     props: {
         content: {
             type: Object,
@@ -19,10 +19,10 @@ export default {
     },
 
     computed: {
-        
+
         /**
          * don't apply these customisations to list views
-         * 
+         *
          * @returns { Boolean }
          */
         isEventInListComponent () {
@@ -31,7 +31,7 @@ export default {
 
         /**
          * don't apply these customisations to list views
-         * 
+         *
          * @returns { String }
          */
         eventBackgroundColor () {
@@ -48,7 +48,7 @@ export default {
 
         /**
          * to display a checkbox to show complete/incomplete
-         * 
+         *
          * @returns { Boolean }
          */
         isTask () {
@@ -61,7 +61,7 @@ export default {
 
         /**
          * to display the status of the task checkbox and add a strike through the title if completed
-         * 
+         *
          * @returns { Boolean }
          */
         isTaskComplete () {
@@ -75,7 +75,7 @@ export default {
         /**
          * to update the display of the event depending on whether the event has attendance
          * and if so the status of that attendance
-         * 
+         *
          * @returns { String }
          */
         getAttendanceClass () {
@@ -108,7 +108,7 @@ export default {
                     this.$refs.timeText.style.color = readableTextColor;
                 }
                 this.$refs.titleText.style.color = readableTextColor;
-                this.$refs.eventContainer.style.color = readableTextColor; 
+                this.$refs.eventContainer.style.color = readableTextColor;
             }
         },
 
@@ -130,22 +130,18 @@ export default {
 
 <template>
     <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
-        <b v-if="content.timeText" ref="timeText">{{ content.timeText }}</b>
-        <input v-if="isTask" type="checkbox" class="checkbox plain" id="completd" name="completed" v-model="isTaskComplete">
-        <span ref="titleText" v-html="lineBreakedTitleText" :class="{ strike : isTaskComplete }"></span>
+        <b v-if="content.timeText" ref="timeText" class="fc-event-time">{{ content.timeText }}</b>
+        <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete">
+        <span ref="titleText" class="fc-event-title" v-html="lineBreakedTitleText" :class="{ strike : isTaskComplete }"></span>
     </div>
 </template>
 
 <style lang="scss" scoped>
 
-.event-container {
-    padding: 3px;
-}
-
 //the task checkbox can be selected, but this change wont be reflected in the view-event-modal.vue that's opened
-//prevent this behaviour as it's a bit confusing - the checkbox can only be changed in the modal, not directly on the event 
+//prevent this behaviour as it's a bit confusing - the checkbox can only be changed in the modal, not directly on the event
 //updating directly via the event might be a nice feature in future
-.checkbox { 
+.checkbox {
     pointer-events: none;
 }
 
