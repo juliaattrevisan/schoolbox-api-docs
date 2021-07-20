@@ -219,6 +219,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config external_db_host "$external_db_host" \
 --config external_db_db "$external_db_db" \
 --config redis_url 'tcp://127.0.0.1:6379' \
+--config redis_ephemeral_url 'tcp://127.0.0.1:6380' \
 --config site_domain 'dev.schoolbox.cloud' \
 --config site_hostname 'vagrant' \
 --config site_school_code "vagrant" \
