@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\S3;
 
 use Alaress_Byte_Format;
 use Alaress\Database as AlaressDatabase;
+use Aws\S3\Exception\S3Exception;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
@@ -40,6 +41,7 @@ use function readdir;
 use function realpath;
 use function rmdir;
 use function shell_exec;
+use function sleep;
 use function sprintf;
 use function str_pad;
 use function str_replace;
@@ -74,6 +76,9 @@ class Migration extends CliTool\App
     /** @var int */
     private $countBytesUploaded;
 
+    /** @var int */
+    private int $countUploadsFailed = 0;
+
     /**
      * Should we delete files from local storage?
      *
@@ -90,6 +95,9 @@ class Migration extends CliTool\App
 
     /** @var bool */
     private $quiet;
+
+    /** @var int */
+    private int $maxUploadAttempts = 10; // TODO expose as CLI option
 
 
     /** @inheritDoc */
@@ -147,8 +155,8 @@ class Migration extends CliTool\App
         $this->filesInS3  = [];
         $this->getLogger()->notice("Fetching file list from S3, this may take a while on large datasets...");
         foreach ($s3Client->getIterator('ListObjects', ['Bucket' => $bucketName, 'Prefix' => FilesystemFactory::PREFIX_STORAGE]) as $i => $object) {
-            if($i % 1000 === 1){
-                $this->getLogger()->debug("Files in S3 $i...");
+            if($i && $i % 1000 === 0){
+                $this->getLogger()->debug("Files found in S3: $i...");
              }
             $this->filesInS3[$object['Key']] = true;
         }
@@ -241,6 +249,8 @@ class Migration extends CliTool\App
         $this->getLogger()->notice(sprintf("Files in s3 storage:        %d", count($this->filesInS3)));
         $this->getLogger()->notice(sprintf("Storage files uploaded:     %d", $this->countStorageFilesUploaded));
         $this->getLogger()->notice(sprintf("Transcode files uploaded:   %d", $this->countTranscodeFilesUploaded));
+        $message = "Count failed uploads:       {$this->countUploadsFailed}";
+        $this->countUploadsFailed ? $this->getLogger()->error($message) : $this->getLogger()->notice($message);
         $this->getLogger()->notice(sprintf("Data transferred:           %s", $this->byteFormat::bytesToString($this->countBytesUploaded)));
         if (!$this->quiet) {
             $this->getLogger()->notice(sprintf("Storage before transfer:    %s", $this->byteFormat::bytesToString($storageBeforeTransfer)));
@@ -345,6 +355,8 @@ class Migration extends CliTool\App
             if ($this->moveFileToS3($filepath)) {
                 $foundInS3 = true;
                 $this->countStorageFilesUploaded++;
+            } else {
+                $this->countUploadsFailed++;
             }
         } else {
             $this->getLogger()->info('File both on local disk and in S3' . ($this->deleteLocalCopy ? ', deleting local copy' : ''));
@@ -377,8 +389,21 @@ class Migration extends CliTool\App
 
         $relativeLocalPath = $this->getRelativeLocalPath($filepathLocalAbsolute);
         if ($this->perform()) {
+            $writeSucceeded= false;
             try {
-                $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
+                $countUploadAttempts = 0;
+                while (!$writeSucceeded && $countUploadAttempts < $this->maxUploadAttempts) {
+                    try{
+                        $writeSucceeded = $this->fileSystemAwsS3->writeStream($relativeLocalPath, $fp);
+                    } /** @noinspection PhpRedundantCatchClauseInspection */
+                    catch (S3Exception $e){
+                        $sleep = 2 ** $countUploadAttempts;
+                        $countUploadAttempts++;
+                        $this->getLogger()->error("Cannot write file to S3. Attempt {$countUploadAttempts}/{$this->maxUploadAttempts}: '{$e->getMessage()}'");
+                        $this->getLogger()->debug("Sleeping {$sleep}s ...");
+                        sleep($sleep);
+                    }
+                }
             } catch (InvalidArgumentException $e) {
                 $this->getLogger()->error("Cannot write file to S3, skipping: '{$e->getMessage()}'");
                 return false;
@@ -461,6 +486,8 @@ class Migration extends CliTool\App
             $this->getLogger()->info("Transcode file '$entry' found locally but not in S3, uploading...");
             if ($this->moveFileToS3($transcodeFilePath)) {
                 $this->countTranscodeFilesUploaded++;
+            } else {
+                $this->countUploadsFailed++;
             }
         }
         closedir($handle);
