@@ -69,7 +69,7 @@ class Sync extends Base implements ISync
                 ''              AS student_home_email,
                 S.EMAIL         AS student_default_email,
                 ''              AS student_work_email,
-                S.CURRENT_YEAR  AS student_year_level,
+                TRIM(S.CURRENT_YEAR)  AS student_year_level,
                 S.HOUSE         AS student_house,
                 ''              AS student_boarder,
                 ''              AS student_boarding_house,
@@ -134,7 +134,7 @@ class Sync extends Base implements ISync
                 ''               AS staff_year_level,
                 ''               AS staff_year_level_description,
                 ''               AS staff_position_code,
-                ''               AS staff_position   
+                ''               AS staff_position
             FROM TEACHER T
             LEFT JOIN [IDENTITY] AS ID ON T.TEACHER# = ID.MEMBER#
             WHERE (
