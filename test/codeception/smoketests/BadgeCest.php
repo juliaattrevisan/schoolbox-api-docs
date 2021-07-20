@@ -150,4 +150,30 @@ class BadgeCest
         #THEN
         $i->seeResponseCodeIs(200);
     }
+
+    /** Set a goal
+     * check if response code is 200
+     *
+     * @param IntegrationTester $i
+     */
+    public function setGoal(IntegrationTester $i): void
+    {
+        #GIVEN
+        $badgeId = 1;
+        $externalId = 507;
+        $firstName = 'Jana';
+        $id = 25;
+        $lastName = 'Reed';
+        $name = 'Jana Reed - Year 9, Middle Student (507)';
+        $role = 'Middle Student';
+        $setGoalPayload = new Payload\Badge\SetGoal($badgeId, $externalId, $firstName, $id, $lastName, $name, $role);
+        #WHEN
+
+        $i->amGoingTo('Send request to set a goal');
+        $badgeId = 1;
+        $i->sendRequest($setGoalPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+    }
 }
