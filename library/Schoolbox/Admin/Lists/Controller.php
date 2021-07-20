@@ -357,66 +357,81 @@ class Controller extends Base
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStudentProfile' => [
                         'caption'   => 'View Student Profile',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStudentGrades' => [
                         'caption'   => 'View Student Grades',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStudentCalendar' => [
                         'caption'   => 'View Student Calendar',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewParentProfile' => [
                         'caption'   => 'View Parent Profile',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'accessEportfolio' => [
                         'caption'   => 'Access Eportfolio',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'accessPastoral' => [
                         'caption'   => 'Access Pastoral',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'createBadges' => [
                         'caption'   => 'Create Badges',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'accessEvidence' => [
                         'caption'   => 'Learning Moments',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewParentDirectory' => [
                         'caption'   => 'View Parent Directory',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStaffDirectory' => [
                         'caption'   => 'View Staff Directory',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'popoutList' => 'Permissions',
+                    ],
+                    'validPermissions' => [
+                        'caption'   => 'validPermissions',
+                        'width'     => 0,
                     ],
                     'sequence'      => [
                         'caption'   => 'sequence',
@@ -1063,16 +1078,41 @@ class Controller extends Base
             }
         }
 
-        // Render this thing out
-        $this->getResponse()->content->set([
-            'template' => '@adminLists/index.twig',
-            'data'     => [
-                'pageCurrent' => $this->router->generate('adminLists.getIndex') . "/{$table}",
-                'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLists.getIndex') . "/{$table}"),
-                'tables'      => $tables,
-                'table'       => $table,
-                'records'     => $records
-            ],
-        ]);
+        if ($this->isXhrRequest()) {
+            $currentTable = $tables[$table];
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput(
+                    [
+                        'canDelete'     => $currentTable['delete'] ?? false,
+                        'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
+                        'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
+                        'deleteWarning' => $currentTable['deleteWarning'] ?? '',
+                        'fields'        => $currentTable['fields'] ?? [],
+                        'fixed'         => $currentTable['fixed'] ?? [],
+                        'isSortable'    => $currentTable['sortable'] ?? false,
+                        'mapper'        => $currentTable['mapper'] ?? '',
+                        'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
+                        'rows'          => $records,
+                        'saveRoute'     => $this->router->generate('adminLists.postSave'),
+                        'tableName'     => $currentTable['name'],
+                        'title'         => $currentTable['title'],
+                    ]
+                )
+            );
+        } else {
+            // Render this thing out
+            $this->getResponse()->content->set(
+                [
+                    'template' => '@adminLists/index.twig',
+                    'data'     => [
+                        'pageCurrent'    => $this->router->generate('adminLists.getIndex') . "/{$table}",
+                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLists.getIndex') . "/{$table}"),
+                        'tables'         => $tables,
+                        'table'          => $table,
+                        'records'        => $records
+                    ],
+                ]
+            );
+        }
     }
 }
