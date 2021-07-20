@@ -18,6 +18,7 @@ use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventRelations;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\External\ClassEntryMapper;
+use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\TimetableCycle;
@@ -285,7 +286,9 @@ class External_Liss_Server
                 $struct = $currentData->me['struct'];
                 $class = $classAll[trim((string)$struct['ClassCode']->me['string'])];
                 $external_id = trim((string)$struct['StudentId']->me['string']);
-                $queryItems[] = "(NULL, '" . $class->getId() . "', '" . $external_id . "')";
+                if ($class instanceof ClassEntry) {
+                    $queryItems[] = "(NULL, '" . $class->getId() . "', '" . $external_id . "')";
+                }
             }
 
             if (count($queryItems) > 0) {
