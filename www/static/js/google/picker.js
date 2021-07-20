@@ -41,6 +41,8 @@
                  */
                 modalId: '#gfile',
 
+                containerID: '',
+
                 /* Client id si required, as is postGoogleFileUrl
                  */
                 clientId: '',
@@ -149,7 +151,11 @@
                 .build();
             picker.setVisible(true);
             
-            config.onLoaded.call(this, picker);
+            if (config.containerID) {
+                picker.$.style.left = '0px';
+                picker.$.style.top = '0px';
+                $(config.containerID).append(picker.$);
+            }
 
             /* Shut google modal when we shut our modal
              * https://stackoverflow.com/questions/13745505/how-to-use-zurb-foundation-reveal-with-open-opened-close-closed-callback-func
