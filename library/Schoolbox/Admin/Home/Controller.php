@@ -26,7 +26,7 @@ use Proxy\Server as ProxyServer;
 use Healthcheck;
 use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
-use Schoolbox\Version;
+use Schoolbox\Version\Version;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
 
 use function array_column;

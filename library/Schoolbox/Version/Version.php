@@ -7,12 +7,17 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox;
+namespace Schoolbox\Version;
 
+use Schoolbox\IConfigLoader;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
 
 class Version
 {
+    public IConfigLoader $config;
+
+    public InstanceRegistry $instanceRegistry;
+
     /**
      * Constructor
      *
@@ -20,21 +25,22 @@ class Version
      */
     public function __construct(IConfigLoader $config)
     {
-        $this->config = $config;
+        $this->config           = $config;
+        $this->instanceRegistry = new InstanceRegistry($this->config);
     }
 
     /**
      * get a complete representation of this schoolbox instances version.
      *
-     * @example these would look something like:
-     *  - 21.0.2-1
-     *  - 20.2.11-1
-     *  - 20.1.8-2
-     *  - 20.0.12-1
-     *  - 19.1.12-3
-     *  - 18.1.8-1
-     *
      * @return string
+     * @example these would look something like:
+     *          - 21.0.2-1
+     *          - 20.2.11-1
+     *          - 20.1.8-2
+     *          - 20.0.12-1
+     *          - 19.1.12-3
+     *          - 18.1.8-1
+     *
      */
     public function getFull(): string
     {
@@ -44,15 +50,15 @@ class Version
     /**
      * get the major version section of this running schoolbox instance.
      *
-     * @example these would look something like:
-     *  - 21.0
-     *  - 20.2
-     *  - 20.1
-     *  - 20.0
-     *  - 19.1
-     *  - 18.1
-     *
      * @return string
+     * @example these would look something like:
+     *          - 21.0
+     *          - 20.2
+     *          - 20.1
+     *          - 20.0
+     *          - 19.1
+     *          - 18.1
+     *
      */
     public function getMajor(): string
     {
@@ -70,12 +76,12 @@ class Version
     /**
      * get the minor version section of this running schoolbox instance.
      *
+     * @return string
      * @example these would look something like:
      *          - .4-1
      *          - .11-1
      *          - .8-2
      *
-     * @return string
      */
     public function getMinor(): string
     {
@@ -84,11 +90,12 @@ class Version
          * given the full version, everything after the second
          * period is defined as the minor version
          */
-        if (preg_match('/^\d+\.\d+\.(.)/', $this->getFull(), $matches)) {
-            $minorVersion = $matches[0];
+        if (preg_match('/^\d+\.\d+\.(.+)/', $this->getFull(), $matches)) {
+            $minorVersion = $matches[1];
         }
         return $minorVersion;
     }
+
     /**
      * is this schoolbox instance client hosted?
      *
@@ -96,7 +103,11 @@ class Version
      */
     public function isClientHosted(): bool
     {
-        return (bool)$this->config->get('site_environment') == "client-hosted";
+        if ($this->config->get('site_environment') != "client-hosted") {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -106,7 +117,11 @@ class Version
      */
     public function isCloudHosted(): bool
     {
-        return (bool)$this->config->get('site_environment') == "cloud-hosted";
+        if ($this->config->get('site_environment') != "cloud-hosted") {
+            return false;
+        }
+
+        return true;
     }
 
     public function showUpgradeReminder(): bool
@@ -122,7 +137,7 @@ class Version
          * if the instance is the same or ahead of the current latest release,
          * then they dont need the reminder
          */
-        $latestMajorVersion = (new InstanceRegistry($this->config))->getLatestVersionMajor();
+        $latestMajorVersion = $this->instanceRegistry->getLatestVersionMajor();
         if ($this->getMajor() >= $latestMajorVersion) {
             return false;
         }

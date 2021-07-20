@@ -44,11 +44,6 @@ class ApiClient
      */
     public function getLatestRelease(): string
     {
-        /**
-         * TODO fake it for the time being
-         */
-        return "31.1.1-111";
-
         try {
             $requestUrl    = "/api/releases/schoolbox/latest";
             $response      = $this->makeRequest($requestUrl);
