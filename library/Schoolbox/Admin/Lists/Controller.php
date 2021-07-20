@@ -415,81 +415,89 @@ class Controller extends Base
                         'changePopOutOptions' => Role::VALID_PERMISSIONS,
                     ],
                     'canChangePassword' => [
-                        'caption'    => 'Allow Password Change',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'Allow Password Change',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStudentProfile' => [
-                        'caption'    => 'View Student Profile',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'View Student Profile',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStudentGrades' => [
-                        'caption'    => 'View Student Grades',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'View Student Grades',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStudentCalendar' => [
-                        'caption'    => 'View Student Calendar',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'View Student Calendar',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewParentProfile' => [
-                        'caption'    => 'View Parent Profile',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'View Parent Profile',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'accessEportfolio' => [
-                        'caption'    => 'Access Eportfolio',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'Access Eportfolio',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'accessPastoral' => [
-                        'caption'    => 'Access Pastoral',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'Access Pastoral',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'createBadges' => [
-                        'caption'    => 'Create Badges',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'Create Badges',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'accessEvidence' => [
-                        'caption'    => 'Learning Moments',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'Learning Moments',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewParentDirectory' => [
-                        'caption'    => 'View Parent Directory',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'View Parent Directory',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
                     ],
                     'viewStaffDirectory' => [
-                        'caption'    => 'View Staff Directory',
-                        'checkbox'   => true,
-                        'mandatory'  => true,
-                        'default'    => false,
-                        'popOutList' => 'permissions',
+                        'caption'   => 'View Staff Directory',
+                        'checkbox'  => true,
+                        'width'     => 1,
+                        'mandatory' => true,
+                        'popoutList' => 'Permissions',
+                    ],
+                    'validPermissions' => [
+                        'caption'   => 'validPermissions',
+                        'width'     => 0,
+                    ],
+                    'sequence'      => [
+                        'caption'   => 'sequence',
+                        'width'     => 0,
                     ],
                 ]
             ],
@@ -1206,7 +1214,7 @@ class Controller extends Base
             }
         }
 
-        if ($json) {
+        if ($this->isXhrRequest()) {
             $currentTable = $tables[$table];
             $this->getResponse()->content->set(
                 $this->buildJsonOutput(
@@ -1215,11 +1223,14 @@ class Controller extends Base
                         'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
                         'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
                         'deleteWarning' => $currentTable['deleteWarning'] ?? '',
-                        'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
+                        'fields'        => $currentTable['fields'] ?? [],
+                        'fixed'         => $currentTable['fixed'] ?? [],
                         'isSortable'    => $currentTable['sortable'] ?? false,
+                        'mapper'        => $currentTable['mapper'] ?? '',
                         'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
-                        'rows'          => $this->reformatForJson($records, true),
+                        'rows'          => $records,
                         'saveRoute'     => $this->router->generate('adminLists.postSave'),
+                        'tableName'     => $currentTable['name'],
                         'title'         => $currentTable['title'],
                     ]
                 )
@@ -1234,29 +1245,10 @@ class Controller extends Base
                         'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLists.getIndex') . "/{$table}"),
                         'tables'         => $tables,
                         'table'          => $table,
-                        'records'        => $records,
+                        'records'        => $records
                     ],
                 ]
             );
         }
-    }
-
-    /**
-     * @param array $rows
-     * @param bool  $addSequence
-     * @return array
-     */
-    private function reformatForJson(array $rows, bool $addSequence): array
-    {
-        $reordered = [];
-        $sequence  = 1;
-        foreach ($rows as $key => $array) {
-            $array['id'] = $key;
-            if ($addSequence) {
-                $array['sequence'] = $sequence++;
-            }
-            $reordered[] = $array;
-        }
-        return $reordered;
     }
 }
