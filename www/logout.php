@@ -16,14 +16,11 @@ if (Config::get('saml_slo_enabled') && isset($_SESSION['samlNameId'])) {
 session_regenerate_id(true);
 session_destroy();
 
-//Destroy remember me cookie
+// Destroy remember me cookie
 if (isset($_COOKIE['remember'])) {
     (new Remember(INSTANCE_ID, \Alaress\Redis::getClientInstance()))->forgetRememberedUsername($_COOKIE['remember']);
     setcookie('remember', '', 1, '/');
 }
-//$redis = \Alaress\Redis::getClientInstance();
-//$username = $redis->executeCommand($redis->createCommand('del', array($_COOKIE['remember'])));
-//setcookie('remember', '', 1, '/');
 
 $samlLogoutUrl = trim(Config::get('saml_logout_url'));
 

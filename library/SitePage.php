@@ -323,8 +323,6 @@ class SitePage extends Page
         ) {
             //Catch users with the remember me cookie
             if ($this->config->get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
-//                $redis = \Alaress\Redis::getClientInstance();
-//                $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
                 $username = (new Remember(INSTANCE_ID, \Alaress\Redis::getClientInstance()))
                     ->retrieveRememberedUsername($_COOKIE['remember']);
                 $sessionHandler->disableLoginLog();

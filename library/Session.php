@@ -116,8 +116,6 @@ class Session
                 $expiry = 60 * 24 * 60 * 60;
                 $key = $rememberer->rememberUsername($username, $expiry);
 
-//                $key = sha1(microtime(true) . mt_rand(10000, 90000));
-//                $expire = strtotime('+2 month');
                 $cookieParams = session_get_cookie_params();
                 setcookie(
                     'remember',
@@ -128,9 +126,6 @@ class Session
                     $cookieParams['secure'],
                     $cookieParams['httponly']
                 );
-//                $redis = \Alaress\Redis::getClientInstance();
-//                $redis->executeCommand($redis->createCommand('set', array($key, $username)));
-//                $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
             }
 
             //register users id
