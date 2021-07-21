@@ -147,7 +147,7 @@ class Indicator extends CliTool\App
      * The time at the start of the script run: stored so that any indicators
      * deleted are marked as deleted at a consistent time.
      */
-    private Alaress_Date_Format $now;
+    private string $now;
 
     /**
      * Array of one or more folder IDs to operate on.
@@ -180,7 +180,7 @@ class Indicator extends CliTool\App
     public function run(): void
     {
         $db        = $this->getDatabaseInternal();
-        $this->now = Alaress_Date_Format::now();
+        $this->now = Alaress_Date_Format::now()->getDatabaseDate();
 
         // Set up folders
         $folderIds = $this->getOpt(self::OPT_LONG_FOLDER_IDS);
@@ -188,7 +188,7 @@ class Indicator extends CliTool\App
             $this->getLogger()->error('Exiting - at least 1 folder ID must be supplied. Run again with --folders <id1,id2>');
             return;
         }
-        $this->folderIds = explode(",", $folderIds);
+        $this->folderIds = array_map('intval', explode(",", $folderIds));
 
         // log perform / dry run
         if ($this->perform()) {
