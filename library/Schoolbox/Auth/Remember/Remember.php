@@ -52,20 +52,16 @@ class Remember
      */
     public function retrieveRememberedUsername(string $key): ?string
     {
-        // The username is stored in key "remember:$instanceId:$key":
-        // search for it there first.
+        // Search in the new key first
         $redisKey = $this->generateRedisKey($key);
         $username = $this->redis->get($redisKey);
         if (isset($username)) {
             return $username;
         }
 
-        // The first implementation of user remembrance stored the username in
-        // key "$key": this was changed so that the key was instance-aware and
-        // prefixed for visibility.
-        // Anyway: if the user is in the original key, move it to the
-        // instance-aware key.
-        $oldRedisKey = $key;
+        // Then search the old key, and migrate to the new key if the username
+        // was found there
+        $oldRedisKey = $this->generateOldRedisKey($key);
         $username    = $this->redis->get($oldRedisKey);
         if (isset($username)) {
             $this->redis->setex($redisKey, $this->redis->ttl($oldRedisKey), $username);
@@ -84,7 +80,11 @@ class Remember
      */
     public function forgetRememberedUsername(string $key): void
     {
-        $this->redis->del([$this->generateRedisKey($key), $key]);
+        // Forget both the old and new keys
+        $this->redis->del([
+            $this->generateRedisKey($key),
+            $this->generateOldRedisKey($key),
+        ]);
     }
 
     /**
@@ -124,5 +124,22 @@ class Remember
     private function generateRedisKey(string $randomKey): string
     {
         return sprintf(self::REDIS_KEY_FORMAT, $this->instanceId, $randomKey);
+    }
+
+    /**
+     * Convert a random key into the key in which the previous remember me
+     * implementation stored the username.
+     *
+     * This is implemented for backward compatibility with the previous remember
+     * me implementation.
+     *
+     * @param string $randomKey
+     * @return string
+     */
+    private function generateOldRedisKey(string $randomKey): string
+    {
+        // The original implementation just used the random key as the Redis
+        // key: this wasn't instance aware or prefixed.
+        return $randomKey;
     }
 }
