@@ -26,7 +26,10 @@ $app = new class extends CliTool\App {
         '^msg:' . INSTANCE_ID . ':m:.+',
         '^pad:g\.',
         '^msg:' . INSTANCE_ID . ':q:\D.+',
-        "^[0-9a-f]{40}$",    // 2fdbf72862ff72dece37045211a43fd285c03286 SHA1 remember me?
+        // Old remember me format
+        "^[0-9a-f]{40}$",
+        // New remember me format
+        "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
         '^msg:' . INSTANCE_ID . ':s:.+',
         '^token2author:',
         '^author2sessions:',
