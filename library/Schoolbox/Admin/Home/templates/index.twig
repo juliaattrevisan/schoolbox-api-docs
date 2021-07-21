@@ -248,18 +248,18 @@
                 <section>
                     <ul class="information-list">
                         {% for article in updates_rss %}
-                            <li>
-                                <div class="list-item">
-                                    <div class="card small-12">
-                                        <h3>
-                                            <a href="/redir.php?url={RSS_URL}" target="_blank">{{ article.title }}</a>
-                                        </h3>
-                                        <p class="meta">
-                                            Posted {{ article.pubDate|date('F jS \\a\\t g:ia') }}
-                                        </p>
-                                    </div>
+                        <li>
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <h3>
+                                        <a href="{{ article.link }}" target="_blank">{{ article.title }}</a>
+                                    </h3>
+                                    <p class="meta">
+                                        Posted {{ article.pubDate|date('F jS \\a\\t g:ia') }}
+                                    </p>
                                 </div>
-                            </li>
+                            </div>
+                        </li>
                         {% endfor %}
                     </ul>
                 </section>
