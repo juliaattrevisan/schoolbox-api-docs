@@ -37,10 +37,12 @@
                  */
                 element: element,
 
-                /* Our modal. The google modal appears on top of this
+                /* Our modal. The google modal appears on top of this or inside of this with containerID if set
                  */
                 modalId: '#gfile',
 
+                /* To insert the Google Picker directly into a specific container within modalId, for when the picker is part of step by step process
+                 */
                 containerID: '',
 
                 /* Client id si required, as is postGoogleFileUrl
@@ -151,7 +153,7 @@
                 .build();
             picker.setVisible(true);
             
-            if (config.containerID) {
+            if (config.containerID) { //if it exists, add it into the empty containerId and ensure it sits at the top left
                 picker.$.style.left = '0px';
                 picker.$.style.top = '0px';
                 $(config.containerID).append(picker.$);
@@ -162,6 +164,9 @@
              */
             $(document).on('close.fndtn.reveal', config.modalId, function () {
                 picker.setVisible(false);
+                if (config.containerID) { //empty on close
+                    $(config.containerID).empty();
+                }
             });
         }
 
@@ -210,6 +215,9 @@
             if (data[google.picker.Response.ACTION] === google.picker.Action.CANCEL) {
                 if (config.modalId) {
                     $(config.modalId).foundation('reveal', 'close');
+                }
+                if (config.containerID) { //empty on close
+                    $(config.containerID).empty();
                 }
             }
         }

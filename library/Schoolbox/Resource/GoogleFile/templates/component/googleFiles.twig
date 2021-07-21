@@ -60,72 +60,88 @@
     {% endif %}
 {% endif %}
 <div id="gfile" class="reveal-modal" data-reveal aria-labelledby="Google Files" aria-hidden="true" role="dialog">
-    {% set levels = {
-        'Nobody':constant('LEVEL_NOBODY', googleFile),
-        'Only group admins':constant('LEVEL_ADMIN', googleFile),
-        'Only group members with write access':constant('LEVEL_WRITE', googleFile),
-        'All group members':constant('LEVEL_READ', googleFile)
-    } %}
-    <form id="googleFileForm" method="POST" action="{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}">
-        <div id="gfile-step0"></div>
-        <div id="gfile-step1" style="display:none;">
-            Who should be able to <strong>edit</strong> this file?
-            <table>
-                <tbody>
-                {% for levelName, levelId in levels %}
-                    <tr>
-                        <td>
-                            <input type="radio" name="gfileEdit" id="gfile-edit-{{ levelId }}" data-gfile-edit
-                                   value="{{ levelId }}">
-                            <label class="radio-label" for="gfile-edit-{{ levelId }}">{{ levelName }}</label>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            <ul class="flex-list buttons">
-                <li><a href="#" class="button submit" data-action="continue" disabled>Continue</a></li>
-                <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
-            </ul>
-        </div>
-        <div id="gfile-step2" style="display:none;">
-            Who should be able to <strong>comment</strong> on this file?
-            <table>
-                <tbody>
-                {% for levelName, levelId in levels %}
-                    <tr>
-                        <td>
-                            <input type="radio" name="gfileComment" id="gfile-comment-{{ levelId }}" data-gfile-comment
-                                   value="{{ levelId }}">
-                            <label class="radio-label" for="gfile-comment-{{ levelId }}">{{ levelName }}</label>
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            Everyone in this group will be able to view the file.
-            Only group members with write access will be able to edit the file.
-            <ul class="flex-list buttons">
-                <li><a href="#" class="button submit" data-action="share" disabled>Share file</a></li>
-                <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
-            </ul>
-            <input type="hidden" id="gfile-google-ids" name="googleIds" value="">
-            <input type="hidden" id="gfile-access-token" name="accessToken" value="">
-            <input type="hidden" id="gfile-token-type" name="tokenType" value="">
-        </div>
-    </form>
-    <div data-overlay class="row hide">
-        <div class="small-12 island no-pad">
-            <section class="content text-center">
-                <div class="loader"></div>
-                Updating file permissions...
-            </section>
+    <div id="gfile-container">
+        {% set levels = {
+            'Nobody':constant('LEVEL_NOBODY', googleFile),
+            'Only group admins':constant('LEVEL_ADMIN', googleFile),
+            'Only group members with write access':constant('LEVEL_WRITE', googleFile),
+            'All group members':constant('LEVEL_READ', googleFile)
+        } %}
+        <form id="googleFileForm" method="POST" action="{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}">
+            <div id="gfile-step0"></div>
+            <div id="gfile-step1" style="display:none;">
+                Who should be able to <strong>edit</strong> this file?
+                <table>
+                    <tbody>
+                    {% for levelName, levelId in levels %}
+                        <tr>
+                            <td>
+                                <input type="radio" name="gfileEdit" id="gfile-edit-{{ levelId }}" data-gfile-edit
+                                    value="{{ levelId }}">
+                                <label class="radio-label" for="gfile-edit-{{ levelId }}">{{ levelName }}</label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <ul class="flex-list buttons">
+                    <li><a href="#" class="button submit" data-action="continue" disabled>Continue</a></li>
+                    <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
+                </ul>
+            </div>
+            <div id="gfile-step2" style="display:none;">
+                Who should be able to <strong>comment</strong> on this file?
+                <table>
+                    <tbody>
+                    {% for levelName, levelId in levels %}
+                        <tr>
+                            <td>
+                                <input type="radio" name="gfileComment" id="gfile-comment-{{ levelId }}" data-gfile-comment
+                                    value="{{ levelId }}">
+                                <label class="radio-label" for="gfile-comment-{{ levelId }}">{{ levelName }}</label>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                Everyone in this group will be able to view the file.
+                Only group members with write access will be able to edit the file.
+                <ul class="flex-list buttons">
+                    <li><a href="#" class="button submit" data-action="share" disabled>Share file</a></li>
+                    <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
+                </ul>
+                <input type="hidden" id="gfile-google-ids" name="googleIds" value="">
+                <input type="hidden" id="gfile-access-token" name="accessToken" value="">
+                <input type="hidden" id="gfile-token-type" name="tokenType" value="">
+            </div>
+        </form>
+        <div data-overlay class="row hide">
+            <div class="small-12 island no-pad">
+                <section class="content text-center">
+                    <div class="loader"></div>
+                    Updating file permissions...
+                </section>
+            </div>
         </div>
     </div>
 </div>
+<style>
+{# #gfile-container {
+    position: relative;
+    width: 1052px;
+    height: 650px;
+    padding: 0px;
+    overlay: hidden;
+} #}
+</style>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
 <script type="text/javascript">
     $(function () {
+        $('#find-files').on('click', function () {
+            document.getElementById('gfile-step0').style.display = 'block';
+            document.getElementById('gfile-step1').style.display = 'none';
+            document.getElementById('gfile-step2').style.display = 'none';
+        });
         $('#find-files').googlePicker({
             clientId: '{{ clientId }}',
             containerID: '#gfile-step0',
