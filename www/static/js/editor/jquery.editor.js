@@ -64,7 +64,7 @@
 
             /* Remove default plugins; add Schoolbox Custom Plugins
              */
-            removePlugins: 'image,image2,uploadimage',
+            removePlugins: 'image,image2',
             extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
 
             /* Other settings
@@ -123,7 +123,17 @@
             /* A callback to fire when editor blurs
              */
             blur: function(element) {
-            }
+            },
+
+            // File paste upload
+            uploadUrl: '/storage/asyncUpload.php',
+            fileUploadResponse: function (event) {
+                let response        = JSON.parse(event.data.fileLoader.xhr.responseText);
+                event.data.message  = response.message;
+                event.data.uploaded = 1;
+                event.data.url      = response.meta.file._links.fetch;
+                event.stop();
+            },
         };
 
         var derived = {
@@ -249,6 +259,12 @@
                     event.removeListener();
                 }
             });
+
+            // Apply fileUploadResponse manually if it's there:
+            // somehow, it's not applied when passed as a config option
+            if (config.fileUploadResponse) {
+                CKEDITOR.instances[identifier].on('fileUploadResponse', config.fileUploadResponse);
+            }
         }
     };
 

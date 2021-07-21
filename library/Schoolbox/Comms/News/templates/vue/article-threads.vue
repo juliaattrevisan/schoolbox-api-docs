@@ -238,8 +238,8 @@ export default {
                         targetElements: $('#comment'),
                         startupFocus: true,
                         height: '8rem',
-                        removePlugins: 'uploadimage,schoolboxanchor',
-                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,EqnEditor,Embed',
+                        removePlugins: 'schoolboxanchor',
+                        removeButtons: 'Subscript,Superscript,RemoveFormat,Table,HorizontalRule,SpecialChar,Embed',
                         toolbarGroups: [
                             {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
                             {name: 'paragraph', groups: ['list', 'blocks', 'bidi']},

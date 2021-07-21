@@ -204,6 +204,11 @@
             self.element.trigger('inlineTextboxEditor.editorCreate', [self]);
         });
 
+        // File upload response callback can't be set on config, but request can?
+        if (self.editorInstanceOptions.fileUploadResponse) {
+            self.editor.on('fileUploadResponse', self.editorInstanceOptions.fileUploadResponse);
+        }
+
         /* The Modify button should never be available initially, once you've already
          * clicked it to enter the Modify workflow
          */
