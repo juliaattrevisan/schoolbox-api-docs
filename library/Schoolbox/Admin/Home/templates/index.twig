@@ -111,6 +111,11 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        <!-- Upgrade Reminder -->
+        {% if showUpgradeReminder %}
+            {% include '@adminHome/upgrade-reminder.twig' %}
+        {% endif %}
+        <div class="row">
 
         <!-- Upgrade Reminder -->
         {% if showUpgradeReminder %}
@@ -239,6 +244,25 @@
             <!-- Recent Log Entries -->
 
             <div class="small-12 large-7 island">
+                <h2 class="subheader">Recent Updates</h2>
+                <section>
+                    <ul class="information-list">
+                        {% for article in updates_rss %}
+                            <li>
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        <h3>
+                                            <a href="/redir.php?url={RSS_URL}" target="_blank">{{ article.title }}</a>
+                                        </h3>
+                                        <p class="meta">
+                                            Posted {{ article.pubDate|date('F jS \\a\\t g:ia') }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
                 <div class="actions-small-2 row">
                     <div class="list-item">
                         <div class="small-12 columns">
@@ -273,7 +297,6 @@
             </div>
 
         </div>
-
     </div>
 </div>
 
