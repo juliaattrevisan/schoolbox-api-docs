@@ -35,7 +35,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
+                new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
             ),
         );
 

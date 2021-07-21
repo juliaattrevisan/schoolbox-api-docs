@@ -33,11 +33,19 @@ class Module extends BaseModule
      */
     public function registerRoutes(): void
     {
-        $baseRule = new Rule\All(
+        $viewBadgesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRole(Role::STAFF),
+            ),
+        );
+
+        $manageBadgesRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_CREATE_BADGES, Role::STAFF),
             ),
         );
 
@@ -55,7 +63,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '',
             'getBadgeListPage',
-            $baseRule
+            $viewBadgesRule
         );
 
         /* The form that people use to Create a Badge
@@ -64,7 +72,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/create',
             'getCreateForm',
-            $baseRule
+            $manageBadgesRule
         );
 
         /* The form that people use to Update a Badge
@@ -73,7 +81,7 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{badgeId}/update',
             'getUpdateForm',
-            $baseRule,
+            $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
@@ -83,7 +91,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/{badgeId}/update',
             'postUpdate',
-            $baseRule,
+            $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
@@ -94,7 +102,7 @@ class Module extends BaseModule
             self::METHOD_DELETE,
             '/{badgeId}',
             'deleteBadge',
-            $baseRule,
+            $manageBadgesRule,
             Closure::fromCallable([$this, 'preloadBadge']),
         );
 
@@ -102,7 +110,7 @@ class Module extends BaseModule
             self::METHOD_POST,
             '',
             'postBadge',
-            $baseRule
+            $manageBadgesRule
         );
     }
 
@@ -120,8 +128,8 @@ class Module extends BaseModule
     {
         return [
             'badge' => $this->getMapperFactory()
-                ->get(Mapper::class)
-                ->findById($params['badgeId']),
+                            ->get(Mapper::class)
+                            ->findById($params['badgeId']),
         ];
     }
 
