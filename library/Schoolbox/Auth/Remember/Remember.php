@@ -71,6 +71,16 @@ class Remember
     }
 
     /**
+     * Forget the remembered username.
+     *
+     * @param string $key A key, previously returned by `rememberUsername`
+     */
+    public function forgetRememberedUsername(string $key): void
+    {
+        $this->redis->del([$this->generateRedisKey($key), $key]);
+    }
+
+    /**
      * Remember the given username.
      *
      * @param string $username The username to remember
