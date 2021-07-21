@@ -321,11 +321,20 @@ class SitePage extends Page
             (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
             ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
-            //Catch users with the remember me cookie
-            if ($this->config->get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
-                $username = (new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance()))
-                    ->retrieveRememberedUsername($_COOKIE['remember']);
-                $sessionHandler->disableLoginLog();
+            // Catch users with the remember me cookie
+            if ($this->config->get('session_remember')) {
+                $rememberCookie = new Remember\Cookie(
+                    Remember\Cookie::DEFAULT_COOKIE_NAME,
+                    $_COOKIE,
+                    session_get_cookie_params()
+                );
+                $username = null;
+                $hash     = $rememberCookie->retrieveHash();
+                if (isset($hash) && $hash) {
+                    $rememberRedis = new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance());
+                    $username      = $rememberRedis->retrieveRememberedUsername($hash);
+                    $sessionHandler->disableLoginLog();
+                }
 
                 if (strlen($username) === 0 || !$sessionHandler->create($username)) {
                     $sessionHandler->destroy();

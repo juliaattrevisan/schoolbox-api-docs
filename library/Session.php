@@ -112,20 +112,15 @@ class Session
 
             /* Store remember me cookie so user can return in the future */
             if ($remember) {
-                $rememberer = new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance());
+                $rememberRedis = new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance());
                 $expiry     = Remember\Redis::DEFAULT_EXPIRY;
-                $key        = $rememberer->rememberUsername($username, $expiry);
-
-                $cookieParams = session_get_cookie_params();
-                setcookie(
-                    'remember',
-                    $key,
-                    time() + $expiry,
-                    $cookieParams['path'],
-                    $cookieParams['domain'],
-                    $cookieParams['secure'],
-                    $cookieParams['httponly']
+                $key        = $rememberRedis->rememberUsername($username, $expiry);
+                $rememberCookie = new Remember\Cookie(
+                    Remember\Cookie::DEFAULT_COOKIE_NAME,
+                    $_COOKIE,
+                    session_get_cookie_params()
                 );
+                $rememberCookie->rememberHash($key, $expiry);
             }
 
             //register users id

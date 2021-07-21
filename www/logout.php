@@ -17,9 +17,12 @@ session_regenerate_id(true);
 session_destroy();
 
 // Destroy remember me cookie
-if (isset($_COOKIE['remember'])) {
-    (new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance()))->forgetRememberedUsername($_COOKIE['remember']);
-    setcookie('remember', '', 1, '/');
+$rememberCookie = new Remember\Cookie(Remember\Cookie::DEFAULT_COOKIE_NAME, $_COOKIE, session_get_cookie_params());
+$hash           = $rememberCookie->retrieveHash();
+if (isset($hash)) {
+    $rememberRedis = new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance());
+    $rememberRedis->forgetRememberedUsername($hash);
+    $rememberCookie->forgetHash();
 }
 
 $samlLogoutUrl = trim(Config::get('saml_logout_url'));
