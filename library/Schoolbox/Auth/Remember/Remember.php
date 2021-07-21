@@ -61,7 +61,7 @@ class Remember
         // Second attempt: fetch from key "$key" and migrate to new key
         $username = $this->redis->get($key);
         if (isset($username)) {
-            $this->redis->setex($this->generateRedisKey($key), $username, $this->redis->ttl($key));
+            $this->redis->setex($this->generateRedisKey($key), $this->redis->ttl($key), $username);
             $this->redis->del($key);
             return $username;
         }
@@ -80,7 +80,7 @@ class Remember
     public function rememberUsername(string $username, int $expiry): string
     {
         $key = $this->generateRandomKey();
-        $this->redis->setex($this->generateRedisKey($key), $username, $expiry);
+        $this->redis->setex($this->generateRedisKey($key), $expiry, $username);
         return $key;
     }
 
