@@ -64,9 +64,15 @@ class Remember
         $oldRedisKey = $this->generateOldRedisKey($key);
         $username    = $this->redis->get($oldRedisKey);
         if (isset($username)) {
-            $this->redis->setex($redisKey, $this->redis->ttl($oldRedisKey), $username);
-            $this->redis->del($oldRedisKey);
-            return $username;
+            // Give the new key the same lifetime as the old one has remaining.
+            // If somehow it expired in the moment between getting and checking:
+            // return null
+            $ttl = $this->redis->ttl($oldRedisKey);
+            if ($ttl > 0) {
+                $this->redis->setex($redisKey, $ttl, $username);
+                $this->redis->del($oldRedisKey);
+                return $username;
+            }
         }
 
         // No user was found
