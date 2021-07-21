@@ -52,17 +52,24 @@ class Remember
      */
     public function retrieveRememberedUsername(string $key): ?string
     {
-        // First attempt: fetch from key "remember:$instanceId:$key"
-        $username = $this->redis->get($this->generateRedisKey($key));
+        // The username is stored in key "remember:$instanceId:$key":
+        // search for it there first.
+        $redisKey = $this->generateRedisKey($key);
+        $username = $this->redis->get($redisKey);
         if (isset($username)) {
             return $username;
         }
 
-        // Second attempt: fetch from key "$key" and migrate to new key
-        $username = $this->redis->get($key);
+        // The first implementation of user remembrance stored the username in
+        // key "$key": this was changed so that the key was instance-aware and
+        // prefixed for visibility.
+        // Anyway: if the user is in the original key, move it to the
+        // instance-aware key.
+        $oldRedisKey = $key;
+        $username    = $this->redis->get($oldRedisKey);
         if (isset($username)) {
-            $this->redis->setex($this->generateRedisKey($key), $this->redis->ttl($key), $username);
-            $this->redis->del($key);
+            $this->redis->setex($redisKey, $this->redis->ttl($oldRedisKey), $username);
+            $this->redis->del($oldRedisKey);
             return $username;
         }
 
@@ -84,7 +91,7 @@ class Remember
      * Remember the given username.
      *
      * @param string $username The username to remember
-     * @param int    $expiry   The amount of time to remember it for
+     * @param int    $expiry   The number of seconds to remember for
      * @return string A key to pass into `retrieveRememberedUsername`.
      */
     public function rememberUsername(string $username, int $expiry): string
