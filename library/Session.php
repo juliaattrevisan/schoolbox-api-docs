@@ -110,23 +110,27 @@ class Session
             session_regenerate_id();
 
             /* Store remember me cookie so user can return in the future */
+            if ($remember) {
+                $rememberer = new Schoolbox\Auth\Remember\Remember(INSTANCE_ID, \Alaress\Redis::getClientInstance());
+                // Remember for 2 months
+                $expiry = 60 * 24 * 60 * 60;
+                $key = $rememberer->rememberUsername($username, $expiry);
 
-            if ($remember == true) {
-                $key = sha1(microtime(true) . mt_rand(10000, 90000));
-                $expire = strtotime('+2 month');
+//                $key = sha1(microtime(true) . mt_rand(10000, 90000));
+//                $expire = strtotime('+2 month');
                 $cookieParams = session_get_cookie_params();
                 setcookie(
                     'remember',
                     $key,
-                    $expire,
+                    time() + $expiry,
                     $cookieParams['path'],
                     $cookieParams['domain'],
                     $cookieParams['secure'],
                     $cookieParams['httponly']
                 );
-                $redis = \Alaress\Redis::getClientInstance();
-                $redis->executeCommand($redis->createCommand('set', array($key, $username)));
-                $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
+//                $redis = \Alaress\Redis::getClientInstance();
+//                $redis->executeCommand($redis->createCommand('set', array($key, $username)));
+//                $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
             }
 
             //register users id
