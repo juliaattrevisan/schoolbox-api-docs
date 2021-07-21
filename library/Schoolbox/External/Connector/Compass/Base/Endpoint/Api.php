@@ -143,9 +143,12 @@ class Api implements IApi
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
-                $response = $this->client->post($method, [
-                    RequestOptions::JSON => $params
-                ]);
+                $options = [];
+                if (!empty($params)) {
+                    $options[RequestOptions::JSON] = $params;
+                }
+
+                $response = $this->client->post($method, $options);
             } catch (\GuzzleHttp\Exception\GuzzleException $e) {
                 $fails++;
 
