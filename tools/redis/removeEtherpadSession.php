@@ -37,8 +37,18 @@ $app = new class extends CliTool\App {
         $search = new Keyspace($redis, 'sessionstorage:*');
         foreach ($search as $key) {
             $this->getLogger()->debug("Found sessionstorage object: $key");
-            $redis->del($key);
+            if ($this->perform()) {
+                $redis->del($key);
+            }
             $i++;
+        }
+
+        $sessionKeySet = $redis->smembers('ueberDB:keys:sessionstorage');
+        foreach($sessionKeySet as $key) {
+            $this->getLogger()->debug("Removing sessionstorage from key list: $key");
+            if ($this->perform()) {
+                $redis->srem('ueberDB:keys:sessionstorage', $key);
+            }
         }
 
         $s = 0;
@@ -50,7 +60,9 @@ $app = new class extends CliTool\App {
             $this->getLogger()->debug("Found session object: $key, $ttl: $contents");
             $contents = json_decode($contents, true);
             if (is_int($contents['validUntil']) && $contents['validUntil'] > 0) {
-                $redis->expireat($key, $contents['validUntil']);
+                if ($this->perform()) {
+                    $redis->expireat($key, $contents['validUntil']);
+                }
                 $s++;
             }
         }
