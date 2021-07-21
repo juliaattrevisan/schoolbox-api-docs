@@ -35,7 +35,7 @@ class Freedom implements IQueryHelper
             I.EMAIL_PERSONAL                    AS student_contact_default_email,
             I.EMAIL_HOME                        AS student_contact_home_email,
             S.STUDKEY                           AS student_id,
-            S.CURRENT_YEAR                      AS student_year_level,
+            TRIM(S.CURRENT_YEAR)                AS student_year_level,
             S.CAMPUS                            AS student_campus,
             S.HOUSE                             AS student_house,
             S.SEX                               AS student_gender,
