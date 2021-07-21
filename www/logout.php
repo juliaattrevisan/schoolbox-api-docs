@@ -2,7 +2,7 @@
 
 //small script to logout users
 
-use Schoolbox\Auth\Remember\Remember;
+use Schoolbox\Auth\Remember;
 
 require_once '../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -18,7 +18,7 @@ session_destroy();
 
 // Destroy remember me cookie
 if (isset($_COOKIE['remember'])) {
-    (new Remember(INSTANCE_ID, \Alaress\Redis::getClientInstance()))->forgetRememberedUsername($_COOKIE['remember']);
+    (new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance()))->forgetRememberedUsername($_COOKIE['remember']);
     setcookie('remember', '', 1, '/');
 }
 

@@ -5,7 +5,7 @@ use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
-use Schoolbox\Auth\Remember\Remember;
+use Schoolbox\Auth\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -323,7 +323,7 @@ class SitePage extends Page
         ) {
             //Catch users with the remember me cookie
             if ($this->config->get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
-                $username = (new Remember(INSTANCE_ID, \Alaress\Redis::getClientInstance()))
+                $username = (new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance()))
                     ->retrieveRememberedUsername($_COOKIE['remember']);
                 $sessionHandler->disableLoginLog();
 
