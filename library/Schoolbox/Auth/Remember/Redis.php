@@ -57,7 +57,7 @@ class Redis
      * @param string $key A key, previously returned by `rememberUsername`
      * @return string|null The username previously remembered
      */
-    public function retrieveRememberedUsername(string $key): ?string
+    public function retrieveUsername(string $key): ?string
     {
         // Search in the new key first
         $redisKey = $this->generateRedisKey($key);
@@ -91,7 +91,7 @@ class Redis
      *
      * @param string $key A key, previously returned by `rememberUsername`
      */
-    public function forgetRememberedUsername(string $key): void
+    public function forgetUsername(string $key): void
     {
         // Forget both the old and new keys
         $this->redis->del([

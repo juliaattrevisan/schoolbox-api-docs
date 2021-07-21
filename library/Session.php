@@ -114,13 +114,13 @@ class Session
             if ($remember) {
                 $rememberRedis = new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance());
                 $expiry     = Remember\Redis::DEFAULT_EXPIRY;
-                $key        = $rememberRedis->rememberUsername($username, $expiry);
+                $hash       = $rememberRedis->rememberUsername($username, $expiry);
                 $rememberCookie = new Remember\Cookie(
                     Remember\Cookie::DEFAULT_COOKIE_NAME,
                     $_COOKIE,
                     session_get_cookie_params()
                 );
-                $rememberCookie->rememberHash($key, $expiry);
+                $rememberCookie->rememberHash($hash, $expiry);
             }
 
             //register users id

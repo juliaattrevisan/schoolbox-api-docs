@@ -332,7 +332,7 @@ class SitePage extends Page
                 $hash     = $rememberCookie->retrieveHash();
                 if (isset($hash) && $hash) {
                     $rememberRedis = new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance());
-                    $username      = $rememberRedis->retrieveRememberedUsername($hash);
+                    $username      = $rememberRedis->retrieveUsername($hash);
                     $sessionHandler->disableLoginLog();
                 }
 

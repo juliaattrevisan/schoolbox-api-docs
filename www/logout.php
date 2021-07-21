@@ -21,7 +21,7 @@ $rememberCookie = new Remember\Cookie(Remember\Cookie::DEFAULT_COOKIE_NAME, $_CO
 $hash           = $rememberCookie->retrieveHash();
 if (isset($hash)) {
     $rememberRedis = new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance());
-    $rememberRedis->forgetRememberedUsername($hash);
+    $rememberRedis->forgetUsername($hash);
     $rememberCookie->forgetHash();
 }
 
