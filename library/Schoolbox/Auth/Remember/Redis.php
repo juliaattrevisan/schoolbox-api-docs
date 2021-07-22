@@ -19,11 +19,6 @@ use Predis\ClientInterface;
 class Redis
 {
     /**
-     * Default expiry for the remembered username: 2 months
-     */
-    public const DEFAULT_EXPIRY = 60 * 24 * 60 * 60;
-
-    /**
      * The format of the Redis key in which to store the username.
      */
     private const REDIS_KEY_FORMAT = 'remember:%s:%s';

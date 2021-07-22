@@ -18,6 +18,11 @@ namespace Schoolbox\Auth\Remember;
 class Remember
 {
     /**
+     * Default expiry for the remembered username: 2 months
+     */
+    public const DEFAULT_EXPIRY = 60 * 24 * 60 * 60;
+
+    /**
      * The cookie part of remember me: responsible for retrieving, remembering
      * and forgetting the remember me cookie.
      */
