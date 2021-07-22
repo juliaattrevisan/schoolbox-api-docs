@@ -106,7 +106,7 @@ Data:
         <div class="column small-12 medium-6 student">
             <h2 class="subheader">Student</h2>
             <div class="card small-12">
-                <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="View Profile">
+                {% include 'include/portrait.twig' with {user: user} %}
                 <h3><a href="/search/user/{{ user.id }}">{{ user.fullName }}</a></h3>
                 <p class="meta">{{ user.role.name }}</p>
             </div>
@@ -115,7 +115,7 @@ Data:
             <h2 class="subheader">Class Teacher{% if teachers | length > 1 %}s{% endif %}</h2>
             {% for teacher in teachers %}
                 <div class="card small-12">
-                    <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="View Profile">
+                    {% include 'include/portrait.twig' with {user: teacher, description: "View Profile"} %}
                     <h3><a href="/search/user/{{ teacher.id }}">{{ teacher.fullName }}</a></h3>
                     <p class="meta">{{ teacher.role.name }}</p>
                 </div>

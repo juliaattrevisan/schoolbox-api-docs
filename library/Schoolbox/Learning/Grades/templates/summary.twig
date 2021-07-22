@@ -25,7 +25,7 @@
                 <li>
                     <div class="small-12 card">
                         <a href="/search/user/{{ student.id }}" title="View Profile">
-                            <img src="/portrait.php?userId={{ student.externalId }}&size=square64" alt="{{ student.fullName }}"/>
+                            {% include 'include/portrait.twig' with {user: student, description: student.fullname} %}
                             <p>{{ student.fullName }}</p>
                             <p class="meta">Year {{ student.year ? student.year.name : '' }} Student</p>
                         </a>
@@ -89,7 +89,7 @@
                         <div class="list-item">
                             <div class="compact card small-12">
                                 <a href="/search/user/{{ teacher.id }}" title="">
-                                    <img src="/portrait.php?userId={{ teacher.externalId }}&size=square64" alt="{{ teacher.fullName }}"/>
+                                    {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullname} %}
                                     <p>{{ teacher.fullName }} <span class="pipe meta">Teacher</span></p>
                                 </a>
                             </div>

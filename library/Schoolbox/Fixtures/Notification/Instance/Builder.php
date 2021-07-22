@@ -37,7 +37,7 @@ class Builder implements BuilderInterface
         $this->internalBuilder = new InternalBuilder($validate);
         // Set some defaults into the builder
         $this->internalBuilder
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
+            ->setIcon("/portrait.php?id={$effector->getId()}&size=square64")
             ->setSeverity(Logger::INFO);
     }
 

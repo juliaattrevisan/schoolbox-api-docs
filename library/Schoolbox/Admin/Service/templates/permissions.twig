@@ -22,7 +22,7 @@
                         <div class="list-item">
                             <div class="compact card small-12">
                                 <a href="/adminv2/user/{{ person.id }}/modify">
-                                    <img src="/portrait.php?userId={{ person.externalId }}&size=square64" />
+                                    {% include 'include/portrait.twig' with {user: person} %}
                                     <p>
                                         {{ person.fullname }}
                                     </p>

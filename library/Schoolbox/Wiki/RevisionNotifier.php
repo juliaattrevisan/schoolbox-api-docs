@@ -137,7 +137,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
         $cat        = $wiki->getCategory();
         $categoryId = $cat->getId();
 
-        $authorExtId = $author->getExternalId();
+        $authorId = $author->getId();
 
         $href = "/wiki/revision/$wikiId/$revisionId";
 
@@ -146,7 +146,7 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
 
         $bob->setTitle(':author revised the wiki :title in :folder')
             ->setHref($href)
-            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
+            ->setIcon("/portrait.php?id={$authorId}&size={$this->iconSize}")
             ->addTopic("wiki.$revisionId.created")
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())

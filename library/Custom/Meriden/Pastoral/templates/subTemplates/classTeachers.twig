@@ -10,7 +10,7 @@
             <section>
                 {% for teacher in teachers %}
                     <div class="small-12 card">
-                        <img class="teacher-image" src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}">
+                        {% include 'include/portrait.twig' with {user: teacher, class: 'teacher-image', description: teacher.fullName} %}
                         <p class="teacher-name">{{ teacher.formatName }}</p>
                     </div>
                 {% endfor %}

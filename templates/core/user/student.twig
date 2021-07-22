@@ -767,7 +767,7 @@
                                                 {% set maxTeachersToShowCount = 4 %}
                                                 {% set teachersHead = subject.teachers[:maxTeachersToShowCount] %}
                                                 {% for teacher in teachersHead %}
-                                                    <img src="/portrait.php?userId={{ teacher.externalId|e('url') }}&amp;size=square64" title="{{ teacher.formatName }}" />
+                                                    {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullname} %}
                                                 {% endfor %}
                                                 {% set teachersTail = subject.teachers[maxTeachersToShowCount:] %}
                                                 {% if teachersTail|length %}
@@ -867,7 +867,7 @@
                                             {% set maxOwnersToShowCount = 4 %}
                                             {% set ownersHead = group.owners[:maxOwnersToShowCount] %}
                                             {% for owner in ownersHead %}
-                                                <img src="/portrait.php?userId={{ owner.externalId|e('url') }}&amp;size=square64" title="{{ owner.formatName }}" />
+                                                {% include 'include/portrait.twig' with {user: owner, description: owner.fullname} %}
                                             {% endfor %}
                                             {% set ownersTail = group.owners[maxOwnersToShowCount:] %}
                                             {% if ownersTail|length %}
@@ -957,14 +957,14 @@
                                                     <div class="compact card small-12">
                                                         {% if contact.main %}
                                                             <a href="/search/user/{{ contact.main.id }}">
-                                                                <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                                                {% include 'include/portrait.twig' with {user: contact.main} %}
                                                                 <p>
                                                                     {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
                                                                     <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
                                                                 </p>
                                                             </a>
                                                         {% else %}
-                                                            <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                                            {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} %}
                                                             <p>
                                                                 {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
                                                                 <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
@@ -1028,14 +1028,14 @@
                                                             {# need to know user's schoolbox info here #}
                                                             {% if contact.spouse %}
                                                                 <a href="/search/user/{{ contact.spouse.id }}">
-                                                                    <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                                                    {% include 'include/portrait.twig' with {user: contact.spouse} %}
                                                                     <p>
                                                                         {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                                                         <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
                                                                     </p>
                                                                 </a>
                                                             {% else %}
-                                                                <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                                                {% include 'include/portrait.twig' with {externalId: contact.StudentContactSpouseID} %}
                                                                 <p>
                                                                     {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                                                     <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>

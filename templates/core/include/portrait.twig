@@ -1,0 +1,119 @@
+{# usage:
+    - user:             User|false
+    - class:            string
+    - limitHeight:      int
+    - limitWidth:       int
+    - render:           enum [tiny, small, medium, large, menuMobile]
+    - description:      string
+    - appendQueryParam: string
+    - userId:           int
+    - externalId:       int
+#}
+
+{# portrait image tag is composed of... #}
+{% set sizeParameter = '&size=' %}
+{% set userParameter = '' %}
+{% set userFullname = '' %}
+{% set limitHeight = '' %}
+{% set limitWidth = '' %}
+{% if class is not defined %}
+    {% set class = '' %}
+{% endif %}
+{% if render is not defined %}
+    {% set render = "small" %}
+{% endif %}
+{% if description is not defined %}
+    {% set description = '' %}
+{% endif %}
+{% if appendQueryParam is not defined %}
+    {% set appendQueryParam = '' %}
+{% endif %}
+
+{# prefer to take the userId  from the `user` object #}
+{% if user is defined %}
+    {# we want to render the default portrait image #}
+    {% if user == false %}
+        {% set userId = 0 %}
+    {% else %}
+        {% set userId = user.id %}
+    {% endif %}
+
+    {# I think this makes more sense   #}
+    {#    {% set userDescription = "View Profile of " ~ user.fullName %}#}
+    {# but this is what we are currently doing #}
+    {% set userDescription = 'View Profile' %}
+{% else %}
+    {% set userDescription = description %}
+{% endif %}
+
+{# it's still possible to fallback on an explicit userId or externalId #}
+{% if userId is defined %}
+    {% set userParameter = "id=" ~ userId %}
+{% elseif externalId is defined %}
+    {% set userParameter = "userId=" ~ externalId %}
+{%  endif %}
+
+{# TODO make sure this is commented out in production #}
+{% set debugStyling = 'border: dashed 2px mediumvioletred' %}
+
+{# prefer the use a semantic name for the portrait (tiny, small, medium, large, menuMobile)#}
+{# establish small as the default rendering method #}
+{% if render in ['square32'] %}
+    {% set render = 'tiny' %}
+{% elseif render in ['square64'] %}
+    {% set render = 'small' %}
+{% elseif render in ['square72'] %}
+    {% set render = 'menuMobile' %}
+{% elseif render in ['square200'] %}
+    {% set render = 'medium' %}
+{% elseif render in ['portrait'] %}
+    {% set render = 'large' %}
+{% else %}
+    {% set render = 'small' %}
+{% endif %}
+
+{# how does the semantic render affect the tag #}
+{% if render == "tiny" %}
+    {% set sizeParameter = sizeParameter ~ "square32" %}
+{% endif %}
+{% if render == "small" %}
+    {% set sizeParameter = sizeParameter ~ "square64" %}
+{% endif %}
+{% if render == "medium" %}
+    {% set sizeParameter = sizeParameter ~ "constrain200" %}
+    {% set limitHeight = 200 %}
+    {% set limitWidth = 200 %}
+    {% set class = "full-width" %}
+{% endif %}
+{% if render == "menuMobile" %}
+    {% set sizeParameter = sizeParameter ~ "square72" %}
+    {% set limitHeight = 72 %}
+    {% set limitWidth = 72 %}
+{% endif %}
+{% if render == "large" %}
+    {% set sizeParameter = sizeParameter ~ "profile" %}
+    {% set class = "full-width" %}
+{% endif %}
+
+<img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
+    {% if debugStyling is not empty %}
+        style="{{ debugStyling }}"
+    {% endif %}
+
+    {% if class is not empty %}
+        class="{{ class }}"
+    {% endif %}
+
+    {% if limitHeight is not empty %}
+        height="{{ limitHeight }}"
+    {% endif %}
+
+    {% if limitWidth is not empty %}
+        width="{{ limitWidth }}"
+    {% endif %}
+
+    {% if userDescription is not empty %}
+        alt="{{ userDescription }}"
+        title="{{ userDescription }}"
+    {% endif %}
+/>

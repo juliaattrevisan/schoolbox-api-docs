@@ -48,7 +48,7 @@
                         {% if url %}
                         <a href="{{ url }}" title="{{ tooltip }}">
                         {% endif %}
-                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullname }}">
+                            {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullname} %}
                             <p>
                                 {% if currentInteraction.isSubmitted %}
                                     {% if currentInteraction.isSubmittedOffline %}

@@ -29,11 +29,11 @@
                             <div class="card small-12">
                                 {% if contact.main %}
                                     <a href="/search/user/{{ contact.main.getId() }}">
-                                        <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64"/>
+                                        {% include 'include/portrait.twig' with {user: contact.main} %}
                                         <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
                                     </a>
                                 {% else %}
-                                    <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64"/>
+                                    {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} %}
                                     <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
                                 {% endif %}
                                 <p class="meta">{{ contact.StudentContactRelation }}</p>

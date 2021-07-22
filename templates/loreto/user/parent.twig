@@ -26,7 +26,7 @@
             <div class="profile content">
                 <div class="row no-margin">
                     <div class="small-12 medium-2 columns no-pad">
-                        <img class="full-width" src="/portrait.php?userId={{ user.getExternalId() }}&amp;size=constrain200"/>
+                        {% include 'include/portrait.twig' with {user: user, render: 'medium'} %}
                     </div>
 
                     <div class="small-12 medium-10 columns">

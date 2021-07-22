@@ -811,7 +811,7 @@
                         <li>
                             <div class="card small-12">
                                 <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming work">
-                                    <img src="/portrait.php?userId={{ child.externalId }}&size=square64" alt="View upcoming work" />
+                                    {% include 'include/portrait.twig' with {user: child, description: "View upcoming work"} %}
                                     <p>{{ child.formatName }}</p>
                                     <p class="meta">{{ child.role.name }}</p>
                                 </a>
@@ -919,7 +919,7 @@
                                             <div class="list-item">
                                                 <div class="small-12 card">
                                                     <a href="/search/user/{{ teacher.id }}" title="">
-                                                        <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}" />
+                                                        {% include 'include/portrait.twig' with {user: teacher} %}
                                                         <p>{{ teacher.formatName }}</p>
                                                     </a>
                                                     <p class="meta">{{ teacher.role.name }}</p>

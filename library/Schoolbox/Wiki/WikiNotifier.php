@@ -180,7 +180,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
         $wikiId   = $wiki->getId();
         $wikiSlug = $wiki->getSlug();
 
-        $authorExtId = $author->getExternalId();
+        $authorId = $author->getId();
 
         $folder   = $this->folderMapper->findById($wiki->getCategory()->getId());
         $folderId = $folder->getId();
@@ -193,7 +193,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
                 'catname' => new CategoryParam($folder),
             ])
             ->setHref("/wiki/$folderId/$wikiSlug")
-            ->setIcon("/portrait.php?userId=$authorExtId&size={$this->iconSize}")
+            ->setIcon("/portrait.php?id={$authorId}&size={$this->iconSize}")
             ->setSeverity(Logger::INFO)
             ->setTopics(["wiki.$wikiId.created"])
             ->setFilter(['roletype' => $roleType])
