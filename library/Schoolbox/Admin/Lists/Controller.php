@@ -1214,145 +1214,41 @@ class Controller extends Base
             }
         }
 
-        // Render this thing out
-        $this->getResponse()->content->set(
-            [
-                'template' => '@adminLists/index.twig',
-                'data'     => [
-                    'pageCurrent'    => $this->router->generate('adminLists.getIndex') . "/{$table}",
-                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLists.getIndex') . "/{$table}"),
-                    'tables'         => $tables,
-                    'table'          => $table,
-                    'records'        => $records,
-                ],
-            ]
-        );
-    }
-
-    /**
-     * Show options
-     *
-     * @param string $table Arbitrary value to identify a table. Does not need to be the actual table name.
-     * @since 160
-     *
-     * @api   /adminv2/lists/data
-     */
-    public function getData($table)
-    {
-        if (!isset($table)) {
-            $table = "roles";
-        }
-
-        $tables = $this->getTableData();
-
-        // Check for incorrect URLs
-        if (!isset($tables[$table])) {
-            $this->getResponse()->status->setCode(404);
-            return;
-        }
-
-        /** @var Mapper $mapper */
-        $mapper     = new $tables[$table]['mapper']();
-        $model_name = $mapper->getModel();
-        $prototype  = new $model_name();
-
-        $reflect    = new ReflectionClass($prototype);
-        $properties = $reflect->getProperties(ReflectionProperty::IS_PUBLIC | ReflectionProperty::IS_PROTECTED | ReflectionProperty::IS_PRIVATE);
-
-        $records = [];
-
-        // Go through every row in the current lookup table
-
-        if (isset($tables[$table]['findAllMethod'])) {
-            $finder = $tables[$table]['findAllMethod'];
-            $rows   = $mapper->$finder();
-        } elseif (isset($tables[$table]['sort'])) {
-            $rows = $mapper->findAll(['order' => [$tables[$table]['sort'] => 'ASC']]);
-        } elseif ($prototype instanceof Sequential) {
-            // Sequential: just use whatever ordering is defined in getDefaultOrderByParams
-            $rows                       = $mapper->findAll();
-            $tables[$table]['sortable'] = true;
+        if ($json) {
+            $currentTable = $tables[$table];
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput(
+                    [
+                        'canDelete'     => $currentTable['delete'] ?? false,
+                        'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
+                        'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
+                        'deleteWarning' => $currentTable['deleteWarning'] ?? '',
+                        'fields'        => $currentTable['fields'] ?? [],
+                        'fixed'         => $currentTable['fixed'] ?? [],
+                        'isSortable'    => $currentTable['sortable'] ?? false,
+                        'mapper'        => $currentTable['mapper'] ?? '',
+                        'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
+                        'rows'          => $records,
+                        'saveRoute'     => $this->router->generate('adminLists.postSave'),
+                        'tableName'     => $currentTable['name'],
+                        'title'         => $currentTable['title'],
+                    ]
+                )
+            );
         } else {
-            $orderArr = [$mapper->getIdentifierColumn() => 'ASC'];
-            $rows     = $mapper->findAll(['order' => $orderArr]);
-        }
-
-        foreach ($rows as $row) {
-            // Go through every property available
-
-            foreach ($properties as $prop) {
-                // We only want to display fields that are listed in the 'fields' array
-
-                if (isset($tables[$table]['fields'][$prop->getName()])) {
-                    // And they have to have a getId() column (or a manually defined getter function for the column)
-
-                    if ($reflect->hasMethod('getId') || isset($tables[$table]['fields']['id']['getter'])) {
-                        // And only if there is a mapper function to retrieve its value
-
-                        if (isset($tables[$table]['fields'][$prop->getName()]['getter'])) {
-                            $getter = $tables[$table]['fields'][$prop->getName()]['getter'];
-                        } else {
-                            $getter = $mapper->getGetMethodName($prop->getName());
-                        }
-
-                        if ($reflect->hasMethod($getter)) {
-                            if (isset($tables[$table]['fields']['id']['getter'])) {
-                                $idGetter = $tables[$table]['fields']['id']['getter'];
-                            } else {
-                                $idGetter = 'getId';
-                            }
-
-                            $id = $row->$idGetter();
-
-                            if (!isset($records[$id])) {
-                                $records[$id] = [];
-                            }
-
-                            $value = $row->$getter();
-
-                            // If we get an object back, we really want its ID
-
-                            if (is_object($value)) {
-                                $value = $value->getId();
-                            }
-
-                            $records[$id][$prop->getName()] = $value;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Stick a name column in those with no fields defined
-
-        foreach ($tables as $tableCurrent) {
-            if (!isset($tableCurrent['fields'])) {
-                $tableCurrent['fields']         = [];
-                $tableCurrent['fields']['name'] = [
-                    'caption' => 'Name',
-                ];
-            }
-        }
-
-        $currentTable = $tables[$table];
-        $this->getResponse()->content->set(
-            $this->buildJsonOutput(
+            // Render this thing out
+            $this->getResponse()->content->set(
                 [
-                    'canDelete'     => $currentTable['delete'] ?? false,
-                    'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
-                    'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
-                    'deleteWarning' => $currentTable['deleteWarning'] ?? '',
-                    'fields'        => $currentTable['fields'] ?? [],
-                    'fixed'         => $currentTable['fixed'] ?? [],
-                    'isSortable'    => $currentTable['sortable'] ?? false,
-                    'mapper'        => $currentTable['mapper'] ?? '',
-                    'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
-                    'rows'          => $records,
-                    'saveRoute'     => $this->router->generate('adminLists.postSave'),
-                    'tableName'     => $currentTable['name'],
-                    'title'         => $currentTable['title'],
+                    'template' => '@adminLists/index.twig',
+                    'data'     => [
+                        'pageCurrent'    => $this->router->generate('adminLists.getIndex') . "/{$table}",
+                        'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminLists.getIndex') . "/{$table}"),
+                        'tables'         => $tables,
+                        'table'          => $table,
+                        'records'        => $records,
+                    ],
                 ]
-            )
-        );
+            );
+        }
     }
 }
