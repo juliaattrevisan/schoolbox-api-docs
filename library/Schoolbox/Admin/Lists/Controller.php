@@ -351,6 +351,14 @@ class Controller extends Base
                         'width'     => 2,
                         'mandatory' => true,                                    // Set this true to remove an empty option from a drop down field.
                     ],
+                    'permissions' => [
+                        'caption'      => 'Permissions',
+                        'key'          => 'permissions',
+                        'width'        => 8,
+                        'tooltip'      => 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.',
+                        'mandatory'    => true,
+                        'isPopoutList' => true,
+                    ],
                     'canChangePassword' => [
                         'caption'   => 'Allow Password Change',
                         'checkbox'  => true,
@@ -430,10 +438,6 @@ class Controller extends Base
                     ],
                     'validPermissions' => [
                         'caption'   => 'validPermissions',
-                        'width'     => 0,
-                    ],
-                    'sequence'      => [
-                        'caption'   => 'sequence',
                         'width'     => 0,
                     ],
                 ]
@@ -1120,12 +1124,12 @@ class Controller extends Base
                         'deleteFailMsg' => $currentTable['deleteFailMsg'] ?? '',
                         'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
                         'deleteWarning' => $currentTable['deleteWarning'] ?? '',
-                        'fields'        => $currentTable['fields'] ?? [],
+                        'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
                         'fixed'         => $currentTable['fixed'] ?? [],
                         'isSortable'    => $currentTable['sortable'] ?? false,
                         'mapper'        => $currentTable['mapper'] ?? '',
                         'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
-                        'rows'          => $records,
+                        'rows'          => $this->reformatForJson($records, true),
                         'saveRoute'     => $this->router->generate('adminLists.postSave'),
                         'tableName'     => $currentTable['name'],
                         'title'         => $currentTable['title'],
@@ -1147,5 +1151,24 @@ class Controller extends Base
                 ]
             );
         }
+    }
+
+    /**
+     * @param array $rows
+     * @param bool  $addSequence
+     * @return array
+     */
+    private function reformatForJson(array $rows, bool $addSequence): array
+    {
+        $reordered = [];
+        $sequence  = 1;
+        foreach ($rows as $key => $array) {
+            $array['id'] = $key;
+            if ($addSequence) {
+                $array['sequence'] = $sequence++;
+            }
+            $reordered[] = $array;
+        }
+        return $reordered;
     }
 }
