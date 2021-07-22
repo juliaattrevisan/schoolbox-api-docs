@@ -59,7 +59,7 @@ class Phpfunc extends \Aura\Session\Phpfunc
             return true;
         }
 
-        if (!($this->config->get('session_remember') && isset($this->cookies[Remember\Cookie::DEFAULT_COOKIE_NAME]))) {
+        if (!$this->config->get('session_remember')) {
             // no remembery; well, that's too bad then
             return false;
         }
@@ -74,7 +74,6 @@ class Phpfunc extends \Aura\Session\Phpfunc
             new Remember\Redis(INSTANCE_ID, Redis::getClientInstance())
         );
         $username = $rememberer->retrieveUsername();
-//        $username = $this->redis->get($this->cookies['remember']);
 
         if (strlen($username)) {
             // found a redis match; attempt to rebuild that session
