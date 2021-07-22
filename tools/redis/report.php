@@ -159,7 +159,7 @@ $app = new class extends CliTool\App {
                     $sumLength += $row['length'];
                     $ttl       = $row['ttl'];
                     switch ($ttl) {
-                        case -2;
+                        case -2:
                             break;
                         case -1:
                             $countNoTtl++;
