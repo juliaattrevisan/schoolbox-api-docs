@@ -70,7 +70,7 @@
         <form id="googleFileForm" method="POST" action="{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}">
             <div id="gfile-step0"></div>
             <div id="gfile-step1" style="display:none;">
-                Who should be able to <strong>edit</strong> this file?
+                <h3>Who should be able to <strong>edit</strong> this file?</h3>
                 <table>
                     <tbody>
                     {% for levelName, levelId in levels %}
@@ -90,7 +90,7 @@
                 </ul>
             </div>
             <div id="gfile-step2" style="display:none;">
-                Who should be able to <strong>comment</strong> on this file?
+                <h3>Who should be able to <strong>comment</strong> on this file?</h3>
                 <table>
                     <tbody>
                     {% for levelName, levelId in levels %}
@@ -104,8 +104,7 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                Everyone in this group will be able to view the file.
-                Only group members with write access will be able to edit the file.
+                <p><em>Everyone in this group will be able to view the file. Only group members with write access will be able to edit the file.</em></p>
                 <ul class="flex-list buttons">
                     <li><a href="#" class="button submit" data-action="share" disabled>Share file</a></li>
                     <li><a href="#" class="button" data-action="cancel">Cancel</a></li>
@@ -114,178 +113,25 @@
                 <input type="hidden" id="gfile-access-token" name="accessToken" value="">
                 <input type="hidden" id="gfile-token-type" name="tokenType" value="">
             </div>
-        </form>
-        <div data-overlay class="row hide">
-            <div class="small-12 island no-pad">
-                <section class="content text-center">
-                    <div class="loader"></div>
-                    Updating file permissions...
-                </section>
+            <div id='gfile-step3' class="row" style="display:none;">
+                <div class="small-12 island no-pad">
+                    <section class="content text-center">
+                        <div class="loader"></div>
+                        <span>Updating file permissions...</span>
+                    </section>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
-<style>
-{# #gfile-container {
-    position: relative;
-    width: 1052px;
-    height: 650px;
-    padding: 0px;
-    overlay: hidden;
-} #}
-</style>
+<div 
+    id="googleFiles"
+    data-client-id="{{ clientId }}" 
+    data-levels="{{ levels['All group members'] }}"
+    data-save-route="{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}"
+    data-component-id="{{ component_id }}"
+    data-folder-id="{{ folder.id }}"
+>
+</div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/google/picker.js"></script>
-<script type="text/javascript">
-    $(function () {
-        $('#find-files').on('click', function () {
-            document.getElementById('gfile-step0').style.display = 'block';
-            document.getElementById('gfile-step1').style.display = 'none';
-            document.getElementById('gfile-step2').style.display = 'none';
-        });
-        $('#find-files').googlePicker({
-            clientId: '{{ clientId }}',
-            containerID: '#gfile-step0',
-            modules: ['client:auth2', 'picker'],
-            mimeTypes: [
-                'application/msword',
-                'application/vnd.ms-powerpoint',
-                'application/vnd.ms-excel',
-                'application/vnd.google-apps.document',
-                'application/vnd.google-apps.presentation',
-                'application/vnd.google-apps.spreadsheet'
-            ],
-            onSelect: function (docs) {
-                let selected = docs.map(function (v) {
-                    return {
-                        'id': v.id,
-                        'name': v.name,
-                        'icon': v.iconUrl
-                    }
-                });
-                document.getElementById('gfile-step0').style.display = 'none';
-                document.getElementById('gfile-step1').style.display = 'block';
-                $('#gfile-google-ids').val(JSON.stringify(selected));
-            }
-        });
-        //let $permModal = $('#gfile-permission');
-        const $gModal = $('#gfile');
-        const $step1 = $('#gfile-step1');
-        const $step2 = $('#gfile-step2');
-
-        function clearSelections() {
-            $('[data-gfile-edit]').each(function () {
-                $(this).prop('checked', false);
-                $(this).prop('disabled', false);
-            });
-            $('[data-gfile-comment]').each(function () {
-                $(this).prop('checked', false);
-                $(this).prop('disabled', false);
-            });
-            //$step1.show();
-            //$step2.hide();
-            document.getElementById('gfile-step1').style.display = 'block';
-            document.getElementById('gfile-step2').style.display = 'none';
-        }
-
-        $step1.on('click', '[data-gfile-edit]', function (e) {
-            $('[data-action="continue"]').removeAttr('disabled');
-        });
-        $step1.on('click', 'a[data-action]', function (e) {
-            e.preventDefault();
-            $step1.hide();
-            switch ($(this).data('action')) {
-                case 'cancel':
-                    clearSelections();
-                    //$permModal.foundation('reveal', 'close');
-                    $gModal.foundation('reveal', 'close');
-                    return;
-                case 'continue':
-                    let selected = $('input[name="gfileEdit"]:checked').val();
-                    $('[data-gfile-comment]').each(function () {
-                        if ($(this).val() > selected) {
-                            $(this).attr('disabled', true);
-                        }
-                        // if selected edit level = 1, there will be only one option available.
-                        // Pre-check it to save one extra click
-                        if (selected == {{ levels['All group members'] }} && $(this).val() == selected) {
-                            $(this).prop('checked', true);
-                            $('[data-action="share"]').removeAttr('disabled');
-                        }
-                    });
-                    //$step2.show();
-                    document.getElementById('gfile-step2').style.display = 'block';
-                    break;
-            }
-        });
-        $step2.on('click', '[data-gfile-comment]', function (e) {
-            $('[data-action="share"]').removeAttr('disabled');
-        });
-        $step2.on('click', 'a[data-action]', function (e) {
-            e.preventDefault();
-            switch ($(this).data('action')) {
-                case 'cancel':
-                    //$permModal.foundation('reveal', 'close');
-                    $gModal.foundation('reveal', 'close');
-                    clearSelections();
-                    return;
-                case 'share':
-                    //$step2.hide();
-                    document.getElementById('gfile-step2').style.display = 'none';
-                    $('[data-overlay]').removeClass('hide');
-                    $.ajax({
-                        type: 'POST',
-                        url: '{{ routeLookupIfAuthorized('googleFile.postGoogleFile', {folderId: folder.id, folder: folder}) }}',
-                        data: {
-                            googleIds: $('#gfile-google-ids').val(),
-                            gfileEdit: $('input[name="gfileEdit"]:checked').val(),
-                            gfileComment: $('input[name="gfileComment"]:checked').val(),
-                            accessToken: $('#gfile-access-token').val(),
-                            tokenType: $('#gfile-token-type').val(),
-                        },
-                        success: function (data) {
-                            window.location.reload();
-                        }
-                    });
-                    break;
-            }
-        });
-        $('#component{{ component_id }} [data-action="delete"]').on('click', function (event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this google file?',
-                confirmLabel: 'Delete',
-                confirmEvent: function () {
-                    $.ajax({
-                        url: $(event.target).attr('href'),
-                        type: 'DELETE',
-                        success: function (result) {
-                            window.location.href = '/homepage/' +{{ folder.id }};
-                        },
-                    });
-
-                }
-            });
-        });
-        $('#component{{ component_id }} [data-action="permission"]').googlePicker({
-            clientId: '{{ clientId }}',
-            modules: ['client:auth2'],
-            onAuth: function () {
-                $('[data-action="continue"]').removeAttr('disabled');
-                $('[data-action="share"]').removeAttr('disabled');
-                //$permModal.foundation('reveal', 'open');
-                $gModal.foundation('reveal', 'open');
-                document.getElementById('gfile-step0').style.display = 'none';
-                document.getElementById('gfile-step1').style.display = 'block';
-                document.getElementById('gfile-step2').style.display = 'none';
-            },
-        });
-
-        // TODO: combine below with above
-        $('#component{{ component_id }} [data-action="permission"]').on('click', function (event) {
-            let editLevel = $(event.target).data('edit-level'), commentLevel = $(event.target).data('comment-level');
-            $('#gfile-edit-' + editLevel).prop('checked', true);
-            $('#gfile-comment-' + commentLevel).prop('checked', true);
-            $('#gfile-google-ids').val(JSON.stringify([{'id': $(event.target).data('id')}]));
-        });
-    });
-</script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/googleFiles.js"></script>
