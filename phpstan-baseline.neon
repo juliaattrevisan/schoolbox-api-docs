@@ -3476,11 +3476,6 @@ parameters:
 			path: library/Schoolbox/Assessment/Rubric/MarkedGrid/Test/Generator.php
 
 		-
-			message: "#^Property Schoolbox\\\\Assessment\\\\Rubric\\\\Repair\\\\Unused\\\\Delete\\\\Indicator\\:\\:\\$folderIds \\(array\\<int\\>\\) does not accept array\\<int, string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Assessment/Rubric/Repair/Unused/Delete/Indicator.php
-
-		-
 			message: "#^Method Schoolbox\\\\Assessment\\\\Term\\\\Model\\:\\:getYearLevels\\(\\) should return \\(iterable\\<Schoolbox\\\\YearLevel\\\\Model\\>&Schoolbox\\\\GenericCollection\\)\\|null but returns array\\<Schoolbox\\\\YearLevel\\\\Model\\>\\|null\\.$#"
 			count: 1
 			path: library/Schoolbox/Assessment/Term/Model.php
