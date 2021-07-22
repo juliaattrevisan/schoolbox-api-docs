@@ -37,7 +37,7 @@
                  */
                 element: element,
 
-                /* Our modal. The google modal appears on top of this or inside of this with containerID if set
+                /* Our modal. The google modal appears on top of this or inside of this with containerID set
                  */
                 modalId: '#gfile',
 
@@ -153,7 +153,7 @@
                 .build();
             picker.setVisible(true);
             
-            if (config.containerID) { //if it exists, add it into the empty containerId and ensure it sits at the top left
+            if (config.containerID) { //if it exists, add it into the empty containerId element and ensure it sits at the top left
                 picker.$.style.left = '0px';
                 picker.$.style.top = '0px';
                 $(config.containerID).append(picker.$);

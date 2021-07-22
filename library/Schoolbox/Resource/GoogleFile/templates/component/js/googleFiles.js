@@ -1,3 +1,7 @@
+/**
+ * To select a file from the Google Drive picker, then step through the file edit permissions, file comment permissions, and lastly file processing 
+ */
+
 import { gsap } from 'gsap/all';
 
     
