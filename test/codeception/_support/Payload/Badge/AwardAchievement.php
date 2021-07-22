@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Payload\Badge;
-
 
 use Payload\Pastoral\FormTrait;
 use Payload\PostTrait;
