@@ -48,7 +48,11 @@
             </dd>
 
             {% if externalUser.StudentForm %}
-                <dt class="small-12 medium-3">Vertical Tutor Group:</dt>
+                {% if externalUser.StudentYearLevel is defined and externalUser.StudentYearLevel > 5 %}
+                    <dt class="small-12 medium-3">Vertical Tutor Group:</dt>
+                {% else %}
+                    <dt class="small-12 medium-3">Class Group:</dt>
+                {% endif %}
                 <dd class="small-12 medium-9">{{ externalUser.StudentForm }}</dd>
             {% endif %}
         {% endif %}
