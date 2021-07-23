@@ -75,7 +75,7 @@ class BadgeCest
         $body                = 'Badge Description: Automation API Smoke Test' . $timestamp;
         $name                = 'Badge Name Automation API Smoke Test' . $timestamp;
         $image_name          = "homepageUploadTestDragDrop{$timestamp}.png";
-        $image_location      = '/UploadTestFiles/fish2.png';
+        $image_location      = '/UploadTestFiles/cat.png';
         $achievementExpiry   = BadgeModel::EXPIRY_DAY;
         $goalExpiry          = BadgeModel::EXPIRY_MONTH;
 
@@ -86,7 +86,7 @@ class BadgeCest
         $json_reply = json_decode($i->grabResponse(), true);
 
         $badgePayload = new Payload\Badge\Create($badgeavatarselector, $category, $body, $name, false, $achievementExpiry, $goalExpiry);
-        $badgePayload->setFormParam('image', $json_reply['hash'] . ":fish2.png");
+        $badgePayload->setFormParam('image', $json_reply['hash'] . ":cat.png");
         $i->amGoingTo('Send request to create a badge');
         $i->sendRequest($badgePayload);
         $i->seeResponseCodeIs(200);
@@ -144,8 +144,101 @@ class BadgeCest
          */
         #WHEN
         $badgePayloadDelete = new Payload\Badge\Delete($badge->getId());
-        $i->amGoingTo('Send request to delete a learning moment');
+        $i->amGoingTo('Send request to delete a badge');
         $i->sendRequest($badgePayloadDelete);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+    }
+
+    /** Set a goal
+     * check if response code is 200
+     *
+     * @param IntegrationTester $i
+     */
+    public function setGoal(IntegrationTester $i): void
+    {
+        #GIVEN
+        $badgeId = 1;
+        $externalId = 507;
+        $firstName = 'Jana';
+        $id = 25;
+        $lastName = 'Reed';
+        $name = 'Jana Reed - Year 9, Middle Student (507)';
+        $role = 'Middle Student';
+        $setGoalPayload = new Payload\Badge\SetGoal($badgeId, $externalId, $firstName, $id, $lastName, $name, $role);
+        #WHEN
+
+        $i->amGoingTo('Send request to set a goal to Jana Reed');
+        $badgeId = 1;
+        $i->sendRequest($setGoalPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+    }
+
+
+    /** Remove a goal
+     * check if response code is 200
+     *
+     * @param IntegrationTester $i
+     */
+    public function removeGoal(IntegrationTester $i): void
+    {
+        #GIVEN
+        $badgeId = 1;
+        $userId = '25';
+        $RemoveGoalPayload = new Payload\Badge\RemoveGoal($badgeId, $userId);
+        #WHEN
+
+        $i->amGoingTo('Send request to remove a goal from Jana Reed');
+        $i->sendRequest($RemoveGoalPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+    }
+
+    /** Award an Achievement
+     * check if response code is 200
+     *
+     * @param IntegrationTester $i
+     */
+    public function awardAchievement(IntegrationTester $i): void
+    {
+        #GIVEN
+        $badgeId = 2;
+        $externalId = 507;
+        $firstName = 'Jana';
+        $id = 25;
+        $lastName = 'Reed';
+        $name = 'Jana Reed - Year 9, Middle Student (507)';
+        $role = 'Middle Student';
+        $AwardAchievementPayload = new Payload\Badge\AwardAchievement($badgeId, $externalId, $firstName, $id, $lastName, $name, $role);
+        #WHEN
+
+        $i->amGoingTo('Send request to award an achievement to Jana Reed');
+        $badgeId = 1;
+        $i->sendRequest($AwardAchievementPayload);
+
+        #THEN
+        $i->seeResponseCodeIs(200);
+    }
+
+    /** Withdraw an Achievement
+     * check if response code is 200
+     *
+     * @param IntegrationTester $i
+     */
+    public function withdrawAchievement(IntegrationTester $i): void
+    {
+        #GIVEN
+        $badgeId = 2;
+        $userId = '25';
+        $WithdrawAchievementPayload = new Payload\Badge\WithdrawAchievement($badgeId, $userId);
+        #WHEN
+
+        $i->amGoingTo('Send request to withdraw an achievement from Jana Reed');
+        $i->sendRequest($WithdrawAchievementPayload);
 
         #THEN
         $i->seeResponseCodeIs(200);
