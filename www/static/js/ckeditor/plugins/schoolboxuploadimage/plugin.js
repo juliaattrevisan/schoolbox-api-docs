@@ -95,7 +95,7 @@
                     // Also set data vars to ensure that Schoolbox knows how to render this file later.
                     this.replaceWith( '<img src="' + upload.url + '" ' +
                         'data-schoolboxresource-type="image" ' +
-                        'data-schoolboxresource-filesystem="' + upload.filesystem + '" ' +
+                        'data-schoolboxresource-filesystem="' + upload.responseData.filesystem + '" ' +
                         'data-schoolboxresource-thumbnail="' + upload.url + '" ' +
                         'data-schoolboxresource-source="' + upload.url + '" ' +
                         'data-schoolboxresource-width="' + width + '" ' +
