@@ -82,7 +82,8 @@
                     // Width and height could be returned by server (https://dev.ckeditor.com/ticket/13519).
                     let $img = this.parts.img.$,
                         width = upload.responseData.width || $img.naturalWidth,
-                        height = upload.responseData.height || $img.naturalHeight;
+                        height = upload.responseData.height || $img.naturalHeight,
+                        isEmpty = (this.editor.getData() === '');
 
                     // Set width and height to prevent blinking.
                     // Also set data vars to ensure that Schoolbox knows how to render this file later.
@@ -95,6 +96,19 @@
                         'data-schoolboxresource-height="' + height + '" ' +
                         'width="' + width + '" ' +
                         'height="' + height + '">' );
+
+                    // Is there nothing else in the editor?
+                    // If so, put a blank line in so that it doesn't report as empty.
+                    if (isEmpty) {
+                        // Get the current selected element (the pasted image)
+                        // so it can be reselected.
+                        let currentSelection = editor.getSelection().getSelectedElement(),
+                            endRange = editor.createRange();
+                        endRange.moveToElementEditEnd(endRange.root);
+                        editor.getSelection().selectRanges([ endRange ]);
+                        this.editor.insertHtml('<p>&nbsp;</p>');
+                        editor.getSelection().selectElement(currentSelection);
+                    }
                 }
             } );
 
