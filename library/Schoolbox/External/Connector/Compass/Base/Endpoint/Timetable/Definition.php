@@ -102,6 +102,18 @@ class Definition implements IStrategy
         // I don't know which academic group uses which structure
         $academicGroups = (new AcademicGroups($this->api))->generate();
         $structures     = (new Structures($this->api))->generate();
+
+//        $subjects = $this->api->retrieveDocument('schedule/v1/GetSubjects', []);
+//        foreach (array_slice($subjects['d'], 0, 3) as $subject) {
+//            $classDetails[] = $this->api->retrieveDocument(
+//                'schedule/v1/GetStandardClassDetails',
+//                [
+//                    'activityCode'      => $subject['importIdentifier'],
+//                    'academicGroupCode' => $subject['academicYear']['importIdentifier'],
+//                ]
+//            );
+//        }
+
         foreach ($academicGroups as $academicGroup) {
             foreach ($structures as $structure) {
                 // Parse structure into a set of days
