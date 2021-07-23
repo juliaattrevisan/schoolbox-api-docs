@@ -42,6 +42,17 @@ made to them:
 git restore www/static/javascript/ckeditor/config.js www/static/javascript/ckeditor/styles.js
 ```
 
+## Update customised plugins (optional)
+
+Schoolbox may contain customised versions of plugins: you may wish to keep those
+customised plugins up-to-date with changes in the core plugins.
+
+The core plugin is probably part of the build, so you may have to visit that
+plugin's official page and download its source code in order to compare.
+
+Schoolbox contains the following customised plugins:
+* `schoolboxuploadimage` (customised `uploadimage`)
+
 ## Commit CKEditor build
 
 As with any other code change, the new CKEditor build needs to be committed:
