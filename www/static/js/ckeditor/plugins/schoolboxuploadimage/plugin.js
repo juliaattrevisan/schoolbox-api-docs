@@ -29,7 +29,7 @@
         return 'image-' + CKEDITOR.tools.array.map( dateParts, padNumber ).join( '' ) + '-' + uniqueNameCounter + '.' + type;
     }
 
-    CKEDITOR.plugins.add( 'uploadimage', {
+    CKEDITOR.plugins.add( 'schoolboxuploadimage', {
         requires: 'uploadwidget',
 
         onLoad: function() {
