@@ -1,5 +1,5 @@
 <a href="{{ routeLookup('blog.getItem', { id: blog.getId }) }}">
-    {% include 'include/portrait.twig' with {user: blog.getOwner} %}
+    {% include 'include/portrait.twig' with {user: blog.getOwner} only %}
     <h3>{{ blog.getHeading }}</h3>
 </a>
 <p class="meta">

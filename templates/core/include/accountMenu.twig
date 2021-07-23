@@ -40,7 +40,7 @@
                 <li class="user">
                     <a class="no-pad" href="/user/switch/{{ linkedUser.id }}" title="Switch to {{ linkedUser.formatName }}">
                         <div class="card small-12">
-                            {% include 'include/portrait.twig' with {user: linkedUser} %}
+                            {% include 'include/portrait.twig' with {user: linkedUser} only %}
                             <p>{{ linkedUser.formatName }}</p>
                             <p class="meta">{{ linkedUser.role.name }}</p>
                         </div>
@@ -54,7 +54,7 @@
             <li class="user">
                 <a class="no-pad" href="/user/recoverSession" title="Return to {{ user.previous.formatName }}">
                     <div class="card small-12">
-                        {% include 'include/portrait.twig' with {user: user.previous} %}
+                        {% include 'include/portrait.twig' with {user: user.previous} only %}
                         <p>{{ user.previous.formatName }}</p>
                         <p class="meta">{{ user.previous.role.name }}</p>
                     </div>

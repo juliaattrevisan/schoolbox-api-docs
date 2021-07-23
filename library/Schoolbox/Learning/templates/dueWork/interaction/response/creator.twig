@@ -1,7 +1,7 @@
 <div class="list-item">
     <div class="card small-12">
         <a href="/search/user/{{ student.id }}" title="View Profile">
-            {% include 'include/portrait.twig' with {user: student, description: student.fullname, class: 'hide-for-small-only'} %}
+            {% include 'include/portrait.twig' with {user: student, description: student.fullName, class: 'hide-for-small-only'} only %}
             <p>{{ student.fullname }}</p>
             <p class="meta">
             {% if currentInteraction.submitted %}

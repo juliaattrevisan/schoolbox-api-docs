@@ -118,7 +118,7 @@
         <div class="flex-grade">
             <div class="{{ cardSize ?? 'small-12' }} card sibling">
                 <a href="/search/user/{{ participant.user.id }}" title="View Profile">
-                    {% include 'include/portrait.twig' with {user: participant.user} %}
+                    {% include 'include/portrait.twig' with {user: participant.user} only %}
                 </a>
                 {% if not participant.user.deleted %}
                     <h3>

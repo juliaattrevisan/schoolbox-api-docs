@@ -22,7 +22,7 @@
                         <div class="list-item">
                             <div class="compact card small-12">
                                 <a href="/adminv2/user/{{ person.id }}/modify">
-                                    {% include 'include/portrait.twig' with {user: person} %}
+                                    {% include 'include/portrait.twig' with {user: person} only %}
                                     <p>
                                         {{ person.fullname }}
                                     </p>

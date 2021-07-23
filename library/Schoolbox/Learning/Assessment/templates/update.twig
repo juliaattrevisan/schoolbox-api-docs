@@ -86,7 +86,6 @@
                             $(Object.keys(response['affectedUsers'])).each(function(index, userId) {
                                 var noInstructorFeedback = affectedUsers[userId]['selfAssess'] && !affectedUsers[userId]['instructorGiven'];
 
-                                var userExternalId = affectedUsers[userId]['user']['externalId'];
                                 var userName = affectedUsers[userId]['user']['firstname'] + ' ' + affectedUsers[userId]['user']['lastname'];
                                 dialogHtml += '<li>' +
                                     '      <div class="row">' +

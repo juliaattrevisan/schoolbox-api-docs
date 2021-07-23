@@ -30,7 +30,7 @@
             <section>
                 <div class="small-12 card">
                     {# As you are not logged in, you don't have permission to view this user's profile image. #}
-                    {% include 'include/portrait.twig' with {user: reset.getUser(), description: reset.getUser().fullName()} %}
+                    {% include 'include/portrait.twig' with {user: reset.getUser(), description: reset.getUser().fullName()} only %}
                     <h3>{{ reset.getUser().formatName() }}</h3>
                 </div>
             </section>

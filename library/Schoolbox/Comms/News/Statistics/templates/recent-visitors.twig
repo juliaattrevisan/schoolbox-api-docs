@@ -11,13 +11,13 @@
             <div class="card small-12">
                 {% if user.occursAt %}
                     <a href="/search/user/{{ user.id }}" title="{{ user.fullname }} (last visited {{ user.occursAt.relative }})">
-                        {% include 'include/portrait.twig' with {user: user} %}
+                        {% include 'include/portrait.twig' with {user: user} only %}
 
                         <p>{{ user.fullname }}</p>
                     </a>
                 {% else %}
                     <a href="/search/user/{{ user.id }}" title="{{ user.fullname }}">
-                        {% include 'include/portrait.twig' with {user: user} %}
+                        {% include 'include/portrait.twig' with {user: user} only %}
 
                         <p>{{ user.fullname }}</p>
                     </a>

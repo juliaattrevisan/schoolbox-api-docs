@@ -76,7 +76,7 @@
                             <li class="actions-small-1">
                                 <div class="card small-12">
                                     <a href="/search/user/{{ user.getId }}" title="View Profile">
-                                        {% include 'include/portrait.twig' with {user: user, appendQueryParam: '&cb=' ~ date().timestamp} %}
+                                        {% include 'include/portrait.twig' with {user: user, appendQueryParam: '&cb=' ~ date().timestamp} only %}
                                         <p>{{ user.getFirstName }} {{ user.getLastName }}</p>
                                     </a>
                                     <p class="meta">{{ user.getRole.getName }}</p>

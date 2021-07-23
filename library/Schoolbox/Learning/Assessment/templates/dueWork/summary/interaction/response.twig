@@ -48,7 +48,7 @@
                         {% if url %}
                         <a href="{{ url }}" title="{{ tooltip }}">
                         {% endif %}
-                            {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullname} %}
+                            {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
                             <p>
                                 {% if currentInteraction.isSubmitted %}
                                     {% if currentInteraction.isSubmittedOffline %}

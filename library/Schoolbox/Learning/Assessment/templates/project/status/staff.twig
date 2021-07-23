@@ -210,7 +210,7 @@ Data:
                                     {# cache to prevent repeated traversals #}
                                     {% set publishedHumanReadableMark = participant.humanReadableMark(true) %}
                                     <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
-                                        {% include 'include/portrait.twig' with {user: participant.user, limitWidth: 48} %}
+                                        {% include 'include/portrait.twig' with {user: participant.user, limitWidth: 48} only %}
                                         <p>
                                             {{ participant.user.formatName }}
                                             <span class="pipe meta">

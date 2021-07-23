@@ -10,7 +10,7 @@
             <section>
                 {% for teacher in teachers %}
                     <div class="small-12 card">
-                        {% include 'include/portrait.twig' with {user: teacher, class: 'teacher-image', description: teacher.fullName} %}
+                        {% include 'include/portrait.twig' with {user: teacher, class: 'teacher-image', description: teacher.fullName} only %}
                         <p class="teacher-name">{{ teacher.formatName }}</p>
                     </div>
                 {% endfor %}

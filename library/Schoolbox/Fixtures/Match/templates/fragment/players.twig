@@ -6,7 +6,7 @@
             <li>
                 <div class="card small-12">
                     <a href="/search/user/{{ currentPlayer.user.id }}" title="View Profile">
-                        {% include 'include/portrait.twig' with {user: currentPlayer.user} %}
+                        {% include 'include/portrait.twig' with {user: currentPlayer.user} only %}
                         <p>{{ currentPlayer.user.fullname }}</p>
                     </a>
                     <p class="meta">

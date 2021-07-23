@@ -142,7 +142,7 @@
                     <div class="compact card no-pad small-12">
                         <a href="/search/user/{{ student.id }}" title="View Profile">
                             {% if studentCount < functionDegradeLimit %}
-                                {% include 'include/portrait.twig' with {user: student} %}
+                                {% include 'include/portrait.twig' with {user: student} only %}
                             {% endif %}
                             <p>{{ student.lastname }}, {{ student.firstname }}</p>
                         </a>

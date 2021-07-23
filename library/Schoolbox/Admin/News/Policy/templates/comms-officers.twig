@@ -14,7 +14,7 @@
             <li>
                 <div class="card small-12">
                     <a href="/search/user/{{ officer.id }}" title="View Profile">
-                        {% include 'include/portrait.twig' with {user: officer} %}
+                        {% include 'include/portrait.twig' with {user: officer} only %}
                         <p>{{ officer.fullname }}</p>
                     </a>
                     <p class="meta">{{ officer.role.name }}</p>

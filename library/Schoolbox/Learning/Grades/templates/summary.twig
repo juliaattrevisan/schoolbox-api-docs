@@ -25,7 +25,7 @@
                 <li>
                     <div class="small-12 card">
                         <a href="/search/user/{{ student.id }}" title="View Profile">
-                            {% include 'include/portrait.twig' with {user: student, description: student.fullname} %}
+                            {% include 'include/portrait.twig' with {user: student, description: student.fullName} only %}
                             <p>{{ student.fullName }}</p>
                             <p class="meta">Year {{ student.year ? student.year.name : '' }} Student</p>
                         </a>
@@ -89,7 +89,7 @@
                         <div class="list-item">
                             <div class="compact card small-12">
                                 <a href="/search/user/{{ teacher.id }}" title="">
-                                    {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullname} %}
+                                    {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullName} only %}
                                     <p>{{ teacher.fullName }} <span class="pipe meta">Teacher</span></p>
                                 </a>
                             </div>

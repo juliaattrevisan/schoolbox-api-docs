@@ -233,8 +233,8 @@ Usage:
                                                                 {% include 'include/portrait.twig' with {
                                                                     user: participant.user,
                                                                     render: 'tiny',
-                                                                    description: participant.user.fullname
-                                                                } %}
+                                                                    description: participant.user.fullName
+                                                                } only %}
                                                                 <p>{{ participant.user.fullname }}<span class="pipe meta">{{ selfAssessmentFeedback.publishedAt.short }}</span></p>
                                                             </a>
                                                             {% endif %}

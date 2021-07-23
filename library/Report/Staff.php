@@ -104,9 +104,6 @@ class Report_Staff extends Report_Abstract
             array()
         );
 
-        /**
-         * TODO it looks like STAFF_STAFFID could be better named STAFF_EXTERNALID to avoid confusion
-         */
         if (is_array($allStaff) && count($allStaff)) {
             foreach ($allStaff as $currentStaff) {
                 $this->getPage()->setVar(

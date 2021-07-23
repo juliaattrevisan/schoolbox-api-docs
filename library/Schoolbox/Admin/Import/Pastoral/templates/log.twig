@@ -21,7 +21,7 @@
                             <li>
                                 <div class="list-item">
                                     <div class="card small-12">
-                                        {% include 'include/portrait.twig' with {user: log.creator} %}
+                                        {% include 'include/portrait.twig' with {user: log.creator} only %}
                                         <h3><a href="{{ routeLookup('adminImportPastoral.getLogDetail', {logId: log.importId}) }}" title="View Log">{{ log.creator.fullName }} - {{ log.createdAt.short }}</a></h3>
                                         <p class="meta">Last Message - {{ log.result }}</p>
                                         <p></p>

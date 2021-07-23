@@ -46,7 +46,7 @@
                         <td>
                             <div class="card wrap-down small-12 ">
                                 <a href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: dueWork.id, studentId: participant.id}) }}" title="View Profile">
-                                    {% include 'include/portrait.twig' with {user: participant, description: participant.fullname} %}
+                                    {% include 'include/portrait.twig' with {user: participant, description: participant.fullName} only %}
                                     <p>{{ participant.fullname}}</p>
                                 </a>
                             </div>

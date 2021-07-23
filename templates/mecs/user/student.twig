@@ -29,11 +29,11 @@
                             <div class="card small-12">
                                 {% if contact.main %}
                                     <a href="/search/user/{{ contact.main.getId() }}">
-                                        {% include 'include/portrait.twig' with {user: contact.main} %}
+                                        {% include 'include/portrait.twig' with {user: contact.main} only %}
                                         <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
                                     </a>
                                 {% else %}
-                                    {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} %}
+                                    {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} only %}
                                     <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
                                 {% endif %}
                                 <p class="meta">{{ contact.StudentContactRelation }}</p>

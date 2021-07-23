@@ -158,9 +158,6 @@ class Report_StaffDepartment extends Report_Abstract
                     $userId = -1;
                 }
 
-                /**
-                 * TODO it looks like STAFF_STAFFID and STAFF_EXTERNALID have had their values swapped
-                 */
                 $this->getPage()->setVar([
                     'STAFF_STAFFID'    => Scrub::text($currentStaff['StaffID']),
                     'STAFF_EXTERNALID' => $userId,

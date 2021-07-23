@@ -27,7 +27,7 @@
                         <li>
                             <div class="card small-12">
                                 <a href="{{ routeLookup('learningUpcoming.getUpcomingForStudent', {studentId: child.id, student: child}) }}" title="View upcoming Due Work">
-                                    {% include 'include/portrait.twig' with {user: child, description: 'View upcoming ' ~ locale.assessment.properPlural} %}
+                                    {% include 'include/portrait.twig' with {user: child, description: 'View upcoming ' ~ locale.assessment.properPlural} only %}
                                     <p>{{ child.formatName }}</p>
                                     <p class="meta">{{ child.role.name }}</p>
                                 </a>
@@ -135,7 +135,7 @@
                                         <div class="list-item">
                                             <div class="small-12 card">
                                                 <a href="/search/user/{{ teacher.id }}" title="">
-                                                    {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullname} %}
+                                                    {% include 'include/portrait.twig' with {user: teacher, description: teacher.fullName} only %}
                                                     <p>{{ teacher.formatName }}</p>
                                                 </a>
                                                 <p class="meta">{{ teacher.role.name }}</p>

@@ -1,13 +1,14 @@
-{# usage:
-    - user:             User|false
-    - class:            string
-    - limitHeight:      int
-    - limitWidth:       int
-    - render:           enum [tiny, small, medium, large, menuMobile]
-    - description:      string
-    - appendQueryParam: string
-    - userId:           int
-    - externalId:       int
+{# render a user portrait, but allow the ability to manually specify an userId or externalId
+    usage:
+    - user:             User|false checks for user.id or user.externalId - otherwise false renders a blank avatar
+    - userId:           int allows you to manually specify a preferred userId
+    - externalId:       string allows you to manually specify a preferred externalId
+    - limitHeight:      int constrain the image tag height
+    - limitWidth:       int constrain the image tab width
+    - render:           enum [tiny, small, medium, large, menuMobile] (default is `small`)
+    - description:      string a descriptor used for alt and title attributes
+    - appendQueryParam: string query params you want appended to the image tag
+    - class:            string optional class(es) to apply to the img tag
 #}
 
 {# portrait image tag is composed of... #}
@@ -16,35 +17,47 @@
 {% set userFullname = '' %}
 {% set limitHeight = '' %}
 {% set limitWidth = '' %}
-{% if class is not defined %}
-    {% set class = '' %}
-{% endif %}
-{% if render is not defined %}
-    {% set render = "small" %}
-{% endif %}
-{% if description is not defined %}
-    {% set description = '' %}
-{% endif %}
 {% if appendQueryParam is not defined %}
     {% set appendQueryParam = '' %}
 {% endif %}
 
+{# there is no default class used on the img tag #}
+{% if class is not defined %}
+    {% set class = '' %}
+{% endif %}
+
+{# the default render strategy is 'small' #}
+{% if render is not defined %}
+    {% set render = "small" %}
+{% endif %}
+
+{% if description is not defined %}
+    {% set description = 'View Profile' %}
+{% endif %}
+
 {# prefer to take the userId  from the `user` object #}
 {% if user is defined %}
+
     {# we want to render the default portrait image #}
     {% if user == false %}
         {% set userId = 0 %}
     {% else %}
-        {% set userId = user.id %}
-    {% endif %}
 
-    {# I think this makes more sense   #}
-    {#    {% set userDescription = "View Profile of " ~ user.fullName %}#}
-    {# but this is what we are currently doing #}
-    {% set userDescription = 'View Profile' %}
-{% else %}
-    {% set userDescription = description %}
+        {# we always prefer to use the user.id #}
+        {%  if user.id is not empty %}
+            {% set userId = user.id %}
+        {# but failing that, we should try the user.externalId #}
+        {% elseif user.externalId is not empty %}
+            {% set externalId = user.externalId %}
+        {# and in the worst case, make sure we provide a blank avatar #}
+        {% else %}
+            {% set userId = 0 %}
+        {% endif %}
+
+    {% endif %}
 {% endif %}
+
+{% set userDescription = description %}
 
 {# it's still possible to fallback on an explicit userId or externalId #}
 {% if userId is defined %}
@@ -53,22 +66,9 @@
     {% set userParameter = "userId=" ~ externalId %}
 {%  endif %}
 
-{# TODO make sure this is commented out in production #}
-{% set debugStyling = 'border: dashed 2px mediumvioletred' %}
-
 {# prefer the use a semantic name for the portrait (tiny, small, medium, large, menuMobile)#}
 {# establish small as the default rendering method #}
-{% if render in ['square32'] %}
-    {% set render = 'tiny' %}
-{% elseif render in ['square64'] %}
-    {% set render = 'small' %}
-{% elseif render in ['square72'] %}
-    {% set render = 'menuMobile' %}
-{% elseif render in ['square200'] %}
-    {% set render = 'medium' %}
-{% elseif render in ['portrait'] %}
-    {% set render = 'large' %}
-{% else %}
+{% if render not in ['tiny', 'small', 'medium', 'large', 'menuMobile'] %}
     {% set render = 'small' %}
 {% endif %}
 
@@ -96,10 +96,6 @@
 {% endif %}
 
 <img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
-    {% if debugStyling is not empty %}
-        style="{{ debugStyling }}"
-    {% endif %}
-
     {% if class is not empty %}
         class="{{ class }}"
     {% endif %}

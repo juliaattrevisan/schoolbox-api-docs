@@ -72,7 +72,7 @@
                             <th class="profile-cell">
                                 <div class="compact card no-pad small-12">
                                     <a href="/search/user/{{ student.id }}" title="View Profile">
-                                        {% include 'include/portrait.twig' with {user: student} %}
+                                        {% include 'include/portrait.twig' with {user: student} only %}
                                         <p>{{ student.lastname }}, {{ student.firstname }}</p>
                                     </a>
                                 </div>

@@ -6,7 +6,7 @@
                 <div class="small-12 compact card wrap-down">
                     <div>
                         <a href="/search/user/{{ teamPlayer.id }}">
-                            {% include 'include/portrait.twig' with {user: teamPlayer} %}
+                            {% include 'include/portrait.twig' with {user: teamPlayer} only %}
                         </a>
                         <p><a href="/search/user/{{ teamPlayer.id }}">{{ teamPlayer.fullName }}</a></p>
                         {% if positions[teamPlayer.id] is defined %}

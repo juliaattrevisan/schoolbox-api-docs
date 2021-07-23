@@ -46,7 +46,7 @@ Data:
         <div class="column small-12 medium-6">
             <h2 class="subheader">Student</h2>
             <div class="card small-12">
-                {% include 'include/portrait.twig' with {user: user} %}
+                {% include 'include/portrait.twig' with {user: user} only %}
                 <h3><a href="/search/user/{{ user.id }}">{{ user.fullName }}</a></h3>
                 <p class="meta">{{ user.role.name }}</p>
                 <p class="meta">Unapproved absences: Semester 1 <span class="label neutral">{{ absences[1] }}</span> Semester 2 <span class="label neutral">{{ absences[2] }}</span></p>
@@ -64,7 +64,7 @@ Data:
         <div class="column small-12 medium-6 dean">
             <h2 class="subheader">Dean</h2>
             <div class="card small-12">
-                {% include 'include/portrait.twig' with {user: dean, description: "View Profile"} %}
+                {% include 'include/portrait.twig' with {user: dean} only %}
                 <h3>
                     {%- if dean.id -%}
                         <a href="/search/user/{{ dean.id }}">{{ dean.fullName }}</a>
@@ -78,7 +78,7 @@ Data:
         <div class="column small-12 medium-6 mentor">
             <h2 class="subheader">Student Mentor</h2>
             <div class="card small-12">
-                {% include 'include/portrait.twig' with {user: mentor, description: "View Profile"} %}
+                {% include 'include/portrait.twig' with {user: mentor} only %}
                 <h3>
                     {%- if mentor.id -%}
                         <a href="/search/user/{{ mentor.id }}">{{ mentor.fullName }}</a>

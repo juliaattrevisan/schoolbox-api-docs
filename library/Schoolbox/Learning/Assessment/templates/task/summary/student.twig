@@ -79,7 +79,7 @@ Data:
                         <div class="list-item">
                             <div class="card small-12">
                                 <a href="/search/user/{{ student.id }}" title="View Profile">
-                                    {% include 'include/portrait.twig' with {user: student, description: student.fullName, class: 'hide-for-small-only'} %}
+                                    {% include 'include/portrait.twig' with {user: student, description: student.fullName, class: 'hide-for-small-only'} only %}
                                     <p>{{ student.formatName }}</p>
 
                                     {% if assessment.isImplementation %}
@@ -126,9 +126,9 @@ Data:
                                     <a href="/search/user/{{ mostRecentResponse.submittedBy.id }}" title="View Profile">
                                         {% include 'include/portrait.twig' with {
                                             user: mostRecentResponse.submittedBy,
-                                            description: mostRecentResponse.submittedBy.fullname,
+                                            description: mostRecentResponse.submittedBy.fullName,
                                             class: 'hide-for-small-only'
-                                        } %}
+                                        } only %}
                                         <p>{{ mostRecentResponse.submittedBy.formatName }}</p>
                                         <p class="meta">
                                             marked {% if isViewingOwnSummary %}you{% else %}this task{% endif %} as
