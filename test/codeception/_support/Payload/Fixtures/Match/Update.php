@@ -12,17 +12,17 @@ use Payload\PostTrait;
 class Update extends Request
 {
     use PostTrait;
-    
+
     var $match;
-    
+
     public function __construct(\Schoolbox\Fixtures\Match\Model $match)
     {
         $this->match=$match;
-        
+
         $this->setReferer('/fixtures/matches/' . $this->match->getId() . '/edit' );
-        
+
         $itinerary = $this->match->getItinerary();
-        
+
         $this->setFormParam('divisionId', $this->match->getDivision()->getId());
         $this->setFormParam('matchId', $this->match->getId());
         $this->setFormParam('seasonId', $this->match->getSeason()->getId());
@@ -36,9 +36,9 @@ class Update extends Request
         $this->setFormParam('itinerary[date][0]', $itinerary->first()->getStartAt());
         $this->setFormParam('itinerary[description][0]', $itinerary->first()->getDescription());
         $this->setFormParam('notes', $this->match->getNotes());
-        
+
     }
-    
+
     public function getUrl():string
     {
         return '/fixtures/matches/' . $this->match->getId();
