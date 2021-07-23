@@ -80,12 +80,19 @@
 
                 onUploaded: function( upload ) {
                     // Width and height could be returned by server (https://dev.ckeditor.com/ticket/13519).
-                    var $img = this.parts.img.$,
+                    let $img = this.parts.img.$,
                         width = upload.responseData.width || $img.naturalWidth,
                         height = upload.responseData.height || $img.naturalHeight;
 
                     // Set width and height to prevent blinking.
+                    // Also set data vars to ensure that Schoolbox knows how to render this file later.
                     this.replaceWith( '<img src="' + upload.url + '" ' +
+                        'data-schoolboxresource-type="image" ' +
+                        'data-schoolboxresource-filesystem="' + upload.filesystem + '" ' +
+                        'data-schoolboxresource-thumbnail="' + upload.url + '" ' +
+                        'data-schoolboxresource-source="' + upload.url + '" ' +
+                        'data-schoolboxresource-width="' + width + '" ' +
+                        'data-schoolboxresource-height="' + height + '" ' +
                         'width="' + width + '" ' +
                         'height="' + height + '">' );
                 }

@@ -128,10 +128,11 @@
             // File paste upload
             uploadUrl: '/storage/asyncUpload.php',
             fileUploadResponse: function (event) {
-                let response        = JSON.parse(event.data.fileLoader.xhr.responseText);
-                event.data.message  = response.message;
-                event.data.uploaded = 1;
-                event.data.url      = response.meta.file._links.fetch;
+                let response          = JSON.parse(event.data.fileLoader.xhr.responseText);
+                event.data.message    = response.message;
+                event.data.uploaded   = 1;
+                event.data.url        = response.meta.file._links.image;
+                event.data.filesystem = response.hash.split(':')[0];
                 event.stop();
             },
         };
