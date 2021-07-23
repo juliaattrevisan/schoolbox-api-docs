@@ -74,7 +74,7 @@
                     //can be called either on upload from modal window (as a group of files) or straight drag and drop (as per file)
                     $attachzone.on('success.attachzone', function (event, fileData) {
                         if (fileData.data && fileData.data.length > 0) { //coming from modal window upload
-                            const successfullyUploadedFiles = fileData.data.filter((file) => file.status === 'success'); //don't add in files that have failed...
+                            const successfullyUploadedFiles = fileData.data.filter((file) => file.status !== 'error'); //don't add in files that have failed...
                             if (successfullyUploadedFiles.length > 0) { //only if there's files to add
                                 addFilesFromModalWindowUpload(successfullyUploadedFiles);
                                 updateFileTree();
