@@ -109,6 +109,8 @@
                         this.editor.insertHtml('<p>&nbsp;</p>');
                         editor.getSelection().selectElement(currentSelection);
                     }
+                    editor.fire('change');
+                    editor.fire('saveSnapshot');
                 }
             } );
 
