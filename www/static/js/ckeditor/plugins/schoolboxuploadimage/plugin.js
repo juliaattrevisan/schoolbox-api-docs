@@ -1,4 +1,10 @@
 /**
+ * Copy-paste of the [uploadImage](https://ckeditor.com/cke4/addon/uploadimage)
+ * plugin, required as that plugin doesn't allow customisation of the onUploaded
+ * event to the degree that Schoolbox requires.
+ *
+ * The only change in this plugin is to that onUploaded event.
+ *
  * @license Copyright (c) 2003-2021, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
  */
