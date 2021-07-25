@@ -34,13 +34,14 @@
     quickload: false,
 } only %}
 
+{% set createFormRoute = routeLookupIfAuthorized('learningBadge.getCreateForm') ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null %}
 <div class="row">
     <div class="small-12 island">
         <div id="{{ reportContentId }}">
             <badge-list get-badges-route="{{ routeLookup('learningBadge.getBadgeJsonList') }}"
-                        get-badge-create-form-route="{{ routeLookupIfAuthorized('learningBadge.getCreateForm')
-                        ? routeLookupIfAuthorized('learningBadge.getCreateForm')~'?'~RETURN_URL.name~'='~RETURN_URL.current : null }}"
-                        expiry-date-format="{{ config.date_long | momentJsFormat }}">
+                        get-badge-create-form-route="{{ createFormRoute }}"
+                        expiry-date-format="{{ config.date_long | momentJsFormat }}"
+                        :show-badge-menus={{ createFormRoute is null ? 'false' : 'true' }}>
             </badge-list>
         </div>
         <script src="{{ CDN_PREFIX }}/js/bundle/badgeList.js"></script>
