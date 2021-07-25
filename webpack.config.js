@@ -199,6 +199,9 @@ module.exports = {
         // Class List
         classList: './library/Schoolbox/Learning/vue/init-class-list.js',
 
+        // Google Files
+        googleFiles: './library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js',
+
         //Sass
         chromeFoundation: './www/static/css/foundation/chrome-foundation.scss',
         editor: './www/static/css/foundation/editor.scss',
