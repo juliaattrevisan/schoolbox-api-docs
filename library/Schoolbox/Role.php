@@ -117,18 +117,30 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     public const PERMISSION_ACCESS_EVIDENCE       = 'accessEvidence';
     public const PERMISSION_VIEW_PARENT_DIRECTORY = 'viewParentDirectory';
     public const PERMISSION_VIEW_STAFF_DIRECTORY  = 'viewStaffDirectory';
+    public const PERMISSION_CHANGE_PASSWORD       = 'canChangePassword';
 
     public const VALID_PERMISSIONS = [
-        self::PERMISSION_VIEW_STUDENT_PROFILE,
-        self::PERMISSION_VIEW_STUDENT_GRADES,
-        self::PERMISSION_VIEW_STUDENT_CALENDAR,
-        self::PERMISSION_VIEW_PARENT_PROFILE,
-        self::PERMISSION_ACCESS_EPORTFOLIO,
-        self::PERMISSION_ACCESS_PASTORAL,
-        self::PERMISSION_CREATE_BADGES,
-        self::PERMISSION_ACCESS_EVIDENCE,
-        self::PERMISSION_VIEW_PARENT_DIRECTORY,
-        self::PERMISSION_VIEW_STAFF_DIRECTORY,
+        self::STAFF   => [
+            self::PERMISSION_CHANGE_PASSWORD,
+            self::PERMISSION_VIEW_STUDENT_PROFILE,
+            self::PERMISSION_VIEW_STUDENT_GRADES,
+            self::PERMISSION_VIEW_STUDENT_CALENDAR,
+            self::PERMISSION_VIEW_PARENT_PROFILE,
+            self::PERMISSION_ACCESS_EPORTFOLIO,
+            self::PERMISSION_ACCESS_PASTORAL,
+            self::PERMISSION_CREATE_BADGES,
+            self::PERMISSION_ACCESS_EVIDENCE,
+            self::PERMISSION_VIEW_PARENT_DIRECTORY,
+            self::PERMISSION_VIEW_STAFF_DIRECTORY,
+        ],
+        self::STUDENT => [
+            self::PERMISSION_CHANGE_PASSWORD,
+        ],
+        self::PARENT  => [
+            self::PERMISSION_CHANGE_PASSWORD,
+        ],
+        self::GUEST   => [
+        ],
     ];
 
     /**

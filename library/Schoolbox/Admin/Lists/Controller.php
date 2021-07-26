@@ -401,7 +401,7 @@ class Controller extends Base
                         'mandatory' => true,
                     ],
                     'accessEvidence' => [
-                        'caption'   => 'Learning Moment',
+                        'caption'   => 'Learning Moments',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,
