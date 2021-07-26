@@ -92,9 +92,9 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
      * What's the digest schedule for this group?
      * self::DIGEST_NEVER or a cron schedule
      *
-     * @var string|null
+     * @var string
      */
-    protected ?string $digestSchedule;
+    protected string $digestSchedule = self::DIGEST_NEVER;
 
     /**
      * Role Types

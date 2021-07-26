@@ -334,16 +334,13 @@ class Controller extends Base
                 'deleteWarning'     => 'WARNING! Deleting users roles can have a serious impact on your system and may prevent access to various users/records throughout the system- please consult Schoolbox helpdesk if you require more information. Are you sure you want to delete this role?',
                 'deleteFailMsg'     => 'You cannot delete a role that still has non-deleted users with that role',
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
-                //'findAllMethod'     => 'findAllIncludeHidden',                // By default it uses the findAll() method of the mapper- however you can override this. Necessary for 'components' page where findAll is overridden to not return items with 'visible = false'
-                'fixed'             => [                                        // This is a list of fixed values added to new items, useful if there are hidden items that need default values
-                    'digestSchedule' => '0'                                     // (e.g. Digest schedule cannot be null, so is hardcoded to 0 for new records)
-                ],
                 'fields'            => [                                        // This is a list of all of the updateable fields
                     'name'          => [
                         'caption'   => 'Name',                                  // Friendly caption that is displayed
                         'width'     => 2,                                       // Width of the column on anything bigger than 'small'
                         'maxLength' => 50,
                         'mandatory' => true,                                    // Set this true to avoid empty value for a text field.
+                        'default'   => '',
                     ],
                     'type' => [
                         'caption'   => 'Role Type',
@@ -352,81 +349,91 @@ class Controller extends Base
                         'mandatory' => true,                                    // Set this true to remove an empty option from a drop down field.
                     ],
                     'permissions' => [
-                        'caption'      => 'Permissions',
-                        'key'          => 'permissions',
-                        'width'        => 8,
-                        'tooltip'      => 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.',
-                        'mandatory'    => true,
-                        'isPopoutList' => true,
+                        'caption'             => 'Permissions',
+                        'key'                 => 'permissions',
+                        'width'               => 8,
+                        'tooltip'             => 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.',
+                        'mandatory'           => true,
+                        'isPopOutList'        => true,
+                        'changePopOut'        => 'type',
+                        'changePopOutOptions' => Role::VALID_PERMISSIONS,
                     ],
                     'canChangePassword' => [
-                        'caption'   => 'Allow Password Change',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'Allow Password Change',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'viewStudentProfile' => [
-                        'caption'   => 'View Student Profile',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'View Student Profile',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'viewStudentGrades' => [
-                        'caption'   => 'View Student Grades',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'View Student Grades',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'viewStudentCalendar' => [
-                        'caption'   => 'View Student Calendar',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'View Student Calendar',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'viewParentProfile' => [
-                        'caption'   => 'View Parent Profile',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'View Parent Profile',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'accessEportfolio' => [
-                        'caption'   => 'Access Eportfolio',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'Access Eportfolio',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'accessPastoral' => [
-                        'caption'   => 'Access Pastoral',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'Access Pastoral',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'createBadges' => [
-                        'caption'   => 'Create Badges',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'Create Badges',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'accessEvidence' => [
-                        'caption'   => 'Learning Moments',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'Learning Moments',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'viewParentDirectory' => [
-                        'caption'   => 'View Parent Directory',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
+                        'caption'    => 'View Parent Directory',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                     'viewStaffDirectory' => [
-                        'caption'   => 'View Staff Directory',
-                        'checkbox'  => true,
-                        'mandatory' => true,
-                        'popoutList' => 'Permissions',
-                    ],
-                    'validPermissions' => [
-                        'caption'   => 'validPermissions',
+                        'caption'    => 'View Staff Directory',
+                        'checkbox'   => true,
+                        'mandatory'  => true,
+                        'default'    => false,
+                        'popOutList' => 'Permissions',
                     ],
                 ]
             ],
@@ -440,6 +447,7 @@ class Controller extends Base
                         'width'     => 12,
                         'maxLength' => 50,
                         'mandatory' => true,
+                        'default'   => '',
                     ]
                 ]
             ],
@@ -453,6 +461,7 @@ class Controller extends Base
                         'width'     => 12,
                         'maxLength' => 255,
                         'mandatory' => true,
+                        'default'   => '',
                     ]
                 ]
             ],
@@ -465,21 +474,25 @@ class Controller extends Base
                         'caption'   => 'Base URI',
                         'width'     => 3,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'path'          => [
                         'caption'   => 'Path',
                         'width'     => 3,
                         'tooltip'   => 'The path underneath the base URI. Available tokens are {:yearlevel}, {:calendaryear}, {:graduationyear7}, {:graduationyear12}, {:graduationyeartwodigit7}, {:graduationyeartwodigit12}, {:startyear7}, {:startyear12} and {:username}.',
+                        'default'   => '',
                     ],
                     'usernamePrefix' => [
-                        'tooltip'   => 'String will be placed infront of username when authenticating, commonly a domain string like "domain/"',
+                        'tooltip'   => 'String will be placed in front of username when authenticating, commonly a domain string like "domain/"',
                         'caption'   => 'User Prefix',
                         'width'     => 1,
+                        'default'   => '',
                     ],
                     'usernameSuffix' => [
                         'tooltip'   => 'String will be placed at the end of username when authenticating, commonly a domain string like "@domain.edu"',
                         'caption'   => 'User Suffix',
                         'width'     => 1,
+                        'default'   => '',
                     ],
                     'campus'        => [
                         'caption'   => 'Campus',
@@ -531,6 +544,7 @@ class Controller extends Base
                         'width'     => 5,
                         'maxLength' => 255,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'extTimetableCode' => [
                         'caption'   => 'External Timetable Code',
@@ -543,6 +557,7 @@ class Controller extends Base
                     'timetableDay'  => [
                         'caption'   => 'Timetable Days',
                         'width'     => 2,
+                        'default'   => '',
                     ]
                 ]
             ],
@@ -556,11 +571,13 @@ class Controller extends Base
                         'width'     => 10,
                         'maxLength' => 100,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'color'         => [
                         'caption'   => 'Event Colour',
                         'colour'    => true,
                         'width'     => 2,
+                        'default'   => '',
                     ]
                 ]
             ],
@@ -574,6 +591,7 @@ class Controller extends Base
                         'width'     => 12,
                         'maxLength' => 150,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                 ]
             ],
@@ -588,6 +606,7 @@ class Controller extends Base
                         'checkbox'  =>  true,
                         'width'     => 1,
                         'mandatory' => true,
+                        'default'   => false,
                     ],
                     'staffOrInstructorVisibleOnly' => [
                         'caption'   => 'Visible to Staff & Instructors only',
@@ -595,16 +614,19 @@ class Controller extends Base
                         'checkbox'  => true,
                         'width'     => 2,
                         'mandatory' => true,
+                        'default'   => false,
                     ],
                     'name'          => [
                         'caption'   => 'Name',
                         'width'     => 6,
                         'maxLength' => 40,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'externalResultType' => [
                         'caption'   => 'External SIS Type',
                         'width'     => 3,
+                        'default'   => '',
                     ]
                 ]
             ],
@@ -617,17 +639,20 @@ class Controller extends Base
                         'caption'   => 'Code',
                         'width'     => 2,
                         'maxLength' => 4,
+                        'default'   => '',
                     ],
                     'displayAs'     => [
                         'caption'   => 'Display Name',
                         'width'     => 8,
                         'maxLength' => 16,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'normaliseAs'   => [
                         'caption'   => 'Normalised Mark',
                         'nullable'  => true,
                         'width'     => 2,
+                        'default'   => '',
                     ],
                 ]
             ],
@@ -674,7 +699,8 @@ class Controller extends Base
                     'hexColour'    => [
                         'caption'   => 'Event Colours',
                         'colour'    => true,
-                        'width'     => 12
+                        'width'     => 12,
+                        'default'   => '',
                     ],
                 ]
             ],
@@ -689,6 +715,7 @@ class Controller extends Base
                         'width'     => 6,
                         'maxLength' => 100,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'documentClassification' => [
                         'getter'    => 'getDocumentClassification',
@@ -730,6 +757,7 @@ class Controller extends Base
                         'mandatory' => true,
                         'width'     => 8,
                         'maxLength' => 100,
+                        'default'   => '',
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
@@ -752,6 +780,7 @@ class Controller extends Base
                         'width'     => 10,
                         'maxLength' => 100,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'externalCode' => [
                         'caption'   => 'SIS Code',
@@ -790,6 +819,7 @@ class Controller extends Base
                         'width' => 8,
                         'maxLength' => 100,
                         'mandatory' => true,
+                        'default'   => '',
                     ],
                     'dashboard' => [
                         'caption' => 'Show On Pastoral Dashboard',
@@ -813,10 +843,11 @@ class Controller extends Base
             'deleteWarning' => 'Deleting pastoral tags may affect existing reports. Are you sure?',
             'fields' => [
                 'name' => [
-                    'caption' => 'Name',
-                    'width' => 12,
+                    'caption'   => 'Name',
+                    'width'     => 12,
                     'maxLength' => 100,
                     'mandatory' => true,
+                    'default'   => '',
                 ],
             ]
         ];
@@ -840,6 +871,7 @@ class Controller extends Base
                     'width'     => 1,
                     'maxLength' => 150,
                     'mandatory' => true,
+                    'default'   => '',
                 ],
                 'overallGrade'             => [
                     'caption'   => 'Overall Grade',
@@ -854,12 +886,14 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 'displayGradePage'         => [
                     'caption'   => 'Display Grade Page',
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 // Class Results, display_assessment_grade (global config: display_grade_graph)
                 'displayAssessmentGrade'  => [
@@ -868,6 +902,7 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 // Learning Levels tab, display_rubric_grade (global config: enable_grades_criteria)
                 'displayRubricGrade'      => [
@@ -876,6 +911,7 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 // Capability Marks tab, display_capability_grade (global config: grade_capability_display)
                 'displayCapabilityGrade'  => [
@@ -884,6 +920,7 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 // Progression tab, display_progression_grade (global config: grade_progression_display)
                 'displayProgressionGrade' => [
@@ -892,6 +929,7 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 'showRubricPoints' => [
                     'caption'   => 'Show Points on Rubrics',
@@ -899,6 +937,7 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 'lmsCohortComparison' => [
                     'caption'   => 'Enable Cohort Comparison',
@@ -906,6 +945,7 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
                 'learningMomentsEnabled' => [
                     'caption'   => 'Learning Moments Enabled',
@@ -913,6 +953,7 @@ class Controller extends Base
                     'checkbox'  => true,
                     'width'     => 1,
                     'mandatory' => true,
+                    'default'   => false,
                 ],
             ],
         ];
@@ -928,6 +969,7 @@ class Controller extends Base
                     'width'     => 12,
                     'maxLength' => 60,
                     'mandatory' => true,
+                    'default'   => '',
                 ],
             ]
         ];
@@ -942,6 +984,7 @@ class Controller extends Base
                     'width'     => 12,
                     'maxLength' => 60,
                     'mandatory' => true,
+                    'default'   => '',
                 ],
             ]
         ];
@@ -956,6 +999,7 @@ class Controller extends Base
                     'width'     => 12,
                     'maxLength' => 20,
                     'mandatory' => true,
+                    'default'   => '',
                 ],
             ]
         ];
@@ -1113,9 +1157,7 @@ class Controller extends Base
                         'deleteRoute'   => $this->router->generate('adminLists.postDelete'),
                         'deleteWarning' => $currentTable['deleteWarning'] ?? '',
                         'fields'        => $currentTable['fields'] ? $this->reformatForJson($currentTable['fields'], false) : [],
-                        'fixed'         => $currentTable['fixed'] ?? [],
                         'isSortable'    => $currentTable['sortable'] ?? false,
-                        'mapper'        => $currentTable['mapper'] ?? '',
                         'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
                         'rows'          => $this->reformatForJson($records, true),
                         'saveRoute'     => $this->router->generate('adminLists.postSave'),
