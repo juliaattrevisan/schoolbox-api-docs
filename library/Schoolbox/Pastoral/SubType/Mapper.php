@@ -31,6 +31,8 @@ class Mapper extends BaseMapper
         $this->joins('pastoral_type_id', PastoralTypeMapper::class, 'id', null, null, 'pastoralType', 'pastoralType');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('template', self::TYPE_STRING);
+        $this->uses('color', self::TYPE_COLOR);
+        $this->uses('icon', self::TYPE_STRING);
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('visibility_locked', self::TYPE_BOOLEAN);
         $this->uses('sequence', self::TYPE_INTEGER);
