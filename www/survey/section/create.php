@@ -33,7 +33,16 @@ if (!empty($_POST)) {
     /* Create new Section
      */
     $sectionHandler = new Survey_Section();
-    $section_id = $sectionHandler->create($_POST);
+
+    $section = [
+        'assess_id' => (int)$_POST['assess_id'],
+        'section_id' => (int)$_POST['section_id'],
+        'title'     => $_POST['title'],
+        'sequence'  => (int)$_POST['sequence'],
+        'description'   => $_POST['description'],
+    ];
+
+    $section_id = $sectionHandler->create($section);
 
     /* Redirect to question creation for this section
      */

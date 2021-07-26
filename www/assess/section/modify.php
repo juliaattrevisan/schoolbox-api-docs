@@ -37,11 +37,11 @@ if (!empty($_POST)) {
     $sectionHandler = new Assess_Section();
 
     $sectionHandler->update(array(
-        'assess_id' => $_POST['assess_id'],
-        'section_id' => $_POST['section_id'],
-        'sequence' => $_POST['sequence'],
+        'assess_id' => (int)$_POST['assess_id'],
+        'section_id' => (int)$_POST['section_id'],
+        'sequence' => (int)$_POST['sequence'],
         'title' => $_POST['title'],
-        'random' => (int)$_POST['random'],
+        'random'    => $_POST['random'] ? 1 : 0,
         'pool' => (int)$_POST['pool'],
         'description' => $_POST['description'],
     ));

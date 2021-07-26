@@ -38,12 +38,17 @@ if (!empty($_POST)) {
 
     $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
-    // Have to unset the returnUrl from the POST array, otherwise it tries to shove it in the SQL query when creating
-    // the section
+    $section = [
+        'assess_id' => (int)$_POST['assess_id'],
+        'section_id' => (int)$_POST['section_id'],
+        'sequence'  => (int)$_POST['sequence'],
+        'title'     => $_POST['title'],
+        'random'    => $_POST['random'] ? 1 : 0,
+        'pool'      => (int)$_POST['pool'],
+        'description'   => $_POST['description'],
+    ];
 
-    unset($_POST[Redirect::RETURN_URL]);
-
-    $section_id = $sectionHandler->create($_POST);
+    $section_id = $sectionHandler->create($section);
 
     /* Redirect to question creation for this section
      */
