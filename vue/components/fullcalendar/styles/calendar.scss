@@ -1,5 +1,6 @@
 @import "www/static/css/foundation/utils/colors";
 @import "www/static/css/foundation/utils/variables";
+@import "www/static/css/foundation/_settings";
 
 .fc {
     .fc-button {
@@ -34,6 +35,10 @@
     .fc-list-event-time { 
         min-width: 150px;
         max-width: 150px;
+        @media #{$small-only} {
+            min-width: unset;
+            max-width: unset;
+        }
     }
     .fc-list-event-title {
         width: 100%;
