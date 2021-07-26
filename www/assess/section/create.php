@@ -39,13 +39,12 @@ if (!empty($_POST)) {
     $returnUrl = $_POST[Redirect::RETURN_URL] != '' ? "?" . Redirect::RETURN_URL . "={$_POST[Redirect::RETURN_URL]}" : "";
 
     $section = [
-        'assess_id' => (int)$_POST['assess_id'],
-        'section_id' => (int)$_POST['section_id'],
-        'sequence'  => (int)$_POST['sequence'],
-        'title'     => $_POST['title'],
-        'random'    => $_POST['random'] ? 1 : 0,
-        'pool'      => (int)$_POST['pool'],
-        'description'   => $_POST['description'],
+        'assess_id'   => (int)$_POST['assess_id'],
+        'sequence'    => (int)$_POST['sequence'],
+        'title'       => $_POST['title'],
+        'random'      => $_POST['random'] ? 1 : 0,
+        'pool'        => (int)$_POST['pool'],
+        'description' => $_POST['description'],
     ];
 
     $section_id = $sectionHandler->create($section);

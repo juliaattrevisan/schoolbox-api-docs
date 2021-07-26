@@ -33,10 +33,10 @@ if (!empty($_POST)) {
     $sectionHandler = new Survey_Section();
 
     $sectionHandler->update(array(
-        'assess_id' => (int)$_POST['assess_id'],
-        'section_id' => (int)$_POST['section_id'],
-        'sequence' => $_POST['sequence'],
-        'title' => $_POST['title'],
+        'assess_id'   => (int)$_POST['assess_id'],
+        'section_id'  => (int)$_POST['section_id'],
+        'title'       => $_POST['title'],
+        'sequence'    => (int)$_POST['sequence'],
         'description' => $_POST['description'],
     ));
 

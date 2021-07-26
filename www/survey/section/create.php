@@ -35,11 +35,10 @@ if (!empty($_POST)) {
     $sectionHandler = new Survey_Section();
 
     $section = [
-        'assess_id' => (int)$_POST['assess_id'],
-        'section_id' => (int)$_POST['section_id'],
-        'title'     => $_POST['title'],
-        'sequence'  => (int)$_POST['sequence'],
-        'description'   => $_POST['description'],
+        'assess_id'   => (int)$_POST['assess_id'],
+        'title'       => $_POST['title'],
+        'sequence'    => (int)$_POST['sequence'],
+        'description' => $_POST['description'],
     ];
 
     $section_id = $sectionHandler->create($section);
