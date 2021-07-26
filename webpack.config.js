@@ -127,7 +127,7 @@ module.exports = {
             './node_modules/lodash/lodash.js',
 
             // MS Immersive Reader
-            './node_modules/@microsoft/immersive-reader-sdk/lib/immersive-reader-sdk.js',
+            './www/static/js/immersive-reader.js',
 
             './www/static/js/calendar/jquery.getExportCalendarLink.js'
         ],
