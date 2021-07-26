@@ -57,6 +57,9 @@ try {
 
     $fileSystem = $storageModel->getFilesystem();
 
+    $portrait  = new Image\Transformation\Portrait();
+    $cacheKey  = (isset($_GET['size'])) ? $portrait->getCacheKey($_GET['size']) : null;
+
     if (
         $fileSystem instanceof Filesystem &&
         $fileSystem->getAdapter() instanceof S3Adapter &&
@@ -65,7 +68,7 @@ try {
         $preSignedUrlService = new PreSignedUrlService($config);
 
         $portraitPath = $storageModel->getPath();
-        $size = $_GET['size'] ?? null;
+        $size = $cacheKey ?? null;
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storageModel,
@@ -76,12 +79,9 @@ try {
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $portrait  = new Image\Transformation\Portrait();
-    $transform = $portrait->retrieve($_GET['size']);
-    $cacheKey  = $portrait->getCacheKey($_GET['size']);
-    $image     = new Image\Processor($storageModel, $cacheKey, $transform);
-
+    $image = new Image\Processor($storageModel, $cacheKey, $portrait->retrieve($_GET['size']));
     $image->load()->stream();
+
 } catch (ConcurrentTransformationException $e) {
     // This transformation is already being processed.
     $kernel->outputResourceBeingProcessedHeader();

@@ -99,7 +99,6 @@ class PreSignedUrlService
 
         $transformType = (strpos($itemPath, '-') !== false) ? substr($itemPath, strpos($itemPath, '-') + 1) : null;
 
-
         if ($transformType && $transformType === 'transcode') {
             return $this->fileExistsInVideoQueue($hash);
         }
