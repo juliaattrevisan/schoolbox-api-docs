@@ -103,6 +103,7 @@ class Controller extends Base
         $cursor          = new Cursor(
             $this->database,
             $user,
+            $this->getUser(),
             null,
             self::FEED_ITEMS_PER_PAGE,
             $this->getConfigLoader(),

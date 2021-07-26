@@ -40,7 +40,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
+                    new Rule\HasRole(Role::STAFF),
                     new Rule\IsUserOrParentOfUser(
                         $this->getExternalUser(),
                         UserMapper::getInstance(),
