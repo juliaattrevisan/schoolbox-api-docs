@@ -1220,7 +1220,6 @@ class Controller extends Base
                         'noNewRecords'  => $currentTable['noNewRecords'] ?? false,
                         'rows'          => $this->reformatForJson($records, true),
                         'saveRoute'     => $this->router->generate('adminLists.postSave'),
-                        'tableName'     => $currentTable['name'],
                         'title'         => $currentTable['title'],
                     ]
                 )
