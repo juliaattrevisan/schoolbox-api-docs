@@ -16,7 +16,7 @@
                     {% endif %}
                     {% for type in types %}
                         <option {% if type.id == record.type.id ?? '' %}selected{% endif %}
-                                value="{{ type.id }}">{{ type.name }}</option>
+                                value="{{ type.id }}" data-visibility-locked="{{ type.visibilityLocked }}">{{ type.name }}</option>
                     {% endfor %}
                 </select>
         </div>
@@ -30,7 +30,9 @@
                                 value="{{ record.subtype.id }}">{{ record.subtype.name }} (deleted)</option>
                     {% endif %}
                     {% for subtype in subTypes %}
-                        <option data-chained="{{ subtype.pastoralType.id }}" class="{{ subtype.pastoralType.id }}" {% if subtype.id == record.subtype.id ?? '' %}selected{% endif %} value="{{ subtype.id }}">{{ subtype.name }}</option>
+                        <option data-chained="{{ subtype.pastoralType.id }}" class="{{ subtype.pastoralType.id }}"
+                                {% if subtype.id == record.subtype.id ?? '' %}selected{% endif %} value="{{ subtype.id }}"
+                                data-visibility-locked="{{ subtype.visibilityLocked }}">{{ subtype.name }}</option>
                     {% endfor %}
                 </select> </label>
         </div>

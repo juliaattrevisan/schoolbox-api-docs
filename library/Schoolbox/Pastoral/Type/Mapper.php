@@ -34,6 +34,7 @@ class Mapper extends BaseMapper
         $this->uses('name', self::TYPE_STRING);
         $this->uses('template', self::TYPE_STRING);
         $this->uses('external_code', self::TYPE_STRING);
+        $this->uses('visibility_locked', self::TYPE_BOOLEAN);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

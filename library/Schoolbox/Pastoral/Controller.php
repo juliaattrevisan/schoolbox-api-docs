@@ -549,7 +549,16 @@ class Controller extends Base
             }
         }
 
-        $audienceDefaults = $this->audienceMapper->findAll();
+        $audiences        = $this->audienceMapper->findAll();
+        $typeAudiences    = [];
+        $subtypeAudiences = [];
+        foreach ($audiences as $audience) {
+            if ($audience->getSubtype()) {
+                $subtypeAudiences[$audience->getSubtype()->getId()][] = $audience;
+            } else {
+                $typeAudiences[$audience->getType()->getId()][] = $audience;
+            }
+        }
 
         // When student ids are provided to copy this record to, prefill Create duplicate record field.
         $duplicateIds = explode(',', $this->request->query->get('duplicates') ?? '');
@@ -575,15 +584,30 @@ class Controller extends Base
         $subtypes = $this->pastoralSubTypeMapper->findAll();
 
         $typesIndex = [];
+        $audienceDefaults = [];
 
         foreach ($types as $type) {
             $typesIndex[$type->getId()] = $type->getTemplate();
+            if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
+                $audienceDefaults[] = [
+                    'typeId'    => $type->getId(),
+                    'subtypeId' => 0,
+                    'audiences' => $typeAudiences[$type->getId()] ?? [],
+                ];
+            }
         }
 
         $subtypesIndex = [];
 
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
+            if (key_exists($subtype->getId(), $typeAudiences) || $subtype->getVisibilityLocked()) {
+                $audienceDefaults[] = [
+                    'typeId'    => $subtype->getPastoralType()->getId(),
+                    'subtypeId' => $subtype->getId(),
+                    'audiences' => $subtypeAudiences[$subtype->getId()] ?? [],
+                ];
+            }
         }
 
         // Render this thing out
@@ -945,6 +969,7 @@ class Controller extends Base
                 $subtype = null;
             }
         }
+        $visibilityLocked = $subtype ? $subtype->getVisibilityLocked() : $type->getVisibilityLocked();
 
         // Prepare Severity. No database change.
         $severity = null;

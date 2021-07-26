@@ -3,6 +3,7 @@
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
 {% if roles | length > 0 %}
+    {% set visibilityLocked = visibilityLocked and not managePage %}
 
     <tbody id="permission-roles">
 
@@ -30,21 +31,21 @@
                     </td>
                     <td class="small-2">
                         <input type="radio" name="role[{{ userAccess.role.id }}]" id="roleDeny{{ userAccess.role.id }}"
-                               value="0" {{ checkedDeny }}>
+                               value="0" {{ checkedDeny }} {% if visibilityLocked %}readonly{% endif %}>
                         <label class="radio-label" for="roleDeny{{ userAccess.role.id }}"></label>
                     </td>
                     <td class="small-2">
                         <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePublic{{ userAccess.role.id }}"
-                               value="1" {{ checkedPublic }}>
+                               value="1" {{ checkedPublic }} {% if visibilityLocked %}readonly{% endif %}>
                         <label class="radio-label" for="rolePublic{{ userAccess.role.id }}"></label>
                     </td>
                     <td class="small-2">
                         <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePrivate{{ userAccess.role.id }}"
-                               value="2" {{ checkedPrivate }}>
+                               value="2" {{ checkedPrivate }} {% if visibilityLocked %}readonly{% endif %}>
                         <label class="radio-label" for="rolePrivate{{ userAccess.role.id }}"></label>
                     </td>
                     <td class="text-right small-1">
-                        <a href="#" data-delete-visibility="role" class="icon-delete"></a>
+                        <a href="#" data-delete-visibility="role" class="icon-delete {% if visibilityLocked %}hide{% endif %}"></a>
                     </td>
                 </tr>
             {% endfor %}
@@ -167,7 +168,7 @@
 
             {# Add role to table #}
 
-            window.addRole = function(roleId, roleName, permission) {
+            window.addRole = function(roleId, roleName, permission, locked) {
 
                 // this line will check if the argument is undefined
                 // if so set it to 1, otherwise set it to it's original value
@@ -176,7 +177,8 @@
                 if (window.rolesAdded.indexOf(roleId) === -1) {
                     $('#empty-roles').remove();
 
-                    html = $('[data-role-permission-clone]').html()
+                    let html = $('[data-role-permission-clone]').html()
+                        .replace(/{TYPE_NAME}/g, 'Role')
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
 
@@ -188,6 +190,7 @@
                     //Check the correct box
                     var selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
                     $(permissionListRoles).find(selector).attr("checked", "checked");
+                    applyLock(['roles'], locked);
                 }
 
                 $(this).addClass('hide');

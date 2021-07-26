@@ -45,10 +45,15 @@ class Model implements ISoftDeletable, Sequential
     /** @var GenericCollection|Pastoral\SubType\Model[] */
     private $subTypes;
 
+    /**
+     * Visibility locked
+     * Defaults to false, when created from the admin page.
+     */
+    private bool $visibilityLocked = false;
+
 
     public function __construct()
     {
-        /** @noinspection PhpUnhandledExceptionInspection */
         $this->subTypes = new GenericCollection(Pastoral\SubType\Model::class);
     }
 
@@ -151,6 +156,24 @@ class Model implements ISoftDeletable, Sequential
     public function setTemplate(?string $template): self
     {
         $this->template = $template;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVisibilityLocked(): bool
+    {
+        return $this->visibilityLocked;
+    }
+
+    /**
+     * @param bool $visibilityLocked
+     * @return static
+     */
+    public function setVisibilityLocked(bool $visibilityLocked): self
+    {
+        $this->visibilityLocked = $visibilityLocked;
         return $this;
     }
 }

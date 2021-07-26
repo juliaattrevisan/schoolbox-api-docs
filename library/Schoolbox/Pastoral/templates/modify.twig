@@ -6,9 +6,11 @@
 {% if record.id %}
     {% set saveRoute = routeLookup('pastoral.postRecordUpdate', {recordId: record.id}) %}
     {% set pageTitle = 'Update ' ~ locale.pastoral.proper ~ ' Record' %}
+    {% set visibilityLocked = record.subtype ? record.subtype.visibilityLocked : record.type.visibilityLocked %}
 {% else %}
     {% set saveRoute = routeLookup('pastoral.postRecordInsert') %}
     {% set pageTitle = 'Add ' ~ locale.pastoral.proper ~ ' Record' %}
+    {% set visibilityLocked = false %}
 {% endif %}
 {% set bulkCreate = record.student is null %}
 {% if bulkCreate %}
@@ -86,6 +88,8 @@
                     roles: roles,
                     roleUsers: roleUsers,
                     bulkCreate: bulkCreate,
+                    managePage: false,
+                    visibilityLocked: visibilityLocked
                 } only
             %}
 

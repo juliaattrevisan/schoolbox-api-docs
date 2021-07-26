@@ -8,7 +8,7 @@
         or <a href="#" data-reveal-id="modal-group" title="Add Pastoral Group">pastoral group</a>
     {%- endif %}
 {% endset %}
-
+<span id="visibility_empty_state">
 {% if name is not null %}
     <p>There are no visibility rules on this record, it will only be visible by {{ name }} and the {{ locale.pastoral }} moderators.</p>
     <p>
@@ -24,3 +24,7 @@
         to set a default visibility rule for this record type.
     </p>
 {% endif %}
+</span>
+<span id="visibility_empty_state_locked">
+    Visibility has been disabled and cannot be modified
+</span>
