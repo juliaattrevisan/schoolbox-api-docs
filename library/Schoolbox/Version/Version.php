@@ -18,6 +18,8 @@ class Version
 
     public InstanceRegistry $instanceRegistry;
 
+    public Section $section;
+
     /**
      * Constructor
      *
@@ -27,6 +29,7 @@ class Version
     {
         $this->config           = $config;
         $this->instanceRegistry = new InstanceRegistry($this->config);
+        $this->section          = new Section($this->config->get('site_version'));
     }
 
     /**
@@ -44,7 +47,7 @@ class Version
      */
     public function getFull(): string
     {
-        return $this->config->get('site_version');
+        return $this->section->getFull();
     }
 
     /**
@@ -62,15 +65,7 @@ class Version
      */
     public function getMajor(): string
     {
-        $majorVersion = "";
-        /**
-         * given the full version, everything leading up to the second
-         * period is considered the major version
-         */
-        if (preg_match('/^(\d+\.\d+)\.*/', $this->getFull(), $matches)) {
-            $majorVersion = $matches[1];
-        }
-        return $majorVersion;
+        return $this->section->getMajor();
     }
 
     /**
@@ -85,15 +80,7 @@ class Version
      */
     public function getMinor(): string
     {
-        $minorVersion = '';
-        /**
-         * given the full version, everything after the second
-         * period is defined as the minor version
-         */
-        if (preg_match('/^\d+\.\d+\.(.+)/', $this->getFull(), $matches)) {
-            $minorVersion = $matches[1];
-        }
-        return $minorVersion;
+        return $this->section->getMinor();
     }
 
     /**

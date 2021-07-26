@@ -28,7 +28,17 @@ class Cache extends Alaress_Cache_Abstract
      */
     protected function setup()
     {
-        $this->cachedTime = \Config::get('instance_registry_api_caching');
-        $this->lockTime   = $this->lockTimeMultiplier * $this->cachedTime;
+        $this->lockTime = $this->lockTimeMultiplier * $this->cachedTime;
+    }
+
+    /**
+     * Constructor
+     *
+     * @param int|null $cachedTime cache duration in seconds
+     */
+    public function __construct(?int $cachedTime)
+    {
+        $this->cachedTime ??= $cachedTime;
+        parent::__construct();
     }
 }

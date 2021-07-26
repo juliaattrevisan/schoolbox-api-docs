@@ -9,13 +9,15 @@
 </div>
 
 <script type="text/javascript">
-    $(window).load( function() {
-        const url = '{{ routeLookup('adminHome.dismissUpgradeReminder') }}';
+    {% autoescape 'js' %}
+        $(window).load( function() {
+            const url = '{{ routeLookup('adminHome.dismissUpgradeReminder') }}';
 
-        {# if the user closes the upgrade reminder alert, lets make sure we
-        record the interaction to prevent the reminder from showing again #}
-        $('#alert-upgrade-reminder').on("close.fndtn.alert", function() {
-            $.get(url);
+            {# if the user closes the upgrade reminder alert, lets make sure we
+            record the interaction to prevent the reminder from showing again #}
+            $('#alert-upgrade-reminder').on("close.fndtn.alert", function() {
+                $.get(url);
+            });
         });
-    });
+    {% endautoescape %}
 </script>

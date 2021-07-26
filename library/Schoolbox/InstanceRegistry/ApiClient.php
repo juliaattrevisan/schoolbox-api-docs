@@ -13,6 +13,7 @@ use Exception;
 use DomainException;
 use InvalidArgumentException;
 use RuntimeException;
+use Schoolbox\IConfigLoader;
 
 /**
  * Class ApiClient
@@ -22,6 +23,22 @@ use RuntimeException;
 class ApiClient
 {
     /**
+     * endpoint where we can find version information about the current latest
+     * available version of schoolbox
+     */
+    private const API_LATEST_RELEASE_URL = '/api/releases/schoolbox/latest';
+
+    /**
+     * @var int duration in seconds to cache responses
+     */
+    private int $cachedTime;
+
+    /**
+     * Schoolbox configuration
+     */
+    private IConfigLoader $config;
+
+    /**
      * @var string
      */
     private string $apiUrl;
@@ -29,11 +46,13 @@ class ApiClient
     /**
      * ApiClient constructor.
      *
-     * @param string $apiUrl
+     * @param IConfigLoader $config
      */
-    public function __construct(string $apiUrl)
+    public function __construct(IConfigLoader $config)
     {
-        $this->apiUrl = $apiUrl;
+        $this->config     = $config;
+        $this->apiUrl     = $this->config->get('instance_registry_url');
+        $this->cachedTime = (int)$this->config->get('instance_registry_api_caching');
     }
 
     /**
@@ -45,7 +64,7 @@ class ApiClient
     public function getLatestRelease(): string
     {
         try {
-            $requestUrl    = "/api/releases/schoolbox/latest";
+            $requestUrl    = self::API_LATEST_RELEASE_URL;
             $response      = $this->makeRequest($requestUrl);
             $latestRelease = $response['name'];
         } catch (Exception $e) {
@@ -66,7 +85,7 @@ class ApiClient
     {
         // Cache the request
         try {
-            $cache = new Cache();
+            $cache = new Cache($this->cachedTime);
             $cache->init("{$this->apiUrl}{$requestUrl}");
             $response = $cache->getStreamContents();
         } catch (InvalidArgumentException $e) {
@@ -94,6 +113,6 @@ class ApiClient
 
         // If it isn't, it either failed to decode or we hit an incorrect server endpoint, but that server endpoint returned a 2xx, likely
         // with a HTML payload. This happens for example if you hit a login wall, which redirected you to a login page.
-        throw new DomainException("Unable to decode Weather API response: {$decodedResponse}");
+        throw new DomainException("Unable to decode Instance Registry API response: {$decodedResponse}");
     }
 }

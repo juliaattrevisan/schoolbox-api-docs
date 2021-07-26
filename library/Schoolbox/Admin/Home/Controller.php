@@ -75,14 +75,14 @@ class Controller extends Base
     public function dismissUpgradeReminder()
     {
         $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
-
         $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
+
+        //update the config item with the current instance major version
         $configDismissUpgradeReminder->setValue($latestVersionMajor);
         $this->configMapper->save($configDismissUpgradeReminder);
 
-        //update the config item with the current instance major version
-        $this->getResponse()->status->set(200);
-        $this->getResponse()->content->set(
+        $this->response->status->set(200);
+        $this->response->content->set(
             $this->buildJsonOutput(
                 [
                     'success'  => true,
@@ -290,19 +290,17 @@ class Controller extends Base
             }
         }
 
-        // Get the navigation
+        $version = new Version($this->getConfigLoader());
 
-        // Render this thing out
-
-        $this->getResponse()->content->set(
+        $this->response->content->set(
             array(
                 'template' => '@adminHome/index.twig',
                 'data' => array(
                     'pageCurrent'          => $this->router->generate('adminHome.getIndex'),
                     'allBreadcrumbs'       => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
                     'usageInGraph'         => $usageInGraph,
-                    'showUpgradeReminder'  => (new Version($this->getConfigLoader()))->showUpgradeReminder(),
-                    'major_site_version'   => (new Version($this->getConfigLoader()))->getMajor(),
+                    'showUpgradeReminder'  => $version->showUpgradeReminder(),
+                    'major_site_version'   => $version->getMajor(),
                     'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
                     'disk_used'            => $disk_used,
                     //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
@@ -370,7 +368,7 @@ class Controller extends Base
             ];
         }
 
-        $this->getResponse()->content->set(
+        $this->response->content->set(
             array(
                 'template' => '@adminHome/healthcheck.twig',
                 'data' => array(
@@ -401,14 +399,14 @@ class Controller extends Base
             $enabledData = [];
         }
 
-        $this->getResponse()->content->set(
+        $this->response->content->set(
             [
                 'template' => '@adminHome/disaster-recovery.twig',
                 'data'     => array_merge(
                     [
-                        'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                        'pageCurrent'    => $this->router->generate('adminHome.getIndex'),
                         'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
-                        'enabled'     => $isEnabled,
+                        'enabled'        => $isEnabled,
                     ],
                     $enabledData
                 ),

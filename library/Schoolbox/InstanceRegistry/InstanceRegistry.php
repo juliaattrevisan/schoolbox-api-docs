@@ -11,6 +11,7 @@ namespace Schoolbox\InstanceRegistry;
 
 use Exception;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Version\Section;
 
 class InstanceRegistry
 {
@@ -31,15 +32,7 @@ class InstanceRegistry
 
     public function getLatestVersionMajor(): string
     {
-        $majorVersion = "";
-        /**
-         * given the full version, everything leading up to the second
-         * period is considered the major version
-         */
-        if (preg_match('/^(\d+\.\d+)\.*/', $this->getLatestVersionFull(), $matches)) {
-            $majorVersion = $matches[1];
-        }
-        return $majorVersion;
+        return (new Section($this->getLatestVersionFull()))->getMajor();
     }
 
     /**
@@ -58,7 +51,7 @@ class InstanceRegistry
     public function getLatestVersionFull(): string
     {
         try {
-            return (new ApiClient($this->config->get('instance_registry_url')))->getLatestRelease();
+            return (new ApiClient($this->config))->getLatestRelease();
         } catch (Exception $e) {
             /**
              * we were unable to fetch the latest release version from the instance registry, so lets

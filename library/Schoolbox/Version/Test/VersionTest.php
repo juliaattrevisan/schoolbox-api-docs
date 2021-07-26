@@ -133,6 +133,7 @@ class VersionTest extends TestCase
         yield 'match client hosted is true' => [
             true,
             [
+                'site_version'     => '21.0.2-1',
                 'site_environment' => 'client-hosted',
             ],
         ];
@@ -140,14 +141,16 @@ class VersionTest extends TestCase
         yield 'match client hosted is false' => [
             false,
             [
-                'site_version' => 'cloud-hosted',
+                'site_version'     => '21.0.2-1',
+                'site_environment' => 'cloud-hosted',
             ],
         ];
 
         yield 'match client hosted is unknown' => [
             false,
             [
-                'site_version' => 'super-unknown',
+                'site_version'     => '21.0.2-1',
+                'site_environment' => 'super-unknown',
             ],
         ];
     }
@@ -177,6 +180,7 @@ class VersionTest extends TestCase
         yield 'match cloud hosted is true' => [
             true,
             [
+                'site_version'     => '21.0.2-1',
                 'site_environment' => 'cloud-hosted',
             ],
         ];
@@ -184,14 +188,16 @@ class VersionTest extends TestCase
         yield 'match cloud hosted is false' => [
             false,
             [
-                'site_version' => 'client-hosted',
+                'site_version'     => '21.0.2-1',
+                'site_environment' => 'client-hosted',
             ],
         ];
 
         yield 'match cloud hosted is unknown' => [
             false,
             [
-                'site_version' => 'a-walking-potato',
+                'site_version'     => '21.0.2-1',
+                'site_environment' => 'a-walking-potato',
             ],
         ];
     }
@@ -217,6 +223,7 @@ class VersionTest extends TestCase
         yield 'cloud hosted never needs a upgrade reminder' => [
             false,
             [
+                'site_version'     => '21.0.2-1',
                 'site_environment' => 'cloud-hosted',
             ],
         ];
@@ -224,6 +231,7 @@ class VersionTest extends TestCase
         yield 'non client hosting never needs a upgrade reminder' => [
             false,
             [
+                'site_version'     => '21.0.2-1',
                 'site_environment' => 'unknown-hosted',
             ],
         ];
