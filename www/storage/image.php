@@ -23,9 +23,11 @@ $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CAC
 
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {
-        $size       = $_GET['size'] ?: 'maxsize';
         $resource   = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
         $fileSystem = $resource->getFilesystem();
+
+        $transforms = new Transformation\Storage();
+        $size = (isset($_GET['size'])) ? $transforms->getCacheKey($_GET['size']) : 'maxsize';
 
         if ($fileSystem instanceof Filesystem && $fileSystem->getAdapter() instanceof S3Adapter) {
             /** @var IConfigLoader $config */
@@ -46,10 +48,8 @@ try {
             }
         }
 
-        $transforms     = new Transformation\Storage();
         $imageProcessor = new Image\Processor($resource, $transforms->getCacheKey($size), $transforms->retrieve($size));
         $imageProcessor->load()->stream();
-        exit;
     }
 } catch (ConcurrentTransformationException $e) {
     $kernel->outputResourceBeingProcessedHeader();

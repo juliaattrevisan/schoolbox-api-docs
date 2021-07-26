@@ -81,7 +81,6 @@ try {
 
     $image = new Image\Processor($storageModel, $cacheKey, $portrait->retrieve($_GET['size']));
     $image->load()->stream();
-
 } catch (ConcurrentTransformationException $e) {
     // This transformation is already being processed.
     $kernel->outputResourceBeingProcessedHeader();
