@@ -130,7 +130,7 @@ export default {
 
 <template>
     <div class="event-container" ref="eventContainer" :class="getAttendanceClass">
-        <b v-if="content.timeText" ref="timeText" class="fc-event-time">{{ content.timeText }}</b>
+        <b v-if="content.timeText" ref="timeText" class="fc-event-title">{{ content.timeText }}</b>
         <input v-if="isTask" type="checkbox" class="checkbox plain" name="completed" v-model="isTaskComplete">
         <span ref="titleText" class="fc-event-title" v-html="lineBreakedTitleText" :class="{ strike : isTaskComplete }"></span>
     </div>
