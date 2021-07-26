@@ -64,8 +64,8 @@
 
             /* Remove default plugins; add Schoolbox Custom Plugins
              */
-            removePlugins: 'image,image2',
-            extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize',
+            removePlugins: 'image,image2,uploadimage',
+            extraPlugins: 'schoolboxresource,schoolboxiframe,schoolboxlink,schoolboxanchor,dragresize,schoolboxuploadimage',
 
             /* Other settings
              */
@@ -128,10 +128,11 @@
             // File paste upload
             uploadUrl: '/storage/asyncUpload.php',
             fileUploadResponse: function (event) {
-                let response        = JSON.parse(event.data.fileLoader.xhr.responseText);
-                event.data.message  = response.message;
-                event.data.uploaded = 1;
-                event.data.url      = response.meta.file._links.fetch;
+                let response          = JSON.parse(event.data.fileLoader.xhr.responseText);
+                event.data.message    = response.message;
+                event.data.uploaded   = 1;
+                event.data.url        = response.meta.file._links.image;
+                event.data.filesystem = response.hash.split(':')[0];
                 event.stop();
             },
         };
