@@ -92,6 +92,19 @@
                                 // Add new icon class and set color
                                 flagPreview.classList.add('icon-' + icon);
                                 flagPreview.style.color = color;
+
+                                // Background color:
+                                // same hue/saturation/alpha as foreground,
+                                // but contrasting luminance
+                                let colorHsl          = new tinycolor(color).toHsl(),
+                                    baseBackgroundHsl = tinycolor.mostReadable(color, ['#dddddd', '#333333']).toHsl(),
+                                    actualBackground  = new tinycolor({
+                                        h: colorHsl.h,
+                                        s: colorHsl.s,
+                                        l: baseBackgroundHsl.l,
+                                        a: colorHsl.a,
+                                    });
+                                flagPreview.style.backgroundColor = actualBackground.toHslString();
                             }
                         });
                     });
