@@ -19,6 +19,8 @@ use OutOfBoundsException;
  */
 class Portrait implements ITransformFactory
 {
+    use HasTranscodePathTrait;
+
     private const SIZES = [
         'square32',
         'square48',

@@ -22,6 +22,8 @@ use function preg_match;
  */
 class Storage implements ITransformFactory
 {
+    use HasTranscodePathTrait;
+
     public const TRANSFORM_SQUARE64 = 'square64';
 
     private const SIZES = [

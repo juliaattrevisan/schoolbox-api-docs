@@ -71,6 +71,9 @@ try {
 
     /** @var IConfigLoader $config */
     $config = $kernel->get('config');
+
+    $transforms = new Image\Transformation\Storage();
+
     if (
         $fileSystem instanceof FilesystemInterface &&
         $fileSystem->getAdapter() instanceof S3Adapter &&
@@ -82,13 +85,12 @@ try {
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storage,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            ($size && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $size : $resourcePath
+            $transforms->getTranscodePath($resourcePath, $transforms->getCacheKey($size))
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
     }
 
-    $transforms = new Image\Transformation\Storage();
     $processor  = new Image\Processor($storage, $transforms->getCacheKey($size), $transforms->retrieve($size));
     $processor->load()->stream();
 } catch (Image\Exception\ConcurrentTransformationException $e) {
