@@ -517,11 +517,13 @@ class DataSource
      * Finds a count of linked records grouped by linked student names for a particular student visible to the given viewer
      * @param User $viewer    Who is viewing this student's records
      * @param int  $studentId Id of a student being viewed
+     * @param int|null $typeId
+     * @param int|null $subtypeId
      * @return array
      */
-    public function getLinkedStudentRecordCount(User $viewer, int $studentId): array
+    public function getLinkedStudentRecordCount(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId): array
     {
-        $permissionClause = $this->getPermissionClause($viewer, null, null, null, 'p');
+        $permissionClause = $this->getPermissionClause($viewer, null, $typeId, $subtypeId, 'p');
         $linkedClause     = $this->getLinkedClause($viewer, $studentId, null);
 
         $sql = "
