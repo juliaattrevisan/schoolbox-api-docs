@@ -16,6 +16,8 @@ use Alaress\Image\Transform\Constrain;
  */
 class MyImage implements ITransformFactory
 {
+    use HasTranscodePathTrait;
+
     /**
      * @param int $width
      * @param int $height
