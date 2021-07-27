@@ -65,7 +65,7 @@ try {
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $resource,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT)),
-            ($cacheKey && strpos($resourcePath, '-') === false) ? $resourcePath . '-' . $cacheKey : $resourcePath
+            $myImage->getTranscodePath($resourcePath, $cacheKey)
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
