@@ -400,8 +400,8 @@ class Controller extends Base
                         'width'     => 1,
                         'mandatory' => true,
                     ],
-                    'createEvidence' => [
-                        'caption'   => 'Create Evidence',
+                    'accessEvidence' => [
+                        'caption'   => 'Learning Moments',
                         'checkbox'  => true,
                         'width'     => 1,
                         'mandatory' => true,

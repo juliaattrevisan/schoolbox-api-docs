@@ -69,7 +69,7 @@ class Module extends Comment\Module
             $userMapper = $this->getMapperFactory()->get(UserMapper::class);
             return new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
-                new Auth\Rule\HasRole(Role::STAFF),
+                new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                 new Auth\Rule\IsUserOrParentOfUser(
                     $this->getExternalUser(),
                     $userMapper,
@@ -99,7 +99,7 @@ class Module extends Comment\Module
     {
         return new Auth\Rule\Any(
             new Auth\Rule\IsSuperuser(),
-            new Auth\Rule\HasRole(Role::STAFF),
+            new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
             new Auth\Rule\IsUser(
                 static function (array $params) {
                     /** @var Comment\Model $comment */

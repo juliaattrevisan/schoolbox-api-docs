@@ -23,19 +23,19 @@ class HasRolePermission extends All
     protected string $permission;
 
     /**
-     * The role to check against (optional).
+     * The role to check against.
      * One of Schoolbox\Role::(GUEST|STAFF|PARENT|STUDENT).
      */
-    protected ?string $roleType;
+    protected string $roleType;
 
     /**
-     * @param string      $permission The permission to check
-     * @param string|null $roleType   The role type to check. Matches one of the consts in Role
+     * @param string $permission The permission to check
+     * @param string $roleType   The role type to check. Matches one of the constants in Role
      * @throws InvalidArgumentException
      */
-    public function __construct(string $permission, ?string $roleType)
+    public function __construct(string $permission, string $roleType)
     {
-        if (!in_array($permission, Role::VALID_PERMISSIONS)) {
+        if (!in_array($permission, Role::VALID_PERMISSIONS[$roleType])) {
             throw new InvalidArgumentException('Invalid permission provided.');
         }
 

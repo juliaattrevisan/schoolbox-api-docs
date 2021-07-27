@@ -88,7 +88,8 @@ class Cursor implements ICursor
      * Constructor
      *
      * @param IConnector               $database
-     * @param User                     $user
+     * @param User                     $viewee
+     * @param User                     $viewer
      * @param Alaress_Date_Format|null $expiryDate
      * @param int                      $limit
      * @param IConfigLoader            $config
@@ -96,18 +97,21 @@ class Cursor implements ICursor
      */
     public function __construct(
         IConnector $database,
-        User $user,
+        User $viewee,
+        User $viewer,
         ?Alaress_Date_Format $expiryDate,
         int $limit,
         IConfigLoader $config,
         ?ICodec $codec = null
     ) {
         $this->database               = $database;
-        $this->user                   = $user;
+        $this->user                   = $viewee;
         $this->expiryDate             = $expiryDate;
         $this->limit                  = $limit;
         $this->codec                  = $codec ?? new Base64();
-        $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED) && $user->getLearningMomentsEnabled();
+        $this->learningMomentsEnabled = $config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
+            && $viewee->getLearningMomentsEnabled()
+            && (!$viewer->getRole()->isStaff() || $viewer->getRole()->getAccessEvidence());
         $this->badgesEnabled          = $config->get(ConfigMapper::NAME_BADGES_ENABLED);
     }
 

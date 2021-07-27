@@ -439,7 +439,9 @@ class Controller extends Base
                 'replyTo'                => $this->getUser()->getEmail(),
                 'mailEnabled'            => $this->getConfigLoader()->get('mail_enable'),
                 'pastoralEnabled'        => $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->getRole()->getAccessPastoral(),
-                'learningMomentsEnabled' => $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED),
+                'learningMomentsEnabled' =>
+                    $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
+                    && $this->getUser()->getRole()->getAccessEvidence(),
                 'badgesEnabled'          =>
                     $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED)
                     && $this->getUser()->getRole()->getCreateBadges(),

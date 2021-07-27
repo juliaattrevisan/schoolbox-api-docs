@@ -116,7 +116,7 @@ class Module extends Thread\Module
             $userMapper = $this->getMapperFactory()->get(UserMapper::class);
             return new Auth\Rule\Any(
                 new Auth\Rule\IsSuperuser(),
-                new Auth\Rule\HasRole(Role::STAFF),
+                new Auth\Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                 new Auth\Rule\IsUserOrParentOfUser(
                     $this->getExternalUser(),
                     $userMapper,

@@ -76,7 +76,7 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     /**
      * @var bool Users can create evidence (for staff)
      */
-    private bool $createEvidence;
+    private bool $accessEvidence;
 
     /**
      * @var bool Users can view parent directory (for staff)
@@ -114,21 +114,33 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     public const PERMISSION_ACCESS_EPORTFOLIO     = 'accessEportfolio';
     public const PERMISSION_ACCESS_PASTORAL       = 'accessPastoral';
     public const PERMISSION_CREATE_BADGES         = 'createBadges';
-    public const PERMISSION_CREATE_EVIDENCE       = 'createEvidence';
+    public const PERMISSION_ACCESS_EVIDENCE       = 'accessEvidence';
     public const PERMISSION_VIEW_PARENT_DIRECTORY = 'viewParentDirectory';
     public const PERMISSION_VIEW_STAFF_DIRECTORY  = 'viewStaffDirectory';
+    public const PERMISSION_CHANGE_PASSWORD       = 'canChangePassword';
 
     public const VALID_PERMISSIONS = [
-        self::PERMISSION_VIEW_STUDENT_PROFILE,
-        self::PERMISSION_VIEW_STUDENT_GRADES,
-        self::PERMISSION_VIEW_STUDENT_CALENDAR,
-        self::PERMISSION_VIEW_PARENT_PROFILE,
-        self::PERMISSION_ACCESS_EPORTFOLIO,
-        self::PERMISSION_ACCESS_PASTORAL,
-        self::PERMISSION_CREATE_BADGES,
-        self::PERMISSION_CREATE_EVIDENCE,
-        self::PERMISSION_VIEW_PARENT_DIRECTORY,
-        self::PERMISSION_VIEW_STAFF_DIRECTORY,
+        self::STAFF   => [
+            self::PERMISSION_CHANGE_PASSWORD,
+            self::PERMISSION_VIEW_STUDENT_PROFILE,
+            self::PERMISSION_VIEW_STUDENT_GRADES,
+            self::PERMISSION_VIEW_STUDENT_CALENDAR,
+            self::PERMISSION_VIEW_PARENT_PROFILE,
+            self::PERMISSION_ACCESS_EPORTFOLIO,
+            self::PERMISSION_ACCESS_PASTORAL,
+            self::PERMISSION_CREATE_BADGES,
+            self::PERMISSION_ACCESS_EVIDENCE,
+            self::PERMISSION_VIEW_PARENT_DIRECTORY,
+            self::PERMISSION_VIEW_STAFF_DIRECTORY,
+        ],
+        self::STUDENT => [
+            self::PERMISSION_CHANGE_PASSWORD,
+        ],
+        self::PARENT  => [
+            self::PERMISSION_CHANGE_PASSWORD,
+        ],
+        self::GUEST   => [
+        ],
     ];
 
     /**
@@ -356,12 +368,12 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     }
 
     /**
-     * @param bool $createEvidence
+     * @param bool $accessEvidence
      * @return static
      */
-    public function setCreateEvidence($createEvidence)
+    public function setAccessEvidence(bool $accessEvidence): self
     {
-        $this->createEvidence = $createEvidence;
+        $this->accessEvidence = $accessEvidence;
         return $this;
     }
 
@@ -369,9 +381,9 @@ class Role implements ValueLabelInterface, ISoftDeletable, JsonSerializable, Seq
     /**
      * @return bool
      */
-    public function getCreateEvidence(): bool
+    public function getAccessEvidence(): bool
     {
-        return $this->createEvidence;
+        return $this->accessEvidence;
     }
 
 

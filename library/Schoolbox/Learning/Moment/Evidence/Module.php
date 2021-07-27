@@ -58,7 +58,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                 new Rule\LazyCallback(function () use ($createRule) {
                     return new Rule\Callback(function (array $params, User $user) use ($createRule) {
                         $this->authorizeAllUsers($params, $user, $createRule);
@@ -75,7 +75,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                 $isParentOrUserRule
             )
         );
@@ -87,7 +87,7 @@ class Module extends BaseModule
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                 new Rule\IsUser('creatorId')
             )
         );
@@ -140,7 +140,7 @@ class Module extends BaseModule
                 new Rule\IsLoggedIn(),
                 new Rule\Any(
                     new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF),
+                    new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                     $isParentOrUserRule,
                 ),
             ),
