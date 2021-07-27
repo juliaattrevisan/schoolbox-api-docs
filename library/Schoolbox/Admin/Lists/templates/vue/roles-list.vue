@@ -14,7 +14,7 @@ import Toast from '@schoolbox/toast';
 import RevealModal from '@schoolbox/reveal-modal';
 
 export default {
-    
+
     components: {
         RolesListHeader,
         RolesListPermissions,
@@ -48,7 +48,7 @@ export default {
 
     data () {
         return {
-            rows: [], //to display and possibly edit the rows 
+            rows: [], //to display and possibly edit the rows
             isPermissionsOpen: false, //to open and close the list
             selectedRow: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
             saveStatus: 'Save All', //to update the button text when saving
@@ -56,14 +56,14 @@ export default {
             selectedPermissionName: '', //to highlight all other rows that have that permission
             isProcessing: false, //to prevent multiple rapid-fire submissions
             isSaving: false,
-        }   
+        }
     },
 
     computed: {
 
         /**
          * Assign a key for each column for future reference, so can link the selectedRow to the columns when editing permissions
-         * 
+         *
          * @returns { Array of Objects }
          */
         columns () {
@@ -73,40 +73,40 @@ export default {
                 column.key = rowKeysList[index];
             });
             return columns;
-        }, 
+        },
 
         /**
          * Only Name and Role type are shown with
          * the rest within #roles-list-permissions.vue
-         * 
+         *
          * @returns { Array of Objects }
          */
         headerColumns () {
             const headerColumns = this.columns.filter((column) => {
-                return (column.caption === 'Name' || column.caption === 'Role Type'); 
-            }); 
+                return (column.caption === 'Name' || column.caption === 'Role Type');
+            });
             headerColumns.push( { //and add another to allow space for Permissions UI
-                caption: 'Permissions', 
-                width: '8', 
-                tooltip: 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.' 
-            } ); 
+                caption: 'Permissions',
+                width: '8',
+                tooltip: 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.'
+            } );
             return headerColumns;
-        },  
-        
+        },
+
         /**
          * To provide the permission columns, pulling out Name and Role Type
-         * 
+         *
          * @returns { Array of Objects }
          */
         permissionColumns () {
             return this.columns.filter((column) => {
                 return (column.caption !== 'Name' && column.caption !== 'Role Type' && column.caption !== 'sequence'); //all excluding Name, Role Type and sequence
             });
-        }, 
+        },
 
         /**
          * To show list of columns that cannot be null
-         * 
+         *
          * @returns { Array of Objects }
          */
         fixedList () {
@@ -119,7 +119,7 @@ export default {
 
         /**
          * To display the rows how they have been sorted
-         * 
+         *
          * @returns { Array of Objects }
          */
         rowsSortedBySequence () {
@@ -141,12 +141,12 @@ export default {
         /**
          * Add in the id so can link to the DB on form submit
          * and a boolean to know whether the row is one being newly added
-         * 
+         *
          */
         initRows () {
             this.rows = Object.values(this.initialRows);
             const rowKeys = Object.keys(this.initialRows);
-            this.rows.forEach((row, index) => { 
+            this.rows.forEach((row, index) => {
                 row.id = rowKeys[index]; //for example 1: { name: 'Teacher' } - so retrieve the key of 1 which is the id to link with DB
                 row.isNew = false;
             });
@@ -154,7 +154,7 @@ export default {
 
         /**
          * Init the sortable feature
-         * 
+         *
          */
         initSortable () {
             if (this.table.sortable) {
@@ -164,7 +164,7 @@ export default {
 
         /**
          * Show the permissions options
-         * 
+         *
          */
         onPermissionsSelected (selectedRow) {
             this.selectedRow = selectedRow;
@@ -174,7 +174,7 @@ export default {
 
         /**
          * Close the permissions options
-         * 
+         *
          */
         onPermissionsClosed () {
             this.isPermissionsOpen = false;
@@ -183,7 +183,7 @@ export default {
 
         /**
          * Push in a new row with basic guest access
-         * 
+         *
          */
         onNewRowSelected () {
             this.rows.push(
@@ -198,7 +198,7 @@ export default {
                     accessEportfolio: false,
                     accessPastoral: false,
                     createBadges: false,
-                    createEvidence: false,
+                    accessEvidence: false,
                     viewParentDirectory: false,
                     viewStaffDirectory: false,
                     sequence: this.getNextSequence(),
@@ -209,9 +209,9 @@ export default {
         },
 
         /**
-         * The new row is placed at the bottom of the list, so it'll 
+         * The new row is placed at the bottom of the list, so it'll
          * be the last number in the sequence
-         * 
+         *
          * @param { Number }
          */
         getNextSequence () {
@@ -219,9 +219,9 @@ export default {
         },
 
         /**
-         * Retrieve the lowest id and decrement for it to 
+         * Retrieve the lowest id and decrement for it to
          * be used for the new row
-         * 
+         *
          * @param { String }
          */
         getNextId () {
@@ -231,7 +231,7 @@ export default {
 
         /**
          * Open the delete modal, storing the selected row index for possible deletion
-         * 
+         *
          * @param { Number }
          */
         onDeleteRow (selectedRow) {
@@ -244,7 +244,7 @@ export default {
         },
 
         /**
-         * Notify the DB and pull out the selectedRow 
+         * Notify the DB and pull out the selectedRow
          * on delete confirmation
          *
          */
@@ -372,7 +372,7 @@ export default {
         /**
          * To highlight all rows which also have the same permission
          * maybe an easy way to check which rows have the permission?
-         * 
+         *
          */
         onPermissionNameSelected (permissionName) {
             if (this.selectedPermissionName === permissionName) { //so can toggle on/off
@@ -380,7 +380,7 @@ export default {
             } else {
                 this.selectedPermissionName = permissionName;
             }
-            
+
         }
 
     }
@@ -391,9 +391,9 @@ export default {
 <template>
 
     <div>
-        
+
         <div class="small-12 island">
-            
+
             <div v-if="rows.length === 0" id="listEmptyState" class="empty-state">
                 <i class="icon-list"></i>
                 <p>The {{ table.title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
@@ -410,7 +410,7 @@ export default {
 
                     <div class="list-container">
 
-                        <roles-list-header 
+                        <roles-list-header
                             :header-columns="headerColumns"
                             :is-sortable="table.sortable"
                             :is-deletable="table.delete"
@@ -421,12 +421,12 @@ export default {
                             tag="ul"
                             :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`"
                             v-bind:css="false"
-                            data-sortable 
-                            data-list 
+                            data-sortable
+                            data-list
                             @before-enter="onBeforeEnter"
                             @enter="onEnter"
                             @leave="onLeave"
-                        >    
+                        >
                             <roles-list-row
                                 v-for="(row, index) in rowsSortedBySequence"
                                 :key="`${row.id}-${index}`"
@@ -446,10 +446,10 @@ export default {
                         </transition-group>
 
                         <roles-list-permissions
-                            :permission-columns="permissionColumns" 
+                            :permission-columns="permissionColumns"
                             :selected-row="selectedRow"
-                            :is-open="isPermissionsOpen" 
-                            :save-route="saveRoute" 
+                            :is-open="isPermissionsOpen"
+                            :save-route="saveRoute"
                             @on-permissions-closed="onPermissionsClosed"
                         />
 
@@ -467,7 +467,7 @@ export default {
 
             </form>
 
-        </div><!-- small-12 island -->  
+        </div><!-- small-12 island -->
 
         <toast ref="toast"></toast>
 

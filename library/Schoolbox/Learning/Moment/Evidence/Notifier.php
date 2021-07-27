@@ -197,7 +197,11 @@ class Notifier extends AbstractModuleNotifier
         switch ($roleType) {
             case Role::STAFF:
                 $student->loadTeachers();
+                /** @var User $teacher */
                 foreach ($student->getTeacherCollection() as $teacher) {
+                    if (!$teacher->getRole()->getAccessEvidence()) {
+                        continue;
+                    }
                     $envelope->targetToUser($teacher, $instance);
                 }
                 break;
