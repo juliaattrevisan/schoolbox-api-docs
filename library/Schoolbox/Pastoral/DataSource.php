@@ -112,11 +112,12 @@ class DataSource
      * @param User     $viewer    Who is viewing this student's records
      * @param int      $studentId Id of a student being viewed
      * @param int|null $typeId    Filter the records with a pastoral type, if provided
+     * @param int|null $subtypeId Filter the records with a pastoral subtype, if provided
      * @return int
      */
-    public function countRecords(User $viewer, int $studentId, ?int $typeId): int
+    public function countRecords(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId): int
     {
-        $where = $this->getPermissionClause($viewer, $studentId, $typeId);
+        $where = $this->getPermissionClause($viewer, $studentId, $typeId, $subtypeId);
         $sql   = "
         SELECT count(*)
                 FROM pastoral p
@@ -134,16 +135,17 @@ class DataSource
      * @param User     $viewer          Who is viewing this student's records
      * @param int      $studentId       Id of a student being viewed
      * @param int|null $typeId          Filter the records with a pastoral type, if not null
+     * @param int|null $subtypeId
      * @param int      $offset
      * @param int      $limit
      * @param int|null $linkedStudentId Returns the records linked to this student only, if provided
      * @return GenericCollection|Model[]
      */
-    public function findRecords(User $viewer, int $studentId, ?int $typeId, int $offset, int $limit, ?int $linkedStudentId): GenericCollection
+    public function findRecords(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?int $linkedStudentId): GenericCollection
     {
 
         // get records for the student
-        $studentRecords = $this->findRawRecords($viewer, $studentId, $typeId, $offset, $limit, $linkedStudentId, null);
+        $studentRecords = $this->findRawRecords($viewer, $studentId, $typeId, $subtypeId, $offset, $limit, $linkedStudentId, null);
 
         if (!$studentRecords->count()) {
             return $studentRecords;
@@ -166,7 +168,7 @@ class DataSource
         }
 
         // get linked records to the student records found
-        $linkedRecords = $this->findRawRecords($viewer, null, $typeId, null, null, null, $studentRecords->keys());
+        $linkedRecords = $this->findRawRecords($viewer, null, $typeId, $subtypeId, null, null, null, $studentRecords->keys());
 
         /** @var Model $linkedRecord */
         foreach ($linkedRecords as $linkedRecord) {
@@ -199,15 +201,16 @@ class DataSource
      * @param User       $viewer          Who is viewing this student's records
      * @param int        $studentId       Id of a student being viewed
      * @param int|null   $typeId          Filter the records with a pastoral type, if not null
+     * @param int|null   $subtypeId
      * @param int|null   $offset
      * @param int|null   $limit
      * @param int|null   $linkedStudentId Find records linked to this student only, if provided
      * @param array|null $linkedRecordIds Find records linked to these records only, if provided
      * @return GenericCollection
      */
-    private function findRawRecords(User $viewer, ?int $studentId, ?int $typeId, ?int $offset, ?int $limit, ?int $linkedStudentId, ?array $linkedRecordIds): GenericCollection
+    private function findRawRecords(User $viewer, ?int $studentId, ?int $typeId, ?int $subtypeId, ?int $offset, ?int $limit, ?int $linkedStudentId, ?array $linkedRecordIds): GenericCollection
     {
-        $permissionClause = $this->getPermissionClause($viewer, $studentId, $typeId);
+        $permissionClause = $this->getPermissionClause($viewer, $studentId, $typeId, $subtypeId);
         $where            = $permissionClause['where'];
         $params           = $permissionClause['params'];
         if (null !== $linkedRecordIds || null != $linkedStudentId) {
@@ -276,7 +279,7 @@ class DataSource
         $whereClauses = [];
         $params       = [];
         for ($i = 0; $i < 3; $i++) {
-            $permissionClause = $this->getPermissionClause($viewer, $linkedStudentId, null, "pl{$i}");
+            $permissionClause = $this->getPermissionClause($viewer, $linkedStudentId, null, null, "pl{$i}");
             $whereClauses[$i] = $permissionClause['where'];
             $params[$i]       = $permissionClause['params'];
             if (is_array($recordIds)) {
@@ -326,10 +329,11 @@ class DataSource
      * @param User     $viewer
      * @param int|null $studentId
      * @param int|null $typeId
+     * @param int|null $subtypeId
      * @param string   $alias
      * @return array
      */
-    private function getPermissionClause(User $viewer, ?int $studentId, ?int $typeId, string $alias = 'p'): array
+    private function getPermissionClause(User $viewer, ?int $studentId, ?int $typeId, ?int $subtypeId = null, string $alias = 'p'): array
     {
         // Hydrate pastoral group membership, if not yet set
         if ($viewer->getPastoralGroupsMemberships() === null) {
@@ -351,6 +355,9 @@ class DataSource
         $validPb->isNull("{$alias}.deleted_at");
         if (null !== $typeId) {
             $validPb->equals("{$alias}.type_id", $typeId);
+        }
+        if (null !== $subtypeId) {
+            $validPb->equals("{$alias}.subtype_id", $subtypeId);
         }
         $where  = implode(' AND ', $validPb->getWhere());
         $params = $validPb->getParams();
@@ -510,11 +517,13 @@ class DataSource
      * Finds a count of linked records grouped by linked student names for a particular student visible to the given viewer
      * @param User $viewer    Who is viewing this student's records
      * @param int  $studentId Id of a student being viewed
+     * @param int|null $typeId
+     * @param int|null $subtypeId
      * @return array
      */
-    public function getLinkedStudentRecordCount(User $viewer, int $studentId): array
+    public function getLinkedStudentRecordCount(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId): array
     {
-        $permissionClause = $this->getPermissionClause($viewer, null, null, 'p');
+        $permissionClause = $this->getPermissionClause($viewer, null, $typeId, $subtypeId, 'p');
         $linkedClause     = $this->getLinkedClause($viewer, $studentId, null);
 
         $sql = "
