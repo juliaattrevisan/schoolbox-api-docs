@@ -344,7 +344,8 @@ class Controller extends Base
         $auditRecord->setUser($this->getUser());
         $this->pastoralAuditMapper->save($auditRecord);
 
-        $typeId = is_numeric($get['type']) ? (int)$get['type'] : null;
+        $typeId    = is_numeric($get['type']) ? (int)$get['type'] : null;
+        $subtypeId = is_numeric($get['subtype']) ? (int)$get['subtype'] : null;
 
         // Limit the number of pastoral records to display on each page of pastoral records
         $resultsPerPage = (int)$this->config->get('pastoral_page_size');
@@ -354,7 +355,7 @@ class Controller extends Base
 
         // Retrieve all of the students pastoral records
         $recordCount  = 0;
-        $linkedCounts = $this->pastoralDataSource->getLinkedStudentRecordCount($this->getUser(), $student->getId());
+        $linkedCounts = $this->pastoralDataSource->getLinkedStudentRecordCount($this->getUser(), $student->getId(), $typeId, $subtypeId);
         foreach ($linkedCounts as $linkedCount) {
             if ((int)$linkedCount['student_id'] === $linkedStudent->getId()) {
                 $recordCount = (int)$linkedCount['count'];
@@ -374,23 +375,25 @@ class Controller extends Base
         }
 
         // populate related records
-        $pageRecords = $this->pastoralDataSource->findRecords($this->getUser(), $student->getId(), $typeId, null, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, $linkedStudent->getId());
+        $pageRecords = $this->pastoralDataSource->findRecords($this->getUser(), $student->getId(), $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, $linkedStudent->getId());
 
         $this->getResponse()->content->set(
             [
                 'template' => '@pastoral/student_linked.twig',
                 'data'     => [
-                    'user'           => $this->getUser(),
-                    'recordCount'    => $recordCount,
-                    'records'        => $pageRecords,
-                    'student'        => $student,
-                    'linkedStudent'  => $linkedStudent,
-                    'pageCurrent'    => $pageCurrent,
-                    'types'          => $this->pastoralTypeMapper->findAll(),
-                    'linkedStudents' => $linkedCounts,
-                    'typeSelected'   => $get['type'],
-                    'resultsPerPage' => $resultsPerPage,
-                    'pagesToDisplay' => $maxPage,
+                    'user'            => $this->getUser(),
+                    'recordCount'     => $recordCount,
+                    'records'         => $pageRecords,
+                    'student'         => $student,
+                    'linkedStudent'   => $linkedStudent,
+                    'pageCurrent'     => $pageCurrent,
+                    'types'           => $this->pastoralTypeMapper->findAll(),
+                    'subtypes'        => $this->pastoralSubTypeMapper->findAll(),
+                    'linkedStudents'  => $linkedCounts,
+                    'typeSelected'    => $typeId,
+                    'subtypeSelected' => $subtypeId,
+                    'resultsPerPage'  => $resultsPerPage,
+                    'pagesToDisplay'  => $maxPage,
                 ],
                 'title'    => 'Linked Records',
             ]
