@@ -114,7 +114,6 @@ class Controller extends Base
         }
 
         // Reformat to rows to field -> values
-        $fields = $tableData[$tableKey]['fields'];
         if ($this->getRequest()->post['rows']) {
             $fieldValues = $this->processRows(array_keys($tableData[$tableKey]['fields']), $this->getRequest()->post['rows']);
         } else {
@@ -308,7 +307,6 @@ class Controller extends Base
     {
         // add "id" as it's not in fields
         $fieldNames[] = 'id';
-        $fieldNames[] = 'sequence';
         $fieldValues = [];
         $rows        = json_decode($data, true);
         foreach ($rows as $row) {
