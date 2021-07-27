@@ -16,8 +16,8 @@ export default {
     },
 
     props: {
-        caption: { //the title of the pop out
-            type: String,
+        headerField: { //the header field object
+            type: Object,
             required: true
         },
         fields: { //the fields to display within the pop out
@@ -48,19 +48,20 @@ export default {
     computed: {
 
         /**
-         * Only show those fields relevant to the user type,
-         * showing all for staff and just password change for all others
+         * When 'changePopOut' is set on the popOutList, we need to consider 
+         * displaying only those fields linked to the current selection of 'changePopOutOptions'
+         * For example on Lists > Roles, changing 'Role Type' will change the list of Permissions available 
+         * If 'changePopOut' isn't set, we can just return all 'popOutList' fields
          *
          * @returns { Array of Objects }
          */
-        roleSpecificPermissions () {
-            if (this.selectedRow.type === 'staff') {
-                return this.fields;
+        changePopOutFields () {
+            if (this.headerField.changePopOut && this.selectedRow.id) {
+                const selectedRowChangePopOutValue = this.selectedRow[this.headerField.changePopOut];
+                const changePopOutOptions = this.headerField.changePopOutOptions[selectedRowChangePopOutValue];
+                return this.fields.filter((field) => changePopOutOptions.includes(field.id));
             } else {
-                const onlyShowPasswordField = this.fields.filter((field) => {
-                    return field.caption === 'Allow Password Change';
-                });
-                return onlyShowPasswordField;
+                return this.fields;
             }
         }
 
@@ -70,7 +71,6 @@ export default {
 
         /**
          * To open or close depending on boolean value
-         *
          */
         isOpen (newValue) {
             if (newValue === true) {
@@ -140,11 +140,10 @@ export default {
 <template>
     <div class="outer-container" ref="outerContainer">
         <div class="inner-container checklist" ref="innerContainer">
-            <h4>{{ selectedRow.name }} {{ caption }}</h4>
+            <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
             <a href="#close-pop-out" class="close-button icon-close" @click.prevent="onClosePopOutSelected"></a>
             <ul class="option-list" data-option-list>
-                <li v-for="(field, index) in roleSpecificPermissions" :key="index">
-                <!-- <li v-for="(field, index) in fields" :key="index"> -->
+                <li v-for="(field, index) in changePopOutFields" :key="index">
                     <input
                         :id="field.caption"
                         type="checkbox"

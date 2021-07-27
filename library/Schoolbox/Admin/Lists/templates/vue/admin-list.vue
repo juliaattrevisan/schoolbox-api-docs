@@ -38,7 +38,7 @@ export default {
             data: null, //contains the loaded data
             rows: [], //to display and possibly edit the rows 
             isPopOutOpen: false, //to open and close the list
-            selectedRow: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
+            selectedRow: {}, //to track which row is selected
             saveStatus: 'Save All', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
             selectedNameInPopOut: '', //to highlight all other rows that have that permission
@@ -59,17 +59,18 @@ export default {
         },  
 
         /**
-         * the name of the popOutList
+         * the popOut field that's used in the header, and is the reference for 
+         * the following popOutFields
          * 
-         * @returns { String }
+         * @returns { Object }
          */
-        popOutCaption () {
-            const popOutList = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
-            if (typeof popOutList !== 'undefined') {
-                return popOutList.caption;
+        popOutHeaderField () {
+            const popOutHeaderField = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
+            if (typeof popOutHeaderField !== 'undefined') {
+                return popOutHeaderField;
             } 
-            return '';
-        },  
+            return {};
+        }, 
         
         /**
          * Just those fields that are used in a popoutList
@@ -406,7 +407,7 @@ export default {
                                     :selected-row="selectedRow"
                                     :is-sortable="data.isSortable"
                                     :can-delete="data.canDelete"
-                                    :pop-out-caption="popOutCaption"
+                                    :pop-out-header-field="popOutHeaderField"
                                     :pop-out-fields="popOutFields"
                                     :is-pop-out-open="isPopOutOpen"
                                     :selected-pop-out-name="selectedNameInPopOut"
@@ -418,7 +419,7 @@ export default {
 
                             <admin-list-pop-out
                                 v-if="popOutFields.length > 0"
-                                :caption="popOutCaption"
+                                :header-field="popOutHeaderField"
                                 :fields="popOutFields" 
                                 :selected-row="selectedRow"
                                 :is-open="isPopOutOpen" 
