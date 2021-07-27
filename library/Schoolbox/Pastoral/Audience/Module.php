@@ -11,9 +11,11 @@ namespace Schoolbox\Pastoral\Audience;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule\HasServicePermission;
+use Alaress\Color\ColorFactory;
 use Alaress\Module as AlaressModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
+use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\RoleMapper;
@@ -79,7 +81,9 @@ class Module extends AlaressModule\Module
             'roleMapper'             => $this->getMapperFactory()->getLazy(RoleMapper::class),
             'pastoralTypeMapper'     => $this->getMapperFactory()->getLazy(Pastoral\Type\Mapper::class),
             'pastoralSubTypeMapper'  => $this->getMapperFactory()->getLazy(Pastoral\SubType\Mapper::class),
+            'iconMapper'             => $this->getMapperFactory()->getLazy(IconMapper::class),
             'rosettaStone'           => $injector->lazyGet('l10n'),
+            'colorFactory'           => $injector->lazyNew(ColorFactory::class),
         ];
 
         $injector->set('controller:' . $this->basename, $injector->lazyNew(Controller::class, $mappers));

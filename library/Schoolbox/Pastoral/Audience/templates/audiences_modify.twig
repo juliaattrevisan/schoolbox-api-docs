@@ -23,6 +23,34 @@
     <div class="admin-content">
         <div class="small-12 island" id="formPastoral">
             <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="{{ action }}">
+
+                <h2 class="subheader">Flag</h2>
+                <p class="meta">
+                    If a student has one or more {{ locale.pastoral }} records of this type,
+                    a flag with this icon and colour will display next to their name on their profile,
+                    attendance marking and class list.
+                </p>
+                <p class="meta">
+                    If no icon or colour is selected, no flag will display.
+                </p>
+
+                {% set icon  = (subtype ? subtype.icon  : type.icon) %}
+                {% set color = (subtype ? subtype.color : type.color) %}
+                <select id="pastoralIcon" name="icon">
+                    <option value="">-- none selected --</option>
+                    {% for icon in icons %}
+                        <option value="{{ icon.name }}"
+                                label="{{ icon.title }}"
+                                {% if (subtype ? subtype.icon : type.icon) == icon.name %}selected{% endif %}
+                        >{{ icon.title }}</option>
+                    {% endfor %}
+                </select>
+                <input id="pastoralColor" name="color" type="text" value="{{ color ?? '#000000' }}" />
+                <span id="pastoralFlagPreview"
+                      class="label neutral {% if icon and color %}icon-{{ icon }}{% else %}hide{% endif %}"
+                      style="color: {{ color ?? '#000000' }}"
+                      >1</span>
+
                 <h2 class="subheader">General Template</h2>
 
                 <p class="meta">
@@ -31,9 +59,41 @@
 
                 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/ckeditor/ckeditor.js?v={{ config.site_version }}"></script>
                 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/editor/jquery.editor.js?v={{ config.site_version }}"></script>
+                <link rel="stylesheet" type="text/css" href="{{ CDN_PREFIX }}/css/core/spectrum/spectrum.css" />
+                <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/masonry.js?v={{ config.site_version }}"></script>
                 <script>
                     $(function() {
                         $('#template').alaressEditor();
+
+                        let colorInput  = document.getElementById('pastoralColor'),
+                            iconSelect  = document.getElementById('pastoralIcon'),
+                            flagPreview = document.getElementById('pastoralFlagPreview');
+                        $(colorInput).spectrum({
+                            allowEmpty: false,
+                            showAlpha: false,
+                            showInput: true,
+                            preferredFormat: 'hex',
+                            clickoutFiresChange: true,
+                            showInitial: true,
+                        });
+
+                        $().add(colorInput).add(iconSelect).on('change', function () {
+                            let color = colorInput.value,
+                                icon  = iconSelect.value;
+                            if (color.length === 0 || icon.length === 0) {
+                                flagPreview.classList.add('hide');
+                            } else {
+                                // Remove hide and all icon classes
+                                flagPreview.classList.remove('hide');
+                                flagPreview.classList.remove(
+                                    ...Array.from(flagPreview.classList.values()).filter((v) => v.startsWith('icon-'))
+                                );
+
+                                // Add new icon class and set color
+                                flagPreview.classList.add('icon-' + icon);
+                                flagPreview.style.color = color;
+                            }
+                        });
                     });
                 </script>
 

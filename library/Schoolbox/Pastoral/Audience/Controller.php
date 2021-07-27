@@ -9,10 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
+use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
 use Schoolbox\GenericCollection;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Menu\Icon\Mapper as IconMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -44,12 +46,20 @@ class Controller extends Base
      */
     private Pastoral\SubType\Mapper $pastoralSubTypeMapper;
 
+    /**
+     * Icon mapper: the list of icons is fetched from here.
+     */
+    private IconMapper $iconMapper;
 
     /**
      * @var RosettaStone
      */
     private RosettaStone $rosettaStone;
 
+    /**
+     * A factory object for creating color objects from form input.
+     */
+    private ColorFactory $colorFactory;
 
     /**
      * Constructor
@@ -60,6 +70,8 @@ class Controller extends Base
      * @param RoleMapper              $roleMapper
      * @param Pastoral\Type\Mapper    $pastoralTypeMapper
      * @param Pastoral\SubType\Mapper $pastoralSubTypeMapper
+     * @param IconMapper              $iconMapper
+     * @param RosettaStone            $rosettaStone
      */
     public function __construct(
         UserMapper $userMapper,
@@ -68,7 +80,9 @@ class Controller extends Base
         RoleMapper $roleMapper,
         Pastoral\Type\Mapper $pastoralTypeMapper,
         Pastoral\SubType\Mapper $pastoralSubTypeMapper,
-        RosettaStone $rosettaStone
+        IconMapper $iconMapper,
+        RosettaStone $rosettaStone,
+        ColorFactory $colorFactory
     ) {
         $this->userMapper             = $userMapper;
         $this->pastoralGroupMapper    = $pastoralGroupMapper;
@@ -76,7 +90,9 @@ class Controller extends Base
         $this->roleMapper             = $roleMapper;
         $this->pastoralTypeMapper     = $pastoralTypeMapper;
         $this->pastoralSubTypeMapper  = $pastoralSubTypeMapper;
+        $this->iconMapper             = $iconMapper;
         $this->rosettaStone           = $rosettaStone;
+        $this->colorFactory           = $colorFactory;
     }
 
 
@@ -232,6 +248,7 @@ class Controller extends Base
                 'groups'          => $this->pastoralGroupMapper->findAll(['name' => ['order' => 'ASC']]),
                 'type'            => $type,
                 'subtype'         => $subType,
+                'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
             ],
             'title'    => 'Pastoral Group Management',
         ]);
@@ -292,6 +309,8 @@ class Controller extends Base
             /* Save the "General Template" content
              */
             $subType->setTemplate($post['template']);
+            $subType->setIcon($post['icon'] ?: null);
+            $subType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
             $subType->setVisibilityLocked($isVisibilityLocked);
             $this->pastoralSubTypeMapper->save($subType);
 
@@ -306,6 +325,8 @@ class Controller extends Base
             /* Save the "General Template" content
              */
             $type->setTemplate($post['template']);
+            $type->setIcon($post['icon'] ?: null);
+            $type->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
             $type->setVisibilityLocked($isVisibilityLocked);
             $this->pastoralTypeMapper->save($type);
 
