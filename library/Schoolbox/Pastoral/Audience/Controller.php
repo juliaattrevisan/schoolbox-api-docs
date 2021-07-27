@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\Audience;
 
+use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Database\Predicate\InvalidColumnException;
 use Alaress\Web\Controller\Base;
@@ -235,6 +236,13 @@ class Controller extends Base
             ['Manage Type Defaults', $this->router->generate('pastoralAudience.getAudiences')],
         ]);
 
+
+        // Figure out a background color based on the record's color
+        // (default color: black)
+        $foregroundColor = ($subType ? $subType->getColor() : $type->getColor()) ?? Color::black();
+        $transformer     = new ColorHelper();
+        $backgroundColor = $transformer->calculateBackground($foregroundColor);
+
         $this->getResponse()->content->set([
             'template' => '@pastoralAudience/audiences_modify.twig',
             'data'     => [
@@ -249,6 +257,12 @@ class Controller extends Base
                 'type'            => $type,
                 'subtype'         => $subType,
                 'icons'           => $this->iconMapper->findAll()->sortNaturally('title'),
+                'flagColors'  => [
+                    'foreground' => $foregroundColor->getAsRgba(),
+                    'background' => $backgroundColor->getAsRgba(),
+                    'baseLight'  => ColorHelper::BASE_BACKGROUND_COLOR_LIGHT,
+                    'baseDark'   => ColorHelper::BASE_BACKGROUND_COLOR_DARK,
+                ]
             ],
             'title'    => 'Pastoral Group Management',
         ]);
