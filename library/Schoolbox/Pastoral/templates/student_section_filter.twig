@@ -4,7 +4,9 @@
 
     <div class="small-12 island">
         <h2 class="subheader">Filter Records By Type</h2>
-        <select data-type-filter>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <select data-type-filter name="typeId" id="typeId">
             <option value="">Show All {{ locale.pastoral.proper }} Record Types</option>
             {% for type in types %}
                 <option value="{{ type.id }}"
@@ -12,11 +14,25 @@
             {% endfor %}
         </select>
     </div>
+    <div class="small-12 medium-6 columns">
+        <select data-subtype-filter name="subtypeId" id="subtypeId">
+            <option value="">Show All {{ locale.pastoral.proper }} Record Sub-Types</option>
+            {% for subtype in subtypes %}
+                <option data-chained="{{ subtype.pastoralType.id }}" value="{{ subtype.id }}"
+                        {% if subtypeSelected == subtype.id %}selected{% endif %}>{{ subtype.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js"></script>
     <script>
         $(function () {
+            $('#subtypeId').chained('#typeId');
             $('[data-type-filter]').change(function () {
-                window.location.href = "?type=" + $(this).val();
+                window.location.href = "?type=" + $(this).val() + "&subtype=" + $('#subtypeId').val();
+            });
+            $('[data-subtype-filter]').change(function () {
+                window.location.href = "?type=" + $('#typeId').val() + "&subtype=" + $(this).val();
             });
         });
     </script>
