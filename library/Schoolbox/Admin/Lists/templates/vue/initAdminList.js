@@ -1,9 +1,9 @@
 import Vue from 'vue';
-import RolesList from './roles-list';
+import AdminList from './admin-list';
 
 new Vue({
-	el: '#roles-list',
+	el: '#admin-list',
 	components: {
-		RolesList
+		AdminList
     }
 });
