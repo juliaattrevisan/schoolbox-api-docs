@@ -670,6 +670,8 @@ else
 
   # Truncate storage_transform table if it is a DB only sync
 	echo "Truncating 'storage_transform' table";
+  temp_ini_file="/etc/$package/instances.ini"
+  read_ini
   mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "TRUNCATE storage_transform";
 fi
 
