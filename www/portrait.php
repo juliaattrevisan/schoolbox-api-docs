@@ -68,12 +68,11 @@ try {
         $preSignedUrlService = new PreSignedUrlService($config);
 
         $portraitPath = $storageModel->getPath();
-        $size = $cacheKey ?? null;
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storageModel,
             Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
-            ($size && strpos($portraitPath, '-') === false) ? $portraitPath . '-' . $size : $portraitPath
+            $portrait->getTranscodePath($portraitPath, $cacheKey)
         );
 
         $preSignedUrlService->download($preSignedUrlDataObject);
