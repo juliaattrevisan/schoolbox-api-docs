@@ -1,7 +1,7 @@
 <script>
 
 /**
- * To view and edit the Roles List, currently showing Name and Role Type, with all others accessed via a Permissions popup
+ * 
  *
  */
 
@@ -17,31 +17,15 @@ import RevealModal from '@schoolbox/reveal-modal';
 export default {
 
     components: {
-        RolesListHeader,
-        RolesListPermissions,
-        RolesListRow,
+        AdminListHeader,
+        AdminListPopOut,
+        AdminListRow,
         Toast,
         RevealModal,
     },
 
     props: {
-        tableName: { //the name of the current list, to pass through the form submit
-            type: String,
-            required: true
-        },
-        table: { //all the table data, including warning messages, title etc
-            type: Object,
-            required: true
-        },
-        initialRows: { //list of currently active rows
-            type: Object,
-            required: true
-        },
-        deleteRoute: { //url of row delete
-            type: String,
-            required: true
-        },
-        saveRoute: { //url of entire list save
+        tableName: { //the name of the current list, used to submit updates to the DB
             type: String,
             required: true
         }
@@ -49,12 +33,15 @@ export default {
 
     data () {
         return {
-            rows: [], //to display and possibly edit the rows
-            isPermissionsOpen: false, //to open and close the list
+            isDataLoaded: false, 
+            hasDataLoadError: false, 
+            data: null, //contains the loaded data
+            rows: [], //to display and possibly edit the rows 
+            isPopOutOpen: false, //to open and close the list
             selectedRow: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
             saveStatus: 'Save All', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
-            selectedPermissionName: '', //to highlight all other rows that have that permission
+            selectedNameInPopOut: '', //to highlight all other rows that have that permission
             isProcessing: false, //to prevent multiple rapid-fire submissions
             isSaving: false,
         }
@@ -63,60 +50,35 @@ export default {
     computed: {
 
         /**
-         * Assign a key for each column for future reference, so can link the selectedRow to the columns when editing permissions
-         *
+         * Retrieve only those fields that will appear in the header
+         * 
          * @returns { Array of Objects }
          */
-        columns () {
-            const columns = Object.values(this.table.fields);
-            const rowKeysList = Object.keys(this.rows[0]);
-            columns.forEach((column, index) => {
-                column.key = rowKeysList[index];
-            });
-            return columns;
-        },
+        headerFields () {
+            return this.data.fields.filter((field) => field.hasOwnProperty('width')); //use width to determine if it's to display in the header
+        },  
 
         /**
-         * Only Name and Role type are shown with
-         * the rest within #roles-list-permissions.vue
-         *
-         * @returns { Array of Objects }
+         * the name of the popOutList
+         * 
+         * @returns { String }
          */
-        headerColumns () {
-            const headerColumns = this.columns.filter((column) => {
-                return (column.caption === 'Name' || column.caption === 'Role Type');
-            });
-            headerColumns.push( { //and add another to allow space for Permissions UI
-                caption: 'Permissions',
-                width: '8',
-                tooltip: 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.'
-            } );
-            return headerColumns;
-        },
-
+        popOutCaption () {
+            const popOutList = this.headerFields.find((field) => field.isPopoutList); //use width to determine if it's to display in the header
+            if (typeof popOutList !== 'undefined') {
+                return popOutList.caption;
+            } 
+            return '';
+        },  
+        
         /**
-         * To provide the permission columns, pulling out Name and Role Type
-         *
+         * Just those fields that are used in a popoutList
+         * 
          * @returns { Array of Objects }
          */
-        permissionColumns () {
-            return this.columns.filter((column) => {
-                return (column.caption !== 'Name' && column.caption !== 'Role Type' && column.caption !== 'sequence'); //all excluding Name, Role Type and sequence
-            });
-        },
-
-        /**
-         * To show list of columns that cannot be null
-         *
-         * @returns { Array of Objects }
-         */
-        fixedList () {
-            const fixedList = [];
-            for (const [key, value] of Object.entries(this.table.fixed)) {
-                fixedList.push({ key: key, value: value });
-            }
-            return fixedList;
-        },
+        popOutFields () {
+            return this.data.fields.filter((field) => field.popoutList);
+        }, 
 
         /**
          * To display the rows how they have been sorted
@@ -129,64 +91,81 @@ export default {
 
     },
 
-    created () {
-        this.initRows();
-    },
-
     mounted () {
-        this.initSortable();
+        this.getData();
     },
 
     methods: {
 
         /**
-         * Add in the id so can link to the DB on form submit
-         * and a boolean to know whether the row is one being newly added
-         *
+         * Load the list data relevant to the current list
+         */
+        async getData () {
+            try {
+                const response = await axios.get(`/adminv2/lists/data/${this.tableName}`);
+                this.data = response.data; 
+                this.initRows();
+                this.initSortable();
+            } catch (error) {
+                this.hasDataLoadError = true; //show load error
+            } finally {
+                this.isDataLoaded = true; //update the display to show the list
+            }
+        },
+
+        /**
+         * Add a boolean to know whether the row is one being newly added
          */
         initRows () {
-            this.rows = Object.values(this.initialRows);
-            const rowKeys = Object.keys(this.initialRows);
-            this.rows.forEach((row, index) => {
-                row.id = rowKeys[index]; //for example 1: { name: 'Teacher' } - so retrieve the key of 1 which is the id to link with DB
+            this.rows = this.data.rows;
+            this.rows.forEach((row) => { 
                 row.isNew = false;
             });
         },
 
         /**
          * Init the sortable feature
-         *
          */
         initSortable () {
-            if (this.table.sortable) {
+            if (this.data.isSortable) {
                 $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
             }
+        }, 
+
+        /**
+         * Get all the fields for the relevant pop out
+         * 
+         * @param { String }
+         * 
+         * @returns { Array of Objects }
+         */
+        getPopOutFields (popOut) {
+            return this.popOutFields.filter((field) => field.popoutList === popOut);
         },
 
         /**
-         * Show the permissions options
-         *
+         * Show the popout options
          */
-        onPermissionsSelected (selectedRow) {
+        onPopOutSelected (selectedRow) {
             this.selectedRow = selectedRow;
-            this.isPermissionsOpen = true;
-            document.querySelector('[data-sortable]').style.pointerEvents = 'none'; //prevent ediding/sorting while permissions is open
+            this.isPopOutOpen = true;
+            document.querySelector('[data-sortable]').style.pointerEvents = 'none'; //prevent editing/sorting while popoutList is open
         },
 
         /**
-         * Close the permissions options
-         *
+         * Close the pop out options
          */
-        onPermissionsClosed () {
-            this.isPermissionsOpen = false;
+        onPopOutClosed () {
+            this.isPopOutOpen = false;
             document.querySelector('[data-sortable]').style.pointerEvents = 'auto';
         },
 
         /**
-         * Push in a new row with basic guest access
-         *
+         * Push in a new row
          */
         onNewRowSelected () {
+            // const newRow = this.rows.filter((item, index) => index === 0);
+            // this.rows = [...this.rows, newRow];
             this.rows.push(
                 {
                     name: '',
@@ -247,13 +226,12 @@ export default {
         /**
          * Notify the DB and pull out the selectedRow
          * on delete confirmation
-         *
          */
         async onConfirmDeleteRowSelected () {
             this.isProcessing = true;
             this.$refs.toast.activate('Deleting row...');
             try {
-                const response = await axios.post(this.deleteRoute, this.getDeleteRowFormData());
+                const response = await axios.post(this.data.deleteRoute, this.getDeleteRowFormData());
                 if (response.result !== false) {
                     this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
                     this.$refs.toast.timeout('Row Deleted', true, 2000);
@@ -270,7 +248,6 @@ export default {
 
         /**
          * Cancel the the selected row deletion
-         *
          */
         getDeleteRowFormData () {
             const formData = new FormData();
@@ -281,7 +258,6 @@ export default {
 
         /**
          * Cancel the the selected row deletion
-         *
          */
         onCancelDeleteRowSelected () {
             this.$refs.deleteModal.close();
@@ -289,7 +265,6 @@ export default {
 
         /**
          * Save all data
-         *
          */
         async onSaveAllSelected () {
             this.isSaving = true;
@@ -299,7 +274,7 @@ export default {
             this.$refs.toast.activate('Saving...');
             try {
                 const formData = new FormData(this.$refs.form);
-                const response = await axios.post(this.saveRoute, formData);
+                const response = await axios.post(this.data.saveRoute, formData);
                 if (response.status === 200) {
                     this.saveStatus = 'Save All';
                     this.$refs.toast.timeout('Save successful', true, 2000);
@@ -315,7 +290,6 @@ export default {
 
         /**
          * Ensure the correct sorting order is reflected for page reload
-         *
          */
         updateSequenceOrder () {
             const allRowElements = document.querySelector('[data-list]').children;
@@ -332,7 +306,6 @@ export default {
          * what happens before shown
          *
          * @param {DOMElement} element - the element that's animating
-         *
          */
         onBeforeEnter (row) {
             if (!this.isSaving) {
@@ -345,7 +318,6 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
-         *
          */
         onEnter (row, done) {
             if (this.isSaving) {
@@ -360,7 +332,6 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
-         *
          */
         onLeave (row, done) {
             if (this.isSaving) {
@@ -373,13 +344,12 @@ export default {
         /**
          * To highlight all rows which also have the same permission
          * maybe an easy way to check which rows have the permission?
-         *
          */
-        onPermissionNameSelected (permissionName) {
-            if (this.selectedPermissionName === permissionName) { //so can toggle on/off
-                this.selectedPermissionName = '';
+        onPopOutNameSelected (popOutName) {
+            if (this.selectedNameInPopOut === popOutName) { //so can toggle on/off
+                this.selectedNameInPopOut = '';
             } else {
-                this.selectedPermissionName = permissionName;
+                this.selectedNameInPopOut = popOutName;
             }
 
         }
@@ -393,93 +363,102 @@ export default {
 
     <div>
 
-        <div class="small-12 island">
+        <div v-if="isDataLoaded">
+        
+            <div class="small-12 island">
+                
+                <div v-if="rows.length === 0" id="listEmptyState" class="empty-state">
+                    <i class="icon-list"></i>
+                    <p>The {{ data.title }} list is empty.<br><a href="#add-an-item" data-button="add-row">Add an item to this list</a>.</p>
+                </div>
 
-            <div v-if="rows.length === 0" id="listEmptyState" class="empty-state">
-                <i class="icon-list"></i>
-                <p>The {{ table.title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
-            </div>
+                <form v-else method="post" action="/adminv2/lists/save" ref="form">
 
-            <form v-else method="post" action="/adminv2/lists/save" ref="form">
+                    <section id="listEditor">
 
-                <input name="table" type="hidden" :value="tableName" />
+                        <div class="list-container">
 
-                <!-- {# This is used when hidden columns cannot be NULL. Existing rows should already be set in DB #} -->
-                <input v-for="(column, index) in fixedList" :key="index" type="hidden" :name="`fixed-${column.key}`" :value="column.value" />
-
-                <section id="listEditor">
-
-                    <div class="list-container">
-
-                        <roles-list-header
-                            :header-columns="headerColumns"
-                            :is-sortable="table.sortable"
-                            :is-deletable="table.delete"
-                        />
-
-                        <transition-group
-                            name="staggered-fade"
-                            tag="ul"
-                            :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`"
-                            v-bind:css="false"
-                            data-sortable
-                            data-list
-                            @before-enter="onBeforeEnter"
-                            @enter="onEnter"
-                            @leave="onLeave"
-                        >
-                            <roles-list-row
-                                v-for="(row, index) in rowsSortedBySequence"
-                                :key="`${row.id}-${index}`"
-                                :initial-index="index + 1"
-                                :header-columns="headerColumns"
-                                :permission-columns="permissionColumns"
-                                :row="row"
-                                :selected-row="selectedRow"
-                                :is-permissions-open="isPermissionsOpen"
-                                :selected-permission-name="selectedPermissionName"
-                                :is-sortable="table.sortable"
-                                :is-deletable="table.delete"
-                                @on-permissions-selected="onPermissionsSelected"
-                                @on-permission-name-selected="onPermissionNameSelected"
-                                @on-delete-row-selected="onDeleteRow"
+                            <admin-list-header 
+                                :header-fields="headerFields"
+                                :is-sortable="data.isSortable"
+                                :is-deletable="data.canDelete"
                             />
-                        </transition-group>
 
-                        <roles-list-permissions
-                            :permission-columns="permissionColumns"
-                            :selected-row="selectedRow"
-                            :is-open="isPermissionsOpen"
-                            :save-route="saveRoute"
-                            @on-permissions-closed="onPermissionsClosed"
-                        />
+                            <transition-group
+                                name="staggered-fade"
+                                tag="ul"
+                                :class="`information-list ${ data.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
+                                v-bind:css="false"
+                                data-sortable 
+                                data-list 
+                                @before-enter="onBeforeEnter"
+                                @enter="onEnter"
+                                @leave="onLeave"
+                            >    
+                                <admin-list-row
+                                    v-for="(row, index) in rowsSortedBySequence"
+                                    :key="`${row.id}-${index}`"
+                                    :header-fields="headerFields"
+                                    :row="row"
+                                    :selected-row="selectedRow"
+                                    :is-sortable="data.isSortable"
+                                    :can-delete="data.canDelete"
+                                    :pop-out-caption="popOutCaption"
+                                    :pop-out-fields="popOutFields"
+                                    :is-pop-out-open="isPopOutOpen"
+                                    :selected-pop-out-name="selectedNameInPopOut"
+                                    @on-pop-out-selected="onPopOutSelected"
+                                    @on-pop-out-name-selected="onPopOutNameSelected"
+                                    @on-delete-row-selected="onDeleteRow"
+                                />
+                            </transition-group>
 
-                        <div v-if="!table.noNewRecords" class="component-action">
-                            <section>
-                                <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
-                            </section>
-                        </div>
+                            <admin-list-pop-out
+                                v-if="popOutFields.length > 0"
+                                :caption="popOutCaption"
+                                :fields="popOutFields" 
+                                :selected-row="selectedRow"
+                                :is-open="isPopOutOpen" 
+                                :save-route="data.saveRoute" 
+                                @on-pop-out-closed="onPopOutClosed"
+                            />
 
-                    </div><!-- .list-container -->
+                            <div v-if="!data.noNewRecords" class="component-action">
+                                <section>
+                                    <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
+                                </section>
+                            </div>
 
-                </section>
+                        </div><!-- .list-container -->
 
-                <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" :disabled="isProcessing" />
+                    </section>
 
-            </form>
+                    <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" :disabled="isProcessing" />
 
-        </div><!-- small-12 island -->
+                </form>
 
-        <toast ref="toast"></toast>
+            </div><!-- small-12 island -->  
 
-        <reveal-modal ref="deleteModal">
-            <h2>Please Confirm</h2>
-            <div data-alert class="alert-box warning">{{ table.deleteWarning }}</div>
-            <ul class="flex-list buttons">
-                <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
-                <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
-            </ul>
-        </reveal-modal>
+            <toast ref="toast"></toast>
+
+            <reveal-modal v-if="data.canDelete" ref="deleteModal">
+                <h2>Please Confirm</h2>
+                <div data-alert class="alert-box warning">{{ data.deleteWarning }}</div>
+                <ul class="flex-list buttons">
+                    <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
+                    <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
+                </ul>
+            </reveal-modal>
+
+        </div><!-- v-if="isDataLoaded" -->
+
+        <div v-else-if="hasDataLoadError">
+            <h2>Unable to load the list data</h2>
+        </div>
+
+        <div v-else>
+            <h2>Loading please wait</h2>
+        </div>
 
     </div>
 

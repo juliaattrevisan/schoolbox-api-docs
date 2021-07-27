@@ -8,15 +8,7 @@
 export default {
 
     props: {
-        initialIndex: {
-            type: Number,
-            required: true
-        },
-        headerColumns: { //the headerColumns to display within the list item
-            type: Array,
-            required: true
-        },
-        permissionColumns: { //to pass through the permission fields on form submit
+        headerFields: { //the headerFields to display within the list item
             type: Array,
             required: true
         },
@@ -28,58 +20,56 @@ export default {
             type: Object,
             required: true
         },
-        isPermissionsOpen: { //to change display of row while open
-            type: Boolean,
-            required: true
-        },
-        selectedPermissionName: { //to show all rows with the same permission
-            type: String,
-            required: true
-        },
         isSortable: { //whether drag n drop is enabled
             type: Boolean,
             required: true
         },
-        isDeletable: { //allows space for the delete UI
+        canDelete: { //allows space for the delete UI
             type: Boolean,
             required: true
+        },
+        popOutCaption: { //the title of the pop out
+            type: String,
+            required: false
+        },
+        popOutFields: { //when a #admin-list-pop-out.vue is in use
+            type: Array,
+            required: false    
+        },
+        isPopOutOpen: { //to change display of row while open
+            type: Boolean,
+            required: false
+        },
+        selectedPopOutName: { //to show all rows with the same permission
+            type: String,
+            required: false
         },
     },
 
     computed: {
 
         /**
-         * To retrieve the list of key/value pairs contained within the row object
+         * To retrieve a list of key/value pairs contained within the row object
          *
          * @returns { Array of Objects }
          */
-        rowFields () {
-            const rowFields = [];
+        rowKeyValueList () {
+            const rowKeyValueList = [];
             for (const [key, value] of Object.entries(this.row)) {
-                rowFields.push({ key: key, value: value });
+                rowKeyValueList.push({ key: key, value: value });
             }
-            return rowFields;
+            return rowKeyValueList;
         },
 
         /**
-         * To loop through and add <input hidden> options for permission settings
-         * removing those that are added otherwise, or not part of the form data to submit
+         * To show only those options in pop out list currently set to true
          *
          * @returns { Array of Objects }
          */
-        permissionFields () {
-            return this.rowFields.filter((field) => {
-                return (field.key !== 'name' && field.key !== 'type' && field.key !== 'id' && field.key !== 'isNew' && field.key !== 'sequence');
-            });
-        },
-
-        /**
-         * To show only those permissions currently set to true
-         *
-         * @returns { Array of Objects }
-         */
-        activePermissionFields () {
-            return this.permissionColumns.filter((field, index) => this.permissionFields[index].value); //when the value is set to true, put in the list
+        activePopOutFields () {
+            const fieldIdList = this.popOutFields.map((field) => field.id); //a list of just field.id to get the relevant key/value in rowKeyValueList
+            const popOutKeyValueList = this.rowKeyValueList.filter((row) => fieldIdList.some((fieldId) => fieldId === row.key)); //pull out those rowKeyValue object pairs that are part of the pop out 
+            return this.popOutFields.filter((field, index) => popOutKeyValueList[index].value); //when the value is set to true, put in the list
         },
 
         /**
@@ -88,7 +78,7 @@ export default {
          * @returns { Boolean }
          */
         isUnselectedRow () {
-            return (this.isPermissionsOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
+            return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
 
     },
@@ -96,17 +86,17 @@ export default {
     watch: {
 
         /**
-         * Preset the permission fields when setting between staff / all others
+         * Preset the pop out fields when setting between staff / all others
          *
          */
         'row.type': function (newValue) {
             if (newValue === 'staff') { //set all enabled when staff
-                this.permissionFields.forEach((option) => {
-                    this.row[option.key] = true;
+                this.popOutFields.forEach((option) => {
+                    this.row[option.id] = true;
                 });
             } else { //otherwise only allowPasswordChange
-                this.permissionFields.forEach((option) => {
-                    this.row[option.key] = false;
+                this.popOutFields.forEach((option) => {
+                    this.row[option.id] = false;
                 });
                 this.row['canChangePassword'] = true;
             }
@@ -117,12 +107,12 @@ export default {
     methods: {
 
         /**
-         * Show the permission columns
+         * Show the pop out fields
          *
          */
-        onPermissionsSelected () {
-            this.$emit('on-permissions-selected', this.row);
-            this.$emit('on-permission-name-selected', '');
+        onPopOutSelected () {
+            this.$emit('on-pop-out-selected', this.row);
+            this.$emit('on-pop-out-name-selected', '');
         },
 
         /**
@@ -131,15 +121,15 @@ export default {
          */
         onDeleteRowSelected () {
             this.$emit('on-delete-row-selected', this.row);
-            this.$emit('on-permission-name-selected', '');
+            this.$emit('on-pop-out-name-selected', '');
         },
 
         /**
-         * To confirm whether should delete the row
+         * Higlight the currently selected pop out name
          *
          */
-        onPermissionNameSelected (permissionName) {
-            this.$emit('on-permission-name-selected', permissionName);
+        onPopOutNameSelected (popOutName) {
+            this.$emit('on-pop-out-name-selected', popOutName);
         }
 
     }
@@ -151,40 +141,33 @@ export default {
 
     <li :class="[ isUnselectedRow ? 'un-selected-row' : '', 'list-item-container' ]" :data-row-id="row.id">
 
-        <input type="hidden" :name="`id[${initialIndex}]`" :value="row.id">
+        <div :class="`actions-small-${ canDelete ? '1' : '0' }`">
 
-        <div :class="`actions-small-${ isDeletable ? '1' : '0' }`">
-
-            <div class="grip ui-sortable-handle"></div>
+            <div v-if="isSortable" class="grip ui-sortable-handle"></div>
 
             <div class="list-item">
-                <template v-for="(column, index) in headerColumns">
-                    <div :class="`small-12 medium-${ column.width ? column.width : '2' } column`" :key="index">
-                        <span class="hide-for-medium-up">{{ column.caption }}</span>
-                        <template v-if="column.lookup">
-                            <select :name="`value-${rowFields[index].key}[${initialIndex}]`" v-model="row[column.key]" :title="rowFields[index].value">
-                                <option v-for="(option, index) in column.lookup" :key="index" :value="option.key">{{ option.value }}</option>
+                <template v-for="(field, index) in headerFields">
+                    <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
+                        <span class="hide-for-medium-up">{{ field.caption }}</span>
+                        <template v-if="field.isPopoutList">
+                            <div class="pop-out-list-container">
+                                <transition-group name="pop-out-list" tag="div" class="pop-out-list">
+                                    <button v-for="field in activePopOutFields" :key="field.caption" :class="[ selectedPopOutName === field.caption ? 'pop-out-list-item-active' : '', 'pop-out-list-item']" @click.prevent="onPopOutNameSelected(field.caption)">{{ field.caption }}</button>
+                                </transition-group>
+                                <button @click.prevent="onPopOutSelected" class="update-pop-out-button button icon-modify" title="Modify"></button>
+                            </div>
+                        </template>
+                        <template v-else-if="field.lookup">
+                            <select v-model="row[field.id]" :title="rowKeyValueList[index].value">
+                                <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
                             </select>
                         </template>
-                        <template v-else-if="column.mandatory">
-                            <input :name="`mandatory-${rowFields[index].key}[${initialIndex}]`" type="text" :placeholder="column.caption" v-model="row[column.key]" :maxlength="column.maxLength ? column.maxLength : 0">
-                        </template>
                         <template v-else>
-                            <div class="permissions-list-container">
-                                <transition-group name="permissions-list" tag="div" class="permissions-list">
-                                    <button v-for="field in activePermissionFields" :key="field.caption" :class="[ selectedPermissionName === field.caption ? 'permission-list-item-active' : '', 'permission-list-item']" @click.prevent="onPermissionNameSelected(field.caption)">{{ field.caption }}</button>
-                                </transition-group>
-                                <button @click.prevent="onPermissionsSelected" class="update-permissions-button button icon-modify" title="Modify Permissions"></button>
-                            </div>
+                            <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : 0">
                         </template>
                     </div>
                 </template>
             </div><!-- .list-item -->
-
-            <!-- the checkboxes are selected by #roles-list-configure-access.vue so need to track via hidden vars -->
-            <input v-for="(field, index) in permissionFields" :name="`checkbox-${field.key}[${initialIndex}]`" type="hidden" :value="`${Number(field.value)}`" :key="index">
-
-            <input type="hidden" :name="`sequence[${initialIndex}]`" :value="row.sequence">
 
             <nav>
                 <a @click.prevent="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
@@ -200,7 +183,7 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-.column {
+.field {
     @media screen and (max-width: 1500px) {
         padding: 0px 0.5rem;
     }
@@ -214,29 +197,29 @@ export default {
     opacity: 0.2;
 }
 
-.permissions-list-container { //to contain the .permissions-list and the .update-permissions-button
+.pop-out-list-container { //to contain the .pop-out-list and the .update-pop-out-button
     display: flex;
     align-items: stretch;
     width: 100%;
     border: 1px solid $form-border-color;
 }
 
-.permissions-list {
+.pop-out-list {
     width: 100%;
     padding: 2px;
     transition: height 0.3s;
 }
 
-.permissions-list-enter, .permissions-list-leave-to { //to animate on/off when toggling in #roles-list-permissions.vue
+.pop-out-list-enter, .pop-out-list-leave-to { //to animate on/off when toggling in #roles-list-permissions.vue
     opacity: 0;
     transform: translateY(5px);
 }
 
-.permissions-list-leave-active {
+.pop-out-list-leave-active {
     position: absolute;
 }
 
-.permission-list-item {
+.pop-out-list-item {
     min-height: auto;
     margin: 2px;
     padding: 5px 10px;
@@ -250,11 +233,11 @@ export default {
     }
 }
 
-.permission-list-item-active {
+.pop-out-list-item-active {
     background: $content-ui-background;
 }
 
-.update-permissions-button {
+.update-pop-out-button {
     flex: 0 0 40px;
     margin: 0px;
     padding: 0.5rem;
