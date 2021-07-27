@@ -28,8 +28,8 @@ export default {
             type: Boolean,
             required: true
         },
-        popOutCaption: { //the title of the pop out
-            type: String,
+        popOutHeaderField: { //the title of the pop out
+            type: Object,
             required: false
         },
         popOutFields: { //when a #admin-list-pop-out.vue is in use
