@@ -1,24 +1,26 @@
 <script>
 
 /**
- * Update an individual rows pop out options
- * Currently only checkboxes are being considered, can be extended as required
+ * Update an invidual rows permissions
+ *
  */
 
-import { gsap } from 'gsap/all';
+import gsap from 'gsap/all';
+import axios from 'axios';
+import Toast from '@schoolbox/toast';
 
 export default {
 
+    components: {
+        Toast
+    },
+
     props: {
-        headerField: { //the header field object
-            type: Object,
-            required: true
-        },
-        fields: { //the fields to display within the pop out
+        permissionColumns: { //the columns to display within the list
             type: Array,
             required: true
         },
-        selectedRow: { //to know which row to display
+        selectedRow: { //to know which row permission fields to display
             type: Object,
             required: true
         },
@@ -26,71 +28,36 @@ export default {
             type: Boolean,
             required: true
         },
-        saveStatus: { //to update the button text when saving
+        saveRoute: { //url of entire list save
             type: String,
             required: true
-        },
-        isProcessing: { //to prevent multiple rapid-fire submissions
-            type: Boolean,
-            required: true
+        }
+    },
+
+    data () {
+        return {
+            saveStatus: 'Save Permissions', //to update the button text when saving
+            isProcessing: false //to prevent multiple rapid-fire submissions
         }
     },
 
     computed: {
 
         /**
-         * When 'changePopOut' is set on the popOutList, we need to consider 
-         * displaying only those fields linked to the current selection of 'changePopOutOptions'
-         * For example on Lists > Roles, changing 'Role Type' will change the list of Permissions available 
-         * If 'changePopOut' isn't set, we can just return all 'popOutList' fields
+         * Only show those fields relevant to the user type,
+         * showing all for staff and just password change for all others
          *
          * @returns { Array of Objects }
          */
-        changePopOutFields () {
-            if (this.headerField.changePopOut && this.selectedRow.id) {
-                const selectedRowChangePopOutValue = this.selectedRow[this.headerField.changePopOut]; //eg: for 'Role Type', could be 'Staff' or 'Student' 
-                const changePopOutOptions = this.headerField.changePopOutOptions[selectedRowChangePopOutValue]; //eg: only the options linked to the selected 'Role Type'
-                return this.fields.filter((field) => changePopOutOptions.includes(field.id)); //now only those fields linked to the value
+        roleSpecificPermissions () {
+            if (this.selectedRow.type === 'staff') {
+                return this.permissionColumns;
             } else {
-                return this.fields; //otherwise when there's no 'changePopOut' just return as normal
+                const onlyShowPasswordField = this.permissionColumns.filter((field) => {
+                    return field.caption === 'Allow Password Change';
+                });
+                return onlyShowPasswordField;
             }
-        },
-
-        /**
-         * Retrieve all checkboxes in the pop out
-         *
-         * @returns { Array }
-         */
-        checkboxFieldList () {
-            return this.changePopOutFields.filter((field) => field.checkbox);
-        },
-
-        /**
-         * If there's a few checkboxes in the list, we should show a 'Select All' checkbox
-         * for easier selection
-         *
-         * @returns { Boolean }
-         */
-        canShowSelectAllCheckbox () {
-            return this.checkboxFieldList.length > 2;
-        },
-
-        /**
-         * Retrieve all selected check boxes
-         *
-         * @returns { Array }
-         */
-        selectedCheckboxFieldList () {
-            return this.checkboxFieldList.filter((field) => this.selectedRow[field.id]); //will return those checkboxes with a true value
-        },
-
-        /**
-         * To determine the status of the Select All checkbox
-         *
-         * @returns { Boolean }
-         */
-        isAllCheckboxesSelected () {
-            return this.selectedCheckboxFieldList.length === this.checkboxFieldList.length; //whether all checkboxes are selected (set as true) or not
         }
 
     },
@@ -99,6 +66,7 @@ export default {
 
         /**
          * To open or close depending on boolean value
+         *
          */
         isOpen (newValue) {
             if (newValue === true) {
@@ -110,15 +78,11 @@ export default {
 
     },
 
-    mounted () {
-        this.$emit('on-pop-out-mounted', this.$refs.innerContainer.clientHeight);
-        this.$refs.outerContainer.style.display = 'none';
-    },
-
     methods: {
 
         /**
          * Animate the view on
+         *
          */
         open () {
             this.$refs.outerContainer.style.display = 'block';
@@ -126,21 +90,46 @@ export default {
         },
 
         /**
+         * Save all the permissions options, currently just using the
+         * existing save all route
+         *
+         */
+        async onSavePermissionsSelected () {
+            this.isProcessing = true;
+            this.saveStatus = 'Saving...';
+            this.$refs.toast.activate('Saving...');
+            try {
+                const formData = new FormData(this.$parent.$refs.form);
+                const response = await axios.post(this.saveRoute, formData);
+                if (response.status === 200) {
+                    this.saveStatus = 'Save Permissions';
+                    this.$refs.toast.timeout('Save successful', true, 2000);
+                } else {
+                    this.$refs.toast.timeout('Unable to save', false, 2000);
+                }
+            } catch (error) {
+                this.$refs.toast.timeout('Unable to save', false, 2000);
+            } finally {
+                location.reload();
+            }
+        },
+
+        /**
+         * Show the access options
+         *
+         */
+        onClosePermissionsSelected () {
+            this.$emit('on-permissions-closed');
+        },
+
+        /**
          * Close the view
+         *
          */
         close () {
             gsap.to(this.$refs.innerContainer, { right: '-100%', duration: 0.3, onComplete: () => {
                 this.$refs.outerContainer.style.display = 'none'
             } } );
-        },
-
-        /**
-         * check / uncheck all checkboxes
-         */
-        onSelectAllSelected (event) {
-            this.checkboxFieldList.forEach((field) => {
-                this.selectedRow[field.id] = event.target.checked;
-            });
         },
 
     }
@@ -149,31 +138,23 @@ export default {
 </script>
 
 <template>
-    <div class="outer-container" ref="outerContainer">
-        <div class="inner-container checklist" ref="innerContainer">
-            <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
-            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="$emit('on-pop-out-closed')"></a>
+    <div class="permissions-outer-container" ref="outerContainer">
+        <div class="permissions-inner-container checklist" ref="innerContainer">
+            <h4>{{ selectedRow.name }} Permissions</h4>
+            <a href="#close-permissions" class="close-permissions-button icon-close" @click.prevent="onClosePermissionsSelected"></a>
             <ul class="option-list" data-option-list>
-                <li v-if="canShowSelectAllCheckbox" style="margin-bottom: 5px;">
-                    <input
-                        id="select-all"
-                        type="checkbox"
-                        :checked="isAllCheckboxesSelected"
-                        @change="onSelectAllSelected"
-                    />
-                    <label for="select-all">Select All</label>
-                </li>
-                <li v-for="(field, index) in changePopOutFields" :key="index">
+                <li v-for="(field, index) in roleSpecificPermissions" :key="index">
                     <input
                         :id="field.caption"
                         type="checkbox"
-                        v-model="selectedRow[field.id]"
+                        v-model="selectedRow[field.key]"
                     />
-                    <label :for="field.caption">{{ field.caption }}<span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span></label>
+                    <label :for="field.caption">{{ field.caption }}</label>
                 </li>
             </ul>
-            <button @click.prevent="$emit('on-pop-out-saved')" class="save-button">{{ saveStatus }}</button>
+            <button @click.prevent="onSavePermissionsSelected" class="save-permissions-button">{{ saveStatus }}</button>
         </div>
+        <toast ref="toast"></toast>
     </div>
 </template>
 
@@ -181,26 +162,29 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-.outer-container {
+.permissions-outer-container {
+    display: none;
     position: absolute;
     z-index: 1;
     right: 0px;
     top: 0px;
     width: 320px;
-    min-height: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
-.inner-container {
+.permissions-inner-container {
     position: absolute;
     right: -100%;
     top: 0px;
     width: 100%;
+    height: 100%;
     border: 2px solid $form-border-color;
     padding: 1rem;
     background: white;
 }
 
-.close-button {
+.close-permissions-button {
     position: absolute;
     top: 0;
     right: 0;
@@ -208,7 +192,7 @@ export default {
     font-size: 1.5rem;
 }
 
-.save-button {
+.save-permissions-button {
     width: 100%;
 }
 

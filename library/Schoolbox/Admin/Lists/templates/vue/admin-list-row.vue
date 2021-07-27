@@ -2,22 +2,21 @@
 
 /**
  * Display an indivudal row, providing access to view and edit permissions and delete
+ *
  */
-
-import AdminListRowLookup from './admin-list-row-lookup';
-import AdminListRowColour from './admin-list-row-colour';
-import AdminListRowPopOut from './admin-list-row-pop-out';
 
 export default {
 
-    components: {
-        AdminListRowLookup,
-        AdminListRowColour,
-        AdminListRowPopOut,
-    },
-
     props: {
-        headerFields: { //the headerFields to display within the list item
+        initialIndex: {
+            type: Number,
+            required: true
+        },
+        headerColumns: { //the headerColumns to display within the list item
+            type: Array,
+            required: true
+        },
+        permissionColumns: { //to pass through the permission fields on form submit
             type: Array,
             required: true
         },
@@ -29,45 +28,58 @@ export default {
             type: Object,
             required: true
         },
+        isPermissionsOpen: { //to change display of row while open
+            type: Boolean,
+            required: true
+        },
+        selectedPermissionName: { //to show all rows with the same permission
+            type: String,
+            required: true
+        },
         isSortable: { //whether drag n drop is enabled
             type: Boolean,
             required: true
         },
-        canDelete: { //allows space for the delete UI
+        isDeletable: { //allows space for the delete UI
             type: Boolean,
             required: true
-        },
-        popOutHeaderField: { //the title of the pop out
-            type: Object,
-            required: false
-        },
-        popOutFields: { //when a #admin-list-pop-out.vue is in use
-            type: Array,
-            required: false    
-        },
-        isPopOutOpen: { //to change display of row while open
-            type: Boolean,
-            required: false
-        },
-        selectedPopOutName: { //to show all rows with the same permission
-            type: String,
-            required: false
         },
     },
 
     computed: {
 
         /**
-         * To retrieve a list of key/value pairs contained within the row object
+         * To retrieve the list of key/value pairs contained within the row object
          *
          * @returns { Array of Objects }
          */
-        rowKeyValueList () {
-            const rowKeyValueList = [];
+        rowFields () {
+            const rowFields = [];
             for (const [key, value] of Object.entries(this.row)) {
-                rowKeyValueList.push({ key: key, value: value });
+                rowFields.push({ key: key, value: value });
             }
-            return rowKeyValueList;
+            return rowFields;
+        },
+
+        /**
+         * To loop through and add <input hidden> options for permission settings
+         * removing those that are added otherwise, or not part of the form data to submit
+         *
+         * @returns { Array of Objects }
+         */
+        permissionFields () {
+            return this.rowFields.filter((field) => {
+                return (field.key !== 'name' && field.key !== 'type' && field.key !== 'id' && field.key !== 'isNew' && field.key !== 'sequence');
+            });
+        },
+
+        /**
+         * To show only those permissions currently set to true
+         *
+         * @returns { Array of Objects }
+         */
+        activePermissionFields () {
+            return this.permissionColumns.filter((field, index) => this.permissionFields[index].value); //when the value is set to true, put in the list
         },
 
         /**
@@ -76,34 +88,58 @@ export default {
          * @returns { Boolean }
          */
         isUnselectedRow () {
-            return (this.isPopOutOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
+            return (this.isPermissionsOpen && this.selectedRow.id !== this.row.id) //is a row selected, and is it this row if so
         },
+
+    },
+
+    watch: {
+
+        /**
+         * Preset the permission fields when setting between staff / all others
+         *
+         */
+        'row.type': function (newValue) {
+            if (newValue === 'staff') { //set all enabled when staff
+                this.permissionFields.forEach((option) => {
+                    this.row[option.key] = true;
+                });
+            } else { //otherwise only allowPasswordChange
+                this.permissionFields.forEach((option) => {
+                    this.row[option.key] = false;
+                });
+                this.row['canChangePassword'] = true;
+            }
+        }
 
     },
 
     methods: {
 
         /**
-         * Show the pop out fields
+         * Show the permission columns
+         *
          */
-        onPopOutSelected (row) {
-            this.$emit('on-pop-out-selected', row);
-            this.$emit('on-pop-out-name-selected', '');
-        },
-
-        /**
-         * Higlight the currently selected pop out name
-         */
-        onPopOutNameSelected (popOutName) {
-            this.$emit('on-pop-out-name-selected', popOutName);
+        onPermissionsSelected () {
+            this.$emit('on-permissions-selected', this.row);
+            this.$emit('on-permission-name-selected', '');
         },
 
         /**
          * To confirm whether should delete the row
+         *
          */
         onDeleteRowSelected () {
             this.$emit('on-delete-row-selected', this.row);
-            this.$emit('on-pop-out-name-selected', '');
+            this.$emit('on-permission-name-selected', '');
+        },
+
+        /**
+         * To confirm whether should delete the row
+         *
+         */
+        onPermissionNameSelected (permissionName) {
+            this.$emit('on-permission-name-selected', permissionName);
         }
 
     }
@@ -115,80 +151,42 @@ export default {
 
     <li :class="[ isUnselectedRow ? 'un-selected-row' : '', 'list-item-container' ]" :data-row-id="row.id">
 
-        <div :class="`actions-small-${ canDelete ? '1' : '0' }`">
+        <input type="hidden" :name="`id[${initialIndex}]`" :value="row.id">
 
-            <div v-if="isSortable" class="grip ui-sortable-handle"></div>
+        <div :class="`actions-small-${ isDeletable ? '1' : '0' }`">
+
+            <div class="grip ui-sortable-handle"></div>
 
             <div class="list-item">
-                <template v-for="(field, index) in headerFields">
-                    <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
-                       
-                        <span class="hide-for-medium-up">{{ field.caption }}</span>
-                        
-                        <template v-if="field.readonly">
-                            <p>{{ row[field.id] }}</p>
+                <template v-for="(column, index) in headerColumns">
+                    <div :class="`small-12 medium-${ column.width ? column.width : '2' } column`" :key="index">
+                        <span class="hide-for-medium-up">{{ column.caption }}</span>
+                        <template v-if="column.lookup">
+                            <select :name="`value-${rowFields[index].key}[${initialIndex}]`" v-model="row[column.key]" :title="rowFields[index].value">
+                                <option v-for="(option, index) in column.lookup" :key="index" :value="option.key">{{ option.value }}</option>
+                            </select>
                         </template>
-
-                        <template v-else-if="field.checkbox">
-                            <div class="checklist">
-                                <input 
-                                    :id="`${row.id}-${field.caption}`"
-                                    type="checkbox"
-                                    v-model="row[field.id]"
-                                />
-                                <label :for="`${row.id}-${field.caption}`"></label>
-                            </div>
+                        <template v-else-if="column.mandatory">
+                            <input :name="`mandatory-${rowFields[index].key}[${initialIndex}]`" type="text" :placeholder="column.caption" v-model="row[column.key]" :maxlength="column.maxLength ? column.maxLength : 0">
                         </template>
-
-                        <template v-else-if="field.lookup">
-                            <admin-list-row-lookup
-                                :field="field"
-                                :row="row"
-                            />
-                        </template>
-
-                        <template v-else-if="field.colour">
-                            <admin-list-row-colour
-                                :caption="field.caption"
-                                :colour="row[field.id]"
-                                @input="row[field.id] = $event"
-                            />
-                        </template>
-
-                        <template v-else-if="field.isPopOutList">
-                            <admin-list-row-pop-out
-                                :row="row"
-                                :pop-out-header-field="popOutHeaderField"
-                                :pop-out-fields="popOutFields"
-                                :is-pop-out-open="isPopOutOpen"
-                                :selected-pop-out-name="selectedPopOutName"
-                                @on-pop-out-selected="onPopOutSelected"
-                                @on-pop-out-name-selected="onPopOutNameSelected"
-                            />
-                        </template>
-
                         <template v-else>
-                            <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
-                        </template>
-
-                        <!-- <template v-if="field.nullable">
-                            <div class="checklist">
-                                <input 
-                                    :id="`${row.id}-${field.caption}`"
-                                    v-model="row[field.id]"
-                                    type="checkbox"
-                                />
-                                <label :for="`${row.id}-${field.caption}`">
-                                    {{ field.nullable_label }}
-                                </label>
+                            <div class="permissions-list-container">
+                                <transition-group name="permissions-list" tag="div" class="permissions-list">
+                                    <button v-for="field in activePermissionFields" :key="field.caption" :class="[ selectedPermissionName === field.caption ? 'permission-list-item-active' : '', 'permission-list-item']" @click.prevent="onPermissionNameSelected(field.caption)">{{ field.caption }}</button>
+                                </transition-group>
+                                <button @click.prevent="onPermissionsSelected" class="update-permissions-button button icon-modify" title="Modify Permissions"></button>
                             </div>
-                        </template> -->
-                        
+                        </template>
                     </div>
                 </template>
             </div><!-- .list-item -->
 
-            <nav v-if="canDelete">
+            <!-- the checkboxes are selected by #roles-list-configure-access.vue so need to track via hidden vars -->
+            <input v-for="(field, index) in permissionFields" :name="`checkbox-${field.key}[${initialIndex}]`" type="hidden" :value="`${Number(field.value)}`" :key="index">
+
+            <input type="hidden" :name="`sequence[${initialIndex}]`" :value="row.sequence">
+
+            <nav>
                 <a @click.prevent="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
             </nav>
 
@@ -202,7 +200,7 @@ export default {
 
 @import 'www/static/css/foundation/utils/_variables.scss';
 
-.field {
+.column {
     @media screen and (max-width: 1500px) {
         padding: 0px 0.5rem;
     }
@@ -214,6 +212,56 @@ export default {
 
 .un-selected-row {
     opacity: 0.2;
+}
+
+.permissions-list-container { //to contain the .permissions-list and the .update-permissions-button
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    border: 1px solid $form-border-color;
+}
+
+.permissions-list {
+    width: 100%;
+    padding: 2px;
+    transition: height 0.3s;
+}
+
+.permissions-list-enter, .permissions-list-leave-to { //to animate on/off when toggling in #roles-list-permissions.vue
+    opacity: 0;
+    transform: translateY(5px);
+}
+
+.permissions-list-leave-active {
+    position: absolute;
+}
+
+.permission-list-item {
+    min-height: auto;
+    margin: 2px;
+    padding: 5px 10px;
+    color: #000;
+    font-size: 0.7rem;
+    text-align: center;
+    background: $body-bg;
+    transition: all 0.3s;
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+.permission-list-item-active {
+    background: $content-ui-background;
+}
+
+.update-permissions-button {
+    flex: 0 0 40px;
+    margin: 0px;
+    padding: 0.5rem;
+    &:before { //to fix weird button wiggle on press otherwise
+        float: none;
+        padding: 0;
+    }
 }
 
 .delete-row-button {

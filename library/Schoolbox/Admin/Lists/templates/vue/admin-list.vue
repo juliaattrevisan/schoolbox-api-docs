@@ -1,31 +1,47 @@
 <script>
 
 /**
- * Provide access to CRUD Admin > Lists
+ * To view and edit the Roles List, currently showing Name and Role Type, with all others accessed via a Permissions popup
  *
  */
 
 import axios from 'axios';
 import { gsap } from 'gsap/all'
-
 import AdminListHeader from './admin-list-header';
 import AdminListPopOut from './admin-list-pop-out';
 import AdminListRow from './admin-list-row';
-import Toast from '@vue/components/toast';
-import RevealModal from '@vue/components/reveal-modal';
+import Toast from '@schoolbox/toast';
+import RevealModal from '@schoolbox/reveal-modal';
+
 
 export default {
 
     components: {
-        AdminListHeader,
-        AdminListPopOut,
-        AdminListRow,
+        RolesListHeader,
+        RolesListPermissions,
+        RolesListRow,
         Toast,
         RevealModal,
     },
 
     props: {
-        tableName: { //the name of the current list, used to submit updates to the DB
+        tableName: { //the name of the current list, to pass through the form submit
+            type: String,
+            required: true
+        },
+        table: { //all the table data, including warning messages, title etc
+            type: Object,
+            required: true
+        },
+        initialRows: { //list of currently active rows
+            type: Object,
+            required: true
+        },
+        deleteRoute: { //url of row delete
+            type: String,
+            required: true
+        },
+        saveRoute: { //url of entire list save
             type: String,
             required: true
         }
@@ -33,16 +49,12 @@ export default {
 
     data () {
         return {
-            isDataLoaded: false, 
-            hasDataLoadError: false, 
-            data: null, //contains the loaded data
-            rows: [], //to display and possibly edit the rows 
-            isPopOutOpen: false, //to open and close the list
-            popOutHeight: 0, //so the popout 
-            selectedRow: {}, //to track which row is selected
-            saveStatus: 'Save', //to update the button text when saving
+            rows: [], //to display and possibly edit the rows
+            isPermissionsOpen: false, //to open and close the list
+            selectedRow: { id: '-1', name: '', type: '' }, //just a place holder until permissions or delete is accessed
+            saveStatus: 'Save All', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
-            selectedNameInPopOut: '', //to highlight all other rows that have that permission
+            selectedPermissionName: '', //to highlight all other rows that have that permission
             isProcessing: false, //to prevent multiple rapid-fire submissions
             isSaving: false,
         }
@@ -51,45 +63,60 @@ export default {
     computed: {
 
         /**
-         * Retrieve only those fields that will appear in the header
-         * 
+         * Assign a key for each column for future reference, so can link the selectedRow to the columns when editing permissions
+         *
          * @returns { Array of Objects }
          */
-        headerFields () {
-            return this.data.fields.filter((field) => field.hasOwnProperty('width')); //use width to determine if it's to display in the header
-        },  
+        columns () {
+            const columns = Object.values(this.table.fields);
+            const rowKeysList = Object.keys(this.rows[0]);
+            columns.forEach((column, index) => {
+                column.key = rowKeysList[index];
+            });
+            return columns;
+        },
 
         /**
-         * Whether the admin-list-pop-out.vue is requred
-         * 
-         * @returns { Boolean }
-         */
-        hasPopOut () {
-            return this.data.fields.some((field) => field.hasOwnProperty('isPopOutList')); 
-        }, 
-
-        /**
-         * the popOut field that's used in the header, and is the reference for 
-         * the following popOutFields
-         * 
-         * @returns { Object }
-         */
-        popOutHeaderField () {
-            const popOutHeaderField = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
-            if (typeof popOutHeaderField !== 'undefined') {
-                return popOutHeaderField;
-            } 
-            return {};
-        }, 
-        
-        /**
-         * Just those fields that are used in a popoutList
-         * 
+         * Only Name and Role type are shown with
+         * the rest within #roles-list-permissions.vue
+         *
          * @returns { Array of Objects }
          */
-        popOutFields () {
-            return this.data.fields.filter((field) => field.popOutList);
-        }, 
+        headerColumns () {
+            const headerColumns = this.columns.filter((column) => {
+                return (column.caption === 'Name' || column.caption === 'Role Type');
+            });
+            headerColumns.push( { //and add another to allow space for Permissions UI
+                caption: 'Permissions',
+                width: '8',
+                tooltip: 'The permissions each row is currently granted. Select a permission below to see all rows which also have the selected permission.'
+            } );
+            return headerColumns;
+        },
+
+        /**
+         * To provide the permission columns, pulling out Name and Role Type
+         *
+         * @returns { Array of Objects }
+         */
+        permissionColumns () {
+            return this.columns.filter((column) => {
+                return (column.caption !== 'Name' && column.caption !== 'Role Type' && column.caption !== 'sequence'); //all excluding Name, Role Type and sequence
+            });
+        },
+
+        /**
+         * To show list of columns that cannot be null
+         *
+         * @returns { Array of Objects }
+         */
+        fixedList () {
+            const fixedList = [];
+            for (const [key, value] of Object.entries(this.table.fixed)) {
+                fixedList.push({ key: key, value: value });
+            }
+            return fixedList;
+        },
 
         /**
          * To display the rows how they have been sorted
@@ -102,90 +129,84 @@ export default {
 
     },
 
+    created () {
+        this.initRows();
+    },
+
     mounted () {
-        this.getData();
+        this.initSortable();
     },
 
     methods: {
 
         /**
-         * Load the list data relevant to the current list
-         */
-        async getData () {
-            try {
-                const response = await axios.get(`/adminv2/lists/data/${this.tableName}`);
-                this.data = response.data; 
-                this.initRows();
-            } catch (error) {
-                this.hasDataLoadError = true; //show load error
-            } finally {
-                this.isDataLoaded = true; //update the display to show the list
-                this.initSortable();
-            }
-        },
-
-        /**
-         * Add a boolean to know whether the row is one being newly added
+         * Add in the id so can link to the DB on form submit
+         * and a boolean to know whether the row is one being newly added
+         *
          */
         initRows () {
-            this.rows = _.cloneDeep(this.data.rows);
-            this.rows.forEach((row) => { 
+            this.rows = Object.values(this.initialRows);
+            const rowKeys = Object.keys(this.initialRows);
+            this.rows.forEach((row, index) => {
+                row.id = rowKeys[index]; //for example 1: { name: 'Teacher' } - so retrieve the key of 1 which is the id to link with DB
                 row.isNew = false;
             });
         },
 
         /**
          * Init the sortable feature
+         *
          */
         initSortable () {
-            if (this.data.isSortable) {
-                this.$nextTick(() => {
-                    $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
-                });
+            if (this.table.sortable) {
+                $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
             }
-        }, 
-
-        /**
-         * Ensure there's enough height in the container so the pop out doesn't get cut off
-         */
-        onPopOutMounted (popOutHeight) {
-            this.popOutHeight = popOutHeight;
         },
 
         /**
-         * Show the popout options
+         * Show the permissions options
+         *
          */
-        onPopOutSelected (selectedRow) {
+        onPermissionsSelected (selectedRow) {
             this.selectedRow = selectedRow;
-            this.isPopOutOpen = true;
-            document.querySelector('[data-list]').style.pointerEvents = 'none'; //prevent editing/sorting while popoutList is open
+            this.isPermissionsOpen = true;
+            document.querySelector('[data-sortable]').style.pointerEvents = 'none'; //prevent ediding/sorting while permissions is open
         },
 
         /**
-         * Close the pop out options
+         * Close the permissions options
+         *
          */
-        onPopOutClosed () {
-            this.isPopOutOpen = false; 
-            document.querySelector('[data-list]').style.pointerEvents = 'auto';
+        onPermissionsClosed () {
+            this.isPermissionsOpen = false;
+            document.querySelector('[data-sortable]').style.pointerEvents = 'auto';
         },
 
         /**
-         * Push in a new row, retrieving the default value for each property and 
-         * then adding in additional values required to track and add
+         * Push in a new row with basic guest access
+         *
          */
         onNewRowSelected () {
-            const newRow = {}
-            this.data.fields.forEach((field) => {
-                if (Object.keys(field).includes('default')) {
-                    newRow[`${field.id}`] = field.default;
-                } else if (Object.keys(field).includes('lookup')) { //for lookups, use the first value as default
-                    newRow[`${field.id}`] = field.lookup[0]?.key ? field.lookup[0].key : '';
+            this.rows.push(
+                {
+                    name: '',
+                    type: 'guest',
+                    canChangePassword: true,
+                    viewStudentProfile: false,
+                    viewStudentGrades: false,
+                    viewStudentCalendar: false,
+                    viewParentProfile: false,
+                    accessEportfolio: false,
+                    accessPastoral: false,
+                    createBadges: false,
+                    accessEvidence: false,
+                    viewParentDirectory: false,
+                    viewStaffDirectory: false,
+                    sequence: this.getNextSequence(),
+                    id: this.getNextId(),
+                    isNew: true,
                 }
-            });
-            newRow.sequence = this.getNextSequence();
-            newRow.id = this.getNextId(),
-            newRow.isNew = true;
-            this.rows = [...this.rows, newRow];
+            );
         },
 
         /**
@@ -214,7 +235,7 @@ export default {
          *
          * @param { Number }
          */
-        onDeleteRowSelected (selectedRow) {
+        onDeleteRow (selectedRow) {
             this.selectedRow = selectedRow;
             if (selectedRow.isNew) { //hasn't been placed int he DB yet, so no need to confirm its removal
                 this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
@@ -226,12 +247,13 @@ export default {
         /**
          * Notify the DB and pull out the selectedRow
          * on delete confirmation
+         *
          */
         async onConfirmDeleteRowSelected () {
             this.isProcessing = true;
             this.$refs.toast.activate('Deleting row...');
             try {
-                const response = await axios.post(this.data.deleteRoute, this.getDeleteRowFormData());
+                const response = await axios.post(this.deleteRoute, this.getDeleteRowFormData());
                 if (response.result !== false) {
                     this.rows = this.rows.filter((row) => row.id !== this.selectedRow.id);
                     this.$refs.toast.timeout('Row Deleted', true, 2000);
@@ -247,9 +269,8 @@ export default {
         },
 
         /**
-         * Send through the data to delete the row
-         * 
-         * @returns { FormData }
+         * Cancel the the selected row deletion
+         *
          */
         getDeleteRowFormData () {
             const formData = new FormData();
@@ -260,6 +281,7 @@ export default {
 
         /**
          * Cancel the the selected row deletion
+         *
          */
         onCancelDeleteRowSelected () {
             this.$refs.deleteModal.close();
@@ -267,17 +289,19 @@ export default {
 
         /**
          * Save all data
+         *
          */
-        async onSaveSelected () {
+        async onSaveAllSelected () {
             this.isSaving = true;
+            this.updateSequenceOrder();
             this.isProcessing = true;
             this.saveStatus = 'Saving...';
             this.$refs.toast.activate('Saving...');
-            this.updateSequenceOrder();
             try {
-                const response = await axios.post(this.data.saveRoute, this.getSaveAllFormData());
+                const formData = new FormData(this.$refs.form);
+                const response = await axios.post(this.saveRoute, formData);
                 if (response.status === 200) {
-                    this.updateNewRowIds(response.data.newRowIdList);
+                    this.saveStatus = 'Save All';
                     this.$refs.toast.timeout('Save successful', true, 2000);
                 } else {
                     this.$refs.toast.timeout('Unable to save', false, 2000);
@@ -285,14 +309,13 @@ export default {
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
-                this.isSaving = false;
-                this.isProcessing = false;
-                this.saveStatus = 'Save';
+                location.reload();
             }
         },
 
         /**
-         * Ensure the correct sorting order is reflected 
+         * Ensure the correct sorting order is reflected for page reload
+         *
          */
         updateSequenceOrder () {
             const allRowElements = document.querySelector('[data-list]').children;
@@ -304,38 +327,12 @@ export default {
         },
 
         /**
-         * Send through the data to save the whole list
-         * 
-         * @returns { FormData }
-         */
-        getSaveAllFormData () {
-            const formData = new FormData();
-            formData.append('table', this.tableName);
-            formData.append('rows', JSON.stringify(this.rows));
-            return formData;
-        },
-
-        /**
-         * The new rows have been assigned, so need to match the front end 
-         * 
-         * @param { Array or undefined }
-         */
-        updateNewRowIds (newRowIdList) {
-            if (typeof newRowIdList !== 'undefined') { //won't be returned currently if there's no new rows
-                const newRows = this.rows.filter((row) => row.id < 0);
-                newRows.forEach((row, index) => {
-                    row.id = newRowIdList[index];
-                    row.isNew = false;
-                });
-            }
-        },
-
-        /**
          * animate settings to help context when filtering
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
          *
          * @param {DOMElement} element - the element that's animating
+         *
          */
         onBeforeEnter (row) {
             if (!this.isSaving) {
@@ -344,10 +341,11 @@ export default {
         },
 
         /**
-         * how the element animates on
+         * how it element animates on
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
+         *
          */
         onEnter (row, done) {
             if (this.isSaving) {
@@ -362,6 +360,7 @@ export default {
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
+         *
          */
         onLeave (row, done) {
             if (this.isSaving) {
@@ -372,14 +371,15 @@ export default {
         },
 
         /**
-         * To highlight all rows which also have the same pop out option
-         * for an easier visual way to check which rows have the same pop out option
+         * To highlight all rows which also have the same permission
+         * maybe an easy way to check which rows have the permission?
+         *
          */
-        onPopOutNameSelected (popOutName) {
-            if (this.selectedNameInPopOut === popOutName) { //so can toggle on/off
-                this.selectedNameInPopOut = '';
+        onPermissionNameSelected (permissionName) {
+            if (this.selectedPermissionName === permissionName) { //so can toggle on/off
+                this.selectedPermissionName = '';
             } else {
-                this.selectedNameInPopOut = popOutName;
+                this.selectedPermissionName = permissionName;
             }
 
         }
@@ -393,110 +393,93 @@ export default {
 
     <div>
 
-        <div v-if="isDataLoaded">
-        
-            <div class="small-12 island">
-                
-                <transition name="fade" mode="out-in">
+        <div class="small-12 island">
 
-                    <div v-if="rows.length === 0" id="listEmptyState" class="empty-state" key="empty-list">
-                        <i class="icon-list"></i>
-                        <p>The {{ data.title }} list is empty.<br><a @click.prevent="onNewRowSelected" href="#add-an-item" data-button="add-row">Add an item to this list</a>.</p>
-                    </div>
+            <div v-if="rows.length === 0" id="listEmptyState" class="empty-state">
+                <i class="icon-list"></i>
+                <p>The {{ table.title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
+            </div>
 
-                    <form v-else method="post" action="/adminv2/lists/save" key="list">
+            <form v-else method="post" action="/adminv2/lists/save" ref="form">
 
-                        <section>
+                <input name="table" type="hidden" :value="tableName" />
 
-                            <div class="list-container">
+                <!-- {# This is used when hidden columns cannot be NULL. Existing rows should already be set in DB #} -->
+                <input v-for="(column, index) in fixedList" :key="index" type="hidden" :name="`fixed-${column.key}`" :value="column.value" />
 
-                                <admin-list-header 
-                                    :header-fields="headerFields"
-                                    :is-sortable="data.isSortable"
-                                    :is-deletable="data.canDelete"
-                                />
+                <section id="listEditor">
 
-                                <transition-group
-                                    name="staggered-fade"
-                                    tag="ul"
-                                    :class="`information-list ${ data.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
-                                    :style="{ minHeight: popOutHeight + 'px' }"
-                                    v-bind:css="false"
-                                    data-sortable 
-                                    data-list 
-                                    @before-enter="onBeforeEnter"
-                                    @enter="onEnter"
-                                    @leave="onLeave"
-                                >    
-                                    <admin-list-row
-                                        v-for="(row, index) in rowsSortedBySequence"
-                                        :key="`${row.id}-${index}`"
-                                        :header-fields="headerFields"
-                                        :row="row"
-                                        :selected-row="selectedRow"
-                                        :is-sortable="data.isSortable"
-                                        :can-delete="data.canDelete"
-                                        :pop-out-header-field="popOutHeaderField"
-                                        :pop-out-fields="popOutFields"
-                                        :is-pop-out-open="isPopOutOpen"
-                                        :selected-pop-out-name="selectedNameInPopOut"
-                                        @on-pop-out-selected="onPopOutSelected"
-                                        @on-pop-out-name-selected="onPopOutNameSelected"
-                                        @on-delete-row-selected="onDeleteRowSelected"
-                                    />
-                                </transition-group>
+                    <div class="list-container">
 
-                                <admin-list-pop-out
-                                    v-if="hasPopOut"
-                                    :header-field="popOutHeaderField"
-                                    :fields="popOutFields" 
-                                    :selected-row="selectedRow"
-                                    :is-open="isPopOutOpen" 
-                                    :save-status="saveStatus" 
-                                    :is-processing="isProcessing" 
-                                    @on-pop-out-mounted="onPopOutMounted"
-                                    @on-pop-out-saved="onSaveSelected"
-                                    @on-pop-out-closed="onPopOutClosed"
-                                />
+                        <roles-list-header
+                            :header-columns="headerColumns"
+                            :is-sortable="table.sortable"
+                            :is-deletable="table.delete"
+                        />
 
-                                <div v-if="!data.noNewRecords" class="component-action">
-                                    <section>
-                                        <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
-                                    </section>
-                                </div>
+                        <transition-group
+                            name="staggered-fade"
+                            tag="ul"
+                            :class="`information-list ${ table.sortable ? 'sortable ui-sortable' : 'unsortable'}`"
+                            v-bind:css="false"
+                            data-sortable
+                            data-list
+                            @before-enter="onBeforeEnter"
+                            @enter="onEnter"
+                            @leave="onLeave"
+                        >
+                            <roles-list-row
+                                v-for="(row, index) in rowsSortedBySequence"
+                                :key="`${row.id}-${index}`"
+                                :initial-index="index + 1"
+                                :header-columns="headerColumns"
+                                :permission-columns="permissionColumns"
+                                :row="row"
+                                :selected-row="selectedRow"
+                                :is-permissions-open="isPermissionsOpen"
+                                :selected-permission-name="selectedPermissionName"
+                                :is-sortable="table.sortable"
+                                :is-deletable="table.delete"
+                                @on-permissions-selected="onPermissionsSelected"
+                                @on-permission-name-selected="onPermissionNameSelected"
+                                @on-delete-row-selected="onDeleteRow"
+                            />
+                        </transition-group>
 
-                            </div><!-- .list-container -->
+                        <roles-list-permissions
+                            :permission-columns="permissionColumns"
+                            :selected-row="selectedRow"
+                            :is-open="isPermissionsOpen"
+                            :save-route="saveRoute"
+                            @on-permissions-closed="onPermissionsClosed"
+                        />
 
-                        </section>
+                        <div v-if="!table.noNewRecords" class="component-action">
+                            <section>
+                                <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
+                            </section>
+                        </div>
 
-                        <input type="submit" @click.prevent="onSaveSelected" :value="saveStatus" :disabled="isProcessing" />
+                    </div><!-- .list-container -->
 
-                    </form>
+                </section>
 
-                </transition>    
+                <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" :disabled="isProcessing" />
 
-            </div><!-- small-12 island -->  
+            </form>
 
-            <toast ref="toast"></toast>
+        </div><!-- small-12 island -->
 
-            <reveal-modal v-if="data.canDelete" ref="deleteModal">
-                <h2>Please Confirm</h2>
-                <div data-alert class="alert-box warning">{{ data.deleteWarning }}</div>
-                <ul class="flex-list buttons">
-                    <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
-                    <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
-                </ul>
-            </reveal-modal>
+        <toast ref="toast"></toast>
 
-        </div><!-- v-if="isDataLoaded" -->
-
-        <div v-else-if="hasDataLoadError">
-            <h2>Unable to load the list data</h2>
-        </div>
-
-        <div v-else>
-            <h2>Loading please wait</h2>
-        </div>
+        <reveal-modal ref="deleteModal">
+            <h2>Please Confirm</h2>
+            <div data-alert class="alert-box warning">{{ table.deleteWarning }}</div>
+            <ul class="flex-list buttons">
+                <li><a @click.prevent="onConfirmDeleteRowSelected" class="button submit">Yes</a></li>
+                <li><a @click.prevent="onCancelDeleteRowSelected" class="button">Cancel</a></li>
+            </ul>
+        </reveal-modal>
 
     </div>
 
@@ -504,7 +487,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.list-container { //so rows aren't shown when animating on/off on add/remove
+.list-container { //so roles aren't shown when animating on/off on add/remove
     position: relative;
     overflow: hidden;
 }
@@ -515,13 +498,6 @@ export default {
 
 .component-action {
     position: relative;
-}
-
-.fade-enter-active, .fade-leave-active {
-  transition: opacity .3s;
-}
-.fade-enter, .fade-leave-to {
-  opacity: 0;
 }
 
 </style>
