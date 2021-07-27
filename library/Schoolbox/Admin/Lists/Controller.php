@@ -113,6 +113,13 @@ class Controller extends Base
             return;
         }
 
+        // Reformat to rows to field -> values
+        if ($this->getRequest()->post['rows']) {
+            $fieldValues = $this->processRows(array_keys($tableData[$tableKey]['fields']), $this->getRequest()->post['rows']);
+        } else {
+            $fieldValues = $this->getRequest()->post;
+        }
+
         $mapper_name     = $tableData[$tableKey]['mapper'];
 
         $mapper = $this->mapperFactory->get($mapper_name);
@@ -128,7 +135,7 @@ class Controller extends Base
 
         // Get the data into some sort of usable format
 
-        foreach ($this->getRequest()->post as $field => $value) {
+        foreach ($fieldValues as $field => $value) {
             if (substr($field, 0, 6) == "value-") {
                 $values[substr($field, 6)] = $value;
             } else if (substr($field, 0, 10) == "mandatory-") {
@@ -261,6 +268,25 @@ class Controller extends Base
         }
 
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
+    }
+
+    /**
+     * @param array  $fieldNames
+     * @param string $data
+     * @return array
+     */
+    private function processRows(array $fieldNames, string $data): array
+    {
+        // add "id" as it's not in fields
+        $fieldNames[] = 'id';
+        $fieldValues = [];
+        $rows        = json_decode($data, true);
+        foreach ($rows as $row) {
+            foreach ($fieldNames as $fieldName) {
+                $fieldValues[$fieldName][] = $row[$fieldName] ?? null;
+            }
+        }
+        return $fieldValues;
     }
 
 
