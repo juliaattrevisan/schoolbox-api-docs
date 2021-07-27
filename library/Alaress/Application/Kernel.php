@@ -633,24 +633,8 @@ abstract class Kernel
                     /** @var IConnector $db */
                     $db = $di->get('databaseInternal');
 
-                    /** @var Session $session */
-                    $session = $di->get('session');
+                    $knownUserClasses = $this->getKnownUserClassesFromSession($di);
 
-                    /** @var User $user */
-                    $user = $session->get('user');
-
-                    // Get known user-to-class mapping from the session and inject into factory
-                    $knownUserClasses = [];
-
-                    // Self case
-                    $subjects = $session->get('subjects');
-                    if ($subjects) {
-                        $knownUserClasses[$user->getId()] = $subjects;
-                    }
-                    // Parent case
-                    foreach ($session->get('children', []) as $childData) {
-                        $knownUserClasses[$childData['id']] = $childData['subjects'];
-                    }
                     return new News\Audience\Segment\StrategyFactory(
                         $userAccessMapper,
                         $config->get(ConfigMapper::_STAFF_CAN_POST_NEWS),
@@ -1513,6 +1497,16 @@ abstract class Kernel
 
         return $di;
     }
+
+    /**
+     * Return known classes for current session user.
+     *
+     * Returns empty array if session not available (eg CLI)
+     *
+     * @param Di\Container $di
+     * @return array
+     */
+    abstract protected function getKnownUserClassesFromSession(Di\Container $di): array;
 
 
     /**
