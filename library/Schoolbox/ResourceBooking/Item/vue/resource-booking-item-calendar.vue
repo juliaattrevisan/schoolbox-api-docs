@@ -81,18 +81,18 @@ export default {
                 day: {
                     dayHeaders: false,
                     allDaySlot: false,
-					slotMinTime: '06:00:00',
+                    slotMinTime: '06:00:00',
                     titleFormat: this.config.dateDisplayFormats.momentJsDateLong, // will produce something like "Tuesday July 16th 2021"
                 },
                 week: {
                     dayHeaderFormat: this.formats.displayWeekDay,
                     allDaySlot: false,
-					slotMinTime: '06:00:00',
+                    slotMinTime: '06:00:00',
                     titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
                 }
             },
             eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
-			eventTextColor: 'black',
+            eventTextColor: 'black',
             customButtons: {
                 customExport: {
                     text: 'Export',
