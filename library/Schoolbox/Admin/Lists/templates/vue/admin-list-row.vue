@@ -149,7 +149,7 @@ export default {
                 <template v-for="(field, index) in headerFields">
                     <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
                         <span class="hide-for-medium-up">{{ field.caption }}</span>
-                        <template v-if="field.isPopoutList">
+                        <template v-if="field.isPopOutList">
                             <div class="pop-out-list-container">
                                 <transition-group name="pop-out-list" tag="div" class="pop-out-list">
                                     <button v-for="field in activePopOutFields" :key="field.caption" :class="[ selectedPopOutName === field.caption ? 'pop-out-list-item-active' : '', 'pop-out-list-item']" @click.prevent="onPopOutNameSelected(field.caption)">{{ field.caption }}</button>

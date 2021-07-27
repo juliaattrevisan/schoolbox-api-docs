@@ -64,7 +64,7 @@ export default {
          * @returns { String }
          */
         popOutCaption () {
-            const popOutList = this.headerFields.find((field) => field.isPopoutList); //use width to determine if it's to display in the header
+            const popOutList = this.headerFields.find((field) => field.isPopOutList); //use width to determine if it's to display in the header
             if (typeof popOutList !== 'undefined') {
                 return popOutList.caption;
             } 
@@ -77,7 +77,7 @@ export default {
          * @returns { Array of Objects }
          */
         popOutFields () {
-            return this.data.fields.filter((field) => field.popoutList);
+            return this.data.fields.filter((field) => field.popOutList);
         }, 
 
         /**
@@ -131,17 +131,6 @@ export default {
                 $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
             }
         }, 
-
-        /**
-         * Get all the fields for the relevant pop out
-         * 
-         * @param { String }
-         * 
-         * @returns { Array of Objects }
-         */
-        getPopOutFields (popOut) {
-            return this.popOutFields.filter((field) => field.popoutList === popOut);
-        },
 
         /**
          * Show the popout options
@@ -247,7 +236,9 @@ export default {
         },
 
         /**
-         * Cancel the the selected row deletion
+         * Send through the data to delete the row
+         * 
+         * @returns { FormData }
          */
         getDeleteRowFormData () {
             const formData = new FormData();
@@ -268,13 +259,12 @@ export default {
          */
         async onSaveAllSelected () {
             this.isSaving = true;
-            this.updateSequenceOrder();
             this.isProcessing = true;
             this.saveStatus = 'Saving...';
             this.$refs.toast.activate('Saving...');
+            this.updateSequenceOrder();
             try {
-                const formData = new FormData(this.$refs.form);
-                const response = await axios.post(this.data.saveRoute, formData);
+                const response = await axios.post(this.data.saveRoute, this.getSaveAllFormData());
                 if (response.status === 200) {
                     this.saveStatus = 'Save All';
                     this.$refs.toast.timeout('Save successful', true, 2000);
@@ -284,7 +274,8 @@ export default {
             } catch (error) {
                 this.$refs.toast.timeout('Unable to save', false, 2000);
             } finally {
-                location.reload();
+                this.isSaving = false;
+                this.isProcessing = false;
             }
         },
 
@@ -301,6 +292,18 @@ export default {
         },
 
         /**
+         * Send through the data to save the whole list
+         * 
+         * @returns { FormData }
+         */
+        getSaveAllFormData () {
+            const formData = new FormData();
+            formData.append('table', this.tableName);
+            formData.append('rows', JSON.stringify(this.rows));
+            return formData;
+        },
+
+        /**
          * animate settings to help context when filtering
          * refer to https://vuejs.org/v2/guide/transitions.html#Staggering-List-Transitions
          * what happens before shown
@@ -314,7 +317,7 @@ export default {
         },
 
         /**
-         * how it element animates on
+         * how the element animates on
          *
          * @param {DOMElement} element - the element that's animating
          * @param {Function} done - to be called once animation is complete
@@ -342,8 +345,8 @@ export default {
         },
 
         /**
-         * To highlight all rows which also have the same permission
-         * maybe an easy way to check which rows have the permission?
+         * To highlight all rows which also have the same pop out option
+         * for an easier visual way to check which rows have the same pop out option
          */
         onPopOutNameSelected (popOutName) {
             if (this.selectedNameInPopOut === popOutName) { //so can toggle on/off

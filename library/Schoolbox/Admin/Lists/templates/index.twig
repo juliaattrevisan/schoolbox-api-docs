@@ -10,11 +10,80 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+
+        {# Use Vue just for the roles list for now, aim to incorporate all lists in the future #}
+        {% if table == 'roles' %}
+        
         <div id="admin-list">
             <admin-list 
                 table-name="{{ table }}"
             />
         </div>
         <script type="text/javascript" src="{{CDN_PREFIX}}/js/bundle/adminList.js?v={{ config.site_version }}"></script>
+
+        {% else %}
+
+        <div class="small-12 island">
+            {% if records | length > 0 %}
+                {% set emptyStateClass = 'hide' %}
+            {% else %}
+                {% set listClass = 'hide' %}
+            {% endif %}
+
+            <div id="listEmptyState" class="empty-state {{ emptyStateClass ?? '' }}">
+                <i class="icon-list"></i>
+                <p>The {{ tables[table].title }} list is empty.<br><a href="#" data-button="add-row">Add an item to this list</a>.</p>
+            </div>
+
+            <form method="post" action="/adminv2/lists/save">{# TODO routeLookup #}
+
+                <input name="table" type="hidden" value="{{ table }}" />
+
+                {# This is used when hidden fields cannot be NULL. Existing records should already be set in DB #}
+
+                {% for field_key, value in tables[table].fixed ?? [] %}
+                    <input type="hidden" name="fixed-{{field_key}}" value="{{ value }}" />
+                {% endfor %}
+
+                <section id="listEditor" class="{{ listClass ?? '' }}">
+                    <div{% if sortable %} class="sortable"{% endif %}>
+                        <header class="list-header actions-small-{{ deletable ? 1 : 0 }}">
+                            <div class="list-item">
+                                {% for field_key, field in tables[table].fields %}
+                                    {% if field.hidden is not defined or field.hidden is empty %}
+                                        <div class="small-12 medium-{% if field.width is not empty %}{{ field.width }}{% else %}2{% endif %} columns">
+                                            {{ field.caption }}
+                                            {% if field.tooltip is defined %}
+                                                <span class="hint has-tip tip-{{ field.tooltipPosition ?? 'top' }}" data-tooltip title="{{ field.tooltip }}">?</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </header>
+                    </div>
+
+                    {% set ulAttr = sortable ? 'class="information-list sortable ui-sortable" data-sortable data-list' : 'class="information-list unsortable" data-list' %}
+
+                    <ul {{ ulAttr | raw }}>
+                        {# Render each row of data#}
+                        {% for key, record in records %}
+                            {% include '@adminLists/list-item.twig' %}
+                        {% endfor %}
+                    </ul>
+                    {% if canSpawn %}
+                    <div class="component-action">
+                        <section>
+                            <a href="#" data-button="add-row" class="button">Add New Row</a>
+                        </section>
+                    </div>
+                    {% endif %}
+                </section>
+                <input type="submit" value="Save"/>
+            </form>
+        </div>
+
+        {% endif %}
+
     </div>
 </div>
