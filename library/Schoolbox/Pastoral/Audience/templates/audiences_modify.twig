@@ -36,20 +36,28 @@
 
                 {% set icon  = (subtype ? subtype.icon  : type.icon) %}
                 {% set color = (subtype ? subtype.color : type.color) %}
-                <select id="pastoralIcon" name="icon">
-                    <option value="">-- none selected --</option>
-                    {% for icon in icons %}
-                        <option value="{{ icon.name }}"
-                                label="{{ icon.title }}"
-                                {% if (subtype ? subtype.icon : type.icon) == icon.name %}selected{% endif %}
-                        >{{ icon.title }}</option>
-                    {% endfor %}
-                </select>
-                <input id="pastoralColor" name="color" type="text" value="{{ flagColors.foreground }}" />
-                <span id="pastoralFlagPreview"
-                      class="label neutral {% if icon and color %}icon-{{ icon }}{% else %}hide{% endif %}"
-                      style="color: {{ flagColors.foreground }}; background-color: {{ flagColors.background }}"
-                      >1</span>
+                <div class="row">
+                    <div class="small-12 medium-8 columns">
+                        <select id="pastoralIcon" name="icon">
+                            <option value="">-- none selected --</option>
+                            {% for icon in icons %}
+                                <option value="{{ icon.name }}"
+                                        label="{{ icon.title }}"
+                                        {% if (subtype ? subtype.icon : type.icon) == icon.name %}selected{% endif %}
+                                >{{ icon.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="small-6 medium-2 columns">
+                        <input id="pastoralColor" name="color" type="text" value="{{ flagColors.foreground }}" />
+                    </div>
+                    <div class="small-6 medium-2 columns">
+                        <span id="pastoralFlagPreview"
+                              class="label neutral {% if icon and color %}icon-{{ icon }}{% else %}hide{% endif %}"
+                              style="color: {{ flagColors.foreground }}; background-color: {{ flagColors.background }}"
+                        >1</span>
+                    </div>
+                </div>
 
                 <h2 class="subheader">General Template</h2>
 
