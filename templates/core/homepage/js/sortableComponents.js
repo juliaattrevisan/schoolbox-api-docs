@@ -12,7 +12,7 @@ gsap.registerPlugin(Draggable, Flip);
 
 const sortablesContainersSelector = '[data-components-container]'; //the top/left/right parent containers
 const sortablesSelector = '[data-component]'; //any component that will be sorted
-const sortablesTriggerSelector = '[data-component-titlebar-container]'; //the top bar of the component that will be used as the drag trigger
+const sortablesTriggerSelector = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
 const MAX_ELEMENT_HEIGHT = 2000;
 
 let draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
