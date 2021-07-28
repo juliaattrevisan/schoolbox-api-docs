@@ -128,29 +128,44 @@ class Definition implements IStrategy
                         continue;
                     }
                     $dayPeriodClasses[$dayIdentifier] ??= [
-                        'day'         => $dayIdentifier,
-                        'periods'     => [],
+                        'day'      => $dayIdentifier,
+                        'periods'  => [],
+                        'firstDay' => null,
+                        'lastDay'  => null,
+                    ];
+                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier] ??= [
+                        'period'      => $periodIdentifier,
+                        'activities'  => [],
                         'firstPeriod' => null,
                         'lastPeriod'  => null,
                     ];
-                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier] ??= [
-                        'period'     => $periodIdentifier,
-                        'activities' => [],
-                    ];
 
-                    $start  = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['start']))->getDatabase();
-                    $finish = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['finish']))->getDatabase();
-                    $dayPeriodClasses[$dayIdentifier]['firstPeriod'] = min(
-                        $dayPeriodClasses[$dayIdentifier]['firstPeriod'] ?? $start,
-                        $start
+                    // Set first and last occurrence for each day/period
+                    $start      = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['start']));
+                    $finish     = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['finish']));
+                    $startDate  = $start->getDatabaseDate();
+                    $finishDate = $finish->getDatabaseDate();
+                    $startTime  = $start->getDatabaseTime();
+                    $finishTime = $finish->getDatabaseTime();
+                    $dayPeriodClasses[$dayIdentifier]['firstDay'] = min(
+                        $dayPeriodClasses[$dayIdentifier]['firstDay'] ?? $startDate,
+                        $startDate
                     );
-                    $dayPeriodClasses[$dayIdentifier]['lastPeriod'] = max(
-                        $dayPeriodClasses[$dayIdentifier]['lastPeriod'] ?? $finish,
-                        $finish
+                    $dayPeriodClasses[$dayIdentifier]['lastDay'] = max(
+                        $dayPeriodClasses[$dayIdentifier]['lastDay'] ?? $finishDate,
+                        $finishDate
+                    );
+                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['firstPeriod'] = min(
+                        $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['firstPeriod'] ?? $startTime,
+                        $startTime
+                    );
+                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['lastPeriod'] = max(
+                        $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['lastPeriod'] ?? $finishTime,
+                        $finishTime
                     );
                     $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['activities'][$activityName][] = [
-                        'start'  => $start,
-                        'finish' => $finish,
+                        'start'  => $start->getDatabase(),
+                        'finish' => $finish->getDatabase(),
                     ];
                 }
             }
