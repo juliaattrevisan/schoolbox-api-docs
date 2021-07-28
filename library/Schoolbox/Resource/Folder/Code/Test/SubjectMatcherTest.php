@@ -127,7 +127,8 @@ class SubjectMatcherTest extends TestCase
             'folder code w/ / and campus: sisClass matches, sisCampus incomplete (case insensitive)'     => ['D/Y/Abc', 'D', 'ABC', false],
 
             // PCSchool case: a space between campus code separator and class name
-            'folder code w/ campus: sisCampus/sisClass matches with space'                               => ['D/ 9ART', 'D', '9ART', false],
+            'folder code w/ campus: sisCampus/sisClass matches, space in folderCode'                     => ['D/ 9ART', 'D', '9ART', false],
+            'folder code w/ campus: sisCampus/sisClass matches, space in folderCode and sisClass'        => ['D/ 9ART', 'D', ' 9ART', false],
         ];
     }
 
@@ -182,7 +183,8 @@ class SubjectMatcherTest extends TestCase
             'folder code w/ / and campus: sisClass matches, sisCampus incomplete (case insensitive)'     => ['D/Y/Abc', 'd', 'ABC', false],
 
             // PCSchool case: a space between campus code separator and class name
-            'folder code w/ campus: sisCampus/sisClass matches with space'                               => ['D/ 9ART', 'D', '9ART', false],
+            'folder code w/ campus: sisCampus/sisClass matches, space in folderCode'                     => ['D/ 9ART', 'D', '9ART', false],
+            'folder code w/ campus: sisCampus/sisClass matches, space in folderCode and sisClass'        => ['D/ 9ART', 'D', ' 9ART', false],
         ];
     }
 
@@ -237,7 +239,8 @@ class SubjectMatcherTest extends TestCase
             'folder code w/ / and campus: sisClass matches, sisCampus incomplete (case insensitive)'     => ['D/Y/Abc', 'D', 'ABC', false],
 
             // PCSchool case: a space between campus code separator and class name
-            'folder code w/ campus: sisCampus/sisClass matches with space'                               => ['D/ 9ART', 'D', '9ART', true],
+            'folder code w/ campus: sisCampus/sisClass matches, space in folderCode'                     => ['D/ 9ART', 'D', '9ART', true],
+            'folder code w/ campus: sisCampus/sisClass matches, space in folderCode and sisClass'        => ['D/ 9ART', 'D', ' 9ART', true],
         ];
     }
 }
