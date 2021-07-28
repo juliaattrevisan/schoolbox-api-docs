@@ -114,6 +114,7 @@ class Controller extends Base
         }
 
         // Reformat to rows to field -> values
+        $fields = $tableData[$tableKey]['fields'];
         if ($this->getRequest()->post['rows']) {
             $fieldValues = $this->processRows(array_keys($tableData[$tableKey]['fields']), $this->getRequest()->post['rows']);
         } else {
@@ -151,6 +152,9 @@ class Controller extends Base
                 $checkboxes[substr($field, 9)] = $value;
             } else if ($field == "id") {
                 $ids = $value;
+            } else {
+                // TODO: new format
+                $values[$field] = $value;
             }
         }
 
@@ -175,6 +179,9 @@ class Controller extends Base
 
                 foreach ($fixed as $field => $value) {
                     $setter = $mapper->getSetMethodName($field);
+                    if (!method_exists($mapper, $setter)) {
+                        continue;
+                    }
 
                     if (empty(trim($value))) {
                         $value = null;
@@ -191,9 +198,16 @@ class Controller extends Base
                     continue 2;
                 }
                 $getter = $mapper->getGetMethodName($field);
+                if (!method_exists($model, $getter)) {
+                    continue;
+                }
+
                 if ($model->$getter() != $value[$currentIndex]) {
                     // Update values
                     $setter = $mapper->getSetMethodName($field);
+                    if (!method_exists($model, $setter)) {
+                        continue;
+                    }
 
                     $model->$setter(trim($value[$currentIndex]));
                 }
@@ -202,6 +216,9 @@ class Controller extends Base
             // Override nullable fields where appropriate
             foreach ($nulls as $field => $value) {
                 $setter = $mapper->getSetMethodName($field);
+                if (!method_exists($model, $setter)) {
+                    continue;
+                }
 
                 foreach ($value as $index => $_) {
                     if ($currentIndex == $index) {
@@ -213,6 +230,9 @@ class Controller extends Base
             // Process any radio buttons for this list
             foreach ($radios as $field => $index) {
                 $setter = $mapper->getSetMethodName($field);
+                if (!method_exists($model, $setter)) {
+                    continue;
+                }
 
                 // Radio buttons can only be on for one row, so set that row to true and all others to false
 
@@ -226,6 +246,9 @@ class Controller extends Base
             //Set checkboxes whose that are checked
             foreach ($checkboxes as $field => $value) {
                 $setter  = $mapper->getSetMethodName($field);
+                if (!method_exists($model, $setter)) {
+                    continue;
+                }
                 $boolean = (bool)$value[$currentIndex];
                 $model->$setter($boolean);
             }
