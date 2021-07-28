@@ -235,6 +235,7 @@ class Controller extends Base
 
         $context = ProxyServer::getInstance()->getContext('http', true);
         $context['http']['timeout'] = 1;
+        $rss = '';
 
         if (@file_get_contents('https://schoolbox.com.au/schoolboxinstaller/status.html', null, stream_context_create($context))) {
             $www_light = 'success';
