@@ -103,16 +103,61 @@ class Definition implements IStrategy
         $academicGroups = (new AcademicGroups($this->api))->generate();
         $structures     = (new Structures($this->api))->generate();
 
-//        $subjects = $this->api->retrieveDocument('schedule/v1/GetSubjects', []);
-//        foreach (array_slice($subjects['d'], 0, 3) as $subject) {
-//            $classDetails[] = $this->api->retrieveDocument(
-//                'schedule/v1/GetStandardClassDetails',
-//                [
-//                    'activityCode'      => $subject['importIdentifier'],
-//                    'academicGroupCode' => $subject['academicYear']['importIdentifier'],
-//                ]
-//            );
-//        }
+//        $calendar = $this->api->retrieveDocument('schedule/v1/GetCalendar', ['year' => date('Y')]);
+        $schedules = $this->api->retrieveDocument('schedule/v1/GetSchedule', []);
+
+
+        // Introspect the ImportDayIdentifier and ImportPeriodIdentifier from getSchedule:
+        // Use that to figure out the first day and offset
+        // Assume schedule[0] is Normal Classes
+
+        $dayPeriodClasses = [];
+        foreach ($schedules as $schedule) {
+            // Only these classes may be imported
+            if (!$schedule['allowImport']) {
+                continue;
+            }
+
+            // Every schedule contains an activity
+            foreach ($schedule['activities'] as $activity) {
+                foreach ($activity['instances'] as $instance) {
+                    $dayIdentifier    = $instance['importDayIdentifier'] ?? null;
+                    $periodIdentifier = $instance['importPeriodIdentifier'] ?? null;
+                    $activityName     = $activity['name'] ?? null;
+                    if (!isset($dayIdentifier, $periodIdentifier, $activityName)) {
+                        continue;
+                    }
+                    $dayPeriodClasses[$dayIdentifier] ??= [
+                        'day'         => $dayIdentifier,
+                        'periods'     => [],
+                        'firstPeriod' => null,
+                        'lastPeriod'  => null,
+                    ];
+                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier] ??= [
+                        'period'     => $periodIdentifier,
+                        'activities' => [],
+                    ];
+
+                    $start  = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['start']))->getDatabase();
+                    $finish = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['finish']))->getDatabase();
+                    $dayPeriodClasses[$dayIdentifier]['firstPeriod'] = min(
+                        $dayPeriodClasses[$dayIdentifier]['firstPeriod'] ?? $start,
+                        $start
+                    );
+                    $dayPeriodClasses[$dayIdentifier]['lastPeriod'] = max(
+                        $dayPeriodClasses[$dayIdentifier]['lastPeriod'] ?? $finish,
+                        $finish
+                    );
+                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['activities'][$activityName][] = [
+                        'start'  => $start,
+                        'finish' => $finish,
+                    ];
+                }
+            }
+        }
+
+        // Sort this jumble
+        ksort($dayPeriodClasses);
 
         foreach ($academicGroups as $academicGroup) {
             foreach ($structures as $structure) {
