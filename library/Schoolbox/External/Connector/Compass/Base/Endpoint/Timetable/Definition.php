@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Timetable;
 
+use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
@@ -102,77 +103,7 @@ class Definition implements IStrategy
         // I don't know which academic group uses which structure
         $academicGroups = (new AcademicGroups($this->api))->generate();
         $structures     = (new Structures($this->api))->generate();
-
-//        $calendar = $this->api->retrieveDocument('schedule/v1/GetCalendar', ['year' => date('Y')]);
-        $schedules = $this->api->retrieveDocument('schedule/v1/GetSchedule', []);
-
-
-        // Introspect the ImportDayIdentifier and ImportPeriodIdentifier from getSchedule:
-        // Use that to figure out the first day and offset
-        // Assume schedule[0] is Normal Classes
-
-        $dayPeriodClasses = [];
-        foreach ($schedules as $schedule) {
-            // Only these classes may be imported
-            if (!$schedule['allowImport']) {
-                continue;
-            }
-
-            // Every schedule contains an activity
-            foreach ($schedule['activities'] as $activity) {
-                foreach ($activity['instances'] as $instance) {
-                    $dayIdentifier    = $instance['importDayIdentifier'] ?? null;
-                    $periodIdentifier = $instance['importPeriodIdentifier'] ?? null;
-                    $activityName     = $activity['name'] ?? null;
-                    if (!isset($dayIdentifier, $periodIdentifier, $activityName)) {
-                        continue;
-                    }
-                    $dayPeriodClasses[$dayIdentifier] ??= [
-                        'day'      => $dayIdentifier,
-                        'periods'  => [],
-                        'firstDay' => null,
-                        'lastDay'  => null,
-                    ];
-                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier] ??= [
-                        'period'      => $periodIdentifier,
-                        'activities'  => [],
-                        'firstPeriod' => null,
-                        'lastPeriod'  => null,
-                    ];
-
-                    // Set first and last occurrence for each day/period
-                    $start      = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['start']));
-                    $finish     = \Alaress_Date_Format::newFromTimestamp(strtotime($instance['finish']));
-                    $startDate  = $start->getDatabaseDate();
-                    $finishDate = $finish->getDatabaseDate();
-                    $startTime  = $start->getDatabaseTime();
-                    $finishTime = $finish->getDatabaseTime();
-                    $dayPeriodClasses[$dayIdentifier]['firstDay'] = min(
-                        $dayPeriodClasses[$dayIdentifier]['firstDay'] ?? $startDate,
-                        $startDate
-                    );
-                    $dayPeriodClasses[$dayIdentifier]['lastDay'] = max(
-                        $dayPeriodClasses[$dayIdentifier]['lastDay'] ?? $finishDate,
-                        $finishDate
-                    );
-                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['firstPeriod'] = min(
-                        $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['firstPeriod'] ?? $startTime,
-                        $startTime
-                    );
-                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['lastPeriod'] = max(
-                        $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['lastPeriod'] ?? $finishTime,
-                        $finishTime
-                    );
-                    $dayPeriodClasses[$dayIdentifier]['periods'][$periodIdentifier]['activities'][$activityName][] = [
-                        'start'  => $start->getDatabase(),
-                        'finish' => $finish->getDatabase(),
-                    ];
-                }
-            }
-        }
-
-        // Sort this jumble
-        ksort($dayPeriodClasses);
+        $schedule       = (new Schedule($this->api))->generate();
 
         foreach ($academicGroups as $academicGroup) {
             foreach ($structures as $structure) {
@@ -182,14 +113,9 @@ class Definition implements IStrategy
                 $dayLength       = $structure['periodCount'];
                 $cycleIdentifier = $academicGroup['academicGroupCode'] . ':' . $structure['name'];
 
-                // Can probably determine cycle start/end from the calendar,
-                // once I can access it
-                $cycleStart = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_START);
-                $cycleEnd   = \Alaress_Date_Format::newDatabaseDate(self::CYCLE_END);
-
-                // No idea what dayStart should be
-                $dayStart = 1;
-
+                $cycleStart = new Alaress_Date_Format($schedule['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $cycleEnd   = new Alaress_Date_Format($schedule['finishDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                $dayStart   = $schedule['startDay'];
 
                 /* Reuse existing cycle with the same identifier, if it exists, and update it
                  */
