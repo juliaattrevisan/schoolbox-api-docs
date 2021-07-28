@@ -236,6 +236,10 @@ class Notifier extends AbstractModuleNotifier
             $instance = $bob->build();
             $envelope->targetToParent($student->getId(), $instance);
         } elseif ($roleType === Role::STAFF) {
+            $targetTo = $evidence->getCreator();
+            if (!$targetTo->getRole()->getAccessEvidence()) {
+                return new Envelope();
+            }
             $bob->setTitle($isOwn ? self::PATTERN_COMMENTED_OWN_TITLE : self::PATTERN_COMMENTED_TITLE)
                 ->setParams(
                     [
@@ -247,7 +251,7 @@ class Notifier extends AbstractModuleNotifier
                     ]
                 );
             $instance = $bob->build();
-            $envelope->targetToUser($evidence->getCreator(), $instance);
+            $envelope->targetToUser($targetTo, $instance);
         } else {
             return new Envelope();
         }
