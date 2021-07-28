@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Pastoral\Type;
 
+use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
@@ -34,6 +35,18 @@ class Model implements ISoftDeletable, Sequential
      * @var string|null
      */
     private ?string $template = null;
+
+
+    /**
+     * This type's color.
+     */
+    private ?Color $color;
+
+
+    /**
+     * This type's icon.
+     */
+    private ?string $icon;
 
 
     /** @var DocumentClassification */
@@ -157,6 +170,38 @@ class Model implements ISoftDeletable, Sequential
     {
         $this->template = $template;
         return $this;
+    }
+
+    /**
+     * @return Color|null
+     */
+    public function getColor(): ?Color
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param Color|null $color
+     */
+    public function setColor(?Color $color): void
+    {
+        $this->color = $color;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string|null $icon
+     */
+    public function setIcon(?string $icon): void
+    {
+        $this->icon = $icon;
     }
 
     /**

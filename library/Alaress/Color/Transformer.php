@@ -107,6 +107,47 @@ class Transformer
     }
 
 
+    /**
+     * Calculate a contrasting background with the same shade (hue+saturation)
+     * as the foreground.
+     *
+     * @param Color|null $foreground The foreground color, defaults to black if
+     *                               not set.
+     * @param Color|null $light      The color to use as the base for the
+     *                               background, if `$foreground` is light.
+     * @param Color|null $dark       The color to use as the base for the
+     *                               background, if `$foreground` is dark.
+     * @return Color
+     */
+    public function calculateShadedBackgroundColor(
+        Color $foreground = null,
+        Color $light = null,
+        Color $dark = null
+    ): Color {
+        $foregroundColor     = $this->convertToColorUtilsColor($foreground);
+        $foregroundHsl       = $foregroundColor->getHsl();
+        $basebackgroundColor = $this->convertToColorUtilsColor(
+            $this->calculateTextColor($foreground ?? Color::black(), $light, $dark)
+        );
+        $basebackgroundHsl   = $basebackgroundColor->getHsl();
+
+        return $this->convertToAlaressColor(
+            ColorUtils\hsla(
+                $foregroundHsl->getHue(),
+                $foregroundHsl->getSaturation(),
+                $basebackgroundHsl->getLightness(),
+                $foregroundHsl->getAlpha()
+            )
+        );
+    }
+
+
+    /**
+     * Convert an Alaress color object to a ColorUtils color object.
+     *
+     * @param Color $color
+     * @return ColorUtils\Colors\Color
+     */
     private function convertToColorUtilsColor(Color $color): ColorUtils\Colors\Color
     {
         return ColorUtils\rgba(
@@ -118,6 +159,12 @@ class Transformer
     }
 
 
+    /**
+     * Convert a ColorUtils color object to an Alaress color object.
+     *
+     * @param ColorUtils\Colors\Color $color
+     * @return Color
+     */
     private function convertToAlaressColor(ColorUtils\Colors\Color $color): Color
     {
         return new Color(

@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Pastoral\SubType;
 
+use Alaress\Color\Color;
 use JsonSerializable;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -38,6 +39,18 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      * @var string|null
      */
     private ?string $template = null;
+
+
+    /**
+     * This type's color.
+     */
+    private ?Color $color;
+
+
+    /**
+     * This type's icon.
+     */
+    private ?string $icon;
 
 
     /**
@@ -144,6 +157,38 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     {
         $this->template = $template;
         return $this;
+    }
+
+    /**
+     * @return Color|null
+     */
+    public function getColor(): ?Color
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param Color|null $color
+     */
+    public function setColor(?Color $color): void
+    {
+        $this->color = $color;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string|null $icon
+     */
+    public function setIcon(?string $icon): void
+    {
+        $this->icon = $icon;
     }
 
     /**
