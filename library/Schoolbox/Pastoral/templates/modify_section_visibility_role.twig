@@ -167,7 +167,7 @@
 
             {# Add role to table #}
 
-            window.addRole = function(roleId, roleName, permission) {
+            window.addRole = function(roleId, roleName, permission, locked) {
 
                 // this line will check if the argument is undefined
                 // if so set it to 1, otherwise set it to it's original value
@@ -176,7 +176,8 @@
                 if (window.rolesAdded.indexOf(roleId) === -1) {
                     $('#empty-roles').remove();
 
-                    html = $('[data-role-permission-clone]').html()
+                    let html = $('[data-role-permission-clone]').html()
+                        .replace(/{TYPE_NAME}/g, 'Role')
                         .replace(/{NAME}/g, roleName)
                         .replace(/{ID}/g, roleId);
 
@@ -188,6 +189,7 @@
                     //Check the correct box
                     var selector = 'input[name = "role['+roleId+']"][value ="'+permission+'"]';
                     $(permissionListRoles).find(selector).attr("checked", "checked");
+                    applyLock(['roles'], locked);
                 }
 
                 $(this).addClass('hide');

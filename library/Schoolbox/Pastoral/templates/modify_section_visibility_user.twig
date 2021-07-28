@@ -71,7 +71,7 @@
 
             {# Callback when user added from modal #}
 
-            window.modalUserAdded = function (user, permission) {
+            window.modalUserAdded = function (user, permission, locked) {
 
                 // this line will check if the argument is undefined
                 // if so set it to 1, otherwise set it to it's original value
@@ -88,7 +88,8 @@
                     {# Add them to the list of members in the HTML #}
 
                     //noinspection JSUnresolvedVariable
-                    html = $('[data-user-permission-clone]').html()
+                    let html = $([data-user-permission-clone]).html()
+                        .replace(/{TYPE_NAME}/g, 'User')
                         .replace(/{NAME}/g, user.first_name + ' ' + user.last_name)
                         .replace(/{ID}/g, user.id)
                         .replace(/{ROLE}/g, user.role);
@@ -101,6 +102,7 @@
                     //Check the correct box
                     var selector = 'input[name = "user['+user.id+']"][value ="'+permission+'"]';
                     $(permissionListUsers).find(selector).attr("checked", "checked");
+                    applyLock(['users'], locked);
                 }
 
                 {# Update visibility table and click events #}

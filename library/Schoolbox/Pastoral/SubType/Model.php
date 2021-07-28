@@ -47,6 +47,13 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
      */
     private $externalCode;
 
+
+    /**
+     * Visibility locked
+     * Defaults to false, when created from the admin page.
+     */
+    private bool $visibilityLocked = false;
+
     /**
      * @param string $name
      *
@@ -110,7 +117,7 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     /**
      * Specify data which should be serialized to JSON
      *
-     * @return string[]
+     * @return array
      */
     public function jsonSerialize()
     {
@@ -136,6 +143,24 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     public function setTemplate(?string $template): self
     {
         $this->template = $template;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVisibilityLocked(): bool
+    {
+        return $this->visibilityLocked;
+    }
+
+    /**
+     * @param bool $visibilityLocked
+     * @return static
+     */
+    public function setVisibilityLocked(bool $visibilityLocked): self
+    {
+        $this->visibilityLocked = $visibilityLocked;
         return $this;
     }
 }

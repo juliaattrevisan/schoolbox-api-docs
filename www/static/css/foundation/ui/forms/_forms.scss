@@ -797,7 +797,9 @@ input[type="radio"]:not(.plain) + label {
 
 // Disabled
 input[type="checkbox"]:not(.plain):disabled,
-input[type="radio"]:not(.plain):disabled {
+input[type="radio"]:not(.plain):disabled,
+input[type="checkbox"][readonly]:not(.plain),
+input[type="radio"][readonly]:not(.plain)  {
     & + label {
         cursor: $cursor-default-value;
         opacity: 0.5;
@@ -806,11 +808,6 @@ input[type="radio"]:not(.plain):disabled {
             opacity: 0.5;
         }
     }
-}
-
-input[type="checkbox"]:not(.plain):disabled:checked + label,
-input[type="radio"]:not(.plain):disabled:checked + label {
-    opacity: 0.5;
 }
 
 select.visibility {

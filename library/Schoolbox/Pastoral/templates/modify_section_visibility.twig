@@ -1,5 +1,15 @@
-<h2 class="subheader">Record Visibility</h2>
-
+<h2 class="subheader"><i id="record-visibility-header" title="This type of record does not allow visibility to be adjusted"></i>Record Visibility </h2>
+{% if managePage %}
+    <label for="visibilityLocked">Lock visibility<span class='hint has-tip tip-top' data-tooltip title="When enabled, records created with this type will be unable to further customise the defaults.">?</span></label>
+    <div class="switch">
+        <input name="visibilityLocked" id="visibilityLocked" type="checkbox"
+               {% if visibilityLocked %}checked="checked"{% endif %} value="1"/>
+        <label for="visibilityLocked">
+            <span class="icon-locked"></span>
+            <span class="icon-unlocked"></span>
+        </label>
+    </div>
+{% endif %}
 <section id="visibility-section">
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
@@ -53,6 +63,48 @@
     <script>
 
         {# Update the visibility of permission tables #}
+
+        function applyLock(perms, locked) {
+            perms.forEach(
+            function(element) {
+                let permList = $('#permission-'+element);
+                if (locked) {
+                    $(permList).find('input[type=radio]').each(function () {
+                        $(this).attr('readonly', 'readonly');
+                    })
+                    $(permList).find('label.radio-label').each(function () {
+                        $(this).attr('for', $(this).attr('for') + '-locked');
+                    })
+                    $('.component-action').addClass('hide');
+                    $('.icon-delete').addClass('hide');
+                } else {
+                    $(permList).find('input[type=radio]').each(function () {
+                        $(this).removeAttr('readonly');
+                    })
+                    $(permList).find('label.radio-label').each(function () {
+                        $(this).attr('for', $(this).attr('for').replace(/-locked/g, ''));
+                    })
+                    $('.component-action').removeClass('hide');
+                    $('.icon-delete').removeClass('hide');
+                }
+            });
+        }
+
+        function clearVisibility() {
+            //Remove all other rows
+            $("#permission-roles tr").remove();
+            $("#permission-users tr").remove();
+            $("#permission-groups tr").remove();
+
+            // Reset roles, users and groups to empty, they will updated below
+            window.rolesAdded = [];
+            window.usersAdded = [];
+            window.groupsAdded = [];
+            $('[data-role-add]').removeClass('hide');
+            $('[data-group-add]').removeClass('hide');
+            $("[data-reveal-id='modal-role']").removeAttr('disabled');
+
+        }
 
         function updateVisibility() {
 
@@ -124,85 +176,30 @@
 
 
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{# Cloneable HTML For Individual User Permission #}
+{# Cloneable HTML For Permission #}
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-
-<table class="hide">
-    <tbody data-user-permission-clone>
-    <tr data-user-id="{ID}">
-        <td class="small-2">User</td>
-        <td class="small-3">{NAME} ({ROLE})</td>
-        <td class="small-2">
-            <input type="radio" name="user[{ID}]" id="userDeny{ID}" value="0">
-            <label class="radio-label" for="userDeny{ID}"></label>
-        </td>
-        <td class="small-2">
-            <input type="radio" name="user[{ID}]" id="userPublic{ID}" value="1">
-            <label class="radio-label" for="userPublic{ID}"></label>
-        </td>
-        <td class="small-2">
-            <input type="radio" name="user[{ID}]" id="userPrivate{ID}" value="2">
-            <label class="radio-label" for="userPrivate{ID}"></label>
-        </td>
-        <td class="text-right small-1">
-            <a href="#" data-delete-visibility="user" class="icon-delete"></a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{# Cloneable HTML For Group Permission #}
-{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-
-<table class="hide">
-    <tbody data-group-permission-clone>
-    <tr data-group-id="{ID}">
-        <td class="small-2">Pastoral Group</td>
-        <td class="small-3">{NAME}</td>
-        <td class="small-2">
-            <input type="radio" name="group[{ID}]" id="groupDeny{ID}" value="0">
-            <label class="radio-label" for="groupDeny{ID}"></label>
-        </td>
-        <td class="small-2">
-            <input type="radio" name="group[{ID}]" id="groupPublic{ID}" value="1">
-            <label class="radio-label" for="groupPublic{ID}"></label>
-        </td>
-        <td class="small-2">
-            <input type="radio" name="group[{ID}]" id="groupPrivate{ID}" value="2">
-            <label class="radio-label" for="groupPrivate{ID}"></label>
-        </td>
-        <td class="text-right small-1">
-            <a href="#" data-delete-visibility="group" class="icon-delete"></a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-{# Cloneable HTML For Role Permission #}
-{# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
-
-<table class="hide">
-    <tbody data-role-permission-clone>
-    <tr data-role-id="{ID}">
-        <td class="small-2">Role</td>
-        <td class="small-3">{NAME}</td>
-        <td class="small-2">
-            <input type="radio" name="role[{ID}]" id="roleDeny{ID}" value="0">
-            <label class="radio-label" for="roleDeny{ID}"></label>
-        </td>
-        <td class="small-2">
-            <input type="radio" name="role[{ID}]" id="rolePublic{ID}" value="1">
-            <label class="radio-label" for="rolePublic{ID}"></label>
-        </td>
-        <td class="small-2">
-            <input type="radio" name="role[{ID}]" id="rolePrivate{ID}" value="2">
-            <label class="radio-label" for="rolePrivate{ID}"></label>
-        </td>
-        <td class="text-right small-1">
-            <a href="#" data-delete-visibility="role" class="icon-delete"></a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+{% for accessType in ['user', 'group', 'role'] %}
+    <table class="hide">
+        <tbody data-{{ accessType }}-permission-clone>
+        <tr data-{{ accessType }}-id="{ID}">
+            <td class="small-2">{TYPE_NAME}</td>
+            <td class="small-3">{NAME}</td>
+            <td class="small-2">
+                <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Deny{ID}" value="0">
+                <label class="radio-label" for="{{ accessType }}Deny{ID}"></label>
+            </td>
+            <td class="small-2">
+                <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Public{ID}" value="1">
+                <label class="radio-label" for="{{ accessType }}Public{ID}"></label>
+            </td>
+            <td class="small-2">
+                <input type="radio" name="{{ accessType }}[{ID}]" id="{{ accessType }}Private{ID}" value="2">
+                <label class="radio-label" for="{{ accessType }}Private{ID}"></label>
+            </td>
+            <td class="text-right small-1">
+                <a href="#" data-delete-visibility="{{ accessType }}" class="icon-delete"></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+{% endfor %}

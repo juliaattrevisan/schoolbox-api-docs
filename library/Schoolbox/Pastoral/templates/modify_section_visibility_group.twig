@@ -157,11 +157,12 @@
 
 
 
-            window.addGroup = function(groupId, groupName, permission) {
+            window.addGroup = function(groupId, groupName, permission, locked) {
                 if (window.groupsAdded[groupId] !== true) {
                     $('#empty-groups').remove();
 
-                    html = $('[data-group-permission-clone]').html()
+                    let html = $('[data-group-permission-clone]').html()
+                        .replace(/{TYPE_NAME}/g, 'Pastoral Group')
                         .replace(/{NAME}/g, groupName)
                         .replace(/{ID}/g, groupId);
 
@@ -170,6 +171,7 @@
                     var permissionListGroups = $('#permission-groups');
                     permissionListGroups.html(permissionListGroups.html() + html);
 
+                    applyLock(['groups'], locked);
                     //Check the correct box
                     var selector = 'input[name = "group['+groupId+']"][value ="'+permission+'"]';
                     $(permissionListGroups).find(selector).attr("checked", "checked");
@@ -188,7 +190,7 @@
                 var groupId = $(this).attr('data-group-add');
                 var groupName = $(this).attr('data-group-name');
 
-                addGroup(groupId, groupName, 1);
+                addGroup(groupId, groupName, 1, false);
 
                 var remaining = 0;
 

@@ -152,54 +152,58 @@
         });
 
         function loadAudience() {
-            // Only load the audience defaults if the record does not yet have any access rules
-            {% if record.access | length < 1 %}
-                {% set noSubTypeVal = 0 %}
-                //Only change between defaults if no other changes have been made
-                if(window.hasChanged == false) {
-                    //Remove all other rows
-                    $("#permission-roles tr").remove();
-                    $("#permission-users tr").remove();
-                    $("#permission-groups tr").remove();
+            let prevLocked = $("#record-visibility-header").hasClass('icon-locked');
+            let visibilityLocked;
+            let typeId = $("#typeId").val();
+            let subtypeId = $("#subtypeId").val();
+            if (!subtypeId) {
+                // Cast null (no selection) to '0' string
+                subtypeId = '0';
+                visibilityLocked = $('#typeId').find('option:selected').attr('data-visibility-locked') === '1';
+            } else {
+                visibilityLocked = $('#subtypeId').find('option:selected').attr('data-visibility-locked') === '1';
+            }
 
-                    // Reset roles, users and groups to empty, they will updated below
-                    window.rolesAdded = [];
-                    window.usersAdded = [];
-                    window.groupsAdded = [];
-                    $('[data-role-add]').removeClass('hide');
-                    $('[data-group-add]').removeClass('hide');
-                    $("[data-reveal-id='modal-role']").removeAttr('disabled');
+            // changed to locked, force the new visibility
+            // changed to unlocked with template, update with the template
+            // changed to unlocked without template, leave the current selection, but make sure to unlock
 
-                    var typeId = $("#typeId").val();
-                    var subtypeId = $("#subtypeId").val();
-                    if(!subtypeId){
-                        // Cast null (no selection) to '0' string
-                        subtypeId = '{{ noSubTypeVal }}';
-                    }
+            if (visibilityLocked) {
+                $("#record-visibility-header").addClass('icon-locked');
+                $("#visibility_empty_state").hide();
+                $("#visibility_empty_state_locked").show();
+            } else {
+                $("#record-visibility-header").removeClass('icon-locked');
+                $("#visibility_empty_state").show();
+                $("#visibility_empty_state_locked").hide();
+            }
 
-                    {% for audience in audiences %}
-                        {% set subtype = audience.subtype %}
-                        {% set type    = subtype is null ? audience.type : subtype.pastoralType %}
-
-                        if ('{{ type.id }}' === typeId && '{{ subtype.id|default(noSubTypeVal) }}' === subtypeId) {
-                            {% if audience.group %}
-                            window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}");
-                            {% elseif audience.role %}
-                            window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access}}");
-                            {% elseif audience.user %}
-                            window.modalUserAdded({
-                                'id' : {{ audience.user.id }},
-                                'first_name': "{{ audience.user.firstname }}",
-                                'last_name': "{{ audience.user.lastname }}",
-                                'role': "{{ audience.user.role.name }}",
-                            }, "{{ audience.access}}");
-                            {% endif %}
-                        }
-                    {% endfor %}
-
-                    updateVisibility();
-                }
-            {% endif %}
+            {% for typeAudiences in audiences %}
+            if ('{{ typeAudiences.typeId }}' === typeId && '{{ typeAudiences.subtypeId }}' === subtypeId) {
+                clearVisibility();
+                {% for audience in typeAudiences.audiences %}
+                {% if audience.group %}
+                window.addGroup("{{ audience.group.id }}", "{{ audience.group.name }}", "{{ audience.access }}", visibilityLocked);
+                {% endif %}
+                {% if audience.role %}
+                window.addRole("{{ audience.role.id }}", "{{ audience.role.name }}", "{{ audience.access }}", visibilityLocked);
+                {% endif %}
+                {% if audience.user %}
+                window.modalUserAdded({
+                    'id': {{ audience.user.id }},
+                    'first_name': "{{ audience.user.firstname }}",
+                    'last_name': "{{ audience.user.lastname }}",
+                    'role': "{{ audience.user.role.name }}",
+                }, "{{ audience.access }}", visibilityLocked);
+                {% endif %}
+                {% endfor %}
+            }
+            {% endfor %}
+            // if unlocked remove locks
+            if (prevLocked && !visibilityLocked) {
+                applyLock(['roles', 'users', 'groups'], false);
+            }
+            updateVisibility();
         }
 
         loadAudience();

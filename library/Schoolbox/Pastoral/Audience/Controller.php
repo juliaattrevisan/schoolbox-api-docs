@@ -284,6 +284,7 @@ class Controller extends Base
      */
     private function postAudienceModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $subType, array $post): void
     {
+        $isVisibilityLocked = $post['visibilityLocked'] ? (bool)$post['visibilityLocked'] : false;
         // Fetch the exiting rules
         if ($subType) {
             $existing = $this->pastoralAudienceMapper->findByColumnList(['subtype_id' => $subType->getId()]);
@@ -291,6 +292,7 @@ class Controller extends Base
             /* Save the "General Template" content
              */
             $subType->setTemplate($post['template']);
+            $subType->setVisibilityLocked($isVisibilityLocked);
             $this->pastoralSubTypeMapper->save($subType);
 
             /* Reload this page
@@ -304,6 +306,7 @@ class Controller extends Base
             /* Save the "General Template" content
              */
             $type->setTemplate($post['template']);
+            $type->setVisibilityLocked($isVisibilityLocked);
             $this->pastoralTypeMapper->save($type);
 
             /* Reload this page

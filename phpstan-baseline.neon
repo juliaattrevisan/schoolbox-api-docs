@@ -7346,19 +7346,9 @@ parameters:
 			path: library/Schoolbox/Pastoral/Revision/Mapper.php
 
 		-
-			message: "#^Method Schoolbox\\\\Pastoral\\\\SubType\\\\Model\\:\\:jsonSerialize\\(\\) should return array\\<string\\> but returns array\\<string, int\\|string\\>\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/SubType/Model.php
-
-		-
 			message: "#^PHPDoc tag @return with type iterable\\<Schoolbox\\\\Pastoral\\\\Model\\>&Schoolbox\\\\GenericCollection is incompatible with native type array\\.$#"
 			count: 1
 			path: library/Schoolbox/Pastoral/Test/AccessLevelCensorTest.php
-
-		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: library/Schoolbox/Pastoral/Type/Mapper.php
 
 		-
 			message: "#^Method Schoolbox\\\\Permission\\\\Access\\\\Access\\:\\:getInstance\\(\\) should return static\\(Schoolbox\\\\Permission\\\\Access\\\\Access\\) but returns Schoolbox\\\\Permission\\\\Access\\\\Access\\.$#"
