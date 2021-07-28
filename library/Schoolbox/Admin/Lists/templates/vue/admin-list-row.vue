@@ -83,32 +83,33 @@ export default {
 
     },
 
-    watch: {
-
-        /**
-         * Preset the pop out fields when setting between staff / all others
-         *
-         */
-        'row.type': function (newValue) {
-            if (newValue === 'staff') { //set all enabled when staff
-                this.popOutFields.forEach((option) => {
-                    this.row[option.id] = true;
-                });
-            } else { //otherwise only allowPasswordChange
-                this.popOutFields.forEach((option) => {
-                    this.row[option.id] = false;
-                });
-                this.row['canChangePassword'] = true;
-            }
+    created () {
+        if (this.popOutHeaderField.changePopOut) {
+            this.enableChangePopOutWatcher();
         }
-
     },
 
     methods: {
 
         /**
+         * If there's a changePopOut set, need to know when its value has changed 
+         * so can respond to changes
+         */
+        enableChangePopOutWatcher () {
+            this.$watch(`row.${this.popOutHeaderField.changePopOut}`, (newValue) => {
+                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[newValue];
+                this.popOutFields.forEach((option) => { //loop through and set those options to true that are available in the current changePopOutOption
+                    if (changePopOutOptions.includes(option.id)) {
+                        this.row[option.id] = true;
+                    } else {
+                        this.row[option.id] = false;
+                    }
+                });
+            });
+        },
+
+        /**
          * Show the pop out fields
-         *
          */
         onPopOutSelected () {
             this.$emit('on-pop-out-selected', this.row);
@@ -117,7 +118,6 @@ export default {
 
         /**
          * To confirm whether should delete the row
-         *
          */
         onDeleteRowSelected () {
             this.$emit('on-delete-row-selected', this.row);
@@ -126,7 +126,6 @@ export default {
 
         /**
          * Higlight the currently selected pop out name
-         *
          */
         onPopOutNameSelected (popOutName) {
             this.$emit('on-pop-out-name-selected', popOutName);
