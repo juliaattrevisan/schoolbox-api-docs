@@ -114,6 +114,7 @@ class Controller extends Base
         }
 
         // Reformat to rows to field -> values
+        $fields = $tableData[$tableKey]['fields'];
         if ($this->getRequest()->post['rows']) {
             $fieldValues = $this->processRows(array_keys($tableData[$tableKey]['fields']), $this->getRequest()->post['rows']);
         } else {
@@ -200,10 +201,6 @@ class Controller extends Base
                     $setter = $mapper->getSetMethodName($field);
                     if (!method_exists($model, $setter)) {
                         continue;
-                    }
-
-                    if (is_string($value[$currentIndex])) {
-                        $value[$currentIndex] = trim($value[$currentIndex]);
                     }
 
                     $model->$setter($value[$currentIndex]);
