@@ -132,6 +132,18 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
             'campusCollection'
         );
 
+        $this->joinsVia(
+            'event_user',
+            UserMapper::class,
+            'id',
+            'user_id',
+            'event_id',
+            'id',
+            null,
+            null,
+            'guests'
+        );
+
         $this->hasJoin('role', array(
             'mapper'    => Relation\RoleMapper::class,
             'this_key'  => 'id',
