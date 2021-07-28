@@ -3,7 +3,6 @@
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
 {% if roles | length > 0 %}
-    {% set visibilityLocked = visibilityLocked and not managePage %}
 
     <tbody id="permission-roles">
 
@@ -31,21 +30,21 @@
                     </td>
                     <td class="small-2">
                         <input type="radio" name="role[{{ userAccess.role.id }}]" id="roleDeny{{ userAccess.role.id }}"
-                               value="0" {{ checkedDeny }} {% if visibilityLocked %}readonly{% endif %}>
+                               value="0" {{ checkedDeny }}>
                         <label class="radio-label" for="roleDeny{{ userAccess.role.id }}"></label>
                     </td>
                     <td class="small-2">
                         <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePublic{{ userAccess.role.id }}"
-                               value="1" {{ checkedPublic }} {% if visibilityLocked %}readonly{% endif %}>
+                               value="1" {{ checkedPublic }}>
                         <label class="radio-label" for="rolePublic{{ userAccess.role.id }}"></label>
                     </td>
                     <td class="small-2">
                         <input type="radio" name="role[{{ userAccess.role.id }}]" id="rolePrivate{{ userAccess.role.id }}"
-                               value="2" {{ checkedPrivate }} {% if visibilityLocked %}readonly{% endif %}>
+                               value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="rolePrivate{{ userAccess.role.id }}"></label>
                     </td>
                     <td class="text-right small-1">
-                        <a href="#" data-delete-visibility="role" class="icon-delete {% if visibilityLocked %}hide{% endif %}"></a>
+                        <a href="#" data-delete-visibility="role" class="icon-delete"></a>
                     </td>
                 </tr>
             {% endfor %}

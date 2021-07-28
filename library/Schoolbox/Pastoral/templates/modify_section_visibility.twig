@@ -1,5 +1,6 @@
 <h2 class="subheader">Record Visibility <i id="record-visibility-header"></i></h2>
 {% if managePage %}
+    <label for="visibilityLocked">Lock visibility<span class='hint has-tip tip-top' data-tooltip title="When enabled, records created with this type will be unable to further customise the defaults.">?</span></label>
     <div class="switch">
         <input name="visibilityLocked" id="visibilityLocked" type="checkbox"
                {% if visibilityLocked %}checked="checked"{% endif %} value="1"/>

@@ -16,7 +16,7 @@
                     {% endif %}
                     {% for type in types %}
                         <option {% if type.id == record.type.id ?? '' %}selected{% endif %}
-                                value="{{ type.id }}" data-visibility-locked="{{ type.visibilityLocked }}">{{ type.name }}</option>
+                                value="{{ type.id }}" {% if not moderator %}data-visibility-locked="{{ type.visibilityLocked }}"{% endif %}>{{ type.name }}</option>
                     {% endfor %}
                 </select>
         </div>
@@ -32,7 +32,7 @@
                     {% for subtype in subTypes %}
                         <option data-chained="{{ subtype.pastoralType.id }}" class="{{ subtype.pastoralType.id }}"
                                 {% if subtype.id == record.subtype.id ?? '' %}selected{% endif %} value="{{ subtype.id }}"
-                                data-visibility-locked="{{ subtype.visibilityLocked }}">{{ subtype.name }}</option>
+                                {% if not moderator %}data-visibility-locked="{{ subtype.visibilityLocked }}"{% endif %}>{{ subtype.name }}</option>
                     {% endfor %}
                 </select> </label>
         </div>

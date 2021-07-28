@@ -48,8 +48,11 @@ class Model implements ISoftDeletable, JsonSerializable, Sequential
     private $externalCode;
 
 
-    /** Visibility locked */
-    private bool $visibilityLocked;
+    /**
+     * Visibility locked
+     * Defaults to false, when created from the admin page.
+     */
+    private bool $visibilityLocked = false;
 
     /**
      * @param string $name

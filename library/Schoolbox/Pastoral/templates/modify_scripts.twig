@@ -159,9 +159,9 @@
             if (!subtypeId) {
                 // Cast null (no selection) to '0' string
                 subtypeId = '0';
-                visibilityLocked = Boolean($('#typeId').find('option:selected').attr('data-visibility-locked'));
+                visibilityLocked = $('#typeId').find('option:selected').attr('data-visibility-locked') === '1';
             } else {
-                visibilityLocked = Boolean($('#subtypeId').find('option:selected').attr('data-visibility-locked'));
+                visibilityLocked = $('#subtypeId').find('option:selected').attr('data-visibility-locked') === '1';
             }
 
             // changed to locked, force the new visibility

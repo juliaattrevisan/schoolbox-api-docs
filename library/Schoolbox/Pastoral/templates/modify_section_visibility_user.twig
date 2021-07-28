@@ -3,7 +3,6 @@
 {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
 
 {% if allowIndividual %}
-    {% set visibilityLocked = visibilityLocked and not managePage %}
 
     {% import '@pastoral/macros/user_search.twig' as userSearch %}
 
@@ -33,22 +32,19 @@
                     <td class="small-2">User</td>
                     <td class="small-3">{{ userAccess.user.firstname }} {{ userAccess.user.lastname }} ({{ userAccess.user.role.name }})</td>
                     <td class="small-2">
-                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userDeny{{ userAccess.user.id }}" value="0"
-                                {{ checkedDeny }} {% if visibilityLocked %}readonly{% endif %}>
+                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userDeny{{ userAccess.user.id }}" value="0" {{ checkedDeny }}>
                         <label class="radio-label" for="userDeny{{ userAccess.user.id }}"></label>
                     </td>
                     <td class="small-2">
-                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPublic{{ userAccess.user.id }}" value="1"
-                                {{ checkedPublic }} {% if visibilityLocked %}readonly{% endif %}>
+                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPublic{{ userAccess.user.id }}" value="1" {{ checkedPublic }}>
                         <label class="radio-label" for="userPublic{{ userAccess.user.id }}"></label>
                     </td>
                     <td class="small-2">
-                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPrivate{{ userAccess.user.id }}" value="2"
-                                {{ checkedPrivate }} {% if visibilityLocked %}readonly{% endif %}>
+                        <input type="radio" name="user[{{ userAccess.user.id }}]" id="userPrivate{{ userAccess.user.id }}" value="2" {{ checkedPrivate }}>
                         <label class="radio-label" for="userPrivate{{ userAccess.user.id }}"></label>
                     </td>
                     <td class="text-right small-1">
-                        <a href="#" data-delete-visibility="user" class="icon-delete" {% if visibilityLocked %}hide{% endif %}></a>
+                        <a href="#" data-delete-visibility="user" class="icon-delete"></a>
                     </td>
                 </tr>
                 {% set countUsers = countUsers + 1 %}
