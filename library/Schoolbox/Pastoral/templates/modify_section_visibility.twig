@@ -1,15 +1,6 @@
-<h2 class="subheader"><i id="record-visibility-header" title="This type of record does not allow visibility to be adjusted"></i>Record Visibility </h2>
-{% if managePage %}
-    <label for="visibilityLocked">Lock visibility<span class='hint has-tip tip-top' data-tooltip title="When enabled, records created with this type will be unable to further customise the defaults.">?</span></label>
-    <div class="switch">
-        <input name="visibilityLocked" id="visibilityLocked" type="checkbox"
-               {% if visibilityLocked %}checked="checked"{% endif %} value="1"/>
-        <label for="visibilityLocked">
-            <span class="icon-locked"></span>
-            <span class="icon-unlocked"></span>
-        </label>
-    </div>
-{% endif %}
+<h2 class="subheader">
+    <i id="record-visibility-header" title="This type of record does not allow visibility to be adjusted"></i>Record Visibility
+</h2>
 <section id="visibility-section">
 
     {# ------------------------------------------------------------------------------------------------------------------------------------------------------ #}
