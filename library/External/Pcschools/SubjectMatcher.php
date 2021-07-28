@@ -30,14 +30,25 @@ class SubjectMatcher extends SubjectMatcherBase
             return true;
         }
 
-        // Just join the campus and class together, without trimming
-        if (
-            isset($sisCampus)
-            && strcasecmp(trim($sisCampus . '/' . $sisClass), trim($sbFolderCode)) === 0
-        ) {
-            return true;
-        }
+        // The PCSchool part of the class code often contains a space.
+        // (e.g. "21.00/ 9ART1E1"
+        // Account for that, if a SIS campus was passed in.
+        if (isset($sisCampus)) {
+            $sbFolderCodeParts = explode('/', $sbFolderCode, 2);
+            if (count($sbFolderCodeParts) === 1) {
+                $sbFolderCampus  = null;
+                [$sbFolderClass] = $sbFolderCodeParts;
+            } else {
+                [$sbFolderCampus, $sbFolderClass] = $sbFolderCodeParts;
+            }
 
+            // Does the folder code contain a campus?
+            // If so compare the SIS and SB campus and class codes directly.
+            if (isset($sbFolderCampus)) {
+                return strcasecmp(trim($sbFolderCampus), trim($sisCampus)) === 0
+                    && strcasecmp(trim($sbFolderClass), trim($sisClass)) === 0;
+            }
+        }
 
         return false;
     }
