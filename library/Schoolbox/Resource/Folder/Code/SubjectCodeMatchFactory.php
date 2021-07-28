@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Folder\Code;
 
+use External\Pcschools;
 use External\Synergetic;
 
 class SubjectCodeMatchFactory
@@ -23,6 +24,9 @@ class SubjectCodeMatchFactory
     {
         if ($externalType === 'synergetic') {
             return new Synergetic\SubjectMatcher();
+        }
+        if ($externalType === 'pcschools') {
+            return new Pcschools\SubjectMatcher();
         }
         return new SubjectMatcherBase();
     }
