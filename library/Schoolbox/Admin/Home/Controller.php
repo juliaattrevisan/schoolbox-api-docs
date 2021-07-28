@@ -13,6 +13,7 @@ use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
+use Alaress_Rss_Stream;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
@@ -28,6 +29,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 use Schoolbox\Version\Version;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
+use UnexpectedValueException;
 
 use function array_column;
 use function array_map;
@@ -241,9 +243,8 @@ class Controller extends Base
             $www_light = 'success';
             $www_status = 'Available';
 
-            $rss = new \Alaress_Rss_Stream('https://help.schoolbox.com.au/news/feed/ab1cf283f09e5e61a1712b116?topic=release-notes');
+            $rss = new Alaress_Rss_Stream('https://help.schoolbox.com.au/news/feed/ab1cf283f09e5e61a1712b116?topic=release-notes');
             $rss->stream();
-
         } else {
             $www_light = 'alert';
             $www_status = 'Inaccessible';
@@ -327,7 +328,7 @@ class Controller extends Base
                     'ldap_alt_status' => $ldap_alt_status,
                     'www_light' => $www_light,
                     'www_status' => $www_status,
-                    'updates_rss' => $rss instanceof \Alaress_Rss_Stream ? $rss->getOutput() : '',
+                    'updates_rss' => $rss instanceof Alaress_Rss_Stream ? $rss->getOutput() : '',
                     'logs' => $logs,
                     'kamiEnabled' => $this->kamiConnector->isEnabled(),
                     'kamiOnline' => $this->kamiConnector->isOnline(),
@@ -437,7 +438,7 @@ class Controller extends Base
         try {
             $domainTtl                = (new TtlFetcher())->getTtl($enabledData['fqdn']);
             $enabledData['domainTtl'] = $domainTtl;
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             // We want to know about this, but continue to render the rest of the page.
             $this->captureException($e);
         }
