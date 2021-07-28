@@ -13,7 +13,7 @@ gsap.registerPlugin(Draggable, Flip);
 const sortablesContainersSelector = '[data-components-container]'; //the top/left/right parent containers
 const sortablesSelector = '[data-component]'; //any component that will be sorted
 const sortablesTriggerSelector = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
-const MAX_ELEMENT_HEIGHT = 2000;
+const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
 let activeElement; //the element that's currently being dragged/sorted around
@@ -21,7 +21,8 @@ let placeholderElement; //the element that subs in for the activeElement being s
 let isScrollingTimeout = false; //to prevent sorting when moving a sortable up/down the window
 let isScrolling = false;
 let isFlipping = false; //prevent quick shifts / odd flickers while using FLIP
-let hasShrunk = false; //if required, wait for the element to shrink down before dragging as some elements are too long to move around effectively
+let isChangingSize = false; //if required, wait for the element to shrink down to just the top bar before dragging as some elements are too long to move around effectively
+let startDragPoint = { left: 0, top: 0 }; //to prevent rapid fire position changes, have to move a minimum amount prior to another change
 
 
 /**
@@ -43,10 +44,9 @@ const initDraggables = () => {
         type: 'x, y',
         trigger: sortableItem.querySelector(sortablesTriggerSelector),
         autoScroll: 1,
-        onPress: (event) => onDragStart(event),
-        // onDragStart: (event) => onDragStart(event),
+        onDragStart: (event) => onDragStart(event),
         onDrag: () => onDrag(),
-        onRelease: () => onDragEnd(),
+        onDragEnd: () => onDragEnd(),
     })[0];
 }
 
@@ -64,9 +64,7 @@ const initDraggables = () => {
  */
 const initComponentLockSwitchListener = () => {
     const componentLockSwitch = document.getElementById('component-lock-switch').querySelector('input');
-    componentLockSwitch.addEventListener('change', (event) => {
-        updateDraggablesStatus(event.target.checked);
-    });
+    componentLockSwitch.addEventListener('change', (event) => updateDraggablesStatus(event.target.checked));
 }
 
 /**
@@ -76,7 +74,7 @@ const initComponentLockSwitchListener = () => {
  */
  const updateDraggablesStatus = (enable) => {
     if (enable) {
-        draggablesList.forEach((draggable) => draggable.enable()); //run through each Draggable instance and enable
+        draggablesList.forEach((draggable) => draggable.enable()); 
     } else {
         draggablesList.forEach((draggable) => draggable.disable());
     }
@@ -88,7 +86,8 @@ const initComponentLockSwitchListener = () => {
  const initOnComponentAddedListener = () => {
     document.addEventListener('jquery.masonry__onComponentAdded', (event) => {
         const newDraggable = getDraggable(document.getElementById(event.detail.componentID));
-        newDraggable.enabled(draggablesList[0].enabled()); //just base the active status on the first Draggable instance
+        const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
+        newDraggable.enabled(componentLockSwitchStatus); //check 
         draggablesList.push(newDraggable); //add the component into the Draggable instances list
         updateSortableElements(); //update the position of all elements due to the new element being added
     });
@@ -114,11 +113,19 @@ const initComponentLockSwitchListener = () => {
 const onDragStart = (event) => {
     
     activeElement = event.target.closest(sortablesSelector); //use the parent container regardless of selection to ensure correct dimensions etc
-    activeElement.querySelector('[data-collapsable]').style.pointerEvents = 'none'; //prevent any mouse interactions interferring while dragging
-    activeElement.style.overflow = 'hidden';
-    
+
+    startDragPoint = updateDragPoint();
+
+    document.querySelectorAll(sortablesContainersSelector).forEach((element) => {
+        if (element.children.length === 1) {
+            element.querySelector('[data-placeholder]').style.display = 'block';
+        }
+    }); //
+    updateSortableElements(); 
+
     document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
     document.documentElement.style.scrollBehavior = 'auto'; //disable smooth scroll as it can jar while moving elements around 
+    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'none') //prevent any mouse interactions interferring while dragging
 
     window.addEventListener('scroll', onScroll); //prevent sorting check while moving up/down window
 
@@ -126,29 +133,38 @@ const onDragStart = (event) => {
 
     placeholderElement = getPlaceholderElement();
     pullOutActiveElement();
+    updateSortableElements(); //ensure we have the most up to date positions
 
-    if (activeElement.getBoundingClientRect().height > MAX_ELEMENT_HEIGHT) {
-        
-        hasShrunk = false;
-        
-        gsap.to(placeholderElement, { height: 40, duration: 0.3 } );
+    collapseActiveElementContent();
 
-        gsap.to(activeElement, { height: 40, duration: 0.3, onComplete: () => {
-            
-            hasShrunk = true;
+}
 
-            
-
-            updateSortableElements(); //ensure we have the most up to date positions
-
-        } } );
-    
-    } else {
-
-        hasShrunk = true;
-
+/**
+ * To drag drag movement
+ * 
+ * @returns { left, top } 
+ */
+const updateDragPoint = () => {
+    return { 
+        left: activeElement.getBoundingClientRect().left,
+        top: activeElement.getBoundingClientRect().top + window.scrollY
     }
+}
 
+/**
+ * Shrink down the element to the top bar, which is used to sort to 
+ * avoid trying to sort tall height elements
+ */
+ const collapseActiveElementContent = () => {
+    isChangingSize = true;
+    const activeElementContent = activeElement.querySelector('[data-collapsable]');
+    gsap.to(activeElementContent, { 
+        onStart: () => activeElementContent.style.overflow = 'hidden',
+        height: 0, 
+        duration: 0.3,
+        overwrite: true,
+        onComplete: () => isChangingSize = false
+    } );
 }
 
 /**
@@ -157,11 +173,9 @@ const onDragStart = (event) => {
  const updateSortableElements = () => {
     document.querySelectorAll(sortablesSelector).forEach((sortableItem) => {
         sortableItem.dataset.originalLeft = sortableItem.getBoundingClientRect().left;
-        sortableItem.dataset.leftDifference = 0;
         sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
+        sortableItem.dataset.leftDifference = 0;
         sortableItem.dataset.topDifference = 0;
-        sortableItem.dataset.currentHeight = sortableItem.getBoundingClientRect().height;
-        sortableItem.dataset.heightRatio = sortableItem.getBoundingClientRect().height / sortableItem.getBoundingClientRect().width; //to keep the height accurate when moving between containers
     });
 }
 
@@ -197,14 +211,7 @@ const onDragStart = (event) => {
  */
  const getPlaceholderElement = () => {
     const cloneElement = activeElement.cloneNode(true);
-    // const cloneElement = document.createElement('div');
-    // activeElement.classList.forEach((className) => cloneElement.classList.add(className));
-    // for (const [key, value] of Object.entries(activeElement.dataset)) {
-    //     cloneElement.dataset[key] = value;
-    // }
-    // cloneElement.style.width = `100%`;
-    // cloneElement.style.height = `${activeElement.getBoundingClientRect().height }px`;
-    // cloneElement.style.background = `white`;
+    cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference
     cloneElement.style.opacity = 0.5; //displayed as reference where the activeElement is currently placed 
     insertElementBefore(activeElement, cloneElement);
     return cloneElement;
@@ -249,8 +256,8 @@ const updateActiveElementComputedStyles = () => {
  * based on whether a move is valid
  */
 const onDrag = () => {
-    
-    if (!isScrolling && hasShrunk) { //don't be checking while scrolling, as can jar the window and produce weird behaviour
+
+    if (canCheckForChange()) { 
         
         let sortablesToCheckList = Array.from(document.querySelectorAll(sortablesSelector)); //grab all sortable elements 
         
@@ -260,15 +267,30 @@ const onDrag = () => {
         }
 
         const closestElement = getClosestElement(getElementsMidPoint(activeElement), sortablesToCheckList); //the element nearest to the dragged element
-        
-        if (isElementAboveOtherElement(activeElement, closestElement)) {
-            flipState(closestElement, true);
-        } else if (isElementBelowOtherElement(activeElement, closestElement)) {
-            flipState(closestElement, false);
+        if (closestElement.id !== activeElement.id) { //no need to FLIP if have hardly moved
+            if (isElementAboveOtherElement(activeElement, closestElement)) {
+                flipState(closestElement, true);
+            } else if (isElementBelowOtherElement(activeElement, closestElement)) {
+                flipState(closestElement, false);
+            }
         }
 
     }
 
+}
+
+/**
+ *  Don't be checking while have hardly dragged, while the window is scrolling or while the activeElement is still shrinking in collapseActiveElementContent()
+ * 
+ * @retruns { Boolean } 
+ */
+const canCheckForChange = () => {
+    const currentDragPoint = { 
+        left: activeElement.getBoundingClientRect().left,
+        top: activeElement.getBoundingClientRect().top + window.scrollY
+    }
+    const distance = Math.sqrt(Math.pow(startDragPoint.left - currentDragPoint.left, 2) + Math.pow(startDragPoint.top - currentDragPoint.top, 2));
+    return distance > MIN_MOVEMENT && !isScrolling && !isChangingSize;
 }
 
 /**
@@ -309,12 +331,18 @@ const flipState = (closestElement, isShiftingDown) => {
             insertElementBefore(closestElement, placeholderElement);
         }
 
-        activeElement.dataset.leftDifference = placeholderElement.getBoundingClientRect().left - parseInt(placeholderElement.dataset.originalLeft);
+        startDragPoint = updateDragPoint();
+
+        activeElement.dataset.leftDifference = placeholderElement.getBoundingClientRect().left - parseInt(placeholderElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
         activeElement.dataset.topDifference = (placeholderElement.getBoundingClientRect().top + window.scrollY) - parseInt(placeholderElement.dataset.originalTop);
+        document.querySelectorAll(sortablesSelector).forEach((sortableItem) => {
+            if (sortableItem.id !== activeElement.id) { //update the top position of all elements excluding the active one
+                sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
+            }
+        });
 
         Flip.from(state, {
             duration: 0.3,
-            ease: 'power1.InOut',
             onComplete: () => {
                 isFlipping = false;
                 onDrag(); //check after Flip to see if another is required
@@ -334,7 +362,6 @@ const flipState = (closestElement, isShiftingDown) => {
         x: 0 + parseInt(activeElement.dataset.leftDifference), //to accommodate for potential position changes that have occured
         y: 0 + parseInt(activeElement.dataset.topDifference),
         width: placeholderElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
-        height: 'auto',
         duration: 0.3,
         overwrite: true,
         onComplete: () => onSnapActiveElementBackComplete()
@@ -353,18 +380,34 @@ const flipState = (closestElement, isShiftingDown) => {
     activeElement.style.position = 'static'; //was absolute, now sitting as it should
     updateActiveElementComputedStyles();
     activeElement.setAttribute('data-component', ''); //so it can be dragged again
-    activeElement.querySelector('[data-collapsable]').style.pointerEvents = 'auto'; //re-enable mouse interactions
+    
+    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
 
     insertElementAfter(placeholderElement, activeElement); //the element was taken out, so put it back where it now belongs
     placeholderElement.remove(); //and now the placeholder can be pulled out
 
-    activeElement.style.overflow = 'visible'
+    const activeElementContent = activeElement.querySelector('[data-collapsable]');
+    gsap.to(activeElementContent, { 
+        height: 'auto', 
+        duration: 0.3, 
+        overwrite: true, 
+        onComplete: () => onActiveElementExpanded(activeElementContent)
+    } ); 
 
-    // gsap.to(activeElement, { height: 'auto', duration: 0.3, onComplete: () => activeElement.style.overflow = 'visible' } ); 
+}
+
+/**
+ * To set up for another possible drag of elements
+ */
+ const onActiveElementExpanded = (activeElementContent) => {
+
+    activeElementContent.style.overflow = 'visible';
 
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
     
+    document.querySelectorAll('[data-placeholder]').forEach((element) => element.style.display = 'none');
+
     window.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
     
@@ -435,6 +478,7 @@ const getComponentID = (componentElement) => {
 export const init = () => {
     initDraggables();
     initListeners();
+    updateSortableElements(); //ensure we have the most up to date positions
 }
 
 document.addEventListener('DOMContentLoaded', init);

@@ -88,7 +88,7 @@ export const getClosestElement = (targetPoint, elements) => {
     let minDistance = 99999; //if this doesn't get overwritten we got issues...
     elements.forEach((element) => { //loop through each element and find the closest element using pythagoras theorem
         const elementsMidPoint = getElementsMidPoint(element);
-        const distance = Math.sqrt((elementsMidPoint.left - targetPoint.left) * (elementsMidPoint.left - targetPoint.left) + (elementsMidPoint.top - targetPoint.top) * (elementsMidPoint.top - targetPoint.top));
+        const distance = Math.sqrt(Math.pow(elementsMidPoint.left - targetPoint.left, 2) + Math.pow(elementsMidPoint.top - targetPoint.top, 2));
         if (distance < minDistance) {
             minDistance = distance;
             closestElement = element;
