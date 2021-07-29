@@ -275,10 +275,10 @@ const onDrag = () => {
 
         let sortablesToCheckList = Array.from(document.querySelectorAll(sortablesSelector)); //grab all sortable elements 
         
-        if (willChangeContainer().hasHit) { //if there's a container change required, only check against those elements in the new container
-            const newContainer = willChangeContainer().newContainer;
-            sortablesToCheckList = sortablesToCheckList.filter((item) => newContainer.contains(item)); //filter sortables check to those in the new parent container
-        }
+        // if (willChangeContainer().hasHit) { //if there's a container change required, only check against those elements in the new container
+        //     const newContainer = willChangeContainer().newContainer;
+        //     sortablesToCheckList = sortablesToCheckList.filter((item) => newContainer.contains(item)); //filter sortables check to those in the new parent container
+        // }
 
         const closestElement = getClosestElement(getElementsMidPoint(activeElement), sortablesToCheckList); //the element nearest to the dragged element
         if (closestElement && closestElement.id !== activeElement.id) { //no need to FLIP if the closest element is still the activeElement
