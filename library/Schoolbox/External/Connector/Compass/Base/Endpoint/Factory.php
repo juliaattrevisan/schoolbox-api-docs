@@ -204,34 +204,34 @@ class Factory
 
             /* Purge previously-imported profile relationships and classes
              */
-            ->add(new Profile\Prepare(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Profile(
-                $this->log,
-                $this->perform,
-                $api,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
-            ->add(new Profile\Cleanup(
-                $this->log,
-                $this->perform,
-                $this->baseProfileMapper,
-                $this->studentProfileMapper,
-                $this->parentProfileMapper,
-                $this->staffProfileMapper,
-                $this->relationshipMapper
-            ))
+//            ->add(new Profile\Prepare(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Profile(
+//                $this->log,
+//                $this->perform,
+//                $api,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
+//            ->add(new Profile\Cleanup(
+//                $this->log,
+//                $this->perform,
+//                $this->baseProfileMapper,
+//                $this->studentProfileMapper,
+//                $this->parentProfileMapper,
+//                $this->staffProfileMapper,
+//                $this->relationshipMapper
+//            ))
             ->add(new Timetable\Prepare(
                 $this->log,
                 $this->perform,
