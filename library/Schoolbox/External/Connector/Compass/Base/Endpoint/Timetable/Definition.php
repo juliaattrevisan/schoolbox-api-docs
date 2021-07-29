@@ -28,17 +28,6 @@ use Schoolbox\Mapper\Exception;
  */
 class Definition implements IStrategy
 {
-
-    /**
-     * Temporarily here to denote the start and end of cycles
-     * There appears to be no equivalent concept
-     *
-     * TODO Decide if you can find these elsewhere, or just use these defaults
-     */
-    private const CYCLE_START = '2000-01-01 00:00:00';
-    private const CYCLE_END = '2999-01-01 00:00:00';
-
-
     /**
      * @var LoggerInterface
      */
