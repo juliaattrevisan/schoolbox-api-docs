@@ -42,6 +42,30 @@ class Schedule
      */
     public function generate(): array
     {
+        // Prebuild periods from structure
+        $structures   = $this->api->retrieveDocument('schedule/v1/GetStructures', []);
+        $periodLookup = [];
+        foreach ($structures['d'] as $structure) {
+            foreach ($structure['days'] as $i => $day) {
+                // Assume that day number is numeric, and the days are in order
+                $dayNumber = $i + 1;
+                foreach ($day['periods'] as $period) {
+                    $periodId  = $period['periodId'];
+                    $periodLookup[$dayNumber][$periodId] = [
+                        'code'       => $periodId,
+                        'name'       => $period['periodName'],
+                        'startTime'  => Alaress_Date_Format::newFromTimestamp(strtotime($period['startTime']))->getDatabaseTime(),
+                        'finishTime' => Alaress_Date_Format::newFromTimestamp(strtotime($period['finishTime']))->getDatabaseTime(),
+                        'activities' => [],
+                    ];
+                }
+            }
+
+            // Only care about the first (default) schedule
+            break;
+        }
+
+
         $schedules = $this->api->retrieveDocument('schedule/v1/GetSchedule', []);
         $days      = [];
         foreach ($schedules as $schedule) {
@@ -57,21 +81,16 @@ class Schedule
                     // Day import identifier always seems to be a number?
                     $dayIdentifier    = $instance['importDayIdentifier'] ?? null;
                     $periodIdentifier = $instance['importPeriodIdentifier'] ?? null;
-                    $activityName     = $activity['name'] ?? null;
-                    if (!isset($dayIdentifier, $periodIdentifier, $activityName)) {
+                    $activityCode     = $activity['subjectImportIdentifier'] ?? null;
+                    $periodData       = $periodLookup[$dayIdentifier] ?? null;
+                    if (!isset($dayIdentifier, $periodIdentifier, $activityCode, $periodData)) {
                         continue;
                     }
                     $days[$dayIdentifier] ??= [
                         'day'       => $dayIdentifier,
-                        'periods'   => [],
+                        'periods'   => $periodLookup[$dayIdentifier],
                         'firstDate' => null,
                         'lastDate'  => null,
-                    ];
-                    $days[$dayIdentifier]['periods'][$periodIdentifier] ??= [
-                        'period'     => $periodIdentifier,
-                        'activities' => [],
-                        'firstTime'  => null,
-                        'lastTime'   => null,
                     ];
 
                     // Set first and last occurrence for each day/period
@@ -79,8 +98,8 @@ class Schedule
                     $finish     = Alaress_Date_Format::newFromTimestamp(strtotime($instance['finish']));
                     $startDate  = $start->getDatabaseDate();
                     $finishDate = $finish->getDatabaseDate();
-                    $startTime  = $start->getDatabaseTime();
-                    $finishTime = $finish->getDatabaseTime();
+//                    $startTime  = $start->getDatabaseTime();
+//                    $finishTime = $finish->getDatabaseTime();
                     $days[$dayIdentifier]['firstDate'] = min(
                         $days[$dayIdentifier]['firstDate'] ?? $startDate,
                         $startDate
@@ -89,15 +108,17 @@ class Schedule
                         $days[$dayIdentifier]['lastDate'] ?? $finishDate,
                         $finishDate
                     );
-                    $days[$dayIdentifier]['periods'][$periodIdentifier]['firstTime'] = min(
-                        $days[$dayIdentifier]['periods'][$periodIdentifier]['firstTime'] ?? $startTime,
-                        $startTime
-                    );
-                    $days[$dayIdentifier]['periods'][$periodIdentifier]['lastTime'] = max(
-                        $days[$dayIdentifier]['periods'][$periodIdentifier]['lastTime'] ?? $finishTime,
-                        $finishTime
-                    );
-                    $days[$dayIdentifier]['periods'][$periodIdentifier]['activities'][$activityName][] = [
+//                    $days[$dayIdentifier]['periods'][$periodIdentifier]['startTime'] = min(
+//                        $days[$dayIdentifier]['periods'][$periodIdentifier]['startTime'] ?? $startTime,
+//                        $startTime
+//                    );
+//                    $days[$dayIdentifier]['periods'][$periodIdentifier]['finishTime'] = max(
+//                        $days[$dayIdentifier]['periods'][$periodIdentifier]['finishTime'] ?? $finishTime,
+//                        $finishTime
+//                    );
+                    $days[$dayIdentifier]['periods'][$periodIdentifier]['activities'][$activityCode][] = [
+                        'name'   => $activity['name'] ?? null,
+                        'code'   => $activityCode,
                         'start'  => $start->getDatabase(),
                         'finish' => $finish->getDatabase(),
                     ];
@@ -111,6 +132,7 @@ class Schedule
         // Figure out start date, finish date, first day from the day list
         $result = [
             'days'       => $days,
+            'periods'    => $periodLookup,
             'startDate'  => null,
             'finishDate' => null,
             'startDay'   => null,
