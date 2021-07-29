@@ -2332,23 +2332,41 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      */
     private function extractFolderCodes(array $subjectList): array
     {
-        $folderCodesWithCampusCode    = array_map(
+        $subjectsWithCampusCode = array_filter(
+            $subjectList,
+            static function ($row) {
+                return (string)($row['campusCode'] ?? '') !== '';
+            }
+        );
+
+        // Allow for a leading space in the class code (e.g. "21.00/ 9ART").
+        // This is common for PCSchool class codes, for year levels 9 and lower.
+        $folderCodesWithCampusCodeUntrimmed = array_map(
+            static function ($row) {
+                return trim($row['campusCode'] . '/' . $row['code']);
+            },
+            $subjectsWithCampusCode
+        );
+
+        // Most SIS will expect the class code to be trimmed, though.
+        $folderCodesWithCampusCode = array_map(
             static function ($row) {
                 return trim($row['campusCode']) . '/' . trim($row['code']);
             },
-            array_filter(
-                $subjectList,
-                static function ($row) {
-                    return (string)($row['campusCode'] ?? '') !== '';
-                }
-            )
+            $subjectsWithCampusCode
         );
+
+        // Can also match on just the class code
         $folderCodesWithoutCampusCode = array_map(
             static function ($row) {
                 return trim($row['code']);
             },
             $subjectList
         );
-        return array_merge($folderCodesWithoutCampusCode, $folderCodesWithCampusCode);
+        return array_merge(
+            $folderCodesWithoutCampusCode,
+            $folderCodesWithCampusCode,
+            $folderCodesWithCampusCodeUntrimmed
+        );
     }
 }
