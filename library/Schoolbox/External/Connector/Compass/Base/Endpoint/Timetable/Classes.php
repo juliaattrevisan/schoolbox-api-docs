@@ -192,21 +192,30 @@ class Classes implements IStrategy
                 $timetableClass = $this->createTimetableClass($class);
                 $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
 
-                /* Process students
+                /* Process students (and non-main teachers)
                  */
-                foreach ($class['students'] as $student) {
+                $involvedUsers = array_merge(
+                    array_slice($class['teachers'], 1, null, true),
+                    $class['students']
+                );
+
+                foreach ($involvedUsers as $involvedUser) {
                     /* Throw warning, but assign them anyway
                      */
-                    if (!isset($users[$student['externalId']])) {
+                    if (!isset($users[$involvedUser['externalId']])) {
                         $this->log->warning(sprintf(
                             'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
-                            $student['externalId'],
+                            $involvedUser['externalId'],
                             $timetableClass->getName(),
                             $timetableClass->getCode()
                         ));
                     }
 
-                    $this->createTimetableClassInvolvement($student, $timetableClass);
+                    $involvedUserDetails = $users[$involvedUser['externalId']] ?? null;
+                    $involvedUser['firstname'] = $involvedUserDetails['firstname'] ?? 'Unknown';
+                    $involvedUser['surname']   = $involvedUserDetails['surname'] ?? 'User';
+
+                    $this->createTimetableClassInvolvement($involvedUser, $timetableClass);
                 }
             }
         }
@@ -326,23 +335,34 @@ class Classes implements IStrategy
             ));
         }
 
+
+        // A timetable class period has only one teacher:
+        // just assign the first teacher in the list as the period's teacher.
+        $teachers = $class['teachers'];
+        $primaryTeacher = array_shift($teachers);
+        $teacherExternalId = $primaryTeacher['externalId'] ?? null;
+
+
         /* Throw warning, but assign them anyway
          */
-        if (!isset($users[$class['teachers']['externalId']])) {
+        if (!isset($users[$teacherExternalId])) {
             $this->log->warning(sprintf(
                 'Tried to assign nonexistent schoolbox profile %s as teacher to class %s %s; externalId might not exist in schoolbox user profile table',
-                $class['teachers']['externalId'],
+                $teacherExternalId,
                 $timetableClass->getName(),
                 $timetableClass->getCode()
             ));
         }
 
-        $timetableClassPeriod->setTeacher($class['teachers']['externalId']);
+        $teacherDetails = $users[$teacherExternalId] ?? null;
+        $primaryTeacher['firstname'] = $teacherDetails['firstname'] ?? 'Unknown';
+        $primaryTeacher['surname']   = $teacherDetails['surname'] ?? 'User';
+        $timetableClassPeriod->setTeacher($teacherExternalId);
 
         $this->log->info(sprintf(
             'Creating class period relation for teacher %s %s in room %s',
-            $class['teachers']['firstname'],
-            $class['teachers']['surname'],
+            $primaryTeacher['firstname'],
+            $primaryTeacher['surname'],
             $class['room']['name']
         ));
 
@@ -498,7 +518,7 @@ class Classes implements IStrategy
                                     [$this, 'loadIntoExternalIdStruct'],
                                     $standardClassDetails[$activityIdentifier]['teachers'],
                                 ),
-                                'student' => array_map(
+                                'students' => array_map(
                                     [$this, 'loadIntoExternalIdStruct'],
                                     $standardClassDetails[$activityIdentifier]['students'],
                                 )
