@@ -28,7 +28,7 @@ class Model implements ISoftDeletable
      *
      * @var Group\Model
      */
-    protected $group;
+    protected Group\Model $group;
 
     /**
      * Lower bound for grades.
@@ -38,7 +38,7 @@ class Model implements ISoftDeletable
      *
      * @var float
      */
-    protected $lowerBound;
+    protected float $lowerBound;
 
     /**
      * Raw grade (0-100) for this selected grade.
@@ -48,7 +48,7 @@ class Model implements ISoftDeletable
      *
      * @var float
      */
-    protected $rawGrade;
+    protected float $rawGrade;
 
     /**
      * Caption for this grade level.
@@ -56,15 +56,15 @@ class Model implements ISoftDeletable
      *
      * @var string
      */
-    protected $caption;
+    protected string $caption;
 
     /**
-     * @var User
+     * @var User|null
      */
     protected ?User $createdBy = null;
 
     /**
-     * @var User
+     * @var User|null
      */
     protected ?User $updatedBy = null;
 
@@ -141,9 +141,10 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * User that first authored this grade level
+     *
      * @param User $createdBy
      * @return $this
-     *
      */
     public function setCreatedBy(User $createdBy): self
     {
@@ -152,7 +153,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return User
+     * User that first authored this grade level
+     *
+     * @return User|null
      */
     public function getCreatedBy(): ?User
     {
@@ -160,9 +163,10 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * User that has made the most recent changes to this grade level group
+     *
      * @param User $updatedBy
      * @return $this
-     *
      */
     public function setUpdatedBy(User $updatedBy): self
     {
@@ -171,7 +175,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return User
+     * User that has made the most recent changes to this grade level group
+     *
+     * @return User|null
      */
     public function getUpdatedBy(): ?User
     {

@@ -15,7 +15,6 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\User;
 
-
 /**
  * Model for due work grade groups.
  */
@@ -31,7 +30,7 @@ class Model implements ISoftDeletable
      *
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * Collection of grade levels that belong to this group
@@ -41,12 +40,12 @@ class Model implements ISoftDeletable
     protected $gradeLevels;
 
     /**
-     * @var User
+     * @var User|null The first user to author the grade level group
      */
     protected ?User $createdBy = null;
 
     /**
-     * @var User
+     * @var User|null The most recent user to change the grade level group
      */
     protected ?User $updatedBy = null;
 
@@ -100,7 +99,9 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return User
+     * User that first authored this grade level group
+     *
+     * @return User|null
      */
     public function getCreatedBy(): ?User
     {
@@ -108,9 +109,10 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * User that first authored this grade level group
+     *
      * @param User $createdBy
      * @return $this
-     *
      */
     public function setCreatedBy(User $createdBy): self
     {
@@ -119,6 +121,8 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * User that has made the most recent changes to this grade level group
+     *
      * @return User|null
      */
     public function getUpdatedBy(): ?User
@@ -127,11 +131,12 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * User that has made the changes to this grade level group
+     *
      * @param User $updatedBy
      * @return $this
-     *
      */
-    public function setUpdatedBy(?User $updatedBy): self
+    public function setUpdatedBy(User $updatedBy): self
     {
         $this->updatedBy = $updatedBy;
         return $this;

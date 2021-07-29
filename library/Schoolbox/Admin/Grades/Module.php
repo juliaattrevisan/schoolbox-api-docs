@@ -12,9 +12,11 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Aura\Di\ContainerInterface;
 use Closure;
+use InvalidArgumentException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Mapper as GradeLevelMapper;
-use Schoolbox\Role;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
 
 class Module extends BaseModule
 {
@@ -27,45 +29,37 @@ class Module extends BaseModule
      * Hook method for setting up routes via self::register()
      *
      * @return void
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function registerRoutes(): void
     {
         /**
-         * TODO are these permissions too broad?
+         * This rule is used for all CRUD operations currently
          */
         $viewGradesRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\IsSuperuser()
         );
 
-        $manageGradesRule = new Rule\All(
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\IsSuperuser(),
-                new Rule\HasRole(Role::STAFF),
-            ),
-        );
-
         /**
          * default landing page
          */
-        $this->register(self::METHOD_GET, '', 'getIndex', $viewGradesRule, null);
+        $this->register(self::METHOD_GET, '', 'getIndex', $viewGradesRule);
 
         /**
          * handle upsert of grade groups and their associated levels
          */
-        $this->register(self::METHOD_POST, '', 'postSaveGrades', $viewGradesRule, null);
+        $this->register(self::METHOD_POST, '', 'postSaveGrades', $viewGradesRule);
 
         /**
-         * soft delete a grade group
+         * soft delete a grade levels group
          */
-        $this->register(self::METHOD_DELETE, '/group/{groupId}', 'deleteGradeGroup', $manageGradesRule, Closure::fromCallable([$this, 'preloadGradeGroup']));
+        $this->register(self::METHOD_DELETE, '/group/{groupId:\d+}', 'deleteGradeGroup', $viewGradesRule, Closure::fromCallable([$this, 'preloadGradeGroup']));
 
         /**
-         * soft delete a grade group level
+         * soft delete a grade level
          */
-        $this->register(self::METHOD_DELETE, '/level/{levelId}', 'deleteGradeLevel', $manageGradesRule, Closure::fromCallable([$this, 'preloadGradeLevel']));
+        $this->register(self::METHOD_DELETE, '/level/{levelId:\d+}', 'deleteGradeLevel', $viewGradesRule, Closure::fromCallable([$this, 'preloadGradeLevel']));
     }
 
     /**
@@ -94,10 +88,12 @@ class Module extends BaseModule
     }
 
     /**
+     * Preload a GradeLevelGroup instance
+     *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws Exception
+     * @throws Deleted
      */
     private function preloadGradeGroup(array $params): array
     {
@@ -109,10 +105,12 @@ class Module extends BaseModule
     }
 
     /**
+     * Preload a GradeLevel instance
+     *
      * @param array $params
      * @return array
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
+     * @throws Exception
+     * @throws Deleted
      */
     private function preloadGradeLevel(array $params): array
     {

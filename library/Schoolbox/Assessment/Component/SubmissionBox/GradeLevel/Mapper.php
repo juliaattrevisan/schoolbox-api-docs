@@ -121,15 +121,14 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Apply the createdBy derived from the updatedBy field, but only when it's a new row
+     *
      * @param Model $gradeLevel
-     * @return bool
      */
-    public function applyCreatedBy(Model $gradeLevel): bool
+    public function applyCreatedBy(Model $gradeLevel): void
     {
         if ($gradeLevel->getId() == null) {
             $gradeLevel->setCreatedBy($gradeLevel->getUpdatedBy());
         }
-
-        return true;
     }
 }

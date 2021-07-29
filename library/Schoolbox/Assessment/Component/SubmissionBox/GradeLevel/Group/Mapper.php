@@ -80,11 +80,10 @@ class Mapper extends BaseMapper
         return true;
     }
 
-
     /**
      * @return string
      */
-    protected function getSelectString()
+    protected function getSelectString(): string
     {
         return "
             SELECT
@@ -143,7 +142,7 @@ class Mapper extends BaseMapper
      * Returns options for default grade group
      * @return GenericCollection
      */
-    public function findAllForAdminOption()
+    public function findAllForAdminOption(): GenericCollection
     {
         $collection = $this->createCollection();
         $none       = (new Model())->setId(self::GRADE_GROUP_ID_NONE)->setName('None');
@@ -155,15 +154,14 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Apply the createdBy derived from the updatedBy field, but only when it's a new row
+     *
      * @param Model $gradeGroup
-     * @return bool
      */
-    public function applyCreatedBy(Model $gradeGroup): bool
+    public function applyCreatedBy(Model $gradeGroup): void
     {
         if ($gradeGroup->getId() == null) {
             $gradeGroup->setCreatedBy($gradeGroup->getUpdatedBy());
         }
-
-        return true;
     }
 }

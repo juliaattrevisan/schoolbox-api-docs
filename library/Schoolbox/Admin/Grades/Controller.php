@@ -11,18 +11,19 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception;
 
 class Controller extends Base
 {
     /**
      * @var GradeLevel\Mapper
      */
-    private $gradeLevelMapper;
+    private GradeLevel\Mapper $gradeLevelMapper;
 
     /**
      * @var GradeLevel\Group\Mapper
      */
-    private $gradeLevelGroupMapper;
+    private GradeLevel\Group\Mapper $gradeLevelGroupMapper;
 
     /**
      * Constructor
@@ -32,8 +33,8 @@ class Controller extends Base
      */
     public function __construct(GradeLevel\Mapper $gradeLevelMapper, GradeLevel\Group\Mapper $gradeLevelGroupMapper)
     {
-        $this->gradeLevelMapper      = $gradeLevelMapper;
         $this->gradeLevelGroupMapper = $gradeLevelGroupMapper;
+        $this->gradeLevelMapper      = $gradeLevelMapper;
     }
 
     /**
@@ -58,19 +59,18 @@ class Controller extends Base
     }
 
     /**
+     * Delete a Grade Group and it's associated Grade Levels
+     *
      * @param GradeLevel\Group\Model $gradeGroup
-     * @api   DELETE /adminv2/grades/group/{groupId}
-     * @route adminGrades.deleteGradeGroup
+     * @throws Exception
+     * @api   DELETE /grades/group/{groupId:\d+}
      */
     public function deleteGradeGroup(GradeLevel\Group\Model $gradeGroup): void
     {
-        /**
-         * don't forget to track those changes!
-         */
         $gradeGroup->setUpdatedBy($this->getUser());
 
         /**
-         * its important to remove any grade levels before the main grade group;
+         * its important to remove any grade levels before the main grade group
          * so that they are not left in an orphaned state
          */
         $this->gradeLevelMapper->delete($gradeGroup->getGradeLevels());
@@ -81,6 +81,13 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Delete a single Grade Level
+     *
+     * @param GradeLevel\Model $gradeLevel
+     * @throws Exception
+     * @api   DELETE /grades/level/{levelId:\d+}
+     */
     public function deleteGradeLevel(GradeLevel\Model $gradeLevel): void
     {
         /**
@@ -98,8 +105,9 @@ class Controller extends Base
     /**
      * Modify admin grades.
      *
-     * @api   POST /adminv2/grades
+     * @throws Exception
      * @since 20.2
+     * @api   POST /adminv2/grades
      */
     public function postSaveGrades(): void
     {
@@ -152,7 +160,9 @@ class Controller extends Base
      */
     private function retrieveAllGradeGroups(): Collection
     {
-        // Workaround for cache of both grade level group and grade level
+        /**
+         * disable caching on Grade Group and Grade Level to ensure we always have fresh content
+         */
         $gradeLevelGroups = $this->gradeLevelGroupMapper->findAll(['cache' => false]);
         foreach ($gradeLevelGroups as $gradeLevelGroup) {
             $gradeLevelGroup->setGradeLevels(
