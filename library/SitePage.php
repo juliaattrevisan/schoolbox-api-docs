@@ -110,19 +110,6 @@ class SitePage extends Page
         return $type;
     }
 
-    /**
-     * Get websocket port
-     *
-     * @return int
-     */
-    public function getWebsocketPort()
-    {
-        if ($this->conType() == 'https://') {
-            return $this->config->get('websocket_port_ssl') ?: 8081;
-        }
-
-        return $this->config->get('websocket_port') ?: 8080;
-    }
 
     /**
      * @param string $pageFile
@@ -492,7 +479,7 @@ class SitePage extends Page
      */
     public static function localRedir($file, $keepProcessing = false, $responseCode = null)
     {
-        header('Location: ' . self::conType() . ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST']) . $file, null, $responseCode);
+        header('Location: ' . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
         // don't quit
         if ($keepProcessing) {

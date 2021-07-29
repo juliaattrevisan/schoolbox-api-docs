@@ -20,6 +20,7 @@ $authenticator = new \Etherpad\Authenticator();
  */
 $padMapper = new \Etherpad\PadMapper();
 
+/** @var SitePage $this */
 try {
     $pad = $padMapper->findById($this->arg[0]);
 } catch (\Exception $e) {
@@ -88,13 +89,13 @@ if ($authenticator->isParticipator($pad->getHomepageId())) {
             $padMapper->save($pad);
 
             if ($authenticator->canCreate($pad->getHomepageId()) || !$pad->isLocked()) {
-                $this->localRedir(':' . $this->getWebsocketPort() . "/pad/p/{$pad->getPadId()}");
+                $this->localRedir("/pad/p/{$pad->getPadId()}");
             } else if ($pad->isLocked()) {
                 $readonlyResult = $client->getReadOnlyID($pad->getPadId());
                 $data = $readonlyResult->getData();
 
                 if ($readonlyResult->getMessage() == 'ok') {
-                    $this->localRedir(":" . $this->getWebsocketPort() . "/pad/p/{$data['readOnlyID']}?showControls=false");
+                    $this->localRedir("/pad/p/{$data['readOnlyID']}?showControls=false");
                 }
             }
         } else {
