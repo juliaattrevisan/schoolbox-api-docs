@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
 use RangeException;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -22,7 +23,6 @@ class Mapper extends BaseMapper
 {
     private const MIN_VALUE = 0;
     private const MAX_VALUE = 100;
-
 
     /**
      * {@inheritdoc}
@@ -44,13 +44,20 @@ class Mapper extends BaseMapper
         $this->uses('lower_bound', self::TYPE_DECIMAL);
         $this->uses('raw_grade', self::TYPE_DECIMAL);
         $this->uses('caption', self::TYPE_STRING);
+        $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
+        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        //apply createdBy() to new rows only
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'applyCreatedBy']);
 
         // Validation
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertValidCaption']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertValidLowerBound']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertValidRawGrade']);
     }
-
 
     /**
      * Pre-save validation for the caption: it must be set and not empty.
@@ -111,5 +118,18 @@ class Mapper extends BaseMapper
         if ($value > $max) {
             throw new RangeException(sprintf('%s must be less than %d', $label, self::MAX_VALUE));
         }
+    }
+
+    /**
+     * @param Model $gradeLevel
+     * @return bool
+     */
+    public function applyCreatedBy(Model $gradeLevel): bool
+    {
+        if ($gradeLevel->getId() == null) {
+            $gradeLevel->setCreatedBy($gradeLevel->getUpdatedBy());
+        }
+
+        return true;
     }
 }

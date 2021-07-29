@@ -9,14 +9,19 @@ declare(strict_types=1);
 
 namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel;
 
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\User;
 
 /**
  * Model for due work grade levels.
  */
-class Model
+class Model implements ISoftDeletable
 {
-    use Id;
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
 
     /**
      * Group this belongs to
@@ -53,6 +58,15 @@ class Model
      */
     protected $caption;
 
+    /**
+     * @var User
+     */
+    protected ?User $createdBy = null;
+
+    /**
+     * @var User
+     */
+    protected ?User $updatedBy = null;
 
     /**
      * @return string
@@ -124,5 +138,43 @@ class Model
     {
         $this->rawGrade = $rawGrade;
         return $this;
+    }
+
+    /**
+     * @param User $createdBy
+     * @return $this
+     *
+     */
+    public function setCreatedBy(User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * @param User $updatedBy
+     * @return $this
+     *
+     */
+    public function setUpdatedBy(User $updatedBy): self
+    {
+        $this->updatedBy = $updatedBy;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
     }
 }

@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\UserMapper;
 use UnexpectedValueException;
 
 /**
@@ -41,6 +42,12 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
+        $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
+        $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
         $this->hasJoin(
             'levels',
             [
@@ -50,6 +57,9 @@ class Mapper extends BaseMapper
                 'multiple'  => true,
             ]
         );
+
+        //apply createdBy() to new rows only
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'applyCreatedBy']);
 
         // Validation
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'assertValidName']);
@@ -142,5 +152,18 @@ class Mapper extends BaseMapper
         $collection->add($percentage);
         $collection = $collection->merge($this->findAll());
         return $collection;
+    }
+
+    /**
+     * @param Model $gradeGroup
+     * @return bool
+     */
+    public function applyCreatedBy(Model $gradeGroup): bool
+    {
+        if ($gradeGroup->getId() == null) {
+            $gradeGroup->setCreatedBy($gradeGroup->getUpdatedBy());
+        }
+
+        return true;
     }
 }

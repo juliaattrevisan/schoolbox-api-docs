@@ -11,14 +11,20 @@ namespace Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevelModel;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\User;
+
 
 /**
  * Model for due work grade groups.
  */
-class Model
+class Model implements ISoftDeletable
 {
-    use Id;
+    use ModelTrait\Id;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
+    use ModelTrait\DeletedAtDate;
 
     /**
      * Name of this group
@@ -33,6 +39,16 @@ class Model
      * @var Collection|GradeLevelModel[]
      */
     protected $gradeLevels;
+
+    /**
+     * @var User
+     */
+    protected ?User $createdBy = null;
+
+    /**
+     * @var User
+     */
+    protected ?User $updatedBy = null;
 
     /**
      * @return string
@@ -80,6 +96,44 @@ class Model
     {
         // Don't add more than once
         $this->getGradeLevels()->setOffset($level->getId(), $level);
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    /**
+     * @param User $createdBy
+     * @return $this
+     *
+     */
+    public function setCreatedBy(User $createdBy): self
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    /**
+     * @param User $updatedBy
+     * @return $this
+     *
+     */
+    public function setUpdatedBy(?User $updatedBy): self
+    {
+        $this->updatedBy = $updatedBy;
         return $this;
     }
 }
