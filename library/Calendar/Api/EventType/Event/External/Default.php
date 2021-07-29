@@ -15,7 +15,6 @@ use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Config\Loader as ConfigLoader;
 
 class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventType_Abstract
 {
@@ -75,24 +74,20 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @param int $startTimestamp
      * @param int $endTimestamp
      * @return Collection
+     * @throws InvalidArgumentException
      * @throws MapperException
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
 
         $stack = new Collection();
-        /*
-         * If the External ID is NOT a number, then stop the system from checking the external database.
-         */
-        $externalId = $this->getUser()->getExternalId();
-        $config = ConfigLoader::getInstance();
-        $external_type = $config->get('external_type');
-        if (is_numeric($externalId) === false && $external_type == "synergetic") {
+
+        try {
+            /** @var IIterator $externalEvents */
+            $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
+        } catch (InvalidArgumentException $e) {
             return $stack;
         }
-
-        /** @var IIterator $externalEvents */
-        $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
 
         // Figure out default event type
         try {

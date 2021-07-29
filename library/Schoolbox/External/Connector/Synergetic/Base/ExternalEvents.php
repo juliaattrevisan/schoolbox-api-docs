@@ -11,6 +11,7 @@
 namespace Schoolbox\External\Connector\Synergetic\Base;
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\External\Connector\IExternalEvents;
 use Schoolbox\External\Connector\Base;
 use Schoolbox\User;
@@ -24,6 +25,14 @@ class ExternalEvents extends Base implements IExternalEvents
     {
         $start = new Alaress_Date_Format($startDate, 'U');
         $finish = new Alaress_Date_Format($endDate, 'U');
+
+
+        // If the External ID is NOT a number, then stop the system from checking the external database.
+
+        if (is_numeric($user->getExternalId()) === false || $user->getExternalId() < 0) {
+            throw new InvalidArgumentException("External ID is not a Number");
+        }
+
 
         if ($user->getRole()->isStaff()) {
             $join  = "";
@@ -58,7 +67,7 @@ class ExternalEvents extends Base implements IExternalEvents
                   FROM	StaffScheduleStudentClasses sssc
                   JOIN dbo.SubjectClasses sc2 ON sssc.ClassCode = sc2.ClassCode AND sssc.FileYear = sc2.FileYear AND sssc.FileSemester = sc2.FileSemester
                   WHERE	sssc.StaffScheduleSeq = ss.StaffScheduleSeq
-                  ORDER BY ', ' + CASE WHEN sc2.Description IS NULL THEN sssc.ClassCode ELSE sc2.Description END 
+                  ORDER BY ', ' + CASE WHEN sc2.Description IS NULL THEN sssc.ClassCode ELSE sc2.Description END
                   FOR	XML PATH ('')), 1, 1, '')))
               -- If a StaffScheduleSeq was specified and we found a class description, use that
               WHEN ISNULL(sc.Description, '') <> '' THEN sc.Description
@@ -69,7 +78,7 @@ class ExternalEvents extends Base implements IExternalEvents
               -- Otherwise try the first 50 characters of the comment
               WHEN ISNULL(LTRIM(RTRIM(ss.Comment)), '') <> '' THEN LEFT(LTRIM(RTRIM(ss.Comment)), 50)
               -- Otherwise we're out of luck making a meaningful title for this event
-              ELSE 'Scheduled Meeting' END	                     
+              ELSE 'Scheduled Meeting' END
                                     AS title
               FROM dbo.StaffSchedule ss
               LEFT JOIN dbo.luLocation l ON ss.LocationCode = l.Code AND ss.LocationCode IS NOT NULL AND ss.LocationCode <> ''
