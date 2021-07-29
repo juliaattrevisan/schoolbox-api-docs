@@ -138,24 +138,38 @@ class DataSource
      */
     public function countRecordsByType(User $viewer, int $studentId, array $typeIds, array $subtypeIds): array
     {
-        $typeBindings    = Builder::getBindings($typeIds, 'typeId');
-        $subtypeBindings = Builder::getBindings($subtypeIds, 'subtypeId');
+        if (empty($typeIds) && empty($subtypeIds)) {
+            return [];
+        }
 
-        $where = $this->getPermissionClause($viewer, $studentId, null);
+        $typeWheres = [];
+        $typeParams = [];
+        if (!empty($typeIds)) {
+            $typeBindings = Builder::getBindings($typeIds, 'typeId');
+            $typeWheres[] = "p.type_id IN ({$typeBindings->getPlaceholder()})";
+            $typeParams = $typeBindings->getParams();
+        }
+        if (!empty($subtypeIds)) {
+            $subtypeBindings = Builder::getBindings($subtypeIds, 'subtypeId');
+            $typeWheres[]    = "p.subtype_id IN ({$subtypeBindings->getPlaceholder()})";
+            $typeParams = array_merge($subtypeBindings->getParams(), $typeParams);
+        }
+
+        $where     = $this->getPermissionClause($viewer, $studentId, null);
+        $typeWhere = implode(' OR ', $typeWheres);
 
         $sql    = "
         SELECT count(*) as count, p.type_id as typeId, p.subtype_id as subtypeId
                 FROM pastoral p
         WHERE ({$where['where']})
-        AND (p.type_id IN ({$typeBindings->getPlaceholder()}) OR p.subtype_id IN ({$subtypeBindings->getPlaceholder()}))
+        AND ({$typeWhere})
         AND created_at >= :yearAgo
         GROUP BY p.type_id, p.subtype_id
         ";
         $date   = new \Alaress_Date_Format();
         $params = array_merge(
             ['yearAgo' => $date->addYears(-1)->getDatabaseDate()],
-            $typeBindings->getParams(),
-            $subtypeBindings->getParams(),
+            $typeParams,
             $where['params']
         );
 
