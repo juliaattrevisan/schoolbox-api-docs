@@ -9,7 +9,6 @@ namespace Payload\Fixtures\Sport;
 
 use Payload\Request;
 use Payload\PostTrait;
-
 use Schoolbox\Collection;
 
 use function Clue\StreamFilter\append;
