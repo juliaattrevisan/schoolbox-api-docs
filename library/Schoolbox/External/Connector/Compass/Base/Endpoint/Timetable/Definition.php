@@ -43,9 +43,15 @@ class Definition implements IStrategy
 
 
     /**
-     * The API abstraction used for connecting to the external data source.
+     * Endpoint wrapper for academic groups
      */
-    private IApi $api;
+    private AcademicGroups $academicGroups;
+
+
+    /**
+     * Endpoint wrapper for schedules
+     */
+    private Schedule $schedule;
 
 
     /**
@@ -65,20 +71,23 @@ class Definition implements IStrategy
      *
      * @param LoggerInterface       $log
      * @param bool                  $perform
-     * @param IApi                  $api
+     * @param AcademicGroups        $academicGroups
+     * @param Schedule              $schedule
      * @param TimetableCycleMapper  $timetableCycleMapper
      * @param TimetablePeriodMapper $timetablePeriodMapper
      */
     public function __construct(
         LoggerInterface $log,
         bool $perform,
-        IApi $api,
+        AcademicGroups $academicGroups,
+        Schedule $schedule,
         TimetableCycleMapper $timetableCycleMapper,
         TimetablePeriodMapper $timetablePeriodMapper
     ) {
         $this->log = $log;
         $this->perform = $perform;
-        $this->api = $api;
+        $this->academicGroups = $academicGroups;
+        $this->schedule = $schedule;
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->timetablePeriodMapper = $timetablePeriodMapper;
     }
@@ -90,8 +99,8 @@ class Definition implements IStrategy
     public function import(): void
     {
         // I don't know which academic group uses which structure
-        $academicGroups = (new AcademicGroups($this->api))->generate();
-        $schedule       = (new Schedule($this->api))->generate();
+        $academicGroups = $this->academicGroups->generate();
+        $schedule       = $this->schedule->generate();
 
         foreach ($academicGroups as $academicGroup) {
             // Parse structure into a set of days

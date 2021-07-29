@@ -200,6 +200,9 @@ class Factory
 
         $api = new Api($this->host, $this->key);
 
+        $academicGroups = new Timetable\AcademicGroups($api);
+        $schedule       = new Timetable\Schedule($api);
+
         return (new GenericCollection(IStrategy::class))
 
             /* Purge previously-imported profile relationships and classes
@@ -243,7 +246,8 @@ class Factory
             ->add(new Timetable\Definition(
                 $this->log,
                 $this->perform,
-                $api,
+                $academicGroups,
+                $schedule,
                 $this->timetableCycleMapper,
                 $this->timetablePeriodMapper
             ))
@@ -251,6 +255,8 @@ class Factory
                 $this->log,
                 $this->perform,
                 $lookup,
+                $academicGroups,
+                $schedule,
                 $api,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,

@@ -56,6 +56,18 @@ class Classes implements IStrategy
 
 
     /**
+     * Endpoint wrapper for academic groups
+     */
+    private AcademicGroups $academicGroups;
+
+
+    /**
+     * Endpoint wrapper for schedules
+     */
+    private Schedule $schedule;
+
+
+    /**
      * The API abstraction used for connecting to the external data source.
      */
     private IApi $api;
@@ -85,6 +97,9 @@ class Classes implements IStrategy
      * @param LoggerInterface        $log
      * @param bool                   $perform
      * @param Lookup                 $lookup
+     * @param AcademicGroups         $academicGroups
+     * @param Schedule               $schedule
+     * @param IApi                   $api
      * @param ClassEntryMapper       $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
      * @param ClassPeriodMapper      $classPeriodMapper
@@ -93,6 +108,8 @@ class Classes implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Lookup $lookup,
+        AcademicGroups $academicGroups,
+        Schedule $schedule,
         IApi $api,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
@@ -101,6 +118,8 @@ class Classes implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->lookup = $lookup;
+        $this->academicGroups = $academicGroups;
+        $this->schedule = $schedule;
         $this->api = $api;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
@@ -127,11 +146,10 @@ class Classes implements IStrategy
         $periods = $this->lookup->getPeriods();
 
         // Timetable: just use the Schedule again
-        // TODO cache this, it's an expensive request
-        $schedule = (new Schedule($this->api))->generate();
+        $schedule = $this->schedule->generate();
 
         // Each academic group will have a timetable cycle created for it
-        $academicGroups = (new AcademicGroups($this->api))->generate();
+        $academicGroups = $this->academicGroups->generate();
 
         foreach ($academicGroups as $academicGroup) {
             $ext = $academicGroup['academicGroupCode'];

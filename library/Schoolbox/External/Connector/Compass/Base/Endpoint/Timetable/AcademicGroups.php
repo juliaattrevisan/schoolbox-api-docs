@@ -26,6 +26,11 @@ class AcademicGroups
     private IApi $api;
 
     /**
+     * A cached result (as this is expensive to generate)
+     */
+    private ?array $cache = null;
+
+    /**
      * Constructor
      *
      * @param IApi $api
@@ -42,6 +47,9 @@ class AcademicGroups
      */
     public function generate(): array
     {
+        if (isset($this->cache)) {
+            return $this->cache;
+        }
         $stack          = [];
         $academicGroups = $this->api->retrieveDocument('reference/v1/GetAcademicGroups', []);
         foreach ($academicGroups['d'] as $academicGroup) {
@@ -50,6 +58,7 @@ class AcademicGroups
             }
             $stack[] = $academicGroup;
         }
+        $this->cache = $stack;
         return $stack;
     }
 }

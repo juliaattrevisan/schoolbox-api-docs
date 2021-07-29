@@ -26,6 +26,11 @@ class Schedule
     private IApi $api;
 
     /**
+     * A cached result (as this is expensive to generate)
+     */
+    private ?array $cache = null;
+
+    /**
      * Constructor
      *
      * @param IApi $api
@@ -43,6 +48,9 @@ class Schedule
     public function generate(): array
     {
         // Prebuild periods from structure
+        if (isset($this->cache)) {
+            return $this->cache;
+        }
         $structures   = $this->api->retrieveDocument('schedule/v1/GetStructures', []);
         $periodLookup = [];
         foreach ($structures['d'] as $structure) {
@@ -162,6 +170,7 @@ class Schedule
                 $result['startDay'] = $day['day'];
             }
         }
+        $this->cache = $result;
         return $result;
     }
 }
