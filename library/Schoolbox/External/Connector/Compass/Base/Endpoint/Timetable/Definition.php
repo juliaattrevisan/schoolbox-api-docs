@@ -102,78 +102,75 @@ class Definition implements IStrategy
     {
         // I don't know which academic group uses which structure
         $academicGroups = (new AcademicGroups($this->api))->generate();
-        $structures     = (new Structures($this->api))->generate();
         $schedule       = (new Schedule($this->api))->generate();
 
         foreach ($academicGroups as $academicGroup) {
-            foreach ($structures as $structure) {
-                // Parse structure into a set of days
-                $cycleName       = $academicGroup['name'] . ' ' . $structure['name'];
-                $cycleLength     = $structure['dayCount'];
-                $dayLength       = $structure['periodCount'];
-                $cycleIdentifier = $academicGroup['academicGroupCode'] . ':' . $structure['name'];
+            // Parse structure into a set of days
+            $cycleName       = $academicGroup['name'];
+            $cycleLength     = $schedule['dayCount'];
+            $dayLength       = $schedule['periodCount'];
+            $cycleIdentifier = $academicGroup['academicGroupCode'];
 
-                $cycleStart = new Alaress_Date_Format($schedule['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                $cycleEnd   = new Alaress_Date_Format($schedule['finishDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
-                $dayStart   = $schedule['startDay'];
+            $cycleStart = new Alaress_Date_Format($schedule['startDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $cycleEnd   = new Alaress_Date_Format($schedule['finishDate'], Alaress_Date_Format::DATABASE_DATE_FORMAT);
+            $dayStart   = $schedule['startDay'];
 
-                /* Reuse existing cycle with the same identifier, if it exists, and update it
-                 */
-                try {
-                    $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $cycleIdentifier);
-                } catch (\Schoolbox\Mapper\Exception $e) {
-                    $timetableCycle = $this->timetableCycleMapper->createModel();
-                }
+            /* Reuse existing cycle with the same identifier, if it exists, and update it
+             */
+            try {
+                $timetableCycle = $this->timetableCycleMapper->findOneByColumn('cycle_identifier', $cycleIdentifier);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $timetableCycle = $this->timetableCycleMapper->createModel();
+            }
 
-                $timetableCycle
-                    ->setCycleIdentifier($cycleIdentifier)
-                    ->setTitle($cycleName)
-                    ->setCycleLength($cycleLength)
-                    ->setDayLength($dayLength)
-                    ->setStart($cycleStart)
-                    ->setFinish($cycleEnd)
-                    ->setStartDay($dayStart);
+            $timetableCycle
+                ->setCycleIdentifier($cycleIdentifier)
+                ->setTitle($cycleName)
+                ->setCycleLength($cycleLength)
+                ->setDayLength($dayLength)
+                ->setStart($cycleStart)
+                ->setFinish($cycleEnd)
+                ->setStartDay($dayStart);
 
-                $this->log->info(
-                    sprintf(
-                        'Creating timetable cycle %s (%s) with day length %s',
+            $this->log->info(
+                sprintf(
+                    'Creating timetable cycle %s (%s) with day length %s',
+                    $timetableCycle->getId(),
+                    $timetableCycle->getTitle(),
+                    $timetableCycle->getDayLength(),
+                )
+            );
+
+            if ($this->perform) {
+                $this->timetableCycleMapper->save($timetableCycle);
+            }
+
+            /* Save all the periods and associate them with a cycle
+             */
+            $dayData = $this->findDays($schedule);
+
+            /** @var array $days */
+            $days = $dayData['days'];
+
+            /** @var array $periods */
+            foreach ($days as $day => $periods) {
+
+                /** @var TimetablePeriod $period */
+                foreach ($periods as $period) {
+                    $period->setDay($day);
+                    $period->setCycle($timetableCycle);
+
+                    $this->log->info(sprintf(
+                        'Creating period %s (%s-%s) in timetable cycle %s (%s)',
+                        $period->getTitle(),
+                        $period->getStart()->getDatabaseTime(),
+                        $period->getFinish()->getDatabaseTime(),
                         $timetableCycle->getId(),
-                        $timetableCycle->getTitle(),
-                        $timetableCycle->getDayLength(),
-                    )
-                );
+                        $timetableCycle->getTitle()
+                    ));
 
-                if ($this->perform) {
-                    $this->timetableCycleMapper->save($timetableCycle);
-                }
-
-                /* Save all the periods and associate them with a cycle
-                 */
-                $dayData = $this->findDays($structure);
-
-                /** @var array $days */
-                $days = $dayData['days'];
-
-                /** @var array $periods */
-                foreach ($days as $day => $periods) {
-
-                    /** @var TimetablePeriod $period */
-                    foreach ($periods as $period) {
-                        $period->setDay($day);
-                        $period->setCycle($timetableCycle);
-
-                        $this->log->info(sprintf(
-                            'Creating period %s (%s-%s) in timetable cycle %s (%s)',
-                            $period->getTitle(),
-                            $period->getStart()->getDatabaseTime(),
-                            $period->getFinish()->getDatabaseTime(),
-                            $timetableCycle->getId(),
-                            $timetableCycle->getTitle()
-                        ));
-
-                        if ($this->perform) {
-                            $this->timetablePeriodMapper->save($period);
-                        }
+                    if ($this->perform) {
+                        $this->timetablePeriodMapper->save($period);
                     }
                 }
             }
@@ -209,15 +206,15 @@ class Definition implements IStrategy
 
         foreach ($days as $day) {
             $periods  = $day['periods'];
-            $dayIndex = $day['dayNumber'];
+            $dayIndex = $day['day'];
 
             $struct['days'][$dayIndex] = [];
 
-            foreach ($periods as $period) {
-                $periodName = $period['periodName'];
-                $sequence   = $period['periodNumber'];
-                $start      = $period['start'];
-                $finish     = $period['finish'];
+            foreach ($periods as $i => $period) {
+                $periodName = $period['name'];
+                $sequence   = $i;
+                $start      = new Alaress_Date_Format($period['startTime'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
+                $finish     = new Alaress_Date_Format($period['finishTime'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
 
                 $timetablePeriod = $this->timetablePeriodMapper->createModel()
                     ->setTitle($periodName)
@@ -232,12 +229,9 @@ class Definition implements IStrategy
             /* Do a quick analysis in case there might be something amiss
              */
             if (!\count($struct['days'][$dayIndex])) {
-                $cycleName = $cycle['name'];
-
                 $this->log->warning(
                     sprintf(
-                        'Cycle %s, Day %s has no periods.',
-                        $cycleName,
+                        'Day %s has no periods.',
                         $dayIndex
                     )
                 );
