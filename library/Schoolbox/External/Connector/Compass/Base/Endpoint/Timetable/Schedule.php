@@ -50,7 +50,7 @@ class Schedule
                 // Assume that day number is numeric, and the days are in order
                 $dayNumber = $i + 1;
                 foreach ($day['periods'] as $period) {
-                    $periodId  = $period['periodId'];
+                    $periodId                            = $period['periodId'];
                     $periodLookup[$dayNumber][$periodId] = [
                         'code'       => $periodId,
                         'name'       => $period['periodName'],
@@ -79,6 +79,8 @@ class Schedule
             foreach ($schedule['activities'] as $activity) {
                 foreach ($activity['instances'] as $instance) {
                     // Day import identifier always seems to be a number?
+                    // We can only make a giant assumption that that day number
+                    // matches the day number we derived before.
                     $dayIdentifier    = $instance['importDayIdentifier'] ?? null;
                     $periodIdentifier = $instance['importPeriodIdentifier'] ?? null;
                     $activityCode     = $activity['subjectImportIdentifier'] ?? null;
@@ -93,13 +95,13 @@ class Schedule
                         'lastDate'  => null,
                     ];
 
-                    // Set first and last occurrence for each day/period
+                    // Set first and last date that this class occurs on.
+                    // That will be used to derive the cycle's start/finish date
+                    // and start day.
                     $start      = Alaress_Date_Format::newFromTimestamp(strtotime($instance['start']));
                     $finish     = Alaress_Date_Format::newFromTimestamp(strtotime($instance['finish']));
                     $startDate  = $start->getDatabaseDate();
                     $finishDate = $finish->getDatabaseDate();
-//                    $startTime  = $start->getDatabaseTime();
-//                    $finishTime = $finish->getDatabaseTime();
                     $days[$dayIdentifier]['firstDate'] = min(
                         $days[$dayIdentifier]['firstDate'] ?? $startDate,
                         $startDate
@@ -108,14 +110,6 @@ class Schedule
                         $days[$dayIdentifier]['lastDate'] ?? $finishDate,
                         $finishDate
                     );
-//                    $days[$dayIdentifier]['periods'][$periodIdentifier]['startTime'] = min(
-//                        $days[$dayIdentifier]['periods'][$periodIdentifier]['startTime'] ?? $startTime,
-//                        $startTime
-//                    );
-//                    $days[$dayIdentifier]['periods'][$periodIdentifier]['finishTime'] = max(
-//                        $days[$dayIdentifier]['periods'][$periodIdentifier]['finishTime'] ?? $finishTime,
-//                        $finishTime
-//                    );
                     $days[$dayIdentifier]['periods'][$periodIdentifier]['activities'][$activityCode][] = [
                         'name'   => $activity['name'] ?? null,
                         'code'   => $activityCode,
@@ -131,11 +125,12 @@ class Schedule
 
         // Figure out start date, finish date, first day from the day list
         $result = [
-            'days'       => $days,
-            'periods'    => $periodLookup,
-            'startDate'  => null,
-            'finishDate' => null,
-            'startDay'   => null,
+            'days'        => $days,
+            'dayCount'    => count($periodLookup),
+            'periodCount' => max(array_map('count', $periodLookup)),
+            'startDate'   => null,
+            'finishDate'  => null,
+            'startDay'    => null,
         ];
         foreach ($days as $day) {
             $result['startDate']  = min($result['startDate'] ?? $day['firstDate'], $day['firstDate']);
