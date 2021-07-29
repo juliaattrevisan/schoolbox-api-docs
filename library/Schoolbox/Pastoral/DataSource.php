@@ -129,6 +129,39 @@ class DataSource
         return (int)$stmt->fetchColumn();
     }
 
+    /**
+     * @param User  $viewer
+     * @param int   $studentId
+     * @param array $typeIds
+     * @param array $subtypeIds
+     * @return array
+     */
+    public function countRecordsByType(User $viewer, int $studentId, array $typeIds, array $subtypeIds): array
+    {
+        $typeBindings    = Builder::getBindings($typeIds, 'typeId');
+        $subtypeBindings = Builder::getBindings($subtypeIds, 'subtypeId');
+
+        $where = $this->getPermissionClause($viewer, $studentId, null);
+
+        $sql    = "
+        SELECT count(*) as count, p.type_id as typeId, p.subtype_id as subtypeId
+                FROM pastoral p
+        WHERE ({$where['where']})
+        AND (p.type_id IN ({$typeBindings->getPlaceholder()}) OR p.subtype_id IN ({$subtypeBindings->getPlaceholder()}))
+        AND created_at >= :yearAgo
+        GROUP BY p.type_id, p.subtype_id
+        ";
+        $date   = new \Alaress_Date_Format();
+        $params = array_merge(
+            ['yearAgo' => $date->addYears(-1)->getDatabaseDate()],
+            $typeBindings->getParams(),
+            $subtypeBindings->getParams(),
+            $where['params']
+        );
+
+        $stmt = $this->mapper->getDatabase()->query($sql, $params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     /**
      * Gets records for a particular student visible to the given viewer

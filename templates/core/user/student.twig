@@ -65,6 +65,7 @@
         userIds: user.id
     }
 ) %}
+{% set pastoralUrl = showPastoral ? routeLookupIfAuthorized('pastoral.getStudent',{studentId: user.id}) : null %}
 {##
  # Is the current user viewing their own profile?
  # This affects some links and metadata displayed.
@@ -317,6 +318,19 @@
                                 {% block extraDetails %}
                                     {# Schools can insert extra details here #}
                                 {% endblock extraDetails %}
+
+                                {% if showPastoral and pastoralCounts|length > 0 %}
+                                    <div>
+                                        {% for pastoralCount in pastoralCounts %}
+                                            <a href="{{ pastoralUrl ? pastoralUrl~'?type='~pastoralCount.typeId~'&subtype='~pastoralCount.subtypeId : '' }}">
+                                    <span id="pastoralFlagPreview"
+                                          class="label neutral icon-{{ pastoralCount.icon }}"
+                                          data-tooltip title="{{ pastoralCount.title }}"
+                                          style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
+                                    >{{ pastoralCount.count }}</span></a>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                             </dl>
                         {% endblock details %}
                     </div>
@@ -357,10 +371,9 @@
 
 
 
-                            {% set pastoralUrl = routeLookupIfAuthorized('pastoral.getStudent',{studentId: user.id}) %}
                             {% if showPastoral and pastoralUrl %}
                                 <li>
-                                    <a href="{{ routeLookup('pastoral.getStudent', {studentId: user.id}) }}"
+                                    <a href="{{ pastoralUrl }}"
                                        class="icon-pastoral">{{ locale.pastoralCare.proper }}</a>
                                 </li>
                             {% endif %}
