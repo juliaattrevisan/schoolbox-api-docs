@@ -49,11 +49,12 @@ class Schedule
             foreach ($structure['days'] as $i => $day) {
                 // Assume that day number is numeric, and the days are in order
                 $dayNumber = $i + 1;
-                foreach ($day['periods'] as $period) {
+                foreach (array_values($day['periods']) as $j => $period) {
                     $periodId                            = $period['periodId'];
                     $periodLookup[$dayNumber][$periodId] = [
                         'code'       => $periodId,
                         'name'       => $period['periodName'],
+                        'sequence'   => $j,
                         'startTime'  => Alaress_Date_Format::newFromTimestamp(strtotime($period['startTime']))->getDatabaseTime(),
                         'finishTime' => Alaress_Date_Format::newFromTimestamp(strtotime($period['finishTime']))->getDatabaseTime(),
                         'activities' => [],
@@ -86,8 +87,9 @@ class Schedule
         }
 
 
-        $schedules = $this->api->retrieveDocument('schedule/v1/GetSchedule', []);
-        $days      = [];
+        $schedules   = $this->api->retrieveDocument('schedule/v1/GetSchedule', []);
+        $days        = [];
+        $daySequence = 0;
         foreach ($schedules as $schedule) {
             // Only schedules which have themselves been imported may be
             // imported into Schoolbox?
@@ -110,6 +112,7 @@ class Schedule
                     }
                     $days[$dayIdentifier] ??= [
                         'day'       => $dayIdentifier,
+                        'sequence'  => $daySequence++,
                         'periods'   => $periodLookup[$dayIdentifier],
                         'firstDate' => null,
                         'lastDate'  => null,

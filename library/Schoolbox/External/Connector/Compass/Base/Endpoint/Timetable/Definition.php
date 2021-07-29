@@ -199,9 +199,9 @@ class Definition implements IStrategy
 
             $struct['days'][$dayIndex] = [];
 
-            foreach (array_values($periods) as $i => $period) {
+            foreach ($periods as $period) {
                 $periodName = $period['name'];
-                $sequence   = $i;
+                $sequence   = $period['sequence'];
                 $start      = new Alaress_Date_Format($period['startTime'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
                 $finish     = new Alaress_Date_Format($period['finishTime'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
 
