@@ -19,6 +19,7 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
 use Schoolbox\Mapper\Exception;
@@ -55,6 +56,12 @@ class Classes implements IStrategy
 
 
     /**
+     * The API abstraction used for connecting to the external data source.
+     */
+    private IApi $api;
+
+
+    /**
      * @var ClassEntryMapper
      */
     private ClassEntryMapper $classEntryMapper;
@@ -86,6 +93,7 @@ class Classes implements IStrategy
         LoggerInterface $log,
         bool $perform,
         Lookup $lookup,
+        IApi $api,
         ClassEntryMapper $classEntryMapper,
         ClassInvolvementMapper $classInvolvementMapper,
         ClassPeriodMapper $classPeriodMapper
@@ -93,6 +101,7 @@ class Classes implements IStrategy
         $this->log = $log;
         $this->perform = $perform;
         $this->lookup = $lookup;
+        $this->api = $api;
         $this->classEntryMapper = $classEntryMapper;
         $this->classInvolvementMapper = $classInvolvementMapper;
         $this->classPeriodMapper = $classPeriodMapper;
@@ -107,76 +116,69 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
+        /* Cache a flat key-value array of (user.id, user.synergy_id)
+         * The alternative would be to iterate findById() in a loop which probably costs more at scale
+         *
+         * Cache a flat key-value array of (day, period)
+         */
+        $this->lookup->init();
 
-//        /* Cache a flat key-value array of (user.id, user.synergy_id)
-//         * The alternative would be to iterate findById() in a loop which probably costs more at scale
-//         *
-//         * Cache a flat key-value array of (day, period)
-//         */
-//        $this->lookup->init();
-//
-//        $users = $this->lookup->getUsers();
-//        $periods = $this->lookup->getPeriods();
-//
-//        /* TODO Get a list of all the timetables to process
-//         */
-//        $timetables = [];
-//
-//        /* If there aren't any timetables, log it and exit
-//         */
-//        if (!\count($timetables)) {
-//            $this->log->warning('No timetables detected.');
-//            return;
-//        }
-//
-//        foreach ($timetables as $timetable) {
-//            /* TODO External Timetable Code (Cycle Identifier)
-//             */
-//            $ext = '';
-//
-//            /* Find all the classes and their details as best we can
-//             *
-//             * Some parts will rely on data to have already been imported into local schema,
-//             * such as period ids, user ids, etc. so we try to get those and assemble them into
-//             * a convenient struct which we can then just ram home
-//             */
-//            /* TODO Create an Iterator which collates subject data
-//             */
-//            $classes = [
-//                /*
-//                    [
-//                        'period' => [
-//                            'day' => '',
-//                            'name' => '',
-//                            'sequence' => '',
-//                            'start' => '',
-//                            'end' => ''
-//                        ],
-//                        'class' => [
-//                            'code' => '',
-//                            'name' => ''
-//                        ],
-//                        'room' => [
-//                            'name' => ''
-//                        ],
-//                        'teachers' => [
-//                            [
-//                                'externalId' => '',
-//                                'firstname' => '',
-//                                'surname' => '',
-//                            ]
-//                        ],
-//                        'student' => [
-//                            [
-//                                'externalId' => '',
-//                                'firstname' => '',
-//                                'surname' => '',
-//                            ]
-//                        ]
-//                    ]
-//                */
-//            ];
-//
+        $users = $this->lookup->getUsers();
+        $periods = $this->lookup->getPeriods();
+
+        // Timetable: just use the Schedule again
+        // TODO cache this, it's an expensive request
+//        $schedule = (new Schedule($this->api))->generate();
+
+        // Each academic group will have a timetable cycle created for it
+        $academicGroups = (new AcademicGroups($this->api))->generate();
+
+        foreach ($academicGroups as $academicGroup) {
+            $ext = $academicGroup['academicGroupCode'];
+
+            /* Find all the classes and their details as best we can
+             *
+             * Some parts will rely on data to have already been imported into local schema,
+             * such as period ids, user ids, etc. so we try to get those and assemble them into
+             * a convenient struct which we can then just ram home
+             */
+            /* TODO Create an Iterator which collates subject data
+             */
+            $classes = [
+                /*
+                    [
+                        'period' => [
+                            'day' => '',
+                            'name' => '',
+                            'sequence' => '',
+                            'start' => '',
+                            'end' => ''
+                        ],
+                        'class' => [
+                            'code' => '',
+                            'name' => ''
+                        ],
+                        'room' => [
+                            'name' => ''
+                        ],
+                        'teachers' => [
+                            [
+                                'externalId' => '',
+                                'firstname' => '',
+                                'surname' => '',
+                            ]
+                        ],
+                        'student' => [
+                            [
+                                'externalId' => '',
+                                'firstname' => '',
+                                'surname' => '',
+                            ]
+                        ]
+                    ]
+                */
+            ];
+
 //            foreach ($classes as $class) {
 //                /* Look up the period instance by (name, day)
 //                 *
@@ -225,7 +227,7 @@ class Classes implements IStrategy
 //                    $this->createTimetableClassInvolvement($student, $timetableClass);
 //                }
 //            }
-//        }
+        }
     }
 
 

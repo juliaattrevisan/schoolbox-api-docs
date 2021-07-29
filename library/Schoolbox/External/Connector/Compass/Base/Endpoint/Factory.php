@@ -251,6 +251,7 @@ class Factory
                 $this->log,
                 $this->perform,
                 $lookup,
+                $api,
                 $this->classEntryMapper,
                 $this->classInvolvementMapper,
                 $this->classPeriodMapper
