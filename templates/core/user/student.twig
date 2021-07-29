@@ -318,21 +318,20 @@
                                 {% block extraDetails %}
                                     {# Schools can insert extra details here #}
                                 {% endblock extraDetails %}
-
-                                {% if showPastoral and pastoralCounts|length > 0 %}
-                                    <div>
-                                        {% for pastoralCount in pastoralCounts %}
-                                            <a href="{{ pastoralUrl ? pastoralUrl~'?type='~pastoralCount.typeId~'&subtype='~pastoralCount.subtypeId : '' }}">
-                                    <span id="pastoralFlagPreview"
-                                          class="label neutral icon-{{ pastoralCount.icon }}"
-                                          data-tooltip title="{{ pastoralCount.title }}"
-                                          style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
-                                    >{{ pastoralCount.count }}</span></a>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
                             </dl>
                         {% endblock details %}
+                        {% if showPastoral and pastoralCounts|length > 0 %}
+                            <div class="pastoralAlerts">
+                                    {% for pastoralCount in pastoralCounts %}
+                                        <a href="{{ pastoralUrl ? pastoralUrl~'?type='~pastoralCount.typeId~'&subtype='~pastoralCount.subtypeId : '' }}">
+                                        <span id="pastoralFlag{{ pastoralCount.typeId }}-{{ pastoralCount.subtypeId }}"
+                                              class="label neutral icon-{{ pastoralCount.icon }}"
+                                              data-tooltip title="{{ pastoralCount.title }}"
+                                              style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
+                                        >{{ pastoralCount.count }}</span></a>
+                                    {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

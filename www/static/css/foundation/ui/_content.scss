@@ -1460,7 +1460,7 @@ dl {
 
 // Profiles
 .profile {
-    .alert-box {
+    .alert-box, .pastoralAlerts {
         margin: 0 0 0.75rem 0.75rem;
         @media #{$small-only} {
             margin: 0 0 0.75rem 0;
@@ -1468,9 +1468,9 @@ dl {
     }
     dl {
         @extend .inline-dl;
-        margin: 0;
+        margin: 0 0 0.75rem 0;
         @media #{$small-only} {
-            margin: 1rem 0;
+            margin: 1rem 0 ;
             dt,
             dd {
                 padding: 0;
