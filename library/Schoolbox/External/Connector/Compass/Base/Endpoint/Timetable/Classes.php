@@ -123,12 +123,12 @@ class Classes implements IStrategy
          */
         $this->lookup->init();
 
-        $users = $this->lookup->getUsers();
+        $users   = $this->lookup->getUsers();
         $periods = $this->lookup->getPeriods();
 
         // Timetable: just use the Schedule again
         // TODO cache this, it's an expensive request
-//        $schedule = (new Schedule($this->api))->generate();
+        $schedule = (new Schedule($this->api))->generate();
 
         // Each academic group will have a timetable cycle created for it
         $academicGroups = (new AcademicGroups($this->api))->generate();
@@ -142,91 +142,55 @@ class Classes implements IStrategy
              * such as period ids, user ids, etc. so we try to get those and assemble them into
              * a convenient struct which we can then just ram home
              */
-            /* TODO Create an Iterator which collates subject data
-             */
-            $classes = [
-                /*
-                    [
-                        'period' => [
-                            'day' => '',
-                            'name' => '',
-                            'sequence' => '',
-                            'start' => '',
-                            'end' => ''
-                        ],
-                        'class' => [
-                            'code' => '',
-                            'name' => ''
-                        ],
-                        'room' => [
-                            'name' => ''
-                        ],
-                        'teachers' => [
-                            [
-                                'externalId' => '',
-                                'firstname' => '',
-                                'surname' => '',
-                            ]
-                        ],
-                        'student' => [
-                            [
-                                'externalId' => '',
-                                'firstname' => '',
-                                'surname' => '',
-                            ]
-                        ]
-                    ]
-                */
-            ];
+            $classes = $this->iterateClassesFromSchedule($ext, $schedule);
+            foreach ($classes as $class) {
+                /* Look up the period instance by (name, day)
+                 *
+                 * If the period doesn't correspond to something in our timetable definition,
+                 * we can't process it anyway, so skip it
+                 */
+                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
 
-//            foreach ($classes as $class) {
-//                /* Look up the period instance by (name, day)
-//                 *
-//                 * If the period doesn't correspond to something in our timetable definition,
-//                 * we can't process it anyway, so skip it
-//                 */
-//                $timetablePeriod = $this->findPeriod($ext, $periods, $class['period']['day'], $class['period']['name']);
-//
-//                $this->log->info(sprintf(
-//                    'Looking for ext_timetable_code %s, day %s, period %s',
-//                    $ext,
-//                    $class['period']['day'],
-//                    $class['period']['name']
-//                ));
-//
-//                if (null === $timetablePeriod) {
-//                    $this->log->warning(sprintf(
-//                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
-//                        $class['period']['name'],
-//                        $class['period']['day'],
-//                        $ext
-//                    ));
-//
-//                    continue;
-//                }
-//
-//                /* Assemble the pieces
-//                 */
-//                $timetableClass = $this->createTimetableClass($class);
-//                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
-//
-//                /* Process students
-//                 */
-//                foreach ($class['students'] as $student) {
-//                    /* Throw warning, but assign them anyway
-//                     */
-//                    if (!isset($users[$student['externalId']])) {
-//                        $this->log->warning(sprintf(
-//                            'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
-//                            $student['externalId'],
-//                            $timetableClass->getName(),
-//                            $timetableClass->getCode()
-//                        ));
-//                    }
-//
-//                    $this->createTimetableClassInvolvement($student, $timetableClass);
-//                }
-//            }
+                $this->log->info(sprintf(
+                    'Looking for ext_timetable_code %s, day %s, period %s',
+                    $ext,
+                    $class['period']['day'],
+                    $class['period']['name']
+                ));
+
+                if (null === $timetablePeriod) {
+                    $this->log->warning(sprintf(
+                        'The period named %s on day %s does not exist in timetable structure for ext_timetable_code %s',
+                        $class['period']['name'],
+                        $class['period']['day'],
+                        $ext
+                    ));
+
+                    continue;
+                }
+
+                /* Assemble the pieces
+                 */
+                $timetableClass = $this->createTimetableClass($class);
+                $this->createTimetableClassPeriod($users, $class, $ext, $timetablePeriod, $timetableClass);
+
+                /* Process students
+                 */
+                foreach ($class['students'] as $student) {
+                    /* Throw warning, but assign them anyway
+                     */
+                    if (!isset($users[$student['externalId']])) {
+                        $this->log->warning(sprintf(
+                            'Tried to assign nonexistent schoolbox profile %s to class %s %s; externalId might not exist in schoolbox user profile table',
+                            $student['externalId'],
+                            $timetableClass->getName(),
+                            $timetableClass->getCode()
+                        ));
+                    }
+
+                    $this->createTimetableClassInvolvement($student, $timetableClass);
+                }
+            }
         }
     }
 
@@ -431,5 +395,111 @@ class Classes implements IStrategy
         }
 
         return $timetableClassInvolvement;
+    }
+
+
+    /**
+     * Helper for creating an iterator of class periods (and their enrolments)
+     * from the external timetable code and schedule.
+     *
+     * @param string $ext
+     * @param array  $schedule
+     * @return iterable
+     */
+    private function iterateClassesFromSchedule(string $ext, array $schedule): iterable
+    {
+        /*
+            [
+                'period' => [
+                    'day' => '',
+                    'name' => '',
+                    'sequence' => '',
+                    'start' => '',
+                    'end' => ''
+                ],
+                'class' => [
+                    'code' => '',
+                    'name' => ''
+                ],
+                'room' => [
+                    'name' => ''
+                ],
+                'teachers' => [
+                    [
+                        'externalId' => '',
+                        'firstname' => '',
+                        'surname' => '',
+                    ]
+                ],
+                'student' => [
+                    [
+                        'externalId' => '',
+                        'firstname' => '',
+                        'surname' => '',
+                    ]
+                ]
+            ]
+        */
+
+        $standardClassDetails = [];
+        foreach ($schedule['days'] as $day) {
+            $dayIdentifier = $day['day'];
+            foreach ($day['periods'] as $period) {
+//                $periodIdentifier = $period['code'];
+                foreach ($period['activities'] as $periodActivities) {
+                    foreach ($periodActivities as $activity) {
+                        $activityIdentifier = $activity['name'];
+                        try {
+                            $standardClassDetails[$activityIdentifier] ??= (new Enrolment($this->api))->generate($ext, $activityIdentifier);
+                        } catch (\Throwable $e) {
+                            // Maybe this isn't a class after all.
+                            // Whatever the case, don't retrieve this document again.
+                            $standardClassDetails[$activityIdentifier] = [
+                                'error' => $e,
+                            ];
+                        }
+
+                        if (!isset($standardClassDetails[$activityIdentifier]['error'])) {
+                            // load teachers and students
+                            yield [
+                                'period' => [
+                                    'day' => $dayIdentifier,
+                                    'name' => $period['name'],
+                                    'sequence' => $period['sequence'],
+                                    'start' => $activity['start'],
+                                    'end' => $activity['finish']
+                                ],
+                                'class' => [
+                                    'code' => $activityIdentifier,
+                                    'name' => $activityIdentifier
+                                ],
+                                'room' => [
+                                    'name' => ''
+                                ],
+                                'teachers' => array_map(
+                                    [$this, 'loadIntoExternalIdStruct'],
+                                    $standardClassDetails[$activityIdentifier]['teachers'],
+                                ),
+                                'student' => array_map(
+                                    [$this, 'loadIntoExternalIdStruct'],
+                                    $standardClassDetails[$activityIdentifier]['students'],
+                                )
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper for converting an external ID into a struct.
+     *
+     * @param string $externalId
+     * @return array
+     */
+    private function loadIntoExternalIdStruct(string $externalId): array
+    {
+        return ['externalId' => $externalId];
     }
 }
