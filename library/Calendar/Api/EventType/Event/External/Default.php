@@ -74,14 +74,20 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
      * @param int $startTimestamp
      * @param int $endTimestamp
      * @return Collection
+     * @throws InvalidArgumentException
      * @throws MapperException
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
 
         $stack = new Collection();
-        /** @var IIterator $externalEvents */
-        $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
+
+        try {
+            /** @var IIterator $externalEvents */
+            $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
+        } catch (InvalidArgumentException $e) {
+            return $stack;
+        }
 
         // Figure out default event type
         try {
