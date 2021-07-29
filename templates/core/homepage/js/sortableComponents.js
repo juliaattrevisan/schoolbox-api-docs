@@ -6,7 +6,7 @@
 import { gsap, Draggable, Flip } from 'gsap/all';
 import axios from 'axios';
 import { insertElementBefore, insertElementAfter, getClosestElement, getElementsMidPoint, 
-         isElementAboveOtherElement, isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
+         isElementAboveOtherElement, isElementBelowOtherElement, setStylesOnElement, insertBeforeFirstChild } from '@js/util/domUtils';
 
 gsap.registerPlugin(Draggable, Flip);
 
@@ -116,12 +116,7 @@ const onDragStart = (event) => {
 
     startDragPoint = updateDragPoint();
 
-    document.querySelectorAll(sortablesContainersSelector).forEach((element) => {
-        if (element.children.length === 1) {
-            element.querySelector('[data-placeholder]').style.display = 'block';
-        }
-    }); //
-    updateSortableElements(); 
+    addPseudoComponents();
 
     document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
     document.documentElement.style.scrollBehavior = 'auto'; //disable smooth scroll as it can jar while moving elements around 
@@ -149,6 +144,25 @@ const updateDragPoint = () => {
         left: activeElement.getBoundingClientRect().left,
         top: activeElement.getBoundingClientRect().top + window.scrollY
     }
+}
+
+/**
+ * need to run through and check each parent container for children
+ * if there's no children need to show that items can be dragged into this container
+ */
+ const addPseudoComponents = () => {
+    document.querySelectorAll(sortablesContainersSelector).forEach((parentContainer) => {
+        if (parentContainer.children.length === 1) {
+            const pseudoComponent = document.createElement('div');
+            pseudoComponent.classList.add('masonry-placeholder');
+            pseudoComponent.style.display = 'block';
+            pseudoComponent.style.height = '100px';
+            pseudoComponent.dataset.component = 'true';
+            pseudoComponent.dataset.pseudoComponent = 'true';
+            pseudoComponent.innerText = 'You can drag components into this space';
+            parentContainer.append(pseudoComponent);
+        }
+    });
 }
 
 /**
@@ -258,7 +272,7 @@ const updateActiveElementComputedStyles = () => {
 const onDrag = () => {
 
     if (canCheckForChange()) { 
-        
+
         let sortablesToCheckList = Array.from(document.querySelectorAll(sortablesSelector)); //grab all sortable elements 
         
         if (willChangeContainer().hasHit) { //if there's a container change required, only check against those elements in the new container
@@ -267,8 +281,8 @@ const onDrag = () => {
         }
 
         const closestElement = getClosestElement(getElementsMidPoint(activeElement), sortablesToCheckList); //the element nearest to the dragged element
-        if (closestElement.id !== activeElement.id) { //no need to FLIP if have hardly moved
-            if (isElementAboveOtherElement(activeElement, closestElement)) {
+        if (closestElement && closestElement.id !== activeElement.id) { //no need to FLIP if the closest element is still the activeElement
+            if (isElementAboveOtherElement(activeElement, closestElement)) { //otherwise determine movement direction, up or down into the container
                 flipState(closestElement, true);
             } else if (isElementBelowOtherElement(activeElement, closestElement)) {
                 flipState(closestElement, false);
@@ -302,7 +316,7 @@ const canCheckForChange = () => {
  const willChangeContainer = () => {
     let containerChange = { hasHit: false, newContainer: null };
     document.querySelectorAll(sortablesContainersSelector).forEach((container) => {
-        if (Draggable.hitTest(container, activeElement, '51%') && !container.contains(placeholderElement) && container.children.length > 0) { //more than 51% is being dragged in and it's not the current parent
+        if (Draggable.hitTest(container, activeElement, '51%') && !container.contains(placeholderElement)) { //more than 51% is being dragged in and it's not the current parent
             containerChange = { hasHit: true, newContainer: container }
         }
     });
@@ -331,6 +345,9 @@ const flipState = (closestElement, isShiftingDown) => {
             insertElementBefore(closestElement, placeholderElement);
         }
 
+        removePsuedoComponents();
+        addPseudoComponents();
+
         startDragPoint = updateDragPoint();
 
         activeElement.dataset.leftDifference = placeholderElement.getBoundingClientRect().left - parseInt(placeholderElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
@@ -354,9 +371,21 @@ const flipState = (closestElement, isShiftingDown) => {
 }
 
 /**
+ * Remove and re-add as has changed
+ */
+ const removePsuedoComponents = () => {
+    document.querySelectorAll('[data-pseudo-component]').forEach((pseudoComponent) => {
+        pseudoComponent.remove();
+    });
+ }
+
+/**
  * Just snap back to where it now belongs
  */
  const onDragEnd = () => {
+
+    removePsuedoComponents(); 
+
     updateDraggablesStatus(false); //prevent quick reclicks on elements
     gsap.to(activeElement, {
         x: 0 + parseInt(activeElement.dataset.leftDifference), //to accommodate for potential position changes that have occured
@@ -365,6 +394,18 @@ const flipState = (closestElement, isShiftingDown) => {
         duration: 0.3,
         overwrite: true,
         onComplete: () => onSnapActiveElementBackComplete()
+    });
+}
+
+/**
+ * need to run through and check each parent container for children
+ * if there's no children need to show that items can be dragged into this container
+ */
+ const hideEmptyParentContainers = () => {
+    document.querySelectorAll(sortablesContainersSelector).forEach((parentContainer) => {
+        if (parentContainer.children.length === 1) {
+            gsap.to(parentContainer, { height: 'auto', duration: 0.3 } );
+        }
     });
 }
 
@@ -405,8 +446,6 @@ const flipState = (closestElement, isShiftingDown) => {
 
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
-    
-    document.querySelectorAll('[data-placeholder]').forEach((element) => element.style.display = 'none');
 
     window.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
@@ -454,7 +493,7 @@ const getNewComponentOrderFormData = () => {
 const getContainerComponentIDs = (componentContainer) => {
     let containerComponentIDList = []; //add all ids into an array
     componentContainer.querySelectorAll(sortablesSelector).forEach((sortable) => {
-        if (sortable.id) { //the <div class="masonry-placeholder" data-component /> exists in each parent container
+        if (sortable.id) { //the <div class="masonry-placeholder" /> exists in each parent container
             containerComponentIDList.push(getComponentID(sortable));
         }
     });
