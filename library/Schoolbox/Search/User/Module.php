@@ -63,6 +63,9 @@ class Module extends BaseModule
                     'profileButtonMapper'           => $this->getMapperFactory()->getLazy(ProfileButtonMapper::class),
                     'timetableColourMapper'         => $this->getMapperFactory()->getLazy(\Timetable_ColourMapper::class),
                     'professionalDevelopmentMapper' => $this->getMapperFactory()->getLazy(\Schoolbox\ProfessionalDevelopment\Mapper::class),
+                    'pastoralTypeMapper'            => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\Type\Mapper::class),
+                    'pastoralSubTypeMapper'         => $this->getMapperFactory()->getLazy(\Schoolbox\Pastoral\SubType\Mapper::class),
+                    'pastoralDataSource'            => $injector->lazyGet('pastoralDataSource'),
                 ]
             )
         );

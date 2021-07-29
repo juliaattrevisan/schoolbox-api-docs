@@ -12,6 +12,7 @@ use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Pastoral;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use PDOStatement;
 
 /**
  * @method Model|null hydrate(array $row, $alias = '', $callback = null)
@@ -69,6 +70,34 @@ class Mapper extends BaseMapper
         ";
     }
 
+    /**
+     * @param PDOStatement $statement
+     * @return GenericCollection
+     * @throws BaseMapper\DefinitionException
+     * @throws BaseMapper\Exception
+     */
+    protected function hydrateSelect(PDOStatement $statement): GenericCollection
+    {
+        $collection = $this->createCollection();
+
+        /** @var Pastoral\Type\Mapper $typeMapper */
+        $typeMapper = $this->getJoinMapper('pastoralType');
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $modelId = $row[$this->getIdentifierColumn()];
+
+            if ($collection->keyExists($modelId)) {
+                $model = $collection[$modelId];
+            } else {
+                $model                = $this->hydrate($row);
+                $collection[$modelId] = $model;
+            }
+
+            $type = $typeMapper->hydrate($row, 't');
+            $model->setPastoralType($type);
+        }
+        return $collection;
+    }
 
 //    /**
 //     * Pre-soft-delete callback to ensure there are no

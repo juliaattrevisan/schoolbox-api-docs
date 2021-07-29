@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\User;
 
+use Alaress\Color\Color;
 use Alaress\Color\ColorFactory;
 use Alaress\Mail\AbstractMailer;
 use Alaress\Web\Controller\Base as BaseController;
@@ -20,6 +21,12 @@ use External_UserInterface;
 use Schoolbox\Collection;
 use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\Audience\ColorHelper;
+use Schoolbox\Pastoral\SubType\Model as PastoralSubType;
+use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
+use Schoolbox\Pastoral\DataSource as PastoralDataSource;
+use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
@@ -94,6 +101,20 @@ class Controller extends BaseController
      */
     private ProfessionalDevelopmentMapper $professionalDevelopmentMapper;
 
+    /**
+     * PastoralTypeMapper
+     */
+    private PastoralTypeMapper $pastoralTypeMapper;
+
+    /**
+     * PastoralSubTypeMapper
+     */
+    private PastoralSubTypeMapper $pastoralSubTypeMapper;
+
+    /**
+     * PastoralDataSource
+     */
+    private PastoralDataSource $pastoralDataSource;
 
     /**
      * Constructor
@@ -106,6 +127,9 @@ class Controller extends BaseController
      * @param ProfileButtonMapper           $profileButtonMapper
      * @param Timetable_ColourMapper        $timetableColourMapper
      * @param ProfessionalDevelopmentMapper $professionalDevelopmentMapper
+     * @param PastoralTypeMapper            $pastoralTypeMapper
+     * @param PastoralSubTypeMapper         $pastoralSubTypeMapper
+     * @param PastoralDataSource            $pastoralDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -116,7 +140,10 @@ class Controller extends BaseController
         External_ClassInterface $externalClass,
         ProfileButtonMapper $profileButtonMapper,
         Timetable_ColourMapper $timetableColourMapper,
-        ProfessionalDevelopmentMapper $professionalDevelopmentMapper
+        ProfessionalDevelopmentMapper $professionalDevelopmentMapper,
+        PastoralTypeMapper $pastoralTypeMapper,
+        PastoralSubTypeMapper $pastoralSubTypeMapper,
+        PastoralDataSource $pastoralDataSource
     ) {
         $this->userMapper                    = $userMapper;
         $this->roleMapper                    = $roleMapper;
@@ -127,6 +154,9 @@ class Controller extends BaseController
         $this->profileButtonMapper           = $profileButtonMapper;
         $this->timetableColourMapper         = $timetableColourMapper;
         $this->professionalDevelopmentMapper = $professionalDevelopmentMapper;
+        $this->pastoralTypeMapper            = $pastoralTypeMapper;
+        $this->pastoralSubTypeMapper         = $pastoralSubTypeMapper;
+        $this->pastoralDataSource            = $pastoralDataSource;
     }
 
     /**
@@ -630,6 +660,54 @@ class Controller extends BaseController
             $canEmailStaff = false;
         }
 
+        // Pastoral icons
+        $types    = $this->pastoralTypeMapper->findByPredicates(
+            $this->pastoralTypeMapper->getPredicateBuilder()->notNull('color')->notNull('icon')->isNull('deleted_at')
+        )->indexBy('id');
+        $subtypes = $this->pastoralSubTypeMapper->findByPredicates(
+            $this->pastoralSubTypeMapper->getPredicateBuilder()->notNull('color')->notNull('icon')->isNull('deleted_at')
+        )->indexBy('id');
+
+        $pastoralCounts = [];
+        if ($types->count() > 0 || $subtypes->count() > 0) {
+            $counts      = $this->pastoralDataSource->countRecordsByType(
+                $this->getUser(),
+                $student->getId(),
+                $types->getPropertyValues('id'),
+                $subtypes->getPropertyValues('id')
+            );
+            $transformer = new ColorHelper();
+
+            foreach ($counts as $count) {
+                if ($count['subtypeId']) {
+                    /** @var PastoralSubType $subtype */
+                    $subtype         = $subtypes->getOffset($count['subtypeId']);
+                    $foregroundColor = $subtype->getColor();
+                    $count['icon']            = $subtype->getIcon();
+                    $count['title']           = "{$subtype->getPastoralType()->getName()}: {$subtype->getName()}";
+                    $count['subSequence']     = $subtype->getSequence();
+                    $count['sequence']        = $subtype->getPastoralType()->getSequence();
+                } else {
+                    /** @var PastoralType $type */
+                    $type            = $types->getOffset($count['typeId']);
+                    $foregroundColor = $type->getColor();
+                    $count['icon']            = $type->getIcon();
+                    $count['title']           = $type->getName();
+                    $count['subSequence'] = 0;
+                    $count['sequence'] = $type->getSequence();
+                }
+                $count['bgColor'] = $transformer->calculateBackground($foregroundColor)->getAsRgba();
+                $count['fgColor'] = $foregroundColor->getAsRgba();
+                $pastoralCounts[] = $count;
+            }
+            usort($pastoralCounts, static function (array $a, array $b) {
+                if ($a['sequence'] === $b['sequence']) {
+                    return $a['subSequence'] > $b['subSequence'] ? 1 : -1;
+                }
+                return $a['sequence'] > $b['sequence'] ? 1 : -1;
+            });
+        }
+
         $this->response->content->set(
             $this->buildHtmlOutput(
                 'user/student.twig',
@@ -638,6 +716,7 @@ class Controller extends BaseController
                     'user'                     => $student,
                     'externalUser'             => $externalUser,
                     'showPastoral'             => $showPastoral,
+                    'pastoralCounts'           => $pastoralCounts,
                     'eportfolioAuth'           => $this->eportfolioAuthenticator->canView(),
                     'hideContacts'             => $hideContacts,
                     'showClasses'              => $showClasses,
