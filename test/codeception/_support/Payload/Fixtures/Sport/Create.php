@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -12,11 +13,11 @@ use Payload\PostTrait;
 class Create extends Request
 {
     use PostTrait;
-    
+
     public function __construct(string $sportsName)
     {
         $this->setReferer('/fixtures/sports/new');
-        
+
         $this->setFormParam('id', '');
         $this->setFormParam('name', $sportsName);
         $this->setFormParam('url', 'http://www.example.com');
@@ -36,8 +37,8 @@ class Create extends Request
         $this->setFormParam('positions[name][3]', 'Position 4');
         $this->setFormParam('positions[name][4]', 'Position 5');
     }
-    
-    public function getUrl():string
+
+    public function getUrl(): string
     {
         return '/fixtures/sports/';
     }

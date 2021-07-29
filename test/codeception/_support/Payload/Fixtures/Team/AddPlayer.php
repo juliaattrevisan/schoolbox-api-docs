@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @copyright Copyright 2020, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
@@ -12,19 +13,18 @@ use Payload\PostTrait;
 class AddPlayer extends Request
 {
     use PostTrait;
-    
-    private $team;
-    
+
+    private \Schoolbox\Fixtures\Team\Model $team;
+
     public function __construct(\Schoolbox\Fixtures\Team\Model $team, \Schoolbox\User $user)
     {
-        $this->team=$team;
+        $this->team = $team;
         $this->setReferer('/fixtures/divisions/' . $this->team->getDivision()->getId() . '/lobby');
-        
+
         $this->setFormParam('userId[]', $user->getId());
-        
     }
-    
-    public function getUrl():string
+
+    public function getUrl(): string
     {
         return '/fixtures/teams/' . $this->team->getId() . '/addPlayers';
     }

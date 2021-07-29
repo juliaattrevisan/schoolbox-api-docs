@@ -1,9 +1,10 @@
 <?php
+
 /*
  * https://vagrant.dev.schoolbox.cloud/fixtures/sports/4/delete
- * 
+ *
  * referer
- * 	
+ *
 https://vagrant.dev.schoolbox.cloud/fixtures/sports
  */
 /**
@@ -19,17 +20,17 @@ use Payload\PostTrait;
 class Delete extends Request
 {
     use PostTrait;
-    
-    private $sport;
-    
+
+    private \Schoolbox\Fixtures\Sport\Model $sport;
+
     public function __construct(\Schoolbox\Fixtures\Sport\Model $sport)
     {
         $this->setReferer('/fixtures/sports');
-        $this->sport=$sport;
+        $this->sport = $sport;
     }
-    
-    public function getUrl():string
+
+    public function getUrl(): string
     {
-        return '/fixtures/sports/'.$this->sport->getId().'/delete';
+        return '/fixtures/sports/' . $this->sport->getId() . '/delete';
     }
 }
