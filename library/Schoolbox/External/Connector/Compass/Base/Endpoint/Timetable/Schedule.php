@@ -66,6 +66,26 @@ class Schedule
         }
 
 
+        // Sort periods by start time, then by finish
+        foreach ($periodLookup as $dayNumber => $periods) {
+            uasort(
+                $periods,
+                function ($a, $b) {
+                    $startDiff = $a['startTime'] <=> $b['startTime'];
+                    if ($startDiff) {
+                        return $startDiff;
+                    }
+                    $finishDiff = $a['finishTime'] <=> $b['finishTime'];
+                    if ($finishDiff) {
+                        return $finishDiff;
+                    }
+                    return 0;
+                }
+            );
+            $periodLookup[$dayNumber] = $periods;
+        }
+
+
         $schedules = $this->api->retrieveDocument('schedule/v1/GetSchedule', []);
         $days      = [];
         foreach ($schedules as $schedule) {
