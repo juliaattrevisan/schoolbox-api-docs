@@ -49,9 +49,12 @@ const initDraggables = () => {
  * Refer to https://greensock.com/docs/v3/Plugins/Draggable for further info
  */
  const getDraggable = (sortableItem) => {
+    const sortableItemTrigger = sortableItem.querySelector(SORTABLES_TRIGGER_SELECTOR);
+    sortableItemTrigger.addEventListener('click', (event) => event.preventDefault());
+    sortableItemTrigger.addEventListener('dblclick', (event) => event.preventDefault());
     return Draggable.create(sortableItem, {
         type: 'x, y',
-        trigger: sortableItem.querySelector(SORTABLES_TRIGGER_SELECTOR),
+        trigger: sortableItemTrigger,
         autoScroll: 1,
         onDragStart: (event) => onDragStart(event),
         onDrag: () => onDrag(),
@@ -162,7 +165,9 @@ const onDragStart = (event) => {
  */
  const getPlaceholderElement = () => {
     const cloneElement = __activeElement.cloneNode(true);
-    cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference
+    cloneElement.querySelector('[data-collapsable]').remove(); //just use the top bar as reference, so remove all component controls that can be expanded
+    cloneElement.querySelector('[data-component-panel="settings"]').remove(); 
+    cloneElement.querySelector('[data-component-panel="delete"]').remove();
     cloneElement.style.opacity = 0.5; //displayed as reference where the __activeElement is currently placed 
     insertElementBefore(__activeElement, cloneElement);
     return cloneElement;
@@ -249,19 +254,37 @@ const onDragStart = (event) => {
  * avoid trying to sort tall height elements
  */
  const collapseActiveElementContent = () => {
+    
     __isChangingSize = true;
-    const __activeElementContent = __activeElement.querySelector('[data-collapsable]');
-    gsap.to(__activeElementContent, { 
-        onStart: () => __activeElementContent.style.overflow = 'hidden',
+    
+    const activeElementSettingsPanel = __activeElement.querySelector('[data-component-panel="settings"]');
+    gsap.to(activeElementSettingsPanel, { 
+        onStart: () => activeElementSettingsPanel.style.overflow = 'hidden',
+        height: 0, 
+        padding: 0,
+        duration: ANIMATE_SPEED,
+    } );
+
+    const activeElementDeletePanel = __activeElement.querySelector('[data-component-panel="delete"]');
+    gsap.to(activeElementDeletePanel, { 
+        onStart: () => activeElementDeletePanel.style.overflow = 'hidden',
+        height: 0, 
+        padding: 0,
+        duration: ANIMATE_SPEED,
+    } );
+    
+    const activeElementContent = __activeElement.querySelector('[data-collapsable]');
+    gsap.to(activeElementContent, { 
+        onStart: () => activeElementContent.style.overflow = 'hidden',
         height: 0, 
         duration: ANIMATE_SPEED,
-        overwrite: true,
         onComplete: () => {
             __isChangingSize = false;
             addPlaceHolderComponents();
             hideExistingMasonryPlaceHolders();
         }
     } );
+
 }
 
 /**
@@ -432,7 +455,7 @@ const removePlaceHolderComponents = () => {
         width: __placeHolderElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
         duration: ANIMATE_SPEED,
         overwrite: true,
-        onComplete: () => onSnapActiveElementBackComplete()
+        onComplete: () => onSnapBackActiveElementComplete()
     });
 }
 
@@ -458,37 +481,62 @@ const removePlaceHolderComponents = () => {
  * 
  * @param { DOMElement }  
  */
- const onSnapActiveElementBackComplete = () => {
+ const onSnapBackActiveElementComplete = () => {
 
     gsap.set(__activeElement, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     __activeElement.style.position = 'static'; //was absolute, now sitting as it should
     __activeElement.setAttribute('data-component', ''); //so it can be dragged again
     updateActiveElementComputedStyles(); //ensure the defined colours are respected
 
-    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
-
     insertElementAfter(__placeHolderElement, __activeElement); //the element was taken out, so put it back where it now belongs
     __placeHolderElement.remove(); //and now the placeholder can be pulled out
 
-    const __activeElementContent = __activeElement.querySelector('[data-collapsable]');
-    gsap.to(__activeElementContent, { 
-        height: 'auto', 
-        duration: ANIMATE_SPEED, 
-        overwrite: true, 
-        onComplete: () => onActiveElementExpanded(__activeElementContent)
-    } ); 
+    expandActiveElement();
 
 }
 
 /**
+ * Expand out the activeElement again now that's its' back in place
+ * The panels will animate regardless of whether they are opened or closed
+ */
+ const expandActiveElement = () => {
+
+    const activeElementSettingsPanel = __activeElement.querySelector('[data-component-panel="settings"]');
+    gsap.to(activeElementSettingsPanel, { 
+        height: 'auto', 
+        padding: '1rem',
+        duration: ANIMATE_SPEED,
+        onComplete: () => activeElementSettingsPanel.style.overflow = 'visible'
+    } );
+
+    const activeElementDeletePanel = __activeElement.querySelector('[data-component-panel="delete"]');
+    gsap.to(activeElementDeletePanel, { 
+        height: 'auto', 
+        padding: '1rem',
+        duration: ANIMATE_SPEED,
+        onComplete: () => activeElementDeletePanel.style.overflow = 'visible'
+    } );
+
+    const activeElementContent = __activeElement.querySelector('[data-collapsable]');
+    gsap.to(activeElementContent, { 
+        height: 'auto', 
+        duration: ANIMATE_SPEED, 
+        onComplete: () => {
+            activeElementContent.style.overflow = 'visible';
+            onActiveElementExpanded();
+        }
+    } ); 
+
+ }
+
+/**
  * To set up for another possible drag of elements
  */
- const onActiveElementExpanded = (__activeElementContent) => {
-
-    __activeElementContent.style.overflow = 'visible';
+ const onActiveElementExpanded = () => {
 
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
+    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
     document.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
     
