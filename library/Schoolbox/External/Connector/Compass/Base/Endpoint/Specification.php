@@ -88,6 +88,29 @@ class Specification
             /**
              * Timetable nodes
              */
+            [
+                'endpoint' => 'reference/v1/GetAcademicGroups',
+                'params' => [],
+            ],
+            [
+                'endpoint' => 'schedule/v1/GetStructures',
+                'params' => [],
+            ],
+            [
+                'endpoint' => 'schedule/v1/GetSchedule',
+                'params' => [],
+            ],
+            [
+                // Blanks are valid here, but I need to differentiate between a
+                // invalid class code and permission denied message.
+                // If this returns a 500 error, then this is considered okay
+                'endpoint' => 'schedule/v1/GetStandardClassDetails',
+                'params' => [
+                    'activityCode'      => '',
+                    'academicGroupCode' => '',
+                ],
+                'responseCode500Ok' => true,
+            ],
 
         ];
 
@@ -100,8 +123,14 @@ class Specification
             try {
                 $result = (bool)$this->api->retrieveDocument($path['endpoint'], $path['params']);
             } catch (\RuntimeException | \DomainException | \JsonException $e) {
-                $errorMessage = $e->getMessage();
-                $result = false;
+                $responseCode500Ok = $path['responseCode500Ok'] ?? false;
+                if ($responseCode500Ok && $e->getCode() === 500) {
+                    $result = true;
+                    $message .= ' (returned response code 500, but this is expected)';
+                } else {
+                    $result = false;
+                    $errorMessage = $e->getMessage();
+                }
             }
 
             if ($result) {
