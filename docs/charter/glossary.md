@@ -7,23 +7,28 @@ Full Name | Most commonly known as | Nicknames | GitHub username
 --- | --- | --- | ---
 Dorothea Baker | Dorothea | | d-baker
 Steve Chan | Steve | | stevechan
+Jason Chow | Jason | | jason-schoolbox
+Janwelle Chua | Janwelle | | janchua
+Justin Clarke | Justin | | justinaclarke
 <s>Matt Day | The Doctor / Matt / MD | Doctoray, Doctorinox, Mr Matt | emdienn</s>
+Michael Heydon | Michael | | MichaelHeydon
 <s>Doug MacKenzie | Doug | Dough | dougmackenzie</s>
-Sophia Marinou | Sophia | | sophiamarinou
+<s>Sophia Marinou | Sophia | | sophiamarinou</s>
 Andy Ryan | Andy | Airian-tech | andrewryantech
 Amri Sannang | Amri | | armatronic
-Matthew Schembri | Schem / Schembri |  | xkem
+<s>Matthew Schembri | Schem / Schembri |  | xkem</s>
 Tomoko Tanaka | Tomoko | Tomo | tallzeebaa
+Julia Trevisan | Julia | | juliaattrevisan
 
 ### Other people
 Full Name | Most commonly known as | Nicknames | GitHub username
 --- | --- | --- | ---
-Stuart Mahon | Stuart | Stu | stuart-mahon
+<s>Stuart Mahon | Stuart | Stu | stuart-mahon</s>
 James Leckie | James | Leck-tech | jleckie
 <s>Sam Bailey | Sam | | thatsamguy</s>
 <s>Damian Sloane | Damo | | dddaaammmooo</s>
 Josh Cauchi | Josh | Cauchi | joshcauchi
-Natalie Bakhtadze | Nat | | nataliebakhtadze
+<s>Natalie Bakhtadze | Nat | | nataliebakhtadze</s>
 
 ## Feature and Software Names
 Term | Definition
