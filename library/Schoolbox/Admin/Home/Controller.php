@@ -243,7 +243,7 @@ class Controller extends Base
             $www_light = 'success';
             $www_status = 'Available';
 
-            $rss = new Alaress_Rss_Stream('https://help.schoolbox.com.au/news/feed/ab1cf283f09e5e61a1712b116?topic=release-notes');
+            $rss = new Alaress_Rss_Stream($this->getConfigLoader()->get('release_notes_url'));
             $rss->stream();
         } else {
             $www_light = 'alert';
