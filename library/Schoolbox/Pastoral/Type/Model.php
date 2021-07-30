@@ -40,13 +40,13 @@ class Model implements ISoftDeletable, Sequential
     /**
      * This type's color.
      */
-    private ?Color $color;
+    private ?Color $color = null;
 
 
     /**
      * This type's icon.
      */
-    private ?string $icon;
+    private ?string $icon = null;
 
 
     /** @var DocumentClassification */
