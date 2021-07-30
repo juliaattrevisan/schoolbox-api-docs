@@ -47,13 +47,31 @@ class Controller extends Base
      * Provide form
      *
      * @throws \Aura\Di\Exception\ServiceNotFound
+     * @throws \Aura\Router\Exception\RouteNotFound
      */
     public function getChangePassword()
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@passwordChange/index.twig', [
-            'isRequestMade' => $this->getSessionSegment()->getFlash('isRequestMade'),
-            'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
-        ])->setTitle('Change Password'));
+        /**
+         * For users who have just been created or those using SSO, they have NO password.
+         * So they shouldn't be able to reset their 'non-existent' password.
+         * Just push them back to the homepage.
+        */
+        $userPassword = $this->getUser()->getPassword() ?? '';
+        if ($userPassword === '') {
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate('userPasswordReset.displayCreateRequestForm')
+            );
+        } else {
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@passwordChange/index.twig',
+                    [
+                        'isRequestMade'   => $this->getSessionSegment()->getFlash('isRequestMade'),
+                        'isPasswordReset' => $this->getSessionSegment()->getFlash('isPasswordReset'),
+                    ]
+                )->setTitle('Change Password')
+            );
+        }
     }
 
 
@@ -73,7 +91,7 @@ class Controller extends Base
         $user = $this->getUser();
 
         $currentPassword = $this->getRequest()->post->get('current_password', '');
-        $userPassword = $user->getPassword();
+        $userPassword = $user->getPassword() ?? '';
         $newPassword = $this->getRequest()->post->get('new_password', '');
         $confirmPassword = $this->getRequest()->post->get('confirm_password', '');
 
