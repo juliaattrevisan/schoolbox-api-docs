@@ -14,6 +14,12 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 
 /**
  * Data generator for a class' enrolment from Compass.
+ *
+ * Looks up a lead teacher, enrolled students and individual session teachers
+ * for each subject from `schedule/v1/GetStandardClassDetails`.
+ *
+ * This generator makes no special assumptions about the data structure returned
+ * by Compass.
  */
 class Enrolment
 {

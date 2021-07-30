@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Timetable;
 
 use Alaress_Date_Format;
 use Psr\Log\LoggerInterface;
-use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetableCycleMapper;
 use Schoolbox\External\TimetablePeriod;
@@ -98,7 +97,7 @@ class Definition implements IStrategy
      */
     public function import(): void
     {
-        // I don't know which academic group uses which structure
+        // Assume: each relevant academic group is its own campus
         $academicGroups = $this->academicGroups->generate();
         $schedule       = $this->schedule->generate();
 

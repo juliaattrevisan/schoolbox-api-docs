@@ -17,6 +17,26 @@ use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
  *
  * A timetable structure (days, periods, start date, end date) can be inferred
  * from the schedule.
+ *
+ * In order to infer that structure, this data generator must make the following
+ * assumptions about the data returned by Compass:
+ * * only the first structure returned by `schedule/v1/GetStructures` is
+ *   relevant
+ * * the list of `StructureDay` objects returned by `schedule/v1/GetStructures`
+ *   are returned in order (first day is day 1, second is day 2, etc.)
+ * * for each `Instance` object returned by `schedule/v1/GetSchedule`:
+ *   * the `importDayIdentifier` is a number, which matches the day number
+ *     identified in `schedule/v1/GetStructures`
+ *   * the `importPeriodIdentifier` matches the period ID of a `StructurePeriod`
+ *     identified earlier in `schedule/v1/GetStructures`
+ *
+ * If these assumptions do not hold true, then it is unlikely that the timetable
+ * structure can be imported: it may be necessary to import classes as calendar
+ * events. (There exists precedent for this in the TASS API.)
+ *
+ * See Compass Public API documentation for more information on the terms above.
+ * Try https://wyndhamchristiancollege-integration-vic.compass.education/ApiDocs/Documentation/index.html
+ * (login may be required)
  */
 class Schedule
 {
