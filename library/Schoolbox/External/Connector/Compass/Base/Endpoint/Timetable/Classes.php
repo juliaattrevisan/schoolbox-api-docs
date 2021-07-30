@@ -213,7 +213,7 @@ class Classes implements IStrategy
 
                     $involvedUserDetails = $users[$involvedUser['externalId']] ?? null;
                     $involvedUser['firstname'] = $involvedUserDetails['firstname'] ?? 'Unknown';
-                    $involvedUser['surname']   = $involvedUserDetails['surname'] ?? 'User';
+                    $involvedUser['surname']   = $involvedUserDetails['lastname'] ?? 'User';
 
                     $this->createTimetableClassInvolvement($involvedUser, $timetableClass);
                 }
@@ -356,7 +356,7 @@ class Classes implements IStrategy
 
         $teacherDetails = $users[$teacherExternalId] ?? null;
         $primaryTeacher['firstname'] = $teacherDetails['firstname'] ?? 'Unknown';
-        $primaryTeacher['surname']   = $teacherDetails['surname'] ?? 'User';
+        $primaryTeacher['surname']   = $teacherDetails['lastname'] ?? 'User';
         $timetableClassPeriod->setTeacher($teacherExternalId);
 
         $this->log->info(sprintf(
