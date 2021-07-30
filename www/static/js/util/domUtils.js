@@ -78,17 +78,18 @@ export const insertElementAfter = (referenceElement, targetElement) => {
 /**
  * Find the closest element (relative to its mid point) in a NodeList, based on a x,y of a targetPoint 
  * 
- * @param { x, y }  
+ * @param { Element }  
  * @param { NodeList }  
  * 
  * @returns { DOMElement }   
  */
-export const getClosestElement = (targetPoint, elements) => {
+export const getClosestElement = (targetElement, elements) => {
+    const targetPoint = getElementsLeftAndMidHeightPoint(targetElement);
     let closestElement = elements[0];
     let minDistance = 99999; //if this doesn't get overwritten we got issues...
     elements.forEach((element) => { //loop through each element and find the closest element using pythagoras theorem
-        const elementsMidPoint = getElementsMidPoint(element);
-        const distance = Math.sqrt(Math.pow(elementsMidPoint.left - targetPoint.left, 2) + Math.pow(elementsMidPoint.top - targetPoint.top, 2));
+        const elementsTargetPoint = getElementsLeftAndMidHeightPoint(element);
+        const distance = Math.sqrt(Math.pow(elementsTargetPoint.left - targetPoint.left, 2) + Math.pow(elementsTargetPoint.top - targetPoint.top, 2));
         if (distance < minDistance) {
             minDistance = distance;
             closestElement = element;
@@ -96,6 +97,20 @@ export const getClosestElement = (targetPoint, elements) => {
     });
     return closestElement;
 };
+
+/**
+ * To get an elements left and mid height point relative to the document
+ * 
+ * @param { DOMElement }  
+ * 
+ * @returns { x, y }   
+ */
+ export const getElementsLeftAndMidHeightPoint = (element) => {
+    return {
+        left: element.getBoundingClientRect().left,
+        top: (element.getBoundingClientRect().top + window.scrollY) + (element.offsetHeight / 2)
+    };
+}
 
 /**
  * To get an elements mid point relative to the document

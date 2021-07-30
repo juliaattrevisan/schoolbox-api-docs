@@ -5,14 +5,15 @@
 
 import { gsap, Draggable, Flip } from 'gsap/all';
 import axios from 'axios';
-import { insertElementBefore, insertElementAfter, getClosestElement, getElementsMidPoint, 
-         isElementAboveOtherElement, isElementBelowOtherElement, setStylesOnElement, insertBeforeFirstChild } from '@js/util/domUtils';
+import { insertElementBefore, insertElementAfter, getClosestElement, isElementAboveOtherElement, 
+         isElementBelowOtherElement, setStylesOnElement } from '@js/util/domUtils';
 
 gsap.registerPlugin(Draggable, Flip);
 
 const sortablesContainersSelector = '[data-components-container]'; //the top/left/right parent containers
 const sortablesSelector = '[data-component]'; //any component that will be sorted
 const sortablesTriggerSelector = '[data-component-handle]'; //the top bar of the component that will be used as the drag trigger
+const ANIMATE_SPEED = 0.3; //the speed of animations
 const MIN_MOVEMENT = 50; //minimum amount of movement before we can FLIP again
 
 let draggablesList = []; //to contain the Draggable instances, to enable/disable depending on the #component-lock-switch status and add/remove when components added/removed
@@ -81,15 +82,15 @@ const initComponentLockSwitchListener = () => {
 }
 
 /**
- * To add a newly added component to the sortable list
+ * To add a newly created component to the sortable list
  */
  const initOnComponentAddedListener = () => {
     document.addEventListener('jquery.masonry__onComponentAdded', (event) => {
         const newDraggable = getDraggable(document.getElementById(event.detail.componentID));
         const componentLockSwitchStatus = document.getElementById('component-lock-switch').querySelector('input').checked; //check the status of the input to know whether the new sortable should be active
         newDraggable.enabled(componentLockSwitchStatus); //check 
-        draggablesList.push(newDraggable); //add the component into the Draggable instances list
-        updateSortableElements(); //update the position of all elements due to the new element being added
+        draggablesList = [...draggablesList, newDraggable]; //add the component into the Draggable instances list
+        updateSortableElements(); //update the position of all elements due to the new element that's been added
     });
 }
 
@@ -111,108 +112,14 @@ const initComponentLockSwitchListener = () => {
  * that contains the sortablesSelector
  */
 const onDragStart = (event) => {
-    
     activeElement = event.target.closest(sortablesSelector); //use the parent container regardless of selection to ensure correct dimensions etc
-
-    startDragPoint = updateDragPoint();
-
-    addPseudoComponents();
-
-    document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
-    document.documentElement.style.scrollBehavior = 'auto'; //disable smooth scroll as it can jar while moving elements around 
-    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'none') //prevent any mouse interactions interferring while dragging
-
-    window.addEventListener('scroll', onScroll); //prevent sorting check while moving up/down window
-
-    disableAllOtherDraggables();
-
     placeholderElement = getPlaceholderElement();
-    pullOutActiveElement();
+    startDragPoint = updateDragPoint(); //to track when we can allow sorting check based on MIN_MOVEMENT
+    updateDocumentForDrag();
+    disableAllOtherDraggables();
+    extractActiveElement();
     updateSortableElements(); //ensure we have the most up to date positions
-
     collapseActiveElementContent();
-
-}
-
-/**
- * To drag drag movement
- * 
- * @returns { left, top } 
- */
-const updateDragPoint = () => {
-    return { 
-        left: activeElement.getBoundingClientRect().left,
-        top: activeElement.getBoundingClientRect().top + window.scrollY
-    }
-}
-
-/**
- * need to run through and check each parent container for children
- * if there's no children need to show that items can be dragged into this container
- */
- const addPseudoComponents = () => {
-    document.querySelectorAll(sortablesContainersSelector).forEach((parentContainer) => {
-        if (parentContainer.children.length === 1) {
-            const pseudoComponent = document.createElement('div');
-            pseudoComponent.classList.add('masonry-placeholder');
-            pseudoComponent.style.display = 'block';
-            pseudoComponent.style.height = '100px';
-            pseudoComponent.dataset.component = 'true';
-            pseudoComponent.dataset.pseudoComponent = 'true';
-            pseudoComponent.innerText = 'You can drag components into this space';
-            parentContainer.append(pseudoComponent);
-        }
-    });
-}
-
-/**
- * Shrink down the element to the top bar, which is used to sort to 
- * avoid trying to sort tall height elements
- */
- const collapseActiveElementContent = () => {
-    isChangingSize = true;
-    const activeElementContent = activeElement.querySelector('[data-collapsable]');
-    gsap.to(activeElementContent, { 
-        onStart: () => activeElementContent.style.overflow = 'hidden',
-        height: 0, 
-        duration: 0.3,
-        overwrite: true,
-        onComplete: () => isChangingSize = false
-    } );
-}
-
-/**
- * To be able to sort elements and snap back to correct position
- */
- const updateSortableElements = () => {
-    document.querySelectorAll(sortablesSelector).forEach((sortableItem) => {
-        sortableItem.dataset.originalLeft = sortableItem.getBoundingClientRect().left;
-        sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
-        sortableItem.dataset.leftDifference = 0;
-        sortableItem.dataset.topDifference = 0;
-    });
-}
-
-/**
- * Disable all others until current drag is finished to avoid rapid fire / double click issues
- */
- const disableAllOtherDraggables = () => {
-    draggablesList.forEach((draggable) => { 
-        if (draggable.target.id !== activeElement.id) { //to avoid disabling the current
-            draggable.disable();
-        }
-    }); 
-}
-
-/**
- * Don't do sorting while moving up or down the window due to dragging at the window edges 
- */
- const onScroll = () => {
-    isScrolling = true;
-    window.clearTimeout(isScrollingTimeout); // Clear our timeout throughout the scroll
-    isScrollingTimeout = setTimeout(() => { // Set a timeout to run after scrolling ends
-        isScrolling = false; 
-    }, 66); 
 }
 
 /**
@@ -232,12 +139,56 @@ const updateDragPoint = () => {
 }
 
 /**
- * With the placeholderElement in place, the activeElement is pulled 
- * out so it doesn't impact our ability to sort through the items and can go into any container
+ * To track drag movement
+ * 
+ * @returns { left, top } 
+ */
+ const updateDragPoint = () => {
+    return { 
+        left: activeElement.getBoundingClientRect().left,
+        top: activeElement.getBoundingClientRect().top + window.scrollY
+    }
+}
+
+/**
+ * Prep the document to handle dragging
+ */
+ const updateDocumentForDrag = () => {
+    document.body.style.overflowX = 'hidden'; //avoid horizontal scroll bars when a sortable gets moved beyond the window edges
+    document.documentElement.style.scrollBehavior = 'auto'; //disable smooth scroll as it can jar while moving elements around 
+    document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'none') //prevent any mouse interactions interferring while dragging
+    document.addEventListener('scroll', onScroll); //prevent sorting check while moving up/down window
+}
+
+/**
+ * Don't do sorting while moving up or down the window due to dragging at the window edges 
+ */
+ const onScroll = () => {
+    isScrolling = true;
+    window.clearTimeout(isScrollingTimeout); // Clear our timeout throughout the scroll
+    isScrollingTimeout = setTimeout(() => { // Set a timeout to run after scrolling ends
+        isScrolling = false; 
+    }, 66); 
+}
+
+/**
+ * Disable all others until current drag is finished to avoid rapid fire / double click issues
+ */
+ const disableAllOtherDraggables = () => {
+    draggablesList.forEach((draggable) => { 
+        if (draggable.target.id !== activeElement.id) { //to avoid disabling the current
+            draggable.disable();
+        }
+    }); 
+}
+
+/**
+ * With the placeholderElement in place, the activeElement is pulled out
+ * so it doesn't impact our ability to sort through the items and can go into any container
  * 
  * @param { DOMElement }  
  */
- const pullOutActiveElement = () => {
+ const extractActiveElement = () => {
     document.body.appendChild(activeElement);
     activeElement.removeAttribute('data-component'); //so there's no position checks when dragging, as the placeholder is there instead
     setStylesOnElement(activeElement, { //Update position and styles to match now that the activeElement has been moved out of context
@@ -250,9 +201,9 @@ const updateDragPoint = () => {
 }
 
 /**
- * Ensure custom set colour vars are respected and set when moving parent
+ * Ensure custom set colour vars are respected and set when moving between parent containers
  */
-const updateActiveElementComputedStyles = () => {
+ const updateActiveElementComputedStyles = () => {
 
     const containerPosition = placeholderElement.parentElement.dataset.position; //to ensure the correct colours are used relative to which parent container the element belongs to
 
@@ -266,6 +217,58 @@ const updateActiveElementComputedStyles = () => {
 }
 
 /**
+ * Shrink down the element to the top bar, which is used to sort to 
+ * avoid trying to sort tall height elements
+ */
+ const collapseActiveElementContent = () => {
+    isChangingSize = true;
+    const activeElementContent = activeElement.querySelector('[data-collapsable]');
+    gsap.to(activeElementContent, { 
+        onStart: () => activeElementContent.style.overflow = 'hidden',
+        height: 0, 
+        duration: ANIMATE_SPEED,
+        overwrite: true,
+        onComplete: () => {
+            isChangingSize = false;
+            addPseudoComponents();
+        }
+    } );
+}
+
+/**
+ * need to run through and check each parent container for children
+ * if there's no children need to show that items can be dragged into this container
+ */
+ const addPseudoComponents = () => {
+    document.querySelectorAll(sortablesContainersSelector).forEach((parentContainer) => {
+        if (parentContainer.children.length === 1) {
+            const pseudoComponent = document.createElement('div');
+            pseudoComponent.classList.add('masonry-placeholder');
+            pseudoComponent.style.display = 'block';
+            pseudoComponent.style.height = '51px';
+            pseudoComponent.style.opacity = 0;
+            pseudoComponent.dataset.component = 'true';
+            pseudoComponent.dataset.pseudoComponent = 'true';
+            pseudoComponent.innerText = 'You can drag components into this space';
+            gsap.to(pseudoComponent, { opacity: 1, duration: ANIMATE_SPEED } );
+            parentContainer.append(pseudoComponent);
+        }
+    });
+}
+
+/**
+ * To be able to sort elements and snap back to correct position
+ */
+ const updateSortableElements = () => {
+    document.querySelectorAll(sortablesSelector).forEach((sortableItem) => {
+        sortableItem.dataset.originalLeft = sortableItem.getBoundingClientRect().left;
+        sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
+        sortableItem.dataset.leftDifference = 0;
+        sortableItem.dataset.topDifference = 0;
+    });
+}
+
+/**
  * Constantly check for the nearest other sortable and update position 
  * based on whether a move is valid
  */
@@ -274,13 +277,8 @@ const onDrag = () => {
     if (canCheckForChange()) { 
 
         let sortablesToCheckList = Array.from(document.querySelectorAll(sortablesSelector)); //grab all sortable elements 
-        
-        // if (willChangeContainer().hasHit) { //if there's a container change required, only check against those elements in the new container
-        //     const newContainer = willChangeContainer().newContainer;
-        //     sortablesToCheckList = sortablesToCheckList.filter((item) => newContainer.contains(item)); //filter sortables check to those in the new parent container
-        // }
 
-        const closestElement = getClosestElement(getElementsMidPoint(activeElement), sortablesToCheckList); //the element nearest to the dragged element
+        const closestElement = getClosestElement(activeElement, sortablesToCheckList); //the element nearest to the dragged element
         if (closestElement && closestElement.id !== activeElement.id) { //no need to FLIP if the closest element is still the activeElement
             if (isElementAboveOtherElement(activeElement, closestElement)) { //otherwise determine movement direction, up or down into the container
                 flipState(closestElement, true);
@@ -308,22 +306,6 @@ const canCheckForChange = () => {
 }
 
 /**
- *  To see whether the sortable element is being dragged into the range of a new parent container,
- *  and if so pass the new container back so it can be used to shift the activeElement into
- * 
- * @retruns { Boolean, Element } 
- */
- const willChangeContainer = () => {
-    let containerChange = { hasHit: false, newContainer: null };
-    document.querySelectorAll(sortablesContainersSelector).forEach((container) => {
-        if (Draggable.hitTest(container, activeElement, '51%') && !container.contains(placeholderElement)) { //more than 51% is being dragged in and it's not the current parent
-            containerChange = { hasHit: true, newContainer: container }
-        }
-    });
-    return containerChange;
-}
-
-/**
  * Use Flip to shift the elements around, recording the difference in shift 
  * for when the dragged element is released
  * Refer to https://greensock.com/docs/v3/Plugins/Flip for more info on Flip
@@ -336,6 +318,7 @@ const flipState = (closestElement, isShiftingDown) => {
     if (!isFlipping) { //don't allow multiple FLIPs to prevent quick shifts / weird jarring behaviour
 
         isFlipping = true;
+        startDragPoint = updateDragPoint();
 
         const state = Flip.getState(document.querySelectorAll(sortablesSelector));
         
@@ -345,21 +328,16 @@ const flipState = (closestElement, isShiftingDown) => {
             insertElementBefore(closestElement, placeholderElement);
         }
 
-        removePsuedoComponents();
-        addPseudoComponents();
-
-        startDragPoint = updateDragPoint();
-
+        removePsuedoComponents(); //remove prior to recording the new co-ordinates so can snap back on release to correct location
+        
         activeElement.dataset.leftDifference = placeholderElement.getBoundingClientRect().left - parseInt(placeholderElement.dataset.originalLeft); //so can animate the dragged element to this new position on mouse release
         activeElement.dataset.topDifference = (placeholderElement.getBoundingClientRect().top + window.scrollY) - parseInt(placeholderElement.dataset.originalTop);
-        document.querySelectorAll(sortablesSelector).forEach((sortableItem) => {
-            if (sortableItem.id !== activeElement.id) { //update the top position of all elements excluding the active one
-                sortableItem.dataset.originalTop = sortableItem.getBoundingClientRect().top + window.scrollY;
-            }
-        });
+        gsap.to(activeElement, { width: placeholderElement.parentElement.offsetWidth, duration: ANIMATE_SPEED } ); //parentElement as the placeHolder may not have fully shifted into place before mouse release})
+
+        addPseudoComponents(); //now check if need to add them back in
 
         Flip.from(state, {
-            duration: 0.3,
+            duration: ANIMATE_SPEED,
             onComplete: () => {
                 isFlipping = false;
                 onDrag(); //check after Flip to see if another is required
@@ -383,35 +361,21 @@ const flipState = (closestElement, isShiftingDown) => {
  * Just snap back to where it now belongs
  */
  const onDragEnd = () => {
-
-    removePsuedoComponents(); 
-
+    removePsuedoComponents();
     updateDraggablesStatus(false); //prevent quick reclicks on elements
     gsap.to(activeElement, {
         x: 0 + parseInt(activeElement.dataset.leftDifference), //to accommodate for potential position changes that have occured
         y: 0 + parseInt(activeElement.dataset.topDifference),
         width: placeholderElement.parentElement.offsetWidth, //parentElement as the placeHolder may not have fully shifted into place before mouse release
-        duration: 0.3,
+        duration: ANIMATE_SPEED,
         overwrite: true,
         onComplete: () => onSnapActiveElementBackComplete()
     });
 }
 
 /**
- * need to run through and check each parent container for children
- * if there's no children need to show that items can be dragged into this container
- */
- const hideEmptyParentContainers = () => {
-    document.querySelectorAll(sortablesContainersSelector).forEach((parentContainer) => {
-        if (parentContainer.children.length === 1) {
-            gsap.to(parentContainer, { height: 'auto', duration: 0.3 } );
-        }
-    });
-}
-
-/**
  * Tidy up once the element has snapped back 
- * setting up for another drag, returning various variables back to there pre dragging state
+ * setting up for another drag, returning various variables back to there pre dragging state etc
  * 
  * @param { DOMElement }  
  */
@@ -419,9 +383,9 @@ const flipState = (closestElement, isShiftingDown) => {
 
     gsap.set(activeElement, { x: 0, y: 0, width: '100%' }); //reset the animation properties for another animate
     activeElement.style.position = 'static'; //was absolute, now sitting as it should
-    updateActiveElementComputedStyles();
     activeElement.setAttribute('data-component', ''); //so it can be dragged again
-    
+    updateActiveElementComputedStyles(); //ensure the defined colours are respected
+
     document.querySelectorAll('[data-collapsable]').forEach((element) => element.style.pointerEvents = 'auto'); //re-enable mouse interactions
 
     insertElementAfter(placeholderElement, activeElement); //the element was taken out, so put it back where it now belongs
@@ -430,7 +394,7 @@ const flipState = (closestElement, isShiftingDown) => {
     const activeElementContent = activeElement.querySelector('[data-collapsable]');
     gsap.to(activeElementContent, { 
         height: 'auto', 
-        duration: 0.3, 
+        duration: ANIMATE_SPEED, 
         overwrite: true, 
         onComplete: () => onActiveElementExpanded(activeElementContent)
     } ); 
@@ -446,8 +410,7 @@ const flipState = (closestElement, isShiftingDown) => {
 
     document.body.style.overflowX = 'auto'; //was hidden to avoid horizontal scroll bars
     document.documentElement.style.scrollBehavior = 'smooth'; //was auto to avoid jarring behaviour 
-
-    window.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
+    document.removeEventListener('scroll', onScroll); //no need to listen for scrolling until next drag
     window.dispatchEvent(new Event('resize')); //for components to respond to - for example swiper.js image gallerys to update to display correctly
     
     updateSortableElements();
@@ -517,7 +480,6 @@ const getComponentID = (componentElement) => {
 export const init = () => {
     initDraggables();
     initListeners();
-    updateSortableElements(); //ensure we have the most up to date positions
 }
 
 document.addEventListener('DOMContentLoaded', init);
