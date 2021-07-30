@@ -16,7 +16,7 @@ external_db="synergetic";
 external_db_host="172.31.15.10";
 external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 enable_xdebug="true";
-
+instance_registry_url_override="https://manage.schoolbox.cloud"
 
 function log(){
   $LOG $L_INFO "$1"
@@ -41,6 +41,7 @@ if [ ! -z $4 ]; then external_db_host=$4; fi;
 if [ ! -z $5 ]; then external_db_db=$5; fi;
 if [ ! -z $6 ]; then enable_xdebug=$6; fi;
 if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
+if [ ! -z $8 ]; then instance_registry_url_override=$8; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -218,6 +219,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config external_type "$external_db" \
 --config external_db_host "$external_db_host" \
 --config external_db_db "$external_db_db" \
+--config ir_url "$instance_registry_url_override" \
 --config redis_url 'tcp://127.0.0.1:6379' \
 --config redis_ephemeral_url 'tcp://127.0.0.1:6380' \
 --config site_domain 'dev.schoolbox.cloud' \
