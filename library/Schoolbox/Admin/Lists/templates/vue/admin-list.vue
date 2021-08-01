@@ -106,11 +106,11 @@ export default {
                 const response = await axios.get(`/adminv2/lists/data/${this.tableName}`);
                 this.data = response.data; 
                 this.initRows();
-                this.initSortable();
             } catch (error) {
                 this.hasDataLoadError = true; //show load error
             } finally {
                 this.isDataLoaded = true; //update the display to show the list
+                this.initSortable();
             }
         },
 
@@ -129,7 +129,9 @@ export default {
          */
         initSortable () {
             if (this.data.isSortable) {
-                $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
+                this.$nextTick(() => {
+                    $('[data-sortable]').sortable({ handle: '.grip', axis: 'y' });
+                });
             }
         }, 
 
@@ -151,31 +153,22 @@ export default {
         },
 
         /**
-         * Push in a new row
+         * Push in a new row, retrieving the default value for each property and 
+         * then adding in additional values required to track and add
          */
         onNewRowSelected () {
-            // const newRow = this.rows.filter((item, index) => index === 0);
-            // this.rows = [...this.rows, newRow];
-            this.rows.push(
-                {
-                    name: '',
-                    type: 'guest',
-                    canChangePassword: true,
-                    viewStudentProfile: false,
-                    viewStudentGrades: false,
-                    viewStudentCalendar: false,
-                    viewParentProfile: false,
-                    accessEportfolio: false,
-                    accessPastoral: false,
-                    createBadges: false,
-                    accessEvidence: false,
-                    viewParentDirectory: false,
-                    viewStaffDirectory: false,
-                    sequence: this.getNextSequence(),
-                    id: this.getNextId(),
-                    isNew: true,
+            const newRow = {}
+            this.data.fields.forEach((field) => {
+                if (Object.keys(field).includes('default')) {
+                    newRow[`${field.id}`] = field.default;
+                } else if (Object.keys(field).includes('lookup')) {
+                    newRow[`${field.id}`] = field.lookup[0].key;
                 }
-            );
+            });
+            newRow.sequence = this.getNextSequence();
+            newRow.id = this.getNextId(),
+            newRow.isNew = true;
+            this.rows = [...this.rows, newRow];
         },
 
         /**
