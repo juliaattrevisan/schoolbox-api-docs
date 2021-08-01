@@ -46,6 +46,12 @@ export default {
         },
     },
 
+    data () {
+        return {
+            isPopOutDisabled: false //provide ability to access the pop out
+        }
+    },
+
     computed: {
 
         /**
@@ -84,27 +90,50 @@ export default {
     },
 
     created () {
-        if (this.popOutHeaderField.changePopOut) {
-            this.enableChangePopOutWatcher();
-        }
+        this.checkChangePopOut();
     },
 
     methods: {
 
         /**
+         * If changePopOut exists, we there's a field that will impact the status of whats in the pop out
+         */
+        checkChangePopOut () {
+            if (this.popOutHeaderField.changePopOut) {
+                this.enableChangePopOutWatcher();
+                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[this.row[this.popOutHeaderField.changePopOut]]; //the initial value to check status
+                this.updatePopOut(changePopOutOptions);
+            }
+        },
+
+        /**
          * If there's a changePopOut set, need to know when its value has changed 
-         * so can respond to changes
+         * so can respond to changes, showing/hiding the fields when updated
          */
         enableChangePopOutWatcher () {
             this.$watch(`row.${this.popOutHeaderField.changePopOut}`, (newValue) => {
                 const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[newValue];
-                this.popOutFields.forEach((option) => { //loop through and set those options to true that are available in the current changePopOutOption
-                    if (changePopOutOptions.includes(option.id)) {
-                        this.row[option.id] = true;
-                    } else {
-                        this.row[option.id] = false;
-                    }
-                });
+                this.updatePopOut(changePopOutOptions);
+            });
+        },
+
+        /**
+         * Pass through the array of options that fill out the pop out and dicate its display status
+         * 
+         * @param { Array }
+         */
+        updatePopOut (changePopOutOptions) {
+            if (changePopOutOptions.length > 0) { //if there's no options avaiable in the current changePopOut value, opening the pop out should be disabled
+                this.isPopOutDisabled = false; 
+            } else {
+                this.isPopOutDisabled = true;
+            }
+            this.popOutFields.forEach((option) => { //loop through and set those options to true that are available in the current changePopOutOption
+                if (changePopOutOptions.includes(option.id)) {
+                    this.row[option.id] = true;
+                } else {
+                    this.row[option.id] = false;
+                }
             });
         },
 
@@ -153,7 +182,7 @@ export default {
                                 <transition-group name="pop-out-list" tag="div" class="pop-out-list">
                                     <button v-for="field in activePopOutFields" :key="field.caption" :class="[ selectedPopOutName === field.caption ? 'pop-out-list-item-active' : '', 'pop-out-list-item']" @click.prevent="onPopOutNameSelected(field.caption)">{{ field.caption }}</button>
                                 </transition-group>
-                                <button @click.prevent="onPopOutSelected" class="update-pop-out-button button icon-modify" title="Modify"></button>
+                                <button @click.prevent="onPopOutSelected" :disabled="isPopOutDisabled" class="update-pop-out-button button icon-modify" title="Modify"></button>
                             </div>
                         </template>
                         <template v-else-if="field.lookup">
