@@ -57,7 +57,9 @@ class Cookie
      */
     public function retrieveHash(): ?string
     {
-        return $this->cookies[$this->cookieName] ?? null;
+        $hash = $this->cookies[$this->cookieName] ?? null;
+        // A falsy hash is considered to not exist at all
+        return $hash ?: null;
     }
 
     /**

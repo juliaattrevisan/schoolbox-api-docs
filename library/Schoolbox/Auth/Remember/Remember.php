@@ -57,7 +57,7 @@ class Remember
      */
     public function rememberUsername(string $username, int $expiry): void
     {
-        $hash = $this->rememberRedis->rememberUsername($username, $expiry);
+        $hash = $this->rememberRedis->rememberUsername($username, $expiry, $this->rememberCookie->retrieveHash());
         $this->rememberCookie->rememberHash($hash, $expiry);
     }
 
@@ -69,7 +69,7 @@ class Remember
     public function retrieveUsername(): ?string
     {
         $hash = $this->rememberCookie->retrieveHash();
-        if (isset($hash) && $hash) {
+        if (isset($hash)) {
             return $this->rememberRedis->retrieveUsername($hash);
         }
         return null;

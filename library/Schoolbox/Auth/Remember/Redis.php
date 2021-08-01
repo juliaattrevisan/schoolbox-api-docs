@@ -98,13 +98,15 @@ class Redis
     /**
      * Remember the given username.
      *
-     * @param string $username The username to remember
-     * @param int    $expiry   The number of seconds to remember for
+     * @param string      $username The username to remember
+     * @param int         $expiry   The number of seconds to remember for
+     * @param string|null $key      If provided, remember the username in this
+     *                              key: otherwise, generate one.
      * @return string A key to pass into `retrieveRememberedUsername`.
      */
-    public function rememberUsername(string $username, int $expiry): string
+    public function rememberUsername(string $username, int $expiry, ?string $key): string
     {
-        $key = $this->generateRandomKey();
+        $key ??= $this->generateRandomKey();
         $this->redis->setex($this->generateRedisKey($key), $expiry, $username);
         return $key;
     }
