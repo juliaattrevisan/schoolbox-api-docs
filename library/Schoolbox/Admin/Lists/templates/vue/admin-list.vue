@@ -39,7 +39,7 @@ export default {
             rows: [], //to display and possibly edit the rows 
             isPopOutOpen: false, //to open and close the list
             selectedRow: {}, //to track which row is selected
-            saveStatus: 'Save All', //to update the button text when saving
+            saveStatus: 'Save', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
             selectedNameInPopOut: '', //to highlight all other rows that have that permission
             isProcessing: false, //to prevent multiple rapid-fire submissions
@@ -251,7 +251,7 @@ export default {
         /**
          * Save all data
          */
-        async onSaveAllSelected () {
+        async onSaveSelected () {
             this.isSaving = true;
             this.isProcessing = true;
             this.saveStatus = 'Saving...';
@@ -260,7 +260,8 @@ export default {
             try {
                 const response = await axios.post(this.data.saveRoute, this.getSaveAllFormData());
                 if (response.status === 200) {
-                    this.saveStatus = 'Save All';
+                    this.saveStatus = 'Save';
+                    this.updateNewRowIds(response.data.newRowIdList);
                     this.$refs.toast.timeout('Save successful', true, 2000);
                 } else {
                     this.$refs.toast.timeout('Unable to save', false, 2000);
@@ -295,6 +296,21 @@ export default {
             formData.append('table', this.tableName);
             formData.append('rows', JSON.stringify(this.rows));
             return formData;
+        },
+
+        /**
+         * The new rows have been assigned, so need to match the front end 
+         * 
+         * @param { Array or undefined }
+         */
+        updateNewRowIds (newRowIdList) {
+            if (typeof newRowIdList !== 'undefined') { //won't be returned currently if there's no new rows
+                const newRows = this.rows.filter((row) => row.id < 0);
+                newRows.forEach((row, index) => {
+                    row.id = newRowIdList[index];
+                    row.isNew = false;
+                });
+            }
         },
 
         /**
@@ -417,6 +433,9 @@ export default {
                                 :selected-row="selectedRow"
                                 :is-open="isPopOutOpen" 
                                 :save-route="data.saveRoute" 
+                                :save-status="saveStatus" 
+                                :is-processing="isProcessing" 
+                                @on-pop-out-saved="onSaveSelected"
                                 @on-pop-out-closed="onPopOutClosed"
                             />
 
@@ -430,7 +449,7 @@ export default {
 
                     </section>
 
-                    <input type="submit" @click.prevent="onSaveAllSelected" :value="saveStatus" :disabled="isProcessing" />
+                    <input type="submit" @click.prevent="onSaveSelected" :value="saveStatus" :disabled="isProcessing" />
 
                 </form>
 
