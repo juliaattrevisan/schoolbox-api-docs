@@ -166,6 +166,8 @@ class Controller extends Base
             $sequence = $modelName::sequenceBase();
         }
 
+        // ids of newly created models
+        $newIds = [];
         foreach ($ids as $currentIndex => $id) {
             // Negative ID numbers indicate new records
             if ($id > 0) {
@@ -282,12 +284,25 @@ class Controller extends Base
                 }
 
                 try {
-                    $mapper->save($model);
+                    $affectedIds = $mapper->save($model);
+                    if (null === $oldModel) {
+                        $newIds = array_merge($newIds, $affectedIds);
+                    }
                 } catch (\Exception $e) {
                     $this->sendError('Could not save: ' . $e->getMessage());
                     return;
                 }
             }
+        }
+        if (!empty($newIds)) {
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput(
+                    [
+                        'newRowIdList' => $newIds,
+                    ]
+                )
+            );
+            return;
         }
 
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
