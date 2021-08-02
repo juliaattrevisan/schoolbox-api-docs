@@ -1,7 +1,7 @@
 <script>
 
 /**
- * 
+ * Provide access to CRUD Admin > Lists
  *
  */
 
@@ -161,7 +161,7 @@ export default {
             this.data.fields.forEach((field) => {
                 if (Object.keys(field).includes('default')) {
                     newRow[`${field.id}`] = field.default;
-                } else if (Object.keys(field).includes('lookup')) {
+                } else if (Object.keys(field).includes('lookup')) { //for lookups, use the first value as default
                     newRow[`${field.id}`] = field.lookup[0].key;
                 }
             });
@@ -274,7 +274,7 @@ export default {
         },
 
         /**
-         * Ensure the correct sorting order is reflected for page reload
+         * Ensure the correct sorting order is reflected 
          */
         updateSequenceOrder () {
             const allRowElements = document.querySelector('[data-list]').children;

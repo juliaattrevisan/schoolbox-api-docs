@@ -72,15 +72,12 @@ export default {
     methods: {
 
         /**
-         * If changePopOut exists, there's a field on the row that will impact the status of what's in the pop out
-         * For example on Lists > Roles, changing 'Role Type' will change the list of Permissions available 
-         * So say for 'Guest' there will be less permissions available then for 'Staff'
+         * If changePopOut exists, we there's a field that will impact the status of whats in the pop out
          */
         checkChangePopOut () {
             if (this.popOutHeaderField.changePopOut) {
-                this.enableChangePopOutWatcher(); //start tracking changes
-                const currentChangePopOutSelection = this.row[this.popOutHeaderField.changePopOut]; //eg: this will return the current selection of 'Role Type' on Lists > Roles
-                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[currentChangePopOutSelection];  //the list of options available based on the selection of 'changePopOut'
+                this.enableChangePopOutWatcher();
+                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[this.row[this.popOutHeaderField.changePopOut]]; //the initial value to check status
                 this.updatePopOut(changePopOutOptions);
             }
         },
@@ -88,11 +85,10 @@ export default {
         /**
          * If there's a changePopOut set, need to know when its value has changed 
          * so can respond to changes, showing/hiding the fields when updated
-         * For example if there's 'Role Type' like in Lists > Roles, we would hide all fields if 'Guest' was selected
          */
         enableChangePopOutWatcher () {
             this.$watch(`row.${this.popOutHeaderField.changePopOut}`, (newValue) => {
-                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[newValue]; //the list of options available based on the selection of 'changePopOut' 
+                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[newValue];
                 this.updatePopOut(changePopOutOptions);
             });
         },
