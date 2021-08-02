@@ -501,11 +501,11 @@ class SitePage extends Page
     {
         header('Location: ' . self::conType() . ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST']) . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
-        // don't quit
         if ($keepProcessing) {
+            // don't quit
             self::keepProcessingInBackground();
-        } // quit
-        else {
+        } else {
+            // quit
             exit;
         }
     }
