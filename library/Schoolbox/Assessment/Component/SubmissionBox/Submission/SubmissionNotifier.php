@@ -237,7 +237,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
         $bob = new Builder();
         $bob->setTitle($title)
             ->setParams($params)
-            ->setIcon("/portrait.php?id={$student->getId()}&size={$this->iconSize}")
+            ->setIcon($this->getUserIcon($student))
             ->setHref("/learning/assessments/{$box->getAssessmentId()}/{$student->getId()}")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
@@ -326,7 +326,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
                     'catname' => new CategoryParam($folder)
                 )
             )
-            ->setIcon("/portrait.php?id={$user->getId()}&size={$this->iconSize}")
+            ->setIcon($this->getUserIcon($user))
             ->setHref("/learning/assessments/{$box->getAssessmentId()}/$studentId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)

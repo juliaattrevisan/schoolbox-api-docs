@@ -193,7 +193,7 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
                 'catname' => new CategoryParam($folder),
             ])
             ->setHref("/wiki/$folderId/$wikiSlug")
-            ->setIcon("/portrait.php?id={$authorId}&size={$this->iconSize}")
+            ->setIcon($this->getUserIcon($author))
             ->setSeverity(Logger::INFO)
             ->setTopics(["wiki.$wikiId.created"])
             ->setFilter(['roletype' => $roleType])

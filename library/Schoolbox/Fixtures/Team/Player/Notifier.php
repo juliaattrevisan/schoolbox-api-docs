@@ -191,7 +191,7 @@ class Notifier extends AbstractModuleNotifier
         $bob->setTitle($title)
             ->setParams($params)
             ->setHref($team->getUrl() ? : "/fixtures/match/{$match->getId()}/results/{$team->getId()}")
-            ->setIcon("/portrait.php?id={$effector->getId()}&size=square64")
+            ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $teamPlayer->getId(), self::TRIGGER_REMOVED) ])
             ->setNamespace($this->getSlug())

@@ -492,7 +492,7 @@ class Notifier extends AbstractModuleNotifier
         string $trigger
     ): Builder {
         $bob = new Builder();
-        $bob->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
+        $bob->setIcon($this->getUserIcon($effector))
             ->setHref($this->buildBlogUrl($post, $comment))
             ->setSeverity(Logger::INFO)
             ->setNamespace($this->getSlug())

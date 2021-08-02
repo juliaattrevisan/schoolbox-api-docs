@@ -101,7 +101,18 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
      */
     protected function getPostIcon(User $author): string
     {
-        return "/portrait.php?size={$this->iconSize}&userId=" . $author->getExternalId();
+        /**
+         * ideally, we always want to use the `id` for all portraits
+         */
+        if (is_numeric($author->getId())) {
+            return "/portrait.php?id={$author->getId()}&size={$this->iconSize}";
+        }
+
+        /**
+         * but if we can't source a decent `id`, then we need to have a default avatar to display
+         */
+        return "/portrait.php?id=0&size={$this->iconSize}";
+
     }
 
 

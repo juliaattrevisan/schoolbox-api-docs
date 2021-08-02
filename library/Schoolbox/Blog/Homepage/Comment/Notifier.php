@@ -140,7 +140,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
             'title'   => new Param($blogName, "/blog/" . $blog->getId()),
             'catname' => new CategoryParam($folder),
         ])
-            ->setIcon("/portrait.php?id={$author->getId()}&size={$this->iconSize}")
+            ->setIcon($this->getUserIcon($author))
             ->setHref("/blog/" . $blog->getId())// dedupe per blog
             ->setSeverity(Logger::INFO)
             ->setTimestamp($comment->getCreatedAt()->getUnixTimeStamp())

@@ -185,7 +185,7 @@ class Notifier extends AbstractModuleNotifier
         $bob = new Builder();
         $ts  = \Alaress_Date_Format::now()->getUnixTimeStamp();
         $bob->setTitle('Results have been updated for :child\'s :sport match :match')
-            ->setIcon("/portrait.php?id={$effector->getId()}&size=square64")
+            ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
             ->setNamespace($this->getSlug())
@@ -232,7 +232,7 @@ class Notifier extends AbstractModuleNotifier
         $bob = new Builder();
         $ts  = \Alaress_Date_Format::now()->getUnixTimeStamp();
         $bob->setTitle('Results have been updated for your :sport match :match')
-            ->setIcon("/portrait.php?id={$effector->getId()}&size=square64")
+            ->setIcon($this->getUserIcon($effector))
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
             ->setNamespace($this->getSlug())

@@ -419,6 +419,9 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      */
     protected function getUserIcon(User $user): string
     {
+        /**
+         * because notifications are not sent to external users, its safe to always rely on User->getId()
+         */
         return "/portrait.php?id={$user->getId()}&size={$this->iconSize}";
     }
 }
