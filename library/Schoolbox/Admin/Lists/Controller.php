@@ -158,14 +158,6 @@ class Controller extends Base
             }
         }
 
-        // List item entity is responsible for declaring its sequence base
-        $sequence  = null;
-        $modelName = $mapper->getModel();
-        if (is_a($modelName, Sequential::class, true)) {
-            /** @var Sequential $modelName */
-            $sequence = $modelName::sequenceBase();
-        }
-
         // ids of newly created models
         $newIds = [];
         foreach ($ids as $currentIndex => $id) {
@@ -312,6 +304,7 @@ class Controller extends Base
     {
         // add "id" as it's not in fields
         $fieldNames[] = 'id';
+        $fieldNames[] = 'sequence';
         $fieldValues = [];
         $rows        = json_decode($data, true);
         foreach ($rows as $row) {
