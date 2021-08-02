@@ -69,7 +69,11 @@ if (is_numeric($_REQUEST['cid'])) {
         // If so render it only so it can be re-rendered
         if ($_POST['movedComponentId']) {
             $instance   = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
-            $cClass     = $instance->getDefinition()->getClass();
+            if (is_object($instance)) {
+                $cClass = $instance->getDefinition()->getClass();
+            } else {
+                exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
+            }
             $controller = new $cClass($instance, $page->getDi()->get('session')->get('user'), $page);
             $renderer   = new Component_Renderer();
             $renderer->renderHomepageComponent($page, $folderMapper->findById($_POST['cid']), $controller);

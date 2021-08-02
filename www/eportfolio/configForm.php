@@ -52,11 +52,14 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
 
                 foreach ($components[$position] as $sequence => $componentID) {
                     if ($componentID) {
-                        /** @var Component_Instance $inst */
-                        $inst = Component_InstanceMapper::getInstance()->findById($componentID);
-                        $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
-                        $inst->setPosition($position);
-                        $instanceCollection->add($inst);
+                        try {
+                            /** @var Component_Instance $inst */
+                            $inst = Component_InstanceMapper::getInstance()->findById($componentID);
+                            $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
+                            $inst->setPosition($position);
+                            $instanceCollection->add($inst);
+                        } catch (Schoolbox\Mapper\Exception $e) {
+                        }
                     }
                 }
 
@@ -68,6 +71,11 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
             // Render the component just moved, so it can be re-rendered
             if ($_POST['movedComponentId']) {
                 $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+                if (is_object($instance)) {
+                    $cClass = $instance->getDefinition()->getClass();
+                } else {
+                    exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
+                }
                 $factoryFactory   = new Component_FactoryFactory();
                 $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
                 $renderer         = new Component_Renderer();

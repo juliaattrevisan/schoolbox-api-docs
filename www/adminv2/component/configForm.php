@@ -67,6 +67,9 @@ if ($_POST['type'] == 'components') {
     // If so render it only so it can be re-rendered
     if ($_POST['movedComponentId']) {
         $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+        if (is_object($instance) === false) {
+            exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
+        }
         $factoryFactory   = new Component_FactoryFactory();
         $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
         $renderer         = new Component_Renderer();
