@@ -601,7 +601,7 @@ class Controller extends Base
 
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()] = $subtype->getTemplate();
-            if (key_exists($subtype->getId(), $typeAudiences) || $subtype->getVisibilityLocked()) {
+            if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $subtype->getPastoralType()->getId(),
                     'subtypeId' => $subtype->getId(),
