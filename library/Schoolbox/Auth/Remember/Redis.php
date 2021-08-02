@@ -104,7 +104,7 @@ class Redis
         foreach ($ttls as $ttl) {
             // Ignore TTLs for keys which either don't exist, or had no TTL
             if ($ttl > 0) {
-                $minTtl = min($minTtl ?? 0, $ttl);
+                $minTtl = isset($minTtl) ? min($minTtl, $ttl) : $ttl;
             }
         }
         return $minTtl;
