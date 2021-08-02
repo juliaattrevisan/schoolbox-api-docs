@@ -123,7 +123,10 @@ class Redis
     public function rememberUsername(string $username, int $expiry, ?string $oldKey): string
     {
         if (isset($oldKey)) {
-            $this->forgetUsername($oldKey);
+            $previousExpiry = $this->forgetUsername($oldKey);
+            if (isset($previousExpiry)) {
+                $expiry = $previousExpiry;
+            }
         }
         $newKey = $this->generateRandomKey();
 
