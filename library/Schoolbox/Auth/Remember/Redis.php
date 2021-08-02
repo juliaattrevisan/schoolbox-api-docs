@@ -85,14 +85,29 @@ class Redis
      * Forget the remembered username.
      *
      * @param string $key A key, previously returned by `rememberUsername`
+     * @return int|null The TTL of the previously remembered key, or null if it
+     *                  didn't exist or somehow doesn't have an expiry.
      */
-    public function forgetUsername(string $key): void
+    public function forgetUsername(string $key): ?int
     {
+        $redisKey    = $this->generateRedisKey($key);
+        $oldRedisKey = $this->generateOldRedisKey($key);
+
+        // Get the TTL of both keys
+        $ttls = [$this->redis->ttl($redisKey), $this->redis->ttl($oldRedisKey)];
+
         // Forget both the old and new keys
-        $this->redis->del([
-            $this->generateRedisKey($key),
-            $this->generateOldRedisKey($key),
-        ]);
+        $this->redis->del([$redisKey, $oldRedisKey]);
+
+        // Return whichever is next to expire
+        $minTtl = null;
+        foreach ($ttls as $ttl) {
+            // Ignore TTLs for keys which either don't exist, or had no TTL
+            if ($ttl > 0) {
+                $minTtl = min($minTtl ?? 0, $ttl);
+            }
+        }
+        return $minTtl;
     }
 
     /**
