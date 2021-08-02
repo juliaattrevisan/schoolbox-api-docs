@@ -126,7 +126,13 @@ class Redis
             $this->forgetUsername($oldKey);
         }
         $newKey = $this->generateRandomKey();
-        $this->redis->setex($this->generateRedisKey($newKey), $expiry, $username);
+
+        // Only set the new key and its expiry if it didn't already exist.
+        // This allows remember me to actually expire.
+        $redisKey = $this->generateRedisKey($newKey);
+        if (!$this->redis->exists($redisKey)) {
+            $this->redis->setex($this->generateRedisKey($newKey), $expiry, $username);
+        }
         return $newKey;
     }
 
