@@ -7,13 +7,8 @@
 
 import { gsap } from 'gsap/all';
 import axios from 'axios';
-import Toast from '@vue/components/toast';
 
 export default {
-
-    components: {
-        Toast
-    },
 
     props: {
         headerField: { //the header field object
@@ -35,13 +30,14 @@ export default {
         saveRoute: { //url of entire list save
             type: String,
             required: true
-        }
-    },
-
-    data () {
-        return {
-            saveStatus: 'Save', //to update the button text when saving
-            isProcessing: false //to prevent multiple rapid-fire submissions
+        },
+        saveStatus: { //to update the button text when saving
+            type: String,
+            required: true
+        },
+        isProcessing: { //to prevent multiple rapid-fire submissions
+            type: Boolean,
+            required: true
         }
     },
 
@@ -93,27 +89,11 @@ export default {
         },
 
         /**
-         * Save all the permissions options, currently just using the
+         * Save all the pop out options, currently just using the
          * existing save all route
          */
-        async onSaveSelected () {
-            this.isProcessing = true;
-            this.saveStatus = 'Saving...';
-            this.$refs.toast.activate('Saving...');
-            try {
-                const formData = new FormData(this.$parent.$refs.form);
-                const response = await axios.post(this.saveRoute, formData);
-                if (response.status === 200) {
-                    this.saveStatus = 'Save';
-                    this.$refs.toast.timeout('Save successful', true, 2000);
-                } else {
-                    this.$refs.toast.timeout('Unable to save', false, 2000);
-                }
-            } catch (error) {
-                this.$refs.toast.timeout('Unable to save', false, 2000);
-            } finally {
-                location.reload();
-            }
+        onSaveSelected () {
+            this.$emit('on-pop-out-saved');
         },
 
         /**
@@ -154,7 +134,6 @@ export default {
             </ul>
             <button @click.prevent="onSaveSelected" class="save-button">{{ saveStatus }}</button>
         </div>
-        <toast ref="toast"></toast>
     </div>
 </template>
 
