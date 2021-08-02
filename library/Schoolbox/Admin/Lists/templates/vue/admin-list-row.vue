@@ -130,11 +130,11 @@ export default {
                         <template v-else-if="field.checkbox">
                             <div class="checklist">
                                 <input 
-                                    v-model="row[field.id]"
-                                    :id="row[field.id]"
+                                    :id="`${row.id}-${field.caption}`"
                                     type="checkbox"
+                                    v-model="row[field.id]"
                                 />
-                                <label :for="row[field.id]"></label>
+                                <label :for="`${row.id}-${field.caption}`"></label>
                             </div>
                         </template>
 
@@ -147,7 +147,7 @@ export default {
                             <template v-else>
                                 <select v-model="row[field.id]">
                                     <template v-if="!field.mandatory">
-                                        <option value="">Not Selected</option>
+                                        <option value="null">Not Selected</option>
                                     </template>
                                     <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
                                 </select>

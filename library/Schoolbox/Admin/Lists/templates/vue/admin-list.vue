@@ -260,7 +260,6 @@ export default {
             try {
                 const response = await axios.post(this.data.saveRoute, this.getSaveAllFormData());
                 if (response.status === 200) {
-                    this.saveStatus = 'Save';
                     this.updateNewRowIds(response.data.newRowIdList);
                     this.$refs.toast.timeout('Save successful', true, 2000);
                 } else {
@@ -271,6 +270,7 @@ export default {
             } finally {
                 this.isSaving = false;
                 this.isProcessing = false;
+                this.saveStatus = 'Save';
             }
         },
 
