@@ -5,11 +5,13 @@
  */
 
 import AdminListRowPopOut from './admin-list-row-pop-out';
+import AdminListRowColour from './admin-list-row-colour';
 
 export default {
 
     components: {
         AdminListRowPopOut,
+        AdminListRowColour,
     },
 
     props: {
@@ -135,6 +137,15 @@ export default {
                                 <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
                             </select>
                         </template>
+                        <template v-else-if="field.readonly">
+                            <p>{{ row[field.id] }}</p>
+                        </template>
+                        <template v-else-if="field.colour">
+                            <admin-list-row-colour
+                                :caption="field.caption"
+                                :colour="row[field.id]"
+                            />
+                        </template>
                         <template v-else>
                             <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : 0">
                         </template>
@@ -142,7 +153,7 @@ export default {
                 </template>
             </div><!-- .list-item -->
 
-            <nav>
+            <nav v-if="canDelete">
                 <a @click.prevent="onDeleteRowSelected" class="delete-row-button icon-delete" href="#delete-row" title="Delete Row"></a>
             </nav>
 
