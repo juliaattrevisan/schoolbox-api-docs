@@ -76,10 +76,12 @@ export default {
                 },
                 resourceTimelineWeek: {
                     slotLabelFormat: ['ddd D/M', 'h'],
-                    slotMinWidth: '50'
+                    slotMinWidth: '50',
+                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
                 },
                 resourceTimelineDay: {
-                    slotMinWidth: '50'
+                    slotMinWidth: '50',
+                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
                 }
             },
             eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,

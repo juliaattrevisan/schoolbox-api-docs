@@ -148,7 +148,8 @@ export default {
                 end: this.maxDate,
             },
             resourceAreaHeaderContent: 'Week',
-            slotMinWidth: '50'
+            slotMinWidth: '50',
+            titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
         };
         this.resourceTimelineWeek = {
             dayHeaderFormat: this.formats.displayWeekDay,
@@ -158,7 +159,8 @@ export default {
                 'ddd DD'
             ],
             resourceAreaWidth: '15%',
-            filterResourcesWithEvents: true
+            filterResourcesWithEvents: true,
+            titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
         };
         this.calendarOptions = {
             schedulerLicenseKey: this.config.schedulerLicenseKey,

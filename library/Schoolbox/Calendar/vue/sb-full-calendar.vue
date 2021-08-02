@@ -122,15 +122,17 @@ export default {
             plugins: [ interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin, momentPlugin, adaptivePlugin ],
             views: {
                 day: {
-                    dayHeaders: false
+                    dayHeaders: false,
+                    titleFormat: this.config.dateDisplayFormats.momentJsDateLong // will produce something like "Tuesday July 16th 2021"
                 },
                 week: {
-                    dayHeaderFormat: this.formats.displayWeekDay
+                    dayHeaderFormat: this.formats.displayWeekDay,
+                    titleFormat: '{MMMM {Do}}, YYYY', // will produce something like "July 26th – August 1st, 2021"
                 },
                 list: {
                     buttonText: 'List',
                     duration: this.duration,
-                    listDayFormat: this.config.momentJsDateShort
+                    listDayFormat: this.config.dateDisplayFormats.momentJsDateLong
                 }
             },
             eventTimeFormat: this.fullCalendarHelper_eventTimeFormat,
