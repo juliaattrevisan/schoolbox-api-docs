@@ -118,7 +118,7 @@ export default {
          * Add a boolean to know whether the row is one being newly added
          */
         initRows () {
-            this.rows = this.data.rows;
+            this.rows = _.cloneDeep(this.data.rows);
             this.rows.forEach((row) => { 
                 row.isNew = false;
             });
@@ -162,7 +162,7 @@ export default {
                 if (Object.keys(field).includes('default')) {
                     newRow[`${field.id}`] = field.default;
                 } else if (Object.keys(field).includes('lookup')) { //for lookups, use the first value as default
-                    newRow[`${field.id}`] = field.lookup[0].key;
+                    newRow[`${field.id}`] = field.lookup[0]?.key ? field.lookup[0].key : '';
                 }
             });
             newRow.sequence = this.getNextSequence();
@@ -382,7 +382,7 @@ export default {
                 
                 <div v-if="rows.length === 0" id="listEmptyState" class="empty-state">
                     <i class="icon-list"></i>
-                    <p>The {{ data.title }} list is empty.<br><a href="#add-an-item" data-button="add-row">Add an item to this list</a>.</p>
+                    <p>The {{ data.title }} list is empty.<br><a @click.prevent="onNewRowSelected" href="#add-an-item" data-button="add-row">Add an item to this list</a>.</p>
                 </div>
 
                 <form v-else method="post" action="/adminv2/lists/save" ref="form">
