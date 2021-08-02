@@ -1,19 +1,19 @@
 <script>
 
 /**
- * A 'pop out' for a row, it's a list of options that animate out from the right side
- * Providing a clearer focus on the list of options available to the current row. 
- * Its intent is to minimise the clutter of a checkbox farm that can become pretty messy UI wise. 
+ * Pass in the jQuery spectrum colour picker
+ * Make use of Using v-model on Components to simulate v-model like input change
+ * See: https://vuejs.org/v2/guide/components.html#Using-v-model-on-Components
  */
 
 export default {
 
     props: {
-        caption: { //
+        caption: { //just shown prior to load
             type: String,
             required: true
         },
-        colour: { //
+        colour: { //the colour chosen
             type: String,
             required: true
         },
@@ -26,10 +26,10 @@ export default {
     methods: {
 
         /**
-         * 
+         * Set up the jQuery spectrum colour picker and emit changes
          */
         initColourPicker () {
-            $('[data-colour-picker]').spectrum({
+            $(this.$el).spectrum({
                 allowEmpty: false,
                 showAlpha: false,
                 showInput: true,
@@ -37,8 +37,7 @@ export default {
                 clickoutFiresChange: true,
                 showInitial: true,
                 change: (color) => {
-                    debugger;
-                    // $('[data-colour-picker]').val(color.toHexString());
+                    this.$emit('input', color.toHexString())
                 }
             });
         }
@@ -49,5 +48,5 @@ export default {
 </script>
 
 <template>
-    <input type="text" :placeholder="caption" v-model="colour" data-colour-picker />
+    <input type="text" :placeholder="caption" :value="colour" data-colour-picker />
 </template>

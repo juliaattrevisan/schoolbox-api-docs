@@ -120,8 +120,49 @@ export default {
             <div class="list-item">
                 <template v-for="(field, index) in headerFields">
                     <div :class="`small-12 medium-${ field.width ? field.width : '2' } column`" :key="index">
+                       
                         <span class="hide-for-medium-up">{{ field.caption }}</span>
-                        <template v-if="field.isPopOutList">
+                        
+                        <template v-if="field.readonly">
+                            <p>{{ row[field.id] }}</p>
+                        </template>
+
+                        <template v-else-if="field.checkbox">
+                            <div class="checklist">
+                                <input 
+                                    v-model="row[field.id]"
+                                    :id="row[field.id]"
+                                    type="checkbox"
+                                />
+                                <label :for="row[field.id]"></label>
+                            </div>
+                        </template>
+
+                        <template v-else-if="field.lookup">
+                            <template v-if="field.lookup.length === 0">
+                                <select v-model="row[field.id]" disabled>
+                                    <option value="" disabled>None Available</option>
+                                </select>
+                            </template>
+                            <template v-else>
+                                <select v-model="row[field.id]">
+                                    <template v-if="!field.mandatory">
+                                        <option value="">Not Selected</option>
+                                    </template>
+                                    <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
+                                </select>
+                            </template>
+                        </template>
+
+                        <template v-else-if="field.colour">
+                            <admin-list-row-colour
+                                :caption="field.caption"
+                                :colour="row[field.id]"
+                                @input="row[field.id] = $event"
+                            />
+                        </template>
+
+                        <template v-else-if="field.isPopOutList">
                             <admin-list-row-pop-out
                                 :row="row"
                                 :pop-out-header-field="popOutHeaderField"
@@ -132,23 +173,26 @@ export default {
                                 @on-pop-out-name-selected="onPopOutNameSelected"
                             />
                         </template>
-                        <template v-else-if="field.lookup">
-                            <select v-model="row[field.id]" :title="rowKeyValueList[index].value">
-                                <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
-                            </select>
-                        </template>
-                        <template v-else-if="field.readonly">
-                            <p>{{ row[field.id] }}</p>
-                        </template>
-                        <template v-else-if="field.colour">
-                            <admin-list-row-colour
-                                :caption="field.caption"
-                                :colour="row[field.id]"
-                            />
-                        </template>
+
                         <template v-else>
                             <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : 0">
                         </template>
+
+                        <!-- <template v-if="field.nullable">
+                            <div class="checklist">
+                                <input 
+                                        value="{{ idIsNumeric ? recordIndex - 1 : recordIndex }}"
+                                        id="{{ field_key }}-{{ recordIndex }}"
+                                        type="checkbox"
+                                        {% if record_value is null %}checked{% endif %}
+                                        data-nullcheck
+                                />
+                                <label for="{{ field_key }}-{{ recordIndex }}">
+                                    {{- field.nullable_label | default('Null') -}}
+                                </label>
+                            </div>
+                        </template> -->
+                        
                     </div>
                 </template>
             </div><!-- .list-item -->

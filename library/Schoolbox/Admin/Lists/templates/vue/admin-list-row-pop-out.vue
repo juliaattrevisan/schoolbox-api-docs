@@ -77,8 +77,6 @@ export default {
         checkChangePopOut () {
             if (this.popOutHeaderField.changePopOut) {
                 this.enableChangePopOutWatcher();
-                const changePopOutOptions = this.popOutHeaderField.changePopOutOptions[this.row[this.popOutHeaderField.changePopOut]]; //the initial value to check status
-                this.updatePopOut(changePopOutOptions);
             }
         },
 
