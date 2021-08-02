@@ -680,21 +680,27 @@ class Controller extends BaseController
 
             foreach ($counts as $count) {
                 if ($count['subtypeId']) {
-                    /** @var PastoralSubType $subtype */
-                    $subtype         = $subtypes->getOffset($count['subtypeId']);
-                    $foregroundColor = $subtype->getColor();
-                    $count['icon']            = $subtype->getIcon();
-                    $count['title']           = "{$subtype->getPastoralType()->getName()}: {$subtype->getName()}";
-                    $count['subSequence']     = $subtype->getSequence();
-                    $count['sequence']        = $subtype->getPastoralType()->getSequence();
+                    /** @var PastoralSubType|null $subtype */
+                    $subtype = $subtypes->getOffset($count['subtypeId']);
+                    if (!$subtype) {
+                        continue;
+                    }
+                    $foregroundColor      = $subtype->getColor();
+                    $count['icon']        = $subtype->getIcon();
+                    $count['title']       = "{$subtype->getPastoralType()->getName()}: {$subtype->getName()}";
+                    $count['subSequence'] = $subtype->getSequence();
+                    $count['sequence']    = $subtype->getPastoralType()->getSequence();
                 } else {
-                    /** @var PastoralType $type */
-                    $type            = $types->getOffset($count['typeId']);
-                    $foregroundColor = $type->getColor();
-                    $count['icon']            = $type->getIcon();
-                    $count['title']           = $type->getName();
+                    /** @var PastoralType|null $type */
+                    $type = $types->getOffset($count['typeId']);
+                    if (!$type) {
+                        continue;
+                    }
+                    $foregroundColor      = $type->getColor();
+                    $count['icon']        = $type->getIcon();
+                    $count['title']       = $type->getName();
                     $count['subSequence'] = 0;
-                    $count['sequence'] = $type->getSequence();
+                    $count['sequence']    = $type->getSequence();
                 }
                 $count['bgColor'] = $transformer->calculateBackground($foregroundColor)->getAsRgba();
                 $count['fgColor'] = $foregroundColor->getAsRgba();
