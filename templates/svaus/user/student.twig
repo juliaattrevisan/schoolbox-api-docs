@@ -58,17 +58,17 @@
 
                                     {% block details_school %}
                                         {# SA-12418 #}
-                                        {% if externalUser.Year is defined %}
+                                        {% if user.year.name is defined %}
                                             <dt class="small-4 medium-3 columns">School:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.Year }}</dd>
+                                            <dd class="small-8 medium-9 columns">{{  user.year.name }}</dd>
                                         {% endif %}
                                     {% endblock details_school %}
 
                                     {% block details_hub %}
                                         {# SA-12418 #}
-                                        {% if externalUser.House is defined %}
+                                        {% if user.schoolhouse.house is defined %}
                                             <dt class="small-4 medium-3 columns">Hub:</dt>
-                                            <dd class="small-8 medium-9 columns">{{ externalUser.House }}</dd>
+                                            <dd class="small-8 medium-9 columns">{{ user.schoolhouse.house }}</dd>
                                         {% endif %}
                                     {% endblock details_hub %}
 
