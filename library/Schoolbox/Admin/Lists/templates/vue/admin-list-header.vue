@@ -37,7 +37,3 @@ export default {
         </header>
     </div>
 </template>
-
-<style lang="sass">
-
-</style>
