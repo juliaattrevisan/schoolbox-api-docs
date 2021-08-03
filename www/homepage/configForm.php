@@ -78,8 +78,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $renderer   = new Component_Renderer();
             $renderer->renderHomepageComponent($page, $folderMapper->findById($_POST['cid']), $controller);
         }
-    } // AJAX request to delete component from homepage
-    elseif ($_POST['cid'] && is_numeric($_POST['delete'])) {
+    } elseif ($_POST['cid'] && is_numeric($_POST['delete'])) { // AJAX request to delete component from homepage
 // locate the instance, locate its config instances, then blast them away
         try {
             /** @var Component_Instance $instance */
@@ -91,8 +90,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $componentInstanceMapper->delete($instance);
         } catch (Schoolbox\Mapper\Exception $e) {
         }
-    } // POST new component to page and output render of component
-    elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) {
+    } elseif (is_numeric($_POST['cid']) && (is_numeric($_POST['add']) || is_numeric($_POST['reload']))) { // POST new component to page and output render of component
         if (is_numeric($_POST['add'])) {
             $newComp = new Component_Instance();
             $newComp
@@ -128,17 +126,16 @@ if (is_numeric($_REQUEST['cid'])) {
         $folder   = $folderMapper->findById($_POST['cid']);
         $renderer = new Component_Renderer();
         $renderer->renderHomepageComponent($page, $folder, $component);
-    } // AJAX Save homepage colours
-    elseif ($_POST['cid'] && is_array($_POST['colors'])) {
-        $homepage = new Homepage($_POST['cid']);
+    } elseif ($_POST['cid'] && is_array($_POST['colors'])) { // AJAX Save homepage colours
+            $homepage = new Homepage($_POST['cid']);
         // Also try to save width
         if (!empty($_POST['width'])) {
             // Mangle width into percentages
             $homepage->updateGrid($_POST['width']);
         }
         $homepage->saveDisplayProperties($_POST['colors']);
-    } // GET config options from homepage
-    elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
+    } elseif ($_GET['cid'] && $_GET['type'] == 'config' && $_GET['component']) {
+    // GET config options from homepage
         $config = $_GET;
 
         /** @var Component_Instance $instance */
@@ -220,7 +217,6 @@ if (is_numeric($_REQUEST['cid'])) {
 //        $homepage = new Homepage($_POST['cid']);
 //        $homepage->updateColumnWidths(Scrub::text($_POST['leftColWidth']), Scrub::text($_POST['rightColWidth']));
 //    }
-} // no cid provided
-else {
+} else { // no cid provided
     error(2);
 }
