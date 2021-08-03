@@ -50,7 +50,7 @@ if ($_POST['type'] == 'components') {
         foreach ($components[$position] as $sequence => $componentID) {
             if ($componentID) {
                 try {
-                    /** @var $inst Component_Instance */
+                    /** @var Component_Instance $inst */
                     $inst = Component_InstanceMapper::getInstance()->findById($componentID);
                     $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
                     $inst->setPosition($position);
@@ -67,6 +67,9 @@ if ($_POST['type'] == 'components') {
     // If so render it only so it can be re-rendered
     if ($_POST['movedComponentId']) {
         $instance         = $componentInstanceMapper->findByInstanceId($_POST['movedComponentId']);
+        if (is_object($instance) === false) {
+            exit("<div class='alert alert-box'>Couldn't move component.<br>Component has been deleted</div>");
+        }
         $factoryFactory   = new Component_FactoryFactory();
         $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
         $renderer         = new Component_Renderer();
@@ -182,8 +185,6 @@ if ($_POST['type'] == 'components') {
             $renderer->renderAdminComponent($page, $componentFactory->buildComponent($instance));
             $page->outputPage(true);
             exit;
-        } else {
-//            SitePage::localRedir("/homepage/" . $_GET['cid']);
         }
     }
 //    SitePage::localRedir("/homepage/" . $_GET['cid']);
