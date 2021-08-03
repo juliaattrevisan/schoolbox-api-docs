@@ -70,6 +70,6 @@ MAILTO="support@schoolbox.com.au"
 20 1 * * 0 www-data php /usr/share/schoolboxdev/tools/mq/remove-old-triggers.php -p >> /var/log/schoolboxdev/remove-old-triggers.log 2>&1
 
 # Cleanup etherpad session storage (once a week on a Sunday)
-10 2 * * 0 www-data php /usr/share/schoolboxdev/tools/redis/removeEtherpadSession.php -p >> /var/log/schoolboxdev/purge-old-sessions.log 2>&1
+#10 2 * * 0 www-data php /usr/share/schoolboxdev/tools/redis/removeEtherpadSession.php -p >> /var/log/schoolboxdev/purge-old-sessions.log 2>&1
 
 # End of file - do not delete
