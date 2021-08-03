@@ -115,7 +115,7 @@ $app = new class extends CliTool\App {
      */
     private function setSessionTTLs(ClientInterface $redis): void
     {
-        $this->getLogger()->info("Setting ttl on sessions to ensure they expire");
+        $this->getLogger()->notice("Setting ttl on sessions to ensure they expire");
         $search = new Keyspace($redis, 'session:*');
         $i      = 0;
         foreach ($search as $key) {
