@@ -798,7 +798,6 @@ class External_Liss_Server
                  * homepage (folder) event, or a personal event
                  */
 
-                /** @var Event $event */
                 $event = $eventMapper->createModel();
                 $event->setOwner($author);
                 $event->setAuthor($author);
@@ -808,6 +807,7 @@ class External_Liss_Server
                 $event->setDetail($currentEvent['detail']);
                 $event->setStartDateTime($currentEvent['startDateTime']);
                 $event->setEndDateTime($currentEvent['endDateTime']);
+                $event->setCampusCollection(new Collection());
 
                 /* Decide between homepage events and personal events
                  * Determine which one based on the existence of a schoolbox folder that
