@@ -6,6 +6,7 @@ import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
 import userProfileMixin from '../../../vue/user-profile/mixin';
 import moment from "moment";
+import { animateBadgeImage } from '../js/animateBadgeImage'
 
 /**
  * Award detail modal.
@@ -101,13 +102,30 @@ export default {
         /**
          * Open this modal.
          */
-        open(award) {
+        open (award) {
             this.award = award;
-
             this.$refs.modal.open();
+
+            this.$nextTick(() => {
+                this.animateBadgeImage();
+            });
+            
         },
 
-        awardAchievement() {
+        /**
+         * animate the badge
+         */
+        animateBadgeImage () {
+
+            const img = this.$refs.badgeImage.$el.querySelector('img');
+            animateBadgeImage(img);
+
+        },
+
+        /**
+         * Award the achievement
+         */
+        awardAchievement () {
             let self = this;
             self.toastActivate('Awarding...');
             self.convertToAchievement(self.award)
@@ -134,7 +152,7 @@ export default {
         <template v-if="award.badge">
             <div class="badge-modal">
                 <div class="badge-img-container">
-                    <badge-image :badge="award.badge" :css="getCss(award)"></badge-image>
+                    <badge-image :badge="award.badge" :css="getCss(award)" ref="badgeImage"></badge-image>
                     <template v-if="award.count > 1">
                         <div class="award-count" :title="'Awarded ' + award.count + ' times'">x{{ award.count }}</div>
                     </template>
