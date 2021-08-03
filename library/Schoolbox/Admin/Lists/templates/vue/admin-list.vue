@@ -157,7 +157,7 @@ export default {
          * Close the pop out options
          */
         onPopOutClosed () {
-            this.isPopOutOpen = false;
+            this.isPopOutOpen = false; 
             document.querySelector('[data-list]').style.pointerEvents = 'auto';
         },
 

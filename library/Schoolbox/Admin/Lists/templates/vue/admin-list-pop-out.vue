@@ -129,7 +129,7 @@ export default {
                         type="checkbox"
                         v-model="selectedRow[field.id]"
                     />
-                    <label :for="field.caption">{{ field.caption }}</label>
+                    <label :for="field.caption">{{ field.caption }}<span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span></label>
                 </li>
             </ul>
             <button @click.prevent="onSaveSelected" class="save-button">{{ saveStatus }}</button>
