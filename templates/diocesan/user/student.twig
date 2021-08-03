@@ -15,33 +15,30 @@
     {% endif %}
 {% endblock details_hohTeacher %}
 
-{% block buttons %}
-    {{ parent() }}
-{% if showButtons %}
-    {% block details_studiesCode %}
-        {% if externalUser.StudentStudiesCode %}
+{% block details_studiesCode %}
+    {% if showDetails and externalUser.StudentStudiesCode %}
         <dt class="no-margin small-6 medium-3">NSN</dt>
         <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
-        {% endif %}
-    {% endblock details_studiesCode %}
+    {% endif %}
+{% endblock details_studiesCode %}
 
-    {% block buttons_miscellaneous %}
+{% block buttons_miscellaneous %}
+    {% if showButtons %}
         <!-- Start on School Grades page initially -->
-        <li><a href="/modules/custom/diocesan/achievementreport/{{ user.getExternalId() }}" class="icon-progress">Achievement</a></li>
+        <li><a href="/modules/custom/diocesan/achievementreport/{{ user.getExternalId() }}" class="icon-progress">Achievement</a>
+        </li>
         <li><a href="/synergetic/contacts" class="icon-progress">Contacts</a></li>
         <li><a href="/synergetic/attendances2" class="icon-progress">Attendance</a></li>
-    {% endblock buttons_miscellaneous %}
+    {% endif %}
+{% endblock buttons_miscellaneous %}
 
-    {% block buttons_documents %}
-        {% if config.external_document_report_enabled %}
-            {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
-            {% if routeAcademicReports %}
-                <li>
-                    <a href="{{ routeAcademicReports }}" class="icon-document">Documents</a>
-                </li>
-            {% endif %}
+{% block buttons_documents %}
+    {% if showButtons and config.external_document_report_enabled %}
+        {% set routeAcademicReports = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
+        {% if routeAcademicReports %}
+            <li>
+                <a href="{{ routeAcademicReports }}" class="icon-document">Documents</a>
+            </li>
         {% endif %}
-    {% endblock buttons_documents %}
-
-{% endif %}
-{% endblock buttons %}
+    {% endif %}
+{% endblock buttons_documents %}
