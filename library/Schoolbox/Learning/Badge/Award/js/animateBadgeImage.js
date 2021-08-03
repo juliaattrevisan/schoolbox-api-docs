@@ -92,7 +92,7 @@ const swingDown = (badgeImage) => {
 }
 
 /**
- * Swing down animation
+ * Slowly spin a scaled up badge
  * 
  * @param { DOMElement }
  * 
@@ -100,7 +100,7 @@ const swingDown = (badgeImage) => {
  */
  const scaleUpAndRotateSlowly = (badgeImage) => {
     const scaleUpAndRotateSlowlyTL = gsap.timeline( { paused: true, repeat: -1 } ); 
-    scaleUpAndRotateSlowlyTL.set(badgeImage, { opacity: 0.2, scale: 4, filter: 'grayscale(100%)' } );
+    scaleUpAndRotateSlowlyTL.set(badgeImage, { opacity: 0.1, scale: 4 } );
     scaleUpAndRotateSlowlyTL.to(badgeImage, { rotationZ: 360, y: 0, duration: 10, ease: 'none' } );
     return scaleUpAndRotateSlowlyTL;
 }
@@ -113,12 +113,13 @@ const swingDown = (badgeImage) => {
 export const animateBadgeImage = (badgeImage) => {
     
     const badgeImageCopy = badgeImage.cloneNode(true);
+    badgeImageCopy.style.position = 'absolute'; //so it doesn't impact the original badge image positioning 
+    badgeImageCopy.dataset.isBadgeClone = true; 
+    badgeImage.parentNode.insertBefore(badgeImageCopy, badgeImage); //sit behind the original badge image
     const copyAnimation = scaleUpAndRotateSlowly(badgeImageCopy);
     copyAnimation.play();
 
-    // const animationList = [popUp, coinSpin, flipUp, dropDown, spinIn, swingDown];
-
-    const animationList = [popUp];
+    const animationList = [popUp, coinSpin, flipUp, dropDown, spinIn, swingDown];
     const randomAnimation = animationList[Math.floor(Math.random()*animationList.length)](badgeImage);
     randomAnimation.play();
 

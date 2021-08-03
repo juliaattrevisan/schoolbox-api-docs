@@ -117,8 +117,17 @@ export default {
          */
         animateBadgeImage () {
 
-            const img = this.$refs.badgeImage.$el.querySelector('img');
-            animateBadgeImage(img);
+            //retrieve a showBadgeReward property, if true can animate 
+
+            const badgeImageClone = this.$refs.badgeImage.$el.querySelector('[data-is-badge-clone]');
+            if (badgeImageClone) {
+                badgeImageClone.remove();
+            }
+
+            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
+            badgeImage.style = '';
+
+            animateBadgeImage(badgeImage);
 
         },
 
