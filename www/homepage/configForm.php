@@ -52,7 +52,7 @@ if (is_numeric($_REQUEST['cid'])) {
             foreach ($components[$position] as $sequence => $componentID) {
                 if ($componentID) {
                     try {
-                        /** @var $inst Component_Instance */
+                        /** @var Component_Instance $inst */
                         $inst = Component_InstanceMapper::getInstance()->findById($componentID);
                         $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
                         $inst->setPosition($position);

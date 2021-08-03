@@ -50,7 +50,7 @@ if ($_POST['type'] == 'components') {
         foreach ($components[$position] as $sequence => $componentID) {
             if ($componentID) {
                 try {
-                    /** @var $inst Component_Instance */
+                    /** @var Component_Instance $inst */
                     $inst = Component_InstanceMapper::getInstance()->findById($componentID);
                     $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
                     $inst->setPosition($position);
@@ -185,8 +185,6 @@ if ($_POST['type'] == 'components') {
             $renderer->renderAdminComponent($page, $componentFactory->buildComponent($instance));
             $page->outputPage(true);
             exit;
-        } else {
-//            SitePage::localRedir("/homepage/" . $_GET['cid']);
         }
     }
 //    SitePage::localRedir("/homepage/" . $_GET['cid']);
