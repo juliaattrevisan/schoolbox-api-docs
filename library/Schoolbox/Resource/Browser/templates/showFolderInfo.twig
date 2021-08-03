@@ -68,7 +68,7 @@
                     const $attachzone = $('#cms-zone');
                     const $toast = $('#resource-browser-toast');
                     const uploadForm = document.getElementById('uploadForm');
-                    let fileCount = 0;
+                    let successFileCount = 0;
                     let fileList = [];
 
                     //can be called either on upload from modal window (as a group of files) or straight drag and drop (as per file)
@@ -81,11 +81,14 @@
                             }
                         } else if (fileData.meta) { //just straight drag and drop
                             addFileFromDragAndDrop(fileData);
-                            fileCount++;
-                            if (fileCount === $attachzone.data('plugin_resourceAttach').dropzone.files.length) {
-                                updateFileTree();
-                            }
+                            successFileCount++;
+                            checkSuccessFileCount();
                         }
+                    });
+
+                    //ensure when a file fails the check to update the file tree also takes splace
+                    $attachzone.on('error.attachzone', function (event, fileData) {
+                        checkSuccessFileCount();
                     });
 
                     //files have been uploaded from the modal window 
@@ -98,6 +101,13 @@
                     //files been uploaded from straight drag and drop
                     function addFileFromDragAndDrop (file) {
                         addFile(file.hash, file.meta.name);
+                    }
+
+                    //when the count matches those in the dropzone, update the file tree
+                    function checkSuccessFileCount () {
+                        if (successFileCount === $attachzone.data('plugin_resourceAttach').dropzone.files.length) {
+                            updateFileTree();
+                        }
                     }
 
                     //for displaying in the file tree
@@ -151,7 +161,7 @@
                         while(azList.firstChild) {
                             azList.removeChild(azList.firstChild);     
                         }
-                        fileCount = 0;
+                        successFileCount = 0;
                         fileList = [];
                     }
 
