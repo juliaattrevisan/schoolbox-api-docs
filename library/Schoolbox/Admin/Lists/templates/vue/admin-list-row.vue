@@ -168,10 +168,10 @@ export default {
                         </template>
 
                         <template v-else>
-                            <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : 0">
+                            <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : ''">
                         </template>
 
-                        <template v-if="field.nullable">
+                        <!-- <template v-if="field.nullable">
                             <div class="checklist">
                                 <input 
                                     :id="`${row.id}-${field.caption}`"
@@ -182,7 +182,7 @@ export default {
                                     {{ field.nullable_label }}
                                 </label>
                             </div>
-                        </template>
+                        </template> -->
                         
                     </div>
                 </template>
