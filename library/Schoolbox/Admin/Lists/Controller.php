@@ -203,6 +203,10 @@ class Controller extends Base
                         continue;
                     }
 
+                    if (is_string($value[$currentIndex])) {
+                        $value[$currentIndex] = trim($value[$currentIndex]);
+                    }
+
                     $model->$setter($value[$currentIndex]);
                 }
             }
