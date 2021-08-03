@@ -150,7 +150,7 @@ export default {
         onPopOutSelected (selectedRow) {
             this.selectedRow = selectedRow;
             this.isPopOutOpen = true;
-            document.querySelector('[data-sortable]').style.pointerEvents = 'none'; //prevent editing/sorting while popoutList is open
+            document.querySelector('[data-list]').style.pointerEvents = 'none'; //prevent editing/sorting while popoutList is open
         },
 
         /**
@@ -158,7 +158,7 @@ export default {
          */
         onPopOutClosed () {
             this.isPopOutOpen = false;
-            document.querySelector('[data-sortable]').style.pointerEvents = 'auto';
+            document.querySelector('[data-list]').style.pointerEvents = 'auto';
         },
 
         /**
