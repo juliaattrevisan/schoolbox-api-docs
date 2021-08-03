@@ -1,14 +1,14 @@
 <!-- BEGIN custom_head -->
 <script type="text/javascript">
-$(function() {
+    $(function() {
 
-	$('#modPoll').alaressValidate();
-});
+        $('#modPoll').alaressValidate();
+    });
 </script>
 <!-- END custom_head -->
 
 {BREADCRUMB}
-        
+
 <div class="row">
     <div class="small-12 columns">
         <h1>{ACTION} Poll</h1>
@@ -26,7 +26,7 @@ $(function() {
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label class="required" for="question">Question</label>
-                        <input type="text" id="question" name="question" value="{POLL_QUESTION}" required />
+                        <input type="text" maxlength="250" id="question" name="question" value="{POLL_QUESTION}" required />
                     </div>
                 </fieldset>
 
@@ -36,16 +36,16 @@ $(function() {
                         <span class="hint has-tip tip-top" data-tooltip title="Options that users can select as a response to your poll. You must fill in at least two.">?</span>
                     </legend>
                     <div class="small-12 columns">
-                        <label><input type="text" class="required" name="option_0" value="{OPTION_0}"/></label>
-                        <label><input type="text" class="required" name="option_1" value="{OPTION_1}"/></label>
-                        <label><input type="text" name="option_2" value="{OPTION_2}"/></label>
-                        <label><input type="text" name="option_3" value="{OPTION_3}"/></label>
-                        <label><input type="text" name="option_4" value="{OPTION_4}"/></label>
-                        <label><input type="text" name="option_5" value="{OPTION_5}"/></label>
-                        <label><input type="text" name="option_6" value="{OPTION_6}"/></label>
-                        <label><input type="text" name="option_7" value="{OPTION_7}"/></label>
-                        <label><input type="text" name="option_8" value="{OPTION_8}"/></label>
-                        <label><input type="text" name="option_9" value="{OPTION_9}"/></label>
+                        <label><input type="text" maxlength="120" class="required" name="option_0" value="{OPTION_0}"/></label>
+                        <label><input type="text" maxlength="120" class="required" name="option_1" value="{OPTION_1}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_2" value="{OPTION_2}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_3" value="{OPTION_3}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_4" value="{OPTION_4}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_5" value="{OPTION_5}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_6" value="{OPTION_6}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_7" value="{OPTION_7}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_8" value="{OPTION_8}"/></label>
+                        <label><input type="text" maxlength="120"  name="option_9" value="{OPTION_9}"/></label>
                     </div>
                 </fieldset>
 
