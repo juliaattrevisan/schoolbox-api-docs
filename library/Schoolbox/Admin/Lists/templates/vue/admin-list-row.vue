@@ -4,14 +4,16 @@
  * Display an indivudal row, providing access to view and edit permissions and delete
  */
 
-import AdminListRowPopOut from './admin-list-row-pop-out';
+import AdminListRowLookup from './admin-list-row-lookup';
 import AdminListRowColour from './admin-list-row-colour';
+import AdminListRowPopOut from './admin-list-row-pop-out';
 
 export default {
 
     components: {
-        AdminListRowPopOut,
+        AdminListRowLookup,
         AdminListRowColour,
+        AdminListRowPopOut,
     },
 
     props: {
@@ -139,19 +141,10 @@ export default {
                         </template>
 
                         <template v-else-if="field.lookup">
-                            <template v-if="field.lookup.length === 0">
-                                <select v-model="row[field.id]" disabled>
-                                    <option value="" disabled>None Available</option>
-                                </select>
-                            </template>
-                            <template v-else>
-                                <select v-model="row[field.id]">
-                                    <template v-if="!field.mandatory">
-                                        <option value="null">Not Selected</option>
-                                    </template>
-                                    <option v-for="(option, index) in field.lookup" :key="index" :value="option.key">{{ option.value }}</option>
-                                </select>
-                            </template>
+                            <admin-list-row-lookup
+                                :field="field"
+                                :row="row"
+                            />
                         </template>
 
                         <template v-else-if="field.colour">
@@ -178,20 +171,18 @@ export default {
                             <input type="text" :placeholder="field.caption" v-model="row[field.id]" :maxlength="field.maxLength ? field.maxLength : 0">
                         </template>
 
-                        <!-- <template v-if="field.nullable">
+                        <template v-if="field.nullable">
                             <div class="checklist">
                                 <input 
-                                        value="{{ idIsNumeric ? recordIndex - 1 : recordIndex }}"
-                                        id="{{ field_key }}-{{ recordIndex }}"
-                                        type="checkbox"
-                                        {% if record_value is null %}checked{% endif %}
-                                        data-nullcheck
+                                    :id="`${row.id}-${field.caption}`"
+                                    v-model="row[field.id]"
+                                    type="checkbox"
                                 />
-                                <label for="{{ field_key }}-{{ recordIndex }}">
-                                    {{- field.nullable_label | default('Null') -}}
+                                <label :for="`${row.id}-${field.caption}`">
+                                    {{ field.nullable_label }}
                                 </label>
                             </div>
-                        </template> -->
+                        </template>
                         
                     </div>
                 </template>

@@ -59,6 +59,15 @@ export default {
         },  
 
         /**
+         * Whether to the admin-list-pop-out.vue is requred
+         * 
+         * @returns { Boolean }
+         */
+        hasPopOut () {
+            return this.data.fields.some((field) => field.hasOwnProperty('isPopOutList')); 
+        }, 
+
+        /**
          * the popOut field that's used in the header, and is the reference for 
          * the following popOutFields
          * 
@@ -380,78 +389,82 @@ export default {
         
             <div class="small-12 island">
                 
-                <div v-if="rows.length === 0" id="listEmptyState" class="empty-state">
-                    <i class="icon-list"></i>
-                    <p>The {{ data.title }} list is empty.<br><a @click.prevent="onNewRowSelected" href="#add-an-item" data-button="add-row">Add an item to this list</a>.</p>
-                </div>
+                <transition name="fade" mode="out-in">
 
-                <form v-else method="post" action="/adminv2/lists/save" ref="form">
+                    <div v-if="rows.length === 0" id="listEmptyState" class="empty-state" key="empty-list">
+                        <i class="icon-list"></i>
+                        <p>The {{ data.title }} list is empty.<br><a @click.prevent="onNewRowSelected" href="#add-an-item" data-button="add-row">Add an item to this list</a>.</p>
+                    </div>
 
-                    <section id="listEditor">
+                    <form v-else method="post" action="/adminv2/lists/save" key="list">
 
-                        <div class="list-container">
+                        <section id="listEditor">
 
-                            <admin-list-header 
-                                :header-fields="headerFields"
-                                :is-sortable="data.isSortable"
-                                :is-deletable="data.canDelete"
-                            />
+                            <div class="list-container">
 
-                            <transition-group
-                                name="staggered-fade"
-                                tag="ul"
-                                :class="`information-list ${ data.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
-                                v-bind:css="false"
-                                data-sortable 
-                                data-list 
-                                @before-enter="onBeforeEnter"
-                                @enter="onEnter"
-                                @leave="onLeave"
-                            >    
-                                <admin-list-row
-                                    v-for="(row, index) in rowsSortedBySequence"
-                                    :key="`${row.id}-${index}`"
+                                <admin-list-header 
                                     :header-fields="headerFields"
-                                    :row="row"
-                                    :selected-row="selectedRow"
                                     :is-sortable="data.isSortable"
-                                    :can-delete="data.canDelete"
-                                    :pop-out-header-field="popOutHeaderField"
-                                    :pop-out-fields="popOutFields"
-                                    :is-pop-out-open="isPopOutOpen"
-                                    :selected-pop-out-name="selectedNameInPopOut"
-                                    @on-pop-out-selected="onPopOutSelected"
-                                    @on-pop-out-name-selected="onPopOutNameSelected"
-                                    @on-delete-row-selected="onDeleteRow"
+                                    :is-deletable="data.canDelete"
                                 />
-                            </transition-group>
 
-                            <admin-list-pop-out
-                                v-if="popOutFields.length > 0"
-                                :header-field="popOutHeaderField"
-                                :fields="popOutFields" 
-                                :selected-row="selectedRow"
-                                :is-open="isPopOutOpen" 
-                                :save-route="data.saveRoute" 
-                                :save-status="saveStatus" 
-                                :is-processing="isProcessing" 
-                                @on-pop-out-saved="onSaveSelected"
-                                @on-pop-out-closed="onPopOutClosed"
-                            />
+                                <transition-group
+                                    name="staggered-fade"
+                                    tag="ul"
+                                    :class="`information-list ${ data.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
+                                    v-bind:css="false"
+                                    data-sortable 
+                                    data-list 
+                                    @before-enter="onBeforeEnter"
+                                    @enter="onEnter"
+                                    @leave="onLeave"
+                                >    
+                                    <admin-list-row
+                                        v-for="(row, index) in rowsSortedBySequence"
+                                        :key="`${row.id}-${index}`"
+                                        :header-fields="headerFields"
+                                        :row="row"
+                                        :selected-row="selectedRow"
+                                        :is-sortable="data.isSortable"
+                                        :can-delete="data.canDelete"
+                                        :pop-out-header-field="popOutHeaderField"
+                                        :pop-out-fields="popOutFields"
+                                        :is-pop-out-open="isPopOutOpen"
+                                        :selected-pop-out-name="selectedNameInPopOut"
+                                        @on-pop-out-selected="onPopOutSelected"
+                                        @on-pop-out-name-selected="onPopOutNameSelected"
+                                        @on-delete-row-selected="onDeleteRow"
+                                    />
+                                </transition-group>
 
-                            <div v-if="!data.noNewRecords" class="component-action">
-                                <section>
-                                    <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
-                                </section>
-                            </div>
+                                <admin-list-pop-out
+                                    v-if="hasPopOut"
+                                    :header-field="popOutHeaderField"
+                                    :fields="popOutFields" 
+                                    :selected-row="selectedRow"
+                                    :is-open="isPopOutOpen" 
+                                    :save-route="data.saveRoute" 
+                                    :save-status="saveStatus" 
+                                    :is-processing="isProcessing" 
+                                    @on-pop-out-saved="onSaveSelected"
+                                    @on-pop-out-closed="onPopOutClosed"
+                                />
 
-                        </div><!-- .list-container -->
+                                <div v-if="!data.noNewRecords" class="component-action">
+                                    <section>
+                                        <a @click.prevent="onNewRowSelected" href="#add-new-row" data-button="add-row" class="button" :disabled="isProcessing">Add New Row</a>
+                                    </section>
+                                </div>
 
-                    </section>
+                            </div><!-- .list-container -->
 
-                    <input type="submit" @click.prevent="onSaveSelected" :value="saveStatus" :disabled="isProcessing" />
+                        </section>
 
-                </form>
+                        <input type="submit" @click.prevent="onSaveSelected" :value="saveStatus" :disabled="isProcessing" />
+
+                    </form>
+
+                </transition>    
 
             </div><!-- small-12 island -->  
 
@@ -482,7 +495,7 @@ export default {
 
 <style lang="scss" scoped>
 
-.list-container { //so roles aren't shown when animating on/off on add/remove
+.list-container { //so rows aren't shown when animating on/off on add/remove
     position: relative;
     overflow: hidden;
 }
@@ -493,6 +506,13 @@ export default {
 
 .component-action {
     position: relative;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .3s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 
 </style>

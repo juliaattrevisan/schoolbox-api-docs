@@ -15,6 +15,19 @@ export default {
             type: Object,
             required: true
         },
+    },
+
+    computed: {
+
+        /**
+         * Can be disbled based on if there's a field.nullable
+         *
+         * @returns { Boolean }
+         */
+        isDisabled () {
+            return true;
+        }
+
     }
 
 }
@@ -22,14 +35,9 @@ export default {
 
 <template>
     <div>
-        <template v-if="field.nullable && field.lookup.length === 0">
-            <select v-model="row[field.id]" disabled>
-                <option value="null">{{ field.nullable_label }}</option>
-            </select>
-        </template>
-        <template v-else-if="field.lookup.length === 0">
-            <select v-model="row[field.id]" disabled>
-                <option value="">None Available</option>
+        <template v-if="field.lookup.length === 0">
+            <select v-model="row[field.id]" :disabled="isDisabled">
+                <option value="" disabled>None Available</option>
             </select>
         </template>
         <template v-else>
