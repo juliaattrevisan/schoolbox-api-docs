@@ -119,8 +119,8 @@ $app = new class extends CliTool\App {
         $search = new Keyspace($redis, 'session:*');
         $i      = 0;
         foreach ($search as $key) {
-            // Show some progress every N keys
-            if ($i % self::PROGRESS_INCREMENTS === 0 && $i) {
+            // Show some progress every N/10 keys
+            if ($i % (self::PROGRESS_INCREMENTS / 10) === 0 && $i) {
                 $this->getLogger()->info("$i...");
             }
             $contents      = $redis->get($key);
