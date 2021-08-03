@@ -19,9 +19,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-    /** @var string $instanceId */
-    private $instanceId;
-
     /**
      * The selected list of modules to disable in dashboard
      *
@@ -50,7 +47,7 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function runAsRoot(): ?bool
     {
-        return true;
+        return true; // writes to /etc/schoolbox/ dir
     }
 
     /**
@@ -75,8 +72,6 @@ Usage: INSTANCE_ID=vagrantx(optional) disableSelectedDashboardComponents.php
 HELP;
             exit;
         }
-
-        $this->instanceId = INSTANCE_ID;
 
         /* @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');

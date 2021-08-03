@@ -19,22 +19,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-    /** @var string $instanceId */
-    private $instanceId;
-
-    /**
-     * The selected list of modules to disable in dashboard
-     *
-     * @var array|string[]
-     */
-    private array $dashboardComponentsToDisable = [
-        'Timetable',
-        'Calendar',
-        'News',
-        'Upcoming Due Work',
-        'Recent Submissions',
-    ];
-
     // --help: print help
     private const OPT_LONG_HELP = 'help';
 
@@ -50,7 +34,7 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function runAsRoot(): ?bool
     {
-        return true;
+        return null; // We don't care who runs this, it only writes to DB
     }
 
     /**
@@ -68,9 +52,6 @@ Usage: INSTANCE_ID=vagrantx(optional) restore.php
 HELP;
             exit;
         }
-
-        $this->instanceId = INSTANCE_ID;
-
         /* @var IConnector $db */
         $db = $this->getDi()->get('databaseInternal');
 
