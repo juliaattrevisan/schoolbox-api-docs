@@ -180,8 +180,6 @@ class WikiNotifier extends AbstractModuleNotifier implements SourceInterface
         $wikiId   = $wiki->getId();
         $wikiSlug = $wiki->getSlug();
 
-        $authorId = $author->getId();
-
         $folder   = $this->folderMapper->findById($wiki->getCategory()->getId());
         $folderId = $folder->getId();
 

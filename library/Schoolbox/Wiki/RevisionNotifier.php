@@ -137,8 +137,6 @@ class RevisionNotifier extends AbstractModuleNotifier implements SourceInterface
         $cat        = $wiki->getCategory();
         $categoryId = $cat->getId();
 
-        $authorId = $author->getId();
-
         $href = "/wiki/revision/$wikiId/$revisionId";
 
         $envelope = new Envelope();

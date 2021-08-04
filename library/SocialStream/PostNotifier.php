@@ -94,28 +94,6 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         }
     }
 
-
-    /**
-     * @param User $author
-     * @return string
-     */
-    protected function getPostIcon(User $author): string
-    {
-        /**
-         * ideally, we always want to use the `id` for all portraits
-         */
-        if (is_numeric($author->getId())) {
-            return "/portrait.php?id={$author->getId()}&size={$this->iconSize}";
-        }
-
-        /**
-         * but if we can't source a decent `id`, then we need to have a default avatar to display
-         */
-        return "/portrait.php?id=0&size={$this->iconSize}";
-
-    }
-
-
     /* ASYNC METHODS */
 
     /**
@@ -158,7 +136,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                     'cat'    => new CategoryParam($cat)
                 ]
             )
-            ->setIcon($this->getPostIcon($author))
+            ->setIcon($this->getUserIcon($author))
             ->setHref($href)
             ->addTopic("sstream.{$post->getPostId()}.posted")
             ->setSeverity(Logger::NOTICE)
@@ -203,7 +181,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $href = '/homepage/' . $cat->getId();
-        $icon = $this->getPostIcon($author);
+        $icon = $this->getUserIcon($author);
 
         // base config
         $bob->setHref($href)
