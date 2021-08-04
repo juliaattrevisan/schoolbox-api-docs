@@ -73,6 +73,12 @@ class Model implements ISoftDeletable
 
 
     /**
+     * When an user viewed this achievement/goal?
+     */
+    private ?Alaress_Date_Format $viewedOn = null;
+
+
+    /**
      * A corresponding Award instance. This correlates a specific usage of a Goal
      * and its corresponding Achievement, if any
      *
@@ -221,6 +227,25 @@ class Model implements ISoftDeletable
         return $this;
     }
 
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getViewedOn(): ?Alaress_Date_Format
+    {
+        return $this->viewedOn;
+    }
+
+
+    /**
+     * @param Alaress_Date_Format|null $viewedOn
+     * @return $this
+     */
+    public function setViewedOn(?Alaress_Date_Format $viewedOn): self
+    {
+        $this->viewedOn = $viewedOn;
+        return $this;
+    }
 
 
     /**

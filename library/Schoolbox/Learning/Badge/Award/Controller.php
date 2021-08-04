@@ -574,6 +574,31 @@ class Controller extends Base
 
 
     /**
+     * Update view date, if this is the first time for this user to view this award.
+     *
+     * @api   POST /learning/badge/award/{awardId}/view
+     * @since 21.1
+     * @param AwardModel $award
+     * @throws MapperException if somehow the save fails
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     */
+    public function setViewedOn(AwardModel $award): void
+    {
+        // Set view on, only the viewer is the recipient and viewed on has not been set
+        if (
+            $this->getUser()->getId() !== $award->getRecipient()->getId()
+            || !$award->getViewedOn()->isNull()
+        ) {
+            return;
+        }
+
+        $award->setViewedOn(\Alaress_Date_Format::now());
+        $this->mapper->save($award);
+    }
+
+
+    /**
      * Builder for the model-to-array translator for badge awards.
      *
      * @return Translator\ModelToArray
