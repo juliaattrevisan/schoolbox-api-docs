@@ -175,7 +175,7 @@ execute_upgrade_scripts(){
 
   # Set Site Package version in config will be blank in vagrant
   local package_version
-  if dpkg -l | grep -E "\s{$package}\s" > /dev/null; then
+  if dpkg -l | grep -qE "\s{$package}\s"; then
     package_version=$(dpkg -s $package | grep Version | awk '{print $2}')
   fi
   log "Setting 'site_package' to '$package_version'"
