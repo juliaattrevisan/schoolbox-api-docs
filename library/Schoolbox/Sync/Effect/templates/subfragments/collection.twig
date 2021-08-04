@@ -16,7 +16,7 @@
                         {% endif %}
                         {% if not loop.last %},{% endif %}
                     {% endfor %}
-                {% elseif preselected is defined and preselected != '' and entireDataset[preselected] %}
+                {% elseif preselected is defined and preselected != '' and (entireDataset[preselected] is defined) %}
                 {% autoescape 'js' %}{"id":{{ preselected }},"name":"{{ entireDataset[preselected] }}"}{% endautoescape %}
                 {% endif %}
             ],
