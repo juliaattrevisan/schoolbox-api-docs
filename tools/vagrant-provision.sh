@@ -223,7 +223,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --config site_domain 'dev.schoolbox.cloud' \
 --config site_hostname 'vagrant' \
 --config site_school_code "vagrant" \
---config site_environment "client-hosted"
+--config site_environment "client-hosted" \
 --config title 'Schoolbox [vagrant]'; then
   error "Unable to install instance. Exiting."
   exit 1
