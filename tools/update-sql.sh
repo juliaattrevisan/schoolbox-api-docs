@@ -13,8 +13,7 @@ readonly L_INFO=200
 readonly L_ERROR=400
 
 # Global vars
-declare package                  # 'vagrant'|'schoolbox'|'schoolboxdev'
-declare package_version
+declare package                  # 'schoolbox'|'schoolboxdev'
 declare site_root                # Schoolbox root dir
 declare sql_user
 declare sql_pass
@@ -63,10 +62,6 @@ derive_global_vars(){
     error "No ini found at '/etc/$package/instances.ini";
     error "No cache directories cleaned";
     exit;
-  fi
-
-  if dpkg -l | grep -E '\sschoolbox\s' > /dev/null; then
-    package_version=$(dpkg -s schoolbox | grep Version | awk '{print $2}')
   fi
 
   log "Using db credentials from: '/etc/$package/instances.ini'";
@@ -178,6 +173,14 @@ execute_upgrade_scripts(){
 
   log "Updating database to new version";
 
+  # Set Site Package version in config will be blank in vagrant
+  local package_version
+  if dpkg -l | grep -E "\s{$package}\s" > /dev/null; then
+    package_version=$(dpkg -s $package | grep Version | awk '{print $2}')
+  fi
+  log "Setting 'site_package' to '$package_version'"
+  mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
+
   # Run update scripts in release order, SQL first then PHP for each release
   for release in $(echo "$version_list" | sed -n "$start","$end"p ); do
     log "Running update $release";
@@ -190,8 +193,6 @@ execute_upgrade_scripts(){
     # Update the config table to show current release version
     mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
   done
-  # Set Site Package version in config will be blank in vagrant
-  mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
 }
 
 
