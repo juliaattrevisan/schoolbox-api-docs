@@ -17,6 +17,7 @@ use Schoolbox\Version\Version;
  * Tests for checking the version of the running instance
  *
  * @covers \Schoolbox\Version\Version
+ * @codeCoverageIgnore
  */
 class VersionTest extends TestCase
 {
