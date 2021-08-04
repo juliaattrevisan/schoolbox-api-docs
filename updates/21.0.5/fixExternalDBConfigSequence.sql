@@ -18,7 +18,7 @@ UPDATE config SET sequence = 15 WHERE name = 'external_liss_calendar_owner';
 
 UPDATE config SET sequence = 16 WHERE name = 'xml_cache_timeout';
 UPDATE config SET sequence = 17 WHERE name = 'external_custom_ups_staff';
-UPDATE config SET sequence = 19 WHERE name = 'external_custom_ups_student';
+UPDATE config SET sequence = 18 WHERE name = 'external_custom_ups_student';
 UPDATE config SET sequence = 19 WHERE name = 'external_custom_ups_parent';
 UPDATE config SET sequence = 20 WHERE name = 'photo_sis_import';
 
