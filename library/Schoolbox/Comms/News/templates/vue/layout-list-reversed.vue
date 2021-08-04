@@ -85,7 +85,8 @@
                     in
                     <template v-for="(topic, index) in article.topics">
                         <template v-if="index">, </template>
-                        <a v-if="changeTabOnMeta" @click="onTabChange(topic.slug)">{{ topic.name }}</a>
+                        <!-- Tab change event is triggered on parent article-list, as that has the full list of articles -->
+                        <a v-if="changeTabOnMeta" @click="$parent.onTabChange(topic.slug, false, false, true)">{{ topic.name }}</a>
                         <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">{{ topic.name }}</a>
                     </template>
                     </span>
