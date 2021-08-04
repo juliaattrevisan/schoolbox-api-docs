@@ -22,10 +22,10 @@ VALUES ('instance_registry_url',
         'The URL of the Schoolbox instance registry: the most recent version is retrieved from here ',
         (SELECT id FROM lu_config_field WHERE field = 'input'),
         '',
-        null,
+        (SELECT id FROM lu_config_type WHERE type = 'resources'),
         'false',
         'true',
-        'false',
+        'true',
         'settings',
         null);
 
