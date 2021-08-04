@@ -16,6 +16,7 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 /** @var \SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
+$page->injectGlobalVars();
 
 $instanceId = intval($_GET['instanceId']);
 $homepageId = intval($_GET['homepageId']);
