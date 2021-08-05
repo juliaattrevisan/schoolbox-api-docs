@@ -6,7 +6,7 @@
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\External\Connector\Synergetic\Oakburn;
+namespace Schoolbox\External\Connector\Synergetic\Soc;
 
 use Schoolbox\External\Connector\Synergetic\Base\Sync as BaseSync;
 use Schoolbox\Sync\Iterator;
