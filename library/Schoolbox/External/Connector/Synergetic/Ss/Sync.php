@@ -1,18 +1,19 @@
 <?php
 
 /**
- * Synergetic implementation of sync connector for Shore
- *
  * @author    Sam Bailey <sam.bailey@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
 
-namespace Schoolbox\External\Connector\Synergetic\Shore;
+namespace Schoolbox\External\Connector\Synergetic\Ss;
 
 use Schoolbox\External\Connector\Synergetic\Base\Sync as BaseSync;
 use Schoolbox\Sync\Iterator;
 
+/**
+ * Synergetic implementation of sync connector for Shore
+ */
 class Sync extends BaseSync
 {
     /**
@@ -30,9 +31,9 @@ class Sync extends BaseSync
                 vStudents.StudentSurname       AS student_surname,
                 StudentGender                  AS student_gender,
                 StudentEmail                   AS student_home_email,
-                CASE WHEN Community.DefaultEmailCode = 'O' 
-                  THEN Community.OccupEmail 
-                  ELSE Community.Email 
+                CASE WHEN Community.DefaultEmailCode = 'O'
+                  THEN Community.OccupEmail
+                  ELSE Community.Email
                 END AS student_default_email,
                 StudentOccupEmail              AS student_work_email,
                 vStudents.StudentYearLevel     AS student_year_level,
