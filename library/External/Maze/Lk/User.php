@@ -1,10 +1,6 @@
 <?php
 
 /**
- * External_Maze_Loreto_User
- *
- * Loreto-specific customisations of Maze
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -12,7 +8,10 @@
 
 declare(strict_types=1);
 
-class External_Maze_Loreto_User extends External_Maze_User
+/**
+ * Loreto-specific customisations of Maze
+ */
+class External_Maze_Lk_User extends External_Maze_User
 {
 
     /**
