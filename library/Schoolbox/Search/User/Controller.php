@@ -592,7 +592,7 @@ class Controller extends BaseController
         $allTeacherEmails = implode(AbstractMailer::implodeGlue(), array_filter(array_unique($emails)));
 
         $pd = null;
-        if ($this->getConfigLoader()->get('site_location') === 'help') {
+        if (strtolower($this->getConfigLoader()->get('site_school_code')) === 'help') {
             /* Load Professional Development details if they exist
              */
             try {
