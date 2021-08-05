@@ -48,7 +48,7 @@
                                 <li>
                                     <div>
                                         <div class="small-12 card">
-                                            <img src="/portrait.php?userId={{ revision.modifiedBy.externalId }}&size=square64">
+                                            {% include 'include/portrait.twig' with {user: revision.modifiedBy} only %}
                                             <h3>{{ revision.heading }}</h3>
                                             <p class="meta">
                                                 Edited by {{ revision.modifiedBy.fullName }} -

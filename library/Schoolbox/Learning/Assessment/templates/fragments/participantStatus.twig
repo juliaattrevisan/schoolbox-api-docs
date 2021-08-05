@@ -4,7 +4,7 @@
  #}
 <div class="{{ cardSize ?? 'small-12' }} card">
     <a href="/search/user/{{ participant.user.id }}" title="View Profile">
-        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" />
+        {% include 'include/portrait.twig' with {user: participant.user} only %}
     </a>
     {% if not participant.user.deleted %}
         <h3>

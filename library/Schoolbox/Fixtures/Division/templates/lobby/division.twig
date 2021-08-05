@@ -14,7 +14,7 @@
                             <div class="compact card small-12 wrap-down">
                                 <div>
                                     <a href="/search/user/{{ playerData.player.id }}">
-                                        <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
+                                        {% include 'include/portrait.twig' with {user: playerData.player} only %}
                                     </a>
                                     <p><a href="/search/user/{{ playerData.player.id }}">{{ playerData.player.formatName() }}</a></p>
                                     {% for currentTeam in playerData.teams %}

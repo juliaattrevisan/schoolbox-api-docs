@@ -28,14 +28,14 @@
                             <div class="compact card small-12">
                                 {% if contact.main %}
                                     <a href="/search/user/{{ contact.main.id }}">
-                                        <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                        {% include 'include/portrait.twig' with {user: contact.main} only %}
                                         <p>
                                             {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
                                             <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
                                         </p>
                                     </a>
                                 {% else %}
-                                    <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                    {% include 'include/portrait.twig' with {externalId: contact.StudentContactID} only %}
                                     <p>
                                         {{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}
                                         <span class="pipe meta">{{ contact.StudentContactRelation }}</span>
@@ -99,14 +99,14 @@
                                     {# need to know user's schoolbox info here #}
                                     {% if contact.spouse %}
                                         <a href="/search/user/{{ contact.spouse.id }}">
-                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                            {% include 'include/portrait.twig' with {user: contact.spouse} only %}
                                             <p>
                                                 {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                                 <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>
                                             </p>
                                         </a>
                                     {% else %}
-                                        <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                        {% include 'include/portrait.twig' with {externalId: contact.StudentContactSpouseID} only %}
                                         <p>
                                             {{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}
                                             <span class="pipe meta">{{ contact.StudentContactSpouseRelation }}</span>

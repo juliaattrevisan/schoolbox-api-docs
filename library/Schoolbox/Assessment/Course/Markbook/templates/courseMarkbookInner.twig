@@ -164,7 +164,7 @@
                         <th class="profile-cell">
                             <div class="compact card no-pad small-12">
                                 <a href="/search/user/{{ student.id }}" title="View Profile">
-                                    <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square32" alt="View Profile">
+                                    {% include 'include/portrait.twig' with {user: student, render: 'tiny'} only %}
                                     <p>{{ student.fullName }}</p>
                                 </a>
                             </div>

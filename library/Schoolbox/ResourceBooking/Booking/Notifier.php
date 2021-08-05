@@ -209,7 +209,7 @@ class Notifier extends AbstractModuleNotifier
             ->addTopic($this->slug . '.' . $object->getId() . '.' . $event)
             ->setSeverity(Logger::NOTICE)
             ->setTitle($messageText)
-            ->setIcon('/portrait.php?userId=' . $user->getExternalId() . "&size={$this->iconSize}")
+            ->setIcon('/portrait.php?id=' . $user->getId() . "&size={$this->iconSize}")
             ->setHref($resourceUrl)
             ->setParam('user', new UserParam($user))
             ->setParam('resource', new Param($object->getResource()->getName(), $resourceUrl))

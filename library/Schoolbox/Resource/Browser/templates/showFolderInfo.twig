@@ -91,11 +91,11 @@
                         checkSuccessFileCount();
                     });
 
-                    //files have been uploaded from the modal window 
+                    //files have been uploaded from the modal window
                     function addFilesFromModalWindowUpload (files) {
                         files.forEach(function (file) {
                             addFile(file.hash, file.title);
-                        });  
+                        });
                     }
 
                     //files been uploaded from straight drag and drop
@@ -159,7 +159,7 @@
                         $attachzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
                         var azList = uploadForm.querySelector('.az-list');
                         while(azList.firstChild) {
-                            azList.removeChild(azList.firstChild);     
+                            azList.removeChild(azList.firstChild);
                         }
                         successFileCount = 0;
                         fileList = [];
@@ -193,7 +193,7 @@
                 <dd class="small-12 medium-8">
                     <div class="card tiny">
                         <a href="/search/user/{{ admin.id }}">
-                            <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
+                            {% include 'include/portrait.twig' with {user: admin, description: admin.formatName} only %}
                             <p>{{ admin.formatName }}</p>
                         </a>
                     </div>
@@ -205,7 +205,7 @@
                 <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
                     <div class="card tiny">
                         <a href="/search/user/{{ teacher.id }}">
-                            <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
+                            {% include 'include/portrait.twig' with {user: teacher, description: teacher.formatName, limitWidth: '48', limitHeight: '48'} only %}
                             <p>{{ teacher.formatName }}</p>
                         </a>
                     </div>

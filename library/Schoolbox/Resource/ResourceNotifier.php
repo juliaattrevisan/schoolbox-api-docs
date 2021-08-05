@@ -223,7 +223,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         }
 
         $bob = new Builder();
-        $bob->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
+        $bob->setIcon($this->getUserIcon($effector))
             ->setHref("/homepage/$categoryId#$kind")
             ->setTitle(":effector $action the $kind :resource in :category")
             ->setParams([
@@ -235,7 +235,6 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
             ->setSeverity(Logger::INFO)
             ->addTopic("cms.$kind.$id.$action")
             ->addFilter('roletype', [$roletype]);
-
 
         $envelope->broadcastToCategory($category, $accessLevel, $bob->build());
 
@@ -341,7 +340,7 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
 
         $bob = new Builder();
 
-        $bob->setIcon("/portrait.php?id={$effector->getId()}&size={$this->iconSize}")
+        $bob->setIcon($this->getUserIcon($effector))
             ->setHref("/homepage/$categoryId")
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)

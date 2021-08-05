@@ -55,7 +55,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
      * Shut any opened accordions when viewing student workloads
      * Used when changing between the tabs and works in conjunction
      * with the collapsible event rebind
-     * 
+     *
      * @param $modal
      */
     function shutOpenedAccordions($modal) {
@@ -64,7 +64,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
         });
     }
 
-    
+
     // Timetable elements
     var timetable = {
         campus: $byTimetable.find('[data-adtp-tt-campus]'),
@@ -661,7 +661,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                 // Show most loaded student
                 html += '<div class="top-due-work" data-adtp-top-due>';
                 html += '<div class="compact card small-12">';
-                html += '<img src="/portrait.php?userId=' + data.students[0].externalId + '&amp;size=square80">';
+                html += '<img src="/portrait.php?id=' + data.students[0].id + '&amp;size=square80">';
                 html += '<h3>' + data.students[0].firstname + ' ' + data.students[0].lastname + '</h3>';
                 html += '<p class="meta">' + data.students[0].assessmentsDue + ' due' + '</p>';
                 html += '</div>';
@@ -681,7 +681,7 @@ $.fn.alaressDateTimeModal = function (twigVars) {
                     html += '<div>';
                     html += '<div class="expander" data-collapser="collap-' + i + '"></div>';
                     html += '<div class="card compact small-12">';
-                    html += '<img src="/portrait.php?userId=' + data.students[i].externalId + '&amp;size=square80">';
+                    html += '<img src="/portrait.php?id=' + data.students[i].id + '&amp;size=square80">';
                     html += '<h3>' + data.students[i].firstname + ' ' + data.students[i].lastname + '</h3>';
                     html += '<p class="meta">' + data.students[i].assessmentsDue + ' due' + '</p>';
                     html += '</div>';

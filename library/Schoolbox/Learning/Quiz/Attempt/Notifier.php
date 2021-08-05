@@ -190,7 +190,7 @@ class Notifier extends AbstractModuleNotifier
             ])
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::NOTICE)
-            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $student->getId())
+            ->setIcon($this->getUserIcon($student))
             ->setHref($href)
             ->addTopic("assess.$assessId.attempted")
             ->setFilter([
@@ -245,7 +245,7 @@ class Notifier extends AbstractModuleNotifier
         $bob->setSeverity(Logger::NOTICE)
             ->setNamespace($this->getSlug())
             ->setHref($href)
-            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $teacher->getId())
+            ->setIcon($this->getUserIcon($teacher))
             ->setTitle(":staff has marked your attempt of :quiz in :cat")
             ->setParams([
                 'staff' => new UserParam($teacher),
@@ -310,7 +310,7 @@ class Notifier extends AbstractModuleNotifier
         $bob->setSeverity(Logger::NOTICE)
             ->setNamespace($this->getSlug())
             ->setHref($href)
-            ->setIcon("/portrait.php?size={$this->iconSize}&id=" . $teacher->getId())
+            ->setIcon($this->getUserIcon($teacher))
             ->setTitle(":staff has marked :child's attempt of :quiz in :cat")
             ->setParams([
                 'staff' => new UserParam($teacher),

@@ -83,27 +83,16 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                 /** @var SocialStream_Post_Abstract $post (I THINK!) */
                 $post = $bundle->getEvent()->getObject();
 
-                // is a child post: ie. comment
                 if ($post->getParentId()) {
+                    // is a child post: ie. comment
                     $bundle->attach(self::TRIGGER_REPLIED, self::IMMEDIATELY);
-                } // has no parent: ie. fresh post
-                else {
+                } else {
+                    // has no parent: ie. fresh post
                     $bundle->attach(self::TRIGGER_POSTED, self::IMMEDIATELY);
                 }
                 break;
         }
     }
-
-
-    /**
-     * @param User $author
-     * @return string
-     */
-    protected function getPostIcon(User $author): string
-    {
-        return "/portrait.php?size={$this->iconSize}&userId=" . $author->getExternalId();
-    }
-
 
     /* ASYNC METHODS */
 
@@ -133,8 +122,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             $posted = 'posted a video';
         } elseif ($post instanceof \SocialStream_Post_Image) {
             $posted = 'posted an image';
-        } // string
-        else {
+        } else {
             $posted = 'posted';
         }
 
@@ -147,7 +135,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                     'cat'    => new CategoryParam($cat)
                 ]
             )
-            ->setIcon($this->getPostIcon($author))
+            ->setIcon($this->getUserIcon($author))
             ->setHref($href)
             ->addTopic("sstream.{$post->getPostId()}.posted")
             ->setSeverity(Logger::NOTICE)
@@ -192,7 +180,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
         }
 
         $href = '/homepage/' . $cat->getId();
-        $icon = $this->getPostIcon($author);
+        $icon = $this->getUserIcon($author);
 
         // base config
         $bob->setHref($href)

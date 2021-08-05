@@ -593,7 +593,7 @@ class Controller extends Base
      */
     private function getUserPortraitUrl($user, $size = 'square80')
     {
-        return "{$this->baseUrl}/portrait.php?userId={$user->getExternalId()}&size={$size}";
+        return "{$this->baseUrl}/portrait.php?id={$user->getId()}&size={$size}";
     }
 
     /**

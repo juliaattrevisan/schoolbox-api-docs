@@ -18,7 +18,7 @@
     {% if isTask %}
     <div class="compact card small-11">
         <div>
-            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
+            {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
             <p>{{ participant.user.firstname }} {{ participant.user.lastname }}</p>
         </div>
     </div>
@@ -50,7 +50,7 @@
             <a class="link-row" href="{{ href }}" title="{{ title }}">
                 <div class="compact card">
                     <div>
-                        <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="{{ participant.user.fullName }}">
+                        {% include 'include/portrait.twig' with {user: participant.user, description: participant.user.fullName} only %}
                         <p>{{ participant.user.firstname }} {{ participant.user.lastname }}</p>
                     </div>
                 </div>

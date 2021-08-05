@@ -33,7 +33,7 @@
             <div class="profile content">
                 <div class="row no-margin">
                     <div class="small-12 medium-2 columns no-pad">
-                        <img class="full-width" src="/portrait.php?id={{ user.id }}&amp;size=constrain200"/>
+                        {% include 'include/portrait.twig' with {user: user, render: 'medium'} only %}
                     </div>
 
                     <div class="small-12 medium-10 columns">
@@ -94,11 +94,11 @@
                                         <div class="card small-12">
                                             {% if spouse %}
                                                 <a href="/search/user/{{ spouse.id }}">
-                                                    <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
+                                                    {% include 'include/portrait.twig' with {user: spouse} only %}
                                                     <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
                                                 </a>
                                             {% else %}
-                                                <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
+                                                {% include 'include/portrait.twig' with {externalId: externalUser.SpouseID} only %}
                                                 <p>{{ externalUser.SpouseTitle }} {{ externalUser.SpousePreferred }} {{ externalUser.SpouseSurname }}</p>
                                             {% endif %}
 
@@ -159,8 +159,7 @@
                     {% for student in students %}
                         <li>
                             <div class="card small-12">
-                                <img src="/portrait.php?userId={{ student.externalId }}&amp;size=square64"
-                                     alt="View Profile">
+                                {% include 'include/portrait.twig' with {user: student} only %}
                                 <a href="/search/user/{{ student.id }}"><p>{{ student.formatName }}</p></a>
                                 <span class="meta">Year {{ student.year ? student.year.name : '' }}</span>
                             </div>

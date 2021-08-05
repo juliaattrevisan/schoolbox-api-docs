@@ -1,6 +1,6 @@
 {% if not (user.isDeleted() or user.getId() == 0) %}
     <a href="/search/user/{{ user.getId }}" title="View Profile">
-        <img src="/portrait.php?userId={{ user.getExternalId }}&size=square64" alt="View Profile" />
+        {% include 'include/portrait.twig' with {user: user} only %}
         <p>
             {{ user.formatName() }}
             {% if comment is defined %}
@@ -9,7 +9,7 @@
         </p>
     </a>
 {% else %}
-    <img src="/portrait.php?userId={{ user.getExternalId }}&size=square64" alt="View Profile" />
+    {% include 'include/portrait.twig' with {user: user} only %}
     <p>
         {{ user.formatName() }}
         {% if comment is defined %}

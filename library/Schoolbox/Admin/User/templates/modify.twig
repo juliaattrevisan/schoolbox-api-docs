@@ -72,7 +72,7 @@
                          #}
                         {% if user.portrait %}
                             <div id="portraitImage">
-                                <img src="/portrait.php?id={{ user.id }}&size=profile&cb={{ date().timestamp }}" />
+                                {% include 'include/portrait.twig' with {user: user, render: 'large', appendQueryParam: '&cb=' ~ date().timestamp} only %}
                             </div>
                         {% endif %}
 
@@ -105,7 +105,7 @@
                          #}
                         {% if not user.portrait and not portraitZone %}
                             <div class="empty-state">
-                                <img src="/portrait.php?id={{ user.id }}&size=profile">
+                                {% include 'include/portrait.twig' with {user: user, render: 'large'} only %}
                                 <p>We were unable to find a portrait for this user in {{ config.external_type|capitalize }}.</p>
                                 <p>You can disable auto loading portraits <a href="/adminv2/setting/External+DB#photo_sis_import">via this setting.</a></p>
                             </div>

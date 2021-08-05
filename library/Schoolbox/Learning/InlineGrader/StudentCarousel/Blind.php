@@ -180,7 +180,7 @@ class Blind
                 <div class=\"row\">
                     <div class=\"card small-10\">
                         <div class='blind-container'>
-                            <img src=\"/portrait.php?userId={$currentParticipant->getUser()->getExternalId()}&size=square64\" class=\"blind\" alt=\"View Profile\" />
+                            <img src=\"/portrait.php?id={$currentParticipant->getUser()->getId()}&size=square64\" class=\"blind\" alt=\"View Profile\" />
                         </div>
                         <p class=\"blind\" >{$currentParticipant->getUser()->getFullName()}</p>
                         <span class=\"label status {$css}\">{$label}</span>

@@ -7,11 +7,11 @@
                     <div class="card small-12">
                         {% if currentCoach.user.id %}
                         <a href="/search/user/{{ currentCoach.user.id }}" title="View Profile">
-                            <img src="/portrait.php?id={{ currentCoach.user.id }}&size=square64" alt="View Profile" />
+                            {% include 'include/portrait.twig' with {user: currentCoach.user} only %}
                             <p>{{ currentCoach.name }}</p>
                         </a>
                         {% else %}
-                        <img src="/portrait.php?userId=0&size=square64" alt="View Profile" />
+                        {% include 'include/portrait.twig' with {user: false} only %}
                         <p class="meta">{{ currentCoach.name }}</p>
                     </div>
                     {% endif %}

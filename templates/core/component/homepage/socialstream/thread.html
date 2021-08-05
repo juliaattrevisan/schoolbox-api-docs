@@ -5,7 +5,7 @@
 
             <!-- BEGIN owner_exists -->
             <a href="/search/user/{SOCIALSTREAM_POST_USER_ID}" title="View Profile">
-                <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
+                <img src="/portrait.php?id={SOCIALSTREAM_POST_USER_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
                 <p>
                     {SOCIALSTREAM_POST_USER_FULLNAME}
                     <span class="pipe meta" title="{SOCIALSTREAM_POST_CREATED_AT_LONG}">Posted {SOCIALSTREAM_POST_CREATED_AT}</span>
@@ -13,7 +13,7 @@
             </a>
             <!-- END owner_exists -->
             <!-- BEGIN owner_deleted -->
-            <img src="/portrait.php?userId={SOCIALSTREAM_POST_USER_EXTERNAL_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
+            <img src="/portrait.php?id={SOCIALSTREAM_POST_USER_ID}&size=square64" alt="{SOCIALSTREAM_POST_USER_FULLNAME}">
             <p>
                 {SOCIALSTREAM_POST_USER_FULLNAME}
                 <span class="pipe meta" title="{SOCIALSTREAM_POST_CREATED_AT_LONG}">Posted {SOCIALSTREAM_POST_CREATED_AT}</span>
@@ -109,7 +109,7 @@
 
                     <!-- BEGIN commenter_exists -->
                     <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" title="View Profile">
-                        <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
+                        <img src="/portrait.php?id={SOCIALSTREAM_COMMENT_USER_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
                     </a>
                     <p>
                         <a href="/search/user/{SOCIALSTREAM_COMMENT_USER_ID}" title="View Profile">{SOCIALSTREAM_COMMENT_USER_FULLNAME}</a>
@@ -117,7 +117,7 @@
                     </p>
                     <!-- END commenter_exists -->
                     <!-- BEGIN commenter_deleted -->
-                    <img src="/portrait.php?userId={SOCIALSTREAM_COMMENT_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
+                    <img src="/portrait.php?id={SOCIALSTREAM_COMMENT_USER_ID}&size=square32" alt="{SOCIALSTREAM_COMMENT_USER_FULLNAME}">
                     <p>{SOCIALSTREAM_COMMENT_USER_FULLNAME} | <span class="meta" title="{SOCIALSTREAM_COMMENT_CREATED_AT_LONG}">Replied {SOCIALSTREAM_COMMENT_CREATED_AT}</span></p>
                     <!-- END commenter_deleted -->
 
@@ -209,7 +209,7 @@
 
                             <!-- BEGIN replier_exists -->
                             <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">
-                                <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
+                                <img src="/portrait.php?id={SOCIALSTREAM_REPLY_USER_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
                             </a>
                             <p>
                                 <a href="/search/user/{SOCIALSTREAM_REPLY_USER_ID}" title="View Profile">{SOCIALSTREAM_REPLY_USER_FULLNAME}</a>
@@ -218,7 +218,7 @@
 
                             <!-- END replier_exists -->
                             <!-- BEGIN replier_deleted -->
-                            <img src="/portrait.php?userId={SOCIALSTREAM_REPLY_USER_EXTERNAL_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
+                            <img src="/portrait.php?id={SOCIALSTREAM_REPLY_USER_ID}&size=square32" alt="{SOCIALSTREAM_REPLY_USER_FULLNAME}">
                             <p>{SOCIALSTREAM_REPLY_USER_FULLNAME} | <span class="meta" title="{SOCIALSTREAM_REPLY_CREATED_AT_LONG}">Replied {SOCIALSTREAM_REPLY_CREATED_AT}</span></p>
                             <!-- END replier_deleted -->
 

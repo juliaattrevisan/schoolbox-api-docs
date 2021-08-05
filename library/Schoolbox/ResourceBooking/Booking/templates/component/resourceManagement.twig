@@ -60,7 +60,7 @@
                         {# show booker's card #}
                         <div class="small-12 card">
                             <a href="/search/user/{{ event.booking.event.owner.id }}">
-                                <img src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square64" />
+                                {% include 'include/portrait.twig' with {user: event.booking.event.owner} only %}
                             </a>
 
                             <h4>

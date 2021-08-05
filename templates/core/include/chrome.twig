@@ -147,7 +147,7 @@
                         <ul class="account-menu-mobile accordion" id="account-menu-mobile" data-accordion>
                             <li class="accordion-navigation">
                                 <a href="#account-content-mobile" class="profile-drop" id="profile-accordion">
-                                    <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square72"/>
+                                    {% include 'include/portrait.twig' with {user: user.current, render: 'menuMobile'} only %}
                                     <span>{{ user.current.formatName }}</span>
                                 </a>
                                 <div id="account-content-mobile" class="content">
@@ -216,7 +216,7 @@
                         {% block accountMenu %}
                             {% if user.current.id %}
                                 <a href="#" id="profile-drop" title="{{ user.current.fullName }}" class="account-menu">
-                                    <img height="72" width="72" alt="View Profile" src="/portrait.php?userId={{ user.current.externalId }}&size=square72"/>
+                                    {% include 'include/portrait.twig' with {user: user.current, render: 'menuMobile'} only %}
                                 </a>
                                 <div id="account-content" class="account-drop">
                                     {% include 'include/accountMenu.twig' with {user: user, mobile: false} only %}

@@ -23,9 +23,12 @@
             {% if blindMode %}
                 <p class="rb-self-reflection-choice blind-mode" title="{{ tooltip }} choice"></p>
             {% else %}
-                <img class="rb-self-reflection-choice"
-                     src="/portrait.php?userId={{ learner.externalId }}&amp;size=square32"
-                     title="{{ tooltip }} choice" />
+                {% include 'include/portrait.twig' with {
+                    user: learner,
+                    render: 'tiny',
+                    class: 'rb-self-reflection-choice',
+                    description: toolip ~ ' choice'
+                } only %}
             {% endif %}
         {% endif %}
 

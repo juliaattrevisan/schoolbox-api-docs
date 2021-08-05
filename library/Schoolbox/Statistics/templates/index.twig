@@ -78,7 +78,7 @@
                                 <li class="row">
                                     <div class="card small-12">
                                         <a href="/search/user/{{ topVisitor.user.id }}" title="View Profile">
-                                            <img src="/portrait.php?id={{ topVisitor.user.id }}&amp;size=square64" alt="View Profile">
+                                            {% include 'include/portrait.twig' with {user: topVisitor.user} only %}
                                             <p>{{ topVisitor.user.fullName }}</p>
                                         </a>
                                         <span class="neutral label tally" title="Visit count">{{ topVisitor.hitcount }}</span>
@@ -172,7 +172,7 @@
                                 <li>
                                     <div class="card small-12">
                                         <a href="/search/user/{{ recentVisitor.user.id }}" title="{{ recentVisitor.user.fullName }} (last visited {{ recentVisitor.lastAccessTime.relativeTime }})">
-                                            <img src="/portrait.php?id={{ recentVisitor.user.id }}&amp;size=square64" alt="View Profile">
+                                            {% include 'include/portrait.twig' with {user: recentVisitor.user} only %}
 
                                             <p>{{ recentVisitor.user.fullName }}</p>
                                         </a>
@@ -207,7 +207,7 @@
                                 <li>
                                     <div class="card small-12">
                                         <a href="/search/user/{{ yetToVisitor.id }}" title="View Profile">
-                                            <img src="/portrait.php?userId={{ yetToVisitor.externalId }}&amp;size=square64" alt="View Profile">
+                                            {% include 'include/portrait.twig' with {user: yetToVisitor} only %}
 
                                             <p>{{ yetToVisitor.fullName }}</p>
                                         </a>

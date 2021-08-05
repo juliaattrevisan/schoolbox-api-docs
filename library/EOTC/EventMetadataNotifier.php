@@ -309,7 +309,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                     'eotc'      => new Param($this->stone->translate('eotc', false, false)),
                 )
             )
-            ->setIcon("/portrait.php?size={$this->iconSize}&userId=" . $applicant->getExternalId())
+            ->setIcon($this->getUserIcon($applicant))
             ->setHref($href)
             ->setSeverity(Logger::WARNING)
             ->setNamespace($this->getSlug())
@@ -362,21 +362,20 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $applicant         = $relEvent->getAuthor();
         $applicantId       = $applicant->getId();
         $effectorId        = $effector->getId();
-        $effectorExtId     = $effector->getExternalId();
 
         // get list of moderators relevant to the current status
         $currentStatus = $eventMetadata->getStatus();
         $moderatorIds  = $this->getInterestedUsers($relEvent, $currentStatus);
 
         // prep msg data
-        $bob->setIcon("/portrait.php?size={$this->iconSize}&userId=$effectorExtId");
+        $bob->setIcon($this->getUserIcon($effector));
         $href = "/modules/eotc/status/modify/$relEventId";
 
-        // change was made by applicant or TiC: inform moderators
         if ($effectorId == $teacherInChargeId || $effectorId == $applicantId) {
+            // change was made by applicant or TiC: inform moderators
             $inform = $moderatorIds;
-        } // change was made by moderator (right?): inform applicant and TiC
-        else {
+        } else {
+            // change was made by moderator (right?): inform applicant and TiC
             $inform = array($teacherInChargeId, $applicantId);
             $href = "/modules/eotc/manage/modify?eventID=$relEventId";
         }
@@ -445,12 +444,10 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $teacherInChargeId = $teacherInCharge->getId();
         $applicant         = $relEvent->getAuthor();
         $applicantId       = $applicant->getId();
-        $effectorExtId     = $effector->getExternalId();
-
 
         // setup initial condition of the builder
         $bob = new Builder();
-        $bob->setIcon("/portrait.php?size={$this->iconSize}&userId=$effectorExtId")
+        $bob->setIcon($this->getUserIcon($effector))
             ->setNamespace($this->getSlug())
             ->addTopic("eotc.$relEventId.statuschanged")
             ->setSeverity(Logger::WARNING)

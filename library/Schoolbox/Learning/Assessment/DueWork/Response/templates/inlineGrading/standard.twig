@@ -230,7 +230,11 @@ Usage:
                                                         <div class="card small-12">
                                                             {% if not blindMode %}
                                                             <a href="/search/user/{{ participant.user.id }}">
-                                                                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square32" title="{{ participant.user.fullname }}" />
+                                                                {% include 'include/portrait.twig' with {
+                                                                    user: participant.user,
+                                                                    render: 'tiny',
+                                                                    description: participant.user.fullName
+                                                                } only %}
                                                                 <p>{{ participant.user.fullname }}<span class="pipe meta">{{ selfAssessmentFeedback.publishedAt.short }}</span></p>
                                                             </a>
                                                             {% endif %}

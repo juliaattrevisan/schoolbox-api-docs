@@ -21,7 +21,7 @@
     {% if isTask %}
     <div class="compact card small-11">
         <div>
-            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
+            {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
             <p>
                 {{ participant.user.firstname }} {{ participant.user.lastname }}
                 <span class="pipe meta" title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</span>
@@ -39,7 +39,7 @@
     <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
         <div class="compact card small-12">
             <div>
-                <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
+                {% include 'include/portrait.twig' with {user: participant.user, description: 'View Submission'} only %}
                 <p>
                     {{ participant.user.firstname }} {{ participant.user.lastname }}
                     <span class="pipe meta" title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</span>

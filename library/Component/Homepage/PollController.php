@@ -69,15 +69,16 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $author = \Schoolbox\UserMapper::getInstance()->getUnknownUser();
             }
+            /** @var \Schoolbox\User $author **/
+
             if ($poll['id']) {
                 $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
                 $this->setVar(
                     [
                         'POLL_ID'           => $poll['id'],
                         'POLL_QUESTION'     => Scrub::text($poll['question']),
                         'POLL_AUTHOR_ID'    => $author->getId(),
-                        'POLL_AUTHOR_THUMB' => "/portrait.php?userId={$author->getExternalId()}&size=square64",
+                        'POLL_AUTHOR_THUMB' => "/portrait.php?id={$author->getId()}&size=square64",
                         'POLL_AUTHOR_NAME'  => $author->getFullName(),
                         'POLL_CREATED'      => $created->getRelativeTime(),
                     ]

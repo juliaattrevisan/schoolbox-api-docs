@@ -1,5 +1,5 @@
 <a href="{{ routeLookup('eportfolioBlog.getItem', {pageId: page.getPageId, id: blog.getId}) }}">
-    <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
+    {% include 'include/portrait.twig' with {user: blog.getOwner} only %}
     <h3>{{ blog.getHeading }}</h3>
 </a>
 <p class="meta">

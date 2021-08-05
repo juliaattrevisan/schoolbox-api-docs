@@ -1,0 +1,115 @@
+{# render a user portrait, but allow the ability to manually specify an userId or externalId
+    usage:
+    - user:             User|false checks for user.id or user.externalId - otherwise false renders a blank avatar
+    - userId:           int allows you to manually specify a preferred userId
+    - externalId:       string allows you to manually specify a preferred externalId
+    - limitHeight:      int constrain the image tag height
+    - limitWidth:       int constrain the image tab width
+    - render:           enum [tiny, small, medium, large, menuMobile] (default is `small`)
+    - description:      string a descriptor used for alt and title attributes
+    - appendQueryParam: string query params you want appended to the image tag
+    - class:            string optional class(es) to apply to the img tag
+#}
+
+{# portrait image tag is composed of... #}
+{% set sizeParameter = '&size=' %}
+{% set userParameter = '' %}
+{% set userFullname = '' %}
+{% set limitHeight = '' %}
+{% set limitWidth = '' %}
+{% if appendQueryParam is not defined %}
+    {% set appendQueryParam = '' %}
+{% endif %}
+
+{# there is no default class used on the img tag #}
+{% if class is not defined %}
+    {% set class = '' %}
+{% endif %}
+
+{# the default render strategy is 'small' #}
+{% if render is not defined %}
+    {% set render = "small" %}
+{% endif %}
+
+{% if description is not defined %}
+    {% set description = 'View Profile' %}
+{% endif %}
+
+{# prefer to take the userId  from the `user` object #}
+{% if user is defined %}
+
+    {# we want to render the default portrait image #}
+    {% if user == false %}
+        {% set userId = 0 %}
+    {% else %}
+
+        {# we always prefer to use the user.id #}
+        {%  if user.id is not empty %}
+            {% set userId = user.id %}
+        {# but failing that, we should try the user.externalId #}
+        {% elseif user.externalId is not empty %}
+            {% set externalId = user.externalId %}
+        {# and in the worst case, make sure we provide a blank avatar #}
+        {% else %}
+            {% set userId = 0 %}
+        {% endif %}
+
+    {% endif %}
+{% endif %}
+
+{% set userDescription = description %}
+
+{# it's still possible to fallback on an explicit userId or externalId #}
+{% if userId is defined %}
+    {% set userParameter = "id=" ~ userId %}
+{% elseif externalId is defined %}
+    {% set userParameter = "userId=" ~ externalId %}
+{%  endif %}
+
+{# prefer the use a semantic name for the portrait (tiny, small, medium, large, menuMobile)#}
+{# establish small as the default rendering method #}
+{% if render not in ['tiny', 'small', 'medium', 'large', 'menuMobile'] %}
+    {% set render = 'small' %}
+{% endif %}
+
+{# how does the semantic render affect the tag #}
+{% if render == "tiny" %}
+    {% set sizeParameter = sizeParameter ~ "square32" %}
+{% endif %}
+{% if render == "small" %}
+    {% set sizeParameter = sizeParameter ~ "square64" %}
+{% endif %}
+{% if render == "medium" %}
+    {% set sizeParameter = sizeParameter ~ "constrain200" %}
+    {% set limitHeight = 200 %}
+    {% set limitWidth = 200 %}
+    {% set class = "full-width" %}
+{% endif %}
+{% if render == "menuMobile" %}
+    {% set sizeParameter = sizeParameter ~ "square72" %}
+    {% set limitHeight = 72 %}
+    {% set limitWidth = 72 %}
+{% endif %}
+{% if render == "large" %}
+    {% set sizeParameter = sizeParameter ~ "profile" %}
+    {% set class = "full-width" %}
+{% endif %}
+
+<img src="/portrait.php?{{ userParameter }}{{ sizeParameter }}{{ appendQueryParam }}"
+    {% if class is not empty %}
+        class="{{ class }}"
+    {% endif %}
+
+    {% if limitHeight is not empty %}
+        height="{{ limitHeight }}"
+    {% endif %}
+
+    {% if limitWidth is not empty %}
+        width="{{ limitWidth }}"
+    {% endif %}
+
+    {% if userDescription is not empty %}
+        alt="{{ userDescription }}"
+        title="{{ userDescription }}"
+    {% endif %}
+/>

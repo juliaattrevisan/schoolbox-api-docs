@@ -6,7 +6,7 @@
             <li>
                 <div class="card small-12">
                     <a href="/search/user/{{ currentPlayer.user.id }}" title="View Profile">
-                        <img src="/portrait.php?userId={{ currentPlayer.user.externalId }}&size=square64" alt="View Profile" />
+                        {% include 'include/portrait.twig' with {user: currentPlayer.user} only %}
                         <p>{{ currentPlayer.user.fullname }}</p>
                     </a>
                     <p class="meta">

@@ -125,7 +125,7 @@
                                     <div class="row">
                                         <label for="participant-{{ user.id }}" class="checkbox-label">
                                             <div class="small-12 medium-6 columns compact card{{ userInclude ? '' : ' participant-excluded' }}" {% if hasInteraction %}data-has-interaction{% endif %}>
-                                                <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64">
+                                                {% include 'include/portrait.twig' with {user: user} only %}
                                                 <p>{{ user.fullName }}</p>
                                             </div>
                                             <div class="small-12 medium-6 columns meta" data-participant-status="{{ userStatus }}">{{ userPlanName }}</div>
