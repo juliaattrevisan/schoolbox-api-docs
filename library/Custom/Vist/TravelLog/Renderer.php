@@ -23,7 +23,6 @@ class Renderer
 
     /**
      * Student's Travel Log should be requested and displayed only for verso school
-     * Note that this is the school code, not the site location
      */
     private const VERSO_SCHOOL_CODE = 'VIST';
 
@@ -169,9 +168,8 @@ class Renderer
     public function isTravelLogAvailable(?string $externalId): bool
     {
 
-        /* 1. school_code must be set to "verso" (note that site_school_code is VIST...)
-         * 2. api credentials must exist (they can be incorrect, but they must exist)
-         * 3. an external id must exist
+        /* 1. api credentials must exist (they can be incorrect, but they must exist)
+         * 2. an external id must exist
          */
         return
             ($this->schoolCode === self::VERSO_SCHOOL_CODE) &&
