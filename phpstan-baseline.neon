@@ -2468,7 +2468,7 @@ parameters:
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
-			path: library/External/Synergetic/Hutchins/Class.php
+			path: library/External/Synergetic/Ths/Class.php
 
 		-
 			message: "#^If condition is always true\\.$#"
