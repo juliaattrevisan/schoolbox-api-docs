@@ -1,13 +1,12 @@
 <?php
 
 /**
- *
  * @author      Doug MacKenzie <doug.mackenzie@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-class External_Synergetic_Hutchins_Class extends External_Synergetic_Class
+class External_Synergetic_Ths_Class extends External_Synergetic_Class
 {
     /**
      * @inheritdoc
