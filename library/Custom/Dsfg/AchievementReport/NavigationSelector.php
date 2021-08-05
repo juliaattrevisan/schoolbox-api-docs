@@ -27,6 +27,7 @@ class NavigationSelector
     public const IB_KEY = 'ib';
     public const COMMENTS_KEY = 'comments';
     public const COCURRICULAR_KEY = 'coCurricular';
+    public const MYP_KEY = 'myp';
 
 
     /**
@@ -76,7 +77,7 @@ class NavigationSelector
     /**
      * Default report information
      *
-     * @var null
+     * @var string|array|null
      */
     private $defaultReport;
 
@@ -122,7 +123,9 @@ class NavigationSelector
          */
         if (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
-        } elseif (($this->user->getYear()->getName() >= 7) && ($this->user->getYear()->getName() <= 10)) {
+        } elseif ($this->user->getYear()->getName() == 7) {
+            $this->defaultReport = self::MYP_KEY;
+        } elseif (($this->user->getYear()->getName() >= 8) && ($this->user->getYear()->getName() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
         } elseif ($this->user->getYear()->getName() == 11) {
             /* NCEA for year 11 specifically
@@ -160,6 +163,15 @@ class NavigationSelector
     private function navigationData(): void
     {
         $availableNavigation = [];
+
+        if ($this->user->getYear()->getName() == 7) {
+            $availableNavigation[self::MYP_KEY] = [
+                'url' => $this->router->generate('achievementreport.getMyp', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                ]),
+                'label' => 'MYP',
+            ];
+        }
 
         /* Conditionally add NCEA option
          */

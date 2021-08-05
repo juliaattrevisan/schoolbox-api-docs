@@ -1,0 +1,78 @@
+{# #
+ # MYP tab
+ #
+ # @param array navigation
+#}
+{% include '@achievementreport/Avatar.twig' %}
+
+{% include '@achievementreport/Navigation.twig' with {
+    elements: navigation
+} %}
+{% for classCode, subjectData in subjects %}
+    <div class="row">
+        <div class="small-12 island">
+            <strong>{{ headings[classCode].subjectName }}</strong>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>{{ subjectData.overview }}</p>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <table>
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% for shortHeading in headings[classCode].shortHeadings %}
+                            <th class="centered">{{ shortHeading }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for topicHeading in headings[classCode].topicHeadings %}
+                        <tr>
+                            <th>{{ topicHeading }}</th>
+                            {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                                <td class="centered">{{ subjectData.topics[topicHeading][shortCode] ?? '' }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <th>Interim Achievement Level</th>
+                        {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                            <td class="centered">{{ grades[classCode][2][shortCode] ?? '' }}</td>
+                        {% endfor %}
+                    </tr>
+                    <tr>
+                        <th>Final Achievement Level</th>
+                        {% for shortCode, shortHeading in headings[classCode].shortHeadings %}
+                            <td class="centered">{{ grades[classCode][4][shortCode] ?? '' }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+    <div class="row">
+        <div class="small-12 island">
+            <section class="content">
+                <p>{{ subjectData.comment }}</p>
+            </section>
+        </div>
+    </div>
+{% endfor %}
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Further Information</h2>
+
+        <section class="content">
+            {{ (config.dio_achievement_report_myp_footer ?? '')|purify }}
+        </section>
+    </div>
+</div>

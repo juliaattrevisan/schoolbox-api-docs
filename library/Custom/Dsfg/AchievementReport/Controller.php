@@ -145,6 +145,16 @@ class Controller extends Base
 
                 break;
 
+            case NavigationSelector::MYP_KEY:
+                $this->getResponse()->redirect->to(
+                    $this->getRouter()->generate('achievementreport.getMyp', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year'           => $year,
+                    ])
+                );
+
+                break;
+
             /* Error state - render an error page and leave it
              * at that, I guess
              */
@@ -830,6 +840,40 @@ class Controller extends Base
             ]
         ];
 
+        $this->getResponse()->content->set($output);
+    }
+
+
+    /**
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
+     * @throws RouteNotFound
+     */
+    public function getMyp(IConnector $db, User $user, array $externalUser, ?int $year): void
+    {
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? (int)date('Y');
+        $mypBase      = new MYP\Base($user, $externalUser, $db, $selectedYear);
+        $mypData      = $mypBase->findData();
+
+        $output = [
+            'template' => '@myp/index.twig',
+            'data'     => [
+                'navigation'   => [
+                    'all'      => (new NavigationSelector($this->getRouter(), $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => NavigationSelector::MYP_KEY,
+                ],
+                'externalUser' => $externalUser,
+                'user'         => $user,
+                'year'         => $year,
+                'headings'     => $mypData['headings'],
+                'subjects'     => $mypData['data'],
+                'grades'       => $mypBase->getMYPGrade(),
+            ],
+        ];
         $this->getResponse()->content->set($output);
     }
 }
