@@ -9,11 +9,6 @@ declare(strict_types=1);
 
 namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
-/**
- * Class Base
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy
- */
 abstract class Base extends \Custom\Dsfg\AchievementReport\StandardisedTest\Base
 {
 

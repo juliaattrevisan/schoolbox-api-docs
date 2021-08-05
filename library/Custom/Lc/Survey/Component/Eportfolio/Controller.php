@@ -18,10 +18,6 @@ use Scrub;
 use SitePage;
 
 /**
- * {@inheritDoc}
- *
- * Class Controller
- * @package Custom\Lc\Survey\Component\Eportfolio
  */
 class Controller extends Component_Eportfolio_ControllerAbstract
 {

@@ -12,11 +12,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Stanine;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Stanine\Payload;
 
-/**
- * Class Data
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Stanine
- */
 class Data extends Base
 {
 

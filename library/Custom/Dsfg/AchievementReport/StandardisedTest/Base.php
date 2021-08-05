@@ -10,11 +10,6 @@
 
 namespace Custom\Dsfg\AchievementReport\StandardisedTest;
 
-/**
- * Class Base
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
- */
 abstract class Base extends \Custom\Dsfg\AchievementReport\Base
 {
 

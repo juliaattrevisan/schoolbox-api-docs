@@ -11,10 +11,6 @@ namespace Custom\Lc\Survey\Component\Homepage;
 use Component_Homepage_ControllerAbstract;
 
 /**
- * {@inheritDoc}
- *
- * Class Controller
- * @package Custom\Lc\Survey\Component\Homepage
  */
 class Controller extends Component_Homepage_ControllerAbstract
 {

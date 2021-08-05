@@ -11,11 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT\Table;
 
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 
-/**
- * Class Data
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\PAT\Table
- */
 class Data extends Base
 {
 

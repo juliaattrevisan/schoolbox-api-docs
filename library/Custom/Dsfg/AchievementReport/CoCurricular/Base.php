@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\CoCurricular;
 
-/**
- * Class Base
- *
- * @package Custom\Dsfg\AchievementReport\CoCurricular
- */
 abstract class Base extends \Custom\Dsfg\AchievementReport\Base
 {
 }

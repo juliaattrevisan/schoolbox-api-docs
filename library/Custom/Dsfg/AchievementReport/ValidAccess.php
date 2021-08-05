@@ -12,14 +12,10 @@ namespace Custom\Dsfg\AchievementReport;
 use Schoolbox\User;
 
 /**
- * Class ValidAccess
- *
  * There's a config var which prevents people from accessing the Achievement Reports
  *
  * The config var should restrict parents and students from accessing the reports, but
  * should always allow staff
- *
- * @package Custom\Dsfg\AchievementReport
  */
 class ValidAccess
 {

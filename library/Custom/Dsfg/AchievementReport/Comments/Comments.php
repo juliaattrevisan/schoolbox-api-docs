@@ -10,11 +10,6 @@ namespace Custom\Dsfg\AchievementReport\Comments;
 
 use Custom\Dsfg\AchievementReport\NormaliseTeachers;
 
-/**
- * Class Comments
- *
- * @package Custom\Dsfg\AchievementReport\Comments
- */
 class Comments extends Base
 {
 

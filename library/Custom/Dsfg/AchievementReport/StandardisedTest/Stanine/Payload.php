@@ -11,11 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\Stanine;
 
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
-/**
- * Class Payload
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\Stanine
- */
 class Payload
 {
 

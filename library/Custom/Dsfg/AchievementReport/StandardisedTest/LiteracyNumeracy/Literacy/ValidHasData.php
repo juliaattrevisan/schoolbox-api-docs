@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy\Litera
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the Writing graph should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy\Literacy
  */
 class ValidHasData
 {

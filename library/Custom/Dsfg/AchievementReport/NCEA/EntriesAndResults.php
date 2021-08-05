@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
-/**
- * Class EntriesAndResults
- *
- * @package Custom\Dsfg\AchievementReport\NCEA
- */
 class EntriesAndResults extends Base
 {
 

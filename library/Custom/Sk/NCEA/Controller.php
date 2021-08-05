@@ -1,8 +1,6 @@
 <?php
 
 /**
- * Controller
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -13,7 +11,6 @@ namespace Custom\Sk\NCEA;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 
 class Controller extends Base

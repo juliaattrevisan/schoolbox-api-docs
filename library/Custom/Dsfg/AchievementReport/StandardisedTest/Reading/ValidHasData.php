@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\Reading;
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the Reading graph should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\Reading
  */
 class ValidHasData
 {

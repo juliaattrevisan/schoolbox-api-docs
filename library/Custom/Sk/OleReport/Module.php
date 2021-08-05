@@ -21,8 +21,6 @@ use Schoolbox\UserMapper;
 
 /**
  * Module definition for SaintKentigern's custom OLE report.
- *
- * @package Custom\Sk\OleReport
  */
 class Module extends BaseModule
 {

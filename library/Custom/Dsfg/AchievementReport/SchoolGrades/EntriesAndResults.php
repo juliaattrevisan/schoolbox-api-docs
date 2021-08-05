@@ -10,11 +10,6 @@ namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
 use Custom\Dsfg\AchievementReport\Comments\Comments;
 
-/**
- * Class EntriesAndResults
- *
- * @package Custom\Dsfg\AchievementReport\SchoolGrades
- */
 class EntriesAndResults extends Base
 {
 

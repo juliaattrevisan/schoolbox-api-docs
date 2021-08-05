@@ -11,11 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
-/**
- * Class GroupData
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy
- */
 class GroupData
 {
 

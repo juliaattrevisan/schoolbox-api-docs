@@ -9,12 +9,8 @@
 namespace Custom\Dsfg\AchievementReport;
 
 /**
- * Class NormaliseTeachers
- *
  * Arrange teacher information into a set of (key, value) tuples
  * from a denormalised query result
- *
- * @package Custom\Dsfg\AchievementReport
  */
 class NormaliseTeachers
 {

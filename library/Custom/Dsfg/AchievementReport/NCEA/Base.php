@@ -10,11 +10,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
 
 use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
 
-/**
- * Class Base
- *
- * @package Custom\Dsfg\AchievementReport\NCEA
- */
 abstract class Base extends AchievementReportBase
 {
 

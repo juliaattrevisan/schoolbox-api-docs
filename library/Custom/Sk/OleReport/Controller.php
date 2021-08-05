@@ -16,8 +16,6 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Controller for SaintKentigern's OLE Report page.
- *
- * @package Custom\Sk\OleReport
  */
 class Controller extends Base
 {

@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\Comments;
 
-/**
- * Class CommentsNavigation
- *
- * @package Custom\Dsfg\AchievementReport\Comments
- */
 class CommentsNavigation extends Base
 {
 

@@ -11,11 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest;
 
 use Schoolbox\YearLevel;
 
-/**
- * Class ValidHasLiteracyNumeracy
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
- */
 class ValidHasLiteracyNumeracy
 {
 

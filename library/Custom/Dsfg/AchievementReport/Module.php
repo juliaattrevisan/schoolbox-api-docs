@@ -23,9 +23,6 @@ use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 /**
- * Class Module
- *
- * @package Custom\Dsfg\AchievementReport
  */
 class Module extends BaseModule
 {

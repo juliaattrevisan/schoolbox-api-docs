@@ -12,12 +12,8 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\User;
 
 /**
- * Class Base
- *
  * All report subclasses that need external db connection should
  * inherit this class
- *
- * @package Custom\Dsfg\AchievementReport
  */
 abstract class Base
 {

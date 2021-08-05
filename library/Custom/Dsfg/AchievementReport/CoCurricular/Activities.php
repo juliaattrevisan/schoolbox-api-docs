@@ -9,11 +9,6 @@ declare(strict_types=1);
 
 namespace Custom\Dsfg\AchievementReport\CoCurricular;
 
-/**
- * Class Activities
- *
- * @package Custom\Dsfg\AchievementReport\CoCurricular
- */
 class Activities extends Base
 {
 

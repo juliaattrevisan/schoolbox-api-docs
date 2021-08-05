@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT\Mathematics;
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the PAT Mathematics graph should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
  */
 class ValidHasData
 {

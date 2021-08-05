@@ -14,11 +14,6 @@ use Aura\Router\Exception\RouteNotFound;
 use Aura\Router\Router;
 use Schoolbox\User;
 
-/**
- * Class Navigation
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
- */
 class Navigation
 {
 

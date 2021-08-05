@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT\Table;
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the PAT Table should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\PAT\Table
  */
 class ValidHasData
 {

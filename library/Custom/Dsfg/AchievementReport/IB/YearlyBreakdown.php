@@ -10,11 +10,6 @@ namespace Custom\Dsfg\AchievementReport\IB;
 
 use Custom\Dsfg\AchievementReport\NormaliseTeachers;
 
-/**
- * Class YearlyBreakdown
- *
- * @package Custom\Dsfg\AchievementReport\IB
- */
 class YearlyBreakdown extends Base
 {
 

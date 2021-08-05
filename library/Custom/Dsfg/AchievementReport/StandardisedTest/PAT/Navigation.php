@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 
 /**
- * Class PATNavigation
- *
  * Get a list of years that have PAT Graph data
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
  */
 class Navigation extends Base
 {

@@ -12,11 +12,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\Writing;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
-/**
- * Class Data
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\Writing
- */
 class Data extends Base
 {
 

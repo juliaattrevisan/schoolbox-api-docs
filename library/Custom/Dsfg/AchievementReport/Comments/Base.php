@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\Comments;
 
-/**
- * Class Base
- *
- * @package Custom\Dsfg\AchievementReport\Comments
- */
 abstract class Base extends \Custom\Dsfg\AchievementReport\Base
 {
 }

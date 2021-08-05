@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT\ReadingComprehensio
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the PAT Reading Comprehension graph should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
  */
 class ValidHasData
 {

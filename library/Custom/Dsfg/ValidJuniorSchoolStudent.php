@@ -11,11 +11,7 @@ namespace Custom\Dsfg;
 use Schoolbox\User;
 
 /**
- * Class ValidJuniorSchoolStudent
- *
  * Decide if a student is in the Junior School Students campus
- *
- * @package Custom\Dsfg
  */
 class ValidJuniorSchoolStudent
 {

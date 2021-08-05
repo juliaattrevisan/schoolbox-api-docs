@@ -12,11 +12,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT\ReadingVocabulary;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Stanine\Payload;
 
-/**
- * Class Data
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
- */
 class Data extends Base
 {
 

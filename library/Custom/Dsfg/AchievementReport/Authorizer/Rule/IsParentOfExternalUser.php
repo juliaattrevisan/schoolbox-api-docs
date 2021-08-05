@@ -18,11 +18,6 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-/**
- * Class IsParentOfExternalUser
- *
- * @package Custom\Dsfg\AchievementReport\Authorizer\Rule
- */
 class IsParentOfExternalUser implements IAuthorizationRule
 {
     /**

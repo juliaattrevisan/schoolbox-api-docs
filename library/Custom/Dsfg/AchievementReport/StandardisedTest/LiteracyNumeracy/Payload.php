@@ -9,11 +9,6 @@ declare(strict_types=1);
 
 namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 
-/**
- * Class Payload
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy
- */
 class Payload
 {
 

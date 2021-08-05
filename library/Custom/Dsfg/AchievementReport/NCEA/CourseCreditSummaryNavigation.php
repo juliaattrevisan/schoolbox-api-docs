@@ -9,12 +9,8 @@
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
 /**
- * Class CourseCreditSummaryNavigation
- *
  * Decide whether there is any data for Course Credit Summary
  * year-specific section
- *
- * @package Custom\Dsfg\AchievementReport\NCEA
  */
 class CourseCreditSummaryNavigation extends Base
 {

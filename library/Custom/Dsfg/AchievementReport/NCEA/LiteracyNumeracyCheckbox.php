@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
-/**
- * Class LiteracyNumeracyCheckbox
- *
- * @package Custom\Dsfg\AchievementReport\NCEA
- */
 class LiteracyNumeracyCheckbox extends Base
 {
 

@@ -14,9 +14,6 @@ use Aura\Router\Router;
 use Schoolbox\User;
 
 /**
- * Class NavigationSelector
- *
- * @package Custom\Dsfg\AchievementReport
  */
 class NavigationSelector
 {

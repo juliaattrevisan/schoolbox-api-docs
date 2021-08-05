@@ -11,11 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Table;
 
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 
-/**
- * Class Data
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Table
- */
 class Data extends Base
 {
 

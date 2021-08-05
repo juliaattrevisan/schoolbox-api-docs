@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
-/**
- * Class Footer
- *
- * @package Custom\Dsfg\AchievementReport\NCEA
- */
 class Footer extends Base
 {
 

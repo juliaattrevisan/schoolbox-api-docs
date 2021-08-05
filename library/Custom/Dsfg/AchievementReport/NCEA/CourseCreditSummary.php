@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
-/**
- * Class CourseCreditSummary
- *
- * @package Custom\Dsfg\AchievementReport\NCEA
- */
 class CourseCreditSummary extends Base
 {
 

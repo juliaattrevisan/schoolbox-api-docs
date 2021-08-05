@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base as StandardisedTestBase;
 
 /**
- * Class Stars
- *
  * Assemble series data for the stars
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy
  */
 class Stars
 {

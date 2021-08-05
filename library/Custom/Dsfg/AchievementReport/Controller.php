@@ -23,9 +23,6 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 use Schoolbox\User;
 
 /**
- * Class Controller
- *
- * @package Custom\Dsfg\AchievementReport
  */
 class Controller extends Base
 {

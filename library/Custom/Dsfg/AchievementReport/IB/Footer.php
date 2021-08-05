@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\IB;
 
-/**
- * Class Footer
- *
- * @package Custom\Dsfg\AchievementReport\IB
- */
 class Footer extends Base
 {
 

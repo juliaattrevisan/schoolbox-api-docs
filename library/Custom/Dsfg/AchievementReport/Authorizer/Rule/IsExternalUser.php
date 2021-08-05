@@ -16,11 +16,6 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\User;
 
-/**
- * Class IsExternalUser
- *
- * @package Custom\Dsfg\AchievementReport\Authorizer\Rule
- */
 class IsExternalUser implements IAuthorizationRule
 {
     /**

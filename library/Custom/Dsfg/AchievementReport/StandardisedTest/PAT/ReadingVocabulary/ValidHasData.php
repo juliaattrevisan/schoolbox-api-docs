@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT\ReadingVocabulary;
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the PAT Reading Vocabulary graph should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
  */
 class ValidHasData
 {

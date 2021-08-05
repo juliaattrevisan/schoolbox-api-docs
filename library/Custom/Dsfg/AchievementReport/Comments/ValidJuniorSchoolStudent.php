@@ -10,11 +10,6 @@ namespace Custom\Dsfg\AchievementReport\Comments;
 
 use Schoolbox\User;
 
-/**
- * Class ValidJuniorSchoolStudent
- *
- * @package Custom\Dsfg\AchievementReport\Comments
- */
 class ValidJuniorSchoolStudent
 {
 

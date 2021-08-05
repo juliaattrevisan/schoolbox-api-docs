@@ -16,11 +16,7 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 /**
- * Class Renderer
- *
  * Render a TravelLog data set for a given student $externalId
- *
- * @package Custom\Vist\TravelLog
  */
 class Renderer
 {

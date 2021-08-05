@@ -13,11 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use Schoolbox\User;
 
 /**
- * Class ValidPAT
- *
  * Decide whether the PAT navigation tab should display.
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
  */
 class ValidPAT
 {

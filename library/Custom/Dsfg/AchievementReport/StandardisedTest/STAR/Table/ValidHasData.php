@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Table;
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the STAR Table should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Table
  */
 class ValidHasData
 {

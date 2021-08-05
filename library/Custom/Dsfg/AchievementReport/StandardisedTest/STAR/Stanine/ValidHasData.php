@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Stanine;
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the STAR Stanine graph should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\STAR\Stanine
  */
 class ValidHasData
 {

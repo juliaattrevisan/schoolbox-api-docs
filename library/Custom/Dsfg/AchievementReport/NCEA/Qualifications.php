@@ -9,11 +9,7 @@
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
 /**
- * Class Qualifications
- *
  * Because mssql won't let me do this in LiteracyNumeracy
- *
- * @package Custom\Dsfg\AchievementReport\NCEA
  */
 class Qualifications extends Base
 {

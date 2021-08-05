@@ -12,11 +12,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy\Numera
 use Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy\Base;
 use Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy\Payload;
 
-/**
- * Class Data
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy\Numeracy
- */
 class Data extends Base
 {
 

@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
-/**
- * Class YearlyBreakdown
- *
- * @package Custom\Dsfg\AchievementReport\SchoolGrades
- */
 class YearlyBreakdown extends Base
 {
 

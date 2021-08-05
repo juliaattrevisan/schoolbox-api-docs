@@ -12,12 +12,8 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Base;
 
 /**
- * Class PATHeading
- *
  * Sadly we must inspect the db to find out which YearLevel corresponds
  * to the given calendar year for a particular student
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
  */
 class Heading extends Base
 {

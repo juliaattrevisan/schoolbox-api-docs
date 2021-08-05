@@ -12,11 +12,7 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\PAT\ListeningComprehens
 use Schoolbox\YearLevel;
 
 /**
- * Class ValidHasData
- *
  * Determine whether the PAT Listening Comprehension graph should appear
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest
  */
 class ValidHasData
 {

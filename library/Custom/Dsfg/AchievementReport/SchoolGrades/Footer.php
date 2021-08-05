@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
-/**
- * Class Footer
- *
- * @package Custom\Dsfg\AchievementReport\SchoolGrades
- */
 class Footer extends Base
 {
 

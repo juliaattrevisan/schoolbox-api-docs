@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\IB;
 
-/**
- * Class Navigation
- *
- * @package Custom\Dsfg\AchievementReport\IB
- */
 class Navigation extends Base
 {
 

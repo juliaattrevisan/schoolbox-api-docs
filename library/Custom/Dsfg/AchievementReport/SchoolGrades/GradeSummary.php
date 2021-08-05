@@ -8,11 +8,6 @@
 
 namespace Custom\Dsfg\AchievementReport\SchoolGrades;
 
-/**
- * Class GradeSummary
- *
- * @package Custom\Dsfg\AchievementReport\SchoolGrades
- */
 class GradeSummary extends Base
 {
 

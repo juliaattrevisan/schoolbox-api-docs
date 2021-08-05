@@ -11,11 +11,6 @@ namespace Custom\Dsfg\AchievementReport\StandardisedTest\STAR;
 
 use Schoolbox\User;
 
-/**
- * Class ValidSTAR
- *
- * @package Custom\Dsfg\AchievementReport\StandardisedTest\STAR
- */
 class ValidSTAR
 {
 

@@ -10,11 +10,6 @@ namespace Custom\Dsfg\AchievementReport\IB;
 
 use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
 
-/**
- * Class Base
- *
- * @package Custom\Dsfg\AchievementReport\IB
- */
 abstract class Base extends AchievementReportBase
 {
 }
