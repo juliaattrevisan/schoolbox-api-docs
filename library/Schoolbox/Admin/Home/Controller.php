@@ -13,6 +13,7 @@ use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\Web\Controller\Base;
 use Alaress_Byte_Format;
 use Alaress_Date_Format;
+use Alaress_Rss_Stream;
 use Aws\CloudWatch\CloudWatchClient;
 use Aws\S3\S3Client;
 use InvalidArgumentException;
@@ -28,6 +29,7 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Resource\Storage\S3\DisasterRecovery;
 use Schoolbox\Version\Version;
 use Schoolbox\InstanceRegistry\InstanceRegistry;
+use UnexpectedValueException;
 
 use function array_column;
 use function array_map;
@@ -235,10 +237,14 @@ class Controller extends Base
 
         $context = ProxyServer::getInstance()->getContext('http', true);
         $context['http']['timeout'] = 1;
+        $rss = '';
 
         if (@file_get_contents('https://schoolbox.com.au/schoolboxinstaller/status.html', null, stream_context_create($context))) {
             $www_light = 'success';
             $www_status = 'Available';
+
+            $rss = new Alaress_Rss_Stream($this->getConfigLoader()->get('release_notes_url'));
+            $rss->stream();
         } else {
             $www_light = 'alert';
             $www_status = 'Inaccessible';
@@ -296,36 +302,37 @@ class Controller extends Base
             array(
                 'template' => '@adminHome/index.twig',
                 'data' => array(
-                    'pageCurrent'          => $this->router->generate('adminHome.getIndex'),
-                    'allBreadcrumbs'       => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
-                    'usageInGraph'         => $usageInGraph,
+                    'pageCurrent' => $this->router->generate('adminHome.getIndex'),
+                    'allBreadcrumbs' => (new Subnav($this->getConfigLoader()))->generateBreadcrumbs($this->router->generate('adminHome.getIndex')),
+                    'usageInGraph' => $usageInGraph,
                     'showUpgradeReminder'  => $version->showUpgradeReminder(),
                     'major_site_version'   => $version->getMajor(),
                     'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
-                    'disk_used'            => $disk_used,
-                    //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
-                    'disk_total'           => Alaress_Byte_Format::bytesToString($disk_total),
-                    'disk_percentage'      => Alaress_Byte_Format::bytesToString($disk_percentage),
-                    'memory_used'          => Alaress_Byte_Format::bytesToString($memory_used),
-                    'memory_total'         => Alaress_Byte_Format::bytesToString($memory_total),
-                    'memory_percentage'    => $memory_percentage,
-                    'memory_gradient'      => $memory_gradient,
-                    'external_db'          => $external_db,
-                    'external_db_version'  => $external_db_version,
-                    'external_db_light'    => $external_db_light,
-                    'external_db_status'   => $external_db_status,
-                    'email_light'          => $email_light,
-                    'email_status'         => $email_status,
-                    'ldap_light'           => $ldap_light,
-                    'ldap_status'          => $ldap_status,
-                    'ldap_alt_light'       => $ldap_alt_light,
-                    'ldap_alt_status'      => $ldap_alt_status,
-                    'www_light'            => $www_light,
-                    'www_status'           => $www_status,
-                    'logs'                 => $logs,
-                    'kamiEnabled'          => $this->kamiConnector->isEnabled(),
-                    'kamiOnline'           => $this->kamiConnector->isOnline(),
-                    'backupsEnabled'       => $this->getDisasterRecoveryBackupsEnabled(),
+                    'disk_used' => $disk_used,
+            //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+                    'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
+                    'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
+                    'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
+                    'memory_total' => Alaress_Byte_Format::bytesToString($memory_total),
+                    'memory_percentage' => $memory_percentage,
+                    'memory_gradient' => $memory_gradient,
+                    'external_db' => $external_db,
+                    'external_db_version' => $external_db_version,
+                    'external_db_light' => $external_db_light,
+                    'external_db_status' => $external_db_status,
+                    'email_light' => $email_light,
+                    'email_status' => $email_status,
+                    'ldap_light' => $ldap_light,
+                    'ldap_status' => $ldap_status,
+                    'ldap_alt_light' => $ldap_alt_light,
+                    'ldap_alt_status' => $ldap_alt_status,
+                    'www_light' => $www_light,
+                    'www_status' => $www_status,
+                    'updates_rss' => $rss instanceof Alaress_Rss_Stream ? $rss->getOutput() : '',
+                    'logs' => $logs,
+                    'kamiEnabled' => $this->kamiConnector->isEnabled(),
+                    'kamiOnline' => $this->kamiConnector->isOnline(),
+                    'backupsEnabled' => $this->getDisasterRecoveryBackupsEnabled(),
                 ),
             )
         );
@@ -431,7 +438,7 @@ class Controller extends Base
         try {
             $domainTtl                = (new TtlFetcher())->getTtl($enabledData['fqdn']);
             $enabledData['domainTtl'] = $domainTtl;
-        } catch (\UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
             // We want to know about this, but continue to render the rest of the page.
             $this->captureException($e);
         }
