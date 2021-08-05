@@ -25,6 +25,7 @@ use Twig\Loader\FilesystemLoader;
 use Twig\Error\LoaderError;
 
 use function array_merge;
+use function strtolower;
 
 class Module
 {
@@ -160,7 +161,7 @@ class Module
      */
     private function putIntoIndex(array &$storage, $object, $string)
     {
-        foreach ($storage as $i => list($stored, $usages)) {
+        foreach ($storage as $i => [$stored, $usages]) {
             if ($stored === $object) {
                 $index = $i;
                 break;
@@ -218,7 +219,7 @@ class Module
             $this->registerRoutes();
 
             // preload registered routes
-            foreach ($this->routeIndex as $controllerMethod => list ($method, $path, $tokens)) {
+            foreach ($this->routeIndex as $controllerMethod => [$method, $path, $tokens]) {
                 $this->addRoute($this->getRouter(), $controllerMethod, $basePath, $path)
                      ->setMethod($method)
                      ->setTokens($tokens);
@@ -248,7 +249,7 @@ class Module
         $this->initDependingModules();
 
         // configure pre-registered preloaders
-        foreach ($this->preloadIndex as list ($preload, $methods)) {
+        foreach ($this->preloadIndex as [$preload, $methods]) {
             $regex = '(?:' . implode('|', $methods) . ')';
             $this->addRoutePreload($this->getPathMatcher(), $regex, $preload);
         }
@@ -256,7 +257,7 @@ class Module
         unset($this->preloadIndex);
 
         // configure pre-registered permissions
-        foreach ($this->permissionIndex as list ($rule, $methods)) {
+        foreach ($this->permissionIndex as [$rule, $methods]) {
             /** @var IAuthorizationRule $rule */
             $regex = '(?:' . implode('|', $methods) . ')';
             $this->addRoutePermission($this->getAuthorizer(), $regex, $rule);
@@ -568,7 +569,7 @@ class Module
     /**
      * Helper method for adding a template path for this component's basename.
      *
-     * Now adds school-specific templates to "$dir/custom/$config[site_school_code]".
+     * Now adds school-specific templates to "$dir/custom/lower($config[site_school_code])".
      *
      * @param  IChainLoader $templateLoader
      * @param  string            $dir The directory to use as the template path
@@ -579,7 +580,7 @@ class Module
     protected function addTemplatePath(IChainLoader $templateLoader, $dir, $basename = '')
     {
         $basePath     = $dir;
-        $overridePath = $basePath . '/custom/' . $this->getConfig()->get('site_school_code');
+        $overridePath = $basePath . '/custom/' . strtolower($this->getConfig()->get('site_school_code'));
         $namespace    = $basename ?: $this->basename;
 
         // Set up the loader for this namespace.
