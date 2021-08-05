@@ -22,3 +22,6 @@ INSERT INTO component_definition (
     'true',
     'false'
 ) ON DUPLICATE KEY UPDATE enabled = enabled; -- but if already exists, retain enabled state
+
+-- Trim any wrapping whitespace so we don't need to do this in the code
+UPDATE config SET value = TRIM(value) where name = 'site_school_code';
