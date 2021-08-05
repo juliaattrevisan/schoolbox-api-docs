@@ -1,17 +1,15 @@
 <?php
 
 /**
- * External_Pcschools_Cornerstone_Timetable
- *
- * Cornerstone-specific customisations of PC Schools
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
-
-class External_Pcschools_Cornerstone_Timetable extends External_Pcschools_Timetable
+/**
+ * Cornerstone-specific customisations of PC Schools
+ */
+class External_Pcschools_Cc_Timetable extends External_Pcschools_Timetable
 {
 
     /**
