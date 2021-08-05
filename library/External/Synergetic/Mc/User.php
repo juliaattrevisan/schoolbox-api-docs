@@ -8,11 +8,9 @@
 declare(strict_types=1);
 
 /**
- * Class External_Synergetic_Moriah_User
- *
  * Includes Chesed Community Service data for the current year
  */
-class External_Synergetic_Moriah_User extends External_Synergetic_User
+class External_Synergetic_Mc_User extends External_Synergetic_User
 {
 
     /**
