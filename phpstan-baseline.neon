@@ -1168,42 +1168,42 @@ parameters:
 		-
 			message: "#^Left side of && is always true\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Authorizer/Rule/IsExternalUser.php
+			path: library/Custom/Dsfg/AchievementReport/Authorizer/Rule/IsExternalUser.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\Base\\:\\:\\$currentYear \\(string\\) does not accept default value of type int\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\Base\\:\\:\\$currentYear \\(string\\) does not accept default value of type int\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
+			path: library/Custom/Dsfg/AchievementReport/Base.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\Base\\:\\:\\$year \\(string\\|null\\) does not accept default value of type int\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\Base\\:\\:\\$year \\(string\\|null\\) does not accept default value of type int\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Base.php
+			path: library/Custom/Dsfg/AchievementReport/Base.php
 
 		-
 			message: "#^Call to an undefined method Schoolbox\\\\Mapper\\:\\:findByExternalId\\(\\)\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/Module.php
+			path: library/Custom/Dsfg/AchievementReport/Module.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept array\\<string, string\\>\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept array\\<string, string\\>\\.$#"
 			count: 3
-			path: library/Custom/Diocesan/AchievementReport/NavigationSelector.php
+			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept string\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\NavigationSelector\\:\\:\\$defaultReport \\(null\\) does not accept string\\.$#"
 			count: 5
-			path: library/Custom/Diocesan/AchievementReport/NavigationSelector.php
+			path: library/Custom/Dsfg/AchievementReport/NavigationSelector.php
 
 		-
-			message: "#^Property Custom\\\\Diocesan\\\\AchievementReport\\\\StandardisedTest\\\\PAT\\\\ValidPAT\\:\\:\\$year \\(string\\) does not accept default value of type int\\.$#"
+			message: "#^Property Custom\\\\Dsfg\\\\AchievementReport\\\\StandardisedTest\\\\PAT\\\\ValidPAT\\:\\:\\$year \\(string\\) does not accept default value of type int\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/StandardisedTest/PAT/ValidPAT.php
+			path: library/Custom/Dsfg/AchievementReport/StandardisedTest/PAT/ValidPAT.php
 
 		-
 			message: "#^Call to function in_array\\(\\) with arguments string\\|null, array\\(0, 1, 2, 3, 4, 5, 6\\) and true will always evaluate to false\\.$#"
 			count: 1
-			path: library/Custom/Diocesan/AchievementReport/StandardisedTest/ValidHasLiteracyNumeracy.php
+			path: library/Custom/Dsfg/AchievementReport/StandardisedTest/ValidHasLiteracyNumeracy.php
 
 		-
 			message: "#^Method Custom\\\\Help\\\\CourseParticipation\\\\Controller\\:\\:getCampusMapper\\(\\) should return Schoolbox\\\\CampusMapper but returns Schoolbox\\\\Mapper\\.$#"
