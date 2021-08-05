@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace External\Canvas\Sync\Bridge\staloy;
+namespace External\Canvas\Sync\Bridge\Staloy;
 
 use Schoolbox\Learning\Assessment\WorkType;
 

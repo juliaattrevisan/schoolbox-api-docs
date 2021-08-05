@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use External\Canvas\Sync\Bridge\Assignment;
 use External\Canvas\Sync\Bridge\Course;
 use External\Canvas\Sync\Bridge\CourseSection;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
@@ -25,8 +26,6 @@ class BridgeFactory
     /** @var string */
     private string $siteSchoolCode;
 
-    private const BASE = "External\\Canvas\\Sync\\Bridge\\";
-
     /**
      * Constructor
      * @param string $siteSchoolCode
@@ -37,29 +36,21 @@ class BridgeFactory
     }
 
     /**
-     * Generates class name depending on the site school code
-     * @param string $filename
-     * @return string
-     */
-    private function getClassName(string $filename): string
-    {
-        $className = self::BASE . $this->siteSchoolCode . '\\' . $filename;
-        if (!class_exists($className)) {
-            $className = self::BASE . $filename;
-        }
-        return $className;
-    }
-
-    /**
      * Gets class for assignment
      * @param GenericCollection $markTypes
      * @param GenericCollection $workTypes
      * @return Assignment
+     * @throws InvalidArgumentException
      */
     public function getAssignment(GenericCollection $markTypes, GenericCollection $workTypes): Assignment
     {
-        $className = $this->getClassName('Assignment');
-        return new $className($markTypes, $workTypes);
+        switch ($this->siteSchoolCode) {
+            case 'STALOY':
+                return new Bridge\Staloy\Assignment($markTypes, $workTypes);
+            case 'MTC':
+                return new Bridge\Mtc\Assignment($markTypes, $workTypes);
+        }
+        throw new InvalidArgumentException("No Assignment class found for '{$this->siteSchoolCode}'");
     }
 
     /**
@@ -67,11 +58,17 @@ class BridgeFactory
      * @param IConnector $canvasDb
      * @param IConnector $schoolboxDb
      * @return Course
+     * @throws InvalidArgumentException
      */
     public function getCourse(IConnector $canvasDb, IConnector $schoolboxDb): Course
     {
-        $className = $this->getClassName('Course');
-        return new $className($canvasDb, $schoolboxDb);
+        switch ($this->siteSchoolCode) {
+            case 'STALOY':
+                return new Bridge\Staloy\Course($canvasDb, $schoolboxDb);
+            case 'MTC':
+                return new Bridge\Mtc\Course($canvasDb, $schoolboxDb);
+        }
+        throw new InvalidArgumentException("No Course class found for '{$this->siteSchoolCode}'");
     }
 
     /**
@@ -90,7 +87,9 @@ class BridgeFactory
         Course $courseBridge,
         LoggerInterface $log
     ): CourseSection {
-        $className = $this->getClassName('CourseSection');
-        return new $className($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
+        if ($this->siteSchoolCode === 'STALOY') {
+            return new Bridge\Staloy\CourseSection($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
+        }
+        return new Bridge\CourseSection($canvasDb, $schoolboxDb, $folderMapper, $courseBridge, $log);
     }
 }

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace External\Canvas\Sync\Bridge\mtc;
+namespace External\Canvas\Sync\Bridge\Mtc;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\WorkType;
