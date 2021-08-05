@@ -60,7 +60,6 @@ class Factory
                 'attach_stacktrace' => true,
             ]);
             Sentry\configureScope(static function (Sentry\State\Scope $scope) use ($instance): void {
-                // fall back to site_school_code if site_school_code not set
                 $scope->setTags([
                     'php_version'      => PHP_VERSION,
                     'site_version'     => $instance->getVersion(),
