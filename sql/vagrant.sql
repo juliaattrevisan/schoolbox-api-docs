@@ -1,6 +1,6 @@
 /* Vagrant Localisation fixes */
 /* DO NOT STORE SECRETS IN THIS FILE */
-UPDATE config SET editable='true' WHERE name = 'site_location';
+UPDATE config SET editable='true' WHERE name = 'site_school_code';
 UPDATE user SET password=PASSWORD('password');
 UPDATE user SET password=PASSWORD('alaress') WHERE username='alaress';
 UPDATE user SET password=PASSWORD('286') WHERE username='286';
@@ -10,7 +10,7 @@ UPDATE config SET value='1025' WHERE name='mail_smtp_port';
 UPDATE config SET value='1' WHERE name='mail_enable';
 UPDATE config SET value='vagrant' WHERE name='site_hostname';
 UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';
-UPDATE config SET value='demo' WHERE name='site_location';
+UPDATE config SET value='demo' WHERE name='site_school_code';
 UPDATE config SET value='Schoolbox [vagrant]' WHERE name='title';
 UPDATE config SET hidden='false' WHERE name IN ('debug_mode','debug_xhprof');
 UPDATE config SET value='/' WHERE name='amqp_vhost';
