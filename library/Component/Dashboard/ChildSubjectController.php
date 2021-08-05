@@ -208,7 +208,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             }
 
             // School-specific buttons
-            if ('TIGS' === strtoupper(trim($this->getConfigLoader()->get('site_school_code')))) {
+            if ('TIGS' === $this->getConfigLoader()->get('site_school_code')) {
                 $this->setBlock('student_block', 'continuous_report', 'continuous_report_block');
                 $route  = 'tigsParticipationReport.getReport';
                 $params = ['userId' => $userChild->getId(), 'user' => $userChild,];
