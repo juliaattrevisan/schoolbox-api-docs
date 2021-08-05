@@ -154,7 +154,7 @@
 
         /**
         * Decide whether the current page is being displayed on a
-        * device with a small screen. 
+        * device with a small screen.
         *
         * 40em marks Small breakpoint
         * Multiply by 16px base font size, js doesn't support em units
@@ -366,6 +366,7 @@
                     .fail(function() {
                         existing.addClass('failed');
                         // Later on, remove "failed" class
+                        existing.prepend("<div class='alert alert-box'>Couldn't update component.</div>");
                         formInputs.prop('disabled', false);
                     });
             }

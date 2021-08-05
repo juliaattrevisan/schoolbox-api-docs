@@ -186,6 +186,8 @@ if ($_POST['type'] == 'components') {
             $page->outputPage(true);
             exit;
         }
+    } else {
+        $page->outputJson('error: component does not exist', false, 409);
     }
 //    SitePage::localRedir("/homepage/" . $_GET['cid']);
 }
