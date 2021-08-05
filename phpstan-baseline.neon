@@ -4676,9 +4676,9 @@ parameters:
 			path: library/Schoolbox/External/Connector/Synergetic/Base/User.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Oakburn\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
+			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Soc\\\\Sync\\:\\:findAllParents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Guardian\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Guardian\\.$#"
 			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Oakburn/Sync.php
+			path: library/Schoolbox/External/Connector/Synergetic/Soc/Sync.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Shore\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
