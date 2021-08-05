@@ -1,1 +1,0 @@
-UPDATE config SET description = 'If toggled to ''ON'', write users of a page are able to change the heading and content colours of the components from the default as set in the skin config.' WHERE name = 'homepage_enable_colour';

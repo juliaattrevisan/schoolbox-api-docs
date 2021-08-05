@@ -1,5 +1,0 @@
-DELETE FROM login_log WHERE YEAR(date) < 2018;
-DELETE FROM cmsLog WHERE YEAR(time) < 2018;
-
-OPTIMIZE TABLE login_log;
-OPTIMIZE TABLE cmsLog;

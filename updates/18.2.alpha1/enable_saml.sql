@@ -1,2 +1,0 @@
-UPDATE config SET title="Login with Single Sign-On only", description = 'Check this to force users who visit the login screen to be redirected to the IDP for Single Sign On via SAML' WHERE name = 'saml_enabled';
-UPDATE config SET type_id = (SELECT lct.id FROM lu_config_type lct WHERE lct.type = 'SAML') WHERE name like 'kerb_enable';

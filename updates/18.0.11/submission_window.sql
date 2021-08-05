@@ -1,5 +1,0 @@
-INSERT INTO `config` (name, value, title, description, field_id, options, type_id, editable, hidden, required)
-VALUES ('submission_window', 20, 'Resubmission Window', 'Users cannot create new submissions within this many seconds of their most recent submission.', 1, null, 2, 'true', 'false', 'false');
-
-INSERT INTO `error` (id, message)
-VALUES (214, 'You cannot create new submissions at this time.');

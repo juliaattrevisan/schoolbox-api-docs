@@ -1,1 +1,0 @@
-UPDATE user SET firstname = 'Schoolbox' where username like 'alaress';

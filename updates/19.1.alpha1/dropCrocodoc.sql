@@ -1,1 +1,0 @@
-DROP TABLE student_submission_file_crocodoc_archive_log;

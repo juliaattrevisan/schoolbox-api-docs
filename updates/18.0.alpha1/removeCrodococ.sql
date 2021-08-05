@@ -1,1 +1,0 @@
-DELETE FROM `config` WHERE `name` = 'crocodoc_api_token';

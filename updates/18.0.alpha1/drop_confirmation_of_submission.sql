@@ -1,2 +1,0 @@
-ALTER TABLE submission_return
-DROP COLUMN is_confirmation_of_submission;
