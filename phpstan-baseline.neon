@@ -1293,27 +1293,27 @@ parameters:
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Method Custom\\\\Meriden\\\\Pastoral\\\\Module\\:\\:getHouseMapper\\(\\) should return HouseMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getHouseMapper\\(\\) should return HouseMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Method Custom\\\\Meriden\\\\Pastoral\\\\Module\\:\\:getSubjectMapper\\(\\) should return Schoolbox\\\\External\\\\SubjectMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getSubjectMapper\\(\\) should return Schoolbox\\\\External\\\\SubjectMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
-			message: "#^Method Custom\\\\Meriden\\\\Pastoral\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Ms\\\\Pastoral\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/Module.php
+			path: library/Custom/Ms/Pastoral/Module.php
 
 		-
 			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
 			count: 1
-			path: library/Custom/Meriden/Pastoral/StudentInvolvement/Report/Factory.php
+			path: library/Custom/Ms/Pastoral/StudentInvolvement/Report/Factory.php
 
 		-
 			message: "#^Method Custom\\\\Mggs\\\\Calendar\\\\Event\\\\Type\\\\Submission\\\\Renderer\\\\Javascript\\:\\:getStatus\\(\\) should return string but returns null\\.$#"
