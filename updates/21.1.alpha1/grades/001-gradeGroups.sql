@@ -8,10 +8,10 @@ alter table submission_grade_group
     add updated_by int unsigned default null null;
 
 alter table submission_grade_group
-    add created_at datetime not null;
+    add created_at datetime null;
 
 alter table submission_grade_group
-    add updated_at datetime not null;
+    add updated_at datetime null;
 
 alter table submission_grade_group
     add deleted_at datetime null;

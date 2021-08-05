@@ -67,10 +67,24 @@ class Controller extends Base
      */
     public function deleteGradeGroup(GradeLevel\Group\Model $gradeGroup): void
     {
+        /**
+         * track who performed this update against the group
+         */
         $gradeGroup->setUpdatedBy($this->getUser());
+        $this->gradeLevelGroupMapper->save($gradeGroup);
 
         /**
-         * its important to remove any grade levels before the main grade group
+         * track who performed this update against all the levels
+         */
+        $updatedGradeLevels = $this->gradeLevelMapper->createCollection();
+        foreach ($gradeGroup->getGradeLevels() as $gradeLevel) {
+            $gradeLevel->setUpdatedBy($this->getUser());
+            $updatedGradeLevels->add($gradeLevel);
+        }
+        $this->gradeLevelMapper->save($updatedGradeLevels);
+
+        /**
+         * it's important to remove any grade levels before the main grade group
          * so that they are not left in an orphaned state
          */
         $this->gradeLevelMapper->delete($gradeGroup->getGradeLevels());
@@ -94,6 +108,7 @@ class Controller extends Base
          * don't forget to track those changes!
          */
         $gradeLevel->setUpdatedBy($this->getUser());
+        $this->gradeLevelMapper->save($gradeLevel);
 
         $this->gradeLevelMapper->delete($gradeLevel);
 
