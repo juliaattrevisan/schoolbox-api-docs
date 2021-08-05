@@ -1286,9 +1286,9 @@ parameters:
 			path: library/Custom/Help/Nesa/Selector.php
 
 		-
-			message: "#^Property Custom\\\\Loyola\\\\Survey\\\\Controller\\:\\:\\$externalClass \\(External_Class\\) does not accept External_ClassInterface\\.$#"
+			message: "#^Property Custom\\\\Lc\\\\Survey\\\\Controller\\:\\:\\$externalClass \\(External_Class\\) does not accept External_ClassInterface\\.$#"
 			count: 1
-			path: library/Custom/Loyola/Survey/Controller.php
+			path: library/Custom/Lc/Survey/Controller.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
