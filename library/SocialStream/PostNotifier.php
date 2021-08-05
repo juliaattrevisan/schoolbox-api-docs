@@ -122,8 +122,7 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
             $posted = 'posted a video';
         } elseif ($post instanceof \SocialStream_Post_Image) {
             $posted = 'posted an image';
-        } // string
-        else {
+        } else {
             $posted = 'posted';
         }
 

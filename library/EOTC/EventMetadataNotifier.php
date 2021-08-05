@@ -371,11 +371,11 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $bob->setIcon($this->getUserIcon($effector));
         $href = "/modules/eotc/status/modify/$relEventId";
 
-        // change was made by applicant or TiC: inform moderators
         if ($effectorId == $teacherInChargeId || $effectorId == $applicantId) {
+            // change was made by applicant or TiC: inform moderators
             $inform = $moderatorIds;
-        } // change was made by moderator (right?): inform applicant and TiC
-        else {
+        } else {
+            // change was made by moderator (right?): inform applicant and TiC
             $inform = array($teacherInChargeId, $applicantId);
             $href = "/modules/eotc/manage/modify?eventID=$relEventId";
         }
