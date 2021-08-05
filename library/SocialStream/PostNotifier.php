@@ -83,11 +83,11 @@ class PostNotifier extends AbstractModuleNotifier implements SourceInterface
                 /** @var SocialStream_Post_Abstract $post (I THINK!) */
                 $post = $bundle->getEvent()->getObject();
 
-                // is a child post: ie. comment
                 if ($post->getParentId()) {
+                    // is a child post: ie. comment
                     $bundle->attach(self::TRIGGER_REPLIED, self::IMMEDIATELY);
-                } // has no parent: ie. fresh post
-                else {
+                } else {
+                    // has no parent: ie. fresh post
                     $bundle->attach(self::TRIGGER_POSTED, self::IMMEDIATELY);
                 }
                 break;
