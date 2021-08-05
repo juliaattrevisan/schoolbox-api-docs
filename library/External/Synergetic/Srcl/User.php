@@ -9,7 +9,7 @@
 
 declare(strict_types=1);
 
-class External_Synergetic_Stritas_User extends External_Synergetic_User
+class External_Synergetic_Srcl_User extends External_Synergetic_User
 {
 
     /**
