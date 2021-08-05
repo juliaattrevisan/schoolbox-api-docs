@@ -115,6 +115,7 @@ class Base extends AchievementReportBase
     {
         $params = [
             'externalId' => $this->getExternalUserId(),
+            'year'       => $this->getCurrentYear(),
         ];
 
         $query = "
@@ -129,6 +130,7 @@ class Base extends AchievementReportBase
             FROM uvSchoolBoxMYPGRADEResults
             WHERE StudentID = :externalId
             AND FileSemester IN (2, 4)
+            AND FileYear = :year
         ";
         $rows  = $this->db->executeQuery($query, $params)->fetchAll();
 
