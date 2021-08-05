@@ -4681,9 +4681,9 @@ parameters:
 			path: library/Schoolbox/External/Connector/Synergetic/Soc/Sync.php
 
 		-
-			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Shore\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
+			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Ss\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
 			count: 1
-			path: library/Schoolbox/External/Connector/Synergetic/Shore/Sync.php
+			path: library/Schoolbox/External/Connector/Synergetic/Ss/Sync.php
 
 		-
 			message: "#^Method Schoolbox\\\\External\\\\Connector\\\\Synergetic\\\\Smcs\\\\Sync\\:\\:findAllStudents\\(\\) should return array\\<Schoolbox\\\\External\\\\Normalise\\\\User\\\\Student\\> but returns Schoolbox\\\\Sync\\\\Iterator\\\\Student\\.$#"
