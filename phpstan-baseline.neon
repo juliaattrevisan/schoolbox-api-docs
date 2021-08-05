@@ -1348,17 +1348,17 @@ parameters:
 		-
 			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
-			path: library/Custom/Stk/NCEA/Availability.php
+			path: library/Custom/Sk/NCEA/Availability.php
 
 		-
 			message: "#^string does not accept array\\<string, mixed\\>\\.$#"
 			count: 1
-			path: library/Custom/Stk/OleReport/Controller.php
+			path: library/Custom/Sk/OleReport/Controller.php
 
 		-
-			message: "#^Method Custom\\\\Stk\\\\OleReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
+			message: "#^Method Custom\\\\Sk\\\\OleReport\\\\Module\\:\\:getUserMapper\\(\\) should return Schoolbox\\\\UserMapper but returns Schoolbox\\\\Mapper\\.$#"
 			count: 1
-			path: library/Custom/Stk/OleReport/Module.php
+			path: library/Custom/Sk/OleReport/Module.php
 
 		-
 			message: "#^Access to an undefined property Aura\\\\Di\\\\ContainerInterface\\:\\:\\$params\\.$#"
