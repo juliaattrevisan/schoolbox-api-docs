@@ -65,6 +65,11 @@
                                 name="{{ formField }}[groups][{{ capabilityId }}][customMark]"
                                 id="group-{{ capabilityId }}-mark">
 
+                            {% if markScheme.gradeGroup.gradeLevels|length == 0 %}
+                                <optgroup label="Original Grades Deleted">
+                                    <option value="" selected disabled>empty</option>
+                                </optgroup>
+                            {% endif %}
                             <option value="" {% if letterGradeBracket is null %}selected{% endif %}>(no grade)</option>
                             {% for gradeLevel in markScheme.gradeGroup.gradeLevels %}
                                 <option value="{{ gradeLevel.rawGrade }}"
