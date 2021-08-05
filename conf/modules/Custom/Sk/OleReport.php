@@ -1,7 +1,6 @@
 <?php
 
 /**
- * @author    Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright Copyright 2019, Schoolbox Pty Ltd
  * @link      https://schoolbox.com.au/
  */
@@ -29,9 +28,8 @@ class OleReport implements ModuleConfigInterface
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'SK') {
-            $module = new OleReportModule($di);
-            $module->init('/modules/custom/stk/oleReport');
-        }
+
+        $module = new OleReportModule($di);
+        $module->init('/modules/custom/stk/oleReport');
     }
 }

@@ -11,10 +11,9 @@ namespace Config\Modules\Custom\Lc;
 use Config\ModuleLoader;
 use Alaress\Application\Kernel;
 use Custom\Lc\Survey\Component\Eportfolio\Module as EportfolioComponentModule;
-use Config\Modules\ModuleConfigInterface;
 use Custom\Lc\Survey\Module as SurveyModule;
 
-class Survey extends ModuleLoader implements ModuleConfigInterface
+class Survey extends ModuleLoader
 {
     /**
      * Run configuration for the given module
@@ -26,11 +25,7 @@ class Survey extends ModuleLoader implements ModuleConfigInterface
     {
         $namespace = 'survey';
 
-        $di = $kernel->getDependencyInjector();
-
-        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'LC') {
-            $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
-            $this->loadModule($kernel, EportfolioComponentModule::class, "/{$namespace}");
-        }
+        $this->loadModule($kernel, SurveyModule::class, "/{$namespace}");
+        $this->loadModule($kernel, EportfolioComponentModule::class, "/{$namespace}");
     }
 }

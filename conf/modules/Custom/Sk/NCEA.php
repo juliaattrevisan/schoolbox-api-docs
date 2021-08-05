@@ -19,15 +19,12 @@ class NCEA implements ModuleConfigInterface
      *
      * @param Kernel $kernel
      * @return void
-     * @throws \Aura\Di\Exception\ServiceNotFound
      */
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
 
-        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'SK') {
-            $module = new NCEAModule($di);
-            $module->init('/modules/custom/stk/ncea');
-        }
+        $module = new NCEAModule($di);
+        $module->init('/modules/custom/stk/ncea');
     }
 }

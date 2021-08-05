@@ -34,8 +34,6 @@ class Factory
         $settings = [];
         $paths    = [];
 
-        $siteSchoolCode = strtoupper(trim($siteSchoolCode));
-
         if ($siteSchoolCode === 'WSL') {
             $settings = array(
                 'baseUri' => 'http://oxygen/',

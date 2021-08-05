@@ -751,7 +751,7 @@ abstract class Kernel
                     $baseLoader  = new FilesystemLoader(array());
                     // Paths: prefer templates/{site_school_code} over templates/core
                     $basePath     = SITE_root . '/templates/';
-                    $overridePath = $basePath . strtolower(trim($config->get('site_school_code')));
+                    $overridePath = $basePath . strtolower($config->get('site_school_code'));
                     $corePath     = $basePath . 'core';
                     if (is_dir($overridePath)) {
                         $baseLoader->addPath($overridePath);
@@ -1555,7 +1555,7 @@ abstract class Kernel
 
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
-            ucfirst(strtolower(trim($this->getDependencyInjector()->get('config')->get('site_school_code'))))
+            ucfirst(strtolower($this->getDependencyInjector()->get('config')->get('site_school_code')))
         );
         $modulePaths = array_merge(
             glob(SITE_root . '/conf/modules/*.php'),

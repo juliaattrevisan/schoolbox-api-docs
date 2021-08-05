@@ -73,7 +73,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 continue;
             }
 
-            if (strtoupper(trim($this->getConfigLoader()->get('site_school_code'))) === 'WSL' && $child['gid'] === 3) {
+            if ($this->getConfigLoader()->get('site_school_code') === 'WSL' && $child['gid'] === 3) {
                 continue;
             }
 
@@ -121,7 +121,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
             /* Diocesan Junior School Students don't have links to subjects
              */
             if (
-                (strtoupper(trim($this->getConfigLoader()->get('site_school_code'))) === 'DSFG') &&
+                ($this->getConfigLoader()->get('site_school_code') === 'DSFG') &&
                 (new ValidJuniorSchoolStudent())->isSatisfiedBy($userChild)
             ) {
                 $this->setVar([

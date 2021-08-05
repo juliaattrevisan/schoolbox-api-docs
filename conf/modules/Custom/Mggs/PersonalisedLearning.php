@@ -25,26 +25,24 @@ class PersonalisedLearning implements ModuleConfigInterface
      *
      * @param Kernel $kernel
      *
-     * @throws ServiceNotFound
      * @return void
      */
     public function configure($kernel)
     {
         $di = $kernel->getDependencyInjector();
-        if (strtoupper(trim($di->get('config')->get('site_school_code'))) === 'MGGS') {
-            $masteryModule = new MasteryModule($di);
-            $masteryModule ->init("/learning/mastery");
 
-            $personalisedLearningModule = new Personalised\Module($di);
-            $personalisedLearningModule->init("/learning/personalised");
+        $masteryModule = new MasteryModule($di);
+        $masteryModule ->init("/learning/mastery");
 
-            $adminModule = new AdminModule($di);
-            $adminModule->init('/adminv2/pbl');
+        $personalisedLearningModule = new Personalised\Module($di);
+        $personalisedLearningModule->init("/learning/personalised");
 
-            // As of SA-10363 the upcoming work module is no longer overridden
-//            // override the default upcoming module
-//            $upcomingModule = new UpcomingModule($di);
-//            $upcomingModule->initOverride('/learning/due');
-        }
+        $adminModule = new AdminModule($di);
+        $adminModule->init('/adminv2/pbl');
+
+        // As of SA-10363 the upcoming work module is no longer overridden
+//        // override the default upcoming module
+//        $upcomingModule = new UpcomingModule($di);
+//        $upcomingModule->initOverride('/learning/due');
     }
 }
