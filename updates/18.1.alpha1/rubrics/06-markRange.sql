@@ -1,1 +1,0 @@
-ALTER TABLE `submission_box` ADD COLUMN `rubric_mark_range` INT(1) UNSIGNED NOT NULL DEFAULT 0 AFTER `rubric_group_marks`;

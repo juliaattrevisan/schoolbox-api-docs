@@ -1,2 +1,0 @@
-UPDATE config SET value='6Ld6nk8UAAAAAK2GDsvZi_wSi86w9krhnxfkqfV0' WHERE name='recaptcha_public_api_key';
-UPDATE config SET value='6Ld6nk8UAAAAAFbdwVMJ-B2ZF6NW7qq7Smksy2qp' WHERE name='recaptcha_private_api_key';

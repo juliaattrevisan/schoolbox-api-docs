@@ -1,1 +1,0 @@
-INSERT INTO error (id,message) VALUES (215, 'We are unable to log you into the TASS system.  This is most likely because your account does not exist in TASS.');

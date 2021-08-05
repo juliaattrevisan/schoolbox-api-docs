@@ -1,1 +1,0 @@
-update config set description = 'Enable the display of the overall grade on the Due Work and Grade Report page for students and parents.' where name = 'show_overall_grade';
