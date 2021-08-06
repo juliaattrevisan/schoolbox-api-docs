@@ -138,21 +138,18 @@ class CreditSummary extends Base
                     if ($letter === 'N') {
                         $finalStack[$level][$internalExternal]['letters'][$letter] += $current['EnteredCredits'];
                         $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
-                    }
-                    /* Regular summation for A, M, E
-                     */
-                    elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
+                    } elseif (in_array($letter, $this->achievementLetterRegistry, false)) {
+                        // Regular summation for A, M, E
                         $finalStack[$level][$internalExternal]['letters'][$letter] += $current['ResultCredits'];
                         $finalStack[$level][$internalExternal]['availableCredits'] -= $current['ResultCredits'];
-                    }
-                    /* Other cases to exclude in Available Credits calculation
-                     *
-                     * According to Sheeba,
-                     * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
-                     * [when result of Y,V or Z is assigned due to absence or not attempting,
-                     * it is no longer available for assessment]
-                     */
-                    elseif (in_array($letter, $this->exclusionLetterRegistry, false)) {
+                    } elseif (in_array($letter, $this->exclusionLetterRegistry, false)) {
+                        /* Other cases to exclude in Available Credits calculation
+                         *
+                         * According to Sheeba,
+                         * Available = 1-2-(sum of enteredcredits where strippedresult=Y, V or Z)
+                         * [when result of Y,V or Z is assigned due to absence or not attempting,
+                         * it is no longer available for assessment]
+                         */
                         $finalStack[$level][$internalExternal]['availableCredits'] -= $current['EnteredCredits'];
                     }
                 }
@@ -265,10 +262,8 @@ class CreditSummary extends Base
                         } elseif (in_array($current['StandardType'], $achievementTypeList, false)) {
                             $finalStack[$level]['achievement'] += $current['ResultCredits'];
                         }
-                    }
-                    /* Special treatment
-                     */
-                    elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || $current['StrippedResult'] === 'N') {
+                    } elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || $current['StrippedResult'] === 'N') {
+                        // Special treatment
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }
@@ -323,10 +318,8 @@ class CreditSummary extends Base
                      */
                     if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
                         $finalStack[$level][$internalExternal] += $current['ResultCredits'];
-                    }
-                    /* Special treatment
-                     */
-                    elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
+                    } elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
+                        // Special treatment
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }

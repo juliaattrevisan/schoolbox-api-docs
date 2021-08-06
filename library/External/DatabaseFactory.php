@@ -56,8 +56,7 @@ class External_DatabaseFactory
         if ($this->isEnabled($config)) {
             try {
                 return $this->buildEnabledClassConnector($this->getValidExternalType($config), $this->getSchoolCode($config));
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
+            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
             }
         }
         return new External_Offline_Class();
@@ -92,8 +91,7 @@ class External_DatabaseFactory
         if ($this->isEnabled($config)) {
             try {
                 return $this->buildEnabledTimetableConnectorInternal($this->getValidExternalType($config), $this->getSchoolCode($config));
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
+            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
             }
         }
         return new External_Offline_Timetable();
@@ -117,8 +115,7 @@ class External_DatabaseFactory
                     $this->getSchoolCode($config),
                     $config->get('external_tass_version')
                 );
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
+            } catch (Schoolbox\External\Exception | Alaress\Database\Exception $e) {
             }
         }
         return new External_Offline_User();
@@ -137,8 +134,7 @@ class External_DatabaseFactory
         if ($this->isEnabled($config) && $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             try {
                 return new External_Synergetic_UserDetention();
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Alaress\Database\Exception $e) {
+            } catch (Alaress\Database\Exception $e) {
             }
         }
         return new External_Offline_UserDetention();
@@ -158,8 +154,7 @@ class External_DatabaseFactory
         if ($this->isEnabled($config) && $this->getValidExternalType($config) === IConnector::EXTERNAL_TYPE_SYNERGETIC) {
             try {
                 return new External_Synergetic_Markbook($config->get('synergetic_mark_sync_value'));
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Alaress\Database\Exception $e) {
+            } catch (Alaress\Database\Exception $e) {
             }
         }
         return new External_Offline_Markbook();
@@ -182,8 +177,7 @@ class External_DatabaseFactory
         ) {
             try {
                 return $this->buildSynergeticPastoralConnector($this->getSchoolCode($config));
-            } /** @noinspection BadExceptionsProcessingInspection */
-            catch (Alaress\Database\Exception $e) {
+            } catch (Alaress\Database\Exception $e) {
             }
         }
         return new External_Offline_Pastoral();
@@ -212,7 +206,7 @@ class External_DatabaseFactory
     private function getValidExternalType(IConfigLoader $config): string
     {
         $externalType = $config->get('external_type');
-        if(!in_array($externalType, IConnector::EXTERNAL_TYPES, true)){
+        if (!in_array($externalType, IConnector::EXTERNAL_TYPES, true)) {
             throw new UnexpectedValueException("Invalid 'external_type': '$externalType'");
         }
         return $externalType;
@@ -306,8 +300,7 @@ class External_DatabaseFactory
             case IConnector::EXTERNAL_TYPE_SYNERGETIC:
                 try {
                     return new External_Synergetic_Ping();
-                } /** @noinspection BadExceptionsProcessingInspection */
-                catch (Alaress\Database\Exception $e) {
+                } catch (Alaress\Database\Exception $e) {
                 }
                 break;
             case IConnector::EXTERNAL_TYPE_DOUBLEFIRST:

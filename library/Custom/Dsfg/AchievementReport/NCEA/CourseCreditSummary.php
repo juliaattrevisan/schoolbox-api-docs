@@ -114,12 +114,11 @@ class CourseCreditSummary extends Base
                         $finalStack['totals']['attempted'] += $current['ResultCredits'];
                         $finalStack['totals']['achieved'] += $current['ResultCredits'];
                         $finalStack['totals']['letters'][$letter] += $current['ResultCredits'];
-                    }
-                    /* Special treatment
-                     * No achievements for N, V, Y, Z but their attempts should still
-                     * be summated (ie. you tried and didn't get an achievement)
-                     */
-                    elseif (in_array($letter, ['N', 'V', 'Y', 'Z'])) {
+                    } elseif (in_array($letter, ['N', 'V', 'Y', 'Z'])) {
+                        /* Special treatment
+                         * No achievements for N, V, Y, Z but their attempts should still
+                         * be summated (ie. you tried and didn't get an achievement)
+                         */
                         $finalStack['courses'][$courseName]['letters'][$letter] += $current['EnteredCredits'];
                         $finalStack['courses'][$courseName]['attempted'] += $current['EnteredCredits'];
 
