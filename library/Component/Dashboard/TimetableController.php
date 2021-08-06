@@ -83,7 +83,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         $timetableHandler = $this->externalTimetable;
-        $this->externalAttendanceLink = new External_AttendanceLink();
+        $this->externalAttendanceLink = new External_AttendanceLink($this->getConfigLoader());
         $this->externalAttendanceLink->init($this->getConfigLoader(), $this->getUser()->getRole()->isStaff());
 
         // Get current day and period. Don't output a timetable if it has the same code as another that has already been added

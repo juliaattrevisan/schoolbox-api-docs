@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\Loader;
 use Schoolbox\Pastoral;
 use Schoolbox\User;
 
@@ -18,11 +19,10 @@ class External_Pastoral implements External_PastoralInterface
      * Constructor
      *
      * @throws Exception
-     * @param String $databaseName
      */
-    public function __construct(string $databaseName = '')
+    public function __construct()
     {
-        $this->database = (new External_DatabaseFactory())->buildPastoralConnector($databaseName);
+        $this->database = (new External_DatabaseFactory())->buildPastoralConnector(Loader::getInstance());
     }
 
     /**

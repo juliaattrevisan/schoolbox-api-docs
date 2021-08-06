@@ -18,9 +18,9 @@ class External_AttendanceLink implements External_AttendanceLinkInterface
 
     /**
      */
-    public function __construct()
+    public function __construct(IConfigLoader $config)
     {
-        $this->database = (new External_DatabaseFactory())->buildAttendanceLinkConnector();
+        $this->database = (new External_DatabaseFactory())->buildAttendanceLinkConnector($config);
     }
 
     /**

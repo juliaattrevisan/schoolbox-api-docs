@@ -10,6 +10,7 @@
 
 use Alaress\Redis;
 use External\CachingConnectorAbstract;
+use Schoolbox\Config\Loader;
 
 class External_Class extends CachingConnectorAbstract implements External_ClassInterface
 {
@@ -24,7 +25,7 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
     public function __construct($databaseName = '')
     {
         parent::__construct(
-            (new External_DatabaseFactory())->buildClassConnector($databaseName),
+            (new External_DatabaseFactory())->buildClassConnector(Loader::getInstance()),
             new External_Offline_Class(),
             Redis::getInstance(),
             Config::get('external_cache_timeout')

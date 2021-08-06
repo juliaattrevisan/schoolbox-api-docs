@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\Loader;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\User;
@@ -20,12 +21,11 @@ class External_Markbook implements External_MarkbookInterface
     /**
      * Constructor
      *
-     * @param String $databaseName
      * @throws LogicException If unable to build connection
      */
-    public function __construct(string $databaseName = '')
+    public function __construct()
     {
-        $this->database = (new External_DatabaseFactory())->buildMarkbookConnector($databaseName);
+        $this->database = (new External_DatabaseFactory())->buildMarkbookConnector(Loader::getInstance());
     }
 
 

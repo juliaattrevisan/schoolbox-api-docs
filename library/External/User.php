@@ -7,6 +7,7 @@
 
 use Alaress\Redis;
 use External\CachingConnectorAbstract;
+use Schoolbox\Config\Loader;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\User;
 use Schoolbox\Resource\Storage;
@@ -25,7 +26,7 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     {
         // TODO inject dependencies
         parent::__construct(
-            (new External_DatabaseFactory())->buildUserConnector($databaseName),
+            (new External_DatabaseFactory())->buildUserConnector($databaseName, Loader::getInstance()),
             new External_Offline_User(),
             Redis::getInstance(),
             ConfigLoader::getInstance()->get('external_cache_timeout')

@@ -19,7 +19,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Attendance_Synergetic_AttendanceMaster as AttendanceMaster;
 use Schoolbox\External\Exception as ExternalException;
 
 class External_Synergetic_Attendance implements External_AttendanceInterface
@@ -63,7 +62,7 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
         //
         // This can be encapsulated further in a Factory
 
-        $attendanceMaster = new AttendanceMaster(
+        $attendanceMaster = new Attendance_Synergetic_AttendanceMaster(
             $class,
             $attendanceDate,
             $attendanceDay,

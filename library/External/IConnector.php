@@ -26,4 +26,18 @@ interface IConnector
     public const EXTERNAL_TYPE_DOUBLEFIRST = 'doublefirst';
     public const EXTERNAL_TYPE_SCHOOLEDGE  = 'schooledge';
     public const EXTERNAL_TYPE_ISAMS       = 'isams';
+
+    public const EXTERNAL_TYPES = [
+        self::EXTERNAL_TYPE_SYNERGETIC,
+        self::EXTERNAL_TYPE_TASS,
+        self::EXTERNAL_TYPE_DENBIGH,
+        self::EXTERNAL_TYPE_EDUMATE,
+        self::EXTERNAL_TYPE_SCHOOLBOX,
+        self::EXTERNAL_TYPE_SCHOOLPRO,
+        self::EXTERNAL_TYPE_MAZE,
+        self::EXTERNAL_TYPE_PCSCHOOLS,
+        self::EXTERNAL_TYPE_DOUBLEFIRST,
+        self::EXTERNAL_TYPE_SCHOOLEDGE,
+        self::EXTERNAL_TYPE_ISAMS,
+    ];
 }
