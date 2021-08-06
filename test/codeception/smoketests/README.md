@@ -5,7 +5,7 @@ All Codeception integration tests go in this folder. Smoke tests also live here 
 
 ## Structure
 
-Same as the structure in acceptance tests, you can see it here: 
+Same as the structure in acceptance tests, you can see it here:
 [Acceptance Tests](./test/codeception/acceptance/README.md).
 
 ## Running tests
@@ -14,13 +14,15 @@ Currently smoke tests use the Integration set of helpers and modules, needs to b
 
 ### Configuration
 
-Same as acceptance tests as they are all based on the same framework. 
+Same as acceptance tests as they are all based on the same framework.
 Found in documentation here: [Acceptance Tests](./test/codeception/acceptance/README.md).
 
 ### Codeception test
 
-To run smoke tests, like acceptance tests, you call codeception, 
+To run smoke tests, like acceptance tests, you call codeception,
 select the suite to be smoketests and then select the test you are after.
+
+The tests require you to have provisioned the `sales` dataset.
 
 So to run all the smoke tests:
 
@@ -47,7 +49,7 @@ Your test needs to create the payload and fire it off at the correct location. I
 payload classes to make tests more readable.
 
 eg.
-         
+
     #WHEN
     $loginPayload = new LoginPayload();
     $loginPayload->setUsername("fred");
