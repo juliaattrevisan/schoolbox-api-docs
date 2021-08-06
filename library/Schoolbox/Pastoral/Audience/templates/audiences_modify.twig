@@ -84,6 +84,43 @@
                                 {% autoescape 'js' %}
                                 $(function () {
                                     $('#template').alaressEditor();
+                                    CKEDITOR.config.mentions = [{
+                                        feed: [
+                                            'firstname',
+                                            'surname',
+                                            'fullname',
+                                            'house',
+                                            'year',
+                                            // {
+                                            //     id: 1,
+                                            //     name: 'firstname',
+                                            //     description: 'The student\'s first name.',
+                                            // },
+                                            // {
+                                            //     id: 2,
+                                            //     name: 'surname',
+                                            //     description: 'The student\'s surname.',
+                                            // },
+                                            // {
+                                            //     id: 3,
+                                            //     name: 'fullname',
+                                            //     description: 'The student\'s full name.',
+                                            // },
+                                            // {
+                                            //     id: 4,
+                                            //     name: 'house',
+                                            //     description: 'The student\'s school house.',
+                                            // },
+                                            // {
+                                            //     id: 5,
+                                            //     name: 'year',
+                                            //     description: 'The student\'s school year.',
+                                            // },
+                                        ],
+                                        marker: '[',
+                                        itemTemplate: '<li data-id="{id}">{name}]</li>',
+                                        outputTemplate: '{name}] ',
+                                    }];
 
                                     let colorInput = document.getElementById('pastoralColor'),
                                             iconSelect = document.getElementById('pastoralIcon'),
