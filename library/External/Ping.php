@@ -20,7 +20,6 @@ class External_Ping implements External_PingInterface
      * Constructor
      *
      * @throws Exception
-     * @param String $databaseName
      */
     public function __construct()
     {

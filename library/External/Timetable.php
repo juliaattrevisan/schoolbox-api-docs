@@ -23,7 +23,6 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
     /**
      * Constructor
      *
-     * @param String $databaseName
      * @throws InvalidArgumentException
      * @throws LogicException If unable to build connector
      */

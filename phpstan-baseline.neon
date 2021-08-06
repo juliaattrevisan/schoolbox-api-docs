@@ -2291,51 +2291,6 @@ parameters:
 			path: library/External/Canvas/Sync/ImportStage/Submission.php
 
 		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildAttendanceConnector\\(\\) should return External_AttendanceInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildAttendanceLinkConnector\\(\\) should return External_AttendanceLink but returns External\\\\IConnector\\.$#"
-			count: 2
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildClassConnector\\(\\) should return External_ClassInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildMarkbookConnector\\(\\) should return External_MarkbookInterface but returns External\\\\IConnector\\.$#"
-			count: 2
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildPastoralConnector\\(\\) should return External_PastoralInterface but returns External\\\\IConnector\\.$#"
-			count: 2
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildPingConnector\\(\\) should return External_PingInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildTimetableConnector\\(\\) should return External_TimetableInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildUserConnector\\(\\) should return External_UserInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
-			message: "#^Method External_DatabaseFactory\\:\\:buildUserDetentionConnector\\(\\) should return External_UserDetentionInterface but returns External\\\\IConnector\\.$#"
-			count: 1
-			path: library/External/DatabaseFactory.php
-
-		-
 			message: "#^Method External_Doublefirst_Timetable\\:\\:getDayNumber\\(\\) should return bool\\|string but returns int\\.$#"
 			count: 1
 			path: library/External/Doublefirst/Timetable.php

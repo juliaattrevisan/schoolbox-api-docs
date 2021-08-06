@@ -23,7 +23,7 @@ class Mailer extends \Alaress\Mail\AbstractMailer
 
     /**
      * Mailer constructor.
-     * @param        $template
+     * @param string $template
      * @param string $subject
      * @param string $to
      * @param string $host
@@ -46,18 +46,18 @@ class Mailer extends \Alaress\Mail\AbstractMailer
     }
 
     /**
-     * @param $file
+     * @param string $file
      */
-    public function loadTemplate($file)
+    public function loadTemplate(string $file): void
     {
         $this->template->set_file($this->t_label, $this->getTemplate($file));
     }
 
     /**
-     * @param $template
+     * @param string $template
      * @return string
      */
-    public function getTemplate($template)
+    public function getTemplate(string $template): string
     {
         $root = defined('MAIL_templates') ? MAIL_templates : SITE_root . '/templates';
 
@@ -69,30 +69,30 @@ class Mailer extends \Alaress\Mail\AbstractMailer
     }
 
     /**
-     * @param        $name
+     * @param string|string[] $name
      * @param string $value
      */
-    public function setVar($name, $value = '')
+    public function setVar($name, string $value = ''): void
     {
         $this->template->set_var($name, $value);
     }
 
     /**
-     * @param $parent
-     * @param $handle
-     * @param $name
+     * @param string $parent
+     * @param string $handle
+     * @param string $name
      */
-    public function setBlock($parent, $handle, $name)
+    public function setBlock(string $parent, string $handle, string $name): void
     {
         $this->template->set_block($parent, $handle, $name);
     }
 
     /**
-     * @param       $target
-     * @param       $handle
-     * @param false $append
+     * @param string $target Target handle to parse into
+     * @param string $handle Which handle should be parsed
+     * @param bool $append Append it to $target or not?
      */
-    public function parse($target, $handle, $append = false)
+    public function parse(string $target, string $handle, bool $append = false): void
     {
         $this->template->parse($target, $handle, $append);
     }
