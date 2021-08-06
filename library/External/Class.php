@@ -20,9 +20,8 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
      * Constructor
      *
      * @throws Exception
-     * @param String $databaseName
      */
-    public function __construct($databaseName = '')
+    public function __construct()
     {
         parent::__construct(
             (new External_DatabaseFactory())->buildClassConnector(Loader::getInstance()),
