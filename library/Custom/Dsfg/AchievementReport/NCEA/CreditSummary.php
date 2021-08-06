@@ -198,10 +198,8 @@ class CreditSummary extends Base
                      */
                     if (in_array($current['StrippedResult'], $this->achievementLetterRegistry, false)) {
                         $finalStack[$level]['achieved'] += $current['ResultCredits'];
-                    }
-                    /* Special treatment
-                     */
-                    elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
+                    } elseif (in_array($current['StrippedResult'], $this->exclusionLetterRegistry, false) || in_array($current['StrippedResult'], array('N'))) {
+                        // Special treatment
                         $finalStack[$level]['exclusions'] += $current['EnteredCredits'];
                     }
                 }
