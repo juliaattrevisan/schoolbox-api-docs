@@ -125,7 +125,7 @@ check_sql_versions(){
 
       error "Set environment var SB_FORCE_UPGRADE to 1 to force unsafe upgrade"
       # Check if this is being invoked by vagrant provision (vagrant-shell > refresh.sh > update-sql.sh)
-      if grep -qE '^vagrant-shell' /proc/"$(ps -o ppid= $PPID)"/comm ; then
+      if grep -qE '^vagrant-shell' /proc/"$(ps -o ppid= $PPID | xargs )"/comm ; then
         error "In vagrant, set 'force_upgrade' to 'true' in your vagrant.yaml to set this env var"
       fi
       exit 1
