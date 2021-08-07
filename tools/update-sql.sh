@@ -104,7 +104,7 @@ check_sql_versions(){
   fi
 
   # Ensure we are not upgrading from a major version where we know there are issues. Allow force override
-  local supported_from_majors=('20.1' '20.2' '21.0')
+  local supported_from_majors=('20.1' '20.2' '21.0' '21.1')
   local sql_major
   sql_major=$(echo "$sql_ver" | grep -Eo '[0-9]+\.[0-9]+')
   local found=0
