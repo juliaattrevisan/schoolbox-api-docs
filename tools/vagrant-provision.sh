@@ -16,6 +16,7 @@ external_db="synergetic";
 external_db_host="172.31.15.10";
 external_db_db="Synergetic_AUVIC_ALARESS_PRD";
 enable_xdebug="true";
+force_upgrade=0
 instance_registry_url="https://manage.schoolbox.cloud"
 
 function log(){
@@ -46,7 +47,8 @@ if [ ! -z $4 ]; then external_db_host=$4; fi;
 if [ ! -z $5 ]; then external_db_db=$5; fi;
 if [ ! -z $6 ]; then enable_xdebug=$6; fi;
 if [ ! -z $7 ]; then instance_id_env_var=$7; fi;
-if [ -n "$8" ]; then instance_registry_url="$8"; fi;
+if [ -n "$8" ] && [[ "$8" != '0' ]] && [[ "$8" != 'false' ]]; then force_upgrade=1; fi;
+if [ -n "$9" ]; then instance_registry_url="$9"; fi;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Setting up vagrant with options:";
 echo "[SB][`date +%Y-%m-%d\ %X`] Data Source: $data_source";
@@ -206,6 +208,10 @@ composer dump-autoload -o --no-interaction;
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing instance via 'schoolbox-data-refresh.sh'";
+
+if [[ $force_upgrade == 1 ]]; then
+  export SB_FORCE_UPGRADE=1 # Allow unsafe upgrade from really old datasets
+fi
 if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --data-source "$data_source" \
 --dataset "$data_filename" \

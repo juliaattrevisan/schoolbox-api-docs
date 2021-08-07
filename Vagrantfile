@@ -27,6 +27,7 @@ instance_registry_url_override = default["instance_registry_url_override"]
 instance_registry_api_key = default["instance_registry_api_key"]
 instance_id_env_var = default["instance_id_env_var"]
 puppet_sync_type = default["puppet_sync_type"]
+force_upgrade = default["force_upgrade"]
 
 # Load custom options
 if File.file?('vagrant.yaml')
@@ -91,6 +92,9 @@ if File.file?('vagrant.yaml')
   end
   if !conf["puppet_sync_type"].nil?
     puppet_sync_type = conf["puppet_sync_type"]
+  end
+  if !conf["force_upgrade"].nil?
+    force_upgrade = conf["force_upgrade"]
   end
 end
 
@@ -159,7 +163,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provision "shell" do |s|
     s.path = "#{provision_script}"
-    s.args = "'#{data_source}' '#{data_filename}' '#{external_db}' '#{external_db_host}' '#{external_db_db}' '#{enable_xdebug}' '#{instance_id_env_var}' '#{instance_registry_url_override}'"
+    s.args = "'#{data_source}' '#{data_filename}' '#{external_db}' '#{external_db_host}' '#{external_db_db}' '#{enable_xdebug}' '#{instance_id_env_var}' '#{force_upgrade}' '#{instance_registry_url_override}'"
   end
   config.vm.provision "shell", run: "always", path: "tools/vagrant-restart.sh"
 end
