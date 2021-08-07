@@ -87,6 +87,18 @@ check_sql_versions(){
     exit 1;
   fi
 
+  # Ensure all required update dirs are present in this package
+  if [[ -e /usr/share/schoolbox/updates/"$sql_ver" ]]; then
+    error "Current SQL version update dir not found: '/usr/share/schoolbox/updates/$sql_ver'"
+    error "System cannot guarantee all required update dirs are present!"
+    error "You are probably trying to upgrade a dataset that is too old for this code version."
+    error " * Upgrades:        You must only upgrade a single major version at a time."
+    error " * Prd-to-Stg sync: The PRD version is too old, and no longer supported."
+    error " * restore.sh:      Select a newer backup, or deploy older package."
+    error " * Vagrant:         Checkout older codebase, provision, save dataset, checkout desired version, re-provision"
+    exit 1
+  fi
+
   if [ "$sql_ver" == "$new_ver" ]; then
     log "No updates required";
     exit;
