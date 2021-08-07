@@ -92,8 +92,8 @@ check_sql_versions(){
   fi
 
   # Ensure all required update dirs are present in this package. Never allow this.
-  if [[ ! -e /usr/share/schoolbox/updates/"$sql_ver" ]]; then
-    error "Current SQL version update dir not found: '/usr/share/schoolbox/updates/$sql_ver'"
+  if [[ ! -e $site_root/updates/"$sql_ver" ]]; then
+    error "Current SQL version update dir not found: '$site_root/updates/$sql_ver'"
     error "Cannot guarantee all required intervening update dirs are present!"
     error "You are probably trying to upgrade a dataset that is too old for this code version."
     error " * Upgrades:        You must only upgrade a single major version at a time."
