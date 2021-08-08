@@ -9,11 +9,19 @@
 use Schoolbox\Permission\Access\UserAccess;
 
 $currentUserId = $_SESSION['id'];
+/** @var SitePage $this */
 $ownerId       = is_numeric($this->arg[0]) ? $this->arg[0] : $_SESSION['id'];
 
-$pageId = $this->arg[1] ? $this->arg[1] : 'profile';
+try {
+    $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
+$pageId = $this->arg[1] ?: 'profile';
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
 
 if ($authenticator->pageExists()) {
     if ($authenticator->canCreate() || $authenticator->canModify()) {

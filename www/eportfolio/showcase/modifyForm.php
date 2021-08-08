@@ -1,8 +1,6 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -15,11 +13,18 @@ $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 $page = $kernel->get('sitePage');
 $page->initSession();
 
-$action = $_POST['action'];
+$action  = $_POST['action'];
 $ownerId = $_POST['userId'];
-$pageId = 'showcase';
+$pageId  = 'showcase';
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
+try {
+    $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
 
 if ($authenticator->canModify()) {
     if ($action == 'unpublish') {
@@ -46,19 +51,19 @@ if ($authenticator->canModify()) {
             }
         } else {
             error(2);
+            exit;
         }
 
         $now = \Alaress_Date_Format::now();
 
 
-
         /* Check if the submission box is already being showcased; if so, ignore request
          */
         $existing = \Eportfolio\ShowcaseMapper::getInstance()->findByColumnList(
-            array(
+            [
                 'uid'               => $ownerId,
-                'submission_box_id' => $boxId,
-            )
+                'submission_box_id' => $box->getId(),
+            ]
         );
 
         if (!$existing->count()) {

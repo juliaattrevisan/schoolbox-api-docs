@@ -21,7 +21,13 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
     // Check permissions
 
     $eportfolioHandler = new Eportfolio($_SESSION['id'], $_POST['page_id']);
-    $authenticator     = new Eportfolio_Authenticator($_SESSION['user'], $eportfolioHandler->getSettingsPageOwner(), $_POST['page_id']);
+    try {
+        $owner = \Schoolbox\UserMapper::getInstance()->findById($eportfolioHandler->getSettingsPageOwner());
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        exit();
+    }
+    $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $_POST['page_id']);
 
     if ($authenticator->canModify()) {
         $componentInstanceMapper       = Component_InstanceMapper::getInstance();
@@ -321,7 +327,14 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
     $pageTitle  = $_POST['page_title'];
     $templateId = $_POST['page_template'];
 
-    $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $userId, null);
+    try {
+        $owner = \Schoolbox\UserMapper::getInstance()->findById($userId);
+    } catch (\Schoolbox\Mapper\Exception $e) {
+        error(ErrorMapper::ERROR_INFORMATION_MISSING);
+        exit();
+    }
+
+    $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, null);
 
     if ($authenticator->canCreate()) {
         // Create page and apply components (a page_id is generated)

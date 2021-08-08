@@ -1,8 +1,6 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -29,7 +27,14 @@ foreach ([$_SESSION['user'], $ownerId, $pageId] as $val) {
     }
 }
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
+try {
+    $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
 
 if ($authenticator->canModify()) {
     /* Add a list item
@@ -53,10 +58,8 @@ if ($authenticator->canModify()) {
         $listItem->setSequence(1);
 
         \Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
-    }
-    /* Update a list item
-     */
-    elseif ($action == 'updateItem') {
+    } elseif ($action == 'updateItem') {
+        /* Update a list item */
         $listItemId = $_POST['listItemId'];
         $title = $_POST['title'];
         $content = $_POST['content'];
@@ -74,10 +77,8 @@ if ($authenticator->canModify()) {
         $listItem->setContent($url->getUrl());
 
         \Component\Eportfolio\LinkListMapper::getInstance()->save($listItem);
-    }
-    /* Delete a list item
-     */
-    elseif ($action == 'removeItem') {
+    } elseif ($action == 'removeItem') {
+        /* Delete a list item */
         $listItemId = $_GET['listItemId'];
 
         $listItem = \Component\Eportfolio\LinkListMapper::getInstance()->findById($listItemId);

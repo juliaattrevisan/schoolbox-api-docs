@@ -1,8 +1,6 @@
 <?php
 
 /**
- * ${NAME}
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2019, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
@@ -17,9 +15,9 @@ $page->initSession();
 
 /* All these are accessed via get from /my-files (My Files)
  */
-$action = $_GET['action'];
+$action  = $_GET['action'];
 $ownerId = $_GET['userId'];
-$pageId = $_GET['pageId'];
+$pageId  = $_GET['pageId'];
 
 /* All three vars need to exist before you can continue:
  * $_SESSION['user'], $ownerId, $pageId
@@ -30,7 +28,14 @@ foreach ([$_SESSION['user'], $ownerId, $pageId] as $val) {
     }
 }
 
-$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $pageId);
+try {
+    $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+    exit;
+}
+
+$authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $pageId);
 
 if ($authenticator->canModify()) {
     /* Add a list item
@@ -40,10 +45,12 @@ if ($authenticator->canModify()) {
 
         /* Prevent dupe publishings
          */
-        $existing = \Component\Eportfolio\FileListMapper::getInstance()->findByColumnList(array(
-            'page_id' => $pageId,
-            'file_id' => $fileId
-        ));
+        $existing = \Component\Eportfolio\FileListMapper::getInstance()->findByColumnList(
+            [
+                'page_id' => $pageId,
+                'file_id' => $fileId,
+            ]
+        );
 
         /* Publish it if it isn't already published
          */
@@ -58,10 +65,8 @@ if ($authenticator->canModify()) {
 
             \Component\Eportfolio\FileListMapper::getInstance()->save($listItem);
         }
-    }
-    /* Delete a list item
-     */
-    elseif ($action == 'removeItem') {
+    } elseif ($action == 'removeItem') {
+        /* Delete a list item */
         $listItemId = $_GET['listItemId'];
 
         $listItem = \Component\Eportfolio\FileListMapper::getInstance()->findById($listItemId);

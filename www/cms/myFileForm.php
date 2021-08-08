@@ -45,10 +45,10 @@ if (!($groupHandler->isStaff() || $_SESSION['user']->getId() == $user->getId()))
 
 // Upload a new file
 if (isset($_POST['description'])) {
-        /** @var MyFile $file */
-        $file = null;
+    /** @var MyFile $file */
+    $file = null;
 
-        // if we're editing an existing file, ensure the file exists
+    // if we're editing an existing file, ensure the file exists
     if (is_numeric($_POST['fileID'])) {
         $file = MyFileMapper::getInstance()->findById($_POST['fileID']);
     } else {
@@ -93,7 +93,7 @@ if (isset($_POST['description'])) {
     }
 
     // set attributes
-    if (is_null($file->getFilename())) {
+    if (!$file->getFilename()) {
         $file->setFilename($file->getStorage()->getBasename());
     }
 
@@ -108,7 +108,7 @@ if (isset($_POST['description'])) {
         if (!is_numeric($file->getId())) {
             $affectedIds = MyFileMapper::getInstance()->create($file);
         } else {
-            $affectedIds = array($file->getId());
+            $affectedIds = [$file->getId()];
             MyFileMapper::getInstance()->save($file);
         }
 
@@ -118,9 +118,14 @@ if (isset($_POST['description'])) {
             $now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
 
             foreach ($_POST['published'] as $ownerId => $pageIds) {
+                if ($ownerId === $user->getId()) {
+                    $owner = $user;
+                } else {
+                    $owner = \Schoolbox\UserMapper::getInstance()->findById($ownerId);
+                }
                 if (is_array($pageIds) && count($pageIds)) {
                     foreach ($pageIds as $currentPageId => $unused) {
-                        $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $ownerId, $currentPageId);
+                        $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $owner, $currentPageId);
                         if ($authenticator->canModify()) {
                             $publishedFile = new \Component\Eportfolio\FileList();
                             $publishedFile->setPageId($currentPageId);
@@ -148,10 +153,12 @@ if (isset($_POST['description'])) {
                                     /* Try to find an existing record and reuse it, if possible
                                      */
                                     try {
-                                        $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList([
-                                            'component_config_definition_id' => $config->getId(),
-                                            'component_instance_id' => $component->getId()
-                                        ]);
+                                        $configInstance = Component_ConfigMapper::getInstance()->findOneByColumnList(
+                                            [
+                                                'component_config_definition_id' => $config->getId(),
+                                                'component_instance_id'          => $component->getId(),
+                                            ]
+                                        );
                                     } catch (\Schoolbox\Mapper\Exception $e) {
                                         $configInstance = new Component_Config();
                                         $configInstance->setId(null);
@@ -172,10 +179,10 @@ if (isset($_POST['description'])) {
         }
 
         if (isset($_POST['return'])) {
-            SitePage::localRedir($_POST['return'] . '&fileID=' . $fileID);
+            SitePage::localRedir($_POST['return'] . '&fileID=' . $file->getId());
         } elseif ($ajax) {
             http_response_code(201);
-            die(json_encode(array('id' => $affectedIds[0])));
+            die(json_encode(['id' => $affectedIds[0]]));
         } else {
             $page->backToTheFuture(2);
         }
@@ -185,23 +192,24 @@ if (isset($_POST['description'])) {
         header('Content-Type: text/html');
         die($e);
     }
-} // delete a single file
-elseif (is_numeric($_GET['delete'])) {
+} elseif (is_numeric($_GET['delete'])) {
+    // delete a single file
     try {
         $parent = deleteMyFile($_GET['delete']);
     } catch (Schoolbox\Resource\Exception $e) {
         error($e->getCode());
+        exit;
     }
     if (isset($_REQUEST['ajax'])) {
         die(json_encode(['result' => 'success']));
     } else {
         SitePage::localRedir("/my-files/$parent");
     }
-} // delete multiple files
-elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
-    $fileList = array_values(array_filter(explode(',', $_GET['fileList'])));
-    $errorList = array();
-    $parent = 0;
+} elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
+    // delete multiple files
+    $fileList  = array_values(array_filter(explode(',', $_GET['fileList'])));
+    $errorList = [];
+    $parent    = 0;
     if (is_array($fileList) && count($fileList)) {
         foreach ($fileList as $file) {
             try {
@@ -218,12 +226,10 @@ elseif (isset($_GET['fileList']) && is_numeric($_GET['deleteList'])) {
     } else {
         error(2);
     }
-} // relocate a file
-elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
+} elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
     /* Move file from one category to another, after checking permission on both from and to categories
       */
     try {
-        /** @var MyFile $file */
         $file = MyFileMapper::getInstance()->findById($_POST['move']);
 
         if ($file->getOwner()->getId() != $_SESSION['id']) {
@@ -231,7 +237,7 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
         }
         $file->getFolder()->setId($_POST['categoryID']);
         MyFileMapper::getInstance()->save($file);
-    } catch (Schoolbox\Resource\Exception $e) {
+    } catch (\Schoolbox\Mapper\Exception $e) {
         die('Failed');
     }
 }
@@ -239,13 +245,12 @@ elseif (is_numeric($_POST['move']) && is_numeric($_POST['categoryID'])) {
 
 /**
  * @param int $fileId
- * @throws Schoolbox\Resource\Exception
  * @return int
+ * @throws Schoolbox\Resource\Exception
  */
 function deleteMyFile($fileId)
 {
     try {
-        /** @var MyFile $file */
         $file      = MyFileMapper::getInstance()->findById($fileId);
         $ownerId   = $file->getOwner()->getId();
         $sessionId = $_SESSION['user']->getId();
@@ -271,7 +276,6 @@ function deleteMyFile($fileId)
  */
 function outputException(Exception $e, IFile $file, $ajax = false)
 {
-
     // Output errors
     if ($e->getCode() === \Schoolbox\File\Exception::CODE_MIMETYPE_NOT_FOUND) {
         $code = 11;
@@ -287,7 +291,7 @@ function outputException(Exception $e, IFile $file, $ajax = false)
 
     if ($ajax) {
         http_response_code(400);
-        die(json_encode(array('code' => $code, 'error' => $msg)));
+        die(json_encode(['code' => $code, 'error' => $msg]));
     } else {
         error($code, $msg);
     }

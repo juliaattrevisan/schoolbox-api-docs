@@ -317,7 +317,7 @@ class Controller extends Assessment\Controller
 
             /* Eportfolio Showcase - whether to show the "send to showcase" trophy button
              */
-            'canShowcase'            => $student->getEportfolioEnable() && $assessment->isImplementation() && ($this->getUser()->getRole()->isStaff() || $this->getUser()->getId() === $student->getId()),
+            'canShowcase'            => $assessment->isImplementation() && (new \Eportfolio_Authenticator($this->getUser(), $student, 'showcase'))->canModify(),
             /* Whether or not this assessment is showcased on the user's eportfolio
              */
             'isShowcased'            => ShowcaseMapper::getInstance()->isShowcased((int)$assessment->getId(), (int)$student->getId()),

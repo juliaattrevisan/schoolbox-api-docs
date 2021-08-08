@@ -167,7 +167,7 @@ class Controller extends BaseController
      */
     public function getProfile(User $user): void
     {
-        $this->eportfolioAuthenticator = new Eportfolio_Authenticator($this->getUser(), $user->getId(), 'profile');
+        $this->eportfolioAuthenticator = new Eportfolio_Authenticator($this->getUser(), $user, 'profile');
 
         if ($user->getRole()->isStaff()) {
             $this->renderStaff($user);
