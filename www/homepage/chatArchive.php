@@ -222,7 +222,7 @@ if (is_array($items)) {
                 'CHAT_ID' => $chat['id'],
                 'CHAT_TITLE' => $owner,
                 'POSTER' => $owner,
-                'CHAT_USER_SYNERGY_ID' => $chat['synergy_id'],
+                'BLOG_AUTHOR_ID' => $chat['user_id'],
                 'DATETIME' => $chat['time'],
                 'CHAT_BODY' => Scrub::text($chat['body']),
                 'CHAT_DATE' => $postDay,
