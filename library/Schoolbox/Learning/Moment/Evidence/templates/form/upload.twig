@@ -32,6 +32,9 @@
     <label for="evidence-body">
         Description
     </label>
+    {% block formInputBodyMeta %}
+        {{ parent() }}
+    {% endblock formInputBodyMeta %}
     <textarea name="body" id="evidence-body">{{ isCreate ? '' : evidence.body | purify }}</textarea>
 {% endblock formInputBody %}
 
@@ -64,9 +67,9 @@
                         }
                     });
                     dropzoneInstance.on('removedfile', (file) => {
-                        //ensure removing the file that's already in place - as this event could be called when multiple files have been dragged and dropped, 
+                        //ensure removing the file that's already in place - as this event could be called when multiple files have been dragged and dropped,
                         //which in this case would wipe out the existing value when this event is called to remove the other files as only a single file is allowed
-                        if (filenameInput.value === file.name) { 
+                        if (filenameInput.value === file.name) {
                             filenameInput.value = '';
                         }
                     });
