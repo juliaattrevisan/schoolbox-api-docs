@@ -125,9 +125,10 @@ class LearningMomentPhotoCest
      * @throws Exception
      * add a learning moment
      * comment the learning moment
-     * check the comment is presented
+     * delete the comment
+     * check the comment is no longer presented
      */
-    public function testLearningMomentDelete(AcceptanceTester $i)
+    public function testLearningMomentDeleteComment(AcceptanceTester $i)
     {
         $learningMoments = new LearningMoments($i);
         $i->amOnPage($learningMoments->getStudentProfilePage(60));
@@ -151,11 +152,46 @@ class LearningMomentPhotoCest
         $i->waitForText('Well done. This is my first comment in this learning moment!', 2);
         $learningMoments->clickCommentDeleteButton();
         sleep(2);
-        //commenting clickConfirmCommentDeleteButton as I need an id to be added - clicking the third button that appears in the screen
-//        $learningMoments->clickConfirmCommentDeleteButton();
-        $i->click(Locator::elementAt('a.button.submit', 2));
+        //commenting clickConfirmDeleteButton as I need an id to be added - clicking the third button that appears in the screen
+//        $learningMoments->clickConfirmDeleteButton();
+        $i->click(Locator::lastElement('a.button.submit'));
         //checking the text is no longer presented and the count is zero
         $i->cantSee('Well done. This is my first comment in this learning moment!');
         $i->canSee('Comments (0)');
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     * add a learning moment
+     * delete the learning moment
+     * check the learning moment is no longer presented
+     */
+    public function testLearningMomentDelete(AcceptanceTester $i)
+    {
+        $learningMoments = new LearningMoments($i);
+        $i->amOnPage($learningMoments->getStudentProfilePage(29));
+        $learningMoments->clickShareLearningMomentLink();
+        $learningMoments->clickTakeAPhoto();
+        $learningMoments->clickTakeAPhotoEvidence();
+        $learningMoments->deletePhotoEvidence();
+        $learningMoments->confirmDeletePhoto();
+        sleep(2);
+        $learningMoments->clickTakeAPhotoEvidence();
+        $i->fillCkEditorById('evidence-body', 'This is a learning moment test to get deleted');
+        $learningMoments->clickSubmit();
+        //checking the learning moment is presented in the student activity feed
+        $i->waitForText('This is a learning moment test to get deleted');
+        //deleting the learning moment
+        $learningMoments->clickDropdownMenu();
+        $learningMoments->clickLearningMomentDeleteButton();
+        sleep(2);
+        //commenting clickConfirmDeleteButton as I need an id to be added - clicking the third button that appears in the screen
+//        $learningMoments->clickConfirmDeleteButton();
+        $i->click(Locator::lastElement('a.button.submit'));
+        sleep(2);
+        //checking the text is no longer presented and the count is zero
+        $i->cantSee('This is a learning moment test to get deleted');
+        $i->canSeeElement($learningMoments::SHARE_LEARNING_MOMENTS_LINK);
     }
 }

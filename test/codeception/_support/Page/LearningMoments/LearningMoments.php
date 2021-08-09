@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Page\LearningMoments;
@@ -24,12 +25,8 @@ class LearningMoments
     public const COMMENT_SUBMIT_BUTTON = 'a[class=button\ submit]';
     public const DROPDOWN_MENU = 'a.icon-overflow';
     public const COMMENT_DELETE_BUTTON = 'a[title="Delete comment"]';
-    public const COMMENT_CONFIRM_DELETE_BUTTON = 'ul.flex-list.buttons li a.button.submit';
-
-    /**
-     * @var AcceptanceTester
-     */
-    protected $tester;
+    public const COMMENT_CONFIRM_DELETE_BUTTON = 'ID to be added and replaced here';
+    public const LEARNING_MOMENT_DELETE_BUTTON = 'a[title="Delete"]';
 
     /**
      * Constructor
@@ -174,8 +171,17 @@ class LearningMoments
      * click learning moments confirm Delete  button on modal dialog
      * @throws Exception
      */
-    public function clickConfirmCommentDeleteButton(): void
+    public function clickConfirmDeleteButton(): void
     {
         $this->tester->click(self::COMMENT_CONFIRM_DELETE_BUTTON);
+    }
+
+    /**
+     * click learning moment Delete button in the 3-dot menu
+     * @throws Exception
+     */
+    public function clickLearningMomentDeleteButton(): void
+    {
+        $this->tester->click(self::LEARNING_MOMENT_DELETE_BUTTON);
     }
 }
