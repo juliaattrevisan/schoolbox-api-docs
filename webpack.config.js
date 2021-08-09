@@ -9,7 +9,6 @@ module.exports = {
 
             // jQuery
             './node_modules/jquery/dist/jquery.js',
-            './node_modules/jquery-migrate/dist/jquery-migrate.js',
 
             // jQuery Validation
             './node_modules/jquery-validation/dist/jquery.validate.js',
