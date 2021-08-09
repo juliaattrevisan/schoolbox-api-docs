@@ -211,7 +211,8 @@ if (is_numeric($_REQUEST['cid'])) {
                 SitePage::localRedir("/homepage/" . $_GET['cid']);
             }
         }
-        SitePage::localRedir("/homepage/" . $_GET['cid']);
+        $page->outputJson('error: component does not exist', false, 409);
+//        SitePage::localRedir("/homepage/" . $_GET['cid']);
     } // AJAX new column widths
 //    elseif ($_POST['cid'] && is_numeric($_POST['leftColWidth']) && is_numeric($_POST['rightColWidth'])) {
 //        $homepage = new Homepage($_POST['cid']);
