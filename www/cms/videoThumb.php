@@ -9,9 +9,12 @@
  * @link        https://schoolbox.com.au/
  */
 
+use League\Flysystem\Filesystem;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Resource\Storage\S3\Adapter as S3Adapter;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\Video\Factory\Thumbnail as VideoThumbnailFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -85,6 +88,22 @@ if (isset($type, $id)) {
 
             /** @var \League\Flysystem\FilesystemInterface $filesystem */
             $filesystem = $videoQueue->getStorage()->getFilesystem();
+
+            if ($filesystem instanceof Filesystem && $filesystem->getAdapter() instanceof S3Adapter) {
+                $config = $kernel->get('config');
+
+                if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
+                    $preSignedUrlService = new PreSignedUrlService($config);
+
+                    $preSignedUrlDataObject = $preSignedUrlService->generate(
+                        $videoQueue->getStorage(),
+                        Alaress_Date_Format::now()->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+                        $imageFilename
+                    );
+
+                    $preSignedUrlService->download($preSignedUrlDataObject);
+                }
+            }
 
             if ($filesystem->has($imageFilename)) {
                 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
