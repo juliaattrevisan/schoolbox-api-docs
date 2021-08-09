@@ -13,7 +13,7 @@ Data:
 
 {# Convert A-E to a normalised value for gradient colours #}
 {% set studentMarks = {'A': 5, 'B': 4, 'C': 3, 'D': 2, 'E': 1} %}
-{% set normalisedMark = studentMarks[studentMark] / (studentMarks | length) * 100 %}
+{% set normalisedMark = studentMark is null ? '' : studentMarks[studentMark] / (studentMarks | length) * 100 %}
 {% set gradientClass = studentMark is null ? '' : urgency.marks(normalisedMark) ~ '-bg' %}
 {% set graphId = 'nesa-graph' ~ semester %}
 

@@ -126,35 +126,21 @@ class MiddleYearsAssessmentTasks extends BaseComponent
             }
         }
 
-        /* For middle years students, only get assessments that are due in the current semester
-         * We don't need formative data from semester 1 when we are in semester 2
-         */
-        $semester = $this->getAttributes()->getCurriculumSemester();
-
-        foreach ($cohortAssessments as $assessable) {
-            if (!$this->isDueWithinReportWindow($assessable, $semester)) {
-                $cohortAssessments->offsetUnset($assessable->getId());
-            }
-        }
-
         // Does the set include an assessment imported to this class and in which the student is participating?
         $classAssessment = null;
         foreach ($cohortAssessments as $assessment) {
             if (
-                $assessment->isParticipant($this->student) &&
-                (int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()
+                $assessment->isParticipant($this->student)
+                && (int)$assessment->getBaseContext()->getFolder()->getId() === (int)$this->folder->getId()
+                && $this->visibility->isVisibleToUserOrChildOfUser($assessment, $this->getViewer(), true, null, false)
+                && $this->isFeedbackVisibleToUser($assessment)
             ) {
                 $classAssessment = $assessment;
                 break;
             }
         }
-        if (!$classAssessment || !$this->visibility->isVisibleToUserOrChildOfUser($classAssessment, $this->getViewer(), true, null, false)) {
+        if (!$classAssessment) {
             // No assessment found, or found but not visible?
-            return null;
-        }
-
-        // Is grade visibility off for the current viewer?
-        if (!$this->isFeedbackVisibleToUser($classAssessment)) {
             return null;
         }
 
