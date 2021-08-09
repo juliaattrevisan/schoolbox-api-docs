@@ -131,11 +131,14 @@
 
         // Add the user token config.
         // (Maybe only staff should get this, or only if there's more than one user?)
-        $.fn.alaressEditor(
-            $.alaressEditorConfigWithUserTokens({
-                targetElements: $('#' + editorId)
-            })
-        );
+        let baseConfig = {
+            targetElements: $('#' + editorId)
+        };
+        {% if USER.role.staff %}
+            $.fn.alaressEditor($.alaressEditorConfigWithUserTokens(baseConfig));
+        {% else %}
+            $.fn.alaressEditor(baseConfig);
+        {% endif %}
 
         // Update the editor's form input on change
         CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
