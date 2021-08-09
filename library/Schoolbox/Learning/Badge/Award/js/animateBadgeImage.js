@@ -106,18 +106,30 @@ const swingDown = (badgeImage) => {
 }
 
 /**
- * Play a random animation
+ * Create a clone of the badge image to use as the background,
+ * sit it behind the award animation, and spin it slowly
  * 
  * @param { DOMElement }
+ * 
+ * @returns { Timeline }
  */
-export const animateBadgeImage = (badgeImage) => {
-    
+ const animateBackground = (badgeImage) => {
     const badgeImageCopy = badgeImage.cloneNode(true);
     badgeImageCopy.style.position = 'absolute'; //so it doesn't impact the original badge image positioning 
     badgeImageCopy.dataset.isBadgeClone = true; 
     badgeImage.parentNode.insertBefore(badgeImageCopy, badgeImage); //sit behind the original badge image
     const copyAnimation = scaleUpAndRotateSlowly(badgeImageCopy);
     copyAnimation.play();
+}
+
+/**
+ * Play a random animation
+ * 
+ * @param { DOMElement }
+ */
+export const animateBadgeImage = (badgeImage) => {
+    
+    animateBackground(badgeImage);
 
     const animationList = [popUp, coinSpin, flipUp, dropDown, spinIn, swingDown];
     const randomAnimation = animationList[Math.floor(Math.random()*animationList.length)](badgeImage);

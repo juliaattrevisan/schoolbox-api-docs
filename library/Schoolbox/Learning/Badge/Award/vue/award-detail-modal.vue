@@ -105,11 +105,19 @@ export default {
         open (award) {
             this.award = award;
             this.$refs.modal.open();
+            this.checkForBadgeAnimation();
+        },
 
+        /**
+         * check to see whether this is the first time the user has viewed this badge achievement
+         * and if so animate it to add a little sparkle
+         */
+        checkForBadgeAnimation () {
             this.$nextTick(() => {
-                this.animateBadgeImage();
+                if (this.award.viewed_on === null) {
+                    this.animateBadgeImage();
+                }
             });
-            
         },
 
         /**
@@ -135,22 +143,21 @@ export default {
          * Award the achievement
          */
         awardAchievement () {
-            let self = this;
-            self.toastActivate('Awarding...');
-            self.convertToAchievement(self.award)
+            this.toastActivate('Awarding...');
+            this.convertToAchievement(this.award)
                 .then((response) => {
-                    self.toastSuccess('Achievement awarded');
+                    this.toastSuccess('Achievement awarded');
 
                     // Once awarded: update the award within this object
-                    self.award = response.data[0];
+                    this.award = response.data[0];
 
                     // And post a message to the other components that this
                     // user's awards have updated
                     // TODO investigate Vuex state management
-                    self.emitUpdateToAllUserProfileFeeds();
+                    this.emitUpdateToAllUserProfileFeeds();
                 })
                 .catch(() => {
-                    self.toastError('Failed to award achievement')
+                    this.toastError('Failed to award achievement')
                 })
         }
     }
@@ -192,7 +199,6 @@ export default {
 
                 <template v-if="award.badge.curriculumNodes.length">
                     <hr />
-
                     <p class="meta">
                         Curriculum Codes:
                         <template v-for="curriculumNode in award.badge.curriculumNodes">
