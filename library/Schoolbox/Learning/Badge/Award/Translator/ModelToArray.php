@@ -116,7 +116,9 @@ class ModelToArray
             'expiresAt' => $model->getExpiresAt() && !$model->getExpiresAt()->isNull()
                 ? $model->getExpiresAt()->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
                 : null,
-            'viewedOn'  => $model->getViewedOn(),
+            'viewedOn'  => $model->getViewedOn() && !$model->getViewedOn()->isNull()
+                ? $model->getViewedOn()->getUsingFormat(Alaress_Date_Format::DATABASE_DATE_FORMAT)
+                : null,
             '_links'    => call_user_func($this->linkTranslator, $model),
         ];
     }
