@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace Page\LearningMoments;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
+use Exception;
 
 class LearningMoments
 {
@@ -11,11 +13,16 @@ class LearningMoments
     public const URL_STUDENT_ID = '{student_id}';
 
     public const SHARE_LEARNING_MOMENTS_LINK = 'a[title="Share a learning moment"]';
+    public const SHARE_LEARNING_MOMENTS_BUTTON = 'a.learning.icon-share';
     public const TAKE_A_PHOTO_BUTTON = 'a.icon-camera.share-photo';
+    public const TAKE_WRITE_SOMETHING = 'a.icon-textbox.share-text';
     public const TAKE_A_PHOTO_BUTTON_EVIDENCE = 'button.vjs-camera-button.vjs-control.vjs-button.vjs-icon-photo-camera';
     public const DELETE_A_PHOTO = 'a.button.icon-delete.delete-button';
     public const CONFIRM_BUTTON = 'Confirm';
     public const SUBMIT_BUTTON = '#evidence-submit';
+    public const ADD_COMMENT_BUTTON = 'button.btn-show-ckeditor';
+    public const COMMENT_SUBMIT_BUTTON = 'a[class=button\ submit]';
+    public const DROPDOWN_MENU = 'a.icon-overflow';
 
     /**
      * @var AcceptanceTester
@@ -55,11 +62,27 @@ class LearningMoments
     }
 
     /**
+     * click "Share a learning moment" button in the student profile page
+     */
+    public function clickShareLearningMomentButton(): void
+    {
+        $this->tester->click(self::SHARE_LEARNING_MOMENTS_BUTTON);
+    }
+
+    /**
      * click "Take a photo" button on the modal
      */
     public function clickTakeAPhoto(): void
     {
         $this->tester->click(self::TAKE_A_PHOTO_BUTTON);
+    }
+
+    /**
+     * click "Write something" button on the modal
+     */
+    public function clickWriteSomething(): void
+    {
+        $this->tester->click(self::TAKE_WRITE_SOMETHING);
     }
 
     /**
@@ -92,5 +115,47 @@ class LearningMoments
     {
         $this->tester->click(self::SUBMIT_BUTTON);
     }
+    /**
+     * click add a comment
+     */
+    public function clickAddComment(): void
+    {
+        $this->tester->click(self::ADD_COMMENT_BUTTON);
+    }
 
+    /**
+     * typing a comment
+     * @throws Exception
+     */
+    public function typeComment(): void
+    {
+        $this->tester->waitForElementVisible(['css' => 'div#cke_1_contents'], 5);
+        $this->tester->fillCkEditorById('1_contents', 'Well done. This is my first comment in this learning moment!');
+        $this->tester->click('a#cke_11');
+    }
+    /**
+     * click add a comment
+     */
+    public function clickSubmitComment(): void
+    {
+        $this->tester->click(self::COMMENT_SUBMIT_BUTTON);
+    }
+    /**
+     * click the 3-dot dropdown mennu
+     */
+    public function clickDropdownMenu(): void
+    {
+        $this->tester->click(self::DROPDOWN_MENU);
+    }
+
+    /**
+     * click Modify submenu
+     * @throws Exception
+     */
+    public function clickModifySubmenu(): void
+    {
+        $element = Locator::contains('div.actions-small-1 ul li a', 'Modify');
+        $this->tester->waitForElementVisible($element, 5);
+        $this->tester->click($element);
+    }
 }
