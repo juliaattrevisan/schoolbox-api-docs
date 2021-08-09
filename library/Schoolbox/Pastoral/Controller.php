@@ -55,7 +55,7 @@ use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\TokenReplacer\Simple;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -1050,13 +1050,10 @@ class Controller extends Base
             /* Perform token replacements, basically a square bracket phplib
              * that performs a one-way substitution
              */
-            $record->setBodyPublic((new Simple())->replace(trim($post->get('body_public')), [
-                '[firstname]' => $student->getFirstname(),
-                '[surname]' => $student->getLastname(),
-                '[fullname]' => $student->getFullName(),
-                '[year]' => $student->getYear() ? $student->getYear()->getLongName() : '',
-                '[house]' => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : ''
-            ]));
+            $record->setBodyPublic(
+                (new TokenReplacer\Student(new TokenReplacer\Simple()))
+                    ->replace(trim($post->get('body_public')), $student)
+            );
 
             $record->setBodyPrivate(trim($post->get('body_private')));
             $record->setParentCommentsAllowed((bool)$post->get('parent_comments_allowed'));
