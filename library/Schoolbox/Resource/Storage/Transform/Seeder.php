@@ -219,8 +219,8 @@ class Seeder extends App
             $this->getLogger()->info('Running in perform mode (-p): new records will be inserted in the storage_transform table (IF ANY)');
 
             $insertQuery = $this->getDatabaseInternal()->prepareQuery("
-                INSERT INTO `storage_transform` (`hash`, `transform`, `size`)
-                VALUES (:hash_1, :transform_1, :size_1)
+                INSERT INTO `storage_transform` (`hash`, `transform`, `size`, `state`, `updated_at`)
+                VALUES (:hash_1, :transform_1, :size_1, 'done', NOW())
                 ON DUPLICATE KEY UPDATE
                     hash =:hash_2,
                     transform = :transform_2,
