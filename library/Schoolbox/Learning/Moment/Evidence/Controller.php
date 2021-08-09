@@ -22,6 +22,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 
 /**
@@ -257,10 +258,13 @@ class Controller extends Base
         $evidenceCollection = $this->mapper->createCollection();
         $baseModel          = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
             ->setCreator($this->getUser());
+        $tokenReplacer      = new TokenReplacer\Student(new TokenReplacer\Simple());
         foreach ($users as $user) {
-            $evidenceCollection->add(
-                (clone $baseModel)->setRecipient($user)
-            );
+            $evidenceModel = clone $baseModel;
+            $evidenceModel = $evidenceModel
+                ->setRecipient($user)
+                ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
+            $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
         $this->response->content->set(
@@ -328,7 +332,9 @@ class Controller extends Base
         $requestBody       = json_decode(json_encode($this->request->content->get()), true);
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
-        $evidence          = $requestTranslator($requestBody, $evidence);
+        $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
+        $evidence          = $requestTranslator($requestBody, $evidence)
+            ->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
 
         $this->mapper->save($evidence);
 
