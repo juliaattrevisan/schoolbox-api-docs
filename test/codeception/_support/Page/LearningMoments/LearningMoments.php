@@ -23,6 +23,8 @@ class LearningMoments
     public const ADD_COMMENT_BUTTON = 'button.btn-show-ckeditor';
     public const COMMENT_SUBMIT_BUTTON = 'a[class=button\ submit]';
     public const DROPDOWN_MENU = 'a.icon-overflow';
+    public const COMMENT_DELETE_BUTTON = 'a[title="Delete comment"]';
+    public const COMMENT_CONFIRM_DELETE_BUTTON = 'ul.flex-list.buttons li a.button.submit';
 
     /**
      * @var AcceptanceTester
@@ -157,5 +159,23 @@ class LearningMoments
         $element = Locator::contains('div.actions-small-1 ul li a', 'Modify');
         $this->tester->waitForElementVisible($element, 5);
         $this->tester->click($element);
+    }
+
+    /**
+     * click learning moments comment Delete  button
+     * @throws Exception
+     */
+    public function clickCommentDeleteButton(): void
+    {
+        $this->tester->click(self::COMMENT_DELETE_BUTTON);
+    }
+
+    /**
+     * click learning moments confirm Delete  button on modal dialog
+     * @throws Exception
+     */
+    public function clickConfirmCommentDeleteButton(): void
+    {
+        $this->tester->click(self::COMMENT_CONFIRM_DELETE_BUTTON);
     }
 }

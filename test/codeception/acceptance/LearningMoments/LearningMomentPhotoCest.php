@@ -3,8 +3,11 @@
 namespace LearningMoments;
 
 use AcceptanceTester;
+use Codeception\Util\Locator;
 use Exception;
 use Page\LearningMoments\LearningMoments;
+
+use function _HumbugBox243b3a4ed02c\React\Promise\Stream\first;
 
 class LearningMomentPhotoCest
 {
@@ -115,5 +118,44 @@ class LearningMomentPhotoCest
         $learningMoments->clickSubmit();
         //checking the learning moment is presented in the student activity feed updated
         $i->waitForText('This is a learning moments test to be modified updated');
+    }
+
+    /**
+     * @param AcceptanceTester $i
+     * @throws Exception
+     * add a learning moment
+     * comment the learning moment
+     * check the comment is presented
+     */
+    public function testLearningMomentDelete(AcceptanceTester $i)
+    {
+        $learningMoments = new LearningMoments($i);
+        $i->amOnPage($learningMoments->getStudentProfilePage(60));
+        $learningMoments->clickShareLearningMomentLink();
+        $learningMoments->clickTakeAPhoto();
+        $learningMoments->clickTakeAPhotoEvidence();
+        $learningMoments->deletePhotoEvidence();
+        $learningMoments->confirmDeletePhoto();
+        sleep(2);
+        $learningMoments->clickTakeAPhotoEvidence();
+        $i->fillCkEditorById('evidence-body', 'This is a learning moments test to get comments deleted');
+        $learningMoments->clickSubmit();
+        //checking the learning moment is presented in the student activity feed
+        $i->waitForText('This is a learning moments test to get comments deleted');
+        $learningMoments->clickAddComment();
+        $i->waitForElementVisible(['css' => 'div#cke_1_contents'], 5);
+        $learningMoments->typeComment();
+        sleep(2);
+        $learningMoments->clickSubmitComment();
+        //checking the comment is presented
+        $i->waitForText('Well done. This is my first comment in this learning moment!', 2);
+        $learningMoments->clickCommentDeleteButton();
+        sleep(2);
+        //commenting clickConfirmCommentDeleteButton as I need an id to be added - clicking the third button that appears in the screen
+//        $learningMoments->clickConfirmCommentDeleteButton();
+        $i->click(Locator::elementAt('a.button.submit', 2));
+        //checking the text is no longer presented and the count is zero
+        $i->cantSee('Well done. This is my first comment in this learning moment!');
+        $i->canSee('Comments (0)');
     }
 }
