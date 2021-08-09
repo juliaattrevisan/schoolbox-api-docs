@@ -78,10 +78,10 @@
 {% block formJs %}
     {% autoescape 'js' %}
         <script type="text/javascript">
-            let buildValidationRules = function () { //so the child .twig templates can customise 
+            let buildValidationRules = function () { //so the child .twig templates can customise
                 return {};
             }
-            let buildValidationMessages = function () { //so the child .twig templates can customise 
+            let buildValidationMessages = function () { //so the child .twig templates can customise
                 return {};
             }
         </script>
@@ -119,9 +119,14 @@
     $(function () {
 
         let editorId = 'evidence-body';
-        $.fn.alaressEditor({
-            targetElements: $('#' + editorId)
-        });
+
+        // Add the user token config.
+        // (Maybe only staff should get this, or only if there's more than one user?)
+        $.fn.alaressEditor(
+            $.alaressEditorConfigWithUserTokens({
+                targetElements: $('#' + editorId)
+            })
+        );
 
         // Update the editor's form input on change
         CKEDITOR.instances[editorId].on('change', CKEDITOR.instances[editorId].updateElement);
@@ -133,7 +138,7 @@
          */
         const isMediaUploadRequired = () => {
             const momentType = '{{ momentType }}';
-            return (momentType === 'video' || momentType === 'audio' || momentType === 'photo') 
+            return (momentType === 'video' || momentType === 'audio' || momentType === 'photo')
                     && (document.getElementById('file').value === '');
         }
 
@@ -170,7 +175,7 @@
                         toast.toastTimeout({text: 'Save failed', css: 'alert'});
                         submit.prop('disabled', false);
                         isSubmittingForm = false;
-                    }); 
+                    });
 
             }
         }
@@ -179,20 +184,20 @@
             rules: buildValidationRules(),
             messages: buildValidationMessages(),
             submitHandler(form, event) {
-                
+
                 event.preventDefault();
 
                 document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
-                
+
                 if (isMediaUploadRequired()) {
                     document.getElementById('evidence-media-recording').scrollIntoView( { behavior: 'smooth' } ); //uploading can take a while, so scroll up to know that it's processing
-                    document.removeEventListener('evidence-media-recording__onUploadComplete', submitForm); 
+                    document.removeEventListener('evidence-media-recording__onUploadComplete', submitForm);
                     document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form) ); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
                 } else {
                     submitForm(form);
                 }
-                
+
             }
         });
         $('[data-tags]').selectizeSelector({
