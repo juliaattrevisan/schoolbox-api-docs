@@ -115,6 +115,7 @@ export default {
         checkForBadgeAnimation () {
             this.$nextTick(() => {
                 if (this.canAnimateBadgeImage()) {
+                    this.checkBadgeAnimationCleanedUp();
                     this.animateBadgeImage();
                 } else {
                     this.checkBadgeAnimationCleanedUp();
@@ -134,20 +135,9 @@ export default {
         },
 
         /**
-         * animate the badge and notify that it's been viewed so 
-         * it won't be animated again
-         */
-        animateBadgeImage () {
-            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
-            animateBadgeImage(badgeImage);
-            this.award.viewedOn = ''; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
-            axios.post(`/learning/badge/award/${this.award.id}/view`); //to update viewedOn in the backend
-        },
-
-        /**
-         * The badge could have been animated, in which case we'll ensure 
+         * This badge or another could have been animated, in which case we'll ensure 
          * it displays as expected when the user re-opens the modal window after
-         * closing it the first time
+         * closing it the first time.
          */
         checkBadgeAnimationCleanedUp () {
             const badgeImageClone = this.$refs.badgeImage.$el.querySelector('[data-is-badge-clone]');
@@ -156,6 +146,17 @@ export default {
             }
             const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
             badgeImage.style = ''; //gsap applies some style attributes, which should be cleared again
+        },
+
+        /**
+         * animate the badge and notify that it's been viewed so 
+         * it won't be animated again
+         */
+        animateBadgeImage () {
+            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
+            animateBadgeImage(badgeImage);
+            this.award.viewedOn = ''; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
+            axios.post(`/learning/badge/award/${this.award.id}/view`); //to update viewedOn in the backend
         },
 
         /**
