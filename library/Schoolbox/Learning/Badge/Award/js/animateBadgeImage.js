@@ -11,8 +11,8 @@ import { gsap } from 'gsap/all'
 const popUp = (badgeImage) => {
     const popUpTL = gsap.timeline( { paused: true, repeat: 0 } ); 
     popUpTL.set(badgeImage, { scale: 0, transformOrigin: '50% 50%', filter: 'grayscale(100%)' } );
-    popUpTL.to(badgeImage, { duration: 1.2, scale: 1, ease: 'bounce', delay: 0.5 } );
-    popUpTL.to(badgeImage, { duration: 0.2, filter: 'grayscale(0%)' }, '-=0.3');
+    popUpTL.to(badgeImage, { duration: 1.2, scale: 1, ease: 'bounce.out', delay: 0.5 } );
+    popUpTL.to(badgeImage, { duration: 0.3, filter: 'grayscale(0%)' }, '-=80%');
     return popUpTL;
 }
 
@@ -55,8 +55,8 @@ const flipUp = (badgeImage) => {
  */
 const dropDown = (badgeImage) => {
     const dropDownTL = gsap.timeline( { paused: true, repeat: 0 } ); 
-    dropDownTL.set(badgeImage, { y: -500, transformOrigin: '50% 70%', scaleX: 0, filter: 'grayscale(100%)' } );
-    dropDownTL.to(badgeImage, { duration: 1.2, y: 0, scaleX: 1, ease: 'bounce', delay: 0.5 } );
+    dropDownTL.set(badgeImage, { y: -500, transformOrigin: '50% 70%', transformStyle: 'preserve-3d', scaleX: 0, filter: 'grayscale(100%)' } );
+    dropDownTL.to(badgeImage, { duration: 1.2, y: 0, scaleX: 1, transformStyle: 'preserve-3d', ease: 'elastic.out(1, 0.3)', delay: 0.5 } );
     dropDownTL.to(badgeImage, { duration: 0.1, filter: 'grayscale(0%)' }, '-=0.7' );
     return dropDownTL;
 }
@@ -101,7 +101,7 @@ const swingDown = (badgeImage) => {
  const scaleUpAndRotateSlowly = (badgeImage) => {
     const scaleUpAndRotateSlowlyTL = gsap.timeline( { paused: true, repeat: -1 } ); 
     scaleUpAndRotateSlowlyTL.set(badgeImage, { opacity: 0.1, scale: 4 } );
-    scaleUpAndRotateSlowlyTL.to(badgeImage, { rotationZ: 360, y: 0, duration: 10, ease: 'none' } );
+    scaleUpAndRotateSlowlyTL.to(badgeImage, { rotationZ: 360, y: 0, duration: 15, ease: 'none' } );
     return scaleUpAndRotateSlowlyTL;
 }
 
@@ -110,13 +110,11 @@ const swingDown = (badgeImage) => {
  * sit it behind the award animation, and spin it slowly
  * 
  * @param { DOMElement }
- * 
- * @returns { Timeline }
  */
  const animateBackground = (badgeImage) => {
     const badgeImageCopy = badgeImage.cloneNode(true);
     badgeImageCopy.style.position = 'absolute'; //so it doesn't impact the original badge image positioning 
-    badgeImageCopy.dataset.isBadgeClone = true; 
+    badgeImageCopy.dataset.isBadgeClone = true; //so can remove later in #award-detail-modal.vue
     badgeImage.parentNode.insertBefore(badgeImageCopy, badgeImage); //sit behind the original badge image
     const copyAnimation = scaleUpAndRotateSlowly(badgeImageCopy);
     copyAnimation.play();
@@ -127,12 +125,18 @@ const swingDown = (badgeImage) => {
  * 
  * @param { DOMElement }
  */
-export const animateBadgeImage = (badgeImage) => {
-    
-    animateBackground(badgeImage);
-
+ const animateForeground = (badgeImage) => {
     const animationList = [popUp, coinSpin, flipUp, dropDown, spinIn, swingDown];
     const randomAnimation = animationList[Math.floor(Math.random()*animationList.length)](badgeImage);
     randomAnimation.play();
+}
 
+/**
+ * Animate the badge, acheievements should be celebrated a little!
+ * 
+ * @param { DOMElement }
+ */
+export const animateBadgeImage = (badgeImage) => {
+    animateBackground(badgeImage);
+    animateForeground(badgeImage)
 }

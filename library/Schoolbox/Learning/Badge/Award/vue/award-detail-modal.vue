@@ -5,7 +5,7 @@ import RelativeTime from '@schoolboxLearningMomentEvidence/relative-time';
 import RevealModal from '@schoolbox/reveal-modal'
 import toastMixin from '@schoolbox/toast-mixin';
 import userProfileMixin from '../../../vue/user-profile/mixin';
-import moment from "moment";
+import axios from 'axios';
 import { animateBadgeImage } from '../js/animateBadgeImage'
 
 /**
@@ -114,29 +114,48 @@ export default {
          */
         checkForBadgeAnimation () {
             this.$nextTick(() => {
-                if (this.award.viewed_on === null) {
+                if (this.canAnimateBadgeImage()) {
                     this.animateBadgeImage();
+                } else {
+                    this.checkBadgeAnimationCleanedUp();
                 }
             });
         },
 
         /**
-         * animate the badge
+         * To determine whether we should show the animation
+         * 
+         * @returns { Boolean }
+         */
+        canAnimateBadgeImage () {
+            return this.award.viewedOn === null //hasn't been looked at before
+                && this.award.recipient.id === window.schoolboxUser.id //is the awarded user
+                && this.award.isGoal === false; //has been awarded
+        },
+
+        /**
+         * animate the badge and notify that it's been viewed so 
+         * it won't be animated again
          */
         animateBadgeImage () {
+            const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
+            animateBadgeImage(badgeImage);
+            this.award.viewedOn = ''; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
+            axios.post(`/learning/badge/award/${this.award.id}/view`); //to update viewedOn in the backend
+        },
 
-            //retrieve a showBadgeReward property, if true can animate 
-
+        /**
+         * The badge could have been animated, in which case we'll ensure 
+         * it displays as expected when the user re-opens the modal window after
+         * closing it the first time
+         */
+        checkBadgeAnimationCleanedUp () {
             const badgeImageClone = this.$refs.badgeImage.$el.querySelector('[data-is-badge-clone]');
-            if (badgeImageClone) {
+            if (badgeImageClone) { //remove the animated background
                 badgeImageClone.remove();
             }
-
             const badgeImage = this.$refs.badgeImage.$el.querySelector('img');
-            badgeImage.style = '';
-
-            animateBadgeImage(badgeImage);
-
+            badgeImage.style = ''; //gsap applies some style attributes, which should be cleared again
         },
 
         /**
