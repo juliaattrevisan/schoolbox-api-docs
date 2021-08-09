@@ -1053,6 +1053,7 @@ class Controller extends Base
             $record->setBodyPublic((new Simple())->replace(trim($post->get('body_public')), [
                 '[firstname]' => $student->getFirstname(),
                 '[surname]' => $student->getLastname(),
+                '[fullname]' => $student->getFullName(),
                 '[year]' => $student->getYear() ? $student->getYear()->getLongName() : '',
                 '[house]' => $student->getSchoolHouse() ? $student->getSchoolHouse()->getHouse() : ''
             ]));
