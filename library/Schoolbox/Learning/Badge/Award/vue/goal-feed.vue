@@ -73,7 +73,7 @@ export default {
      * kind of like window.onload
      */
     mounted: function () {
-        document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
+        document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.updateAwards());
         this.updateAwards();
     },
 
