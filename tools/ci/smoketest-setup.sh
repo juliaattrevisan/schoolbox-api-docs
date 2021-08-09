@@ -29,6 +29,7 @@ mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql -u root mysql -pPassw0rd!
 mysql schoolbox < $initialdir/data/schoolbox.sql
 mysql schoolbox -e "UPDATE config SET value = REPLACE(value, '/var/lib/schoolbox', '/vagrant/data') WHERE value like '/var/lib/schoolbox%'"
 mysql schoolbox -e "UPDATE user SET password = '*5A552EC460D7C517B5C9EFDBC8F2C762B4D923CB' WHERE username like 'alaress'"
+mysql schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name IN ('boarder_leave_enabled','resource_booking_enabled','push_notifications_enabled','pastoral_enabled','ups_groups_enabled','eotc_enabled','fixtures_enabled');"
 
 
 ## Make directories that will be used by our schoolbox instance
