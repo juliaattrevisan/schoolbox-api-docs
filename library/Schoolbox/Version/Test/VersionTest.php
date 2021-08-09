@@ -17,6 +17,7 @@ use Schoolbox\Version\Version;
  * Tests for checking the version of the running instance
  *
  * @covers \Schoolbox\Version\Version
+ * @codeCoverageIgnore
  */
 class VersionTest extends TestCase
 {
@@ -134,7 +135,7 @@ class VersionTest extends TestCase
             true,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => 'client-hosted',
+                'site_environment' => Version::SITE_ENVIRONMENT_CLIENT_HOSTED,
             ],
         ];
 
@@ -142,7 +143,7 @@ class VersionTest extends TestCase
             false,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => 'cloud-hosted',
+                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SASS,
             ],
         ];
 
@@ -181,7 +182,7 @@ class VersionTest extends TestCase
             true,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => 'cloud-hosted',
+                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SASS,
             ],
         ];
 
@@ -189,7 +190,7 @@ class VersionTest extends TestCase
             false,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => 'client-hosted',
+                'site_environment' => Version::SITE_ENVIRONMENT_CLIENT_HOSTED,
             ],
         ];
 
@@ -224,7 +225,7 @@ class VersionTest extends TestCase
             false,
             [
                 'site_version'     => '21.0.2-1',
-                'site_environment' => 'cloud-hosted',
+                'site_environment' => Version::SITE_ENVIRONMENT_CLOUD_SASS,
             ],
         ];
 
