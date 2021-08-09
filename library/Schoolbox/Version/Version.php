@@ -129,7 +129,7 @@ class Version
          * it looks like someone has already seen and dismissed this upgrade reminder.
          * let's not bombard them anymore until there is a new major version released
          */
-        if ($this->config->get('dismiss_version') == $latestMajorVersion) {
+        if ($this->config->get('dismiss_version') === $latestMajorVersion) {
             return false;
         }
 
