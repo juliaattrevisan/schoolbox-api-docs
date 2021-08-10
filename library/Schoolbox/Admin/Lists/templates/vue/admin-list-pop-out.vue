@@ -6,7 +6,6 @@
  */
 
 import { gsap } from 'gsap/all';
-import axios from 'axios';
 
 export default {
 
@@ -25,10 +24,6 @@ export default {
         },
         isOpen: { //to open and close the list
             type: Boolean,
-            required: true
-        },
-        saveRoute: { //url of entire list save
-            type: String,
             required: true
         },
         saveStatus: { //to update the button text when saving
@@ -78,6 +73,11 @@ export default {
 
     },
 
+    mounted () {
+        this.$emit('on-pop-out-mounted', this.$refs.innerContainer.clientHeight);
+        this.$refs.outerContainer.style.display = 'none';
+    },
+
     methods: {
 
         /**
@@ -86,21 +86,6 @@ export default {
         open () {
             this.$refs.outerContainer.style.display = 'block';
             gsap.to(this.$refs.innerContainer, { right: 0, duration: 0.4 } );
-        },
-
-        /**
-         * Save all the pop out options, currently just using the
-         * existing save all route
-         */
-        onSaveSelected () {
-            this.$emit('on-pop-out-saved');
-        },
-
-        /**
-         * Show the access options
-         */
-        onClosePopOutSelected () {
-            this.$emit('on-pop-out-closed');
         },
 
         /**
@@ -121,7 +106,7 @@ export default {
     <div class="outer-container" ref="outerContainer">
         <div class="inner-container checklist" ref="innerContainer">
             <h4>{{ selectedRow.name }} {{ headerField.caption }}</h4>
-            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="onClosePopOutSelected"></a>
+            <a href="#close-pop-out" class="close-button icon-close" @click.prevent="$emit('on-pop-out-closed')"></a>
             <ul class="option-list" data-option-list>
                 <li v-for="(field, index) in changePopOutFields" :key="index">
                     <input
@@ -132,7 +117,7 @@ export default {
                     <label :for="field.caption">{{ field.caption }}<span v-if="field.tooltip" :class="`hint has-tip tip-${ field.tooltipPosition ? field.tooltipPosition : 'top' }`" data-tooltip :title="field.tooltip">?</span></label>
                 </li>
             </ul>
-            <button @click.prevent="onSaveSelected" class="save-button">{{ saveStatus }}</button>
+            <button @click.prevent="$emit('on-pop-out-saved')" class="save-button">{{ saveStatus }}</button>
         </div>
     </div>
 </template>
@@ -142,14 +127,12 @@ export default {
 @import 'www/static/css/foundation/utils/_variables.scss';
 
 .outer-container {
-    display: none;
     position: absolute;
-    overflow: hidden;
     z-index: 1;
     right: 0px;
     top: 0px;
     width: 320px;
-    height: 100%;
+    min-height: 100%;
 }
 
 .inner-container {
@@ -157,7 +140,6 @@ export default {
     right: -100%;
     top: 0px;
     width: 100%;
-    height: 100%;
     border: 2px solid $form-border-color;
     padding: 1rem;
     background: white;

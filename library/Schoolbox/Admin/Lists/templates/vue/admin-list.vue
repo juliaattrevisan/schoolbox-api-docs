@@ -38,6 +38,7 @@ export default {
             data: null, //contains the loaded data
             rows: [], //to display and possibly edit the rows 
             isPopOutOpen: false, //to open and close the list
+            popOutHeight: 0, //so the popout 
             selectedRow: {}, //to track which row is selected
             saveStatus: 'Save', //to update the button text when saving
             newId: 0, //to add another row to the db, decrement with each new row added,
@@ -143,6 +144,13 @@ export default {
                 });
             }
         }, 
+
+        /**
+         * Ensure there's enough height in the container so the pop out doesn't get cut off
+         */
+        onPopOutMounted (popOutHeight) {
+            this.popOutHeight = popOutHeight;
+        },
 
         /**
          * Show the popout options
@@ -398,7 +406,7 @@ export default {
 
                     <form v-else method="post" action="/adminv2/lists/save" key="list">
 
-                        <section id="listEditor">
+                        <section>
 
                             <div class="list-container">
 
@@ -412,6 +420,7 @@ export default {
                                     name="staggered-fade"
                                     tag="ul"
                                     :class="`information-list ${ data.isSortable ? 'sortable ui-sortable' : 'unsortable'}`"
+                                    :style="{ minHeight: popOutHeight + 'px' }"
                                     v-bind:css="false"
                                     data-sortable 
                                     data-list 
@@ -443,9 +452,9 @@ export default {
                                     :fields="popOutFields" 
                                     :selected-row="selectedRow"
                                     :is-open="isPopOutOpen" 
-                                    :save-route="data.saveRoute" 
                                     :save-status="saveStatus" 
                                     :is-processing="isProcessing" 
+                                    @on-pop-out-mounted="onPopOutMounted"
                                     @on-pop-out-saved="onSaveSelected"
                                     @on-pop-out-closed="onPopOutClosed"
                                 />
