@@ -130,6 +130,8 @@ class DataSource
     }
 
     /**
+     * count and details of pastoral events of a single student that a specified `viewer` is allowed to see
+     *
      * @param User  $viewer
      * @param int   $studentId
      * @param array $typeIds
@@ -147,12 +149,12 @@ class DataSource
         if (!empty($typeIds)) {
             $typeBindings = Builder::getBindings($typeIds, 'typeId');
             $typeWheres[] = "p.type_id IN ({$typeBindings->getPlaceholder()})";
-            $typeParams = $typeBindings->getParams();
+            $typeParams   = $typeBindings->getParams();
         }
         if (!empty($subtypeIds)) {
             $subtypeBindings = Builder::getBindings($subtypeIds, 'subtypeId');
             $typeWheres[]    = "p.subtype_id IN ({$subtypeBindings->getPlaceholder()})";
-            $typeParams = array_merge($subtypeBindings->getParams(), $typeParams);
+            $typeParams      = array_merge($subtypeBindings->getParams(), $typeParams);
         }
 
         $where     = $this->getPermissionClause($viewer, $studentId, null);
@@ -190,7 +192,6 @@ class DataSource
      */
     public function findRecords(User $viewer, int $studentId, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?int $linkedStudentId): GenericCollection
     {
-
         // get records for the student
         $studentRecords = $this->findRawRecords($viewer, $studentId, $typeId, $subtypeId, $offset, $limit, $linkedStudentId, null);
 
@@ -562,8 +563,8 @@ class DataSource
 
     /**
      * Finds a count of linked records grouped by linked student names for a particular student visible to the given viewer
-     * @param User $viewer    Who is viewing this student's records
-     * @param int  $studentId Id of a student being viewed
+     * @param User     $viewer    Who is viewing this student's records
+     * @param int      $studentId Id of a student being viewed
      * @param int|null $typeId
      * @param int|null $subtypeId
      * @return array
@@ -733,7 +734,10 @@ class DataSource
         if ($previous) {
             /** @var \Schoolbox\Pastoral\Attachment\Mapper $pastoralAttachmentMapper */
             $pastoralAttachmentMapper = $this->mapper->getJoinMapper('attachments');
-            [$created, $deleted] = $pastoralAttachmentMapper->diffAttachments($object->getAttachments(), $previous->getAttachments());
+            [
+                $created,
+                $deleted,
+            ] = $pastoralAttachmentMapper->diffAttachments($object->getAttachments(), $previous->getAttachments());
             /** @var \Schoolbox\Pastoral\Attachment\Model $attachment */
             foreach ($created->merge($deleted) as $attachment) {
                 if ($attachment->isPublic() && !isset($diff['attachmentsPublic'])) {

@@ -32,6 +32,7 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Comment\Model as PastoralComment;
+use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
@@ -55,7 +56,7 @@ use Schoolbox\Resource\Search\Results;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
-use Schoolbox\TokenReplacer;
+use Schoolbox\TokenReplacer\Simple;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -254,6 +255,20 @@ class Controller extends Base
     }
 
     /**
+     * return a summary of all pastoral events for a collection of students that
+     * the logged-in user has permission to view
+     *
+     * @param Collection $students
+     */
+    public function getStudentsCount(Collection $students): void
+    {
+        $pastoralCountHelper = new PastoralCountHelper($this->pastoralTypeMapper, $this->pastoralSubTypeMapper, $this->pastoralDataSource);
+        $output              = $pastoralCountHelper->countStudentsEventsByTypes($this->getUser(), $students);
+
+        $this->getResponse()->content->set($this->buildJsonOutput($output));
+    }
+
+    /**
      * Display an individual students pastoral records
      *
      * @param User $student
@@ -273,7 +288,7 @@ class Controller extends Base
         $auditRecord->setUser($user);
         $this->pastoralAuditMapper->save($auditRecord);
 
-        $typeId = is_numeric($get['type']) ? (int)$get['type'] : null;
+        $typeId    = is_numeric($get['type']) ? (int)$get['type'] : null;
         $subtypeId = is_numeric($get['subtype']) ? (int)$get['subtype'] : null;
 
         // Limit the number of pastoral records to display on each page of pastoral records
@@ -580,10 +595,10 @@ class Controller extends Base
          * the General Template should get updated and the easiest way is to simply
          * perform an id lookup
          */
-        $types = $this->pastoralTypeMapper->findAll();
+        $types    = $this->pastoralTypeMapper->findAll();
         $subtypes = $this->pastoralSubTypeMapper->findAll();
 
-        $typesIndex = [];
+        $typesIndex       = [];
         $audienceDefaults = [];
 
         foreach ($types as $type) {
@@ -700,8 +715,8 @@ class Controller extends Base
                 $this->getrouter()->generate(
                     'pastoral.getStudentRecord',
                     [
-                    'studentId' => $post['student_id'],
-                    'recordId'  => $record->getId(),
+                        'studentId' => $post['student_id'],
+                        'recordId'  => $record->getId(),
                     ]
                 ) . $hash
             );
@@ -922,10 +937,10 @@ class Controller extends Base
     /**
      * Create/update student records
      *
-     * @param int           $primaryStudentId    The primary records student ID
-     * @param RequestValues $post                POST parameters passed by the create/update form
-     * @param array         $duplicateStudentIds List of students the primary record should be duplicated on
-     * @param PastoralModel|null $parent         Parent record (if we are updating an existing record)
+     * @param int                $primaryStudentId    The primary records student ID
+     * @param RequestValues      $post                POST parameters passed by the create/update form
+     * @param array              $duplicateStudentIds List of students the primary record should be duplicated on
+     * @param PastoralModel|null $parent              Parent record (if we are updating an existing record)
      *
      * @return void
      * @throws MapperException
@@ -1231,7 +1246,7 @@ class Controller extends Base
         $newAttachments = $this->pastoralAttachmentMapper->createCollection();
 
         foreach ([true, false] as $isPrivate) {
-            $attachzone = $isPrivate ? self::ATTACHZONE_PRIVATE : self::ATTACHZONE_PUBLIC;
+            $attachzone    = $isPrivate ? self::ATTACHZONE_PRIVATE : self::ATTACHZONE_PUBLIC;
             $processedHash = [];
 
             // If there are any new attachments, compare and replace
