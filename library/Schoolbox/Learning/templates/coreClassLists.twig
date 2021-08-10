@@ -40,6 +40,7 @@ Data:
         :email-groups="{{ emailGroups }}"
         return-url-name="{{ returnUrlName }}"
         get-student-lists-endpoint="{{ routeLookup('learning.getStudentListByClassId', {folderId: folder.getId, folder: folder}) }}"
+        get-students-pastoral-counts-url="{{ routeLookup('pastoral.getStudentsCount') }}"
         encoded-return-url="{{ encodedReturnUrl }}"
         get-award-as-achievement-form-endpoint="{{ routeLookup('learningBadgeAward.redirectToAwardAsAchievementForm') }}"
         get-set-as-goal-form-endpoint="{{ routeLookup('learningBadgeAward.redirectToSetAsGoalForm') }}"
