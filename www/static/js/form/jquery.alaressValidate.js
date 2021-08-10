@@ -555,7 +555,7 @@
                 // to avoid accidental multiple requests
                 $(form).find('input[type=submit]').prop("disabled", true).val('Working...');
                 $(form).find('button[type=submit]').prop("disabled", true).text('Working...');
-
+                
                 // ..and submit the form
                 form.submit();
             }
