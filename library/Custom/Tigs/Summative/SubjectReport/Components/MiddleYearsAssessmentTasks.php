@@ -9,9 +9,6 @@ declare(strict_types=1);
 
 namespace Custom\Tigs\Summative\SubjectReport\Components;
 
-use function array_key_exists;
-use function count;
-
 use Custom\Tigs\Summative\StudentAttributes;
 use Custom\Tigs\Summative\SubjectReport\BaseComponent;
 use Schoolbox\GenericCollection;
@@ -24,10 +21,11 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit as UnitSpec;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
+use UnexpectedValueException;
 
 use function sprintf;
-
-use UnexpectedValueException;
+use function array_key_exists;
+use function count;
 
 class MiddleYearsAssessmentTasks extends BaseComponent
 {
