@@ -204,6 +204,9 @@ class Factory
         $controllers = [];
 
         foreach ($this->classmap as $source => $controller) {
+            if ($source === 'usermedia' && $this->mime === "image/*") {
+                continue;
+            }
             try {
                 $controllers[] = $this->build($source);
             } catch (OutOfRangeException $e) {
