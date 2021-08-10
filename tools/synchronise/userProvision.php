@@ -43,6 +43,16 @@ $kernel->registerExceptionCallback($cleanup);
 $kernel->run(
     function (Di\Container $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
 
+        // Ensure tool being run as www-data user
+        $requiredUser = 'www-data';
+        $actualUser   = posix_getpwuid(posix_geteuid())['name'];
+        if ($actualUser !== $requiredUser) {
+            $log->error("Invalid process user. Required '$requiredUser', Actual: '$actualUser'");
+            $i = INSTANCE_ID;
+            $log->error("Maybe try something like:\n\tsu -s /bin/bash -c 'INSTANCE_ID=$i php ./userProvision.php' $requiredUser");
+            exit(2);
+        }
+
         $perform    = isset($opts['perform-update']);
         $roleType   = (isset($opts['r']) && in_array($opts['r'], [ 'staff', 'student', 'parent' ])) ? $opts['r'] : null;
         $instanceId = $opts["instance"] ?? INSTANCE_ID;
