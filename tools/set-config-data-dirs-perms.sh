@@ -22,6 +22,8 @@ readonly ARG_DIR='dir'
 readonly ARG_SKIP_DIR='skip'
 readonly ARG_VERBOSE_SHORT='v'
 readonly ARG_VERBOSE_LONG='verbose'
+readonly MODE_DIR=775
+readonly MODE_DIR_FILES=664
 
 # Global vars and defaults
 declare site_root;
@@ -252,8 +254,11 @@ function update_directories(){
       else
         debug "Retaining current owner and group"
       fi
-      debug "Setting file mode to 755"
-      chmod -R 775 "$dir_path"
+      # TODO Should be 755/644, but need this for www-data to write vagrant-owned dirs/files in dev environment. See IST-1088
+      debug "Setting directory modes to $MODE_DIR"
+      find "$dir_path" -type d -exec chmod -c $MODE_DIR {} +
+      debug "Setting file modes to $MODE_DIR_FILES"
+      find "$dir_path" -type f -exec chmod -c $MODE_DIR_FILES {} +
     fi
   done
 }
