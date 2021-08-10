@@ -134,6 +134,15 @@ export default {
             } } );
         },
 
+        /**
+         * check / uncheck all checkboxes
+         */
+        onSelectAllSelected (event) {
+            this.checkboxFieldList.forEach((field) => {
+                this.selectedRow[field.id] = event.target.checked;
+            });
+        },
+
     }
 
 }
@@ -150,6 +159,7 @@ export default {
                         id="select-all"
                         type="checkbox"
                         :checked="isAllCheckboxesSelected"
+                        @change="onSelectAllSelected"
                     />
                     <label for="select-all">Select All</label>
                 </li>
