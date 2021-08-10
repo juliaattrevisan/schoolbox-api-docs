@@ -9,16 +9,13 @@
 namespace Schoolbox;
 
 use TypeError;
-
-use function class_exists;
-
 use DomainException;
-
-use function is_a;
-
 use ReflectionClass;
 use ReflectionException;
 use UnexpectedValueException;
+
+use function is_a;
+use function class_exists;
 
 /**
  * Class GenericCollection
@@ -31,9 +28,8 @@ use UnexpectedValueException;
  */
 class GenericCollection extends Collection
 {
-    /** @var string|null $elementType What type the elements in this Collection are allowed to be. Class/interface name */
-    private $elementType = null;
-
+    /** @var string $elementType What type the elements in this Collection are allowed to be. Class/interface name */
+    private string $elementType;
 
     /**
      * Constructor
