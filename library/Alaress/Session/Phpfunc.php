@@ -9,7 +9,9 @@
 
 namespace Alaress\Session;
 
+use Alaress\Redis;
 use Predis\ClientInterface;
+use Schoolbox\Auth\Remember;
 use Schoolbox\IConfigLoader;
 
 class Phpfunc extends \Aura\Session\Phpfunc
@@ -57,13 +59,21 @@ class Phpfunc extends \Aura\Session\Phpfunc
             return true;
         }
 
-        if (!($this->config->get('session_remember') && isset($this->cookies['remember']))) {
+        if (!$this->config->get('session_remember')) {
             // no remembery; well, that's too bad then
             return false;
         }
 
         // challenge 'remember me' auth
-        $username = $this->redis->get($this->cookies['remember']);
+        $rememberer = new Remember\Remember(
+            new Remember\Cookie(
+                Remember\Cookie::DEFAULT_COOKIE_NAME,
+                $this->cookies,
+                session_get_cookie_params()
+            ),
+            new Remember\Redis(INSTANCE_ID, Redis::getClientInstance())
+        );
+        $username = $rememberer->retrieveUsername();
 
         if (strlen($username)) {
             // found a redis match; attempt to rebuild that session

@@ -5,6 +5,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Auth\Remember;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Notif\Notif;
@@ -110,23 +111,16 @@ class Session
             session_regenerate_id();
 
             /* Store remember me cookie so user can return in the future */
-
-            if ($remember == true) {
-                $key = sha1(microtime(true) . mt_rand(10000, 90000));
-                $expire = strtotime('+2 month');
-                $cookieParams = session_get_cookie_params();
-                setcookie(
-                    'remember',
-                    $key,
-                    $expire,
-                    $cookieParams['path'],
-                    $cookieParams['domain'],
-                    $cookieParams['secure'],
-                    $cookieParams['httponly']
+            if ($remember) {
+                $rememberer = new Remember\Remember(
+                    new Remember\Cookie(
+                        Remember\Cookie::DEFAULT_COOKIE_NAME,
+                        $_COOKIE,
+                        session_get_cookie_params()
+                    ),
+                    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
                 );
-                $redis = \Alaress\Redis::getClientInstance();
-                $redis->executeCommand($redis->createCommand('set', array($key, $username)));
-                $redis->executeCommand($redis->createCommand('expire', array($key,  ($expire - $_SERVER['REQUEST_TIME']))));
+                $rememberer->rememberUsername($username, Remember\Remember::DEFAULT_EXPIRY);
             }
 
             //register users id

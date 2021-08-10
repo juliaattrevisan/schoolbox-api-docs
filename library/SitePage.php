@@ -5,6 +5,7 @@ use Alaress\Web\Output;
 use Aura\Router\Router;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Auth\Remember;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -320,11 +321,17 @@ class SitePage extends Page
             (($_SESSION['lasttime'] + $this->config->get('session_length')) < time()) || //If session has expired
             ($this->config->get('track_ip') && $_SESSION['ip'] != Session::getIP())  // If IP is not the same
         ) {
-            //Catch users with the remember me cookie
-            if ($this->config->get('session_remember') && isset($_COOKIE['remember']) && $_COOKIE['remember']) {
-                $redis = \Alaress\Redis::getClientInstance();
-                $username = $redis->executeCommand($redis->createCommand('get', array($_COOKIE['remember'])));
-                $sessionHandler->disableLoginLog();
+            // Catch users with the remember me cookie
+            if ($this->config->get('session_remember')) {
+                $rememberer = new Remember\Remember(
+                    new Remember\Cookie(
+                        Remember\Cookie::DEFAULT_COOKIE_NAME,
+                        $_COOKIE,
+                        session_get_cookie_params()
+                    ),
+                    new Remember\Redis(INSTANCE_ID, \Alaress\Redis::getClientInstance())
+                );
+                $username = $rememberer->retrieveUsername();
 
                 if (strlen($username) === 0 || !$sessionHandler->create($username)) {
                     $sessionHandler->destroy();
@@ -494,11 +501,11 @@ class SitePage extends Page
     {
         header('Location: ' . self::conType() . ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST']) . $file, null, $responseCode);
         self::disableXssProtectionAfterForm();
-        // don't quit
         if ($keepProcessing) {
+            // don't quit
             self::keepProcessingInBackground();
-        } // quit
-        else {
+        } else {
+            // quit
             exit;
         }
     }
