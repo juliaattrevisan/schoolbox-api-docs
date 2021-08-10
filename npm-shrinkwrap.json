@@ -21,6 +21,7 @@
         "@fullcalendar/resource-timeline": "^5.9.0",
         "@fullcalendar/timegrid": "^5.9.0",
         "@fullcalendar/vue": "^5.9.0",
+        "@gsap/business": "^3.7.1",
         "@microsoft/immersive-reader-sdk": "^1.1.0",
         "@types/classnames": "^2.2.11",
         "axios": "0.21.1",
@@ -34,7 +35,7 @@
         "dropzone": "5.7.2",
         "filesize": "^6.1.0",
         "flatpickr": "^4.6.3",
-        "gsap": "^3.7.0",
+        "gsap": "npm:@gsap/business@^3.7.1",
         "highcharts": "^9.0.1",
         "highcharts-vue": "^1.3.5",
         "intro.js": "2.8.0-alpha.1",
@@ -1391,6 +1392,12 @@
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.2.0.tgz",
       "integrity": "sha512-gS9GVHRU+RGn5KQM2rllAlR3dU6m7AcpJKdtH8gFvQiC4Otgk98XnmMU+nZenHt/+VhnBPWwgrJsyrdcw6i23w=="
+    },
+    "node_modules/@gsap/business": {
+      "version": "3.7.1",
+      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.7.1.tgz",
+      "integrity": "sha512-xypg0rMMMi5hzyPNFPAIxXRnIw8365AnS5hwnPIlIl/MFw5ZziFL498CgQSMg9dsNnrb1uFR2oHRLofGZ3Cmdw==",
+      "license": "This package should only be used by individuals/companies with an active Business Green Club GreenSock membership. See https://greensock.com/club/. Licensing: https://greensock.com/licensing/"
     },
     "node_modules/@microsoft/immersive-reader-sdk": {
       "version": "1.1.0",
@@ -3741,9 +3748,11 @@
       "dev": true
     },
     "node_modules/gsap": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/gsap/-/gsap-3.7.0.tgz",
-      "integrity": "sha512-8JI7pcFj0pgMzwqChARiHf7EIIZp1QrQBP74M2p2NpQLiAeIhQsrJWIRiwmA2JWkkNe0I2BiQF5ZhJvpyJVJDA=="
+      "name": "@gsap/business",
+      "version": "3.7.1",
+      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.7.1.tgz",
+      "integrity": "sha512-xypg0rMMMi5hzyPNFPAIxXRnIw8365AnS5hwnPIlIl/MFw5ZziFL498CgQSMg9dsNnrb1uFR2oHRLofGZ3Cmdw==",
+      "license": "This package should only be used by individuals/companies with an active Business Green Club GreenSock membership. See https://greensock.com/club/. Licensing: https://greensock.com/licensing/"
     },
     "node_modules/hard-rejection": {
       "version": "2.1.0",
@@ -7648,6 +7657,11 @@
         }
       }
     },
+    "@gsap/business": {
+      "version": "3.7.1",
+      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.7.1.tgz",
+      "integrity": "sha512-xypg0rMMMi5hzyPNFPAIxXRnIw8365AnS5hwnPIlIl/MFw5ZziFL498CgQSMg9dsNnrb1uFR2oHRLofGZ3Cmdw=="
+    },
     "@microsoft/immersive-reader-sdk": {
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/@microsoft/immersive-reader-sdk/-/immersive-reader-sdk-1.1.0.tgz",
@@ -9717,9 +9731,9 @@
       "dev": true
     },
     "gsap": {
-      "version": "3.7.0",
-      "resolved": "https://registry.npmjs.org/gsap/-/gsap-3.7.0.tgz",
-      "integrity": "sha512-8JI7pcFj0pgMzwqChARiHf7EIIZp1QrQBP74M2p2NpQLiAeIhQsrJWIRiwmA2JWkkNe0I2BiQF5ZhJvpyJVJDA=="
+      "version": "npm:@gsap/business@3.7.1",
+      "resolved": "https://npm.greensock.com/@gsap%2fbusiness/-/business-3.7.1.tgz",
+      "integrity": "sha512-xypg0rMMMi5hzyPNFPAIxXRnIw8365AnS5hwnPIlIl/MFw5ZziFL498CgQSMg9dsNnrb1uFR2oHRLofGZ3Cmdw=="
     },
     "hard-rejection": {
       "version": "2.1.0",
