@@ -366,7 +366,7 @@
                     .fail(function() {
                         existing.addClass('failed');
                         // Later on, remove "failed" class
-                        existing.prepend("<div class='alert alert-box'>Couldn't update component.</div>");
+                        existing.prepend("<div class='alert alert-box'>Couldn't update component.<br>Component has been deleted.</div>");
                         formInputs.prop('disabled', false);
                     });
             }
