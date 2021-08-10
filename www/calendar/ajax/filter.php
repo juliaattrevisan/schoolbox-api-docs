@@ -7,22 +7,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+/** @var SitePage $this */
+
 // don't bother trying if filters isn't set
 if (!isset($_POST['filters'])) {
     http_response_code(400);
     die('Not enough data supplied');
 }
 
-// this is just to properly initialise the sessions so changes will take hold
-require_once __DIR__ . '/../../../conf/core/require.php';
-$kernel = new \Schoolbox\Application\WebRequest\Kernel();
-/** @var SitePage $page */
-$page = $kernel->get('sitePage');
-$page->initSession();
-
-$calHandler = new Calendar();
-
-//$response = $calHandler->updateFilters($_POST['fList'], $_POST['view']);
 $_SESSION['calendarFilter'] = [
     'campus'    => [],
     'eventType' => [],
@@ -46,4 +38,7 @@ foreach ($_POST['filters'] as $filterType => $filterValues) {
     }
 }
 
-die('Updated successfully');
+$save = session_write_close();
+$jsonOut = ['msg' => "Updated successfully!", 'cal' => $_SESSION['calendarFilter'], 'save' => $save];
+$this->outputJson($jsonOut, false, 200);
+die();
