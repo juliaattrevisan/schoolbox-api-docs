@@ -84,8 +84,7 @@
         {# If it didn't exist in the Grade Group, it might have been one of the Submission States
          # like Submitted/Absent/Pending etc. so look there as well
          #}
-        {% if studentView is defined and studentView %}
-        {% else %}
+        {% if not (studentView is defined and studentView) %}
         <optgroup label="States">
             {% for state in errors %}
                 {% set selected = '' %}
