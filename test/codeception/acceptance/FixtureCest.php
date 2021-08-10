@@ -26,7 +26,7 @@ class FixtureCest
     public function _before(AcceptanceTester $i)
     {
         exec('cd /vagrant/tools/notif; sudo php /vagrant/test/socket/destroy-rabbit-data.php;');
-        c
+        $i->logout();
         $i->loginAsAdmin();
     }
 
