@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use House;
 use PDOStatement;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\File\Mimetype;
@@ -17,6 +18,7 @@ use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\YearLevel\Model as YearLevel;
 
 /**
  * Mapper for learning moment evidence.
@@ -84,6 +86,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('storage', 'storage')},
                 {$this->getJoinColumnString('storage.allowedFileExtension', 'mimetype')},
                 {$this->getJoinColumnString('recipient', 'recipient')},
+                {$this->getJoinColumnString('recipient.year', 'recipientYear')},
+                {$this->getJoinColumnString('recipient.schoolHouse', 'recipientSchoolHouse')},
                 {$this->getJoinColumnString('creator', 'creator')}
         ";
     }
@@ -101,6 +105,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('storage', '', 'storage')}
             LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'storage', 'mimetype')}
             LEFT JOIN {$this->getJoinSql('recipient', '', 'recipient', true)}
+            LEFT JOIN {$this->getJoinSql('recipient.year', 'recipient', 'recipientYear', true)}
+            LEFT JOIN {$this->getJoinSql('recipient.schoolHouse', 'recipient', 'recipientSchoolHouse', true)}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
         ";
     }
@@ -137,6 +143,19 @@ class Mapper extends BaseMapper
 
             /** @var User|null $recipient */
             $recipient = $this->hydrateJoin($row, 'recipient', 'recipient');
+            if ($recipient) {
+                /** @var YearLevel|null $recipientYear */
+                $recipientYear = $this->hydrateJoin($row, 'recipient.year', 'recipientYear');
+                if ($recipientYear) {
+                    $recipient->setYear($recipientYear);
+                }
+
+                /** @var House|null $recipientSchoolHouse */
+                $recipientSchoolHouse = $this->hydrateJoin($row, 'recipient.schoolHouse', 'recipientSchoolHouse');
+                if ($recipientSchoolHouse) {
+                    $recipient->setSchoolHouse($recipientSchoolHouse);
+                }
+            }
             $model->setRecipient($recipient);
 
             /** @var User|null $creator */

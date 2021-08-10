@@ -10,7 +10,8 @@
 
         {# Setup ckEditor #}
 
-        $.fn.alaressEditor();
+        $.fn.alaressEditor($.alaressEditorConfigWithUserTokens({targetElements: $('#body_public')}));
+        $.fn.alaressEditor({targetElements: $('#body_private')});
 
         {# Pastoral Tag Selectize #}
 

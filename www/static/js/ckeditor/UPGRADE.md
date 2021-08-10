@@ -39,7 +39,7 @@ Restore Schoolbox's CKEditor configuration and styles by reverting the changes
 made to them:
 
 ```
-git restore www/static/javascript/ckeditor/config.js www/static/javascript/ckeditor/styles.js
+git restore www/static/js/ckeditor/config.js www/static/js/ckeditor/styles.js
 ```
 
 ## Update customised plugins (optional)
@@ -55,9 +55,17 @@ Schoolbox contains the following customised plugins:
 
 ## Commit CKEditor build
 
-As with any other code change, the new CKEditor build needs to be committed:
+First, remove the examples and vendor code which the downloaded CKEditor build
+contains:
 
 ```
-git add www/static/javascript/ckeditor/
+rm -rf www/static/js/ckeditor/samples www/static/js/ckeditor/vendor
+```
+
+Then, as with any other code change, the new CKEditor build needs to be
+committed:
+
+```
+git add www/static/js/ckeditor/
 git commit
 ```

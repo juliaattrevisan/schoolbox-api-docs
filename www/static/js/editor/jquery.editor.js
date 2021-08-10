@@ -184,6 +184,33 @@
 
 
     /**
+     * Retrieve a configuration for a CKEditor instance, including user tokens
+     * autocomplete configuration.
+     *
+     * @param {Object|null} [options] Any overrides of the default configuration
+     * @returns {Object}
+     */
+    $.alaressEditorConfigWithUserTokens = function (options) {
+        options = options || {};
+        options.mentions = options.mentions || [];
+        options.mentions.push({
+            feed: [
+                'firstname',
+                'surname',
+                'fullname',
+                'house',
+                'year',
+            ],
+            marker: '[',
+            minChars: 0,
+            itemTemplate: '<li data-id="{id}">{name}]</li>',
+            outputTemplate: '{name}] ',
+        });
+        return init(options);
+    };
+
+
+    /**
      * Unified Editor interface
      *
      * @param options

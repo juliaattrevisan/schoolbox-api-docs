@@ -4,6 +4,9 @@
     <label class="required" for="evidence-body">
         Write something
     </label>
+    {% block formInputBodyMeta %}
+        {{ parent() }}
+    {% endblock formInputBodyMeta %}
     <textarea name="body" id="evidence-body" required>{{ isCreate ? '' : evidence.body }}</textarea>
 {% endblock formInputBody %}
 

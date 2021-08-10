@@ -12,9 +12,9 @@
                     <input type="hidden" name="filename" id="evidence-filename" value="{{ isCreate ? '' : evidence.filename }}" />
                     <input type="hidden" name="file" id="file" value="{{ isCreate ? '' : 'store:' ~ evidence.storage.hash ~ ':' ~ evidence.filename }}" />
                     <div id="evidence-media-recording">
-                        <evidence-media-recording  
+                        <evidence-media-recording
                             moment-type="{{ momentType }}"
-                            {% if isCreate == false %} 
+                            {% if isCreate == false %}
                             :pre-recorded-data="{{ evidence.storage|json_encode }}"
                             {% endif %}
                         />
@@ -30,6 +30,9 @@
     <label for="evidence-body">
         Description
     </label>
+    {% block formInputBodyMeta %}
+        {{ parent() }}
+    {% endblock formInputBodyMeta %}
     <textarea name="body" id="evidence-body">{{ isCreate ? '' : evidence.body | purify }}</textarea>
 {% endblock formInputBody %}
 
